@@ -61,6 +61,7 @@ public:
             { "sellerror",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSellErrorCommand,      "", NULL },
             { "setphaseshift",  SEC_ADMINISTRATOR,  false, &HandleDebugSendSetPhaseShiftCommand,  "", NULL },
             { "spellfail",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSpellFailCommand,      "", NULL },
+            { "catCooldown",      SEC_ADMINISTRATOR,  false, &HandleDebugSendCategoryCooldownCommand,      "", NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                                  "", NULL }
         };
         static ChatCommand debugCommandTable[] =
@@ -218,6 +219,20 @@ public:
 
         handler->GetSession()->SendPacket(&data);
 
+        return true;
+    }
+
+    static bool HandleDebugSendCategoryCooldownCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* result = strtok((char*)args, " ");
+        if (!result)
+            return false;
+
+        uint32 categoryId = (uint32)atoi(result);
+        handler->GetSession()->GetPlayer()->SendCategoryCooldown(categoryId, 900000);
         return true;
     }
 

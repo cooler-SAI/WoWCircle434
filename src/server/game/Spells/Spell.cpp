@@ -4376,19 +4376,23 @@ void Spell::TakePower()
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
     {
         if (powerType == POWER_RAGE || powerType == POWER_ENERGY || powerType == POWER_RUNES)
+        {
             if (uint64 targetGUID = m_targets.GetUnitTargetGUID())
+            {
                 for (std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+                {
                     if (ihit->targetGUID == targetGUID)
                     {
                         if (ihit->missCondition != SPELL_MISS_NONE)
                         {
                             hit = false;
-                            //lower spell cost on fail (by talent aura)
-                            if (Player* modOwner = m_caster->ToPlayer()->GetSpellModOwner())
-                                modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_SPELL_COST_REFUND_ON_FAIL, m_powerCost);
+                            m_powerCost -= CalculatePct(m_powerCost, 80); // Refund 80% of power on fail 4.x
                         }
                         break;
                     }
+                }
+            }
+        }
     }
 
     if (powerType == POWER_RUNES)

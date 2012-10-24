@@ -825,7 +825,7 @@ enum SpellEffects
     SPELL_EFFECT_JUMP_DEST                          = 42,
     SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER         = 43,
     SPELL_EFFECT_SKILL_STEP                         = 44,
-    SPELL_EFFECT_ADD_HONOR                          = 45,
+    SPELL_EFFECT_PLAY_MOVIE                         = 45,
     SPELL_EFFECT_SPAWN                              = 46,
     SPELL_EFFECT_TRADE_SKILL                        = 47,
     SPELL_EFFECT_STEALTH                            = 48,
@@ -945,12 +945,12 @@ enum SpellEffects
     SPELL_EFFECT_TALENT_SPEC_SELECT                 = 162,
     SPELL_EFFECT_163                                = 163, // Unused (4.3.4)
     SPELL_EFFECT_REMOVE_AURA                        = 164,
-    SPELL_EFFECT_165                                = 165,
-    SPELL_EFFECT_166                                = 166,
+    SPELL_EFFECT_DAMAGE_SELF_PCT                    = 165,
+    SPELL_EFFECT_REWARD_CURRENCY                    = 166,
     SPELL_EFFECT_167                                = 167,
-    SPELL_EFFECT_168                                = 168,
-    SPELL_EFFECT_169                                = 169,
-    SPELL_EFFECT_170                                = 170,
+    SPELL_EFFECT_PET_CONTROL                        = 168,
+    SPELL_EFFECT_DESTROY_ITEM                       = 169,
+    SPELL_EFFECT_UPDATE_ZONE_AURA                   = 170,
     SPELL_EFFECT_171                                = 171, // Summons gamebject
     SPELL_EFFECT_172                                = 172, // Aoe ressurection
     SPELL_EFFECT_UNLOCK_GUILD_VAULT_TAB             = 173, // Guild tab unlocked (guild perk)

@@ -122,7 +122,7 @@ enum SpellModOp
     SPELLMOD_VALUE_MULTIPLIER       = 27,
     SPELLMOD_RESIST_DISPEL_CHANCE   = 28,
     SPELLMOD_CRIT_DAMAGE_BONUS_2    = 29, //one not used spell
-    SPELLMOD_SPELL_COST_REFUND_ON_FAIL = 30
+    SPELLMOD_SPELL_COST_REFUND_ON_FAIL = 30 // deprecated 4.x
 };
 
 #define MAX_SPELLMOD 32
@@ -1581,7 +1581,7 @@ class Unit : public WorldObject
         Aura* AddAura(uint32 spellId, Unit* target);
         Aura* AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target);
         void SetAuraStack(uint32 spellId, Unit* target, uint32 stack);
-        void SendPlaySpellVisualKit(uint32 id, uint32 unkParam);
+        void SendPlaySpellVisualKit(uint32 id, uint32 impact);
 
         void DeMorph();
 
