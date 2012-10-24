@@ -1573,6 +1573,44 @@ struct RandomPropertiesPointsEntry
     uint32    UncommonPropertiesPoints[5];                  // 12-16
 };
 
+struct ResearchBranchEntry
+{
+    uint32      ID;                                         // 0
+    char*       name;                                       // 1
+    //uint32    unknown;                                    // 2
+    uint32      currency;                                   // 3
+    //char*     unknown;                                    // 4
+    uint32      specItemId;                                 // 5
+};
+
+struct ResearchPOIPoint
+{                                                           
+    int32       x;                                          // 0
+    int32       y;                                          // 1
+};
+
+struct ResearchProjectEntry
+{
+    uint32      ID;                                         // 0
+    char*       name;                                       // 1
+    char*       description;                                // 2
+    uint32      rare;                                       // 3
+    uint32      branchId;                                   // 4
+    uint32      spellId;                                    // 5
+    //uint32    quality;                                    // 6
+    //char*     unknown;                                    // 7
+    uint32      req_currency;                               // 8
+};
+
+struct ResearchSiteEntry
+{
+    uint32 ID;                                              // 0
+    uint32 mapId;                                           // 1
+    uint32 POIid;                                           // 2
+    char* areaName;                                         // 3
+    //uint32 flags;                                         // 4
+};
+
 struct ScalingStatDistributionEntry
 {
     uint32  Id;                                             // 0
