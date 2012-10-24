@@ -228,6 +228,7 @@ class Group
         bool IsLeader(uint64 guid) const;
         uint64 GetMemberGUID(const std::string& name);
         bool IsAssistant(uint64 guid) const;
+        bool IsGuildGroup(uint32 guildId, bool AllInSameMap = false, bool AllInSameInstanceId = false);
 
         Player* GetInvited(uint64 guid) const;
         Player* GetInvited(const std::string& name) const;
