@@ -1476,6 +1476,8 @@ class Player : public Unit, public GridObject<Player>
         void AddRefundReference(uint32 it);
         void DeleteRefundReference(uint32 it);
 
+        /// modify currency flag
+        void ModifyCurrencyFlag(uint32 id, uint8 flag);
         /// send initialization of new currency for client
         void SendNewCurrency(uint32 id) const;
         /// send full data about all currencies to client

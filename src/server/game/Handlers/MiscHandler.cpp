@@ -2143,3 +2143,12 @@ void WorldSession::SendLoadCUFProfiles()
     data.append(byteBuffer);
     SendPacket(&data);
 }
+
+void WorldSession::HandleChangeCurrencyFlags(WorldPacket& recvPacket)
+{
+    uint32 currencyId, flags;
+    recvPacket >> flags >> currencyId;
+
+    if (GetPlayer())
+        GetPlayer()->ModifyCurrencyFlag(currencyId, uint8(flags));
+}
