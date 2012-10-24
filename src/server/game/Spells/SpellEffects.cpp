@@ -1615,6 +1615,10 @@ void Spell::EffectCreateItem(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
+    if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->IsAbilityOfSkillType(SKILL_ARCHAEOLOGY))
+        if (!m_caster->ToPlayer()->SolveResearchProject(m_spellInfo->Id))
+            return;
+
     DoCreateItem(effIndex, m_spellInfo->Effects[effIndex].ItemType);
     ExecuteLogEffectCreateItem(effIndex, m_spellInfo->Effects[effIndex].ItemType);
 }
@@ -2562,6 +2566,13 @@ void Spell::EffectLearnSkill(SpellEffIndex effIndex)
     uint32 skillid = m_spellInfo->Effects[effIndex].MiscValue;
     uint16 skillval = unitTarget->ToPlayer()->GetPureSkillValue(skillid);
     unitTarget->ToPlayer()->SetSkill(skillid, m_spellInfo->Effects[effIndex].CalcValue(), skillval?skillval:1, damage*75);
+
+    // Archaeology
+    if (skillid == SKILL_ARCHAEOLOGY)
+    {
+        unitTarget->ToPlayer()->GenerateResearchSites();
+        unitTarget->ToPlayer()->GenerateResearchProjects();
+    }
 }
 
 void Spell::EffectAddHonor(SpellEffIndex /*effIndex*/)
@@ -4541,6 +4552,22 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
 
     uint32 go_id = m_spellInfo->Effects[effIndex].MiscValue;
 
+    float o = m_caster->GetOrientation();
+
+    int32 duration = 0;
+    
+    // Archaeology
+    if (m_spellInfo->Id == 80451)
+    {
+
+        uint32 id = m_caster->ToPlayer()->GetSurveyBotEntry(o);
+        if (!id)
+            return;
+
+        go_id = id;
+        duration = 15000;
+    }
+
     uint8 slot = 0;
     switch (m_spellInfo->Effects[effIndex].Effect)
     {
@@ -4580,14 +4607,15 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
 
     Map* map = m_caster->GetMap();
     if (!pGameObj->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), go_id, map,
-        m_caster->GetPhaseMask(), x, y, z, m_caster->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
+        m_caster->GetPhaseMask(), x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 0, GO_STATE_READY))
     {
         delete pGameObj;
         return;
     }
 
     //pGameObj->SetUInt32Value(GAMEOBJECT_LEVEL, m_caster->getLevel());
-    int32 duration = m_spellInfo->GetDuration();
+    if (!duration)
+        duration = m_spellInfo->GetDuration();
     pGameObj->SetRespawnTime(duration > 0 ? duration/IN_MILLISECONDS : 0);
     pGameObj->SetSpellId(m_spellInfo->Id);
     m_caster->AddGameObject(pGameObj);

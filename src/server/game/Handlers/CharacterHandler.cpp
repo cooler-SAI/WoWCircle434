@@ -211,6 +211,10 @@ bool LoginQueryHolder::Initialize()
     stmt->setUInt32(0, lowGuid);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOADCURRENCY, stmt);
 
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_ARCHAEOLOGY);
+    stmt->setUInt32(0, lowGuid);
+    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_ARCHAEOLOGY, stmt);
+
     return res;
 }
 

@@ -924,6 +924,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOADVOIDSTORAGE          = 32,
     PLAYER_LOGIN_QUERY_LOADCURRENCY             = 33,
     PLAYER_LOGIN_QUERY_LOAD_CUF_PROFILES        = 34,
+    PLAYER_LOGIN_QUERY_LOAD_ARCHAEOLOGY         = 35,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -2595,6 +2596,59 @@ class Player : public Unit, public GridObject<Player>
 
         void SendCinematicStart(uint32 CinematicSequenceId);
         void SendMovieStart(uint32 MovieId);
+
+        //-------------------------------------------------
+        // ARCHAEOLOGY SYSTEM
+        //-------------------------------------------------
+        void SaveArchaeology(SQLTransaction& trans);
+        void LoadArchaeology(PreparedQueryResult result);
+        bool HasResearchSite(uint32 id);
+        bool HasResearchProject(uint32 id);
+        void ShowResearchSites();
+        void ShowResearchProjects();
+        void GenerateResearchSites();
+        void GenerateResearchSiteInMap(uint32 mapId);
+        void GenerateResearchProjects();
+        bool SolveResearchProject(uint32 spellId);
+        void UseResearchSite(uint32 id);
+        bool IsPointInZone(const ResearchPOIPoint &test, const std::vector<ResearchPOIPoint> &polygon);
+        uint32 GetResearchSiteID();
+        uint32 GetSurveyBotEntry(float &orientation);
+        bool CanResearchWithLevel(uint32 POIid);
+        uint8 CanResearchWithSkillLevel(uint32 POIid);
+        ResearchSiteEntry const* GetResearchSiteEntryById(uint32 id);
+        bool GenerateDigitLoot(uint32 zoneid, float &x, float &y, float &z, uint32 &loot_id);
+        bool IsCompletedProject(uint32 id);
+
+        struct DigitSite
+        {
+            uint32 site_id;
+            float loot_x;
+            float loot_y;
+            float loot_z;
+            uint32 count;
+            uint32 loot_id;
+
+            void clear()
+            {
+                site_id = 0;
+                loot_x = 0;
+                loot_y = 0;
+                loot_z = 0;
+                loot_id = 0;
+                count = 0;
+            }
+
+            bool empty(){ return !site_id; }
+        };
+
+        DigitSite m_digSites[16];
+        std::set<uint32> m_ResearchSites;
+        std::set<uint32> m_ResearchProjects;
+        std::set<uint32> m_CompletedProjects;
+        bool m_archaeology_changed;
+
+        // END
 
         /*********************************************************/
         /***                 INSTANCE SYSTEM                   ***/

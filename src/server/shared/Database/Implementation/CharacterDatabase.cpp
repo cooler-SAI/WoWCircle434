@@ -590,4 +590,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PREPARE_STATEMENT(CHAR_DEL_GUILD_FINDER_APPLICANT, "DELETE FROM guild_finder_applicant WHERE guildId = ? AND playerGuid = ?", CONNECTION_ASYNC);
     PREPARE_STATEMENT(CHAR_REP_GUILD_FINDER_GUILD_SETTINGS, "REPLACE INTO guild_finder_guild_settings (guildId, availability, classRoles, interests, level, listed, comment) VALUES(?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PREPARE_STATEMENT(CHAR_DEL_GUILD_FINDER_GUILD_SETTINGS, "DELETE FROM guild_finder_guild_settings WHERE guildId = ?", CONNECTION_ASYNC);
+
+    // Archaeology
+    PREPARE_STATEMENT(CHAR_SEL_CHAR_ARCHAEOLOGY, "SELECT sites, counts, projects, completed FROM character_archaeology WHERE guid = ?", CONNECTION_ASYNC);
 }

@@ -366,8 +366,11 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         if (!mover->ToPlayer()->HasActiveSpell(spellId) || spellInfo->IsPassive())
         {
             //cheater? kick? ban?
-            recvPacket.rfinish(); // prevent spam at ignore packet
-            return;
+            if (!spellInfo->IsAbilityOfSkillType(SKILL_ARCHAEOLOGY))
+            {
+                recvPacket.rfinish(); // prevent spam at ignore packet
+                return;
+            }
         }
     }
     else
