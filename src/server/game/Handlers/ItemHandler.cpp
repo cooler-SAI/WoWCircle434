@@ -27,6 +27,7 @@
 #include "UpdateData.h"
 #include "ObjectAccessor.h"
 #include "SpellInfo.h"
+#include "GuildMgr.h"
 #include <vector>
 
 void WorldSession::HandleSplitItemOpcode(WorldPacket& recvData)
@@ -774,6 +775,23 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
                 // Items sold out are not displayed in list
                 if (leftInStock == 0)
                     continue;
+
+                if (GuildReward const* pReward = sGuildMgr->FindGuildReward(itemTemplate->ItemId))
+                {
+                    Guild* pGuild = sGuildMgr->GetGuildByGuid(_player->GetGuildId());
+
+                    if (!pGuild)
+                        continue;
+
+                    if (!(pReward->Racemask & _player->getRaceMask()))
+                        continue;
+
+                    if (_player->GetReputationRank(1168) < ReputationRank(pReward->Standing))
+                        continue;
+
+                    if (!pGuild->GetAchievementMgr().HasAchieved(pReward->AchievementId))
+                        continue;
+                }
             }
 
             int32 price = vendorItem->IsGoldRequired(itemTemplate) ? uint32(floor(itemTemplate->BuyPrice * discountMod)) : 0;

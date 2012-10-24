@@ -54,6 +54,14 @@ public:
     uint32 GetXPForGuildLevel(uint8 level) const;
     std::vector<GuildReward> const& GetGuildRewards() const { return GuildRewards; }
 
+    GuildReward const* FindGuildReward(uint32 item_id)
+    {
+        for (std::vector<GuildReward>::const_iterator itr = GuildRewards.begin(); itr != GuildRewards.end(); ++itr)
+            if (itr->Entry == item_id)
+                return &(*itr);
+        return NULL;
+    }
+
 protected:
     uint32 NextGuildId;
     GuildContainer GuildStore;
