@@ -8802,3 +8802,78 @@ VehicleAccessoryList const* ObjectMgr::GetVehicleAccessoryList(Vehicle* veh) con
         return &itr->second;
     return NULL;
 }
+
+void ObjectMgr::LoadResearchSiteZones()
+{
+    QueryResult result = WorldDatabase.Query("SELECT id, position_x, position_y, map, zone FROM research_site");
+    if (!result)
+    {
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 research site zones. DB table `research_site` is empty.");
+        return;
+    }
+
+    uint32 counter = 0;
+
+    do
+    {
+        Field *fields = result->Fetch();
+
+        ResearchZoneEntry* ptr = new ResearchZoneEntry;
+        ptr->POIid = fields[0].GetUInt32();
+        ptr->x = fields[1].GetInt32();
+        ptr->y = fields[2].GetInt32();
+        ptr->map = fields[3].GetUInt16();
+        ptr->zone = fields[4].GetUInt16();
+        ptr->level = 0;
+
+        for (uint32 i = 0; i < sAreaStore.GetNumRows(); ++i)
+        {
+            AreaTableEntry const* area = sAreaStore.LookupEntry(i);
+            if (!area)
+                continue;
+
+            if (area->mapid == ptr->map && area->zone == ptr->zone)
+            {
+                ptr->level = area->area_level;
+                break;
+            }
+        }
+        mResearchZones.push_back(ptr);
+
+        ++counter;
+    }
+    while (result->NextRow());
+
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u research site zones.", counter);
+}
+
+void ObjectMgr::LoadResearchSiteLoot()
+{
+    QueryResult result = WorldDatabase.Query("SELECT site_id, x, y, z, race FROM research_loot");
+    if (!result)
+    {
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 research loot. DB table `research_loot` is empty.");
+        return;
+    }
+
+    uint32 counter = 0;
+
+    do
+    {
+        Field *fields = result->Fetch();
+
+        ResearchLootEntry* dg = new ResearchLootEntry;
+
+        dg->id = fields[0].GetUInt32();
+        dg->x = fields[1].GetFloat();
+        dg->y = fields[2].GetFloat();
+        dg->z = fields[3].GetFloat();
+        dg->race = fields[4].GetUInt32();
+        mResearchLoot.push_back(dg);
+
+        ++counter;
+    }
+    while (result->NextRow());
+
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u research site loot.", counter);
+}

@@ -586,6 +586,25 @@ struct HotfixInfo
     uint32 Entry;
 };
 
+struct ResearchZoneEntry
+{
+    uint32 POIid;
+    int32 x;
+    int32 y;
+    uint32 map;
+    uint32 zone;
+    uint8 level;
+};
+
+struct ResearchLootEntry
+{
+    uint32 id;
+    float x;
+    float y;
+    float z;
+    uint8 race;
+};
+
 typedef std::vector<HotfixInfo> HotfixData;
 
 class PlayerDumpReader;
@@ -910,6 +929,13 @@ class ObjectMgr
 
         void LoadPhaseDefinitions();
         void LoadSpellPhaseInfo();
+
+        void LoadResearchSiteZones();
+        void LoadResearchSiteLoot();
+        typedef std::vector<ResearchZoneEntry*> ResearchZoneVector;
+        typedef std::vector<ResearchLootEntry*> ResearchLootVector;
+        ResearchZoneVector  mResearchZones;
+        ResearchLootVector mResearchLoot;
 
         PhaseDefinitionStore const* GetPhaseDefinitionStore() { return &_PhaseDefinitionStore; }
         SpellPhaseStore const* GetSpellPhaseStore() { return &_SpellPhaseStore; }
