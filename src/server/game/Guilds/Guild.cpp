@@ -1523,7 +1523,7 @@ void Guild::HandleBuyBankTab(WorldSession* session, uint8 tabId)
         return;
 
     uint32 tabCost = _GetGuildBankTabPrice(tabId) * GOLD;
-    if (!tabCost)
+    if (!tabCost && tabId != 6 && tabId != 7)
         return;
 
     Player* player = session->GetPlayer();

@@ -339,6 +339,7 @@ class Spell
         void EffectRechargeManaGem(SpellEffIndex effIndex);
         void EffectRewardCurrency(SpellEffIndex effIndex);
         void EffectDestroyItem(SpellEffIndex effIndex);
+        void EffectUnlockGuildVaultTab(SpellEffIndex effIndex);
 
         typedef std::set<Aura*> UsedSpellMods;
 

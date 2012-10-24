@@ -241,7 +241,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectNULL,                                     //170 SPELL_EFFECT_UPDATE_ZONE_AURA
     &Spell::EffectNULL,                                     //171 SPELL_EFFECT_171
     &Spell::EffectNULL,                                     //172 SPELL_EFFECT_172
-    &Spell::EffectNULL,                                     //173 SPELL_EFFECT_173
+    &Spell::EffectUnlockGuildVaultTab,                      //173 SPELL_EFFECT_UNLOCK_GUILD_VAULT_TAB
     &Spell::EffectNULL,                                     //174 SPELL_EFFECT_174
     &Spell::EffectUnused,                                   //175 SPELL_EFFECT_175  unused
     &Spell::EffectNULL,                                     //176 SPELL_EFFECT_176
@@ -6113,5 +6113,48 @@ void Spell::EffectDestroyItem(SpellEffIndex effIndex)
     uint32 count = uint32(m_spellInfo->Effects[effIndex].BasePoints);
 
     unitTarget->ToPlayer()->DestroyItemCount(itemId, count, true);
+}
+
+void Spell::EffectUnlockGuildVaultTab(SpellEffIndex effIndex)
+{
+    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    uint32 tabId = 0;
+
+    switch (m_spellInfo->Id)
+    {
+        case 89145: tabId = 6; break;
+        case 89146: tabId = 7; break;
+        default: return;
+    }
+
+    Player* pPlayer = m_caster->ToPlayer();
+
+    if (!pPlayer->GetGuildId())
+        return;
+
+    if (Guild* pGuild = sGuildMgr->GetGuildById(pPlayer->GetGuildId()))
+    {
+        // Only guildleader can create guild bank tabs
+        if (pPlayer->GetGUID() != pGuild->GetLeaderGUID())
+            return;
+
+        // Check for guild achievements
+        switch (m_spellInfo->Id)
+        {
+            case 89145:
+                if (!pGuild->GetAchievementMgr().HasAchieved(4943))
+                    return;
+                break;
+            case 89146:
+                if (!pGuild->GetAchievementMgr().HasAchieved(5152) &&
+                    !pGuild->GetAchievementMgr().HasAchieved(5158))
+                    return;
+                break;
+        }
+
+        pGuild->HandleBuyBankTab(pPlayer->GetSession(), tabId);
+    }
 }
 
