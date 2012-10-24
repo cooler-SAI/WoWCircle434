@@ -7302,7 +7302,7 @@ void Player::SendNewCurrency(uint32 id) const
     uint32 weekCap = _GetCurrencyWeekCap(entry) / precision;
 
     packet.WriteBit(weekCount);
-    packet.WriteBits(0, 4); // some flags
+    packet.WriteBits(itr->second.flags, 4);
     packet.WriteBit(weekCap);
     packet.WriteBit(0);     // season total earned
 
@@ -7325,8 +7325,10 @@ void Player::SendNewCurrency(uint32 id) const
 void Player::SendCurrencies() const
 {
     ByteBuffer currencyData;
-    WorldPacket packet(SMSG_INIT_CURRENCY, 4 + _currencyStorage.size()*(5*4 + 1));
-    packet.WriteBits(_currencyStorage.size(), 23);
+
+    int32 size = int32(_currencyStorage.size());
+    WorldPacket packet(SMSG_INIT_CURRENCY, 4 + (1 + 4*4) * size);
+    packet.WriteBits(size, 23);
 
     for (PlayerCurrenciesMap::const_iterator itr = _currencyStorage.begin(); itr != _currencyStorage.end(); ++itr)
     {
@@ -7339,7 +7341,7 @@ void Player::SendCurrencies() const
         uint32 weekCap = _GetCurrencyWeekCap(entry) / precision;
 
         packet.WriteBit(weekCount);
-        packet.WriteBits(0, 4); // some flags
+        packet.WriteBits(itr->second.flags, 4);
         packet.WriteBit(weekCap);
         packet.WriteBit(0);     // season total earned
 
@@ -7393,6 +7395,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
         cur.state = PLAYERCURRENCY_NEW;
         cur.totalCount = 0;
         cur.weekCount = 0;
+        cur.flags = 0;
         _currencyStorage[id] = cur;
         itr = _currencyStorage.find(id);
     }
@@ -7454,7 +7457,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
                 return;
             }
 
-            WorldPacket packet(SMSG_UPDATE_CURRENCY, 12);
+            WorldPacket packet(SMSG_UPDATE_CURRENCY, 4 + (weekCap != 0) ? 4 : 0);
 
             packet.WriteBit(weekCap != 0);
             packet.WriteBit(0); // hasSeasonCount
@@ -7480,12 +7483,13 @@ void Player::SetCurrency(uint32 id, uint32 count, bool printLog /*= true*/)
 uint32 Player::_GetCurrencyWeekCap(const CurrencyTypesEntry* currency) const
 {
    uint32 cap = currency->WeekCap;
+   uint32 precision = (currency->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1;
    switch (currency->ID)
    {
        case CURRENCY_TYPE_CONQUEST_POINTS:
        {
            // TODO: implement
-           cap = 0;
+           cap = 1500 * precision;
            break;
        }
        case CURRENCY_TYPE_HONOR_POINTS:
@@ -7507,7 +7511,7 @@ uint32 Player::_GetCurrencyWeekCap(const CurrencyTypesEntry* currency) const
    if (cap != currency->WeekCap && IsInWorld() && !GetSession()->PlayerLoading())
    {
        WorldPacket packet(SMSG_UPDATE_CURRENCY_WEEK_LIMIT, 8);
-       packet << uint32(cap / ((currency->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1));
+       packet << uint32(cap / precision);
        packet << uint32(currency->ID);
        GetSession()->SendPacket(&packet);
    }

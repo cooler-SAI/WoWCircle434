@@ -6090,12 +6090,13 @@ void Spell::EffectRewardCurrency(SpellEffIndex effIndex)
     Player* player = unitTarget->ToPlayer();
 
     uint32 currencyId = m_spellInfo->Effects[effIndex].MiscValue;
-    CurrencyTypesEntry const* entry = sCurrencyTypesStore.LookupEntry(currencyId);
-    if (!entry)
+    if (!sCurrencyTypesStore.LookupEntry(currencyId))
+    {
+        sLog->outError(LogFilterType::LOG_FILTER_SPELLS_AURAS, "EffectRewardCurrency: spell (id: %u) has wrong currency id (id: %u)", m_spellInfo->Id, currencyId);
         return;
+    }
 
-    uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1;
-    int32 amount = int32(float(m_spellInfo->Effects[effIndex].BasePoints) / precision);
+    int32 amount = m_spellInfo->Effects[effIndex].BasePoints;
 
     player->ModifyCurrency(currencyId, amount);
 }
