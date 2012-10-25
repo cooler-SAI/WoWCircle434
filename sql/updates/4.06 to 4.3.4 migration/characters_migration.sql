@@ -152,6 +152,7 @@ ALTER TABLE `characters`
 	ADD COLUMN `talentTree` VARCHAR(10) NOT NULL DEFAULT '0 0' AFTER `resettalents_time`,
 	ADD COLUMN `grantableLevels` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `actionBars`,
 	ADD COLUMN `guildId` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `grantableLevels`,
+	CHANGE COLUMN `map` `map` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Map Identifier' AFTER `position_z`,
 	DROP COLUMN `power6`,
 	DROP COLUMN `power7`,
 	DROP COLUMN `power8`,
@@ -383,7 +384,7 @@ DECLARE lstr TEXT DEFAULT '';
 DECLARE rstr TEXT DEFAULT '';
 DECLARE newstr TEXT DEFAULT '';
 DECLARE done INT DEFAULT 0;
-DECLARE cur CURSOR FOR SELECT `characters`.`item_instance`.`guid`, `characters`.`item_instance`.`enchantments` FROM  `characters`.`item_instance`;
+DECLARE cur CURSOR FOR SELECT `item_instance`.`guid`, `item_instance`.`enchantments` FROM  `item_instance`;
 DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET done = 1; 
 OPEN cur; 
 WHILE done = 0 DO
@@ -391,7 +392,7 @@ FETCH cur INTO guid, enchant;
 SET lstr = SUBSTRING_INDEX(enchant, ' ', 24);
 SET rstr = SUBSTRING_INDEX(enchant, ' ', -19);
 SET newstr = CONCAT_WS(' ', lstr, '0', '0', '0', rstr);
-UPDATE `characters`.`item_instance` SET `characters`.`item_instance`.`enchantments`=newstr WHERE `characters`.`item_instance`.`guid`=guid;  
+UPDATE `item_instance` SET `item_instance`.`enchantments`=newstr WHERE `item_instance`.`guid`=guid;  
 END WHILE;
 CLOSE cur;
 END;
