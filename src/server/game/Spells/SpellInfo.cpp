@@ -549,6 +549,15 @@ uint32 SpellEffectInfo::GetProvidedTargetMask() const
     return GetTargetFlagMask(TargetA.GetObjectType()) | GetTargetFlagMask(TargetB.GetObjectType());
 }
 
+void SpellEffectInfo::SetRadiusIndex(uint32 index)
+{
+    SpellRadiusEntry const* radiusIndex = sSpellRadiusStore.LookupEntry(index);
+    if (!radiusIndex)
+        return;
+
+    RadiusEntry = radiusIndex;
+}
+
 uint32 SpellEffectInfo::GetMissingTargetMask(bool srcSet /*= false*/, bool dstSet /*= false*/, uint32 mask /*=0*/) const
 {
     uint32 effImplicitTargetMask = GetTargetFlagMask(GetUsedTargetObjectType());
@@ -2691,6 +2700,33 @@ SpellCooldownsEntry const* SpellInfo::GetSpellCooldowns() const
     return SpellCooldownsId ? sSpellCooldownsStore.LookupEntry(SpellCooldownsId) : NULL;
 }
 
+void SpellInfo::SetDurationIndex(uint32 index)
+{
+    SpellDurationEntry const* durationIndex = sSpellDurationStore.LookupEntry(index);
+    if (!durationIndex)
+        return;
+
+    DurationEntry = durationIndex;
+}
+
+void SpellInfo::SetRangeIndex(uint32 index)
+{
+    SpellRangeEntry const* rangeIndex = sSpellRangeStore.LookupEntry(index);
+    if (!rangeIndex)
+        return;
+
+    RangeEntry = rangeIndex;
+}
+
+void SpellInfo::SetCastTimeIndex(uint32 index)
+{
+    SpellCastTimesEntry const* castTimeIndex = sSpellCastTimesStore.LookupEntry(index);
+    if (!castTimeIndex)
+        return;
+
+    CastTimeEntry = castTimeIndex;
+}
+
 void SpellInfo::_UnloadImplicitTargetConditionLists()
 {
     // find the same instances of ConditionList and delete them.
@@ -2707,3 +2743,5 @@ void SpellInfo::_UnloadImplicitTargetConditionLists()
         delete cur;
     }
 }
+
+

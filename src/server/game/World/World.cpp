@@ -1292,23 +1292,23 @@ void World::SetInitialWorldSettings()
     LoadDB2Stores(m_dataPath);
     DetectDBCLang();
 
-    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Research Site Zones...");
-    sObjectMgr->LoadResearchSiteZones();
-
-    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Research Site Loot...");
-    sObjectMgr->LoadResearchSiteLoot();
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading SpellInfo store...");
+    sSpellMgr->LoadSpellInfoStore();
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading spell dbc data corrections...");
     sSpellMgr->LoadDbcDataCorrections();
-
-    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading SpellInfo store...");
-    sSpellMgr->LoadSpellInfoStore();
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading SkillLineAbilityMultiMap Data...");
     sSpellMgr->LoadSkillLineAbilityMap();
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading spell custom attributes...");
     sSpellMgr->LoadSpellCustomAttr();
+
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Research Site Zones...");
+    sObjectMgr->LoadResearchSiteZones();
+
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Research Site Loot...");
+    sObjectMgr->LoadResearchSiteLoot();
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading GameObject models...");
     LoadGameObjectModelList();
