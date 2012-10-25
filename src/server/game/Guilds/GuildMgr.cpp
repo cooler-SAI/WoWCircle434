@@ -124,7 +124,10 @@ void GuildMgr::ResetExperienceCaps()
 
 void GuildMgr::ResetReputationCaps()
 {
-    /// @TODO: Implement
+    CharacterDatabase.Execute(CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_RESET_WEEKLY_REPUTATION));
+
+    for (GuildContainer::iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
+        itr->second->ResetWeeklyReputation();
 }
 
 void GuildMgr::LoadGuilds()
@@ -218,8 +221,8 @@ void GuildMgr::LoadGuilds()
                                                      "BankResetTimeTab3, BankRemSlotsTab3, BankResetTimeTab4, BankRemSlotsTab4, BankResetTimeTab5, BankRemSlotsTab5, "
                                                      //   19                 20                21                 22
                                                      "BankResetTimeTab6, BankRemSlotsTab6, BankResetTimeTab7, BankRemSlotsTab7, "
-                                                     //   23      24       25       26      27         28
-                                                     "c.name, c.level, c.class, c.zone, c.account, c.logout_time "
+                                                     //   23      24       25       26      27         28           29
+                                                     "c.name, c.level, c.class, c.zone, c.account, c.logout_time, week_rep "
                                                      "FROM guild_member gm LEFT JOIN characters c ON c.guid = gm.guid ORDER BY guildid ASC");
 
         if (!result)

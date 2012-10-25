@@ -359,7 +359,21 @@ private:
 
         inline Player* FindPlayer() const { return ObjectAccessor::FindPlayer(m_guid); }
 
-        uint32 GetRemainingWeeklyReputation() const { return 0; }
+        uint32 GetWeeklyReputation() const { return m_week_rep; }
+        void SetWeeklyReputation(uint32 val) { m_week_rep = val; }
+        
+        void SetGuildReputation(uint32 rep)
+        {
+            if (Player* plr = FindPlayer())
+                return plr->SetReputation(1168, rep);
+        }
+
+        uint32 GetGuildReputation()
+        {
+            if (Player* plr = FindPlayer())
+                return plr->GetReputation(1168);
+            return 0;
+        }
 
     private:
         uint32 m_guildId;
@@ -375,6 +389,7 @@ private:
         uint32 m_rankId;
         std::string m_publicNote;
         std::string m_officerNote;
+        uint32 m_week_rep;
 
         RemainingValue m_bankRemaining[GUILD_BANK_MAX_TABS + 1];
     };
@@ -784,7 +799,9 @@ public:
     uint64 GetExperience() const { return _experience; }
     uint64 GetTodayExperience() const { return _todayExperience; }
     void ResetDailyExperience();
+    void ResetWeeklyReputation();
     GuildNewsLog& GetNewsLog() { return _newsLog; }
+    void GainReputationForXP(uint32 rep, Player* player);
 
     EmblemInfo const& GetEmblemInfo() const { return m_emblemInfo; }
 

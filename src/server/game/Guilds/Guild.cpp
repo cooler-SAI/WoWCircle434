@@ -602,6 +602,8 @@ bool Guild::Member::LoadFromDB(Field* fields)
              fields[26].GetUInt16(),                        // characters.zone
              fields[27].GetUInt32());                       // characters.account
     m_logoutTime    = fields[28].GetUInt32();               // characters.logout_time
+    
+    SetWeeklyReputation(fields[29].GetUInt32());
 
     if (!CheckStats())
         return false;
@@ -1120,6 +1122,9 @@ bool Guild::Create(Player* pLeader, const std::string& name)
     trans->Append(stmt);
 
     CharacterDatabase.CommitTransaction(trans);
+    
+    pLeader->SetReputation(1168, 1);
+    
     // Create default ranks
     _CreateDefaultGuildRanks(pLeaderSession->GetSessionDbLocaleIndex());
     // Add guildmaster
@@ -1259,7 +1264,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         memberData << uint32(player ? player->GetZoneId() : member->GetZone());
         memberData << uint64(0);                                    // Total activity
         memberData.WriteByteSeq(guid[7]);
-        memberData << uint32(member->GetRemainingWeeklyReputation());// Remaining guild week Rep
+        memberData << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP) - member->GetWeeklyReputation());// Remaining guild week Rep
 
         if (pubNoteLength)
             memberData.WriteString(member->GetPublicNote());
@@ -1658,6 +1663,7 @@ void Guild::HandleAcceptMember(WorldSession* session)
     {
         _LogEvent(GUILD_EVENT_LOG_JOIN_GUILD, player->GetGUIDLow());
         _BroadcastEvent(GE_JOINED, player->GetGUID(), player->GetName());
+        player->SetReputation(1168, 1);
         sGuildFinderMgr->RemoveMembershipRequest(player->GetGUIDLow(), GUID_LOPART(this->GetGUID()));
     }
 }
@@ -2155,7 +2161,7 @@ void Guild::SendGuildReputationWeeklyCap(WorldSession* session) const
     if (Member const* member = GetMember(session->GetPlayer()->GetGUID()))
     {
         WorldPacket data(SMSG_GUILD_REPUTATION_WEEKLY_CAP, 4);
-        data << uint32(member->GetRemainingWeeklyReputation());
+        data << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP) - member->GetWeeklyReputation());
         session->SendPacket(&data);
     }
 }
@@ -3170,12 +3176,37 @@ void Guild::SendGuildRanksUpdate(uint64 setterGuid, uint64 targetGuid, uint32 ra
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_GUILD_RANKS_UPDATE");
 }
 
+void Guild::GainReputationForXP(uint32 rep, Player* player)
+{
+    if (Guild::Member* pMember = GetMember(player->GetGUID()))
+    {
+        uint32 weekrep = pMember->GetWeeklyReputation();
+        uint32 currep = pMember->GetGuildReputation();
+        uint32 weekcap = sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP);
+
+        if (weekrep >= weekcap)
+            return;
+
+        if (weekrep + rep > weekcap)
+            rep = weekcap - weekrep;
+
+        weekrep += rep;
+
+        pMember->SetWeeklyReputation(weekrep);
+        pMember->SetGuildReputation(currep + rep);
+
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_WEEKLY_REPUTATION);
+        stmt->setUInt32(0, pMember->GetWeeklyReputation());
+        stmt->setUInt32(1, m_id);
+        stmt->setUInt32(2, GUID_LOPART(pMember->GetGUID()));
+        CharacterDatabase.Execute(stmt);
+    }
+}
+
 void Guild::GiveXP(uint32 xp, Player* source)
 {
     if (!sWorld->getBoolConfig(CONFIG_GUILD_LEVELING_ENABLED))
         return;
-
-    /// @TODO: Award reputation and count activity for player
 
     if (GetLevel() >= sWorld->getIntConfig(CONFIG_GUILD_MAX_LEVEL))
         xp = 0; // SMSG_GUILD_XP_GAIN is always sent, even for no gains
@@ -3187,11 +3218,11 @@ void Guild::GiveXP(uint32 xp, Player* source)
     data << uint64(xp);
     source->GetSession()->SendPacket(&data);
 
-    _experience += xp;
-    _todayExperience += xp;
-
     if (!xp)
         return;
+
+    _experience += xp;
+    _todayExperience += xp;
 
     uint32 oldLevel = GetLevel();
 
@@ -3244,6 +3275,17 @@ void Guild::ResetDailyExperience()
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
         if (Player* player = itr->second->FindPlayer())
             SendGuildXP(player->GetSession());
+}
+
+void Guild::ResetWeeklyReputation()
+{
+    for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+        if (Guild::Member* pMember = itr->second)
+        {
+            pMember->SetWeeklyReputation(0);
+            if (Player* pPlayer = pMember->FindPlayer())
+                SendGuildReputationWeeklyCap(pPlayer->GetSession()); 
+        }
 }
 
 void Guild::GuildNewsLog::AddNewEvent(GuildNews eventType, time_t date, uint64 playerGuid, uint32 flags, uint32 data)
