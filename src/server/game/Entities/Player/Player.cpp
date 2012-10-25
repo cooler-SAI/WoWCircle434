@@ -3120,6 +3120,9 @@ void Player::GiveLevel(uint8 level)
     if (level == oldLevel)
         return;
 
+    if (Guild* pGuild = sGuildMgr->GetGuildById(this->GetGuildId()))
+        pGuild->UpdateMemberData(this, GUILD_MEMBER_DATA_LEVEL, level);
+
     PlayerLevelInfo info;
     sObjectMgr->GetPlayerLevelInfo(getRace(), getClass(), level, &info);
 
@@ -7423,6 +7426,9 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
 
     if (m_zoneUpdateId != newZone)
     {
+        if (Guild* pGuild = sGuildMgr->GetGuildById(GetGuildId()))
+            pGuild->UpdateMemberData(this, GUILD_MEMBER_DATA_ZONEID, newZone);
+
         sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
         sOutdoorPvPMgr->HandlePlayerEnterZone(this, newZone);
         sBattlefieldMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);

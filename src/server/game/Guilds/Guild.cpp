@@ -519,6 +519,62 @@ void Guild::Member::SetStats(Player* player)
     m_class     = player->getClass();
     m_zoneId    = player->GetZoneId();
     m_accountId = player->GetSession()->GetAccountId();
+
+    m_achievementPoints = player->GetAchievementMgr().GetAchievementPoints();
+
+    uint8 count_prof = 0;
+    uint32 prev_skill = 0;
+    for (PlayerSpellMap::const_iterator spellIter = player->GetSpellMap().begin(); spellIter != player->GetSpellMap().end(); ++spellIter)
+    {
+        if (count_prof >= 2)
+            break;
+
+        const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellIter->first);
+        if (!spellInfo)
+            continue;
+
+        if (spellInfo->IsPrimaryProfession())
+        {
+            uint32 skill = 0;
+            uint32 value = 0;
+            uint32 rank = 0;
+
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            {
+                if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SKILL)
+                {
+                    skill = uint32(spellInfo->Effects[i].MiscValue);
+                    break;
+                }
+            }
+
+            if (prev_skill == skill)
+                continue;
+
+            value = player->GetSkillValue(skill);
+            rank = sSpellMgr->GetSpellRank(spellIter->first);
+
+            SetProfession(count_prof, value, skill, rank);
+
+            prev_skill = skill;
+            count_prof++;
+        }
+    }
+
+    if (count_prof < 2)
+        for (uint8 i = 0; i < (2 - count_prof); i++)
+            SetProfession(count_prof + i, 0, 0, 0);
+
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_MEMBER_PROFESSIONS);
+    stmt->setUInt32(0, m_professions[0].level);
+    stmt->setUInt32(1, m_professions[0].skillID);
+    stmt->setUInt32(2, m_professions[0].rank);
+    stmt->setUInt32(3, m_professions[1].level);
+    stmt->setUInt32(4, m_professions[1].skillID);
+    stmt->setUInt32(5, m_professions[1].rank);
+    stmt->setUInt32(6, m_guildId);
+    stmt->setUInt32(7, GUID_LOPART(m_guid));
+    CharacterDatabase.Execute(stmt);
 }
 
 void Guild::Member::SetStats(const std::string& name, uint8 level, uint8 _class, uint32 zoneId, uint32 accountId)
@@ -528,6 +584,9 @@ void Guild::Member::SetStats(const std::string& name, uint8 level, uint8 _class,
     m_class     = _class;
     m_zoneId    = zoneId;
     m_accountId = accountId;
+
+    for (uint8 i = 0; i < 2; ++i)
+        SetProfession(i, 0, 0, 0);
 }
 
 void Guild::Member::SetPublicNote(const std::string& publicNote)
@@ -605,6 +664,12 @@ bool Guild::Member::LoadFromDB(Field* fields)
     
     SetWeeklyReputation(fields[29].GetUInt32());
 
+    SetAchievementPoints(fields[30].GetUInt32());
+    sLog->outError(LOG_FILTER_SERVER_LOADING, "ach %u", this->GetAchievementPoints());
+    SetProfession(0, fields[31].GetUInt32(), fields[32].GetUInt32(), fields[33].GetUInt32());
+    SetProfession(1, fields[34].GetUInt32(), fields[35].GetUInt32(), fields[36].GetUInt32());
+    sLog->outError(LOG_FILTER_SERVER_LOADING, "prof1 %u, %u, %u", m_professions[0].level, m_professions[0].rank, m_professions[0].skillID);
+    sLog->outError(LOG_FILTER_SERVER_LOADING, "prof2 %u, %u, %u", m_professions[1].level, m_professions[1].rank, m_professions[1].skillID);
     if (!CheckStats())
         return false;
 
@@ -685,6 +750,16 @@ uint32 Guild::Member::GetBankRemainingValue(uint8 tabId, const Guild* guild) con
         CharacterDatabase.Execute(stmt);
     }
     return m_bankRemaining[tabId].value;
+}
+
+void Guild::Member::SetAchievementPoints(uint32 val)
+{
+    m_achievementPoints = val;
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_MEMBER_ACHIEVEMENTS);
+    stmt->setUInt64(0, m_achievementPoints);
+    stmt->setUInt32(1, m_guildId);
+    stmt->setUInt32(2, GUID_LOPART(GetGUID()));
+    CharacterDatabase.Execute(stmt);
 }
 
 inline void Guild::Member::ResetTabTimes()
@@ -1208,11 +1283,30 @@ void Guild::SaveToDB()
     CharacterDatabase.CommitTransaction(trans);
 }
 
+void Guild::UpdateMemberData(Player* pPlayer, uint8 dataid, uint32 value)
+{
+    if (Member* pMember = GetMember(pPlayer->GetGUID()))
+    {
+        switch(dataid)
+        {
+            case GUILD_MEMBER_DATA_ZONEID:
+                pMember->SetZoneID(value);
+                break;
+            case GUILD_MEMBER_DATA_ACHIEVEMENT_POINTS:
+                pMember->SetAchievementPoints(value);
+                break;
+            case GUILD_MEMBER_DATA_LEVEL:
+                pMember->SetLevel(value);
+                break;
+        }
+    }
+}
+
 void Guild::HandleRoster(WorldSession* session /*= NULL*/)
 {
     ByteBuffer memberData(100);
     // Guess size
-    WorldPacket data(SMSG_GUILD_ROSTER, 100);
+    WorldPacket data(SMSG_GUILD_ROSTER, 200);
     data.WriteBits(m_motd.length(), 11);
     data.WriteBits(m_members.size(), 18);
 
@@ -1253,11 +1347,10 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         memberData.WriteByteSeq(guid[0]);
         memberData << uint64(0);                                    // weekly activity
         memberData << uint32(member->GetRankId());
-        memberData << uint32(0);                                    // player->GetAchievementMgr().GetCompletedAchievementsAmount()
+        memberData << uint32(member->GetAchievementPoints());                                    // player->GetAchievementMgr().GetCompletedAchievementsAmount()
 
-        // for (2 professions)
-        memberData << uint32(0) << uint32(0) << uint32(0);
-        memberData << uint32(0) << uint32(0) << uint32(0);
+        memberData << uint32(member->m_professions[0].rank) << uint32(member->m_professions[0].level) << uint32(member->m_professions[0].skillID);
+        memberData << uint32(member->m_professions[1].rank) << uint32(member->m_professions[1].level) << uint32(member->m_professions[1].skillID);
 
         memberData.WriteByteSeq(guid[2]);
         memberData << uint8(flags);

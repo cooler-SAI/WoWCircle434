@@ -901,6 +901,8 @@ void AchievementMgr<T>::SendAchievementEarned(AchievementEntry const* achievemen
         Trinity::AchievementChatBuilder say_builder(*GetOwner(), CHAT_MSG_GUILD_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
         Trinity::LocalizedPacketDo<Trinity::AchievementChatBuilder> say_do(say_builder);
         guild->BroadcastWorker(say_do);
+            
+        guild->UpdateMemberData(GetOwner(), GUILD_MEMBER_DATA_ACHIEVEMENT_POINTS, GetAchievementPoints());
     }
 
     if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_KILL | ACHIEVEMENT_FLAG_REALM_FIRST_REACH))

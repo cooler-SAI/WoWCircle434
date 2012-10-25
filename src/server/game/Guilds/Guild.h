@@ -227,6 +227,13 @@ enum GuildMemberFlags
     GUILDMEMBER_STATUS_MOBILE    = 0x0008, // remote chat from mobile app
 };
 
+enum GuildMemberData
+{
+    GUILD_MEMBER_DATA_ZONEID                = 0,
+    GUILD_MEMBER_DATA_ACHIEVEMENT_POINTS    = 1,
+    GUILD_MEMBER_DATA_LEVEL                 = 2,
+};
+
 enum GuildNews
 {
     GUILD_NEWS_GUILD_ACHIEVEMENT      = 0,
@@ -319,6 +326,13 @@ private:
             uint32 resetTime;
         };
 
+        struct Profession
+        {
+            uint32 skillID;
+            uint32 rank;
+            uint32 level;
+        };
+
     public:
         Member(uint32 guildId, uint64 guid, uint32 rankId) : m_guildId(guildId), m_guid(guid), m_logoutTime(::time(NULL)), m_rankId(rankId) { }
 
@@ -375,6 +389,20 @@ private:
             return 0;
         }
 
+        void SetZoneID(uint32 id) { m_zoneId = id; }
+        void SetLevel(uint8 var) { m_level = var; }
+        void SetAchievementPoints(uint32 val);
+        uint32 GetAchievementPoints() { return m_achievementPoints; }
+
+        Profession m_professions[2];
+
+        void SetProfession(uint32 num, uint32 level, uint32 skill, uint32 rank)
+        {
+            m_professions[num].level = level;
+            m_professions[num].skillID = skill;
+            m_professions[num].rank = rank;
+        }
+
     private:
         uint32 m_guildId;
         // Fields from characters table
@@ -390,6 +418,7 @@ private:
         std::string m_publicNote;
         std::string m_officerNote;
         uint32 m_week_rep;
+        uint32 m_achievementPoints;
 
         RemainingValue m_bankRemaining[GUILD_BANK_MAX_TABS + 1];
     };
@@ -782,6 +811,7 @@ public:
     bool ChangeMemberRank(uint64 guid, uint8 newRank);
     bool IsMember(uint64 guid);
     uint32 GetMembersCount() { return m_members.size(); }
+    void UpdateMemberData(Player* pPlayer, uint8 dataid, uint32 value);
 
     // Bank
     void SwapItems(Player* player, uint8 tabId, uint8 slotId, uint8 destTabId, uint8 destSlotId, uint32 splitedAmount);

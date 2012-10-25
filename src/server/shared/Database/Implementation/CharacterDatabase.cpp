@@ -245,6 +245,8 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PREPARE_STATEMENT(CHAR_UPD_GUILD_WEEKLY_REPUTATION, "UPDATE guild_member SET week_rep = ? WHERE guildid = ? AND guid = ?", CONNECTION_ASYNC);
     PREPARE_STATEMENT(CHAR_LOAD_GUILD_NEWS, "SELECT id, eventType, playerGuid, data, flags, date FROM guild_news_log WHERE guild = ? ORDER BY guild ASC, id ASC", CONNECTION_SYNCH);
     PREPARE_STATEMENT(CHAR_SAVE_GUILD_NEWS, "INSERT INTO guild_news_log (guild, id, eventType, playerGuid, data, flags, date) VALUES (?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PREPARE_STATEMENT(CHAR_UPD_GUILD_MEMBER_ACHIEVEMENTS, "UPDATE guild_member SET achievementPoints = ? WHERE guildid = ? and guid = ?", CONNECTION_ASYNC);
+    PREPARE_STATEMENT(CHAR_UPD_GUILD_MEMBER_PROFESSIONS, "UPDATE guild_member SET FirstProffLevel = ?, FirstProffSkill = ?, FirstProffRank = ?, SecondProffLevel = ?, SecondProffSkill = ?, SecondProffRank = ? WHERE guildid = ? AND guid = ?", CONNECTION_ASYNC);
 
     // Chat channel handling
     PREPARE_STATEMENT(CHAR_SEL_CHANNEL, "SELECT announce, ownership, password, bannedList FROM channels WHERE name = ? AND team = ?", CONNECTION_SYNCH)
