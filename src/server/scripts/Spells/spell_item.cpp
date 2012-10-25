@@ -2017,6 +2017,60 @@ public:
     }
 };
 
+class spell_item_cauldron_of_battle : public SpellScriptLoader
+{
+    public:
+        spell_item_cauldron_of_battle() : SpellScriptLoader("spell_item_cauldron_of_battle") { }
+
+        class spell_item_cauldron_of_battle_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_item_cauldron_of_battle_SpellScript);
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                if (GetCaster())
+                    GetCaster()->CastSpell(GetCaster(), 92635, true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_item_cauldron_of_battle_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_item_cauldron_of_battle_SpellScript();
+        }
+};
+
+class spell_item_big_cauldron_of_battle : public SpellScriptLoader
+{
+    public:
+        spell_item_big_cauldron_of_battle() : SpellScriptLoader("spell_item_big_cauldron_of_battle") { }
+
+        class spell_item_big_cauldron_of_battle_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_item_big_cauldron_of_battle_SpellScript);
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                if (GetCaster())
+                    GetCaster()->CastSpell(GetCaster(), 92652, true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_item_big_cauldron_of_battle_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_item_big_cauldron_of_battle_SpellScript();
+        }
+};
+
 void AddSC_item_spell_scripts()
 {
     // 23074 Arcanite Dragonling
@@ -2069,4 +2123,6 @@ void AddSC_item_spell_scripts()
     new spell_item_chicken_cover();
     new spell_item_muisek_vessel();
     new spell_item_greatmothers_soulcatcher();
+    new spell_item_cauldron_of_battle();
+    new spell_item_big_cauldron_of_battle();
 }
