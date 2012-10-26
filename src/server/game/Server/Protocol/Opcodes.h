@@ -788,7 +788,6 @@ enum Opcodes
     SMSG_CHAT_WRONG_FACTION                           = 0x6724,
     SMSG_CHECK_FOR_BOTS                               = 0x0000,
     SMSG_CLEAR_BOSS_EMOTES                            = 0x19A3,
-    SMSG_CLEAR_COOLDOWN                               = 0x0000,
     SMSG_CLEAR_COOLDOWNS                              = 0x59B4,
     SMSG_CLEAR_FAR_SIGHT_IMMEDIATE                    = 0x2A04,
     SMSG_CLEAR_TARGET                                 = 0x4B26,

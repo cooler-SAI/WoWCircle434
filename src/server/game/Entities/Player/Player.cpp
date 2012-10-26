@@ -4363,8 +4363,34 @@ void Player::RemoveAllSpellCooldown()
 {
     if (!m_spellCooldowns.empty())
     {
+        ObjectGuid guid = GetGUID();
+        WorldPacket data(SMSG_CLEAR_COOLDOWNS, 1 + 8 + m_spellCooldowns.size() * 4);
+        data.WriteBit(guid[1]);
+        data.WriteBit(guid[3]);
+        data.WriteBit(guid[6]);
+
+        data.WriteBits(m_spellCooldowns.size(), 24);      // cooldown count
+
+        data.WriteBit(guid[7]);
+        data.WriteBit(guid[5]);
+        data.WriteBit(guid[2]);
+        data.WriteBit(guid[4]);
+        data.WriteBit(guid[0]);
+
+        data.WriteByteSeq(guid[7]);
+        data.WriteByteSeq(guid[2]);
+        data.WriteByteSeq(guid[4]);
+        data.WriteByteSeq(guid[5]);
+        data.WriteByteSeq(guid[1]);
+        data.WriteByteSeq(guid[3]);
+
         for (SpellCooldowns::const_iterator itr = m_spellCooldowns.begin(); itr != m_spellCooldowns.end(); ++itr)
-            SendClearCooldown(itr->first, this);
+            data << uint32(itr->first);
+
+        data.WriteByteSeq(guid[0]);
+        data.WriteByteSeq(guid[6]);
+
+        SendDirectMessage(&data);
 
         m_spellCooldowns.clear();
     }
@@ -25035,9 +25061,31 @@ void Player::RemoveAtLoginFlag(AtLoginFlags flags, bool persist /*= false*/)
 
 void Player::SendClearCooldown(uint32 spell_id, Unit* target)
 {
-    WorldPacket data(SMSG_CLEAR_COOLDOWN, 4+8);
+    ObjectGuid guid = target->GetGUID();
+    WorldPacket data(SMSG_CLEAR_COOLDOWNS, 1 + 8 + 4);
+    data.WriteBit(guid[1]);
+    data.WriteBit(guid[3]);
+    data.WriteBit(guid[6]);
+
+    data.WriteBits(1, 24);      // cooldown count
+
+    data.WriteBit(guid[7]);
+    data.WriteBit(guid[5]);
+    data.WriteBit(guid[2]);
+    data.WriteBit(guid[4]);
+    data.WriteBit(guid[0]);
+
+    data.WriteByteSeq(guid[7]);
+    data.WriteByteSeq(guid[2]);
+    data.WriteByteSeq(guid[4]);
+    data.WriteByteSeq(guid[5]);
+    data.WriteByteSeq(guid[1]);
+    data.WriteByteSeq(guid[3]);
+
     data << uint32(spell_id);
-    data << uint64(target->GetGUID());
+
+    data.WriteByteSeq(guid[0]);
+    data.WriteByteSeq(guid[6]);
     SendDirectMessage(&data);
 }
 
