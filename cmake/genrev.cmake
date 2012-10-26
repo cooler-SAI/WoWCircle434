@@ -1,4 +1,4 @@
-# Copyright (C) 2008-2012 Trinity <http://www.trinitycore.org/>
+# Copyright (C) 2008-2010 Trinity <http://www.trinitycore.org/>
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -8,62 +8,46 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-include(${CMAKE_SOURCE_DIR}/cmake/macros/EnsureVersion.cmake)
-
-set(_REQUIRED_GIT_VERSION "1.7")
-
-find_program(_GIT_EXEC
+find_program(_HG_EXEC
   NAMES
-    git git.cmd
+    hg
   HINTS
     ENV PATH
-  DOC "git installation path"
+  DOC "hg installation path"
 )
 
-if(_GIT_EXEC)
+if(_HG_EXEC)
   execute_process(
-    COMMAND "${_GIT_EXEC}" --version
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    OUTPUT_VARIABLE _GIT_VERSION
-    ERROR_QUIET
-  )
-
-  # make sure we're using minimum the required version of git, so the "dirty-testing" will work properly
-  ensure_version( "${_REQUIRED_GIT_VERSION}" "${_GIT_VERSION}" _GIT_VERSION_OK)
-endif()
-
-if(_GIT_VERSION_OK)
-  execute_process(
-    COMMAND "${_GIT_EXEC}" describe --match init --dirty=+ --abbrev=12
+    COMMAND "${_HG_EXEC}" log -l 1
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     OUTPUT_VARIABLE rev_info
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    ERROR_QUIET
-  )
-  execute_process(
-    COMMAND "${_GIT_EXEC}" show -s --format=%ci
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    OUTPUT_VARIABLE rev_date
     OUTPUT_STRIP_TRAILING_WHITESPACE
     ERROR_QUIET
   )
 else()
   message("")
   message(STATUS "WARNING - Missing or outdated git - did you forget to install a recent version?")
-  message(STATUS "WARNING - Observe that for revision hash/date to work you need at least version ${_REQUIRED_GIT_VERSION}")
+  message(STATUS "WARNING - Observe that for revision ID/hash to work you need at least version ${_REQUIRED_GIT_VERSION}")
+  message(STATUS "WARNING - Continuing anyway, but setting the revision-ID and hash to Rev:0 Hash: Archive")
+  message("")
 endif()
 
 # Last minute check - ensure that we have a proper revision
 # If everything above fails (means the user has erased the git revision control directory or removed the origin/HEAD tag)
 if(NOT rev_info)
   # No valid ways available to find/set the revision/hash, so let's force some defaults
-  message(STATUS "WARNING - Missing repository tags - you may need to pull tags with git fetch -t")
-  message(STATUS "WARNING - Continuing anyway - note that the versionstring will be set to 0000-00-00 00:00:00 (Archived)")
-  set(rev_date "0000-00-00 00:00:00 +0000")
-  set(rev_hash "Archived")
+  set(rev_id_str "0")
+  set(rev_id "0")
 else()
-  # Extract information required to build a proper versionstring
-  string(REGEX REPLACE init-|[0-9]+-g "" rev_hash ${rev_info})
+  # Extract revision and hash from git
+  string(REGEX REPLACE changeset:\t[^0-9]+: "" rev_id_str ${rev_info})
+  set(rev_hash  ${rev_id_str})
+  string(REGEX REPLACE date:\t[^0-9]+: "" rev_date ${rev_info})
+  string(REGEX MATCH [A-Z].*\n rev_date ${rev_date})  
+  string(REGEX REPLACE \n "" rev_date ${rev_date})  
+  string(REGEX MATCH [0-9]+:[0-9a-z]*  rev_hash ${rev_hash})  
+  string(REGEX MATCH [0-9]+  rev_id_str ${rev_id_str})
+  string(REGEX REPLACE [+]+ "" rev_id ${rev_id_str})
 endif()
 
 # Its not set during initial run
@@ -72,11 +56,11 @@ if(NOT BUILDDIR)
 endif()
 
 # Create the actual revision.h file from the above params
-if(NOT "${rev_hash_cached}" MATCHES "${rev_hash}")
+if(NOT "${rev_id_cached}" MATCHES "${rev_id_str}")
   configure_file(
     "${CMAKE_SOURCE_DIR}/revision.h.in.cmake"
     "${BUILDDIR}/revision.h"
     @ONLY
   )
-  set(rev_hash_cached "${rev_hash}" CACHE INTERNAL "Cached commit-hash")
+  set(rev_id_cached "${rev_id_str}" CACHE INTERNAL "Cached revision ID")
 endif()
