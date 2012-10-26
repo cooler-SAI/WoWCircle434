@@ -18308,6 +18308,20 @@ bool Player::Satisfy(AccessRequirement const* ar, uint32 target_map, bool report
             if (!leader || !leader->HasAchieved(ar->achievement))
                 missingAchievement = ar->achievement;
 
+        uint32 missingLeaderAchievement = 0;
+        if (ar->leader_achievement)
+        {
+            if (GetGroup())
+            {
+                if (Player* pLeader = ObjectAccessor::FindPlayer(GetGroup()->GetLeaderGUID()))
+                    if (!pLeader->HasAchieved(ar->leader_achievement))
+                        missingLeaderAchievement = ar->leader_achievement;
+            }
+            else
+                if (!HasAchieved(ar->leader_achievement))
+                    missingLeaderAchievement = ar->leader_achievement;
+        }
+
         Difficulty target_difficulty = GetDifficulty(mapEntry->IsRaid());
         MapDifficulty const* mapDiff = GetDownscaledMapDifficultyData(target_map, target_difficulty);
         if (LevelMin || LevelMax || missingItem || missingQuest || missingAchievement)
