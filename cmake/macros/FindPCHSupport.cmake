@@ -283,6 +283,9 @@ MACRO(ADD_NATIVE_PRECOMPILED_HEADER _targetName _input)
 
     SET(newProperties "${oldProps} /Yu\"${_input}.h\" /FI\"${_input}.h\"")
     SET_TARGET_PROPERTIES(${_targetName} PROPERTIES COMPILE_FLAGS "${newProperties}")
+	
+	# enable edit and continue if PCH is handled properly and we are building in debug
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")
 
     #also inlude ${oldProps} to have the same compile options
     SET_SOURCE_FILES_PROPERTIES(${_input}.cpp PROPERTIES COMPILE_FLAGS "${oldProps} /Yc\"${_input}.h\"")
