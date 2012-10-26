@@ -479,6 +479,7 @@ class Spell
         Unit* GetOriginalCaster() const { return m_originalCaster; }
         SpellInfo const* GetSpellInfo() const { return m_spellInfo; }
         int32 GetPowerCost() const { return m_powerCost; }
+        bool costWasModified() const { return m_costModified; }
 
         void UpdatePointers();                              // must be used at call Spell code after time delay (non triggered spell cast/update spell call/etc)
 
@@ -510,6 +511,7 @@ class Spell
         bool m_canReflect;                                  // can reflect this spell?
         bool m_autoRepeat;
         uint8 m_runesState;
+        bool m_costModified;
 
         uint8 m_delayAtDamageCount;
         bool isDelayableNoMore()

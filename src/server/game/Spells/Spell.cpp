@@ -4401,6 +4401,26 @@ void Spell::TakePower()
         return;
     }
 
+    if (m_spellInfo->PowerType == POWER_HOLY_POWER)
+    {
+        // Divine Purpose
+        if (m_caster->HasAura(90174))
+        {
+            m_powerCost = 3;
+            m_costModified = true;
+            if (hit && m_spellInfo->Id != 85696 && m_spellInfo->Id != 85673) // Zealotry & Divine Purpose
+                m_caster->RemoveAurasDueToSpell(90174);
+            return;
+        }
+        else if (hit)
+            m_powerCost = m_caster->GetPower(POWER_HOLY_POWER);
+        else
+            m_powerCost = 0;
+
+        if (m_spellInfo->Id == 85696)
+            return;
+    }
+
     if (!m_powerCost)
         return;
 
