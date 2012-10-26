@@ -550,8 +550,8 @@ struct AreaTableEntry
     uint32  LiquidTypeOverride[4];                          // 13-16 liquid override by type
     float   MaxDepth;                                       // 17,
     //float  unk13;                                         // 18,
-    //uint32 unk19;                                         // 19, All zeros (4.2.2)
-    //uint32 unk20;                                         // 20 4.0.0
+    //uint32 unk19;                                         // 19, All zeros
+    uint32 mountFlags;                                      // 20
     //uint32 unk21;                                         // 21 4.0.0
     //uint32 unk22;                                         // 22 4.0.0
     //uint32 unk23;                                         // 23 4.0.0

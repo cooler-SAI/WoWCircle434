@@ -392,7 +392,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleNoImmediateEffect,                         //333 SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS_2 implemented in WorldSession::HandleCastSpellOpcode
     &AuraEffect::HandleNULL,                                      //334 SPELL_AURA_MOD_BLIND
     &AuraEffect::HandleNULL,                                      //335 SPELL_AURA_335
-    &AuraEffect::HandleNULL,                                      //336 SPELL_AURA_MOD_FLYING_RESTRICTIONS
+    &AuraEffect::HandleNoImmediateEffect,                         //336 SPELL_AURA_MOD_FLYING_RESTRICTIONS
     &AuraEffect::HandleNoImmediateEffect,                         //337 SPELL_AURA_MOD_VENDOR_ITEMS_PRICES
     &AuraEffect::HandleNoImmediateEffect,                         //338 SPELL_AURA_MOD_DURABILITY_LOSS
     &AuraEffect::HandleNULL,                                      //339 SPELL_AURA_INCREASE_SKILL_GAIN_CHANCE
@@ -714,10 +714,6 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             // Dash - do not set speed if not in cat form
             if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_DRUID && GetSpellInfo()->SpellFamilyFlags[2] & 0x00000008)
                 amount = GetBase()->GetUnitOwner()->GetShapeshiftForm() == FORM_CAT ? amount : 0;
-            break;
-        case SPELL_AURA_MOUNTED:
-            if (MountCapabilityEntry const* mountCapability = GetBase()->GetUnitOwner()->GetMountCapability(uint32(GetMiscValueB())))
-                amount = mountCapability->Id;
             break;
         case SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE:
         {
@@ -2793,10 +2789,6 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
                 displayID = 0;
 
         target->Mount(displayID, ci->VehicleId, GetMiscValue());
-
-        // cast speed aura
-        if (MountCapabilityEntry const* mountCapability = target->GetMountCapability(uint32(GetMiscValueB())))
-            target->CastSpell(target, mountCapability->SpeedModSpell, true);
     }
     else
     {
@@ -2805,14 +2797,10 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
         // need to remove ALL arura related to mounts, this will stop client crash with broom stick
         // and never endless flying after using Headless Horseman's Mount
         if (mode & AURA_EFFECT_HANDLE_REAL)
-        {
             target->RemoveAurasByType(SPELL_AURA_MOUNTED);
-
-            // remove speed aura
-            if (MountCapabilityEntry const* mountCapability = target->GetMountCapability(uint32(GetMiscValueB())))
-                target->RemoveAurasDueToSpell(mountCapability->SpeedModSpell, target->GetGUID());
-        }
     }
+    target->UpdateSpeed(MOVE_RUN, true);
+    target->UpdateMount();
 }
 
 void AuraEffect::HandleAuraAllowFlight(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -2825,7 +2813,7 @@ void AuraEffect::HandleAuraAllowFlight(AuraApplication const* aurApp, uint8 mode
     if (!apply)
     {
         // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
-        if (target->HasAuraType(GetAuraType()) || target->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+        if (target->HasAuraType(GetAuraType()))
             return;
     }
 
@@ -3218,30 +3206,8 @@ void AuraEffect::HandleAuraModIncreaseFlightSpeed(AuraApplication const* aurApp,
 
     Unit* target = aurApp->GetTarget();
 
-    //! Update ability to fly
     if (GetAuraType() == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED)
     {
-        // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
-        if (mode & AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK && (apply || (!target->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !target->HasAuraType(SPELL_AURA_FLY))))
-        {
-            target->SetCanFly(apply);
-            if (!apply)
-            {
-                target->m_movementInfo.SetFallTime(0);
-                target->RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING_FLY);
-            }
-
-            Player* player = target->ToPlayer();
-            if (!player)
-                player = target->m_movedPlayer;
-
-            if (player)
-                player->SendMovementCanFlyChange();
-
-            //! We still need to initiate a server-side MoveFall here,
-            //! which requires MSG_MOVE_FALL_LAND on landing.
-        }
-
         //! Someone should clean up these hacks and remove it from this function. It doesn't even belong here.
         if (mode & AURA_EFFECT_HANDLE_REAL)
         {
@@ -3255,8 +3221,7 @@ void AuraEffect::HandleAuraModIncreaseFlightSpeed(AuraApplication const* aurApp,
         }
     }
 
-    if (mode & AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK)
-        target->UpdateSpeed(MOVE_FLIGHT, true);
+    target->UpdateSpeed(MOVE_FLIGHT, true);
 }
 
 void AuraEffect::HandleAuraModIncreaseSwimSpeed(AuraApplication const* aurApp, uint8 mode, bool /*apply*/) const

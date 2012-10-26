@@ -4076,6 +4076,9 @@ void Player::learnSpell(uint32 spell_id, bool dependent)
                 learnSpell(itr2->second, false);
         }
     }
+
+    // Many mounts depend on learned spells, update right now
+    UpdateMount();
 }
 
 void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
@@ -23181,6 +23184,8 @@ void Player::UpdateZoneDependentAuras(uint32 newZone)
 
 void Player::UpdateAreaDependentAuras(uint32 newArea)
 {
+    UpdateMount();
+
     // remove auras from spells with area limitations
     for (AuraMap::iterator iter = m_ownedAuras.begin(); iter != m_ownedAuras.end();)
     {

@@ -343,6 +343,7 @@ class Totem;
 class Transport;
 class Vehicle;
 class TransportBase;
+struct MountCapabilityEntry;
 
 typedef std::list<Unit*> UnitList;
 typedef std::list< std::pair<Aura*, uint8> > DispelChargesList;
@@ -1425,7 +1426,7 @@ class Unit : public WorldObject
         uint32 GetMountID() const { return GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID); }
         void Mount(uint32 mount, uint32 vehicleId = 0, uint32 creatureEntry = 0);
         void Dismount();
-        MountCapabilityEntry const* GetMountCapability(uint32 mountType) const;
+        void UpdateMount();
 
         void SendDurabilityLoss(Player* receiver, uint32 percent);
         void PlayOneShotAnimKit(uint32 id);
@@ -2294,6 +2295,7 @@ class Unit : public WorldObject
 
         uint32 m_unitTypeMask;
         LiquidTypeEntry const* _lastLiquid;
+        MountCapabilityEntry const* _mount;
 
         bool IsAlwaysVisibleFor(WorldObject const* seer) const;
         bool IsAlwaysDetectableFor(WorldObject const* seer) const;

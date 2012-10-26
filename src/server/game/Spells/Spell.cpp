@@ -5501,7 +5501,47 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
             case SPELL_AURA_MOUNTED:
             {
-                if (m_caster->IsInWater())
+                MountCapabilityEntry const* capability = NULL;
+
+                if (MountTypeEntry const* type = sMountTypeStore.LookupEntry(uint32(m_spellInfo->Effects[i].MiscValueB)))
+                {
+                    uint32 ridingSkill = 5000;
+                    if (m_caster->ToPlayer())
+                        ridingSkill = m_caster->ToPlayer()->GetSkillValue(SKILL_RIDING);
+
+                    uint32 zoneId, areaId;
+                    m_caster->GetZoneAndAreaId(zoneId, areaId);
+
+                    for (uint32 i = MAX_MOUNT_CAPABILITIES-1; i < MAX_MOUNT_CAPABILITIES; --i)
+                    {
+                        uint32 id = type->MountCapability[i];
+                        if (!id)
+                            continue;
+
+                        MountCapabilityEntry const* temp = sMountCapabilityStore.LookupEntry(id);
+                        if (!temp)
+                            continue;
+
+                        if (ridingSkill < temp->RequiredRidingSkill)
+                            continue;
+
+                        if (temp->RequiredMap != -1 && m_caster->GetMapId() != uint32(temp->RequiredMap))
+                            continue;
+
+                        if (temp->RequiredArea && (temp->RequiredArea != zoneId && temp->RequiredArea != areaId))
+                            continue;
+
+                        if (temp->RequiredAura && !m_caster->HasAura(temp->RequiredAura))
+                            continue;
+
+                        if (temp->RequiredSpell && !m_caster->HasSpell(temp->RequiredSpell))
+                            continue;
+
+                        capability = temp;
+                    }
+                }
+
+                if (m_caster->IsInWater() && !(capability && capability->Flags & MOUNT_FLAG_CAN_SWIM))
                     return SPELL_FAILED_ONLY_ABOVEWATER;
 
                 // Ignore map check if spell have AreaId. AreaId already checked and this prevent special mount spells
