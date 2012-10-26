@@ -1420,7 +1420,7 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
             addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
 
         addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL);
-
+        
         // Remove Grievious bite if fully healed
         if (unitTarget->HasAura(48920) && (unitTarget->GetHealth() + addhealth >= unitTarget->GetMaxHealth()))
             unitTarget->RemoveAura(48920);
@@ -3054,6 +3054,26 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 }
             }
             break;
+        }
+        case SPELLFAMILY_PALADIN:
+        {
+            // Templar's Verdict
+            if (m_spellInfo->Id == 85256)
+            {
+                switch (GetPowerCost())
+                {
+                    case 1: totalDamagePercentMod *= 1.0f; break;
+                    case 2: totalDamagePercentMod *= 3.0f; break;
+                    case 3: totalDamagePercentMod *= 7.83f; break;
+                }
+                break;
+            }
+            // Crusader Strike
+            else if (m_spellInfo->Id == 35395)
+            {
+                m_caster->CastSpell(m_caster, 85705, true);
+                break;
+            }
         }
         case SPELLFAMILY_WARRIOR:
         {
@@ -6092,7 +6112,7 @@ void Spell::EffectRewardCurrency(SpellEffIndex effIndex)
     uint32 currencyId = m_spellInfo->Effects[effIndex].MiscValue;
     if (!sCurrencyTypesStore.LookupEntry(currencyId))
     {
-        sLog->outError(LogFilterType::LOG_FILTER_SPELLS_AURAS, "EffectRewardCurrency: spell (id: %u) has wrong currency id (id: %u)", m_spellInfo->Id, currencyId);
+        sLog->outError(LOG_FILTER_SPELLS_AURAS, "EffectRewardCurrency: spell (id: %u) has wrong currency id (id: %u)", m_spellInfo->Id, currencyId);
         return;
     }
 
