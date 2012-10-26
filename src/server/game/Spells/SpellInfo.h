@@ -514,6 +514,8 @@ public:
     bool _IsPositiveEffect(uint8 effIndex, bool deep) const;
     bool _IsPositiveSpell() const;
     static bool _IsPositiveTarget(uint32 targetA, uint32 targetB);
+    bool _IsCrowdControl(uint8 effMask, bool nodamage) const;
+    bool _IsNeedDelay() const;
 
     // correction helpers
     void SetDurationIndex(uint32 index);

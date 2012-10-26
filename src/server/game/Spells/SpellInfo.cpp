@@ -2619,6 +2619,71 @@ bool SpellInfo::_IsPositiveTarget(uint32 targetA, uint32 targetB)
     return true;
 }
 
+bool SpellInfo::_IsCrowdControl(uint8 effMask, bool nodamage) const
+{
+    for (uint8 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
+    {
+        if (effMask && !(effMask & (1 << effIndex)))
+            continue;
+
+        if (nodamage)
+        {
+            switch (Effects[effIndex].Effect)
+            {
+                case SPELL_EFFECT_HEALTH_LEECH:
+                case SPELL_EFFECT_SCHOOL_DAMAGE:
+                    return false;
+            }
+        }
+
+        switch (Effects[effIndex].ApplyAuraName)
+        {
+            case SPELL_AURA_MOD_STUN:
+                switch (SpellIconID)
+                {
+                    case 15:
+                    case 457:
+                        return false;
+                        break;
+                    default:
+                        break;
+                }
+            case SPELL_AURA_MOD_CONFUSE:
+            case SPELL_AURA_MOD_FEAR:
+            case SPELL_AURA_MOD_ROOT:
+            case SPELL_AURA_TRANSFORM:
+                if (!IsPositive())
+                    return true;
+                break;
+            default: break;
+        }
+    }
+    return false;
+}
+
+bool SpellInfo::_IsNeedDelay() const
+{
+    switch (Id)
+    {
+        case 379:   // Earth Shield (Shaman)
+        case 14157: // Ruthlessness (Rogue)
+        case 33110: // Prayer of Mending (Priest)
+        case 48503: // Living Seed (Druid)
+        case 52752: // Ancestral Awakening (Shaman)
+        case 62836: // Slag Imbued (Ignis, Ulduar)
+        case 63536: // Slag Imbued (Ignis, Ulduar)
+        case 70802: // Mayhem (Rogue)
+        case 70157: // Ice Tomb (Sindragosa, ICC)
+            return true;
+    }
+
+    // Flurry (Shaman)
+    if (SpellFamilyName == SPELLFAMILY_SHAMAN && SpellIconID == 108)
+        return true;
+
+    return false;
+}
+
 SpellTargetRestrictionsEntry const* SpellInfo::GetSpellTargetRestrictions() const
 {
     return SpellTargetRestrictionsId ? sSpellTargetRestrictionsStore.LookupEntry(SpellTargetRestrictionsId) : NULL;
