@@ -3909,7 +3909,16 @@ void Spell::SendSpellStart()
         castFlags |= CAST_FLAG_POWER_LEFT_SELF;
 
     if (m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNES)
+    {
         castFlags |= CAST_FLAG_UNKNOWN_19;
+        castFlags |= CAST_FLAG_RUNE_LIST;                    // rune cooldowns list
+    }
+
+    if (m_spellInfo->HasEffect(SPELL_EFFECT_ACTIVATE_RUNE))
+    {
+        castFlags |= CAST_FLAG_RUNE_LIST;                    // rune cooldowns list
+        castFlags |= CAST_FLAG_UNKNOWN_19;                   // same as in SMSG_SPELL_GO
+    }
 
     WorldPacket data(SMSG_SPELL_START, (8+8+4+4+2));
     if (m_CastItem)
@@ -4048,6 +4057,13 @@ void Spell::SendSpellGo()
                 float baseCd = float(player->GetRuneBaseCooldown(i));
                 data << uint8((baseCd - float(player->GetRuneCooldown(i))) / baseCd * 255); // rune cooldown passed
             }
+        }
+        else
+        {
+            data << uint8(0);
+            data << uint8(0);
+            for (uint8 i = 0; i < MAX_RUNES; ++i)
+                data << uint8(0);
         }
     }
 
