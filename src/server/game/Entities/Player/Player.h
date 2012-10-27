@@ -2065,7 +2065,7 @@ class Player : public Unit, public GridObject<Player>
         static uint32 GetGuildIdFromDB(uint64 guid);
         static uint8 GetRankFromDB(uint64 guid);
         int GetGuildIdInvited() { return m_GuildIdInvited; }
-        static void RemovePetitionsAndSigns(uint64 guid, uint32 type);
+        static void RemovePetitionsAndSigns(uint64 guid);
         void SendPetitionSignResult(ObjectGuid petitionGuid, Player* player, uint32 result);
         void SendPetitionTurnInResult(uint32 result);
 
@@ -2774,6 +2774,9 @@ class Player : public Unit, public GridObject<Player>
         bool HasTitle(uint32 bitIndex);
         bool HasTitle(CharTitlesEntry const* title) { return HasTitle(title->bit_index); }
         void SetTitle(CharTitlesEntry const* title, bool lost = false);
+
+        void SendCurrencyWeekCap(uint32 id) const;
+        void SendCurrencyWeekCap(const CurrencyTypesEntry* currency) const;
 
         //bool isActiveObject() const { return true; }
         bool canSeeSpellClickOn(Creature const* creature) const;

@@ -44,6 +44,20 @@ enum BattlegroundBracketId                                  // bracketId for lev
 // must be max value in PvPDificulty slot+1
 #define MAX_BATTLEGROUND_BRACKETS  16
 
+#define CURRENCY_PRECISION 100.0f
+
+enum CurrencyCategory
+{
+    CURRENCY_CATEGORY_ARCHAEOLOGY   = 82,
+};
+
+enum CurrencyFlags
+{
+    CURRENCY_FLAG_TRADEABLE      = 0x01,
+    CURRENCY_FLAG_HIGH_PRECISION = 0x08,
+    CURRENCY_FLAG_HAS_SEASON_COUNT  = 0x80, // guessed
+};
+
 enum AreaTeams
 {
     AREATEAM_NONE  = 0,
@@ -542,7 +556,9 @@ enum CurrencyTypes
     CURRENCY_TYPE_CONQUEST_POINTS    = 390,
     CURRENCY_TYPE_HONOR_POINTS       = 392,
     CURRENCY_TYPE_JUSTICE_POINTS     = 395,
-    CURRENCY_TYPE_VALOR_POINTS       = 396
+    CURRENCY_TYPE_VALOR_POINTS       = 396,
+    CURRENCY_TYPE_ARENA_META         = 483,
+    CURRENCY_TYPE_BG_META            = 484
 };
 
 #endif

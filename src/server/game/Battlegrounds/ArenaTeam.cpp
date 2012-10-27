@@ -144,7 +144,7 @@ bool ArenaTeam::AddMember(uint64 playerGuid)
 
     // Remove all player signatures from other petitions
     // This will prevent player from joining too many arena teams and corrupt arena team data integrity
-    Player::RemovePetitionsAndSigns(playerGuid, GetType());
+    Player::RemovePetitionsAndSigns(playerGuid);
 
     // Feed data to the struct
     ArenaTeamMember newMember;
