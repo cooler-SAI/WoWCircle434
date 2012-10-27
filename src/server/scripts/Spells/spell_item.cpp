@@ -2071,6 +2071,87 @@ class spell_item_big_cauldron_of_battle : public SpellScriptLoader
         }
 };
 
+class spell_item_flask_of_battle : public SpellScriptLoader
+{
+    public:
+        spell_item_flask_of_battle() : SpellScriptLoader("spell_item_flask_of_battle") { }
+
+        class spell_item_flask_of_battle_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_item_flask_of_battle_SpellScript);
+
+            // True spells are in comments.
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                if (GetCaster()->GetTypeId() == TYPEID_PLAYER)
+                {
+                    Player* pPlayer = GetCaster()->ToPlayer();
+                    uint32 spec = pPlayer->GetPrimaryTalentTree(pPlayer->GetActiveSpec());
+                    switch (spec)
+                    {
+                        case TALENT_TREE_MAGE_ARCANE:
+                        case TALENT_TREE_MAGE_FIRE:
+                        case TALENT_TREE_MAGE_FROST:
+                        case TALENT_TREE_DRUID_BALANCE:
+                        case TALENT_TREE_DRUID_RESTORATION:
+                        case TALENT_TREE_PALADIN_HOLY:
+                        case TALENT_TREE_SHAMAN_RESTORATION:
+                        case TALENT_TREE_SHAMAN_ELEMENTAL:
+                        case TALENT_TREE_PRIEST_HOLY:
+                        case TALENT_TREE_PRIEST_DISCIPLINE:
+                        case TALENT_TREE_PRIEST_SHADOW:
+                        case TALENT_TREE_WARLOCK_AFFLICTION:
+                        case TALENT_TREE_WARLOCK_DEMONOLOGY:
+                        case TALENT_TREE_WARLOCK_DESTRUCTION:
+                            pPlayer->CastSpell(pPlayer, 79470, true); 
+                            //pPlayer->CastSpell(pPlayer, 92730, true);
+                            break;
+                        case TALENT_TREE_HUNTER_BEAST_MASTERY:
+                        case TALENT_TREE_HUNTER_SURVIVAL:
+                        case TALENT_TREE_HUNTER_MARKSMANSHIP:
+                        case TALENT_TREE_ROGUE_ASSASSINATION:
+                        case TALENT_TREE_ROGUE_COMBAT:
+                        case TALENT_TREE_ROGUE_SUBTLETY:
+                        case TALENT_TREE_SHAMAN_ENHANCEMENT:
+                            pPlayer->CastSpell(pPlayer, 79471, true);
+                            //pPlayer->CastSpell(pPlayer, 92725, true);
+                            break;
+                        case TALENT_TREE_WARRIOR_PROTECTION:
+                        case TALENT_TREE_DEATH_KNIGHT_BLOOD:
+                        case TALENT_TREE_PALADIN_PROTECTION:
+                            pPlayer->CastSpell(pPlayer, 79469, true);
+                            //pPlayer->CastSpell(pPlayer, 92729, true);
+                            break;
+                        case TALENT_TREE_DEATH_KNIGHT_FROST:
+                        case TALENT_TREE_DEATH_KNIGHT_UNHOLY:
+                        case TALENT_TREE_PALADIN_RETRIBUTION:
+                        case TALENT_TREE_WARRIOR_ARMS:
+                        case TALENT_TREE_WARRIOR_FURY:
+                            pPlayer->CastSpell(pPlayer, 79472, true);
+                            //pPlayer->CastSpell(pPlayer, 92731, true);
+                            break;
+                        case TALENT_TREE_DRUID_FERAL_COMBAT:
+                            if (pPlayer->HasAura(5487))
+                                pPlayer->CastSpell(pPlayer, 79469, true);
+                            else
+                                pPlayer->CastSpell(pPlayer, 79471, true);
+                            break;
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_item_flask_of_battle_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_item_flask_of_battle_SpellScript();
+        }
+};
+
 void AddSC_item_spell_scripts()
 {
     // 23074 Arcanite Dragonling
@@ -2125,4 +2206,5 @@ void AddSC_item_spell_scripts()
     new spell_item_greatmothers_soulcatcher();
     new spell_item_cauldron_of_battle();
     new spell_item_big_cauldron_of_battle();
+    new spell_item_flask_of_battle();
 }
