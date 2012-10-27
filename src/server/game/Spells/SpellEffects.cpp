@@ -576,6 +576,40 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
     // selection by spell family
     switch (m_spellInfo->SpellFamilyName)
     {
+        case SPELLFAMILY_WARLOCK:
+            switch (m_spellInfo->Id)
+            {
+                // Have Group, Will Travel
+                case 83967:
+                    // Summon each player in group
+                    if (Group* group = m_caster->ToPlayer()->GetGroup())
+                    {
+                        for (GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                        {
+                            Player* pPlayer = itr->getSource();
+
+                            // Don't summon self
+                            if (!pPlayer || pPlayer->GetGUID() == m_caster->GetGUID())
+                                return;
+
+                            if (!pPlayer->isAlive() || !pPlayer->IsInWorld())
+                                return;
+
+                            float x, y, z;
+                            m_caster->GetPosition(x, y, z);
+
+                            pPlayer->SetSummonPoint(m_caster->GetMapId(), x, y, z);
+
+                            WorldPacket data(SMSG_SUMMON_REQUEST, 8+4+4);
+                            data << uint64(m_caster->GetGUID());                
+                            data << uint32(m_caster->GetZoneId());               
+                            data << uint32(MAX_PLAYER_SUMMON_DELAY*IN_MILLISECONDS);
+                            pPlayer->GetSession()->SendPacket(&data);
+                        }
+                    }
+                    break; 
+            }
+            break;
         case SPELLFAMILY_PALADIN:
             switch (m_spellInfo->Id)
             {

@@ -5118,7 +5118,14 @@ SpellCastResult Spell::CheckCast(bool strict)
         {
             case SPELL_EFFECT_DUMMY:
             {
-                if (m_spellInfo->Id == 19938)          // Awaken Peon
+                // Have Group, Will Travel
+                if (m_spellInfo->Id == 83967)
+                {
+                    Map* pMap = m_caster->GetMap();
+                    if (!pMap || pMap->Instanceable())
+                        return SPELL_FAILED_SPELL_UNAVAILABLE;
+                }
+                else if (m_spellInfo->Id == 19938)          // Awaken Peon
                 {
                     Unit* unit = m_targets.GetUnitTarget();
                     if (!unit || !unit->HasAura(17743))

@@ -2940,6 +2940,12 @@ void SpellMgr::LoadSpellCustomAttr()
             case 72293: // Mark of the Fallen Champion (Deathbringer Saurfang)
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE_EFF0;
                 break;
+            // Have Group, Will Travel
+            case 83967:
+                spellInfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;
+                spellInfo->Effects[0].TriggerSpell = 0;
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_CASTER;
+                break;
             default:
                 break;
         }
