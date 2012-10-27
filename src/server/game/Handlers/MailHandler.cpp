@@ -329,6 +329,11 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         }
     }
 
+    // Guild Mail
+    if (receive && receive->GetGuildId() && player->GetGuildId())
+         if (player->HasAura(83951) && (player->GetGuildId() == receive->GetGuildId()))
+             needItemDelay = false;
+
     // If theres is an item, there is a one hour delivery delay if sent to another account's character.
     uint32 deliver_delay = needItemDelay ? sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY) : 0;
 
