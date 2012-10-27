@@ -6402,12 +6402,6 @@ SpellCastResult Spell::CheckItems()
                 switch (pItem->GetTemplate()->SubClass)
                 {
                     case ITEM_SUBCLASS_WEAPON_THROWN:
-                    {
-                        uint32 ammo = pItem->GetEntry();
-                        if (!m_caster->ToPlayer()->HasItemCount(ammo))
-                            return SPELL_FAILED_NO_AMMO;
-                    };
-                    break;
                     case ITEM_SUBCLASS_WEAPON_GUN:
                     case ITEM_SUBCLASS_WEAPON_BOW:
                     case ITEM_SUBCLASS_WEAPON_CROSSBOW:
