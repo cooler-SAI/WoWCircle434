@@ -4526,7 +4526,7 @@ bool Player::ResetTalents(bool no_cost)
 
         if (!HasEnoughMoney(uint64(cost)))
         {
-            SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
+            SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0);
             return false;
         }
     }
@@ -12944,11 +12944,11 @@ void Player::SendEquipError(InventoryResult msg, Item* pItem, Item* pItem2, uint
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32 /*param*/)
+void Player::SendBuyError(BuyResult msg, uint64 guid, uint32 item)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_BUY_FAILED");
-    WorldPacket data(SMSG_BUY_FAILED, (8+4+4+1));
-    data << uint64(creature ? creature->GetGUID() : 0);
+    WorldPacket data(SMSG_BUY_FAILED, 13);
+    data << uint64(guid);
     data << uint32(item);
     data << uint8(msg);
     GetSession()->SendPacket(&data);
@@ -14089,7 +14089,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
     int32 cost = int32(item->BoxMoney);
     if (!HasEnoughMoney(int64(cost)))
     {
-        SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
+        SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0);
         PlayerTalkClass->SendCloseGossip();
         return;
     }
@@ -20951,7 +20951,7 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
     CurrencyTypesEntry const* proto = sCurrencyTypesStore.LookupEntry(currency);
     if (!proto)
     {
-        SendBuyError(BUY_ERR_CANT_FIND_ITEM, NULL, currency, 0);
+        SendBuyError(BUY_ERR_CANT_FIND_ITEM, NULL, currency);
         return false;
     }
 
@@ -20959,20 +20959,20 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
     if (!creature)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: BuyCurrencyFromVendorSlot - Unit (GUID: %u) not found or you can't interact with him.", GUID_LOPART(vendorGuid));
-        SendBuyError(BUY_ERR_DISTANCE_TOO_FAR, NULL, currency, 0);
+        SendBuyError(BUY_ERR_DISTANCE_TOO_FAR, NULL, currency);
         return false;
     }
 
     VendorItemData const* vItems = creature->GetVendorItems();
     if (!vItems || vItems->Empty())
     {
-        SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, currency, 0);
+        SendBuyError(BUY_ERR_CANT_FIND_ITEM, vendorGuid, currency);
         return false;
     }
 
     if (vendorSlot >= vItems->GetItemCount())
     {
-        SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, currency, 0);
+        SendBuyError(BUY_ERR_CANT_FIND_ITEM, vendorGuid, currency);
         return false;
     }
 
@@ -20980,7 +20980,7 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
     // store diff item (cheating)
     if (!crItem || crItem->item != currency || crItem->Type != ITEM_VENDOR_TYPE_CURRENCY)
     {
-        SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, currency, 0);
+        SendBuyError(BUY_ERR_CANT_FIND_ITEM, vendorGuid, currency);
         return false;
     }
 
@@ -21010,7 +21010,7 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
             CurrencyTypesEntry const* entry = sCurrencyTypesStore.LookupEntry(iece->RequiredCurrency[i]);
             if (!entry)
             {
-                SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, currency, 0); // Find correct error
+                SendBuyError(BUY_ERR_CANT_FIND_ITEM, vendorGuid, currency); // Find correct error
                 return false;
             }
 
@@ -21033,7 +21033,7 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
     }
     else // currencies have no price defined, can only be bought with ExtendedCost
     {
-        SendBuyError(BUY_ERR_CANT_FIND_ITEM, NULL, currency, 0);
+        SendBuyError(BUY_ERR_CANT_FIND_ITEM, NULL, currency);
         return false;
     }
 
@@ -21058,7 +21058,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(item);
     if (!pProto)
     {
-        SendBuyError(BUY_ERR_CANT_FIND_ITEM, NULL, item, 0);
+        SendBuyError(BUY_ERR_CANT_FIND_ITEM, NULL, item);
         return false;
     }
 
@@ -21066,20 +21066,20 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
     if (!creature)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: BuyItemFromVendor - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(vendorguid)));
-        SendBuyError(BUY_ERR_DISTANCE_TOO_FAR, NULL, item, 0);
+        SendBuyError(BUY_ERR_DISTANCE_TOO_FAR, NULL, item);
         return false;
     }
 
     VendorItemData const* vItems = creature->GetVendorItems();
     if (!vItems || vItems->Empty())
     {
-        SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, item, 0);
+        SendBuyError(BUY_ERR_CANT_FIND_ITEM, vendorguid, item);
         return false;
     }
 
     if (vendorslot >= vItems->GetItemCount())
     {
-        SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, item, 0);
+        SendBuyError(BUY_ERR_CANT_FIND_ITEM, vendorguid, item);
         return false;
     }
 
@@ -21087,7 +21087,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
     // store diff item (cheating)
     if (!crItem || crItem->item != item)
     {
-        SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, item, 0);
+        SendBuyError(BUY_ERR_CANT_FIND_ITEM, vendorguid, item);
         return false;
     }
 
@@ -21096,14 +21096,14 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
     {
         if (creature->GetVendorItemCurrentCount(crItem) < pProto->BuyCount * count)
         {
-            SendBuyError(BUY_ERR_ITEM_ALREADY_SOLD, creature, item, 0);
+            SendBuyError(BUY_ERR_ITEM_ALREADY_SOLD, vendorguid, item);
             return false;
         }
     }
 
     if (pProto->RequiredReputationFaction && (uint32(GetReputationRank(pProto->RequiredReputationFaction)) < pProto->RequiredReputationRank))
     {
-        SendBuyError(BUY_ERR_REPUTATION_REQUIRE, creature, item, 0);
+        SendBuyError(BUY_ERR_REPUTATION_REQUIRE, vendorguid, item);
         return false;
     }
 
@@ -21140,7 +21140,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
             CurrencyTypesEntry const* entry = sCurrencyTypesStore.LookupEntry(iece->RequiredCurrency[i]);
             if (!entry)
             {
-                SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, item, 0);
+                SendBuyError(BUY_ERR_CANT_FIND_ITEM, vendorguid, item);
                 return false;
             }
 
@@ -21181,7 +21181,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
 
         if (!HasEnoughMoney(uint64(price)))
         {
-            SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, creature, item, 0);
+            SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, vendorguid, item);
             return false;
         }
     }

@@ -217,7 +217,7 @@ void ProcessCastaction(Player* player, Creature* creature, uint32 spellId, uint3
         player->ModifyMoney(-cost);
     }
     else
-        player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, creature, 0, 0);
+        player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, creature ? creature->GetGUID() : 0, 0);
     player->CLOSE_GOSSIP_MENU();
 }
 
@@ -358,7 +358,7 @@ void ProcessUnlearnAction(Player* player, Creature* creature, uint32 spellId, ui
                 creature->CastSpell(player, alternativeSpellId, true);
         }
         else
-            player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, creature, 0, 0);
+            player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, creature ? creature->GetGUID() : 0, 0);
     }
     else
         player->SendEquipError(EQUIP_ERR_CLIENT_LOCKED_OUT, NULL, NULL);

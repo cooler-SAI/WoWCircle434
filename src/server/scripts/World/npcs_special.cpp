@@ -1299,7 +1299,7 @@ public:
                 {
                     if (!player->HasEnoughMoney(uint64(10000000)))
                     {
-                        player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
+                        player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0);
                         player->PlayerTalkClass->SendCloseGossip();
                         break;
                     }
@@ -2609,7 +2609,7 @@ public:
         if (doSwitch)
         {
             if (!player->HasEnoughMoney(uint64(EXP_COST)))
-                player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
+                player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0);
             else if (noXPGain)
             {
                 player->ModifyMoney(-int64(EXP_COST));
