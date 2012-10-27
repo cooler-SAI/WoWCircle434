@@ -3193,16 +3193,8 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                 {
                     if ((*itr)->ID == miscValue1)
                     {
-                        if ((*itr)->rare == reqValue)
-                        {
-                            ok = true;
-                            break;
-                        }
-                        else
-                        {
-                            ok = false;
-                            break;
-                        }
+                        ok = ((*itr)->rare == reqValue);
+                        break;
                     }
                 }
                 if (!ok)
@@ -3219,16 +3211,8 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                 {
                     if ((*itr)->ID == miscValue1)
                     {
-                        if ((*itr)->branchId == reqValue)
-                        {
-                            ok = true;
-                            break;
-                        }
-                        else
-                        {
-                            ok = false;
-                            break;
-                        }
+                        ok = ((*itr)->branchId == reqValue);
+                        break;
                     }
                 }
                 if (!ok)
