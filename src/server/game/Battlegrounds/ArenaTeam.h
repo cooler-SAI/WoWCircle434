@@ -86,6 +86,14 @@ enum ArenaTeamTypes
     ARENA_TEAM_5v5      = 5
 };
 
+enum ArenaTeamSlots
+{
+    ARENA_SLOT_2v2      = 0,
+    ARENA_SLOT_3v3      = 1,
+    ARENA_SLOT_5v5      = 2,
+    MAX_ARENA_SLOT      = 3
+};
+
 struct ArenaTeamMember
 {
     uint64 Guid;
@@ -112,15 +120,13 @@ struct ArenaTeamStats
     uint32 Rank;
 };
 
-#define MAX_ARENA_SLOT 3                                    // 0..2 slots
-
 class ArenaTeam
 {
     public:
         ArenaTeam();
         ~ArenaTeam();
 
-        bool Create(uint64 captainGuid, uint8 type, std::string teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor);
+        bool Create(uint64 captainGuid, uint8 slot, std::string teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor);
         void Disband(WorldSession* session);
 
         typedef std::list<ArenaTeamMember> MemberList;
@@ -129,6 +135,7 @@ class ArenaTeam
         uint32 GetType() const            { return Type; }
         uint8  GetSlot() const            { return GetSlotByType(GetType()); }
         static uint8 GetSlotByType(uint32 type);
+        static uint8 GetTypeBySlot(uint32 slot);
         uint64 GetCaptain() const  { return CaptainGuid; }
         std::string GetName() const       { return TeamName; }
         const ArenaTeamStats& GetStats() const { return Stats; }

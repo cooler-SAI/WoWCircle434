@@ -28,6 +28,47 @@
 #include "SocialMgr.h"
 #include "ArenaTeamMgr.h"
 
+void WorldSession::HandleArenaTeamCreateOpcode(WorldPacket& recvData)
+{
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_CREATE");
+    uint32 slot, icon, iconcolor, border, bordercolor, background;
+    std::string name;
+
+    recvData >> slot >> iconcolor >> bordercolor >> border >> background >> icon;
+    name = recvData.ReadString(recvData.ReadBits(8));
+
+    // Check for valid arena bracket (2v2, 3v3, 5v5)
+    if (slot >= MAX_ARENA_SLOT)
+        return;
+
+    // Check if player is already in an arena team
+    if (_player->GetArenaTeamId(slot))
+    {
+        SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, name, "", ERR_ALREADY_IN_ARENA_TEAM);
+        return;
+    }
+
+    // Check if arena team name is already taken
+    if (sArenaTeamMgr->GetArenaTeamByName(name))
+    {
+        SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, name, "", ERR_ARENA_TEAM_NAME_EXISTS_S);
+        return;
+    }
+
+    // Create arena team
+    ArenaTeam* arenaTeam = new ArenaTeam();
+
+    if (!arenaTeam->Create(_player->GetGUID(), slot, name, background, icon, iconcolor, border, bordercolor))
+    {
+        delete arenaTeam;
+        return;
+    }
+
+    // Register arena team
+    sArenaTeamMgr->AddArenaTeam(arenaTeam);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "Arena team (guid: %u) added to sArenaTeamMgr", arenaTeam->GetId());
+}
+
 void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket & recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_INSPECT_ARENA_TEAMS");

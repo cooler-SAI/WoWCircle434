@@ -26085,3 +26085,20 @@ void Player::SendMovementSetCollisionHeight(float height)
 
     SendDirectMessage(&data);
 }
+
+void Player::SendPetitionSignResult(ObjectGuid petitionGuid, Player* player, uint32 result)
+{
+    ObjectGuid guid = player->GetGUID();
+    WorldPacket data(SMSG_PETITION_SIGN_RESULTS, 8 + 8 + 4);
+    data << petitionGuid;
+    data << guid;
+    data << uint32(result);
+    GetSession()->SendPacket(&data);
+}
+
+void Player::SendPetitionTurnInResult(uint32 result)
+{
+    WorldPacket data(SMSG_TURN_IN_PETITION_RESULTS, 4);
+    data << uint32(result);
+    GetSession()->SendPacket(&data);
+}

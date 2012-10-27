@@ -2066,6 +2066,8 @@ class Player : public Unit, public GridObject<Player>
         static uint8 GetRankFromDB(uint64 guid);
         int GetGuildIdInvited() { return m_GuildIdInvited; }
         static void RemovePetitionsAndSigns(uint64 guid, uint32 type);
+        void SendPetitionSignResult(ObjectGuid petitionGuid, Player* player, uint32 result);
+        void SendPetitionTurnInResult(uint32 result);
 
         // Arena Team
         void SetInArenaTeam(uint32 ArenaTeamId, uint8 slot, uint8 type)
