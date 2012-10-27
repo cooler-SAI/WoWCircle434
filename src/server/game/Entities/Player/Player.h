@@ -2782,7 +2782,13 @@ class Player : public Unit, public GridObject<Player>
         bool canSeeSpellClickOn(Creature const* creature) const;
 
         uint32 GetChampioningFaction() const { return m_ChampioningFaction; }
-        void SetChampioningFaction(uint32 faction) { m_ChampioningFaction = faction; }
+        uint32 GetChampioningFactionDungeonLevel() const { return m_ChampioningFactionDungeonLevel; }
+        void SetChampioningFaction(uint32 faction, uint32 dungeonLevel = 0)
+        {
+            m_ChampioningFaction = faction;
+            m_ChampioningFactionDungeonLevel = dungeonLevel;
+        }
+
         Spell* m_spellModTakingSpell;
 
         float GetAverageItemLevel();
@@ -3177,6 +3183,7 @@ class Player : public Unit, public GridObject<Player>
         SpellCooldowns m_spellCooldowns;
 
         uint32 m_ChampioningFaction;
+        uint32 m_ChampioningFactionDungeonLevel;
 
         uint32 m_timeSyncCounter;
         uint32 m_timeSyncTimer;
