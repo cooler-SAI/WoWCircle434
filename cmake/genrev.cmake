@@ -42,7 +42,7 @@ else()
   # Extract revision and hash from git
   string(REGEX REPLACE changeset:\t[^0-9]+: "" rev_id_str ${rev_info})
   set(rev_hash  ${rev_id_str})
-  string(REGEX REPLACE date:\t[^0-9]+: "" rev_date ${rev_info})
+  string(REGEX REPLACE .*date: "" rev_date ${rev_info})
   string(REGEX MATCH [A-Z].*\n rev_date ${rev_date})  
   string(REGEX REPLACE \n "" rev_date ${rev_date})  
   string(REGEX MATCH [0-9]+:[0-9a-z]*  rev_hash ${rev_hash})  
