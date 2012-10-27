@@ -60,6 +60,7 @@ enum QuestFailedReasons
     INVALIDREASON_DAILY_QUESTS_REMAINING        = 26,       // You have already completed 25 daily quests today.
     INVALIDREASON_QUEST_FAILED_CAIS             = 27,       // You cannot complete quests once you have reached tired time.
     INVALIDREASON_DAILY_QUEST_COMPLETED_TODAY   = 29        // You have completed that daily quest today.
+    INVALIDREASON_QUEST_MISSING_SPELL           = 31,       // You don't learn the required spell
 };
 
 enum QuestShareMessages
