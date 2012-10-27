@@ -31,8 +31,8 @@ void BuildPlayerLockDungeonBlock(WorldPacket& data, const LfgLockMap& lock)
     {
         data << uint32(it->first);                         // Dungeon entry (id + type)
         data << uint32(it->second);                        // Lock status
-        data << uint32(0);                                 // Unknown 4.2.2
-        data << uint32(0);                                 // Unknown 4.2.2
+        data << uint32(0);                                 // Unknown 4.3.4
+        data << uint32(0);                                 // Unknown 4.3.4
     }
 }
 
@@ -202,21 +202,100 @@ void WorldSession::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*
         if (quest)
         {
             data << uint8(done);
+            data << uint32(1); // Times precision
+            data << uint32(7); // Available times per week
+
+            data << uint32(396); // Unknown 4.3.4
+            data << uint32(7); // Unknown 4.3.4
+
+            data << uint32(7); // Unknown 4.3.4
+            data << uint32(7); // Unknown 4.3.4
+            data << uint32(7); // Unknown 4.3.4
+            data << uint32(0); // Unknown 4.3.4
+            data << uint32(0); // Unknown 4.3.4
+            data << uint32(0); // Unknown 4.3.4
+            data << uint32(0); // Unknown 4.3.4
+
+            data << uint32(1); // Unknown 4.3.4
+            data << uint32(1); // Unknown 4.3.4
+
+            data << uint8(0); // Unknown 4.3.4
+            {
+                for (uint8 i = 0; i < 3; ++i) // 3 - Max roles ?
+                {
+                    uint8 callToArmsRoleMask = 0; // TODO Call to arms role check (LfgRoles) Not implemented
+                    data << uint32(callToArmsRoleMask);
+                    if (callToArmsRoleMask > 0)
+                    {
+                        /* Call to Arms bonus*/
+
+                        data << uint32(0); // Call to arms Money
+                        data << uint32(0); // Call to arms XP
+
+                        uint8 totalRewardCount = uint8(quest->GetRewCurrencyCount() + quest->GetRewItemsCount());
+                        data << uint8(totalRewardCount);
+                        if (totalRewardCount)
+                        {
+                            for (uint8 j = 0; j < QUEST_REWARD_CURRENCY_COUNT; ++j)
+                            {
+                                if (!quest->RewardCurrencyId[j])
+                                    continue;
+
+                                data << uint32(quest->RewardCurrencyId[j]);
+                                data << uint32(0);
+                                data << uint32(quest->RewardCurrencyCount[j]);
+                                data << uint8(true); // Is currency
+                            }
+
+                            ItemTemplate const* iProto = NULL;
+                            for (uint8 j = 0; j < QUEST_REWARDS_COUNT; ++j)
+                            {
+                                if (!quest->RewardItemId[j])
+                                    continue;
+
+                                iProto = sObjectMgr->GetItemTemplate(quest->RewardItemId[j]);
+
+                                data << uint32(quest->RewardItemId[j]);
+                                data << uint32(iProto ? iProto->DisplayInfoID : 0);
+                                data << uint32(quest->RewardItemIdCount[j]);
+                                data << uint8(false); // Is currency
+                            }
+                        }
+                    }
+                }
+            }
+
             data << uint32(quest->GetRewOrReqMoney());
             data << uint32(quest->XPValue(GetPlayer()));
-            data << uint32(reward->reward[done].variableMoney);
-            data << uint32(reward->reward[done].variableXP);
-            data << uint8(quest->GetRewItemsCount());
-            if (quest->GetRewItemsCount())
+
+            uint8 totalRewardCount = uint8(quest->GetRewCurrencyCount() + quest->GetRewItemsCount());
+            data << uint8(totalRewardCount);
+            if (totalRewardCount)
             {
+                for (uint8 i = 0; i < QUEST_REWARD_CURRENCY_COUNT; ++i)
+                {
+                    if (!quest->RewardCurrencyId[i])
+                        continue;
+
+                    data << uint32(quest->RewardCurrencyId[i]);
+                    data << uint32(0);
+                    data << uint32(quest->RewardCurrencyCount[i]);
+                    data << uint8(true); // Is currency
+                }
+
+                ItemTemplate const* iProto = NULL;
                 for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
-                    if (uint32 itemId = quest->RewardItemId[i])
-                    {
-                        ItemTemplate const* item = sObjectMgr->GetItemTemplate(itemId);
-                        data << uint32(itemId);
-                        data << uint32(item ? item->DisplayInfoID : 0);
-                        data << uint32(quest->RewardItemIdCount[i]);
-                    }
+                {
+                    if (!quest->RewardItemId[i])
+                        continue;
+
+                    iProto = sObjectMgr->GetItemTemplate(quest->RewardItemId[i]);
+
+                    data << uint32(quest->RewardItemId[i]);
+                    data << uint32(iProto ? iProto->DisplayInfoID : 0);
+                    data << uint32(quest->RewardItemIdCount[i]);
+                    data << uint8(false); // Is currency
+                }
             }
         }
         else
@@ -226,6 +305,17 @@ void WorldSession::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*
             data << uint32(0);
             data << uint32(0);
             data << uint32(0);
+
+            for (int8 i = 0; i < 9; ++i)
+                data << uint32(0); // Unknown 4.3.4
+
+            data << uint8(1);
+            for (int8 i = 0; i < 3; ++i)
+                data << uint32(0); // Unknown 4.3.4
+
+            for (int8 i = 0; i < 2; ++i)
+                data << uint32(0); // Unknown 4.3.4
+
             data << uint8(0);
         }
     }
