@@ -2871,3 +2871,13 @@ Guild.WeeklyReputationCap = 4375
 
 #
 ###################################################################################################
+
+#
+#    skipLootLoading
+#        Description: Skip loading of loot tables, boosts server loading time
+#        Default:     0
+#
+skipLootLoading = 0
+
+#
+###################################################################################################

@@ -1221,6 +1221,9 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_WINTERGRASP_NOBATTLETIME] = ConfigMgr::GetIntDefault("Wintergrasp.NoBattleTimer", 150);
     m_int_configs[CONFIG_WINTERGRASP_RESTART_AFTER_CRASH] = ConfigMgr::GetIntDefault("Wintergrasp.CrashRestartTimer", 10);
 
+    // loading boost
+    m_bool_configs[CONFIG_DATABASE_SKIP_LOAD_LOOT] = ConfigMgr::GetBoolDefault("skipLootLoading", false);
+
     if (reload)
         sScriptMgr->OnConfigLoad(reload);
 }
@@ -1539,7 +1542,8 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadMailLevelRewards();
 
     // Loot tables
-    LoadLootTables();
+    if (!getBoolConfig(CONFIG_DATABASE_SKIP_LOAD_LOOT))
+        LoadLootTables();
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Skill Discovery Table...");
     LoadSkillDiscoveryTable();
