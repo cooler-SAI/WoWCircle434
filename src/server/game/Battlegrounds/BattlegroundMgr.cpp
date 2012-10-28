@@ -164,7 +164,7 @@ void BattlegroundMgr::Update(uint32 diff)
     }
 }
 
-void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket *data, Battleground *bg, Player * pPlayer, uint8 QueueSlot, uint8 StatusID, uint32 Time1, uint32 Time2, uint8 arenatype, uint8 /*uiFrame*/)
+void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket *data, Battleground *bg, Player * pPlayer, uint8 QueueSlot, uint8 StatusID, uint32 Time1, uint32 Time2, uint8 arenatype, uint8 uiFrame)
 {
     if (!bg)
         StatusID = STATUS_NONE;
@@ -240,7 +240,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket *data, Battlegro
             *data << uint8(0);                          // unk
             data->WriteByteSeq(guidBytes2[4]);
             data->WriteByteSeq(guidBytes1[2]);
-            *data << uint8(0);                          // Player count in rated mode
+            *data << uint8(bg->isArena() ? arenatype : bg->GetMaxPlayersPerTeam());                          // Player count in rated mode
             data->WriteByteSeq(guidBytes2[6]);
             data->WriteByteSeq(guidBytes1[7]);
             data->WriteByteSeq(guidBytes2[3]);
@@ -268,7 +268,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket *data, Battlegro
             *data << uint8(bg->GetMinLevel());          // Min Level
             *data << uint32(1);                         // unk, always 1
             *data << uint32(bg->GetMapId());            // Map Id
-            *data << uint8(0);                          // Player count in rated mode
+            *data << uint8(bg->isArena() ? arenatype : bg->GetMaxPlayersPerTeam()); // Player count in rated mode
 
             data->WriteBit(guidBytes1[5]);
             data->WriteBit(guidBytes1[2]);
@@ -317,13 +317,13 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket *data, Battlegro
             data->WriteBit(guidBytes2[7]);
             data->WriteBit(guidBytes2[1]);
             data->WriteBit(guidBytes1[5]);
-            data->WriteBit(bg->GetPlayerTeam(guidBytes1) == ALLIANCE);       // Battlefield Faction ( 0 horde, 1 alliance )
+            data->WriteBit(uiFrame);        // Arena Frames
             data->WriteBit(guidBytes2[0]);
             data->WriteBit(guidBytes1[1]);
             data->WriteBit(guidBytes2[3]);
             data->WriteBit(guidBytes1[6]);
             data->WriteBit(guidBytes2[5]);
-            data->WriteBit(0);                          // unk, Bit 64
+            data->WriteBit(bg->isRated());                          // unk, Bit 64
             data->WriteBit(guidBytes1[4]);
             data->WriteBit(guidBytes2[6]);
             data->WriteBit(guidBytes2[4]);
@@ -349,7 +349,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket *data, Battlegro
             data->WriteByteSeq(guidBytes1[1]);
 
             *data << uint32(QueueSlot);                 // Queue slot
-            *data << uint8(0);                          // Player count in rated mode
+            *data << uint8(bg->isArena() ? arenatype : bg->GetMaxPlayersPerTeam());        // Player count in rated mode
             *data << uint32(1);                         // unk, always 1
             *data << uint32(bg->GetMapId());            // Map Id
             *data << uint8(bg->GetMinLevel());          // Min Level

@@ -156,6 +156,8 @@ class ArenaTeam
         MemberList::iterator m_membersEnd()   { return Members.end(); }
         bool IsMember(uint64 guid) const;
 
+        static inline bool IsArenaTypeValid(ArenaType type) { return type == ARENA_TYPE_2v2 || type == ARENA_TYPE_3v3 || type == ARENA_TYPE_5v5; }
+
         ArenaTeamMember* GetMember(uint64 guid);
         ArenaTeamMember* GetMember(const std::string& name);
 
