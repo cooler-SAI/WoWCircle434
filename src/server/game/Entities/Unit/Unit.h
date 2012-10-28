@@ -2226,6 +2226,7 @@ class Unit : public WorldObject
         time_t GetLastDamagedTime() const { return _lastDamagedTime; }
         void SetLastDamagedTime(time_t val) { _lastDamagedTime = val; }
 
+        void OnEclipseBuff(bool sun);
     protected:
         explicit Unit (bool isWorldObject);
 

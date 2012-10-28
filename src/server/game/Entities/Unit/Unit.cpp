@@ -4932,11 +4932,12 @@ bool Unit::HandleAuraProcOnPowerAmount(Unit* victim, uint32 /*damage*/, AuraEffe
                         if (procSpell->Id != 2912 && procSpell->Id != 78674)
                             return false;
 
-                        if (HasAura(solarEclipseMarker))
-                        {
-                            RemoveAurasDueToSpell(solarEclipseMarker);
-                            CastSpell(this,lunarEclipseMarker,true);
-                        }
+                        if (!HasAura(solarEclipseMarker))
+                            return true;
+                    
+                        RemoveAurasDueToSpell(solarEclipseMarker);
+                        CastSpell(this,lunarEclipseMarker,true);
+                        OnEclipseBuff(false);
                         break;
                     }
                     case 1:
@@ -4945,12 +4946,12 @@ bool Unit::HandleAuraProcOnPowerAmount(Unit* victim, uint32 /*damage*/, AuraEffe
                         if (procSpell->Id != 5176 && procSpell->Id != 78674)
                             return false;
 
-                        if (HasAura(lunarEclipseMarker))
-                        {
-                            RemoveAurasDueToSpell(lunarEclipseMarker);
-                            CastSpell(this,solarEclipseMarker,true);
-                        }
+                        if (!HasAura(lunarEclipseMarker))
+                            return true;
 
+                        RemoveAurasDueToSpell(lunarEclipseMarker);
+                        CastSpell(this,solarEclipseMarker,true);
+                        OnEclipseBuff(true);
                         break;
                     }
                 }
@@ -17148,6 +17149,31 @@ void CharmInfo::SetIsReturning(bool val)
 bool CharmInfo::IsReturning()
 {
     return m_isReturning;
+}
+
+void Unit::OnEclipseBuff(bool sun)
+{
+    // Nature's Grace
+    this->ToPlayer()->RemoveSpellCooldown(16886);
+
+    // Euphoria
+    SpellInfo const* euphoria_spell = NULL;
+    if (HasAura(81062))
+        euphoria_spell = sSpellMgr->GetSpellInfo(81062);
+    else if (HasAura(81061))
+        euphoria_spell = sSpellMgr->GetSpellInfo(81061);
+    if (euphoria_spell)
+    {
+        int32 bp0 = euphoria_spell->Effects[2].BasePoints;
+        CastCustomSpell(this, 81070, &bp0, NULL, NULL, true);
+    }
+
+    // Item - Druid T11 Balance 4P Bonus
+    if (HasAura(90163))
+    {
+        for (int i = 0; i < 3; ++i)
+            CastSpell(this, 90164, true);
+    }
 }
 
 void Unit::SetInFront(Unit const* target)
