@@ -697,6 +697,23 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     if (Unit* pet = m_caster->GetGuardianPet())
                         pet->CastSpell(pet, 51753, true);
                     break;
+                // Steady Shot - energy gain
+                case 56641:
+                {
+                    if (!m_targets.GetUnitTarget())
+                        break;
+
+                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(77443);
+                    int32 basepoints0 = spellInfo->Effects[EFFECT_0].BasePoints;
+                    // Termination
+                    if (AuraEffect* termination = m_caster->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 2008, 0))
+                        if (m_targets.GetUnitTarget()->GetHealthPct() <= sSpellMgr->GetSpellInfo(termination->GetBase()->GetId())->Effects[EFFECT_1].BasePoints)
+                            basepoints0 += termination->GetAmount();
+
+                    m_caster->CastCustomSpell(m_caster, spellInfo->Id, &basepoints0, NULL, NULL, true);
+                    break;
+                }
+
             }
             break;
     }

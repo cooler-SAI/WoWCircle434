@@ -3657,11 +3657,15 @@ void SpellMgr::LoadDbcDataCorrections()
             case 49462: // Call Ruby Drake
             case 49461: // Call Amber Drake
             case 49345: // Call Emerald Drake
-                spellInfo->Effects[1].Effect = 0;
+                spellInfo->Effects[EFFECT_0].Effect = 0;
                 break;
             // Camouflage
             case 80325:
-                spellInfo->Effects[1].Effect = 0;
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                break;
+            // Steady Shot
+            case 56641:
+                spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_CASTER;
                 break;
             default:
                 break;
