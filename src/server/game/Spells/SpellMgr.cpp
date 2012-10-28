@@ -3659,6 +3659,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 49345: // Call Emerald Drake
                 spellInfo->Effects[1].Effect = 0;
                 break;
+            // Camouflage
+            case 80325:
+                spellInfo->Effects[1].Effect = 0;
+                break;
             default:
                 break;
         }

@@ -688,6 +688,17 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     break;
             }
             break;
+        case SPELLFAMILY_HUNTER:
+            switch (m_spellInfo->Id)
+            {
+                // Camouflage
+                case 51753:
+                    m_caster->CastSpell(m_caster, 51755, true);
+                    if (Unit* pet = m_caster->GetGuardianPet())
+                        pet->CastSpell(pet, 51753, true);
+                    break;
+            }
+            break;
     }
 
     //spells triggered by dummy effect should not miss

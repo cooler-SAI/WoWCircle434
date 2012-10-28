@@ -410,7 +410,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleNULL,                                      //350 SPELL_AURA_MOD_GATHERING_ITEMS_GAINED_PERCENT
     &AuraEffect::HandleNULL,                                      //351 SPELL_AURA_351
     &AuraEffect::HandleNULL,                                      //352 SPELL_AURA_352
-    &AuraEffect::HandleNULL,                                      //353 SPELL_AURA_MOD_CAMOUFLAGE
+    &AuraEffect::HandleModCamouflage,                             //353 SPELL_AURA_MOD_CAMOUFLAGE
     &AuraEffect::HandleNULL,                                      //354 SPELL_AURA_354
     &AuraEffect::HandleUnused,                                    //355 unused (4.3.4)
     &AuraEffect::HandleNULL,                                      //356 SPELL_AURA_356
@@ -1858,6 +1858,24 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
     // need triggering visibility update base at phase update of not GM invisible (other GMs anyway see in any phases)
     if (target->IsVisible())
         target->UpdateObjectVisibility();
+}
+
+void AuraEffect::HandleModCamouflage(AuraApplication const *aurApp, uint8 mode, bool apply) const
+{
+    if (!(mode & AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK))
+        return;
+
+    Unit *target = aurApp->GetTarget();
+
+    if (apply)
+    {
+        //
+    }
+    else
+    {
+        if (Unit* pet = GetCaster()->GetGuardianPet())
+            pet->RemoveAurasByType(SPELL_AURA_MOD_CAMOUFLAGE);
+    }
 }
 
 /**********************/
@@ -6044,6 +6062,14 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                 if (caster)
                     caster->CastSpell(target, triggerSpellId, false);
                 return;
+            }
+            // Camouflage
+            case 80326:
+            {
+                if (caster->isMoving() || caster->HasAura(80325))
+                    return;
+
+                break;
             }
         }
     }

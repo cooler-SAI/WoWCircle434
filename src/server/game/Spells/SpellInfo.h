@@ -156,6 +156,7 @@ enum SpellSpecificType
     SPELL_SPECIFIC_MAGE_POLYMORPH                = 11,
     SPELL_SPECIFIC_JUDGEMENT                     = 13,
     SPELL_SPECIFIC_WARLOCK_CORRUPTION            = 17,
+    SPELL_SPECIFIC_WELL_FED                      = 18,
     SPELL_SPECIFIC_FOOD                          = 19,
     SPELL_SPECIFIC_DRINK                         = 20,
     SPELL_SPECIFIC_FOOD_AND_DRINK                = 21,
@@ -508,6 +509,10 @@ public:
     bool IsRankOf(SpellInfo const* spellInfo) const;
     bool IsDifferentRankOf(SpellInfo const* spellInfo) const;
     bool IsHighRankOf(SpellInfo const* spellInfo) const;
+
+    // camoufalge helpers
+    bool IsBreakCamouflage() const;
+    bool IsBreakCamouflageAfterHit() const;
 
     // loading helpers
     uint32 _GetExplicitTargetMask() const;

@@ -2502,7 +2502,13 @@ TempSummon* WorldObject::SummonCreature(uint32 entry, const Position &pos, TempS
 {
     if (Map* map = FindMap())
     {
-        if (TempSummon* summon = map->SummonCreature(entry, pos, NULL, duration, isType(TYPEMASK_UNIT) ? (Unit*)this : NULL))
+        Unit* owner = NULL;
+        if (isType(TYPEMASK_UNIT))
+            owner = (Unit*)this;
+        else if (isType(TYPEMASK_GAMEOBJECT))
+            owner = ToGameObject()->GetOwner();
+
+        if (TempSummon* summon = map->SummonCreature(entry, pos, NULL, duration, owner))
         {
             summon->SetTempSummonType(spwtype);
             return summon;
