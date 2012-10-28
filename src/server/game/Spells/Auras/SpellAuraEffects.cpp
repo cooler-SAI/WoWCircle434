@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gamePCH.h"
 #include "Common.h"
 #include "WorldPacket.h"
 #include "Opcodes.h"
@@ -509,6 +508,22 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
     // custom amount calculations go here
     switch (GetAuraType())
     {
+        case SPELL_AURA_MOD_RATING:
+        {
+            // Heart's Judgment, Heart of Ignacious trinket 
+            if (m_spellInfo->Id == 91041)
+            {
+                if (Aura* pAura = caster->GetAura(91027))
+                    amount *= pAura->GetStackAmount();
+            }
+            // Heart's Judgment, Heart of Ignacious trinket (Heroic) 
+            else if (m_spellInfo->Id == 92328)
+            {
+                if (Aura* pAura = caster->GetAura(92325))
+                    amount *= pAura->GetStackAmount();
+            }
+            break;
+        }
         // crowd control auras
         case SPELL_AURA_MOD_CONFUSE:
         case SPELL_AURA_MOD_FEAR:
@@ -4410,6 +4425,18 @@ void AuraEffect::HandleModRating(AuraApplication const* aurApp, uint8 mode, bool
 
     if (target->GetTypeId() != TYPEID_PLAYER)
         return;
+
+    switch (m_spellInfo->Id)
+    {
+        // Heart's Judgment, Heart of Ignacious 
+        case 91041:
+            target->RemoveAurasDueToSpell(91027);
+            break;
+        // Heart's Judgment, Heart of Ignacious (Heroic)
+        case 92328:
+            target->RemoveAurasDueToSpell(92325);
+            break;
+    }
 
     for (uint32 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
         if (GetMiscValue() & (1 << rating))

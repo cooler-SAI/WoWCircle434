@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gamePCH.h"
 #include "SpellMgr.h"
 #include "SpellInfo.h"
 #include "ObjectMgr.h"
@@ -2946,6 +2945,14 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;
                 spellInfo->Effects[0].TriggerSpell = 0;
                 spellInfo->Effects[0].TargetA = TARGET_UNIT_CASTER;
+                break;
+            // Heart's Judgment, Heart of Ignacious trinket
+            case 91041:
+                spellInfo->CasterAuraSpell = 91027;
+                break;
+            // Heart's Judgment, Heart of Ignacious trinket (heroic)
+            case 92328:
+                spellInfo->CasterAuraSpell = 92325;
                 break;
             default:
                 break;
