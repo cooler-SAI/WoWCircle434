@@ -55,7 +55,7 @@ void MapInstanced::Update(const uint32 t)
 
     while (i != m_InstancedMaps.end())
     {
-        if (i->second->CanUnload(t))
+        if (i->second->CanUnload(t) || (i->second->IsRaid() && !i->second->HavePlayers()))
         {
             if (!DestroyInstance(i))                             // iterator incremented
             {
@@ -137,6 +137,39 @@ Map* MapInstanced::CreateInstanceForPlayer(const uint32 mapId, Player* player)
                 player->TeleportToBGEntryPoint();
                 return NULL;
             }
+        }
+    }
+    else if (IsRaid())
+    {
+        InstancePlayerBind *pBind = player->GetBoundInstance(GetId(), REGULAR_DIFFICULTY);
+        InstanceSave *pSave = pBind ? pBind->save : NULL;
+
+        if (!pBind || !pBind->perm)
+        {
+            InstanceGroupBind *groupBind = NULL;
+            Group *group = player->GetGroup();
+            if (group)
+            {
+                groupBind = group->GetBoundInstance(this);
+                if (groupBind)
+                    pSave = groupBind->save;
+            }
+        }
+        if (pSave)
+        {
+            newInstanceId = pSave->GetInstanceId();
+            map = FindInstanceMap(newInstanceId);
+            if (!map)
+            {
+                Difficulty diff = player->GetGroup() ? player->GetGroup()->GetDifficulty(true) : player->GetDifficulty(true);
+                map = CreateInstance(newInstanceId, pSave, diff);
+            }
+        }
+        else
+        {
+            newInstanceId = sMapMgr->GenerateInstanceId();
+            Difficulty diff = player->GetGroup() ? player->GetGroup()->GetDifficulty(true) : player->GetDifficulty(true);
+            map = CreateInstance(newInstanceId, NULL, diff);
         }
     }
     else

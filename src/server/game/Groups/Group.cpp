@@ -2044,6 +2044,10 @@ InstanceGroupBind* Group::GetBoundInstance(Map* aMap)
     // Currently spawn numbering not different from map difficulty
     Difficulty difficulty = GetDifficulty(aMap->IsRaid());
 
+    // Raids have only one save
+    if (aMap->IsRaid())
+        difficulty = REGULAR_DIFFICULTY;
+
     // some instances only have one difficulty
     GetDownscaledMapDifficultyData(aMap->GetId(), difficulty);
 
@@ -2060,6 +2064,10 @@ InstanceGroupBind* Group::GetBoundInstance(MapEntry const* mapEntry)
         return NULL;
 
     Difficulty difficulty = GetDifficulty(mapEntry->IsRaid());
+
+    // Raids have only one save
+    if (mapEntry->IsRaid())
+        difficulty = REGULAR_DIFFICULTY;
 
     // some instances only have one difficulty
     GetDownscaledMapDifficultyData(mapEntry->MapID, difficulty);

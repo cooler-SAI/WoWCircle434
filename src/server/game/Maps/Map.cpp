@@ -2383,7 +2383,77 @@ bool InstanceMap::AddPlayerToMap(Player* player)
             //return false;
 
         // Dungeon only code
-        if (IsDungeon())
+        if (IsRaid())
+        {
+            Group *group = player->GetGroup();
+
+            InstanceSave *mapSave = sInstanceSaveMgr->GetInstanceSave(GetInstanceId());
+            if (!mapSave)
+            {
+                sLog->outInfo(LOG_FILTER_MAPS, "InstanceMap::Add: creating instance save for map %d spawnmode %d with instance id %d", GetId(), GetSpawnMode(), GetInstanceId());
+                mapSave = sInstanceSaveMgr->AddInstanceSave(GetId(), GetInstanceId(), REGULAR_DIFFICULTY, 0, true);
+            }
+
+            InstancePlayerBind *playerBind = player->GetBoundInstance(GetId(), REGULAR_DIFFICULTY);
+            if (playerBind && playerBind->perm)
+            {
+                if (playerBind->save != mapSave)
+                {
+                    sLog->outError(LOG_FILTER_MAPS, "InstanceMap::Add: player %s(%d) is permanently bound to instance %d, %d, %d, %d, %d, %d but he is being put into instance %d, %d, %d, %d, %d, %d", player->GetName(), player->GetGUIDLow(), playerBind->save->GetMapId(), playerBind->save->GetInstanceId(), playerBind->save->GetDifficulty(), playerBind->save->GetPlayerCount(), playerBind->save->GetGroupCount(), playerBind->save->CanReset(), mapSave->GetMapId(), mapSave->GetInstanceId(), mapSave->GetDifficulty(), mapSave->GetPlayerCount(), mapSave->GetGroupCount(), mapSave->CanReset());
+                    return false;
+                }
+            }
+            else
+            {
+                if (group)
+                {
+                    InstanceGroupBind *groupBind = group->GetBoundInstance(this);
+                    if (playerBind)
+                    {
+                        sLog->outError(LOG_FILTER_MAPS, "InstanceMap::Add: player %s(%d) is being put into instance %d, %d, %d, %d, %d, %d but he is in group %d and is bound to instance %d, %d, %d, %d, %d, %d!", player->GetName(), player->GetGUIDLow(), mapSave->GetMapId(), mapSave->GetInstanceId(), mapSave->GetDifficulty(), mapSave->GetPlayerCount(), mapSave->GetGroupCount(), mapSave->CanReset(), GUID_LOPART(group->GetLeaderGUID()), playerBind->save->GetMapId(), playerBind->save->GetInstanceId(), playerBind->save->GetDifficulty(), playerBind->save->GetPlayerCount(), playerBind->save->GetGroupCount(), playerBind->save->CanReset());
+                        if (groupBind)
+                            sLog->outError(LOG_FILTER_MAPS, "InstanceMap::Add: the group is bound to the instance %d, %d, %d, %d, %d, %d", groupBind->save->GetMapId(), groupBind->save->GetInstanceId(), groupBind->save->GetDifficulty(), groupBind->save->GetPlayerCount(), groupBind->save->GetGroupCount(), groupBind->save->CanReset());
+                        return false;
+                    }
+                    if (!groupBind)
+                        group->BindToInstance(mapSave, false);
+                    else
+                    {
+                        if (groupBind->save != mapSave)
+                        {
+                            sLog->outError(LOG_FILTER_MAPS, "InstanceMap::Add: player %s(%d) is being put into instance %d, %d, %d but he is in group %d which is bound to instance %d, %d, %d!", player->GetName(), player->GetGUIDLow(), mapSave->GetMapId(), mapSave->GetInstanceId(), mapSave->GetDifficulty(), GUID_LOPART(group->GetLeaderGUID()), groupBind->save->GetMapId(), groupBind->save->GetInstanceId(), groupBind->save->GetDifficulty());
+                            if (mapSave)
+                                sLog->outError(LOG_FILTER_MAPS, "MapSave players: %d, group count: %d", mapSave->GetPlayerCount(), mapSave->GetGroupCount());
+                            else
+                                sLog->outError(LOG_FILTER_MAPS, "MapSave NULL");
+                            if (groupBind->save)
+                                sLog->outError(LOG_FILTER_MAPS, "GroupBind save players: %d, group count: %d", groupBind->save->GetPlayerCount(), groupBind->save->GetGroupCount());
+                            else
+                                sLog->outError(LOG_FILTER_MAPS, "GroupBind save NULL");
+                            return false;
+                        }
+                        if (groupBind->perm)
+                        {
+                            WorldPacket data(SMSG_INSTANCE_LOCK_WARNING_QUERY, 10);
+                            data << uint32(60000);
+                            data << uint32(i_data ? i_data->GetCompletedEncounterMask() : 0);
+                            data << uint8(0);
+                            data << uint8(0); // events it throws:  1 : INSTANCE_LOCK_WARNING   0 : INSTANCE_LOCK_STOP / INSTANCE_LOCK_START
+                            player->GetSession()->SendPacket(&data);
+                            player->SetPendingBind(mapSave->GetInstanceId(), 60000);
+                        }
+                    }
+                }
+                else
+                {
+                    if (!playerBind)
+                        player->BindToInstance(mapSave, false);
+                    else
+                        ASSERT(playerBind->save == mapSave);
+                }
+            }
+        }
+        else if (IsDungeon())
         {
             Group* group = player->GetGroup();
 
