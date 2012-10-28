@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "gamePCH.h"
 #include "ThreatManager.h"
 #include "Unit.h"
 #include "Creature.h"

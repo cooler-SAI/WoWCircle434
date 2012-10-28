@@ -2,6 +2,8 @@
  * This program is free software licensed under GPL version 2
  * Please see the included DOCS/LICENSE.TXT for more information */
 
+#include "gamePCH.h"
+#include "ScriptPCH.h"
 /* ScriptData
 SDName: Npc_EscortAI
 SD%Complete: 100

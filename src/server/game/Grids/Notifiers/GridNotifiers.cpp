@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "gamePCH.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "WorldPacket.h"

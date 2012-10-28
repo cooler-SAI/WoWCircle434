@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "gamePCH.h"
 #include "Cryptography/HMACSHA1.h"
 #include "Cryptography/WardenKeyGeneration.h"
 #include "Common.h"

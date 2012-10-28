@@ -19,6 +19,7 @@
  * Interaction between core and LFGScripts
  */
 
+#include "gamePCH.h"
 #include "Common.h"
 #include "SharedDefines.h"
 #include "Player.h"

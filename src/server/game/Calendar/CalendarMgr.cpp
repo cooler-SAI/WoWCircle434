@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS `calendar_invites` (
 );
 */
 
+#include "gamePCH.h"
 #include "CalendarMgr.h"
 #include "QueryResult.h"
 #include "DatabaseEnv.h"

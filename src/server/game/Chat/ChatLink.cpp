@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "gamePCH.h"
 #include "ChatLink.h"
 #include "SpellMgr.h"
 #include "ObjectMgr.h"

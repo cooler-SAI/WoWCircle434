@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "gamePCH.h"
 #include "ScriptMgr.h"
 #include "Config.h"
 #include "DatabaseEnv.h"

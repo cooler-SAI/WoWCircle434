@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "gamePCH.h"
 #include "ObjectPosSelector.h"
 
 ObjectPosSelector::ObjectPosSelector(float x, float y, float size, float dist)

@@ -5,6 +5,8 @@
  * This program is free software licensed under GPL version 2
  * Please see the included DOCS/LICENSE.TXT for more information */
 
+#include "gamePCH.h"
+#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "Item.h"
 #include "Spell.h"

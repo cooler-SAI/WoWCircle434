@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "gamePCH.h"
 #include "Common.h"
 #include "CreatureAIImpl.h"
 #include "Log.h"
@@ -4916,6 +4917,7 @@ bool Unit::HandleAuraProcOnPowerAmount(Unit* victim, uint32 /*damage*/, AuraEffe
     {
         case SPELLFAMILY_DRUID:
         {
+
             // Eclipse Mastery Driver Passive
             if (auraSpellInfo->Id == 79577)
             {

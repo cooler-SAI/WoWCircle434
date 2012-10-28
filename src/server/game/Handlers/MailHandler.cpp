@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "gamePCH.h"
 #include "DatabaseEnv.h"
 #include "Mail.h"
 #include "WorldPacket.h"

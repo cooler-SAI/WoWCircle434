@@ -1,3 +1,4 @@
+#include "gamePCH.h"
 #include "Player.h"
 
 #define MAX_RESEARCH_SITES                      16

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "gamePCH.h"
 #include "Totem.h"
 #include "WorldPacket.h"
 #include "Log.h"

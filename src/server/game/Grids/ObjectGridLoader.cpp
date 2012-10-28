@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "gamePCH.h"
 #include "ObjectGridLoader.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"

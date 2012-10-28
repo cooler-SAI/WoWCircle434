@@ -1,3 +1,4 @@
+#include "gamePCH.h"
 #include "Player.h"
 
 void Player::SendNewCurrency(uint32 id) const

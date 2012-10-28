@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "gamePCH.h"
 #include "BattlegroundQueue.h"
 #include "ArenaTeam.h"
 #include "BattlegroundMgr.h"
