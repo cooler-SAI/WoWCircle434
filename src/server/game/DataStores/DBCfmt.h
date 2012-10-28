@@ -25,7 +25,7 @@
 char const Achievementfmt[]="niixsxiixixxii";
 //const std::string CustomAchievementfmt="pppaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaapapaaaaaaaaaaaaaaaaaapp";
 //const std::string CustomAchievementIndex = "ID";
-char const AchievementCriteriafmt[]="niixiiiiiisiiiiixxiiiii";
+char const AchievementCriteriafmt[]="niiiixiiiisiiiiixxiiiii";
 char const AreaTableEntryfmt[]="iiinixxxxxisiiiiifxxixxxxx";
 char const AreaGroupEntryfmt[]="niiiiiii";
 char const AreaPOIEntryfmt[]="niiiiiiiiiiiffixixxixx";

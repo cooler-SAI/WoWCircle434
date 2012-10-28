@@ -2941,24 +2941,6 @@ void SpellMgr::LoadSpellCustomAttr()
             case 72293: // Mark of the Fallen Champion (Deathbringer Saurfang)
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE_EFF0;
                 break;
-            // Have Group, Will Travel
-            case 83967:
-                spellInfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;
-                spellInfo->Effects[0].TriggerSpell = 0;
-                spellInfo->Effects[0].TargetA = TARGET_UNIT_CASTER;
-                break;
-            // Heart's Judgment, Heart of Ignacious trinket
-            case 91041:
-                spellInfo->CasterAuraSpell = 91027;
-                break;
-            // Heart's Judgment, Heart of Ignacious trinket (heroic)
-            case 92328:
-                spellInfo->CasterAuraSpell = 92325;
-                break;
-            // Shadow Apparition
-            case 87426:
-                spellInfo->Effects[0].TargetA = TARGET_UNIT_CASTER;
-                break;
             default:
                 break;
         }
@@ -3021,6 +3003,24 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 59735:
                 spellInfo->Effects[EFFECT_1].TriggerSpell = 59736;
+                break;
+            // Have Group, Will Travel
+            case 83967:
+                spellInfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;
+                spellInfo->Effects[0].TriggerSpell = 0;
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_CASTER;
+                break;
+            // Heart's Judgment, Heart of Ignacious trinket
+            case 91041:
+                spellInfo->CasterAuraSpell = 91027;
+                break;
+            // Heart's Judgment, Heart of Ignacious trinket (heroic)
+            case 92328:
+                spellInfo->CasterAuraSpell = 92325;
+                break;
+            // Shadow Apparition
+            case 87426:
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_CASTER;
                 break;
             case 52611: // Summon Skeletons
             case 52612: // Summon Skeletons

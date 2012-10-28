@@ -779,12 +779,9 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
 
                 if (GuildReward const* pReward = sGuildMgr->FindGuildReward(itemTemplate->ItemId))
                 {
-                    Guild* pGuild = sGuildMgr->GetGuildByGuid(_player->GetGuildId());
+                    Guild* pGuild = sGuildMgr->GetGuildById(_player->GetGuildId());
 
                     if (!pGuild)
-                        continue;
-
-                    if (!(pReward->Racemask & _player->getRaceMask()))
                         continue;
 
                     if (_player->GetReputationRank(1168) < ReputationRank(pReward->Standing))
