@@ -4955,8 +4955,8 @@ void ObjectMgr::LoadInstanceEncounters()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                                 0         1            2                3
-    QueryResult result = WorldDatabase.Query("SELECT entry, creditType, creditEntry, lastEncounterDungeon FROM instance_encounters");
+    //                                                 0         1            2          3             4
+    QueryResult result = WorldDatabase.Query("SELECT entry, difficulty, creditType, creditEntry, lastEncounterDungeon FROM instance_encounters");
     if (!result)
     {
         sLog->outError(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 instance encounters, table is empty!");
@@ -4970,9 +4970,10 @@ void ObjectMgr::LoadInstanceEncounters()
     {
         Field* fields = result->Fetch();
         uint32 entry = fields[0].GetUInt32();
-        uint8 creditType = fields[1].GetUInt8();
-        uint32 creditEntry = fields[2].GetUInt32();
-        uint32 lastEncounterDungeon = fields[3].GetUInt16();
+        int32 difficulty = fields[1].GetInt16();
+        uint8 creditType = fields[2].GetUInt8();
+        uint32 creditEntry = fields[3].GetUInt32();
+        uint32 lastEncounterDungeon = fields[4].GetUInt16();
         DungeonEncounterEntry const* dungeonEncounter = sDungeonEncounterStore.LookupEntry(entry);
         if (!dungeonEncounter)
         {
@@ -5024,7 +5025,7 @@ void ObjectMgr::LoadInstanceEncounters()
         }
 
         DungeonEncounterList& encounters = _dungeonEncounterStore[MAKE_PAIR32(dungeonEncounter->mapId, dungeonEncounter->difficulty)];
-        encounters.push_back(new DungeonEncounter(dungeonEncounter, EncounterCreditType(creditType), creditEntry, lastEncounterDungeon));
+        encounters.push_back(new DungeonEncounter(dungeonEncounter, difficulty, EncounterCreditType(creditType), creditEntry, lastEncounterDungeon));
         ++count;
     } while (result->NextRow());
 

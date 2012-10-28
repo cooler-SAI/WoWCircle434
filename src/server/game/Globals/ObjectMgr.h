@@ -567,10 +567,11 @@ enum EncounterCreditType
 
 struct DungeonEncounter
 {
-    DungeonEncounter(DungeonEncounterEntry const* _dbcEntry, EncounterCreditType _creditType, uint32 _creditEntry, uint32 _lastEncounterDungeon)
-        : dbcEntry(_dbcEntry), creditType(_creditType), creditEntry(_creditEntry), lastEncounterDungeon(_lastEncounterDungeon) { }
+    DungeonEncounter(DungeonEncounterEntry const* _dbcEntry, int32 _difficulty, EncounterCreditType _creditType, uint32 _creditEntry, uint32 _lastEncounterDungeon)
+        : dbcEntry(_dbcEntry), difficulty(_difficulty), creditType(_creditType), creditEntry(_creditEntry), lastEncounterDungeon(_lastEncounterDungeon) { }
 
     DungeonEncounterEntry const* dbcEntry;
+    int32 difficulty;
     EncounterCreditType creditType;
     uint32 creditEntry;
     uint32 lastEncounterDungeon;
@@ -795,9 +796,14 @@ class ObjectMgr
 
         DungeonEncounterList const* GetDungeonEncounterList(uint32 mapId, Difficulty difficulty)
         {
-            UNORDERED_MAP<uint32, DungeonEncounterList>::const_iterator itr = _dungeonEncounterStore.find(MAKE_PAIR32(mapId, difficulty));
-            if (itr != _dungeonEncounterStore.end())
-                return &itr->second;
+            UNORDERED_MAP<uint32, DungeonEncounterList>::const_iterator itr1 = _dungeonEncounterStore.find(MAKE_PAIR32(mapId, difficulty));
+            if (itr1 != _dungeonEncounterStore.end())
+                return &itr1->second;
+            // There are bad difficulties in DBC store (-1)
+            // So we check again
+		    UNORDERED_MAP<uint32, DungeonEncounterList>::const_iterator itr2 = _dungeonEncounterStore.find(MAKE_PAIR32(mapId, -1));
+		    if (itr2 != _dungeonEncounterStore.end())
+		        return &itr2->second;
             return NULL;
         }
 

@@ -434,7 +434,8 @@ void InstanceScript::UpdateEncounterState(EncounterCreditType type, uint32 credi
 
     for (DungeonEncounterList::const_iterator itr = encounters->begin(); itr != encounters->end(); ++itr)
     {
-        if ((*itr)->creditType == type && (*itr)->creditEntry == creditEntry)
+        if ((*itr)->creditType == type && (*itr)->creditEntry == creditEntry &&
+            (*itr)->difficulty == -1 || ((*itr)->difficulty == instance->GetDifficulty()))
         {
             completedEncounters |= 1 << (*itr)->dbcEntry->encounterIndex;
             sLog->outDebug(LOG_FILTER_TSCR, "Instance %s (instanceId %u) completed encounter %s", instance->GetMapName(), instance->GetInstanceId(), (*itr)->dbcEntry->encounterName);
