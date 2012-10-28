@@ -411,9 +411,20 @@ class spell_dk_scourge_strike : public SpellScriptLoader
                 if (Unit* unitTarget = GetHitUnit())
                 {
                     multiplier = (GetEffectValue() * unitTarget->GetDiseasesByCaster(caster->GetGUID()) / 100.f);
+                    SpellInfo const* shadowPart = sSpellMgr->GetSpellInfo(DK_SPELL_SCOURGE_STRIKE_TRIGGERED);
+
                     // Death Knight T8 Melee 4P Bonus
                     if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_DK_ITEM_T8_MELEE_4P_BONUS, EFFECT_0))
                         AddPct(multiplier, aurEff->GetAmount());
+
+                    // Second part is also dependent on the increasing damage effects
+                    Unit::AuraEffectList const& damageAuras = caster->GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+                    for (Unit::AuraEffectList::const_iterator i = damageAuras.begin(); i != damageAuras.end(); ++i)
+                    {
+                        if (((*i)->GetMiscValue() & shadowPart->GetSchoolMask()) || ((*i)->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL))
+                            AddPct(multiplier, (*i)->GetAmount());
+                    }
+                    caster->ToPlayer()->ApplySpellMod(DK_SPELL_SCOURGE_STRIKE_TRIGGERED, SPELLMOD_DAMAGE, multiplier);
                 }
             }
 

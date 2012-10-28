@@ -4071,8 +4071,8 @@ uint32 Unit::GetDiseasesByCaster(uint64 casterGUID, bool remove)
 {
     static const AuraType diseaseAuraTypes[] =
     {
-        SPELL_AURA_PERIODIC_DAMAGE, // Frost Fever and Blood Plague
-        SPELL_AURA_LINKED,          // Crypt Fever and Ebon Plague
+        SPELL_AURA_PERIODIC_DAMAGE,         // Frost Fever and Blood Plague
+        SPELL_AURA_MOD_DAMAGE_FROM_CASTER,  // Ebon Plague
         SPELL_AURA_NONE
     };
 
@@ -5350,12 +5350,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // Remove any stun effect on target
                     victim->RemoveAurasWithMechanic(1<<MECHANIC_STUN, AURA_REMOVE_BY_ENEMY_SPELL);
                     return true;
-                }
-                // Glyph of Scourge Strike
-                case 58642:
-                {
-                    triggered_spell_id = 69961; // Glyph of Scourge Strike
-                    break;
                 }
                 // Glyph of Life Tap
                 case 63320:
@@ -6992,6 +6986,65 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         }
         case SPELLFAMILY_DEATHKNIGHT:
         {
+            switch (dummySpell->Id)
+            {
+                // Ebon Plaguebringer
+                case 51099:
+                case 51160:
+                {
+                    triggered_spell_id = 65142;
+                    basepoints0 = triggerAmount;
+                    break;
+                }
+                // Dancing Rune Weapon
+                case 49028:
+                {
+                    // 1 dummy aura for dismiss rune blade
+                    if (effIndex != 1)
+                        return false;
+
+                    Unit* pPet = NULL;
+                    for (ControlList::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr) // Find Rune Weapon
+                        if ((*itr)->GetEntry() == 27893)
+                        {
+                            pPet = *itr;
+                            break;
+                        }
+
+                    if (pPet && pPet->getVictim() && damage && procSpell)
+                    {
+                        uint32 procDmg = damage / 2;
+                        pPet->SendSpellNonMeleeDamageLog(pPet->getVictim(), procSpell->Id, procDmg, procSpell->GetSchoolMask(), 0, 0, false, 0, false);
+                        pPet->DealDamage(pPet->getVictim(), procDmg, NULL, SPELL_DIRECT_DAMAGE, procSpell->GetSchoolMask(), procSpell, true);
+                        break;
+                    }
+                    else
+                        return false;
+
+                    break;
+                }
+                // Unholy Blight
+                case 49194:
+                {
+                    basepoints0 = CalculatePct(int32(damage), triggerAmount);
+                    triggered_spell_id = 50536;
+                    basepoints0 += victim->GetRemainingPeriodicAmount(GetGUID(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE);
+                    break;
+                }
+                // Runic Power Back on Snare/Root
+                case 61257:
+                {
+                    // only for spells and hit/crit (trigger start always) and not start from self casted spells
+                    if (procSpell == 0 || !(procEx & (PROC_EX_NORMAL_HIT|PROC_EX_CRITICAL_HIT)) || this == victim)
+                        return false;
+                    // Need snare or root mechanic
+                    if (!(procSpell->GetAllEffectsMechanicMask() & ((1<<MECHANIC_ROOT)|(1<<MECHANIC_SNARE))))
+                        return false;
+                    triggered_spell_id = 61258;
+                    target = this;
+                    break;
+                }
+            }
             // Blood-Caked Blade
             if (dummySpell->SpellIconID == 138)
             {
@@ -7007,39 +7060,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 basepoints0 = triggerAmount;
                 triggered_spell_id = 50163;
                 target = this;
-                break;
-            }
-            // Dancing Rune Weapon
-            if (dummySpell->Id == 49028)
-            {
-                // 1 dummy aura for dismiss rune blade
-                if (effIndex != 1)
-                    return false;
-
-                Unit* pPet = NULL;
-                for (ControlList::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr) // Find Rune Weapon
-                    if ((*itr)->GetEntry() == 27893)
-                    {
-                        pPet = *itr;
-                        break;
-                    }
-
-                if (pPet && pPet->getVictim() && damage && procSpell)
-                {
-                    uint32 procDmg = damage / 2;
-                    pPet->SendSpellNonMeleeDamageLog(pPet->getVictim(), procSpell->Id, procDmg, procSpell->GetSchoolMask(), 0, 0, false, 0, false);
-                    pPet->DealDamage(pPet->getVictim(), procDmg, NULL, SPELL_DIRECT_DAMAGE, procSpell->GetSchoolMask(), procSpell, true);
-                    break;
-                }
-                else
-                    return false;
-            }
-            // Unholy Blight
-            if (dummySpell->Id == 49194)
-            {
-                basepoints0 = CalculatePct(int32(damage), triggerAmount);
-                triggered_spell_id = 50536;
-                basepoints0 += victim->GetRemainingPeriodicAmount(GetGUID(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE);
                 break;
             }
             // Threat of Thassarian
@@ -7063,19 +7083,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     default:
                         return false;
                 }
-                break;
-            }
-            // Runic Power Back on Snare/Root
-            if (dummySpell->Id == 61257)
-            {
-                // only for spells and hit/crit (trigger start always) and not start from self casted spells
-                if (procSpell == 0 || !(procEx & (PROC_EX_NORMAL_HIT|PROC_EX_CRITICAL_HIT)) || this == victim)
-                    return false;
-                // Need snare or root mechanic
-                if (!(procSpell->GetAllEffectsMechanicMask() & ((1<<MECHANIC_ROOT)|(1<<MECHANIC_SNARE))))
-                    return false;
-                triggered_spell_id = 61258;
-                target = this;
                 break;
             }
             break;
@@ -9339,12 +9346,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
         return pdamage;
 
     // Some spells don't benefit from done mods
-    if (spellProto->AttributesEx3 & SPELL_ATTR3_NO_DONE_BONUS)
-        return pdamage;
-
-    // small exception for Deep Wounds, can't find any general rule
-    // should ignore ALL damage mods, they already calculated in trigger spell
-    if (spellProto->Id == 12721) // Deep Wounds
+    if ((spellProto->AttributesEx3 & SPELL_ATTR3_NO_DONE_BONUS) || (spellProto->AttributesEx6 & SPELL_ATTR6_NO_DONE_PCT_DAMAGE_MODS))
         return pdamage;
 
     // For totems get damage bonus from owner
@@ -9362,7 +9364,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
         DoneTotalMod *= ToCreature()->GetSpellDamageMod(ToCreature()->GetCreatureTemplate()->rank);
 
     // Some spells don't benefit from pct done mods
-    if (!(spellProto->AttributesEx6 & SPELL_ATTR6_NO_DONE_PCT_DAMAGE_MODS) && !spellProto->IsRankOf(sSpellMgr->GetSpellInfo(12162)))
+    if (!spellProto->IsRankOf(sSpellMgr->GetSpellInfo(12162)))
     {
         AuraEffectList const& mModDamagePercentDone = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
         for (AuraEffectList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
