@@ -2955,6 +2955,10 @@ void SpellMgr::LoadSpellCustomAttr()
             case 92328:
                 spellInfo->CasterAuraSpell = 92325;
                 break;
+            // Shadow Apparition
+            case 87426:
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_CASTER;
+                break;
             default:
                 break;
         }

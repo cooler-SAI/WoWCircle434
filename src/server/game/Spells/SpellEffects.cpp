@@ -436,6 +436,15 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         }
                     }
                 }
+                // Shadow Apparition
+                else if (m_spellInfo->Id == 87532)
+                {
+                    if (Unit* pOwner = m_caster->GetOwner())
+                    {
+                        apply_direct_bonus = false;
+                        damage += 0.6f * pOwner->SpellBaseDamageBonusDone(m_spellSchoolMask);
+                    }
+                }
                 break;
             }
             case SPELLFAMILY_DRUID:

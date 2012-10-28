@@ -6053,6 +6053,51 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         basepoints0 = int32(CalculatePct(damage, triggerAmount) / (blessHealing->GetMaxDuration() / blessHealing->Effects[0].Amplitude));
                     }
                     break;
+                // Shadowy Apparition
+                case 78202:
+                case 78203:
+                case 78204:
+                    if (Aura* aur = GetAura(dummySpell->Id))
+                    {
+                        int32 chance = aur->GetEffect(0)->GetAmount();
+                        if (isMoving())
+                            chance *= 5;
+                        if (effIndex !=0 || !procSpell || procSpell->Id != 589 || !roll_chance_i(chance))
+                            return false;
+
+                        std::list<Creature*> summons;
+                        GetAllMinionsByEntry(summons, 46954);
+                        if (summons.size() > 3)
+                            return false;
+
+                        int32 bp0 = 1;
+                        CastCustomSpell(this, 87426, &bp0, NULL, NULL, true);
+
+                        std::list<Creature*> new_summons;
+                        GetAllMinionsByEntry(new_summons, 46954);
+
+                        Unit* summon = NULL;
+                        for (std::list<Creature*>::iterator new_itr = new_summons.begin(); new_itr != new_summons.end(); ++new_itr)
+                        {
+                            summon = NULL;
+                            for (std::list<Creature*>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                                if ((*new_itr)->GetGUID() == (*itr)->GetGUID())
+                                    summon = *new_itr;
+                            if (!summon)
+                            {
+                                summon = *new_itr;
+                                break;
+                            }
+                        }
+                        if (summon)
+                        {
+                            //summon->m_FollowingRefManager.clearReferences();
+                            CastSpell(summon, 87213, true);
+                            summon->CastSpell(summon, 87427, true);
+                            summon->GetAI()->AttackStart(victim);
+                        }
+                    }
+                    break;
             }
             break;
         }
