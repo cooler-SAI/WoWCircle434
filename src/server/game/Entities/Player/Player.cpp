@@ -13441,6 +13441,9 @@ void Player::ApplyReforgeEnchantment(Item* item, bool apply)
         case ITEM_MOD_BLOCK_VALUE:
             HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, -removeValue, apply);
             break;
+        case ITEM_MOD_MASTERY_RATING:
+            ApplyRatingMod(CR_MASTERY, -removeValue, apply);
+            break;
     }
 
     switch (reforge->FinalStat)
@@ -13552,6 +13555,9 @@ void Player::ApplyReforgeEnchantment(Item* item, bool apply)
             break;
         case ITEM_MOD_BLOCK_VALUE:
             HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, addValue, apply);
+            break;
+        case ITEM_MOD_MASTERY_RATING:
+            ApplyRatingMod(CR_MASTERY, addValue, apply);
             break;
     }
 }
@@ -17166,7 +17172,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
         if (i >= talentTrees.size())
             break;
 
-        uint32 talentTree = atol(talentTrees[i]);
+        uint32 talentTree = atol(talentTrees[i]); // talentThreeId, 0 - not selected
         if (sTalentTabStore.LookupEntry(talentTree))
             SetPrimaryTalentTree(i, talentTree);
         else if (i == GetActiveSpec())
