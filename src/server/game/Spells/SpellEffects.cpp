@@ -4251,10 +4251,20 @@ void Spell::EffectAddComboPoints(SpellEffIndex /*effIndex*/)
     if (!m_caster->m_movedPlayer)
         return;
 
-    if (damage <= 0)
-        return;
+    Player* player = m_caster->m_movedPlayer;
 
-    m_caster->m_movedPlayer->AddComboPoints(unitTarget, damage, this);
+    if (damage > 0)
+        player->AddComboPoints(unitTarget, damage, this);
+    else
+    {
+        // Rogue: Redirect
+        if (GetSpellInfo()->Id == 73981 && player->GetComboPoints() > 0 && player->GetComboTarget())
+            player->AddComboPoints(unitTarget, player->GetComboPoints(), this);
+
+        // Rogue: Sinister Strike Enabler
+        if (!player->HasAura(79327) && player->getLevel() >= 3)
+            player->learnSpell(79327, false);
+    }
 }
 
 void Spell::EffectDuel(SpellEffIndex effIndex)

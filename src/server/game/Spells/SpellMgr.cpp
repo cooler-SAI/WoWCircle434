@@ -3232,12 +3232,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 16835:
                 spellInfo->SetDurationIndex(21);
                 break;
-            case 51735: // Ebon Plague
-            case 51734:
-            case 51726:
-                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
-                spellInfo->SpellFamilyFlags[EFFECT_2] = 0x10;
-                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
+            case 65142: // Ebon Plague
+                spellInfo->Effects[1].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_DUMMY;
+                spellInfo->Effects[1].MiscValue = SPELL_SCHOOL_MASK_MAGIC;
                 break;
             case 41913: // Parasitic Shadowfiend Passive
                 spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY; // proc debuff, and summon infinite fiends

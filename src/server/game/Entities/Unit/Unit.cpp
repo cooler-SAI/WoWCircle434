@@ -6270,6 +6270,81 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Revealing Strike
+                case 84617:
+                    return triggeredByAura->GetCaster() == victim;
+
+                // Bandit's Guile
+                case 84652:
+                case 84653:
+                case 84654:
+                {
+                    uint32 spells[] = {84745, 84746, 84747};
+                    int32 basepoints1 = 1; // Sinister Strike/Revealing Strike count
+                    int32 basepoints00 = 0; // damage modifier
+
+                    // read last count
+                    AuraEffect* banditsGuile = 0;
+                    if (banditsGuile = victim->GetAuraEffect(84748, 1, GetGUID()))
+                        basepoints1 = banditsGuile->GetAmount() + 1;
+
+                    if (!banditsGuile)
+                    {
+                        for (int x = 0; x < 3; ++x)
+                            RemoveAurasDueToSpell(spells[x]);
+                    }
+                    else
+                    {
+                        // find Insight aura
+                        int i = 0;
+                        for (i = 0; i < 3; ++i)
+                            if (AuraEffect* moderateInsight = GetAuraEffect(spells[i], 0))
+                            {
+                                basepoints00 = moderateInsight->GetAmount();
+                                break;
+                            }
+                            // "upgrade" Insight aura
+                            if (basepoints1 >= 4)
+                            {
+                                if (i == 2)
+                                    return false;
+                                basepoints1 = 0;
+                                basepoints00 += 10;
+                                if (i == 3)
+                                    triggered_spell_id = spells[0];
+                                else
+                                {
+                                    RemoveAurasDueToSpell(spells[i]);
+                                    triggered_spell_id = spells[i+1];
+                                }
+                            }
+                    }
+                    CastCustomSpell(target, 84748, &basepoints00, &basepoints1, 0, true);
+                    break;
+                }
+                // Restless Blades
+                case 79095:
+                case 79096:
+                {
+                    if (!ToPlayer())
+                        return false;
+
+                    if (procSpell->DmgClass == SPELL_DAMAGE_CLASS_MELEE && procSpell->AttributesEx & SPELL_ATTR1_REQ_COMBO_POINTS1)
+                    {
+                        // better not to use cycle here otherwise the time is not always reduced
+                        uint32 reductionTime = triggerAmount * ToPlayer()->GetComboPoints();
+                        // Sprint
+                        ToPlayer()->ReduceSpellCooldown(2983, reductionTime);
+                        // Adrenaline Rush
+                        ToPlayer()->ReduceSpellCooldown(13750, reductionTime);
+                        // Killing Spree
+                        ToPlayer()->ReduceSpellCooldown(51690, reductionTime);
+                        // Redirect
+                        ToPlayer()->ReduceSpellCooldown(73981, reductionTime);
+                        return true;
+                    }
+                    break;
+                }
                 case 32748: // Deadly Throw Interrupt
                 {
                     // Prevent cast Deadly Throw Interrupt on self from last effect (apply dummy) of Deadly Throw

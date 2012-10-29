@@ -4295,6 +4295,20 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
     }
 }
 
+void Player::ReduceSpellCooldown(uint32 spell_id, time_t modifyTime)
+{
+    int32 newCooldown = GetSpellCooldownDelay(spell_id) - modifyTime;
+    if (newCooldown < 0)
+        newCooldown = 0;
+
+    AddSpellCooldown(spell_id, 0, uint32(time(NULL) + newCooldown));
+    WorldPacket data(SMSG_MODIFY_COOLDOWN, 4+8+4);
+    data << uint32(spell_id);
+    data << uint64(GetGUID());
+    data << int32(-modifyTime);
+    SendDirectMessage(&data);
+}
+
 void Player::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)
 {
     m_spellCooldowns.erase(spell_id);
