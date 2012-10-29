@@ -7789,6 +7789,7 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply)
     _ApplyItemBonuses(proto, slot, apply);
     ApplyItemEquipSpell(item, apply);
     ApplyEnchantment(item, apply);
+    UpdateArmorSpecializations(slot);
 
     sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "_ApplyItemMods complete.");
 }
@@ -8548,6 +8549,7 @@ void Player::_RemoveAllItemMods()
 
             ApplyItemEquipSpell(m_items[i], false);
             ApplyEnchantment(m_items[i], false);
+            UpdateArmorSpecializations(i);
         }
     }
 
@@ -10331,6 +10333,108 @@ bool Player::HasItemOrGemWithLimitCategoryEquipped(uint32 limitCategory, uint32 
     return false;
 }
 
+bool Player::CheckArmorSpecializationItemConditions(SpellInfo const* spellInfo) const
+{
+    if (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR8_ARMOR_SPECIALIZATION))
+        return false;
+
+    uint8 count = 0;
+
+    if (SpellEquippedItemsEntry const* listItems = spellInfo->GetSpellEquippedItems())
+    {
+        for (int i = 0; i < MAX_INVTYPE; ++i)
+        {
+            if (!m_items[i] || !m_items[i]->GetTemplate())
+                continue;
+
+            if (!(1 << (i + 1) & listItems->EquippedItemInventoryTypeMask))
+                continue;
+
+            if (!(1 << m_items[i]->GetTemplate()->SubClass & listItems->EquippedItemSubClassMask))
+                continue;
+
+            if (m_items[i]->GetTemplate()->Class != listItems->EquippedItemClass)
+                continue;
+
+            count++;
+        }
+    }
+
+    return (count == 8);
+}
+
+void Player::UpdateArmorSpecializations(uint8 Slot)
+{
+    uint32 specilaztionSpell = ArmorSpecializationSpellToClass[getClass()];
+    if (!specilaztionSpell)
+        return;
+
+    switch (Slot)
+    {
+        case EQUIPMENT_SLOT_HEAD:
+        case EQUIPMENT_SLOT_SHOULDERS:
+        case EQUIPMENT_SLOT_CHEST:
+        case EQUIPMENT_SLOT_WAIST:
+        case EQUIPMENT_SLOT_LEGS:
+        case EQUIPMENT_SLOT_FEET:
+        case EQUIPMENT_SLOT_WRISTS:
+        case EQUIPMENT_SLOT_HANDS:
+            break;
+        default:
+            return;
+    }
+
+    uint32 spellId = 0;
+
+    for (int i = 0; i < MAX_ARMOR_SPECIALIZATION_SPELLS; ++i)
+    {
+        if (ArmorSpecializationTree[i].Class != getClass())
+            continue;
+
+        spellId =  ArmorSpecializationTree[i].spellId;
+
+        RemoveAurasDueToSpell(spellId);
+
+        if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_DRUID_FERAL_COMBAT)
+        {
+            if (ShapeshiftForm form = GetShapeshiftForm())
+            {
+                if (form = FORM_CAT)
+                    spellId = 86097;
+                else
+                    spellId = 86096;
+            }
+        }
+
+        if (!ArmorSpecializationTree[i].Tree && GetPrimaryTalentTree(GetActiveSpec()) == 0 ||
+            ArmorSpecializationTree[i].Tree && ArmorSpecializationTree[i].Tree != GetPrimaryTalentTree(GetActiveSpec()))
+            continue;
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        if (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR8_ARMOR_SPECIALIZATION))
+        {
+            sLog->outError(LOG_FILTER_PLAYER, "Player::UpdateArmorSpecializations: unexistent or wrong spell %u for class %u",
+                spellId, ArmorSpecializationTree[i].Class);
+            continue;
+        }
+
+        if (!HasSpell(specilaztionSpell))
+        {
+            RemoveAurasDueToSpell(spellInfo->Id);
+            continue;
+        }
+
+        if (!CheckArmorSpecializationItemConditions(spellInfo))
+            continue;
+
+        if (!HasAura(ArmorSpecializationTree[i].spellId))
+        {
+            CastSpell(this, spellInfo->Id, true);
+            break;
+        }
+    }
+}
+
 InventoryResult Player::CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count) const
 {
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(entry);
@@ -12027,6 +12131,7 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
 
             m_items[slot] = NULL;
             SetUInt64Value(PLAYER_FIELD_INV_SLOT_HEAD + (slot * 2), 0);
+            UpdateArmorSpecializations(slot);
 
             if (slot < EQUIPMENT_SLOT_END)
                 SetVisibleItemSlot(slot, NULL);
@@ -12134,6 +12239,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
                     RemoveItemsSetItem(this, pProto);
 
                 _ApplyItemMods(pItem, slot, false);
+                UpdateArmorSpecializations(slot);
             }
 
             if (slot < EQUIPMENT_SLOT_END)

@@ -467,6 +467,18 @@ public:
     bool IsAuraExclusiveBySpecificWith(SpellInfo const* spellInfo) const;
     bool IsAuraExclusiveBySpecificPerCasterWith(SpellInfo const* spellInfo) const;
 
+    inline bool HasAttribute(SpellAttr0 attribute) const { return Attributes & attribute; }
+    inline bool HasAttribute(SpellAttr1 attribute) const { return AttributesEx & attribute; }
+    inline bool HasAttribute(SpellAttr2 attribute) const { return AttributesEx2 & attribute; }
+    inline bool HasAttribute(SpellAttr3 attribute) const { return AttributesEx3 & attribute; }
+    inline bool HasAttribute(SpellAttr4 attribute) const { return AttributesEx4 & attribute; }
+    inline bool HasAttribute(SpellAttr5 attribute) const { return AttributesEx5 & attribute; }
+    inline bool HasAttribute(SpellAttr6 attribute) const { return AttributesEx6 & attribute; }
+    inline bool HasAttribute(SpellAttr7 attribute) const { return AttributesEx7 & attribute; }
+    inline bool HasAttribute(SpellAttr8 attribute) const { return AttributesEx8 & attribute; }
+    inline bool HasAttribute(SpellAttr9 attribute) const { return AttributesEx9 & attribute; }
+    inline bool HasAttribute(SpellAttr10 attribute) const { return AttributesEx10 & attribute; }
+
     SpellCastResult CheckShapeshift(uint32 form) const;
     SpellCastResult CheckLocation(uint32 map_id, uint32 zone_id, uint32 area_id, Player const* player = NULL) const;
     SpellCastResult CheckTarget(Unit const* caster, WorldObject const* target, bool implicit = true) const;

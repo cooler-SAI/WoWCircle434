@@ -552,10 +552,25 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             }
             case SPELLFAMILY_MAGE:
             {
-                // Deep Freeze should deal damage to permanently stun-immune targets.
-                if (m_spellInfo->Id == 71757)
-                    if (unitTarget->GetTypeId() != TYPEID_UNIT || !(unitTarget->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(44572), 0)))
-                        return;
+                switch (m_spellInfo->Id)
+                {
+                    case 71757: // Deep Freeze should deal damage to permanently stun-immune targets.
+                        if (unitTarget->GetTypeId() != TYPEID_UNIT || !(unitTarget->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(44572), 0)))
+                            return;
+                        break;
+                    case 82739: // Flame Orb
+                    case 95969: // Frostfire Orb R1
+                    case 84721: // Frostfire Orb R2
+                        if (Unit* owner = m_caster->GetOwner())
+                        {
+                            damage = owner->SpellDamageBonusDone(unitTarget, m_spellInfo, (uint32)damage, SPELL_DIRECT_DAMAGE);
+                            damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, (uint32)damage, SPELL_DIRECT_DAMAGE);
+                            apply_direct_bonus = false;
+                        }
+                        break;
+                    default:
+                        break;
+                }
                 break;
             }
         }

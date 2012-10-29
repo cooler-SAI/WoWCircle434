@@ -149,6 +149,54 @@ enum TalentTree // talent tabs
     TALENT_TREE_DRUID_RESTORATION    = 748
 };
 
+#define MAX_ARMOR_SPECIALIZATION_SPELLS 18
+
+const uint32 ArmorSpecializationSpellToClass[MAX_CLASSES] =
+{
+    0,
+    86526,  // CLASS_WARRIOR,
+    86525,  // CLASS_PALADIN,
+    86528,  // CLASS_HUNTER,
+    86531,  // CLASS_ROGUE,
+    0,      // CLASS_PRIEST
+    86524,  // CLASS_DEATH_KNIGHT,
+    86529,  // CLASS_SHAMAN,
+    0,      // CLASS_MAGE,
+    0,      // CLASS_WARLOCK
+    0,      // CLASS_UNK2
+    86530,  // CLASS_DRUID
+};
+
+struct armorSpecializationInfo
+{
+    uint32 spellId;
+    uint8 Class;
+    uint16 Tree;
+};
+
+const armorSpecializationInfo ArmorSpecializationTree[MAX_ARMOR_SPECIALIZATION_SPELLS] =
+{
+    { 86537, CLASS_DEATH_KNIGHT, TALENT_TREE_DEATH_KNIGHT_BLOOD  }, // blood
+    { 86113, CLASS_DEATH_KNIGHT, TALENT_TREE_DEATH_KNIGHT_FROST  }, // frost
+    { 86536, CLASS_DEATH_KNIGHT, TALENT_TREE_DEATH_KNIGHT_UNHOLY }, // unholy
+    { 86093, CLASS_DRUID, TALENT_TREE_DRUID_BALANCE              }, // balance
+    { 86096, CLASS_DRUID, TALENT_TREE_DRUID_FERAL_COMBAT         }, // feral (bear)
+    { 86097, CLASS_DRUID, TALENT_TREE_DRUID_FERAL_COMBAT         }, // feral (cat)
+    { 86104, CLASS_DRUID, TALENT_TREE_DRUID_RESTORATION          }, // restor
+    { 86538, CLASS_HUNTER, 0                                     }, // all
+    { 86103, CLASS_PALADIN, TALENT_TREE_PALADIN_HOLY             }, // holy
+    { 86102, CLASS_PALADIN, TALENT_TREE_PALADIN_PROTECTION       }, // prot
+    { 86539, CLASS_PALADIN, TALENT_TREE_PALADIN_RETRIBUTION      }, // retro
+    { 86092, CLASS_ROGUE, 0                                      }, // all
+    { 86100, CLASS_SHAMAN, TALENT_TREE_SHAMAN_ELEMENTAL          }, // elem
+    { 86099, CLASS_SHAMAN, TALENT_TREE_SHAMAN_ENHANCEMENT        }, // ench
+    { 86108, CLASS_SHAMAN, TALENT_TREE_SHAMAN_RESTORATION        }, // restor
+    { 86101, CLASS_WARRIOR, TALENT_TREE_WARRIOR_ARMS             }, // arms
+    { 86110, CLASS_WARRIOR, TALENT_TREE_WARRIOR_FURY             }, // fury
+    { 86535, CLASS_WARRIOR, TALENT_TREE_WARRIOR_PROTECTION       }, // prot
+};
+
+
 // Spell modifier (used for modify other spells)
 struct SpellModifier
 {
@@ -2154,6 +2202,8 @@ class Player : public Unit, public GridObject<Player>
         void UpdateManaRegen();
         void UpdateRuneRegen(RuneType rune);
         void UpdateAllRunesRegen();
+        void UpdateArmorSpecializations(uint8 Slot = NULL);
+        bool CheckArmorSpecializationItemConditions(SpellInfo const* spellInfo) const;
 
         uint64 GetLootGUID() const { return m_lootGuid; }
         void SetLootGUID(uint64 guid) { m_lootGuid = guid; }

@@ -1550,7 +1550,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
             target->RemoveAurasDueToSpell(spellId2);
 
         // Improved Barkskin - apply/remove armor bonus due to shapeshift
-        if (Player* player=target->ToPlayer())
+        if (Player* player = target->ToPlayer())
         {
             if (player->HasSpell(63410) || player->HasSpell(63411))
             {
@@ -2101,6 +2101,8 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         // Dash
         if (AuraEffect* aurEff = target->GetAuraEffect(SPELL_AURA_MOD_INCREASE_SPEED, SPELLFAMILY_DRUID, 0, 0, 0x8))
             aurEff->RecalculateAmount();
+
+        target->ToPlayer()->UpdateArmorSpecializations();
 
         // Disarm handling
         // If druid shifts while being disarmed we need to deal with that since forms aren't affected by disarm
