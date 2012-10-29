@@ -2747,6 +2747,50 @@ bool SpellInfo::IsBreakCamouflage() const
     return true;
 }
 
+bool SpellInfo::IsIgnoringCombat() const
+{
+    if (HasAttribute(SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS))
+        return true;
+
+    switch (Id)
+    {
+        // Slice and Dice
+        case 5171:
+        case 6434:
+        case 6774:
+        // Honor Among Thieves
+        case 51698:
+        case 51699:
+        case 51700:
+        case 51701:
+        case 52916:
+        // Divine Hymn
+        case 64843:
+        case 64844:
+        case 70619:
+        // Shadowmeld
+        case 58984:
+        // Blackjack
+        case 79124:
+        case 79126:
+        // Redirect
+        case 73981:
+        // Venomous Wounds
+        case 79136:
+        // Master Poisoner
+        case 93068:
+        // Blind
+        case 2094:
+        // Ignite
+        case 12654:
+        // Resistance is Futile
+        case 83676:
+            return true;
+        default: return false;
+    }
+    return false;
+}
+
 bool SpellInfo::IsBreakCamouflageAfterHit() const
 {
     // Traps

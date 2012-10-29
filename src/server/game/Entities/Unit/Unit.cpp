@@ -6279,7 +6279,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 84653:
                 case 84654:
                 {
-                    uint32 spells[] = {84745, 84746, 84747};
+                    static const uint32 spells[] = {84745, 84746, 84747};
                     int32 basepoints1 = 1; // Sinister Strike/Revealing Strike count
                     int32 basepoints00 = 0; // damage modifier
 

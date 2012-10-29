@@ -1950,6 +1950,7 @@ class Player : public Unit, public GridObject<Player>
         void SetActiveSpec(uint8 spec){ _talentMgr->ActiveSpec = spec; }
         uint8 GetSpecsCount() const { return _talentMgr->SpecsCount; }
         void SetSpecsCount(uint8 count) { _talentMgr->SpecsCount = count; }
+        PlayerRole GetRole() const;
 
         bool ResetTalents(bool no_cost = false);
         uint32 GetNextResetTalentsCost() const;

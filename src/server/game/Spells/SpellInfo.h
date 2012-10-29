@@ -522,6 +522,8 @@ public:
     bool IsDifferentRankOf(SpellInfo const* spellInfo) const;
     bool IsHighRankOf(SpellInfo const* spellInfo) const;
 
+    bool IsIgnoringCombat() const;
+
     // camoufalge helpers
     bool IsBreakCamouflage() const;
     bool IsBreakCamouflageAfterHit() const;

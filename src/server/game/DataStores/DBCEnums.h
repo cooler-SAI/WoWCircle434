@@ -66,6 +66,17 @@ enum AreaTeams
     AREATEAM_ANY   = 6
 };
 
+enum PlayerRole
+{
+    ROLE_NONE               = 0,
+    ROLE_TANK               = 2,    // dbc - tank
+    ROLE_HEALER             = 4,    // dbc - healer
+    ROLE_DAMAGE_CASTER      = 8,    // dbc - damage
+    ROLE_HYBRID             = 10,   // dbc - hybrid, so far only feral druids
+    ROLE_DAMAGE_AGILITY     = 14,   // custom role for agility damage dealers
+    ROLE_DAMAGE_STRENGTH    = 16    // custom role for strength damage dealers
+};
+
 enum AchievementFaction
 {
     ACHIEVEMENT_FACTION_HORDE           = 0,

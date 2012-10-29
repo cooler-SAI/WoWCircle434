@@ -3665,6 +3665,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 56641:
                 spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_CASTER;
                 break;
+            // Fortune Cookie
+            case 87604:
+                spellInfo->Effects[EFFECT_2].Effect = SPELL_EFFECT_SCRIPT_EFFECT;
+                break;
             default:
                 break;
         }

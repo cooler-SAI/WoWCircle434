@@ -952,7 +952,7 @@ bool Aura::CanBeSaved() const
 
 bool Aura::CanBeSentToClient() const
 {
-    return !IsPassive() || GetSpellInfo()->HasAreaAuraEffect() || HasEffectType(SPELL_AURA_ABILITY_IGNORE_AURASTATE);
+    return !IsPassive() || GetSpellInfo()->HasAreaAuraEffect() || HasEffectType(SPELL_AURA_ABILITY_IGNORE_AURASTATE) || HasEffectType(SPELL_AURA_CAST_WHILE_WALKING);
 }
 
 void Aura::UnregisterSingleTarget()
@@ -1153,6 +1153,39 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         if (target->GetTypeId() == TYPEID_PLAYER)
                             target->ToPlayer()->RemoveSpellCooldown(20252, true);
                         break;
+                    case 87604: // Fortune Cookie
+                    {
+                        if (!caster->ToPlayer())
+                            break;
+
+                        Player* player = caster->ToPlayer();
+
+                        std::vector<uint32> WellFedSpells;
+                        switch (player->GetRole())
+                        {
+                            case ROLE_TANK:
+                                WellFedSpells.push_back(87601);
+                                break;
+                            case ROLE_HEALER:
+                            case ROLE_DAMAGE_CASTER:
+                                WellFedSpells.push_back(87587);
+                                break;
+                            case ROLE_DAMAGE_STRENGTH:
+                                WellFedSpells.push_back(87584);
+                                break;
+                            case ROLE_DAMAGE_AGILITY:
+                                WellFedSpells.push_back(87586);
+                                break;
+                            default:
+                                WellFedSpells.push_back(87597);
+                                break;
+                        }
+                        if (WellFedSpells.empty())
+                            break;
+
+                        caster->CastSpell(caster, WellFedSpells.front(), true);
+                        break;
+                    }
                 }
                 break;
             case SPELLFAMILY_DRUID:

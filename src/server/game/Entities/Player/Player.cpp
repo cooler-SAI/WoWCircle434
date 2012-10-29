@@ -26305,3 +26305,21 @@ void Player::SendPetitionTurnInResult(uint32 result)
     data << uint32(result);
     GetSession()->SendPacket(&data);
 }
+
+PlayerRole Player::GetRole() const
+{
+    TalentTabEntry const* talentTab = sTalentTabStore.LookupEntry(GetPrimaryTalentTree(GetActiveSpec()));
+    if (!talentTab)
+        return ROLE_NONE;
+
+    PlayerRole role = PlayerRole(talentTab->tabRole);
+    if (role == ROLE_DAMAGE_CASTER)
+    {
+        if (GetStat(STAT_AGILITY) > GetStat(STAT_INTELLECT))
+            role = ROLE_DAMAGE_AGILITY;
+        if (GetStat(STAT_STRENGTH) > GetStat(STAT_AGILITY))
+            role = ROLE_DAMAGE_STRENGTH;
+    }
+
+    return role;
+}

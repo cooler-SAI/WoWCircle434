@@ -4043,6 +4043,12 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     unitTarget->CastSpell(unitTarget, spellTarget[urand(0, 4)], true);
                     break;
                 }
+                // Fortune Cookie
+                case 87604:
+                {
+                    DoCreateItem(effIndex, urand(62552, 62591));
+                    break;
+                }
             }
             break;
         }
