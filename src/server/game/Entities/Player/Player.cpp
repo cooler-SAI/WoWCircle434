@@ -10397,12 +10397,16 @@ void Player::UpdateArmorSpecializations(uint8 Slot)
 
         if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_DRUID_FERAL_COMBAT)
         {
-            if (ShapeshiftForm form = GetShapeshiftForm())
+            switch (GetShapeshiftForm())
             {
-                if (form = FORM_CAT)
+                case FORM_CAT:
                     spellId = 86097;
-                else
+                    break;
+                case FORM_BEAR:
                     spellId = 86096;
+                    break;
+                default:
+                    break;
             }
         }
 
