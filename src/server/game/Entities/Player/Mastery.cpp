@@ -36,15 +36,20 @@ bool Player::MasteryAffectsPet() const
     return true;
 }
 
-int32 Player::GetMasteryScalingValue(SpellInfo const* spellInfo) const
+uint8 Player::GetMasteryScalingValue(SpellInfo const* spellInfo, int32& amount) const
 {
     if (!spellInfo || !spellInfo->HasAttribute(SpellAttr8::SPELL_ATTR8_MASTERY))
-        return -1;
+        return 0;
+    
+    amount = 0;
 
     if (spellInfo->Id == 77215)
-        return 163;
+        amount = 163;
     if (spellInfo->Id == 76808)
-        return 250;
+        amount = 250;
+
+    if (amount != 0)
+        return MAX_SPELL_EFFECTS;
 
     // Value stored in first spell effect from end wich have dummy aura
     for (uint8 i = MAX_SPELL_EFFECTS-1; i < MAX_SPELL_EFFECTS; --i)
@@ -52,10 +57,11 @@ int32 Player::GetMasteryScalingValue(SpellInfo const* spellInfo) const
         if (!spellInfo->Effects[i].Effect)
             continue;
 
-        return spellInfo->Effects[i].BasePoints;
+        amount = spellInfo->Effects[i].BasePoints;
+        return i;
     }
 
-    return -1;
+    return 0;
 }
 
 void Player::UpdateMastery()
@@ -79,31 +85,19 @@ void Player::UpdateMastery()
             if (!HasAura(spell))
                 CastSpell(this, spell, true);
 
-            /*if (MasteryAffectsPet())
-            {
-                Pet* _pet = GetPet();
-                if (!_pet)
-                    continue;
-
-                Player* _owner = _pet->GetOwner();
-                if (!_owner)
-                    continue;
-            }*/
-
             if (Aura* aura = GetAura(spell))
             {
-                int32 amount = GetMasteryScalingValue(aura->GetSpellInfo());
-                amount *= masteryPoints;
-                amount /= 100.0f;
+                int32 amount = 0;
+                uint8 effectIndex = GetMasteryScalingValue(aura->GetSpellInfo(), amount);
+                {
+                    amount *= masteryPoints;
+                    amount /= 100.0f;
+                }
 
-                for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
+                for (uint8 j = 0; j < effectIndex; ++j)
                 {
                     if (AuraEffect* eff = aura->GetEffect(j))
                     {
-                        // Do not change amount of dummy aura effect
-                        if (eff->GetAuraType() == AuraType::SPELL_AURA_DUMMY)
-                            continue;
-
                         eff->SetCanBeRecalculated(true);
                         eff->ChangeAmount(amount, false);
                     }
