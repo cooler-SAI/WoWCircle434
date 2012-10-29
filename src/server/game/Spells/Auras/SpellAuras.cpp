@@ -149,8 +149,22 @@ void AuraApplication::_InitFlags(Unit* caster, uint8 effMask)
         _flags |= positiveFound ? AFLAG_POSITIVE : AFLAG_NEGATIVE;
     }
 
-    if (GetBase()->GetSpellInfo()->AttributesEx8 & SPELL_ATTR8_AURA_SEND_AMOUNT)
-        _flags |= AFLAG_ANY_EFFECT_AMOUNT_SENT;
+    /*Fucking Shauren logick!!!*/
+    //if (GetBase()->GetSpellInfo()->AttributesEx8 & SPELL_ATTR8_AURA_SEND_AMOUNT)
+        //_flags |= AFLAG_ANY_EFFECT_AMOUNT_SENT;
+
+    // there are more auras that require this flag, this is just the beginning
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (((1 << i) & effMask))
+        {
+            if (GetBase()->GetEffect(i) && GetBase()->GetEffect(i)->GetAmount())
+            {
+                _flags |= AFLAG_ANY_EFFECT_AMOUNT_SENT;
+                break;
+            }
+        }
+    }
 }
 
 void AuraApplication::_HandleEffect(uint8 effIndex, bool apply)
@@ -196,6 +210,22 @@ void AuraApplication::BuildUpdatePacket(ByteBuffer& data, bool remove) const
     uint32 flags = _flags;
     if (aura->GetMaxDuration() > 0 && !(aura->GetSpellInfo()->AttributesEx5 & SPELL_ATTR5_HIDE_DURATION))
         flags |= AFLAG_DURATION;
+
+    if (!(flags & AFLAG_ANY_EFFECT_AMOUNT_SENT))
+    {
+        for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            if (flags & (1 << i))
+            {
+                if (aura->GetEffect(i))
+                {
+                    flags |= AFLAG_ANY_EFFECT_AMOUNT_SENT;
+                    break;
+                }
+            }
+        }
+    }
+
     data << uint16(flags);
     data << uint8(aura->GetCasterLevel());
     // send stack amount for aura which could be stacked (never 0 - causes incorrect display) or charges
@@ -212,9 +242,18 @@ void AuraApplication::BuildUpdatePacket(ByteBuffer& data, bool remove) const
     }
 
     if (flags & AFLAG_ANY_EFFECT_AMOUNT_SENT)
+    {
         for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-            if (AuraEffect const* eff = aura->GetEffect(i)) // NULL if effect flag not set
-                data << int32(eff->GetAmount());
+        {
+            if (flags & (1 << i))
+            {
+                if (AuraEffect const* eff = aura->GetEffect(i)) // NULL if effect flag not set
+                    data << int32(eff->GetAmount());
+                else
+                    data << int32(0);
+            }
+        }
+    }
 }
 
 void AuraApplication::ClientUpdate(bool remove)
