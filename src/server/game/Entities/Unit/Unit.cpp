@@ -7938,6 +7938,10 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Improved Hamstring
+        case 12289:
+        case 12668:
+            return false;
         // Deep Wounds
         case 12834:
         case 12849:
@@ -9433,6 +9437,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     float DoneTotalMod = 1.0f;
     float ApCoeffMod = 1.0f;
     int32 DoneTotal = 0;
+    bool AlreadyCalculated = false;
 
     // Pet damage?
     if (GetTypeId() == TYPEID_UNIT && !ToCreature()->isPet())
@@ -9619,6 +9624,26 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
                 if (AuraEffect* aurEff = GetAuraEffect(64962, EFFECT_1))
                     DoneTotal += aurEff->GetAmount();
             break;
+        case SPELLFAMILY_HUNTER:
+            // Serpent Sting Damage
+            if (spellProto->SpellFamilyFlags[0] & 0x4000)
+            {
+                AlreadyCalculated = true;
+                switch (spellProto->Id)
+                {
+                    case 1978:
+                        DoneTotal = int32((GetTotalAttackPowerValue(RANGED_ATTACK) * 0.4f + (pdamage * 15 / 3)) / (spellProto->GetMaxDuration() / spellProto->Effects[0].Amplitude));
+                        break;
+                    case 88453:
+                        DoneTotal = int32((GetTotalAttackPowerValue(RANGED_ATTACK) * 0.16f + (pdamage * 6 / 3)) / (spellProto->GetMaxDuration() / spellProto->Effects[0].Amplitude));
+                        break;
+                    case 88466:
+                        DoneTotal = int32((GetTotalAttackPowerValue(RANGED_ATTACK) * 0.24f + (pdamage * 9 / 3)) / (spellProto->GetMaxDuration() / spellProto->Effects[0].Amplitude));
+                        break;
+                    default:
+                        break;
+                }
+            }
     }
 
     // Done fixed damage bonus auras
@@ -9631,7 +9656,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     // Check for table values
     float coeff = 0;
     SpellBonusEntry const* bonus = sSpellMgr->GetSpellBonusData(spellProto->Id);
-    if (bonus)
+    if (bonus && !AlreadyCalculated)
     {
         if (damagetype == DOT)
         {
@@ -9672,6 +9697,9 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
         }
         DoneTotal += int32(DoneAdvertisedBenefit * coeff * factorMod);
     }
+
+    if (AlreadyCalculated)
+        pdamage = 0;
 
     float tmpDamage = (int32(pdamage) + DoneTotal) * DoneTotalMod;
     // apply spellmod to Done damage (flat and pct)

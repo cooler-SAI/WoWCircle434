@@ -1472,7 +1472,8 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
             }
 
             // afterh 4.0 "Changed from selectable talent to a specilization perk. Heals for a fixed amount rather than based on the HoT it consumes"
-            addhealth = caster->SpellHealingBonus(unitTarget, m_spellInfo, effIndex, addhealth, HEAL);
+            addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
+            addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL);
 
             if (!targetAura)
             {

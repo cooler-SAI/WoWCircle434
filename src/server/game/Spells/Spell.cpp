@@ -3284,6 +3284,29 @@ void Spell::cast(bool skipCheck)
 
     PrepareTriggersExecutedOnHit();
 
+    switch (m_spellInfo->SpellFamilyName)
+    {
+        case SPELLFAMILY_WARRIOR:
+        {
+            if (!m_caster || !m_caster->IsInWorld() || m_caster->GetTypeId() != TYPEID_PLAYER)
+                break;
+
+            // Improved Hamstring
+            if (m_spellInfo->Id == 1715 && m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->HasAura(1715))
+            {
+                if (m_caster->ToPlayer()->HasSpellCooldown(23694))
+                    break;
+
+                if (AuraEffect const* improvedHamstring = m_caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_WARRIOR, 23, 0))
+                {
+                    m_caster->CastSpell(unitTarget, 23694, true);
+                    m_caster->ToPlayer()->AddSpellCooldown(23694, 0, time(NULL) + improvedHamstring->GetAmount());
+                }
+            }
+            break;
+        }
+    }
+
     CallScriptOnCastHandlers();
 
     // traded items have trade slot instead of guid in m_itemTargetGUID
