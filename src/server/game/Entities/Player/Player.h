@@ -2206,6 +2206,10 @@ class Player : public Unit, public GridObject<Player>
         void UpdateArmorSpecializations(uint8 Slot = NULL);
         bool CheckArmorSpecializationItemConditions(SpellInfo const* spellInfo) const;
 
+        void RemoveMasterySpells();
+        void ApplyMasterySpells();
+        bool HasMastery() const { return getLevel() >= 80 && HasAuraType(SPELL_AURA_MASTERY); }
+
         uint64 GetLootGUID() const { return m_lootGuid; }
         void SetLootGUID(uint64 guid) { m_lootGuid = guid; }
 

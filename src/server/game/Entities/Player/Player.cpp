@@ -4585,6 +4585,12 @@ bool Player::ResetTalents(bool no_cost)
             if (plrTalent != GetTalentMap(GetActiveSpec())->end())
                 plrTalent->second->state = PLAYERSPELL_REMOVED;
         }
+
+        for (uint8 j = 0; j < MAX_MASTERY_SPELL; ++j)
+        {
+            if (uint32 spell = talentTabInfo->spellIds[j])
+                removeSpell(spell);
+        }
     }
 
     // Remove spec specific spells
@@ -22342,6 +22348,9 @@ void Player::SendInitialPacketsAfterAddToMap()
 
     CastSpell(this, 836, true);                             // LOGINEFFECT
 
+    if (HasMastery())
+        ApplyMasterySpells();
+
     // set some aura effects that send packet to player client after add player to map
     // SendMessageToSet not send it to player not it map, only for aura that not changed anything at re-apply
     // same auras state lost at far teleport, send it one more time in this case also
@@ -25440,6 +25449,8 @@ void Player::ActivateSpec(uint8 spec)
             if (GlyphPropertiesEntry const* old_gp = sGlyphPropertiesStore.LookupEntry(oldglyph))
                 RemoveAurasDueToSpell(old_gp->SpellId);
 
+    RemoveMasterySpells();
+
     SetActiveSpec(spec);
     uint32 spentTalents = 0;
 
@@ -25491,6 +25502,8 @@ void Player::ActivateSpec(uint8 spec)
 
         SetGlyph(slot, glyph);
     }
+
+    ApplyMasterySpells();
 
     SetUsedTalentCount(spentTalents);
     InitTalentForLevel();

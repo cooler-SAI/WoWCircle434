@@ -897,4 +897,7 @@ void WorldSession::HandleLearnPreviewTalentsPet(WorldPacket & recvData)
     }
 
     _player->SendTalentsInfoData(true);
+
+    if (_player->HasMastery())
+        _player->ApplyMasterySpells();
 }
