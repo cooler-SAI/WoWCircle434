@@ -2192,7 +2192,7 @@ struct TalentTabEntry
     //char* internalname;                                   // 6        m_backgroundFile
     //char* description;                                    // 7
     uint32  tabRole;                                        // 8  not sure but looks like a player role
-    //uint32 spellIds[2];                                   // 9-10 passive mastery bonus spells?
+    uint32 spellIds[2];                                     // 9-10 passive mastery bonus spells
 };
 
 struct TalentTreePrimarySpellsEntry
