@@ -6085,6 +6085,9 @@ void Player::UpdateRating(CombatRating cr)
             if (affectStats)
                 UpdateArmorPenetration(amount);
             break;
+        case CR_MASTERY:
+            UpdateMastery();
+            break;
     }
 }
 
@@ -7997,6 +8000,9 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                 break;
             case ITEM_MOD_ARCANE_RESISTANCE:
                 HandleStatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(val), apply);
+                break;
+            case ITEM_MOD_MASTERY_RATING:
+                ApplyRatingMod(CR_MASTERY, int32(val), apply);
                 break;
         }
     }
@@ -13884,6 +13890,9 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                         case ITEM_MOD_BLOCK_VALUE:
                             HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, float(enchant_amount), apply);
                             sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "+ %u BLOCK_VALUE", enchant_amount);
+                            break;
+                        case ITEM_MOD_MASTERY_RATING:
+                            ApplyRatingMod(CR_MASTERY, enchant_amount, apply);
                             break;
                         default:
                             break;
