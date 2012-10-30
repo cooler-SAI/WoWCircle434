@@ -18372,14 +18372,20 @@ void Player::SendRaidInfo()
             if (itr->second.perm)
             {
                 InstanceSave* save = itr->second.save;
+                bool isHeroic = save->GetDifficulty() == RAID_DIFFICULTY_10MAN_HEROIC || save->GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC;
+                uint32 completedEncounters = 0;
+                if (Map* map = sMapMgr->FindMap(save->GetMapId(), save->GetInstanceId()))
+                    if (InstanceScript* instanceScript = ((InstanceMap*)map)->GetInstanceScript())
+                        completedEncounters = instanceScript->GetCompletedEncounterMask();
+
                 data << uint32(save->GetMapId());           // map id
                 data << uint32(save->GetDifficulty());      // difficulty
-                data << uint32(0);                          // Unknown 4.2.2
+                data << uint32(isHeroic);                   // heroic
                 data << uint64(save->GetInstanceId());      // instance id
                 data << uint8(1);                           // expired = 0
                 data << uint8(0);                           // extended = 1
                 data << uint32(save->GetResetTime() - now); // reset time
-                data << uint32(0);                          // Unknown 4.2.2
+                data << uint32(completedEncounters);        // completed encounters mask
                 ++counter;
             }
         }
@@ -26341,12 +26347,37 @@ PlayerRole Player::GetRole() const
         return ROLE_NONE;
 
     PlayerRole role = PlayerRole(talentTab->tabRole);
-    if (role == ROLE_DAMAGE_CASTER)
+    float statValue = 0.0f;
+    switch (role)
     {
-        if (GetStat(STAT_AGILITY) > GetStat(STAT_INTELLECT))
-            role = ROLE_DAMAGE_AGILITY;
-        if (GetStat(STAT_STRENGTH) > GetStat(STAT_AGILITY))
-            role = ROLE_DAMAGE_STRENGTH;
+        case ROLE_DAMAGE:
+        {
+            if (GetStat(STAT_STRENGTH) > statValue)
+            {
+                statValue = GetStat(STAT_STRENGTH);
+                role = ROLE_DAMAGE_STRENGTH;
+            }
+            if (GetStat(STAT_AGILITY) > statValue)
+            {
+                statValue = GetStat(STAT_AGILITY);
+                role = ROLE_DAMAGE_AGILITY;
+            }
+            if (GetStat(STAT_INTELLECT) > statValue)
+            {
+                statValue = GetStat(STAT_INTELLECT);
+                role = ROLE_DAMAGE_INTELLECT;
+            }
+            break;
+        }
+        case ROLE_HYBRID:
+        {
+            if (GetShapeshiftForm() == FORM_BEAR)
+                return ROLE_TANK;
+
+            return ROLE_DAMAGE_AGILITY;
+        }
+        default:
+            break;
     }
 
     return role;

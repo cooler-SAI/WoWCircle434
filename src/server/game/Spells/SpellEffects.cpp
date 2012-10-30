@@ -1497,6 +1497,11 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
         if (unitTarget->HasAura(48920) && (unitTarget->GetHealth() + addhealth >= unitTarget->GetMaxHealth()))
             unitTarget->RemoveAura(48920);
 
+        // Atonement
+        if (m_spellInfo->Id == 81751)
+            if (m_caster == unitTarget)
+                addhealth *= 0.5f;
+
         m_damage -= addhealth;
     }
 }

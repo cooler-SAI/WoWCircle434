@@ -2091,7 +2091,8 @@ class spell_item_flask_of_battle : public SpellScriptLoader
 
                     switch (player->GetRole())
                     {
-                        case ROLE_DAMAGE_CASTER:
+                        case ROLE_HEALER:
+                        case ROLE_DAMAGE_INTELLECT:
                             player->CastSpell(player, 79470, true); 
                             //pPlayer->CastSpell(pPlayer, 92730, true);
                             break;

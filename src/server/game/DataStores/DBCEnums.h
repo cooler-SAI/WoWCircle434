@@ -71,11 +71,14 @@ enum PlayerRole
     ROLE_NONE               = 0,
     ROLE_TANK               = 2,    // dbc - tank
     ROLE_HEALER             = 4,    // dbc - healer
-    ROLE_DAMAGE_CASTER      = 8,    // dbc - damage
+    ROLE_DAMAGE             = 8,    // dbc - damage
     ROLE_HYBRID             = 10,   // dbc - hybrid, so far only feral druids
-    ROLE_DAMAGE_AGILITY     = 14,   // custom role for agility damage dealers
-    ROLE_DAMAGE_STRENGTH    = 16    // custom role for strength damage dealers
+    ROLE_DAMAGE_AGILITY     = 16,   // custom role for agility damage dealers
+    ROLE_DAMAGE_STRENGTH    = 32,   // custom role for strength damage dealers
+    ROLE_DAMAGE_INTELLECT   = 64,   // custom role for caster damage dealers
 };
+
+#define MAX_ROLES   9
 
 enum AchievementFaction
 {

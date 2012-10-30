@@ -1206,7 +1206,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                 WellFedSpells.push_back(87601);
                                 break;
                             case ROLE_HEALER:
-                            case ROLE_DAMAGE_CASTER:
+                            case ROLE_DAMAGE_INTELLECT:
                                 WellFedSpells.push_back(87587);
                                 break;
                             case ROLE_DAMAGE_STRENGTH:

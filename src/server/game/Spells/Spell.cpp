@@ -1277,16 +1277,27 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                     maxSize = 3;
                     power = POWER_MANA;
                 }
-                else
-                    break;
-
-                // Remove targets outside caster's raid
-                for (std::list<Unit*>::iterator itr = unitTargets.begin(); itr != unitTargets.end();)
+                else if (m_spellInfo->Id == 81751) // Atonement
                 {
-                    if (!(*itr)->IsInRaidWith(m_caster))
-                        itr = unitTargets.erase(itr);
-                    else
-                        ++itr;
+                    if (m_caster && m_caster->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        Unit *aTarget = m_caster;
+                        if (m_targets.GetUnitTarget())
+                        {
+                            unitTargets.sort(Trinity::HealthPctOrderPred());
+                            for (std::list<Unit*>::iterator itr = unitTargets.begin() ; itr != unitTargets.end(); ++itr)
+                            {
+                                if (m_caster != (*itr) && (*itr)->IsInRaidWith(m_caster) && (*itr)->IsWithinDistInMap(m_targets.GetUnitTarget(), 15))
+                                {
+                                    aTarget = (*itr);
+                                    break;
+                                }
+                            }
+                        }
+                        unitTargets.clear();
+                        unitTargets.push_back(aTarget);
+                    }
+                    break;
                 }
                 break;
             case SPELLFAMILY_DRUID:

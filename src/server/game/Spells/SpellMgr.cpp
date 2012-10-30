@@ -3669,6 +3669,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 87604:
                 spellInfo->Effects[EFFECT_2].Effect = SPELL_EFFECT_SCRIPT_EFFECT;
                 break;
+            // Atonement
+            case 81751:
+                spellInfo->MaxAffectedTargets = 1;
+                break;
             default:
                 break;
         }

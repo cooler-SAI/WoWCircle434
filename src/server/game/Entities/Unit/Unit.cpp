@@ -2570,12 +2570,7 @@ float Unit::GetUnitCriticalChance(WeaponAttackType attackType, const Unit* victi
 
     // reduce crit chance from Rating for players
     if (attackType != RANGED_ATTACK)
-    {
         ApplyResilience(victim, &crit, NULL, false, CR_CRIT_TAKEN_MELEE);
-        // Glyph of barkskin
-        if (victim->HasAura(63057) && victim->HasAura(22812))
-            crit -= 25.0f;
-    }
     else
         ApplyResilience(victim, &crit, NULL, false, CR_CRIT_TAKEN_RANGED);
 
@@ -4804,27 +4799,6 @@ bool Unit::HandleSpellCritChanceAuraProc(Unit* victim, uint32 /*damage*/, AuraEf
     Unit* target = victim;
     int32 basepoints0 = 0;
 
-    switch (triggeredByAuraSpell->SpellFamilyName)
-    {
-        case SPELLFAMILY_MAGE:
-        {
-            switch (triggeredByAuraSpell->Id)
-            {
-                // Focus Magic
-                case 54646:
-                {
-                    Unit* caster = triggeredByAura->GetCaster();
-                    if (!caster)
-                        return false;
-
-                    triggered_spell_id = 54648;
-                    target = caster;
-                    break;
-                }
-            }
-        }
-    }
-
     // processed charge only counting case
     if (!triggered_spell_id)
         return true;
@@ -4833,7 +4807,7 @@ bool Unit::HandleSpellCritChanceAuraProc(Unit* victim, uint32 /*damage*/, AuraEf
 
     if (!triggerEntry)
     {
-        sLog->outError(LOG_FILTER_UNITS, "Unit::HandleHasteAuraProc: Spell %u has non-existing triggered spell %u", triggeredByAuraSpell->Id, triggered_spell_id);
+        sLog->outError(LOG_FILTER_UNITS, "Unit::HandleSpellCritChanceAuraProc: Spell %u has non-existing triggered spell %u", triggeredByAuraSpell->Id, triggered_spell_id);
         return false;
     }
 
@@ -5919,33 +5893,44 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 victim->CastSpell(victim, 57669, true, castItem, triggeredByAura);
                 return true;                                // no hidden cooldown
             }
-            // Divine Aegis
-            if (dummySpell->SpellIconID == 2820)
+            switch (dummySpell->SpellIconID)
             {
-                if (!target)
-                    return false;
+                // Divine Aegis
+                case 2820:
+                {
+                    if (!target)
+                        return false;
 
-                // Multiple effects stack, so let's try to find this aura.
-                int32 bonus = 0;
-                if (AuraEffect const* aurEff = target->GetAuraEffect(47753, 0))
-                    bonus = aurEff->GetAmount();
+                    // Multiple effects stack, so let's try to find this aura.
+                    int32 bonus = 0;
+                    if (AuraEffect const* aurEff = target->GetAuraEffect(47753, 0))
+                        bonus = aurEff->GetAmount();
 
-                basepoints0 = CalculatePct(int32(damage), triggerAmount) + bonus;
-                if (basepoints0 > target->getLevel() * 125)
-                    basepoints0 = target->getLevel() * 125;
+                    basepoints0 = CalculatePct(int32(damage), triggerAmount) + bonus;
+                    if (basepoints0 > target->getLevel() * 125)
+                        basepoints0 = target->getLevel() * 125;
 
-                triggered_spell_id = 47753;
-                break;
-            }
-            // Body and Soul
-            if (dummySpell->SpellIconID == 2218)
-            {
-                // Proc only from Cure Disease on self cast
-                if (procSpell->Id != 528 || victim != this || !roll_chance_i(triggerAmount))
-                    return false;
-                triggered_spell_id = 64136;
-                target = this;
-                break;
+                    triggered_spell_id = 47753;
+                    break;
+                }
+                // Body and Soul
+                case 2218:
+                {
+                    // Proc only from Cure Disease on self cast
+                    if (procSpell->Id != 528 || victim != this || !roll_chance_i(triggerAmount))
+                        return false;
+                    triggered_spell_id = 64136;
+                    target = this;
+                    break;
+                }
+                // Atonement
+                case 4938:
+                {
+                    basepoints0 = damage * triggerAmount / 100.0f;
+                    target = this;
+                    triggered_spell_id = 81751;
+                    break;
+                }
             }
             switch (dummySpell->Id)
             {
@@ -6542,8 +6527,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     target = this;
                     break;
                 }
-                    if (!victim)
-                        return false;
+                if (!victim)
+                    return false;
 
                 // Holy Power (Redemption Armor set)
                 case 28789:
@@ -6576,36 +6561,29 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     }
                     break;
                 }
-                // Seal of Truth (damage calc on apply aura)
+                // Glyph of Divinity
+                case 54939:
+                {
+                    target = this;
+                    triggered_spell_id = 54986;
+                    basepoints0 = triggerAmount;
+                    break;
+                }
+                // Seal of Truth
                 case 31801:
                 {
-                    if (effIndex != 0)                       // effect 2 used by seal unleashing code
+                    if (effIndex != 0)                       // effect 1, 2 used by seal unleashing code
                         return false;
 
-                    // At melee attack or Hammer of the Righteous spell damage considered as melee attack
-                    bool stacker = !procSpell || procSpell->Id == 53595;
-                    // spells with SPELL_DAMAGE_CLASS_MELEE excluding Judgements
-                    bool damager = procSpell && (procSpell->EquippedItemClass != -1 || (procSpell->SpellIconID == 243 && procSpell->SpellVisual[0] == 39));
-
-                    if (!stacker && !damager)
+                    if (this->GetGUID() == victim->GetGUID())
                         return false;
 
                     triggered_spell_id = 31803;
 
-                    // On target with 5 stacks of Censure direct damage is done
-                    if (Aura* aur = victim->GetAura(triggered_spell_id, GetGUID()))
-                    {
-                        if (aur->GetStackAmount() == 5)
-                        {
-                            if (stacker)
-                                aur->RefreshDuration();
+                    // On target with 5 stacks of Holy Vengeance direct damage is done
+                    if (Aura* sealDoT = victim->GetAura(triggered_spell_id, GetGUID()))
+                        if (sealDoT->GetStackAmount() == 5)
                             CastSpell(victim, 42463, true);
-                            return true;
-                        }
-                    }
-
-                    if (!stacker)
-                        return false;
                     break;
                 }
                 // Paladin Tier 6 Trinket (Ashtongue Talisman of Zeal)
@@ -7398,25 +7376,6 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 /*damage*/, Aura* triggeredByAura
             {
                 *handled = true;
                 CastSpell(victim, 68055, true);
-                return true;
-            }
-            // Glyph of Divinity
-            else if (dummySpell->Id == 54939)
-            {
-                *handled = true;
-                // Check if we are the target and prevent mana gain
-                if (victim && triggeredByAura->GetCasterGUID() == victim->GetGUID())
-                    return false;
-                // Lookup base amount mana restore
-                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; i++)
-                {
-                    if (procSpell->Effects[i].Effect == SPELL_EFFECT_ENERGIZE)
-                    {
-                        // value multiplied by 2 because you should get twice amount
-                        int32 mana = procSpell->Effects[i].CalcValue() * 2;
-                        CastCustomSpell(this, 54986, 0, &mana, NULL, true);
-                    }
-                }
                 return true;
             }
             break;
@@ -10123,6 +10082,15 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
     // No bonus healing for potion spells
     if (spellProto->SpellFamilyName == SPELLFAMILY_POTION)
         return healamount;
+
+    switch (spellProto->Id)
+    {
+        case 64801: // Gift of the Earthmother
+        case 81751: // Atonement
+            return healamount;
+        default:
+            break;
+    }
 
     float DoneTotalMod = 1.0f;
     int32 DoneTotal = 0;
