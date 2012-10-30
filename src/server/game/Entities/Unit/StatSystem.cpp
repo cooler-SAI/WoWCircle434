@@ -157,6 +157,7 @@ bool Player::UpdateAllStats()
     UpdateAllCritPercentages();
     UpdateAllSpellCritChances();
     UpdateBlockPercentage();
+    UpdateShieldBlockValue();
     UpdateParryPercentage();
     UpdateDodgePercentage();
     UpdateSpellDamageAndHealingBonus();
@@ -441,6 +442,18 @@ void Player::UpdateBlockPercentage()
         value = value < 0.0f ? 0.0f : value;
     }
     SetStatFloatValue(PLAYER_BLOCK_PERCENTAGE, value);
+}
+
+void Player::UpdateShieldBlockValue()
+{
+    SetUInt32Value(PLAYER_SHIELD_BLOCK, GetShieldBlockValue());
+}
+
+uint32 Player::GetShieldBlockValue()
+{
+    const uint32 baseShieldBlock = 30; // Block value was removed as a stat in the  Cataclysm expansion. Instead, blocks simply mitigate a fixed 30% percent of damage.[
+    uint32 value = uint32((m_auraBaseMod[SHIELD_BLOCK_VALUE][FLAT_MOD] + baseShieldBlock) * m_auraBaseMod[SHIELD_BLOCK_VALUE][PCT_MOD]);
+    return value;
 }
 
 void Player::UpdateCritPercentage(WeaponAttackType attType)

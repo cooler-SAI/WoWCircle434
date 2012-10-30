@@ -2188,6 +2188,7 @@ class Player : public Unit, public GridObject<Player>
         float GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const;
         void UpdateBlockPercentage();
         void UpdateCritPercentage(WeaponAttackType attType);
+        void UpdateShieldBlockValue();
         void UpdateAllCritPercentages();
         void UpdateParryPercentage();
         void UpdateDodgePercentage();
@@ -2358,6 +2359,7 @@ class Player : public Unit, public GridObject<Player>
         void SendCorpseReclaimDelay(bool load = false);
 
         uint32 GetBlockPercent() { return GetUInt32Value(PLAYER_SHIELD_BLOCK); }
+        uint32 GetShieldBlockValue();
         bool CanParry() const { return m_canParry; }
         void SetCanParry(bool value);
         bool CanBlock() const { return m_canBlock; }
