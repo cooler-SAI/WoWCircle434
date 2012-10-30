@@ -9863,6 +9863,19 @@ int32 Unit::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
 
     if (GetTypeId() == TYPEID_PLAYER)
     {
+        // Damage from attack power
+        // Your spell power is now equal to $s1% of your attack power, and you no longer benefit from other sources of spell power
+        int32 spPctFromAttackPower = 0;
+        AuraEffectList const& mSetSpellPowerPctFromAP = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_SPELL_POWER_BY_AP_PCT);
+        for (AuraEffectList::const_iterator i = mSetSpellPowerPctFromAP.begin(); i != mSetSpellPowerPctFromAP.end(); ++i)
+        {
+            if ((*i)->GetMiscValue() & schoolMask)
+                spPctFromAttackPower += CalculatePct<int>(int32(GetTotalAttackPowerValue(BASE_ATTACK)), (*i)->GetAmount());
+        }
+
+        if (spPctFromAttackPower > 0)
+            return spPctFromAttackPower;
+
         // Base value
         DoneAdvertisedBenefit += ToPlayer()->GetBaseSpellPowerBonus();
 
@@ -10398,6 +10411,19 @@ int32 Unit::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
     // Healing bonus of spirit, intellect and strength
     if (GetTypeId() == TYPEID_PLAYER)
     {
+        // Healing from attack power
+        // Your spell power is now equal to $s1% of your attack power, and you no longer benefit from other sources of spell power
+        int32 spPctFromAttackPower = 0;
+        AuraEffectList const& mSetSpellPowerPctFromAP = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_SPELL_POWER_BY_AP_PCT);
+        for (AuraEffectList::const_iterator i = mSetSpellPowerPctFromAP.begin(); i != mSetSpellPowerPctFromAP.end(); ++i)
+        {
+            if ((*i)->GetMiscValue() & schoolMask)
+                spPctFromAttackPower += CalculatePct<int>(int32(GetTotalAttackPowerValue(BASE_ATTACK)), (*i)->GetAmount());
+        }
+
+        if (spPctFromAttackPower > 0)
+            return spPctFromAttackPower;
+
         // Base value
         AdvertisedBenefit += ToPlayer()->GetBaseSpellPowerBonus();
 
