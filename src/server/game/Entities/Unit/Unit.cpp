@@ -6334,6 +6334,27 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     }
                     break;
                 }
+                // Glyph of Hemorrhage
+                case 56807:
+                {
+                    triggered_spell_id = 89775;
+                    SpellInfo const* hemorrhageDot = sSpellMgr->GetSpellInfo(triggered_spell_id);
+                    int32 tickcount = hemorrhageDot->GetMaxDuration() / hemorrhageDot->Effects[0].Amplitude;
+                    basepoints0 = triggerAmount * damage / tickcount / 100;
+                    break;
+                 }
+                // Serrated Blades
+                case 14171:
+                case 14172:
+                {
+                     float chance = triggerAmount * ToPlayer()->GetComboPoints();
+                     if (roll_chance_i(chance))
+                     {
+                         if (Aura* Rupture = victim->GetAura(1943, GetGUID()))
+                             Rupture->RefreshDuration();
+                     }
+                     break;
+                }
                 case 32748: // Deadly Throw Interrupt
                 {
                     // Prevent cast Deadly Throw Interrupt on self from last effect (apply dummy) of Deadly Throw
@@ -7901,6 +7922,15 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Shield Specialization
+        case 12298:
+        case 12724:
+        case 12725:
+        {
+            if (procEx & PROC_EX_REFLECT)
+                basepoints0 = triggerEntry->Effects[0].BasePoints * 4.0f;
+            break;
+        }
         // Improved Hamstring
         case 12289:
         case 12668:

@@ -4170,10 +4170,22 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     // And spread them on target
                     // Blood Plague
                     if (m_targets.GetUnitTarget()->GetAura(55078))
+                    {
+                        m_caster->CastSpell(unitTarget, 91939, true);
                         m_caster->CastSpell(unitTarget, 55078, true);
+                    }
                     // Frost Fever
                     if (m_targets.GetUnitTarget()->GetAura(55095))
+                    {
+                        m_caster->CastSpell(unitTarget, 91939, true);
                         m_caster->CastSpell(unitTarget, 55095, true);
+                    }
+                    // Ebon Plague
+                    if (m_targets.GetUnitTarget()->GetAura(65142))
+                    {
+                        m_caster->CastSpell(unitTarget, 91939, true);
+                        m_caster->CastSpell(unitTarget, 65142, true);
+                    }
                 }
             }
             break;
