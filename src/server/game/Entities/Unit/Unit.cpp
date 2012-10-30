@@ -5723,11 +5723,15 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                 switch (dummySpell->Id)
                 {
-                    case 29838: triggered_spell_id=29842; break;
-                    case 29834: triggered_spell_id=29841; break;
-                    case 42770: triggered_spell_id=42771; break;
+                    case 29838: 
+                        triggered_spell_id = 29842; 
+                        break;
+                    case 29834: 
+                        triggered_spell_id = 29841; 
+                        break;
                     default:
                         sLog->outError(LOG_FILTER_UNITS, "Unit::HandleDummyAuraProc: non handled spell id: %u (SW)", dummySpell->Id);
+                        break;
                     return false;
                 }
 

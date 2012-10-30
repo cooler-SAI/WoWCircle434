@@ -6398,6 +6398,30 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
 
         damage = uint32(target->CountPctFromMaxHealth(damage));
         damage = uint32(damage * TakenTotalMod);
+
+        switch (m_spellInfo->Id)
+        {
+            case 16488: // Blood Craze Rank 1
+            case 16490: // Blood Craze Rank 2
+            case 16491: // Blood Craze Rank 3
+            {
+                if (!target->ToPlayer() || !target->IsInWorld())
+                    return;
+
+                damage = uint32(damage / 2.0f / (m_spellInfo->GetMaxDuration() / 1000));
+                // Field Dressing
+                target->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DOT, damage);
+            }
+            case 29841: // Second Win2 Rank 1
+            case 29842: // Second Wind Rank 2
+                if (!target->ToPlayer() || !target->IsInWorld())
+                    return;
+
+                target->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DOT, damage);
+                break;
+            default:
+                break;
+        }
     }
     else
     {

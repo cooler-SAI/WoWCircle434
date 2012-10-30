@@ -3673,6 +3673,20 @@ void SpellMgr::LoadDbcDataCorrections()
             case 81751:
                 spellInfo->MaxAffectedTargets = 1;
                 break;
+            // Whirlwind (MH+OH)
+            case 1680:
+            case 44949:
+            // Whirlwind (MH+OH) - Bladestorm
+            case 50622:
+            case 95738:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(14);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(14);
+                break;
+            // Second Wind
+            case 29841:
+            case 29842:
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_OBS_MOD_HEALTH;
+                break;
             default:
                 break;
         }
