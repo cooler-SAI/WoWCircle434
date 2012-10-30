@@ -388,7 +388,7 @@ enum AuraType
     SPELL_AURA_326                                          = 326,  // phase related
     SPELL_AURA_327                                          = 327,  // Not used in 4.3.4
     SPELL_AURA_PROC_ON_POWER_AMOUNT                         = 328,
-    SPELL_AURA_MOD_RUNE_REGEN_SPEED                         = 329,  // NYI
+    SPELL_AURA_MOD_RUNE_POWER_REGEN                         = 329,
     SPELL_AURA_CAST_WHILE_WALKING                           = 330,
     SPELL_AURA_FORCE_WEATHER                                = 331,
     SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS                    = 332,
