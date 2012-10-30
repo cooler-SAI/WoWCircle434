@@ -572,6 +572,10 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
             pet->AI()->OwnerDamagedBy(this);
     }
 
+    // For ground totem
+    if (victim && victim->isTotem() && victim->HasAuraType(SPELL_AURA_SPELL_MAGNET))
+        damage = 0;
+
     if (damagetype != NODAMAGE)
     {
         // interrupting auras with AURA_INTERRUPT_FLAG_DAMAGE before checking !damage (absorbed damage breaks that type of auras)
@@ -8404,10 +8408,8 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
     if (GetCharmerOrOwnerOrSelf() == target->GetCharmerOrOwnerOrSelf())
         return REP_FRIENDLY;
 
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE) || target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
     {
-        if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
-        {
             Player const* selfPlayerOwner = GetAffectingPlayer();
             Player const* targetPlayerOwner = target->GetAffectingPlayer();
 
@@ -8426,6 +8428,11 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
                     return REP_FRIENDLY; // return true to allow config option AllowTwoSide.Interaction.Group to work
                     // however client seems to allow mixed group parties, because in 13850 client it works like:
                     // return GetFactionReactionTo(getFactionTemplateEntry(), target);
+
+                // check FFA_PVP
+                if (selfPlayerOwner->GetByteValue(UNIT_FIELD_BYTES_2, 1) & UNIT_BYTE2_FLAG_FFA_PVP
+                    && targetPlayerOwner->GetByteValue(UNIT_FIELD_BYTES_2, 1) & UNIT_BYTE2_FLAG_FFA_PVP)
+                    return REP_HOSTILE;
             }
 
             // check FFA_PVP
@@ -8458,7 +8465,6 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
                         }
                     }
                 }
-            }
         }
     }
     // do checks dependant only on our faction
@@ -9237,6 +9243,58 @@ int32 Unit::DealHeal(Unit* victim, uint32 addhealth)
     return gain;
 }
 
+void Unit::UpdateMagnetTimer(Unit* victim, SpellInfo const* spellInfo, int32 updateTime)
+{
+    // Magic case
+    if (spellInfo && (spellInfo->Id == 49560 ||
+        (spellInfo->SchoolMask != SPELL_SCHOOL_MASK_NORMAL && spellInfo->Dispel != DISPEL_POISON && 
+        spellInfo->GetSpellSpecific() != SPELL_SPECIFIC_JUDGEMENT && !spellInfo->HasAreaAuraEffect())))
+    {
+        if (!victim->isTotem())
+            return;
+
+        bool canContinue = IsHostileTo(victim);
+
+        switch(spellInfo->SpellIconID)
+        {
+        case 180:   // freezing trap
+            canContinue = true;
+            break;
+        case 2237:  // envenom
+        case 538:   // Hunter's Mark
+        case 3412:  // Chimera Shot
+        case 218:   // Arcane Shot
+        case 3407:  // Explosive Shot
+        case 49576: // Death Grip
+        case 49560:
+            canContinue = false;
+            break;
+        default:
+            break;
+        }
+
+        if (canContinue)
+        {
+            AuraEffectList const& magnetAuras = victim->GetAuraEffectsByType(SPELL_AURA_SPELL_MAGNET);
+            for (Unit::AuraEffectList::const_iterator itr = magnetAuras.begin(); itr != magnetAuras.end(); ++itr)
+            {
+                Aura* magnetAura = (*itr)->GetBase();
+                if (!updateTime)
+                {
+                    magnetAura->DropCharge();
+                    Kill(victim);
+                }
+                else if (magnetAura->GetDuration() == -1 || magnetAura->GetDuration() > updateTime)
+                {
+                    magnetAura->SetAuraTimer(updateTime, victim->GetGUID());
+                    victim->ToTotem()->InitStats(updateTime);
+                }
+                break;
+            }
+        }
+    }
+}
+
 Unit* Unit::GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo)
 {
     // Patch 1.2 notes: Spell Reflection no longer reflects abilities
@@ -9249,10 +9307,10 @@ Unit* Unit::GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo)
         if (Unit* magnet = (*itr)->GetBase()->GetCaster())
             if (spellInfo->CheckExplicitTarget(this, magnet) == SPELL_CAST_OK
                 && spellInfo->CheckTarget(this, magnet, false) == SPELL_CAST_OK
-                && _IsValidAttackTarget(magnet, spellInfo))
+                && _IsValidAttackTarget(magnet, spellInfo)
+                && (IsWithinLOSInMap(magnet)
+                || magnet->isTotem()))
             {
-                // TODO: handle this charge drop by proc in cast phase on explicit target
-                (*itr)->GetBase()->DropCharge(AURA_REMOVE_BY_EXPIRE);
                 return magnet;
             }
     }

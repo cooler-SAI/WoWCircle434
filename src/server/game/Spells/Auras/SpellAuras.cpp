@@ -785,6 +785,17 @@ void Aura::SetDuration(int32 duration, bool withMods)
     SetNeedClientUpdateForTargets();
 }
 
+void Aura::SetAuraTimer(int32 newTime, uint64 guid)
+{
+    if (GetDuration() == -1 || GetDuration() > newTime)
+    {
+        SetDuration(newTime);
+        SetMaxDuration(newTime);
+        if (AuraApplication *timeAura = GetApplicationOfTarget(guid ? guid : m_casterGuid))
+            timeAura->ClientUpdate();
+    }
+}
+
 void Aura::RefreshDuration()
 {
     SetDuration(GetMaxDuration());

@@ -2014,6 +2014,7 @@ class Unit : public WorldObject
         void UnsummonAllTotems();
         Unit* GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo);
         Unit* GetMeleeHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo = NULL);
+        void UpdateMagnetTimer(Unit* victim, SpellInfo const* spellInfo, int32 updateTime);
 
         int32 SpellBaseDamageBonusDone(SpellSchoolMask schoolMask);
         int32 SpellBaseDamageBonusTaken(SpellSchoolMask schoolMask);

@@ -2234,6 +2234,9 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     else
         targetInfo.reflectResult = SPELL_MISS_NONE;
 
+    // some helper to update magnet timer
+    m_caster->UpdateMagnetTimer(target, m_spellInfo, int32(targetInfo.timeDelay));
+
     // Add target to list
     m_UniqueTargetInfo.push_back(targetInfo);
 }
