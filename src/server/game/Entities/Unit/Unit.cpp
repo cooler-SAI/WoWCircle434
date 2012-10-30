@@ -3221,7 +3221,7 @@ void Unit::_RemoveNoStackAurasDueToAura(Aura* aura)
             i = m_appliedAuras.begin();
         }
 
-        if (aura->CanStackWith(i->second->GetBase()))
+        if (!_IsNoStackAuraDueToAura(aura, i->second->GetBase()))
             continue;
 
         RemoveAura(i, AURA_REMOVE_BY_DEFAULT);
@@ -3229,6 +3229,53 @@ void Unit::_RemoveNoStackAurasDueToAura(Aura* aura)
             break;
         remove = true;
     }
+}
+
+bool Unit::_IsNoStackAuraDueToAura(Aura * appliedAura, Aura * existingAura) const
+{
+    SpellInfo const* spellProto = appliedAura->GetSpellInfo();
+    // Do not check already applied aura
+    if (existingAura == appliedAura)
+        return false;
+
+    // Do not check dynobj auras for stacking
+    if (existingAura->GetType() != UNIT_AURA_TYPE)
+        return false;
+
+    SpellInfo const* i_spellProto = existingAura->GetSpellInfo();
+    uint32 i_spellId = i_spellProto->Id;
+    bool sameCaster = appliedAura->GetCasterGUID() == existingAura->GetCasterGUID();
+
+    if (i_spellProto->IsPassive())
+    {
+        // passive non-stackable spells not stackable only for same caster
+        if (!sameCaster)
+            return false;
+
+        // passive non-stackable spells not stackable only with another rank of same spell
+        if (i_spellProto->IsRankOf(spellProto))
+            return false;
+    }
+
+    bool is_triggered_by_spell = false;
+    // prevent triggering aura of removing aura that triggered it
+    // prevent triggered aura of removing aura that triggering it (triggered effect early some aura of parent spell
+    for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
+    {
+        if (i_spellProto->Effects[j].Effect && (i_spellProto->Effects[j].TriggerSpell == spellProto->Id
+            || spellProto->Effects[j].TriggerSpell == i_spellProto->Id)) // I do not know what is this for
+        {
+            is_triggered_by_spell = true;
+            break;
+        }
+    }
+
+    if (is_triggered_by_spell)
+        return false;
+
+    if (sSpellMgr->CanAurasStack(appliedAura, existingAura, sameCaster))
+        return false;
+    return true;
 }
 
 void Unit::_RegisterAuraEffect(AuraEffect* aurEff, bool apply)
