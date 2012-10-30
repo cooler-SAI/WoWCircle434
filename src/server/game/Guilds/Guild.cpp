@@ -1546,6 +1546,8 @@ void Guild::HandleSetEmblem(WorldSession* session, const EmblemInfo& emblemInfo)
         SendSaveEmblemResult(session, ERR_GUILDEMBLEM_SUCCESS);
 
         HandleQuery(session);
+
+        m_achievementMgr.UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_TABARD, 1);
     }
 }
 
@@ -1637,6 +1639,7 @@ void Guild::HandleBuyBankTab(WorldSession* session, uint8 tabId)
     _SetRankBankTabRightsAndSlots(player->GetRank(), tabId, GuildBankRightsAndSlots(GUILD_BANK_RIGHT_FULL, uint32(GUILD_WITHDRAW_SLOT_UNLIMITED)));
     HandleRoster();                                         // Broadcast for tab rights update
     SendBankList(session, tabId, false, true);
+    m_achievementMgr.UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_BANK_SLOTS, _GetPurchasedTabsSize(), 0, NULL, player);
 }
 
 void Guild::HandleInviteMember(WorldSession* session, const std::string& name)
@@ -2008,6 +2011,10 @@ bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool
     SendMoneyInfo(session);
     if (!repair)
         SendBankList(session, 0, false, false);
+
+    if (repair)
+        m_achievementMgr.UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPENT_GOLD_GUILD_REPAIRS, amount, 0, NULL, player);
+    
     return true;
 }
 

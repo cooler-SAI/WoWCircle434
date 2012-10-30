@@ -587,8 +587,8 @@ bool Player::SolveResearchProject(uint32 spellId)
 
     m_ResearchProjects.erase(rp->ID);
 
-    //GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ARCHAEOLOGY_PROJECT, rp->ID, 1);
-    //UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ARCHAEOLOGY_PROJECT, rp->ID, 1);
+    UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHAEOLOGY_PROJECTS, rp->ID, 1);
+    UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHAEOLOGY_PROJECTS, rp->ID, 1);
 
     if (rp->rare)
         m_CompletedProjects.insert(rp->ID);

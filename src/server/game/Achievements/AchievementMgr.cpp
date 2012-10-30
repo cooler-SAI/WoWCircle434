@@ -1480,6 +1480,14 @@ void AchievementMgr<T>::UpdateAchievementCriteria(AchievementCriteriaTypes type,
                 SetCriteriaProgress(achievementCriteria, 1, referencePlayer, PROGRESS_ACCUMULATE);
                 break;
             }
+            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHAEOLOGY_PROJECTS:
+            {
+                if (!miscValue1)
+                    continue;
+
+                SetCriteriaProgress(achievementCriteria, 1, referencePlayer, PROGRESS_ACCUMULATE);
+                break;
+            }
             // FIXME: not triggered in code as result, need to implement
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_RAID:
             case ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA:
@@ -1487,7 +1495,6 @@ void AchievementMgr<T>::UpdateAchievementCriteria(AchievementCriteriaTypes type,
             case ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE:
             case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE:
             case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_BATTLEGROUND:
-            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHAEOLOGY_PROJECTS:
             case ACHIEVEMENT_CRITERIA_TYPE_UNK118:
             case ACHIEVEMENT_CRITERIA_TYPE_UNK120:
             case ACHIEVEMENT_CRITERIA_TYPE_UNK121:
@@ -1550,6 +1557,8 @@ bool AchievementMgr<T>::IsCompletedCriteria(AchievementCriteriaEntry const* achi
             return progress->counter >= achievementCriteria->win_bg.winCount;
         case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
             return progress->counter >= achievementCriteria->kill_creature.creatureCount;
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHAEOLOGY_PROJECTS:
+            return progress->counter >= achievementCriteria->archaeology.count;
         case ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL:
             return progress->counter >= achievementCriteria->reach_level.level;
         case ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL:
@@ -2064,6 +2073,7 @@ void AchievementMgr<Guild>::CompletedAchievement(AchievementEntry const* achieve
 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT, 0, 0, NULL, referencePlayer);
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EARN_ACHIEVEMENT_POINTS, achievement->points, 0, NULL, referencePlayer);
+    UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EARN_GUILD_ACHIEVEMENT_POINTS, achievement->points, 0, NULL, referencePlayer);
 }
 
 struct VisibleAchievementPred

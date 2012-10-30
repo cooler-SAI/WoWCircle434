@@ -1361,6 +1361,9 @@ void GameObject::Use(Unit* user)
                         }
                         else
                             player->SendLoot(GetGUID(), LOOT_FISHING);
+
+                        player->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CATCH_FROM_POOL, 1);
+
                     }
                     // TODO: else: junk
 

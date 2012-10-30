@@ -394,7 +394,10 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, in
         _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION, factionEntry->ID);
         _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_REVERED_REPUTATION, factionEntry->ID);
         _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_HONORED_REPUTATION, factionEntry->ID);
-
+        _player->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION, factionEntry->ID);
+        _player->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION, factionEntry->ID);
+        if (factionEntry->ID == 1168)
+            _player->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL, _player->getLevel());
         return true;
     }
     return false;

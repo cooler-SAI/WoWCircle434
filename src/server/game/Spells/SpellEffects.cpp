@@ -1674,7 +1674,10 @@ void Spell::DoCreateItem(uint32 /*i*/, uint32 itemtype)
 
         // we succeeded in creating at least one item, so a levelup is possible
         if (bgType == 0)
+        {
+            player->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CRAFT_ITEMS_GUILD, pItem->GetTemplate()->ItemId, num_to_add);
             player->UpdateCraftSkill(m_spellInfo->Id);
+        }
     }
 
 /*

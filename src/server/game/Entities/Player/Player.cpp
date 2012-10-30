@@ -441,6 +441,7 @@ KillRewarder::KillRewarder(Player* killer, Unit* victim, bool isBattleGround) :
         _isPvP = !victim->IsVehicle();
 
     _InitGroupData();
+    _isHonnor = false;
 }
 
 inline void KillRewarder::_InitGroupData()
@@ -489,7 +490,7 @@ inline void KillRewarder::_RewardHonor(Player* player)
 {
     // Rewarded player must be alive.
     if (player->isAlive())
-        player->RewardHonor(_victim, _count, -1, true);
+        _isHonnor = player->RewardHonor(_victim, _count, -1, true);
 }
 
 inline void KillRewarder::_RewardXP(Player* player, float rate)
@@ -635,10 +636,42 @@ void KillRewarder::Reward()
         if (victim->IsDungeonBoss())
             if (InstanceScript* instance = _victim->GetInstanceScript())
                 instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, _victim->GetEntry(), _victim);
+    }
 
-        if (uint32 guildId = victim->GetMap()->GetOwnerGuildId())
-            if (Guild* guild = sGuildMgr->GetGuildById(guildId))
-                guild->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, victim->GetEntry(), 1, victim, _killer);
+    // Guild achievements for all kills
+    if (_isPvP)
+    {
+        if (Group* pGroup = _killer->GetGroup())
+        {
+            if (_isHonnor)
+            {
+                pGroup->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_RACE, 1, 0, _victim, _victim);
+                pGroup->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILLS_GUILD, 1, 0, _victim, _victim);
+            }
+            pGroup->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL, 1, 0, _victim, _victim);
+        }
+        else
+        {
+            if (_isHonnor)
+            {
+                _killer->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_RACE, 1, 0, _victim);
+                _killer->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILLS_GUILD, 1, 0, _victim);
+            }
+            _killer->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL, 1, 0, _victim);
+        }
+    }
+    else
+    {
+        if (Group* pGroup = _killer->GetGroup())
+        {
+            pGroup->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, _victim->GetEntry(), 1, _victim, _victim);
+            pGroup->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE_GUILD, _victim->GetEntry(), 1, _victim, _victim);
+        }
+        else
+        {
+            _killer->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, _victim->GetEntry(), 1, _victim);
+            _killer->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE_GUILD, _victim->GetEntry(), 1, _victim);
+        }
     }
 
 }
@@ -3197,7 +3230,8 @@ void Player::GiveLevel(uint8 level)
     }
 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL);
-
+    UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL);
+    
     PhaseUpdateData phaseUdateData;
     phaseUdateData.AddConditionType(CONDITION_LEVEL);
 
@@ -6147,6 +6181,7 @@ bool Player::UpdateSkill(uint32 skill_id, uint32 step)
 
         UpdateSkillEnchantments(skill_id, value, new_value);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, skill_id);
+        UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, skill_id);
         return true;
     }
 
@@ -6292,6 +6327,7 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
 
         UpdateSkillEnchantments(SkillId, value, new_value);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, SkillId);
+        UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, SkillId);
         sLog->outDebug(LOG_FILTER_PLAYER_SKILLS, "Player::UpdateSkillPro Chance=%3.1f%% taken", Chance / 10.0f);
         return true;
     }
@@ -6412,6 +6448,7 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
 
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL, id);
+            UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
         }
         else                                                //remove
         {
@@ -6477,6 +6514,7 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
                 UpdateSkillEnchantments(id, currVal, newVal);
                 UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
                 UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL, id);
+                UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, id);
 
                 // insert new entry or update if not deleted old entry yet
                 if (itr != mSkillStatus.end())
@@ -11740,6 +11778,7 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
         ItemAddedQuestCheck(item, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, 1);
+        UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, 1);
         if (randomPropertyId)
             pItem->SetItemRandomProperties(randomPropertyId);
         pItem = StoreItem(dest, pItem, update);
@@ -15057,6 +15096,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
         {
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST, quest_id);
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST_DAILY, quest_id);
+            UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST, quest_id);
         }
     }
     else if (quest->IsWeekly())
@@ -15087,7 +15127,8 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE, quest->GetZoneOrSort());
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST_COUNT);
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, quest->GetQuestId());
-
+    UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_GUILD, 1);
+    
     //lets remove flag for delayed teleports
     SetCanDelayTeleport(false);
 }
@@ -24159,6 +24200,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, item->itemid, item->count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE, loot->loot_type, item->count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item->itemid, item->count);
+        UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item->itemid, item->count);
     }
     else
         SendEquipError(msg, NULL, NULL, item->itemid);
@@ -24483,14 +24525,12 @@ void Player::ResetAchievementCriteria(AchievementCriteriaTypes type, uint32 misc
 void Player::UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, Unit* unit /*= NULL*/)
 {
     m_achievementMgr.UpdateAchievementCriteria(type, miscValue1, miscValue2, unit, this);
+}
 
-    // Update only individual achievement criteria here, otherwise we may get multiple updates
-    // from a single boss kill
-    if (sAchievementMgr->IsGroupCriteriaType(type))
-        return;
-
-    if (Guild* guild = sGuildMgr->GetGuildById(GetGuildId()))
-        guild->GetAchievementMgr().UpdateAchievementCriteria(type, miscValue1, miscValue2, unit, this);
+void Player::UpdateGuildAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1, uint32 miscValue2, Unit* unit)
+{
+    if (Guild* pGuild = sGuildMgr->GetGuildById(GetGuildId()))
+        pGuild->GetAchievementMgr().UpdateAchievementCriteria(type, miscValue1, miscValue2, unit, this);
 }
 
 void Player::CompletedAchievement(AchievementEntry const* entry)
