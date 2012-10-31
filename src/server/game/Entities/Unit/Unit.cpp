@@ -3519,7 +3519,7 @@ void Unit::RemoveAurasDueToItemSpell(Item* castItem, uint32 spellId)
     }
 }
 
-void Unit::RemoveAurasByType(AuraType auraType, uint64 casterGUID, Aura* except, bool negative, bool positive)
+void Unit::RemoveAurasByType(AuraType auraType, uint64 casterGUID, Aura* exceptAura, uint32 exceptAuraId, bool negative, bool positive)
 {
     for (AuraEffectList::iterator iter = m_modAuras[auraType].begin(); iter != m_modAuras[auraType].end();)
     {
@@ -3527,8 +3527,9 @@ void Unit::RemoveAurasByType(AuraType auraType, uint64 casterGUID, Aura* except,
         AuraApplication * aurApp = aura->GetApplicationOfTarget(GetGUID());
 
         ++iter;
-        if (aura != except && (!casterGUID || aura->GetCasterGUID() == casterGUID)
-            && ((negative && !aurApp->IsPositive()) || (positive && aurApp->IsPositive())))
+        if (aura != exceptAura && (!exceptAuraId || aura->GetId() != exceptAuraId) &&
+            (!casterGUID || aura->GetCasterGUID() == casterGUID) &&
+            ((negative && !aurApp->IsPositive()) || (positive && aurApp->IsPositive())))
         {
             uint32 removedAuras = m_removedAurasCount;
             RemoveAura(aurApp);
@@ -3642,16 +3643,21 @@ void Unit::RemoveMovementImpairingAuras()
     RemoveAurasWithMechanic((1<<MECHANIC_SNARE)|(1<<MECHANIC_ROOT));
 }
 
-void Unit::RemoveAurasWithMechanic(uint32 mechanic_mask, AuraRemoveMode removemode, uint32 except)
+void Unit::RemoveAurasWithMechanic(uint32 mechanic_mask, AuraRemoveMode removemode, uint32 except, uint8 count)
 {
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
     {
+        uint8 aurasCount = 0;
         Aura const* aura = iter->second->GetBase();
         if (!except || aura->GetId() != except)
         {
             if (aura->GetSpellInfo()->GetAllEffectsMechanicMask() & mechanic_mask)
             {
                 RemoveAura(iter, removemode);
+                aurasCount++;
+                if (count && aurasCount == count)
+                    break;
+
                 continue;
             }
         }

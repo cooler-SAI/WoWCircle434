@@ -819,7 +819,7 @@ void Spell::SelectEffectImplicitTargets(SpellEffIndex effIndex, SpellImplicitTar
                 return;
             // choose which targets we can select at once
             for (uint32 j = effIndex + 1; j < MAX_SPELL_EFFECTS; ++j)
-                if (!GetSpellInfo()->IsNoNeedAdditionalEffectChecks() && GetSpellInfo()->Effects[effIndex].TargetA.GetTarget() == GetSpellInfo()->Effects[j].TargetA.GetTarget() &&
+                if (GetSpellInfo()->IsRequireAdditionalTargetCheck() && GetSpellInfo()->Effects[effIndex].TargetA.GetTarget() == GetSpellInfo()->Effects[j].TargetA.GetTarget() &&
                     GetSpellInfo()->Effects[effIndex].TargetB.GetTarget() == GetSpellInfo()->Effects[j].TargetB.GetTarget() &&
                     GetSpellInfo()->Effects[effIndex].ImplicitTargetConditions == GetSpellInfo()->Effects[j].ImplicitTargetConditions &&
                     GetSpellInfo()->Effects[effIndex].CalcRadius(m_caster) == GetSpellInfo()->Effects[j].CalcRadius(m_caster))
@@ -2410,7 +2410,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         return;                                             // No missinfo in that case
 
     // Some spells should remove Camouflage after hit (traps, some spells that have casting time)
-    if (target->targetGUID != m_caster->GetGUID() && m_spellInfo && m_spellInfo->IsBreakCamouflageAfterHit())
+    if (target->targetGUID != m_caster->GetGUID() && m_spellInfo && m_spellInfo->IsBreakingCamouflageAfterHit())
     {
         if (TempSummon* summon = m_caster->ToTempSummon())
         {
@@ -2688,8 +2688,8 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         {
             unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
             //TODO: This is a hack. But we do not know what types of stealth should be interrupted by CC
-            if ((m_spellInfo->AttributesCu & SPELL_ATTR0_CU_AURA_CC) && unit->IsControlledByPlayer())
-                unit->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
+            if (m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_AURA_CC) && unit->IsControlledByPlayer() && m_spellInfo->IsBreakingStealth())
+                unit->RemoveAurasByType(SPELL_AURA_MOD_STEALTH, NULL, NULL, 11327);
         }
         else if (m_caster->IsFriendlyTo(unit))
         {
@@ -3133,7 +3133,7 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     {
         // stealth must be removed at cast starting (at show channel bar)
         // skip triggered spell (item equip spell casting and other not explicit character casts/item uses)
-        if (!(_triggeredCastFlags & TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && m_spellInfo->IsBreakingStealth() && (!m_caster->HasAuraType(SPELL_AURA_MOD_CAMOUFLAGE) || m_spellInfo->IsBreakCamouflage()))
+        if (!(_triggeredCastFlags & TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && m_spellInfo->IsBreakingStealth() && (!m_caster->HasAuraType(SPELL_AURA_MOD_CAMOUFLAGE) || m_spellInfo->IsBreakingCamouflage()))
         {
             m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
             for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -5159,39 +5159,6 @@ SpellCastResult Spell::CheckCast(bool strict)
     castResult = CallScriptCheckCastHandlers();
     if (castResult != SPELL_CAST_OK)
         return castResult;
-
-    bool hasDispellableAura = false;
-    bool hasNonDispelEffect = false;
-    uint32 dispelMask = 0;
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        if (m_spellInfo->Effects[i].Effect == SPELL_EFFECT_DISPEL)
-        {
-            if (m_spellInfo->Effects[i].IsTargetingArea() || m_spellInfo->AttributesEx & SPELL_ATTR1_MELEE_COMBAT_START)
-            {
-                hasDispellableAura = true;
-                break;
-            }
-
-            dispelMask |= SpellInfo::GetDispelMask(DispelType(m_spellInfo->Effects[i].MiscValue));
-        }
-        else if (m_spellInfo->Effects[i].IsEffect())
-        {
-            hasNonDispelEffect = true;
-            break;
-        }
-    }
-
-    if (!hasNonDispelEffect && !hasDispellableAura && dispelMask && !IsTriggered())
-    {
-        if (Unit* target = m_targets.GetUnitTarget())
-        {
-            DispelChargesList dispelList;
-            target->GetDispellableAuraList(m_caster, dispelMask, dispelList);
-            if (dispelList.empty())
-                return SPELL_FAILED_NOTHING_TO_DISPEL;
-        }
-    }
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {

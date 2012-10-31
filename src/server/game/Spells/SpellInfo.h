@@ -452,7 +452,6 @@ public:
     bool IsPositiveEffect(uint8 effIndex) const;
     bool IsChanneled() const;
     bool NeedsComboPoints() const;
-    bool IsBreakingStealth() const;
     bool IsRangedWeaponSpell() const;
     bool IsAutoRepeatRangedSpell() const;
 
@@ -524,11 +523,12 @@ public:
     bool IsHighRankOf(SpellInfo const* spellInfo) const;
 
     bool IsIgnoringCombat() const;
-    bool IsNoNeedAdditionalEffectChecks() const;
+    bool IsRequireAdditionalTargetCheck() const;
 
-    // camoufalge helpers
-    bool IsBreakCamouflage() const;
-    bool IsBreakCamouflageAfterHit() const;
+    // helpers for breaking by damage spells
+    bool IsBreakingCamouflage() const;
+    bool IsBreakingCamouflageAfterHit() const;
+    bool IsBreakingStealth() const;
 
     // loading helpers
     uint32 _GetExplicitTargetMask() const;

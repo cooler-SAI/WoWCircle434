@@ -2430,6 +2430,13 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
     uint32 dispel_type = m_spellInfo->Effects[effIndex].MiscValue;
     uint32 dispelMask  = SpellInfo::GetDispelMask(DispelType(dispel_type));
 
+    // Acts of Sacrifice
+    if (m_spellInfo->SpellIconID == 300 && effIndex == 0 && unitTarget == m_caster)
+    {
+        if (AuraEffect const * aurEff = m_caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_PALADIN, 3022, 0))
+            unitTarget->RemoveAurasWithMechanic((1<<MECHANIC_SNARE) | (1<<MECHANIC_ROOT), AURA_REMOVE_BY_ENEMY_SPELL, 0, 1);
+    }
+
     DispelChargesList dispel_list;
     unitTarget->GetDispellableAuraList(m_caster, dispelMask, dispel_list);
     if (dispel_list.empty())

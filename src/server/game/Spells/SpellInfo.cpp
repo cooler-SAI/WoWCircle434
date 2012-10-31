@@ -1196,11 +1196,6 @@ bool SpellInfo::NeedsComboPoints() const
     return (AttributesEx & (SPELL_ATTR1_REQ_COMBO_POINTS1 | SPELL_ATTR1_REQ_COMBO_POINTS2));
 }
 
-bool SpellInfo::IsBreakingStealth() const
-{
-    return !(AttributesEx & SPELL_ATTR1_NOT_BREAK_STEALTH);
-}
-
 bool SpellInfo::IsRangedWeaponSpell() const
 {
     return (SpellFamilyName == SPELLFAMILY_HUNTER && !(SpellFamilyFlags[1] & 0x10000000)) // for 53352, cannot find better way
@@ -2694,7 +2689,7 @@ bool SpellInfo::_IsNeedDelay() const
     return false;
 }
 
-bool SpellInfo::IsBreakCamouflage() const
+bool SpellInfo::IsBreakingCamouflage() const
 {
     // This is bad but I dont't see another way
     // I cannot check spells using any mask
@@ -2791,19 +2786,56 @@ bool SpellInfo::IsIgnoringCombat() const
     return false;
 }
 
-bool SpellInfo::IsNoNeedAdditionalEffectChecks() const
+bool SpellInfo::IsRequireAdditionalTargetCheck() const
 {
     switch (Id)
     {
         case 2812: // Holy Wrath
-            return true;
+            return false;
         default:
             break;
     }
-    return false;
+
+    return true;
 }
 
-bool SpellInfo::IsBreakCamouflageAfterHit() const
+bool SpellInfo::IsBreakingStealth() const
+{
+    if (IsPositive())
+        return false;
+
+    switch(Id)
+    {
+        // Earthbind Totem
+        case 3600:
+            return false;
+        default:
+            break;
+    }
+
+    if (IsTargetingArea())
+    {
+        // dispel etc spells
+        switch(Effects[EFFECT_0].Effect)
+        {
+            case SPELL_EFFECT_DISPEL:
+            case SPELL_EFFECT_DISPEL_MECHANIC:
+            case SPELL_EFFECT_THREAT:
+            case SPELL_EFFECT_MODIFY_THREAT_PERCENT:
+            case SPELL_EFFECT_DISTRACT:
+                return false;
+            default:
+                break;
+        }
+    }
+
+    if (HasAttribute(SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS) || HasAttribute(SPELL_ATTR1_NOT_BREAK_STEALTH))
+        return false;
+
+    return true;
+}
+
+bool SpellInfo::IsBreakingCamouflageAfterHit() const
 {
     // Traps
     if (SpellFamilyFlags[1] & 0x8002000 ||
