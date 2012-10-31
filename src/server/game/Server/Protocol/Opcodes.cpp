@@ -367,14 +367,14 @@ void OpcodeTable::Initialize()
     DEFINE_OPCODE_HANDLER(CMSG_MOVE_FORCE_SWIM_BACK_SPEED_CHANGE_ACK,   STATUS_UNHANDLED, PROCESS_THREADSAFE,   &WorldSession::HandleForceSpeedChangeAck       );
     DEFINE_OPCODE_HANDLER(CMSG_MOVE_FORCE_SWIM_SPEED_CHANGE_ACK,        STATUS_UNHANDLED, PROCESS_THREADSAFE,   &WorldSession::HandleForceSpeedChangeAck       );
     DEFINE_OPCODE_HANDLER(CMSG_MOVE_FORCE_TURN_RATE_CHANGE_ACK,         STATUS_UNHANDLED, PROCESS_THREADSAFE,   &WorldSession::HandleForceSpeedChangeAck       );
-    DEFINE_OPCODE_HANDLER(CMSG_MOVE_FORCE_WALK_SPEED_CHANGE_ACK,        STATUS_UNHANDLED, PROCESS_THREADSAFE,   &WorldSession::HandleForceSpeedChangeAck       );
+    DEFINE_OPCODE_HANDLER(CMSG_MOVE_FORCE_WALK_SPEED_CHANGE_ACK,        STATUS_LOGGEDIN,  PROCESS_THREADSAFE,   &WorldSession::HandleForceSpeedChangeAck       );
     DEFINE_OPCODE_HANDLER(CMSG_MOVE_GRAVITY_DISABLE_ACK,                STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
     DEFINE_OPCODE_HANDLER(CMSG_MOVE_GRAVITY_ENABLE_ACK,                 STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
     DEFINE_OPCODE_HANDLER(CMSG_MOVE_HOVER_ACK,                          STATUS_UNHANDLED, PROCESS_THREADUNSAFE, &WorldSession::HandleMoveHoverAck              );
-    DEFINE_OPCODE_HANDLER(CMSG_MOVE_KNOCK_BACK_ACK,                     STATUS_UNHANDLED, PROCESS_THREADSAFE,   &WorldSession::HandleMoveKnockBackAck          );
+    DEFINE_OPCODE_HANDLER(CMSG_MOVE_KNOCK_BACK_ACK,                     STATUS_LOGGEDIN,  PROCESS_THREADSAFE,   &WorldSession::HandleMoveKnockBackAck          );
     DEFINE_OPCODE_HANDLER(CMSG_MOVE_NOT_ACTIVE_MOVER,                   STATUS_LOGGEDIN,  PROCESS_THREADSAFE,   &WorldSession::HandleMoveNotActiveMover        );
     DEFINE_OPCODE_HANDLER(CMSG_MOVE_SET_CAN_FLY,                        STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
-    DEFINE_OPCODE_HANDLER(CMSG_MOVE_SET_CAN_FLY_ACK,                    STATUS_UNHANDLED, PROCESS_THREADSAFE,   &WorldSession::HandleMoveSetCanFlyAckOpcode    );
+    DEFINE_OPCODE_HANDLER(CMSG_MOVE_SET_CAN_FLY_ACK,                    STATUS_LOGGEDIN,  PROCESS_THREADSAFE,   &WorldSession::HandleMoveSetCanFlyAckOpcode    );
     DEFINE_OPCODE_HANDLER(CMSG_MOVE_SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY_ACK, STATUS_UNHANDLED, PROCESS_INPLACE, &WorldSession::Handle_NULL                 );
     DEFINE_OPCODE_HANDLER(CMSG_MOVE_SET_COLLISION_HEIGHT_ACK,           STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
     DEFINE_OPCODE_HANDLER(CMSG_MOVE_SPLINE_DONE,                        STATUS_LOGGEDIN,  PROCESS_THREADSAFE,   &WorldSession::HandleMoveSplineDoneOpcode      );
@@ -1015,7 +1015,7 @@ void OpcodeTable::Initialize()
     DEFINE_OPCODE_HANDLER(SMSG_MOVE_UNSET_HOVER,                        STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     DEFINE_OPCODE_HANDLER(SMSG_MOVE_UPDATE_COLLISION_HEIGHT,            STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     DEFINE_OPCODE_HANDLER(SMSG_MOVE_UPDATE_FLIGHT_BACK_SPEED,           STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
-    DEFINE_OPCODE_HANDLER(SMSG_MOVE_UPDATE_KNOCK_BACK,                  STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
+    DEFINE_OPCODE_HANDLER(SMSG_MOVE_UPDATE_KNOCK_BACK,                  STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     DEFINE_OPCODE_HANDLER(SMSG_MOVE_UPDATE_PITCH_RATE,                  STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     DEFINE_OPCODE_HANDLER(SMSG_MOVE_UPDATE_RUN_BACK_SPEED,              STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     DEFINE_OPCODE_HANDLER(SMSG_MOVE_UPDATE_SWIM_BACK_SPEED,             STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
