@@ -535,13 +535,8 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
 
-    uint64 old_mover_guid;
-    recvData.readPackGUID(old_mover_guid);
-
     MovementInfo mi;
     ReadMovementInfo(recvData, &mi);
-
-    mi.guid = old_mover_guid;
 
     _player->m_movementInfo = mi;
 }
@@ -920,7 +915,7 @@ void WorldSession::WriteMovementInfo(WorldPacket &data, MovementInfo* mi)
     MovementStatusElements* sequence = GetMovementStatusElementsSequence(data.GetOpcode());
     if (!sequence)
     {
-        sLog->outError(LOG_FILTER_NETWORKIO, "WorldSession::WriteMovementInfo: No movement sequence found for opcode 0x%04X", uint32(data.GetOpcode()));
+        sLog->outError(LOG_FILTER_NETWORKIO, "WorldSession::WriteMovementInfo: No movement sequence found for opcode %s, 0x%04X", GetOpcodeNameForLogging(data.GetOpcode()), uint32(data.GetOpcode()));
         return;
     }
 
