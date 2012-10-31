@@ -2399,10 +2399,88 @@ MovementStatusElements MoveUpdateKnockBackSequence[] =
     MSEEnd,
 };
 
+MovementStatusElements MoveForceWalkSpeedChangeAckSequence[] =
+{
+    MSEPositionZ,
+    MSEPositionY,
+    MSESpeed,
+    MSEPositionX,
+    MSEMovementCounter,
+    MSEHasGuidByte0,
+    MSEHasMovementFlags2,
+    MSEHasTimestamp,
+    MSEHasGuidByte4,
+    MSEHasGuidByte5,
+    MSEHasGuidByte2,
+    MSEHasMovementFlags,
+    MSEHasFallData,
+    MSEHasOrientation,
+    MSEHasSpline,
+    MSEZeroBit,
+    MSEHasGuidByte3,
+    MSEHasGuidByte1,
+    MSEHasSplineElevation,
+    MSEHasTransportData,
+    MSEHasGuidByte7,
+    MSEHasGuidByte6,
+    MSEHasPitch,
+    MSEHasTransportTime2,
+    MSEHasTransportGuidByte5,
+    MSEHasTransportGuidByte1,
+    MSEHasTransportGuidByte6,
+    MSEHasTransportTime3,
+    MSEHasTransportGuidByte2,
+    MSEHasTransportGuidByte0,
+    MSEHasTransportGuidByte4,
+    MSEHasTransportGuidByte7,
+    MSEHasTransportGuidByte3,
+    MSEMovementFlags,
+    MSEMovementFlags2,
+
+    MSEGuidByte5,
+    MSEGuidByte6,
+    MSEGuidByte7,
+    MSEGuidByte2,
+    MSEGuidByte1,
+    MSEGuidByte3,
+    MSEGuidByte4,
+    MSEGuidByte0,
+    MSEFallVerticalSpeed,
+    MSEFallSinAngle,
+    MSEFallHorizontalSpeed,
+    MSEFallCosAngle,
+    MSEFallTime,
+
+    MSETransportPositionZ,
+    MSETransportGuidByte7,
+    MSETransportGuidByte5,
+    MSETransportPositionX,
+    MSETransportGuidByte0,
+    MSETransportTime,
+    MSETransportTime3,
+    MSETransportPositionY,
+    MSETransportGuidByte2,
+    MSETransportGuidByte4,
+    MSETransportGuidByte1,
+    MSETransportGuidByte3,
+    MSETransportOrientation,
+    MSETransportSeat,
+    MSETransportGuidByte6,
+    MSETransportTime2,
+    MSESplineElevation,
+    MSETimestamp,
+    MSEOrientation,
+    MSEPitch,
+
+    MSEEnd,
+};
+
 MovementStatusElements* GetMovementStatusElementsSequence(Opcodes opcode)
 {
     switch (opcode)
     {
+        case CMSG_MOVE_FORCE_WALK_SPEED_CHANGE_ACK:
+            return MoveForceWalkSpeedChangeAckSequence;
         case MSG_MOVE_FALL_LAND:
             return MovementFallLandSequence;
         case MSG_MOVE_HEARTBEAT:
