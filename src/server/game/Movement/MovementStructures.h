@@ -89,6 +89,7 @@ enum MovementStatusElements
     MSEFallHorizontalSpeed,
     MSESplineElevation,
     MSEMovementCounter,
+    MSESpeed,
 
     // Special
     MSEZeroBit, // writes bit value 0 or skips read bit
