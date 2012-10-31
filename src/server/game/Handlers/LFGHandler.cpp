@@ -206,21 +206,21 @@ void WorldSession::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*
             data << uint32(1); // Times precision
             data << uint32(7); // Available times per week
 
-            data << uint32(396); // Unknown 4.3.4
-            data << uint32(7); // Unknown 4.3.4
+            data << uint32(0); // Unknown 4.3.4
+            data << uint32(0); // Unknown 4.3.4
 
-            data << uint32(7); // Unknown 4.3.4
-            data << uint32(7); // Unknown 4.3.4
-            data << uint32(7); // Unknown 4.3.4
+            data << uint32(0); // Unknown 4.3.4
+            data << uint32(0); // Unknown 4.3.4
+            data << uint32(0); // Unknown 4.3.4
             data << uint32(0); // Unknown 4.3.4
             data << uint32(0); // Unknown 4.3.4
             data << uint32(0); // Unknown 4.3.4
             data << uint32(0); // Unknown 4.3.4
 
             data << uint32(1); // Unknown 4.3.4
-            data << uint32(1); // Unknown 4.3.4
+            data << uint32(0); // isComplited
 
-            data << uint8(0); // Unknown 4.3.4
+            data << uint8(0); // seasonal ?
             {
                 for (uint8 i = 0; i < 3; ++i) // 3 - Max roles ?
                 {
