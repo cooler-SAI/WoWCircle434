@@ -3657,6 +3657,74 @@ void SpellMgr::LoadDbcDataCorrections()
             case 49345: // Call Emerald Drake
                 spellInfo->Effects[EFFECT_0].Effect = 0;
                 break;
+            // ENDOF OCULUS SPELLS
+            //
+            // THRONE OF THE TIDES SPELLS
+            //
+            // Lady Nazjar
+            case 90479: // Waterspout dmg
+                spellInfo->Effects[0].Effect = 0;
+                break;
+            case 75690: // Waterspout knock
+                spellInfo->Effects[0].SetRadiusIndex(7);
+                spellInfo->Effects[1].SetRadiusIndex(7);
+                break;
+            case 75700: // Geyser Errupt
+            case 91469:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                spellInfo->Effects[1].SetRadiusIndex(8);
+                break;
+            case 94046: // Geyser Errupt knock
+            case 94047:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                spellInfo->Effects[1].SetRadiusIndex(8);
+                break;
+            case 75813: // Chain Lightning
+            case 91450:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                break;
+            case 75993: // Lightning Surge dmg
+            case 91451:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                break;
+            case 80564: // Fungal Spores dmg
+            case 91470:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                break;
+            // Commander Ulthok
+            case 76085: // Dark Fissure dmg
+            case 91375:
+                spellInfo->Effects[0].SetRadiusIndex(29);
+                break;
+            case 76047:
+                spellInfo->Effects[0].TargetB = 0;
+                spellInfo->Effects[0].SetRadiusIndex(29);
+                break;
+            // Erunak Stonespeaker
+            case 84945: // Earth Shards dmg
+            case 91491:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                break;
+            // Mindbender Ghursha
+            case 76341: // Unrelenting Agony dmg
+            case 91493:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            // Ozumat
+            case 83463: // Entangling Grasp
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 83915: // Brain Spike
+            case 91497:
+                spellInfo->Effects[0].SetRadiusIndex(23);
+                spellInfo->Effects[1].SetRadiusIndex(23);
+                break;
+            case 83561: // Blight of Ozumat dmg
+            case 91495:
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                break;
+            // ENDOF THRONE OF THE TIDES SPELLS
+            //
             // Camouflage
             case 80325:
                 spellInfo->Effects[EFFECT_1].Effect = 0;

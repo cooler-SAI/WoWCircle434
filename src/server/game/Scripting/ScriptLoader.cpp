@@ -594,6 +594,14 @@ void AddSC_shattrath_city();
 void AddSC_terokkar_forest();
 void AddSC_zangarmarsh();
 
+// Cataclysm Scripts
+void AddSC_instance_throne_of_the_tides(); // Throne of the Tides
+void AddSC_throne_of_the_tides();
+void AddSC_boss_lady_nazjar();
+void AddSC_boss_commander_ulthok();
+void AddSC_boss_erunak_stonespeaker();
+void AddSC_boss_ozumat();
+
 // battlegrounds
 
 // outdoor pvp
@@ -1224,6 +1232,14 @@ void AddNorthrendScripts()
     AddSC_zuldrak();
     AddSC_crystalsong_forest();
     AddSC_isle_of_conquest();
+
+    // Cataclysm Scripts
+    AddSC_instance_throne_of_the_tides(); // Throne of the Tides
+    AddSC_throne_of_the_tides();
+    AddSC_boss_lady_nazjar();
+    AddSC_boss_commander_ulthok();
+    AddSC_boss_erunak_stonespeaker();
+    AddSC_boss_ozumat();
 #endif
 }
 
