@@ -2475,6 +2475,79 @@ MovementStatusElements MoveForceWalkSpeedChangeAckSequence[] =
     MSEEnd,
 };
 
+MovementStatusElements MoveFallResetSequence[] =
+{
+    MSEPositionZ,
+    MSEPositionX,
+    MSEPositionY,
+    MSEHasGuidByte1,
+    MSEHasTimestamp,
+    MSEHasMovementFlags,
+    MSEZeroBit,
+    MSEHasGuidByte6,
+    MSEHasSplineElevation,
+    MSEHasPitch,
+    MSEHasGuidByte3,
+    MSEHasTransportData,
+    MSEHasGuidByte2,
+    MSEHasMovementFlags2,
+    MSEHasOrientation,
+    MSEHasGuidByte4,
+    MSEHasGuidByte5,
+    MSEHasSpline,
+    MSEHasGuidByte7,
+    MSEHasGuidByte0,
+    MSEHasFallData,
+    MSEHasTransportGuidByte0,
+    MSEHasTransportGuidByte1,
+    MSEHasTransportGuidByte5,
+    MSEHasTransportGuidByte4,
+    MSEHasTransportTime2,
+    MSEHasTransportGuidByte2,
+    MSEHasTransportTime3,
+    MSEHasTransportGuidByte6,
+    MSEHasTransportGuidByte7,
+    MSEHasTransportGuidByte3,
+    MSEHasFallDirection,
+    MSEMovementFlags2,
+    MSEMovementFlags,
+    MSEGuidByte4,
+    MSEGuidByte0,
+    MSEGuidByte1,
+    MSEGuidByte7,
+    MSEGuidByte5,
+    MSEGuidByte2,
+    MSEGuidByte3,
+    MSEGuidByte6,
+    MSETransportPositionX,
+    MSETransportGuidByte7,
+    MSETransportGuidByte2,
+    MSETransportGuidByte3,
+    MSETransportGuidByte5,
+    MSETransportPositionY,
+    MSETransportPositionZ,
+    MSETransportSeat,
+    MSETransportTime2,
+    MSETransportGuidByte6,
+    MSETransportTime3,
+    MSETransportTime,
+    MSETransportGuidByte0,
+    MSETransportOrientation,
+    MSETransportGuidByte4,
+    MSETransportGuidByte1,
+    MSEFallVerticalSpeed,
+    MSEFallCosAngle,
+    MSEFallSinAngle,
+    MSEFallHorizontalSpeed,
+    MSEFallTime,
+    MSEOrientation,
+    MSETimestamp,
+    MSESplineElevation,
+    MSEPitch,
+
+    MSEEnd,
+};
+
 MovementStatusElements* GetMovementStatusElementsSequence(Opcodes opcode)
 {
     switch (opcode)
@@ -2545,6 +2618,8 @@ MovementStatusElements* GetMovementStatusElementsSequence(Opcodes opcode)
             return MoveKnockbackAckSequence;
         case SMSG_MOVE_UPDATE_KNOCK_BACK:
             return MoveUpdateKnockBackSequence;
+        case CMSG_MOVE_FALL_RESET:
+            return MoveFallResetSequence;
         default:
             break;
     }
