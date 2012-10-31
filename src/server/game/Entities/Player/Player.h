@@ -1526,30 +1526,6 @@ class Player : public Unit, public GridObject<Player>
         void AddRefundReference(uint32 it);
         void DeleteRefundReference(uint32 it);
 
-        /// modify currency flag
-        void ModifyCurrencyFlag(uint32 id, uint8 flag);
-        /// send initialization of new currency for client
-        void SendNewCurrency(uint32 id) const;
-        /// send full data about all currencies to client
-        void SendCurrencies() const;
-        /// return count of currency witch has plr
-        uint32 GetCurrency(uint32 id) const;
-        /// return presence related currency
-        bool HasCurrency(uint32 id, uint32 count) const;
-        /// @todo: not understand why it subtract from total count and for what it used. It should be remove and replaced by ModifyCurrency
-        void SetCurrency(uint32 id, uint32 count, bool printLog = true);
-
-        /**
-          * @name   ModifyCurrency
-          * @brief  Change specific currency and send result to client
-
-          * @param  id currency entry from CurrencyTypes.dbc
-          * @param  count integer value for adding/removing curent currency
-          * @param  printLog used on SMSG_UPDATE_CURRENCY
-          * @param  ignore gain multipliers
-        */
-        void ModifyCurrency(uint32 id, int32 count, bool printLog = true, bool ignoreMultipliers = false);
-
         void ApplyEquipCooldown(Item* pItem);
         void QuickEquipItem(uint16 pos, Item* pItem);
         void VisualizeItem(uint8 slot, Item* pItem);
@@ -2126,10 +2102,7 @@ class Player : public Unit, public GridObject<Player>
             SetArenaTeamInfoField(slot, ARENA_TEAM_ID, ArenaTeamId);
             SetArenaTeamInfoField(slot, ARENA_TEAM_TYPE, type);
         }
-        void SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
-        {
-            SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + type, value);
-        }
+        void SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value);
         static uint32 GetArenaTeamIdFromDB(uint64 guid, uint8 slot);
         static void LeaveAllArenaTeams(uint64 guid);
         uint32 GetArenaTeamId(uint8 slot) const { return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_ID); }
@@ -2839,8 +2812,42 @@ class Player : public Unit, public GridObject<Player>
         bool HasTitle(CharTitlesEntry const* title) { return HasTitle(title->bit_index); }
         void SetTitle(CharTitlesEntry const* title, bool lost = false);
 
+        // Currency helpers
+
         void SendCurrencyWeekCap(uint32 id) const;
         void SendCurrencyWeekCap(const CurrencyTypesEntry* currency) const;
+        void ResetCurrencyWeekCap();
+        uint32 GetRBGPersonalRating() const;
+
+        /// modify currency flag
+        void ModifyCurrencyFlag(uint32 id, uint8 flag);
+        /// send initialization of new currency for client
+        void SendNewCurrency(uint32 id) const;
+        /// send full data about all currencies to client
+        void SendCurrencies() const;
+        /// return count of currency witch has plr
+        uint32 GetCurrency(uint32 id, bool precision) const;
+        /// return presence related currency
+        bool HasCurrency(uint32 id, uint32 count) const;
+        /// initialize currency count for custom initialization at create character
+        void SetCurrency(uint32 id, uint32 count, bool printLog = true);
+        /// return week cap by currency id
+        uint32 GetCurrencyWeekCap(uint32 id, bool usePrecision) const;
+        /// return count of currency gaind on current week
+        uint32 GetCurrencyOnWeek(uint32 id, bool precision) const;
+        /// send conquest currency points and their cap week/arena
+        void SendPvpRewards() const;
+
+        /**
+          * @name   ModifyCurrency
+          * @brief  Change specific currency and send result to client
+
+          * @param  id currency entry from CurrencyTypes.dbc
+          * @param  count integer value for adding/removing curent currency
+          * @param  printLog used on SMSG_UPDATE_CURRENCY
+          * @param  ignore gain multipliers
+        */
+        void ModifyCurrency(uint32 id, int32 count, bool printLog = true, bool ignoreMultipliers = false);
 
         //bool isActiveObject() const { return true; }
         bool canSeeSpellClickOn(Creature const* creature) const;
@@ -3259,6 +3266,8 @@ class Player : public Unit, public GridObject<Player>
         uint32 _pendingBindTimer;
 
         uint32 _activeCheats;
+        uint32 _maxPersonalArenaRate;
+        uint32 _ConquestCurrencytotalWeekCap;
 
         PhaseMgr phaseMgr;
 };

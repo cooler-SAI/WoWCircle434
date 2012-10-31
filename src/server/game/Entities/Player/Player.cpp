@@ -895,6 +895,8 @@ Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_rep
     SetPendingBind(0, 0);
 
     _activeCheats = CHEAT_NONE;
+    _maxPersonalArenaRate = 0;
+    _ConquestCurrencytotalWeekCap = 0;
 
     memset(_voidStorageItems, 0, VOID_STORAGE_MAX_SLOT * sizeof(VoidStorageItem*));
     memset(_CUFProfiles, 0, MAX_CUF_PROFILES * sizeof(CUFProfile*));
@@ -1054,8 +1056,8 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
     InitRunes();
 
     SetUInt32Value(PLAYER_FIELD_COINAGE, sWorld->getIntConfig(CONFIG_START_PLAYER_MONEY));
-    SetCurrency(CURRENCY_TYPE_HONOR_POINTS, sWorld->getIntConfig(CONFIG_START_HONOR_POINTS));
-    SetCurrency(CURRENCY_TYPE_CONQUEST_POINTS, sWorld->getIntConfig(CONFIG_START_ARENA_POINTS));
+    SetCurrency(CURRENCY_TYPE_HONOR_POINTS, sWorld->getIntConfig(CONFIG_CURRENCY_START_HONOR_POINTS));
+    SetCurrency(CURRENCY_TYPE_CONQUEST_POINTS, sWorld->getIntConfig(CONFIG_CURRENCY_START_CONQUEST_POINTS));
 
     // start with every map explored
     if (sWorld->getBoolConfig(CONFIG_START_ALL_EXPLORED))
@@ -7363,6 +7365,14 @@ void Player::_LoadCurrency(PreparedQueryResult result)
 
         _currencyStorage.insert(PlayerCurrenciesMap::value_type(currencyID, cur));
 
+        // load total conquest cap. should be after insert.
+        if (currency->Category == CURRENCY_CATEGORY_META_CONQUEST)
+        {
+            uint32 cap = _GetCurrencyWeekCap(currency);
+            if (cap > _ConquestCurrencytotalWeekCap)
+                _ConquestCurrencytotalWeekCap = cap;
+        }
+
     } while (result->NextRow());
 }
 
@@ -7432,6 +7442,13 @@ uint8 Player::GetRankFromDB(uint64 guid)
         return result->Fetch()[1].GetUInt8();
 
     return 0;
+}
+
+void  Player::SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
+{
+    SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + type, value);
+    if (type == ARENA_TEAM_PERSONAL_RATING && value > _maxPersonalArenaRate)
+         _maxPersonalArenaRate = value;
 }
 
 uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
@@ -26422,4 +26439,9 @@ PlayerRole Player::GetRole() const
     }
 
     return role;
+}
+
+uint32 Player::GetRBGPersonalRating() const
+{
+    return 0;
 }

@@ -48,7 +48,10 @@ enum BattlegroundBracketId                                  // bracketId for lev
 
 enum CurrencyCategory
 {
+    // ...
     CURRENCY_CATEGORY_ARCHAEOLOGY   = 82,
+    CURRENCY_CATEGORY_META_CONQUEST = 89,
+    // ...
 };
 
 enum CurrencyFlags
@@ -567,12 +570,12 @@ enum VehicleSeatFlagsB
 // CurrencyTypes.dbc
 enum CurrencyTypes
 {
-    CURRENCY_TYPE_CONQUEST_POINTS    = 390,
-    CURRENCY_TYPE_HONOR_POINTS       = 392,
-    CURRENCY_TYPE_JUSTICE_POINTS     = 395,
-    CURRENCY_TYPE_VALOR_POINTS       = 396,
-    CURRENCY_TYPE_ARENA_META         = 483,
-    CURRENCY_TYPE_BG_META            = 484
+    CURRENCY_TYPE_CONQUEST_POINTS       = 390,
+    CURRENCY_TYPE_HONOR_POINTS          = 392,
+    CURRENCY_TYPE_JUSTICE_POINTS        = 395,
+    CURRENCY_TYPE_VALOR_POINTS          = 396,
+    CURRENCY_TYPE_CONQUEST_META_ARENA   = 483,
+    CURRENCY_TYPE_CONQUEST_META_BG      = 484,
 };
 
 #endif
