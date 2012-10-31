@@ -1858,6 +1858,7 @@ MovementStatusElements MoveChngTransport[]=
 // 4.3.4
 MovementStatusElements MoveSplineDone[] =
 {
+    MSEMovementCounter,
     MSEPositionY,
     MSEPositionX,
     MSEPositionZ,

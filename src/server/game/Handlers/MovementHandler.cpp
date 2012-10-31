@@ -801,6 +801,9 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
             case MSEMovementCounter:
                 data.read_skip<uint32>();
                 break;
+            case MSESpeed:
+                data >> mi->speed;
+                break;
             default:
                 ASSERT(false && "Incorrect sequence element detected at ReadMovementInfo");
                 break;
@@ -1080,6 +1083,9 @@ void WorldSession::WriteMovementInfo(WorldPacket &data, MovementInfo* mi)
                 break;
             case MSEMovementCounter:
                 data << uint32(0); // counter
+                break;
+            case MSESpeed:
+                data << mi->speed;
                 break;
             default:
                 ASSERT(false && "Incorrect sequence element detected at ReadMovementInfo");

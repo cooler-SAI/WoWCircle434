@@ -572,6 +572,8 @@ struct MovementInfo
     float j_zspeed, j_cosAngle, j_sinAngle, j_xyspeed;
     // spline
     float splineElevation;
+    // speed
+    float speed;
 
     MovementInfo()
     {
@@ -581,6 +583,7 @@ struct MovementInfo
         flags2 = 0;
         time = t_time = t_time2 = t_time3 = fallTime = 0;
         splineElevation = 0;
+        speed = 0.0f;
         pitch = j_zspeed = j_sinAngle = j_cosAngle = j_xyspeed = 0.0f;
         t_guid = 0;
         t_pos.Relocate(0, 0, 0, 0);
