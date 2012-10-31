@@ -9,14 +9,14 @@ void Player::SendNewCurrency(uint32 id) const
     if (itr == _currencyStorage.end())
         return;
 
-    ByteBuffer currencyData;
-    WorldPacket packet(SMSG_INIT_CURRENCY, 4 + (5*4 + 1));
-    packet.WriteBits(1, 23);
-
     CurrencyTypesEntry const* entry = sCurrencyTypesStore.LookupEntry(id);
     // not send init meta currencies.
     if (!entry || entry->Category == CURRENCY_CATEGORY_META_CONQUEST)
         return;
+
+    ByteBuffer currencyData;
+    WorldPacket packet(SMSG_INIT_CURRENCY, 4 + (5*4 + 1));
+    packet.WriteBits(1, 23);
 
     uint32 weekCount = itr->second.weekCount / entry->GetPrecision();
     uint32 weekCap = _GetCurrencyWeekCap(entry) / entry->GetPrecision();
