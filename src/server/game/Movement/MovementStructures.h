@@ -88,6 +88,7 @@ enum MovementStatusElements
     MSEFallSinAngle,
     MSEFallHorizontalSpeed,
     MSESplineElevation,
+    MSEMovementCounter,
 
     // Special
     MSEZeroBit, // writes bit value 0 or skips read bit
@@ -2094,6 +2095,79 @@ MovementStatusElements DismissControlledVehicle[] =
     MSEEnd,
 };
 
+MovementStatusElements MovementSetCanFlyAckSequence[] =
+{
+    MSEPositionY,
+    MSEMovementCounter,
+    MSEPositionX,
+    MSEPositionZ,
+    MSEHasGuidByte3,
+    MSEHasTimestamp,
+    MSEHasGuidByte4,
+    MSEHasGuidByte0,
+    MSEHasOrientation,
+    MSEHasFallData,
+    MSEHasGuidByte2,
+    MSEHasGuidByte5,
+    MSEHasSplineElevation,
+    MSEHasMovementFlags2,
+    MSEZeroBit,
+    MSEHasGuidByte7,
+    MSEHasSpline,
+    MSEHasGuidByte6,
+    MSEHasGuidByte1,
+    MSEHasMovementFlags,
+    MSEHasTransportData,
+    MSEHasPitch,
+    MSEHasTransportGuidByte3,
+    MSEHasTransportGuidByte1,
+    MSEHasTransportGuidByte2,
+    MSEHasTransportTime3,
+    MSEHasTransportTime2,
+    MSEHasTransportGuidByte0,
+    MSEHasTransportGuidByte5,
+    MSEHasTransportGuidByte7,
+    MSEHasTransportGuidByte4,
+    MSEHasTransportGuidByte6,
+    MSEMovementFlags2,
+    MSEMovementFlags,
+    MSEHasFallDirection,
+    MSEGuidByte1,
+    MSEGuidByte0,
+    MSEGuidByte2,
+    MSEGuidByte3,
+    MSEGuidByte7,
+    MSEGuidByte6,
+    MSEGuidByte4,
+    MSEGuidByte5,
+    MSETransportTime2,
+    MSETransportGuidByte6,
+    MSETransportTime,
+    MSETransportTime3,
+    MSETransportGuidByte7,
+    MSETransportPositionZ,
+    MSETransportGuidByte3,
+    MSETransportPositionY,
+    MSETransportGuidByte5,
+    MSETransportPositionX,
+    MSETransportGuidByte2,
+    MSETransportOrientation,
+    MSETransportSeat,
+    MSETransportGuidByte1,
+    MSETransportGuidByte0,
+    MSETransportGuidByte4,
+    MSEFallTime,
+    MSEFallCosAngle,
+    MSEFallHorizontalSpeed,
+    MSEFallSinAngle,
+    MSEFallVerticalSpeed,
+    MSEPitch,
+    MSEOrientation,
+    MSETimestamp,
+    MSESplineElevation,
+    MSEEnd,
+};
+
 MovementStatusElements* GetMovementStatusElementsSequence(Opcodes opcode)
 {
     switch (opcode)
@@ -2152,6 +2226,8 @@ MovementStatusElements* GetMovementStatusElementsSequence(Opcodes opcode)
             return MoveNotActiveMover;
         case CMSG_DISMISS_CONTROLLED_VEHICLE:
             return DismissControlledVehicle;
+        case CMSG_MOVE_SET_CAN_FLY_ACK:
+            return MovementSetCanFlyAckSequence;
         default:
             break;
     }
