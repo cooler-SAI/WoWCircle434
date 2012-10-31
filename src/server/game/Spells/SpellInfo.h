@@ -524,6 +524,7 @@ public:
     bool IsHighRankOf(SpellInfo const* spellInfo) const;
 
     bool IsIgnoringCombat() const;
+    bool IsNoNeedAdditionalEffectChecks() const;
 
     // camoufalge helpers
     bool IsBreakCamouflage() const;

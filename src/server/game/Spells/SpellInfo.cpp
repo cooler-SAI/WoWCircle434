@@ -2791,6 +2791,18 @@ bool SpellInfo::IsIgnoringCombat() const
     return false;
 }
 
+bool SpellInfo::IsNoNeedAdditionalEffectChecks() const
+{
+    switch (Id)
+    {
+        case 2812: // Holy Wrath
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
+
 bool SpellInfo::IsBreakCamouflageAfterHit() const
 {
     // Traps

@@ -819,7 +819,7 @@ void Spell::SelectEffectImplicitTargets(SpellEffIndex effIndex, SpellImplicitTar
                 return;
             // choose which targets we can select at once
             for (uint32 j = effIndex + 1; j < MAX_SPELL_EFFECTS; ++j)
-                if (GetSpellInfo()->Effects[effIndex].TargetA.GetTarget() == GetSpellInfo()->Effects[j].TargetA.GetTarget() &&
+                if (!GetSpellInfo()->IsNoNeedAdditionalEffectChecks() && GetSpellInfo()->Effects[effIndex].TargetA.GetTarget() == GetSpellInfo()->Effects[j].TargetA.GetTarget() &&
                     GetSpellInfo()->Effects[effIndex].TargetB.GetTarget() == GetSpellInfo()->Effects[j].TargetB.GetTarget() &&
                     GetSpellInfo()->Effects[effIndex].ImplicitTargetConditions == GetSpellInfo()->Effects[j].ImplicitTargetConditions &&
                     GetSpellInfo()->Effects[effIndex].CalcRadius(m_caster) == GetSpellInfo()->Effects[j].CalcRadius(m_caster))
@@ -1300,21 +1300,47 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                     break;
                 }
                 break;
+            case SPELLFAMILY_PALADIN:
+                // Holy Wrath
+                if (m_spellInfo->Id == 2812 && effIndex == 1)
+                {
+                    static const uint8 types_noglyph[] = {CREATURE_TYPE_DEMON, CREATURE_TYPE_UNDEAD, 0};
+                    static const uint8 types_glyph[] = {CREATURE_TYPE_DEMON, CREATURE_TYPE_UNDEAD, CREATURE_TYPE_ELEMENTAL, CREATURE_TYPE_DRAGONKIN, 0};
+                    const uint8 *types = m_caster->HasAura(56420) ? types_glyph: types_noglyph;
+                    for (std::list<Unit*>::iterator itr = unitTargets.begin() ; itr != unitTargets.end();)
+                    {
+                        bool found = false;
+                        uint8 types_i = 0;
+                        while(types[++types_i])
+                        {
+                            if ((*itr)->GetCreatureType() == types[types_i])
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found)
+                            itr++;
+                        else
+                            itr = unitTargets.erase(itr);
+                    }
+                }
+                break;
             case SPELLFAMILY_DRUID:
                 if (m_spellInfo->SpellFamilyFlags[1] == 0x04000000) // Wild Growth
                 {
                     maxSize = m_caster->HasAura(62970) ? 6 : 5; // Glyph of Wild Growth
                     power = POWER_HEALTH;
-                }
-                else
-                    break;
 
-                // Remove targets outside caster's raid
-                for (std::list<Unit*>::iterator itr = unitTargets.begin(); itr != unitTargets.end();)
-                    if (!(*itr)->IsInRaidWith(m_caster))
-                        itr = unitTargets.erase(itr);
-                    else
-                        ++itr;
+                    // Remove targets outside caster's raid
+                    for (std::list<Unit*>::iterator itr = unitTargets.begin(); itr != unitTargets.end();)
+                    {
+                        if (!(*itr)->IsInRaidWith(m_caster))
+                            itr = unitTargets.erase(itr);
+                        else
+                            ++itr;
+                    }
+                }
                 break;
             default:
                 break;
