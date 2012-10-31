@@ -7000,4 +7000,6 @@ mod_pair AuraEffect::GetUniqueVisibleAuraBuff(Unit* target, int8 x) const
             mod_pair pair = {first_mod, second_mod};
             return pair;
     }
+
+    return mod_pair();
 }
