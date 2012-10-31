@@ -2168,6 +2168,78 @@ MovementStatusElements MovementSetCanFlyAckSequence[] =
     MSEEnd,
 };
 
+MovementStatusElements MovementCastSpellSequence[] =
+{
+    MSEPositionZ,
+    MSEPositionY,
+    MSEPositionX,
+    MSEHasFallData,
+    MSEHasTimestamp,
+    MSEHasOrientation,
+    MSEHasSpline,
+    MSEZeroBit,
+    MSEHasGuidByte6,
+    MSEHasGuidByte4,
+    MSEHasMovementFlags2,
+    MSEHasGuidByte3,
+    MSEHasGuidByte5,
+    MSEHasSplineElevation,
+    MSEHasPitch,
+    MSEHasGuidByte7,
+    MSEHasTransportData,
+    MSEHasGuidByte2,
+    MSEHasMovementFlags,
+    MSEHasGuidByte1,
+    MSEHasGuidByte0,
+    MSEHasTransportGuidByte6,
+    MSEHasTransportGuidByte2,
+    MSEHasTransportGuidByte5,
+    MSEHasTransportTime2,
+    MSEHasTransportGuidByte7,
+    MSEHasTransportGuidByte4,
+    MSEHasTransportTime3,
+    MSEHasTransportGuidByte0,
+    MSEHasTransportGuidByte1,
+    MSEHasTransportGuidByte3,
+    MSEMovementFlags2,
+    MSEMovementFlags,
+    MSEHasFallDirection,
+    MSEGuidByte1,
+    MSEGuidByte4,
+    MSEGuidByte7,
+    MSEGuidByte3,
+    MSEGuidByte0,
+    MSEGuidByte2,
+    MSEGuidByte5,
+    MSEGuidByte6,
+    MSETransportSeat,
+    MSETransportOrientation,
+    MSETransportTime,
+    MSETransportGuidByte6,
+    MSETransportGuidByte5,
+    MSETransportTime3,
+    MSETransportPositionX,
+    MSETransportGuidByte4,
+    MSETransportPositionZ,
+    MSETransportGuidByte2,
+    MSETransportGuidByte0,
+    MSETransportTime2,
+    MSETransportGuidByte1,
+    MSETransportGuidByte3,
+    MSETransportPositionY,
+    MSETransportGuidByte7,
+    MSEOrientation,
+    MSESplineElevation,
+    MSEFallTime,
+    MSEFallHorizontalSpeed,
+    MSEFallCosAngle,
+    MSEFallSinAngle,
+    MSEFallVerticalSpeed,
+    MSETimestamp,
+    MSEPitch,
+    MSEEnd,
+};
+
 MovementStatusElements* GetMovementStatusElementsSequence(Opcodes opcode)
 {
     switch (opcode)
@@ -2228,6 +2300,10 @@ MovementStatusElements* GetMovementStatusElementsSequence(Opcodes opcode)
             return DismissControlledVehicle;
         case CMSG_MOVE_SET_CAN_FLY_ACK:
             return MovementSetCanFlyAckSequence;
+        case CMSG_CAST_SPELL:
+        case CMSG_PET_CAST_SPELL:
+        case CMSG_USE_ITEM:
+            return MovementCastSpellSequence;
         default:
             break;
     }

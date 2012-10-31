@@ -48,19 +48,14 @@ void WorldSession::HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlag
         targets.SetElevation(elevation);
         targets.SetSpeed(speed);
 
-        uint8 hasMovementData;
+        bool hasMovementData;
         recvPacket >> hasMovementData;
         if (hasMovementData)
         {
-            recvPacket.rfinish();
-            // movement packet for caster of the spell
-            /*recvPacket.read_skip<uint32>(); // MSG_MOVE_STOP - hardcoded in client
-            uint64 guid;
-            recvPacket.readPackGUID(guid);
-
             MovementInfo movementInfo;
-            movementInfo.guid = guid;
-            ReadMovementInfo(recvPacket, &movementInfo);*/
+            ReadMovementInfo(recvPacket, &movementInfo);
+
+            targets.SetSrc(movementInfo.pos.m_positionX, movementInfo.pos.m_positionY, movementInfo.pos.m_positionZ);
         }
     }
     else if (castFlags & 0x8)   // Archaeology
