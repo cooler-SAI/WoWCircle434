@@ -37,7 +37,7 @@ class SummonList : public std::list<uint64>
         void Summon(Creature* summon) { push_back(summon->GetGUID()); }
         void Despawn(Creature* summon) { remove(summon->GetGUID()); }
         void DespawnEntry(uint32 entry);
-        void DespawnAll();
+        void DespawnAll(uint32 time = 0);
 
         template <class Predicate> void DoAction(int32 info, Predicate& predicate, uint16 max = 0)
         {

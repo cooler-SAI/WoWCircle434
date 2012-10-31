@@ -53,7 +53,7 @@ void SummonList::DespawnEntry(uint32 entry)
     }
 }
 
-void SummonList::DespawnAll()
+void SummonList::DespawnAll(uint32 time /*=0*/)
 {
     while (!empty())
     {
@@ -63,7 +63,7 @@ void SummonList::DespawnAll()
         else
         {
             erase(begin());
-            summon->DespawnOrUnsummon();
+            summon->DespawnOrUnsummon(time);
         }
     }
 }
