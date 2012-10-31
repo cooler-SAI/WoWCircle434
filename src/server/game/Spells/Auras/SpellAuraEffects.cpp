@@ -764,6 +764,24 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 break;
             }
         }
+        case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE:
+        {
+            if (!caster)
+                break;
+
+            switch (GetSpellInfo()->Id)
+            {
+                // Improved Frost Presence
+                case 48266:
+                {
+                    if (AuraEffect const* improvedFrostPresence = caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 2632, 1))
+                        amount += improvedFrostPresence->GetAmount();
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
         default:
             break;
     }
@@ -964,7 +982,11 @@ void AuraEffect::HandleEffect(AuraApplication * aurApp, uint8 mode, bool apply)
     // call scripts helping/replacing effect handlers
     bool prevented = false;
     if (apply)
+    {
         prevented = GetBase()->CallScriptEffectApplyHandlers(const_cast<AuraEffect const*>(this), const_cast<AuraApplication const*>(aurApp), (AuraEffectHandleModes)mode);
+        if (!GetBase()->GetDuration())
+            prevented = true;
+    }
     else
         prevented = GetBase()->CallScriptEffectRemoveHandlers(const_cast<AuraEffect const*>(this), const_cast<AuraApplication const*>(aurApp), (AuraEffectHandleModes)mode);
 
@@ -972,7 +994,19 @@ void AuraEffect::HandleEffect(AuraApplication * aurApp, uint8 mode, bool apply)
     if ((apply && aurApp->GetRemoveMode()) || prevented)
         return;
 
-    (*this.*AuraEffectHandler [GetAuraType()])(const_cast<AuraApplication const*>(aurApp), mode, apply);
+    // Some Auras can stack from different caster but their amount should not stack
+    if (m_base->IsUniqueVisibleAuraBuff() && (
+        (AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModWeaponCritPercent && GetSpellInfo()->Effects[GetEffIndex()].HasRadius()) ||
+        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModAttackPowerPercent || AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModPowerRegen ||
+        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModRangedAttackPowerPercent || AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModDamagePercentDone ||
+        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModCastingSpeed || AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModCritPct ||
+        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModMeleeSpeedPct || AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModAttackSpeed ||
+        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModRangedHaste))
+    {
+        DoUniqueStackAura(aurApp, mode, apply);
+    }
+    else
+        (*this.*AuraEffectHandler [GetAuraType()])(const_cast<AuraApplication const*>(aurApp), mode, apply);
 
     // check if script events have removed the aura or if default effect prevention was requested
     if (apply && aurApp->GetRemoveMode())
@@ -6854,5 +6888,116 @@ void AuraEffect::HandleAuraOverrideSpellPowerByPctAp(AuraApplication const * aur
     {
         player->UpdateSpellDamageAndHealingBonus();
         player->SetStatFloatValue(PLAYER_FIELD_OVERRIDE_SPELL_POWER_BY_AP_PCT, apply ? float(GetAmount()) : 0.0f);
+    }
+}
+
+void AuraEffect::DoUniqueStackAura(AuraApplication const * aurApp, uint8 mode, bool apply) const
+{
+    AuraEffect *first_mod = NULL;
+    AuraEffect *second_mod = NULL;
+    AuraApplication const *first_app = NULL;
+    AuraApplication const *second_app = NULL;
+    Unit* target = aurApp->GetTarget();
+    Unit::VisibleAuraMap const *visibleAuras = target->GetVisibleAuras();
+    for (Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
+        if (itr->second->GetBase()->IsUniqueVisibleAuraBuff())
+            for (uint8 i = 0; i < 3; ++i)
+            {
+                if (!(itr->second->GetBase()->GetEffectMask() & (1 << i)))
+                    continue;
+
+                AuraEffect *effect = itr->second->GetBase()->GetEffect(i);
+                if (effect->GetAuraType() != GetAuraType())
+                    continue;
+
+                if (!first_mod)
+                {
+                    first_mod = effect;
+                    first_app = itr->second;
+                }
+                else if (first_mod->GetAmount() < effect->GetAmount())
+                {
+                    second_mod = first_mod;
+                    first_mod = effect;
+                    second_app = first_app;
+                    first_app = itr->second;
+                }
+                else if(!second_mod || second_mod->GetAmount() < effect->GetAmount())
+                {
+                    second_mod = effect;
+                    second_app = itr->second;
+                }
+            }
+            AuraEffect * d_this = const_cast<AuraEffect*>(this);
+            if (!first_mod)
+            {
+                first_mod = d_this;
+                first_app = aurApp;
+            }
+            else if (first_mod->GetAmount() < GetAmount())
+            {
+                second_mod = first_mod;
+                first_mod = d_this;
+                first_app = aurApp;
+                second_app = first_app;
+            }
+            if (first_mod != d_this)
+                return;
+
+            if (!second_mod)
+            {
+                (*this.*AuraEffectHandler [GetAuraType()])(aurApp, mode, apply);
+                return;
+            }
+            (*(apply ? second_mod : first_mod).*AuraEffectHandler [GetAuraType()])(apply ? second_app : first_app, mode, false);
+            (*(apply ? first_mod : second_mod).*AuraEffectHandler [GetAuraType()])(apply ? second_app : first_app, mode, true);
+}
+
+mod_pair AuraEffect::GetUniqueVisibleAuraBuff(Unit* target, int8 x) const
+{
+    AuraEffect *first_mod = NULL;
+    AuraEffect *second_mod = NULL;
+    Unit::VisibleAuraMap const *visibleAuras = target->GetVisibleAuras();
+    for (Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
+    {
+        if (itr->second->GetBase()->IsUniqueVisibleAuraBuff())
+            for (uint8 i = 0; i < 3; ++i)
+            {
+                if (!(itr->second->GetBase()->GetEffectMask() & (1 << i)))
+                    continue;
+
+                AuraEffect *effect = itr->second->GetBase()->GetEffect(i);
+                if (effect->GetAuraType() !=GetAuraType() || (x && !(effect->GetMiscValue() & int32(1<<x))))
+                    continue;
+
+                if (!first_mod)
+                    first_mod = effect;
+
+                else if (first_mod->GetAmount() < effect->GetAmount())
+                {
+                    second_mod = first_mod;
+                    first_mod = effect;
+                }
+                else if (!second_mod || second_mod->GetAmount() < effect->GetAmount())
+                    second_mod = effect;
+            }
+
+            AuraEffect* d_this = const_cast<AuraEffect*>(this);
+
+            if (!first_mod)
+                first_mod = d_this;
+            else if (first_mod->GetAmount() < GetAmount())
+            {
+                second_mod = first_mod;
+                first_mod = d_this;
+            }
+            if (first_mod != d_this)
+            {
+                first_mod = NULL;
+                second_mod = NULL;
+            }
+
+            mod_pair pair = {first_mod, second_mod};
+            return pair;
     }
 }

@@ -27,6 +27,12 @@ class Aura;
 
 typedef void(AuraEffect::*pAuraEffectHandler)(AuraApplication const* aurApp, uint8 mode, bool apply) const;
 
+struct mod_pair
+{
+    AuraEffect* first_mod;
+    AuraEffect* second_mod;
+};
+
 class AuraEffect
 {
     friend void Aura::_InitEffects(uint8 effMask, Unit* caster, int32 *baseAmount);
@@ -113,6 +119,10 @@ class AuraEffect
         int32 m_periodicTimer;
         int32 m_amplitude;
         uint32 m_tickNumber;
+
+        // aura stack helpers
+        void DoUniqueStackAura(AuraApplication const * aurApp, uint8 mode, bool apply) const;
+        mod_pair GetUniqueVisibleAuraBuff(Unit* target, int8 x) const;
 
         uint8 const m_effIndex;
         bool m_canBeRecalculated;

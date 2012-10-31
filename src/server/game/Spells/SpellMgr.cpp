@@ -33,7 +33,6 @@
 #include "BattlegroundIC.h"
 #include "BattlefieldWG.h"
 #include "BattlefieldMgr.h"
-#include "Vehicle.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
 {
@@ -688,202 +687,6 @@ void SpellMgr::GetSetOfSpellsInSpellGroup(SpellGroup group_id, std::set<uint32>&
             foundSpells.insert(itr->second);
         }
     }
-}
-
-bool SpellMgr::CanAurasStack(Aura const *aura1, Aura const *aura2, bool sameCaster) const
-{
-    SpellInfo const *spellInfo_1 = aura1->GetSpellInfo();
-    SpellInfo const *spellInfo_2 = aura2->GetSpellInfo();
-    if (spellInfo_1->IsAuraExclusiveBySpecificWith(spellInfo_2))
-        return false;
-
-    bool needPetCheck = false;
-    if (aura1 && aura2)
-    {
-        if (aura1->GetCaster() && aura2->GetCaster())
-        {
-            if (aura1->GetCaster()->isPet() || aura2->GetCaster()->isPet())
-                needPetCheck = true;
-        }
-    }
-
-    SpellGroupStackRule stackRule = CheckSpellGroupStackRules(spellInfo_1, spellInfo_2);
-    if (stackRule)
-    {
-        if (stackRule == SPELL_GROUP_STACK_RULE_EXCLUSIVE)
-            return false;
-        if (sameCaster && stackRule == SPELL_GROUP_STACK_RULE_EXCLUSIVE_FROM_SAME_CASTER)
-            return false;
-    }
-
-    if (!sameCaster)
-    {
-        if (spellInfo_1->AttributesEx & SPELL_ATTR1_CHANNEL_TRACK_TARGET
-            || spellInfo_1->AttributesEx3 & SPELL_ATTR3_STACK_FOR_DIFF_CASTERS)
-            return true;
-
-        // check same periodic auras
-        for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-        {
-            // area auras should not stack (shaman totem)
-            if (spellInfo_1->Effects[i].Effect != SPELL_EFFECT_APPLY_AURA
-                && spellInfo_1->Effects[i].Effect != SPELL_EFFECT_PERSISTENT_AREA_AURA)
-                continue;
-
-            // not channeled AOE effects should not stack (blizzard should, but Consecration should not)
-            if (spellInfo_1->Effects[i].IsAreaAuraEffect() && !spellInfo_1->IsChanneled())
-                continue;
-
-            switch(spellInfo_1->Effects[i].ApplyAuraName)
-            {
-                // DOT or HOT from different casters will stack
-            case SPELL_AURA_PERIODIC_DAMAGE:
-            case SPELL_AURA_PERIODIC_DUMMY:
-            case SPELL_AURA_PERIODIC_HEAL:
-            case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
-            case SPELL_AURA_PERIODIC_ENERGIZE:
-            case SPELL_AURA_PERIODIC_MANA_LEECH:
-            case SPELL_AURA_PERIODIC_LEECH:
-            case SPELL_AURA_POWER_BURN:
-            case SPELL_AURA_OBS_MOD_POWER:
-            case SPELL_AURA_OBS_MOD_HEALTH:
-            case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
-                // periodic auras which target areas are not allowed to stack this way (replenishment for example)
-                if (spellInfo_1->Effects[i].IsAreaAuraEffect() || spellInfo_1->Effects[i].IsAreaAuraEffect())
-                    break;
-                // Curse of Elements
-                if (spellInfo_1->Id == 1490)
-                    break;
-                return true;
-            default:
-                break;
-            }
-        }
-    }
-    const SpellInfo *spellInfo_1_last = spellInfo_1->GetLastRankSpell();
-    const SpellInfo *spellInfo_2_last = spellInfo_2->GetLastRankSpell();
-    if (!spellInfo_2_last)
-        spellInfo_2_last = spellInfo_2;
-
-    if (!spellInfo_1_last)
-        spellInfo_1_last = spellInfo_1;
-
-    // negative and positive spells
-    if (spellInfo_1->IsPositive() != spellInfo_2->IsPositive())
-        return true;
-
-    // same spell
-    if (spellInfo_1_last == spellInfo_2_last)
-    {
-        uint32 spellId_1 = spellInfo_1_last->Id;
-        // Hack for Incanter's Absorption
-        if (spellId_1 == 44413)
-            return true;
-        // Bandit's Guile
-        if (spellId_1 == 84748)
-            return true;
-        if (aura1->GetCastItemGUID() && aura2->GetCastItemGUID())
-            if (aura1->GetCastItemGUID() != aura2->GetCastItemGUID() && (spellInfo_1_last->AttributesCu & SPELL_ATTR0_CU_ENCHANT_PROC))
-                return true;
-        // same spell with same caster should not stack
-        return false;
-    }
-
-    SpellSpecificType spec[] = {SPELL_SPECIFIC_ASPECT, SPELL_SPECIFIC_WELL_FED};
-    for (uint8 i = 0; i < 2; ++i)
-        if (spellInfo_1->GetSpellSpecific() == spec[i] || spellInfo_2->GetSpellSpecific() == spec[i])
-            return true;
-
-    if (spellInfo_1->SpellIconID == 0 || spellInfo_2->SpellIconID == 0)
-    {
-        bool isModifier = false;
-        for (int i = 0; i < 3; ++i)
-        {
-            if (spellInfo_1->Effects[i].ApplyAuraName == SPELL_AURA_ADD_FLAT_MODIFIER ||
-                spellInfo_1->Effects[i].ApplyAuraName == SPELL_AURA_ADD_PCT_MODIFIER  ||
-                spellInfo_2->Effects[i].ApplyAuraName == SPELL_AURA_ADD_FLAT_MODIFIER ||
-                spellInfo_2->Effects[i].ApplyAuraName == SPELL_AURA_ADD_PCT_MODIFIER)
-                isModifier = true;
-        }
-        if (isModifier == true)
-            return true;
-    }
-    bool petSpell = false;
-    if (!petSpell && needPetCheck)
-    {
-        for (uint16 type = SKILL_PET_SPIDER; type < SKILL_RACIAL_UNDED; type++)
-        {
-            if (spellInfo_1->IsAbilityOfSkillType(type) || spellInfo_2->IsAbilityOfSkillType(type))
-            {
-                petSpell = true;
-                break;
-            }
-        }
-    }
-
-    if (!petSpell && ((spellInfo_1->GetDuration() <= 60*IN_MILLISECONDS && spellInfo_1->GetDuration() != -1) || 
-        (spellInfo_2->GetDuration() <= 60*IN_MILLISECONDS && spellInfo_2->GetDuration() != -1)))
-        return true;
-
-    if (spellInfo_1->Id == 16191) // mana tide buff
-        return true;
-
-    if (spellInfo_1->SpellFamilyName != SPELLFAMILY_POTION && spellInfo_2->SpellFamilyName != SPELLFAMILY_POTION)
-        for (int i = 0; i < 3; ++i)
-        {
-            if ((spellInfo_1->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA || 
-                spellInfo_1->Effects[i].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID) &&
-                (spellInfo_2->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA || 
-                spellInfo_2->Effects[i].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID) &&
-                spellInfo_1->Effects[i].ApplyAuraName == spellInfo_2->Effects[i].ApplyAuraName)
-                switch (spellInfo_1->Effects[i].ApplyAuraName)
-            {
-                case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
-                case SPELL_AURA_MOD_STAT:
-                case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:
-                    if (spellInfo_1->Effects[i].MiscValue == spellInfo_2->Effects[i].MiscValue || 
-                        (spellInfo_1->Effects[i].MiscValueB != 0 && 
-                        spellInfo_1->Effects[i].MiscValueB == spellInfo_2->Effects[i].MiscValueB))
-                        return false;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        // seriously?
-        if (spellInfo_1->SpellFamilyName != spellInfo_2->SpellFamilyName)
-            return true;
-
-        bool isVehicleAura1 = false;
-        bool isVehicleAura2 = false;
-        uint8 i = 0;
-        while (i < MAX_SPELL_EFFECTS && !(isVehicleAura1 && isVehicleAura2))
-        {
-            if (spellInfo_1->Effects[i].ApplyAuraName == SPELL_AURA_CONTROL_VEHICLE)
-                isVehicleAura1 = true;
-            if (spellInfo_2->Effects[i].ApplyAuraName == SPELL_AURA_CONTROL_VEHICLE)
-                isVehicleAura2 = true;
-
-            ++i;
-        }
-
-        if (isVehicleAura1 && isVehicleAura2)
-        {
-            const Vehicle* veh = NULL;
-            if (aura1->GetOwner()->ToUnit())
-                veh = aura1->GetOwner()->ToUnit()->GetVehicleKit();
-
-            if (!veh)           // We should probably just let it stack. Vehicle system will prevent undefined behaviour later
-                return true;
-
-            if (veh->GetAvailableSeatCount() == 0)
-                return false;   // No empty seat available
-
-            return true;        // Empty seat available (skip rest)
-        }
-
-        return true;
 }
 
 bool SpellMgr::AddSameEffectStackRuleSpellGroups(SpellInfo const* spellInfo, int32 amount, std::map<SpellGroup, int32>& groups) const
@@ -3883,6 +3686,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 29841:
             case 29842:
                 spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_OBS_MOD_HEALTH;
+                break;
+            // Improved Frost Presence (Rank 1/2)
+            case 50384:
+            case 50385:
+                spellInfo->Effects[EFFECT_1].SpellClassMask = 0;
                 break;
             default:
                 break;

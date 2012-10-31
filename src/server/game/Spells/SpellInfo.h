@@ -478,6 +478,7 @@ public:
     inline bool HasAttribute(SpellAttr8 attribute) const { return AttributesEx8 & attribute; }
     inline bool HasAttribute(SpellAttr9 attribute) const { return AttributesEx9 & attribute; }
     inline bool HasAttribute(SpellAttr10 attribute) const { return AttributesEx10 & attribute; }
+    inline bool HasCustomAttribute(SpellCustomAttributes customAttribute) const { return AttributesCu & customAttribute; }
 
     SpellCastResult CheckShapeshift(uint32 form) const;
     SpellCastResult CheckLocation(uint32 map_id, uint32 zone_id, uint32 area_id, Player const* player = NULL) const;
