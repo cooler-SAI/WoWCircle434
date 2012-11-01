@@ -301,7 +301,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket *data, Battlegro
             data->WriteBit(bgGuid[7]);
             data->WriteBit(bgGuid[1]);
             data->WriteBit(playerGuid[5]);
-            data->WriteBit(uiFrame);                                        // Arena Frames
+            data->WriteBit(bg->isArena() ? uiFrame : bg->GetPlayerTeam(playerGuid) == ALLIANCE);    // Arena Frames on Arenas and Faction on Battlegrounds
             data->WriteBit(bgGuid[0]);
             data->WriteBit(playerGuid[1]);
             data->WriteBit(bgGuid[3]);

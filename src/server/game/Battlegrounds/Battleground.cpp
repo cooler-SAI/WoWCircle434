@@ -497,12 +497,14 @@ inline void Battleground::_ProcessJoin(uint32 diff)
     {
         m_Events |= BG_STARTING_EVENT_2;
         SendMessageToAll(StartMessageIds[BG_STARTING_EVENT_SECOND], CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        SendTimerToAll(m_Events);
     }
     // After 30 or 15 seconds, warning is signaled
     else if (GetStartDelayTime() <= StartDelayTimes[BG_STARTING_EVENT_THIRD] && !(m_Events & BG_STARTING_EVENT_3))
     {
         m_Events |= BG_STARTING_EVENT_3;
         SendMessageToAll(StartMessageIds[BG_STARTING_EVENT_THIRD], CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        SendTimerToAll(m_Events);
     }
     // Delay expired (after 2 or 1 minute)
     else if (GetStartDelayTime() <= 0 && !(m_Events & BG_STARTING_EVENT_4))
@@ -1750,6 +1752,28 @@ void Battleground::SendMessage2ToAll(int32 entry, ChatMsg type, Player const* so
     Trinity::Battleground2ChatBuilder bg_builder(type, entry, source, arg1, arg2);
     Trinity::LocalizedPacketDo<Trinity::Battleground2ChatBuilder> bg_do(bg_builder);
     BroadcastWorker(bg_do);
+}
+
+void Battleground::SendTimerToAll(uint8 Flags)
+{
+    if (isArena())
+    {
+        if (Flags & BG_STARTING_EVENT_2)
+        {
+            for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+                if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+                    player->SendBattlegroundTimer(30, 30);
+        }
+    }
+    else
+    {
+        if (Flags & BG_STARTING_EVENT_3)
+        {
+            for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+                if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+                    player->SendBattlegroundTimer(30, 30);
+        }
+    }
 }
 
 void Battleground::EndNow()

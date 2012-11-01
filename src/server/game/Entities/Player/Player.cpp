@@ -26466,3 +26466,12 @@ uint32 Player::GetRBGPersonalRating() const
 {
     return 0;
 }
+
+void Player::SendBattlegroundTimer(uint32 currentTime, uint32 maxTime)
+{
+    WorldPacket data(SMSG_START_TIMER, 12);
+    data << uint32(0);
+    data << uint32(currentTime);
+    data << uint32(maxTime);
+    SendDirectMessage(&data);
+}
