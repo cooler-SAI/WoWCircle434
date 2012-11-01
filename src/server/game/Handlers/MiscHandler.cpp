@@ -2145,3 +2145,15 @@ void WorldSession::HandleChangeCurrencyFlags(WorldPacket& recvPacket)
     if (GetPlayer())
         GetPlayer()->ModifyCurrencyFlag(currencyId, uint8(flags));
 }
+
+void WorldSession::HandleCemeteryListOpcode(WorldPacket& recvPacket)
+{
+    GetPlayer()->SendCemeteryList(false);
+}
+
+void WorldSession::HandlerCategoryCooldownOpocde(WorldPacket& recvPacket)
+{
+    WorldPacket data(SMSG_SPELL_CATEGORY_COOLDOWN, 4);
+    data.WriteBits(0, 23); // TODO: Implement
+    SendPacket(&data);
+}

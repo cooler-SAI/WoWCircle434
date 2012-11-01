@@ -988,6 +988,8 @@ class WorldSession
         void HandleViolenceLevel(WorldPacket& recvPacket);
         void HandleObjectUpdateFailedOpcode(WorldPacket& recvPacket);
         void HandleChangeCurrencyFlags(WorldPacket& recvPacket);
+        void HandleCemeteryListOpcode(WorldPacket& recvPacket);
+        void HandlerCategoryCooldownOpocde(WorldPacket& recvPacket);
         int32 HandleEnableNagleAlgorithm();
 
         // Compact Unit Frames (4.x)
