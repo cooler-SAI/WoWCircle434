@@ -3725,6 +3725,26 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // ENDOF THRONE OF THE TIDES SPELLS
             //
+            // BLACKROCK CAVERNS SPELLS
+            //
+            // Rom'ogg Bonecrusher 
+            case 75272: // Quake
+                spellInfo->Effects[0].SetRadiusIndex(23);
+                spellInfo->Effects[1].SetRadiusIndex(23);
+                break;
+            case 82189: // Chains of Woe
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                spellInfo->Effects[1].SetRadiusIndex(28);
+                break;
+            // Ascendant Lord Obsidius
+            case 76186: // Thinderclap
+                spellInfo->Effects[1].SetRadiusIndex(13);
+                break;
+            case 76164: // Shadow of Obsidius
+                spellInfo->Effects[0].BasePoints = 10000000;
+                break;
+            // ENDOF BLACKROCK CAVERNS SPELLS
+            //
             // Camouflage
             case 80325:
                 spellInfo->Effects[EFFECT_1].Effect = 0;

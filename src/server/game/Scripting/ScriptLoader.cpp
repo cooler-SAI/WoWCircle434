@@ -602,6 +602,13 @@ void AddSC_boss_commander_ulthok();
 void AddSC_boss_erunak_stonespeaker();
 void AddSC_boss_ozumat();
 
+void AddSC_instance_blackrock_caverns(); // Blackrock Caverns
+void AddSC_boss_romogg_bonecrusher();
+void AddSC_boss_corla_herald_of_twilight();
+void AddSC_boss_karsh_steelbender();
+void AddSC_boss_beauty();
+void AddSC_boss_ascendant_lord_obsidius();
+
 // battlegrounds
 
 // outdoor pvp
@@ -1240,6 +1247,13 @@ void AddNorthrendScripts()
     AddSC_boss_commander_ulthok();
     AddSC_boss_erunak_stonespeaker();
     AddSC_boss_ozumat();
+
+    AddSC_instance_blackrock_caverns(); // Blackrock Caverns
+    AddSC_boss_romogg_bonecrusher();
+    AddSC_boss_corla_herald_of_twilight();
+    AddSC_boss_karsh_steelbender();
+    AddSC_boss_beauty();
+    AddSC_boss_ascendant_lord_obsidius();
 #endif
 }
 

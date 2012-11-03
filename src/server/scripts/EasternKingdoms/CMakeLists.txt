@@ -205,6 +205,13 @@ set(scripts_STAT_SRCS
   EasternKingdoms/ThroneOfTheTides/instance_throne_of_the_tides.cpp
   EasternKingdoms/ThroneOfTheTides/throne_of_the_tides.cpp
   EasternKingdoms/ThroneOfTheTides/throne_of_the_tides.h
+  EasternKingdoms/BlackrockCaverns/boss_romogg_bonecrusher.cpp
+  EasternKingdoms/BlackrockCaverns/boss_corla_hearld_of_twilight.cpp
+  EasternKingdoms/BlackrockCaverns/boss_beauty.cpp
+  EasternKingdoms/BlackrockCaverns/boss_ascendant_lord_obsidius.cpp
+  EasternKingdoms/BlackrockCaverns/instance_blackrock_caverns.cpp
+  EasternKingdoms/BlackrockCaverns/blackrock_caverns_teleport.cpp
+  EasternKingdoms/BlackrockCaverns/blackrock_caverns.h
 )
 
 message("  -> Prepared: Eastern Kingdoms")
