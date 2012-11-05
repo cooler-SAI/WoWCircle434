@@ -4985,18 +4985,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
-                // Bloodworms Health Leech
-                case 50453:
-                {
-                    if (Unit* owner = GetOwner())
-                    {
-                        basepoints0 = int32(damage * 1.50f);
-                        target = owner;
-                        triggered_spell_id = 50454;
-                        break;
-                    }
-                    return false;
-                }
                 // Eye for an Eye
                 case 9799:
                 case 25988:

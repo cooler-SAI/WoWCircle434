@@ -3007,6 +3007,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 59735:
                 spellInfo->Effects[EFFECT_1].TriggerSpell = 59736;
                 break;
+            // Blood Burst
+            case 81280:
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                break;
             // Transmute: Living Elements
             case 78866:
                 spellInfo->Effects[0].Effect = SPELL_EFFECT_SCRIPT_EFFECT;

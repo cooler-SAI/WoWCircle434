@@ -3309,6 +3309,75 @@ public:
     }
 };
 
+class npc_bloodworm : public CreatureScript
+{
+public:
+    npc_bloodworm() : CreatureScript("npc_bloodworm") { }
+
+	CreatureAI *GetAI(Creature *creature) const
+    {
+        return new npc_bloodwormAI(creature);
+    }
+
+    struct npc_bloodwormAI : public ScriptedAI
+    {
+        npc_bloodwormAI(Creature *c) : ScriptedAI(c) 
+		{
+		}
+
+		uint32 uiBurstTimer;
+
+		void Burst()
+		{
+			if (!me->isInCombat())
+				return;
+
+			if (Aura* aura = me->GetAura(81277))
+			{
+				uint32 stacks = aura->GetStackAmount();
+				stacks = (stacks <= 10)? stacks: 10;
+				int32 damage = stacks * (me->GetMaxHealth() / 10);
+				me->CastCustomSpell(me, 81280, &damage, NULL, NULL, true);
+			}
+		}
+
+        void EnterCombat(Unit * /*who*/)
+		{
+		}
+
+		void JustDied(Unit* killer)
+		{
+			Burst();
+		}
+
+        void Reset()
+        {
+			if (me->GetOwner())
+			{
+				me->SetMaxHealth(0.20 * me->GetOwner()->GetHealth());
+				me->SetHealth(0.20 * me->GetOwner()->GetHealth());
+			}
+
+			DoCast(me, 50453);
+
+			uiBurstTimer = 19000;
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+			if (uiBurstTimer <= diff)
+				Burst();
+			else
+				uiBurstTimer -= diff;
+
+            if (!UpdateVictim())
+                return;
+
+			DoMeleeAttackIfReady();
+        }
+    };
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3346,4 +3415,5 @@ void AddSC_npcs_special()
     new npc_guardian_of_ancient_kings();
     new npc_hand_of_guldan();
     new npc_ring_of_frost();
+    new npc_bloodworm();
 }
