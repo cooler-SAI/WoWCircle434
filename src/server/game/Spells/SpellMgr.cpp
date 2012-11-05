@@ -3007,6 +3007,22 @@ void SpellMgr::LoadDbcDataCorrections()
             case 59735:
                 spellInfo->Effects[EFFECT_1].TriggerSpell = 59736;
                 break;
+            // wrong dbc, 7 days cooldown
+            case 75141: // Dream of Skywall
+            case 75142: // Dream of Deepholm
+            case 75144: // Dream of Hyjal
+            case 75145: // Dream of Ragnaros
+            case 75146: // Dream of Azshara
+                spellInfo->RecoveryTime = 0;
+                spellInfo->CategoryRecoveryTime = 604800000; 
+                break;
+            // wrong dbc, 1 day cooldown 
+            case 80243: // Transmute: Truegold
+            case 61288: // Minor Inscription Research
+            case 61177: // Northrend Inscription Research
+                spellInfo->RecoveryTime = 0;
+                spellInfo->CategoryRecoveryTime = 86400000; 
+                break;
             // Blood Burst
             case 81280:
                 spellInfo->Effects[0].SetRadiusIndex(13);
