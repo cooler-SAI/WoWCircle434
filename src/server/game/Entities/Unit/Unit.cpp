@@ -7162,6 +7162,36 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     basepoints0 = triggerAmount;
                     break;
                 }
+                // Runic Empowerment
+                case 81229:
+                {
+                    if (!ToPlayer())
+                        return false;
+
+                    // Runic Corruption
+                    if (AuraEffect const* runicCorruption = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 4068, 0))
+                    {
+                        int32 basepoints0 = runicCorruption->GetAmount();
+                        if (Aura* aur = GetAura(51460))
+                            aur->SetDuration(aur->GetDuration() + 3000);
+                        else
+                            CastCustomSpell(this, 51460, &basepoints0, NULL, NULL, true);
+                        return true;
+                    }
+
+                    std::set<uint8> runes;
+                    for (uint8 i = 0; i < MAX_RUNES; i++)
+                        if (this->ToPlayer()->GetRuneCooldown(i) == this->ToPlayer()->GetRuneBaseCooldown(i))
+                            runes.insert(i);
+                    if (runes.size())
+                    {
+                        std::set<uint8>::iterator itr = runes.begin();
+                        std::advance(itr, urand(0, runes.size()-1));
+                        this->ToPlayer()->SetRuneCooldown((*itr), 0);
+                        this->ToPlayer()->ResyncRunes(MAX_RUNES);
+                    }
+                    return true;
+                }
                 // Dancing Rune Weapon
                 case 49028:
                 {
