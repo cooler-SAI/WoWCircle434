@@ -3228,6 +3228,87 @@ public:
     }
 };
 
+class npc_ring_of_frost : public CreatureScript
+{
+public:
+    npc_ring_of_frost() : CreatureScript("npc_ring_of_frost") { }
+
+    struct npc_ring_of_frostAI : public ScriptedAI
+    {
+        npc_ring_of_frostAI(Creature *c) : ScriptedAI(c) {}
+        bool Isready;
+        uint32 timer;
+
+        void Reset()
+        {
+            timer = 3000; // 3sec
+            Isready = false;
+        }
+
+        void InitializeAI()
+        {
+            ScriptedAI::InitializeAI();
+            Unit * owner = me->GetOwner();
+            if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+                return;
+
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
+            std::list<Creature*> templist;
+            me->GetCreatureListWithEntryInGrid(templist, me->GetEntry(), 200.0f);            if (!templist.empty())
+            for (std::list<Creature*>::const_iterator itr = templist.begin(); itr != templist.end(); ++itr)
+                if ((*itr)->GetOwner() == me->GetOwner() && *itr != me)
+                    (*itr)->DisappearAndDie();
+        }
+
+        void EnterEvadeMode() { return; }
+
+        void CheckIfMoveInRing(Unit *who)
+        {
+            if (who->isAlive() && me->IsInRange(who, 2.0f, 4.7f) && me->IsWithinLOSInMap(who) && Isready)
+            {
+                if (!who->HasAura(82691))
+                {
+                    if (!who->HasAura(91264))
+                        me->CastSpell(who, 82691, true);
+                }
+                else who->CastSpell(who, 91264, true);
+            }
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (timer <= diff)
+            {
+                if (!Isready)
+                {
+                    Isready = true;
+                    timer = 9000; // 9sec
+                }
+                else
+                    me->DisappearAndDie();
+            }
+            else
+                timer -= diff;
+
+            // Find all the enemies
+            std::list<Unit*> targets;
+            Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 5.0f);
+            Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
+            me->VisitNearbyObject(5.0f, searcher);
+            for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+                CheckIfMoveInRing(*iter);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_ring_of_frostAI(pCreature);
+    }
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3264,4 +3345,5 @@ void AddSC_npcs_special()
     new npc_shadowy_apparition();
     new npc_guardian_of_ancient_kings();
     new npc_hand_of_guldan();
+    new npc_ring_of_frost();
 }
