@@ -3004,6 +3004,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 59735:
                 spellInfo->Effects[EFFECT_1].TriggerSpell = 59736;
                 break;
+            // Transmute: Living Elements
+            case 78866:
+                spellInfo->Effects[0].Effect = SPELL_EFFECT_SCRIPT_EFFECT;
+                break;
             // Aura of Foreboding
             case 93974:
             case 93975:

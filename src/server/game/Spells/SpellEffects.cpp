@@ -3547,6 +3547,38 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                // Transmute: Living Elements
+                case 78866: 
+                {
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    uint32 item_id = 0;
+                    uint32 zoneid = m_caster->GetZoneId();
+                    switch (zoneid)
+                    {
+                        case 5034: // Uldum
+                            item_id = 52328; // Volatile Air
+                            break;
+                        case 5052: // Deepholm
+                            item_id = 52327; // Volatile Earth
+                            break;
+                        case 4815: // Vashj'ir: Kelp'thar Forest
+                        case 5144: // Vashj'ir: Shimmering Expanse
+                        case 5145: // Vashj'ir: Abyssal Depths
+                        case 5146: // Vashj'ir
+                            item_id = 52326; // Volatile Water
+                            break;
+                        case 616: // Mount Hyjal
+                            item_id = 52325; // Volatile Fire
+                            break;
+                        default: // All other zones
+                            item_id = 52325 + urand(0, 3); // Random item_id
+                            break;
+                    }
+                    DoCreateItem(effIndex, item_id);
+                    break;
+                }
                 // Glyph of Backstab
                 case 63975:
                 {
