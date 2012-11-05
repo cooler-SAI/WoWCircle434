@@ -3004,6 +3004,13 @@ void SpellMgr::LoadDbcDataCorrections()
             case 59735:
                 spellInfo->Effects[EFFECT_1].TriggerSpell = 59736;
                 break;
+            // Aura of Foreboding
+            case 93974:
+            case 93975:
+            case 93986:
+            case 93987:
+                spellInfo->Effects[0].SetRadiusIndex(26);
+                break;
             // Have Group, Will Travel
             case 83967:
                 spellInfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;

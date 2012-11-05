@@ -3161,6 +3161,73 @@ public:
     };
 };
 
+class npc_hand_of_guldan : public CreatureScript
+{
+public:
+    npc_hand_of_guldan() : CreatureScript("npc_hand_of_guldan") { }
+
+    struct npc_hand_of_guldanAI : public ScriptedAI
+    {
+        npc_hand_of_guldanAI(Creature* pCreature) : ScriptedAI(pCreature) {}
+
+        uint32 uiAuraofForebodingTimer;
+        uint32 uiSpell1;
+        uint32 uiSpell2;
+        bool bStunned;
+        bool bAuraofForeboding;
+
+        void Reset()
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
+            uiAuraofForebodingTimer = 6000;
+            bStunned = false;
+            if (Unit* owner = me->GetOwner())
+            {
+                if (owner->HasAura(89604))
+                {
+                    bAuraofForeboding = true;
+                    uiSpell1 = 93974;
+                    uiSpell2 = 93975;
+                }
+                else if (owner->HasAura(89605))
+                {
+                    bAuraofForeboding = true;
+                    uiSpell1 = 93987;
+                    uiSpell2 = 93986;
+                }
+                else
+                    bAuraofForeboding = false;
+            }
+            else
+                me->DespawnOrUnsummon();
+
+            DoCast(me, 85526, true);
+            DoCast(me, 86000, true);
+            if (bAuraofForeboding)
+                DoCast(me, uiSpell1);
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (uiAuraofForebodingTimer <= diff && bAuraofForeboding && !bStunned)
+            {
+                DoCast(me, uiSpell2);
+                bStunned = true;
+            }
+            else
+                uiAuraofForebodingTimer -= diff;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_hand_of_guldanAI(pCreature);
+    }
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3196,4 +3263,5 @@ void AddSC_npcs_special()
     new npc_generic_harpoon_cannon();
     new npc_shadowy_apparition();
     new npc_guardian_of_ancient_kings();
+    new npc_hand_of_guldan();
 }
