@@ -384,6 +384,24 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         damage = (m_caster->getLevel() - 60) * 4 + 60;
                         break;
                     }
+                    // Ancient Fury
+                    case 86704:
+                    {
+                        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            if (Aura* aura = m_caster->GetAura(86700))
+                            {
+                                uint8 stacks = aura->GetStackAmount();
+                                damage = stacks * (damage + 0.1f * m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()));
+                                damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, damage, SPELL_DIRECT_DAMAGE);
+                                uint32 count = 0;
+                                for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+                                    ++count;
+                                damage = damage / count;
+                            }
+                        }
+                        break;
+                    }
                 }
                 break;
             }
@@ -638,6 +656,28 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         case SPELLFAMILY_PALADIN:
             switch (m_spellInfo->Id)
             {
+                // Guardian of ancient kings
+                case 86150:
+                {
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
+                    {
+                        case TALENT_TREE_PALADIN_HOLY:
+                            m_caster->CastSpell(m_caster, 86669, true);
+                            m_caster->CastSpell(m_caster, 86674, true);
+                            break;
+                        case TALENT_TREE_PALADIN_PROTECTION:
+                            m_caster->CastSpell(m_caster, 86659, true);
+                            break;
+                        case TALENT_TREE_PALADIN_RETRIBUTION:
+                            m_caster->CastSpell(m_caster, 86698, true);
+                            m_caster->CastSpell(m_caster, 86701, true);
+                            break;
+                    }
+                    break;
+                }
                 case 31789:                                 // Righteous Defense (step 1)
                 {
                     // Clear targets for eff 1

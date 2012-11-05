@@ -3084,6 +3084,83 @@ class npc_shadowy_apparition : public CreatureScript
         };
 };
 
+class npc_guardian_of_ancient_kings : public CreatureScript
+{
+public:
+    npc_guardian_of_ancient_kings() : CreatureScript("npc_guardian_of_ancient_kings") { }
+
+       CreatureAI *GetAI(Creature *creature) const
+    {
+        return new npc_guardian_of_ancient_kingsAI(creature);
+    }
+
+    struct npc_guardian_of_ancient_kingsAI : public ScriptedAI
+    {
+        npc_guardian_of_ancient_kingsAI(Creature *c) : ScriptedAI(c)
+        {
+            uiHeals = 0;
+        }
+
+        uint32 uiHeals;
+
+        void Reset()
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            
+            if (me->GetEntry() == 46506)
+                me->SetReactState(REACT_AGGRESSIVE);
+            else
+                me->SetReactState(REACT_PASSIVE);
+
+            if (me->GetEntry() == 46490)
+            {
+                if (me->GetOwner())
+                    DoCast(me->GetOwner(), 86657);
+            }
+            else if (me->GetEntry() == 46506)
+            {
+                if (me->GetOwner())
+                {
+                    if (me->GetOwner()->getVictim())
+                        AttackStart(me->GetOwner()->getVictim());
+
+                    DoCast(me, 86703, true);
+                }
+             }
+        }
+
+        void SetData(uint32 type, uint32 data)
+        {
+            if (type == 1001)
+                uiHeals = data;
+        }
+
+        uint32 GetData(uint32 type)
+        {
+            if (type == 1001)
+                return uiHeals;
+                return 0;
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (me->GetOwner())
+                if (Unit* newVictim = me->GetOwner()->getVictim())
+                    if (me->getVictim() != newVictim)
+                        AttackStart(newVictim);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3118,4 +3195,5 @@ void AddSC_npcs_special()
     new npc_spring_rabbit();
     new npc_generic_harpoon_cannon();
     new npc_shadowy_apparition();
+    new npc_guardian_of_ancient_kings();
 }

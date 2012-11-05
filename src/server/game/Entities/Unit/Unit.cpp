@@ -6461,6 +6461,79 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         }
         case SPELLFAMILY_PALADIN:
         {
+            // Ancient Crusader (player)
+            if (dummySpell->Id == 86701)
+            {
+                if (GetTypeId() != TYPEID_PLAYER)
+                    return false;
+
+                //if caster has no guardian of ancient kings aura then remove dummy aura
+                if (!HasAura(86698))
+                {
+                    RemoveAurasDueToSpell(86701);
+                    return false;
+                }
+
+                CastSpell(this, 86700, true);
+                return true;
+            }
+            // Ancient Crusader (guardian)
+            if (dummySpell->Id == 86703)
+            {
+                if (!GetOwner() || GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                    return false;
+
+                GetOwner()->CastSpell(this, 86700, true);
+                return true;
+            }
+            // Ancient Healer
+            if (dummySpell->Id == 86674)
+            {
+                if (GetTypeId() != TYPEID_PLAYER)
+                    return false;
+
+                // if caster has no guardian of ancient kings aura then remove dummy aura
+                if (!HasAura(86669))
+                {
+                    RemoveAurasDueToSpell(86674);
+                   return false;
+                }
+
+                // check for single target spell (TARGET_SINGLE_FRIEND, NO_TARGET)
+                if (!(procSpell->Effects[triggeredByAura->GetEffIndex()].TargetA.GetTarget() == TARGET_UNIT_TARGET_ALLY) &&
+                    (procSpell->Effects[triggeredByAura->GetEffIndex()].TargetB.GetTarget() == 0))
+                    return false;
+
+                // Need to get guardian but that's NOT WORK!!!
+                //if (Creature* pet = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, GetPetGUID()))
+
+                std::list<Creature*> petlist;
+                GetCreatureListWithEntryInGrid(petlist, 46499, 100.0f);
+                if (!petlist.empty())
+                    for (std::list<Creature*>::const_iterator itr = petlist.begin(); itr != petlist.end(); ++itr)
+                    {
+                        Unit* pPet = (*itr);
+                        if (pPet->GetOwnerGUID() == GetGUID())
+                        {
+                            //need to save num of heals up to 5
+                            //I've done it with AI, maybe there's better way
+                            uint32 heals = pPet->GetAI()->GetData(1001);
+                            int32 bp0 = damage;
+                            int32 bp1 = damage / 10;
+                            pPet->CastCustomSpell(victim, 86678, &bp0, &bp1, NULL, true);
+                            if (heals > 3)
+                           {
+                                //Dismiss guardian and remove auras
+                                pPet->ToCreature()->DespawnOrUnsummon();
+                                RemoveAurasDueToSpell(86669);
+                                RemoveAurasDueToSpell(86674);
+                            }
+                            else
+                                pPet->GetAI()->SetData(1001, heals + 1);
+                        }
+                    }
+                return true;
+            }
             // Seal of Righteousness - melee proc dummy (addition  (MWS * (0.011 * AP.022 * holy spell power) * 100 / 100) damage)
             if (dummySpell->SpellFamilyFlags[0] & 0x8000000)
             {
