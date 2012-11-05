@@ -31,7 +31,21 @@ else()
   message(STATUS "WARNING - Continuing anyway, but setting the revision-ID and hash to Rev:0 Hash: Archive")
   message("")
 endif()
-
+if(_HG_EXEC)
+  execute_process(
+    COMMAND "${_HG_EXEC}" log -l 1 --template {date|date}
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    OUTPUT_VARIABLE rev_date
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+    )
+else()
+  message("")
+  message(STATUS "WARNING - Missing or outdated git - did you forget to install a recent version?")
+  message(STATUS "WARNING - Observe that for revision ID/hash to work you need at least version ${_REQUIRED_GIT_VERSION}")
+  message(STATUS "WARNING - Continuing anyway, but setting the revision-ID and hash to Rev:0 Hash: Archive")
+  message("")
+endif()
 # Last minute check - ensure that we have a proper revision
 # If everything above fails (means the user has erased the git revision control directory or removed the origin/HEAD tag)
 if(NOT rev_info)
@@ -42,9 +56,6 @@ else()
   # Extract revision and hash from git
   string(REGEX REPLACE changeset:\t[^0-9]+: "" rev_id_str ${rev_info})
   set(rev_hash  ${rev_id_str})
-  string(REGEX REPLACE .*date: "" rev_date ${rev_info})
-  string(REGEX MATCH [A-Z].*\n rev_date ${rev_date})  
-  string(REGEX REPLACE \n "" rev_date ${rev_date})  
   string(REGEX MATCH [0-9]+:[0-9a-z]*  rev_hash ${rev_hash})  
   string(REGEX MATCH [0-9]+  rev_id_str ${rev_id_str})
   string(REGEX REPLACE [+]+ "" rev_id ${rev_id_str})
