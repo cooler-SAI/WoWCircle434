@@ -498,14 +498,14 @@ struct RuneInfo
     uint8 BaseRune;
     uint8 CurrentRune;
     uint32 Cooldown;
-    AuraEffect const* ConvertAura;
+    uint32 spell_id;
+    bool DeathUsed;
 };
 
 struct Runes
 {
     RuneInfo runes[MAX_RUNES];
     uint8 runeState;                                        // mask of available runes
-    RuneType lastUsedRune;
 
     void SetRuneState(uint8 index, bool set = true)
     {
@@ -2784,14 +2784,14 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetRuneBaseCooldown(uint8 index) const { return GetRuneTypeBaseCooldown(GetBaseRune(index)); }
         uint32 GetRuneTypeBaseCooldown(RuneType runeType) const;
         bool IsBaseRuneSlotsOnCooldown(RuneType runeType) const;
-        RuneType GetLastUsedRune() { return m_runes->lastUsedRune; }
-        void SetLastUsedRune(RuneType type) { m_runes->lastUsedRune = type; }
+        void SetDeathRuneUsed(uint8 index, bool apply) { m_runes->runes[index].DeathUsed = apply; }
+        bool IsDeathRuneUsed(uint8 index) { return m_runes->runes[index].DeathUsed; }
         void SetBaseRune(uint8 index, RuneType baseRune) { m_runes->runes[index].BaseRune = baseRune; }
         void SetCurrentRune(uint8 index, RuneType currentRune) { m_runes->runes[index].CurrentRune = currentRune; }
         void SetRuneCooldown(uint8 index, uint32 cooldown) { m_runes->runes[index].Cooldown = cooldown; m_runes->SetRuneState(index, (cooldown == 0) ? true : false); }
-        void SetRuneConvertAura(uint8 index, AuraEffect const* aura) { m_runes->runes[index].ConvertAura = aura; }
-        void AddRuneByAuraEffect(uint8 index, RuneType newType, AuraEffect const* aura) { SetRuneConvertAura(index, aura); ConvertRune(index, newType); }
-        void RemoveRunesByAuraEffect(AuraEffect const* aura);
+        void SetRuneConvertSpell(uint8 index, uint32 spell_id) { m_runes->runes[index].spell_id = spell_id; }
+        void AddRuneBySpell(uint8 index, RuneType newType, uint32 spell_id) { SetRuneConvertSpell(index, spell_id); ConvertRune(index, newType); }
+        void RemoveRunesBySpell(uint32 spell_id);
         void RestoreBaseRune(uint8 index);
         void ConvertRune(uint8 index, RuneType newType);
         void ResyncRunes(uint8 count);

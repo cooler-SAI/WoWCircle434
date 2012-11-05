@@ -5481,13 +5481,13 @@ void AuraEffect::HandleAuraConvertRune(AuraApplication const* aurApp, uint8 mode
                 continue;
             if (!player->GetRuneCooldown(i))
             {
-                player->AddRuneByAuraEffect(i, RuneType(GetMiscValueB()), this);
+                player->AddRuneBySpell(i, RuneType(GetMiscValueB()), GetId());
                 --runes;
             }
         }
     }
     else
-        player->RemoveRunesByAuraEffect(this);
+        player->RemoveRunesBySpell(GetId());
 }
 
 void AuraEffect::HandleAuraLinked(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -5835,8 +5835,8 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
             }
             // Blood of the North
             // Reaping
-            // Death Rune Mastery
-            if (GetSpellInfo()->SpellIconID == 3041 || GetSpellInfo()->SpellIconID == 22 || GetSpellInfo()->SpellIconID == 2622)
+            // Blood Rites
+            if (GetId() == 54637 || GetId() == 56835 || GetId() == 50034)
             {
                 if (target->GetTypeId() != TYPEID_PLAYER)
                     return;
@@ -5844,7 +5844,7 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                     return;
 
                  // timer expired - remove death runes
-                target->ToPlayer()->RemoveRunesByAuraEffect(this);
+                target->ToPlayer()->RemoveRunesBySpell(GetId());
             }
             break;
         default:

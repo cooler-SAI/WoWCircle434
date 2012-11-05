@@ -7517,63 +7517,80 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 /*damage*/, Aura* triggeredByAura
         }
         case SPELLFAMILY_DEATHKNIGHT:
         {
-            // Blood of the North
-            // Reaping
-            // Death Rune Mastery
-            if (dummySpell->SpellIconID == 3041 || dummySpell->SpellIconID == 22 || dummySpell->SpellIconID == 2622)
-            {
-                *handled = true;
-                // Convert recently used Blood Rune to Death Rune
-                if (Player* player = ToPlayer())
-                {
-                    if (player->getClass() != CLASS_DEATH_KNIGHT)
-                        return false;
-
-                    RuneType rune = ToPlayer()->GetLastUsedRune();
-                    // can't proc from death rune use
-                    if (rune == RUNE_DEATH)
-                        return false;
-                    AuraEffect* aurEff = triggeredByAura->GetEffect(EFFECT_0);
-                    if (!aurEff)
-                        return false;
-
-                    // Reset amplitude - set death rune remove timer to 30s
-                    aurEff->ResetPeriodic(true);
-                    uint32 runesLeft;
-
-                    if (dummySpell->SpellIconID == 2622)
-                        runesLeft = 2;
-                    else
-                        runesLeft = 1;
-
-                    for (uint8 i = 0; i < MAX_RUNES && runesLeft; ++i)
-                    {
-                        if (dummySpell->SpellIconID == 2622)
-                        {
-                            if (player->GetCurrentRune(i) == RUNE_DEATH ||
-                                player->GetBaseRune(i) == RUNE_BLOOD)
-                                continue;
-                        }
-                        else
-                        {
-                            if (player->GetCurrentRune(i) == RUNE_DEATH ||
-                                player->GetBaseRune(i) != RUNE_BLOOD)
-                                continue;
-                        }
-                        if (player->GetRuneCooldown(i) != player->GetRuneBaseCooldown(i))
-                            continue;
-
-                        --runesLeft;
-                        // Mark aura as used
-                        player->AddRuneByAuraEffect(i, RUNE_DEATH, aurEff);
-                    }
-                    return true;
-                }
-                return false;
-            }
-
             switch (dummySpell->Id)
             {
+                case 54637: // Blood of the North
+                case 56835: // Reaping
+                case 50034: // Blood Rites
+                {
+                    *handled = true;
+                    if (GetTypeId() == TYPEID_PLAYER)
+                    {
+                        Player* plr = this->ToPlayer();
+                        if (plr->getClass() != CLASS_DEATH_KNIGHT)
+                            return false;
+
+                        if (AuraEffect * aurEff = triggeredByAura->GetEffect(EFFECT_0))
+                            aurEff->ResetPeriodic(true);
+
+                        uint32 runesLeft;
+                        switch (procSpell->Id)
+                        {
+                            case 45902: // Blood Strike
+                            case 50842: // Pestilence
+                                runesLeft = 1;
+                                for (uint8 i=0; i < MAX_RUNES && runesLeft; ++i)
+                                {
+                                    if (plr->GetCurrentRune(i) == RUNE_DEATH
+                                        || plr->GetBaseRune(i) != RUNE_BLOOD
+                                        || plr->IsDeathRuneUsed(i))
+                                        continue;
+
+                                    if (plr->GetRuneCooldown(i) != plr->GetRuneBaseCooldown(i))
+                                        continue;
+
+                                    --runesLeft;
+                                    plr->AddRuneBySpell(i, RUNE_DEATH, dummySpell->Id);
+                                }
+                                break;
+                            case 49020: // Obliterate
+                            case 49998: // Death Strike
+                                runesLeft = 2;
+                                for (uint8 i=0; i < MAX_RUNES && runesLeft; ++i)
+                                {
+                                    if (plr->GetCurrentRune(i) == RUNE_DEATH
+                                        || plr->GetBaseRune(i) == RUNE_BLOOD
+                                        || plr->IsDeathRuneUsed(i))
+                                        continue;
+
+                                    if (plr->GetRuneCooldown(i) != plr->GetRuneBaseCooldown(i))
+                                        continue;
+
+                                    --runesLeft;
+                                    plr->AddRuneBySpell(i, RUNE_DEATH, dummySpell->Id);
+                                }
+                                break;
+                            case 85948: // Festering Strike
+                                runesLeft = 2;
+                                for (uint8 i=0; i < MAX_RUNES && runesLeft; ++i)
+                                {
+                                    if (plr->GetCurrentRune(i) == RUNE_DEATH
+                                        || plr->GetBaseRune(i) == RUNE_UNHOLY
+                                        || plr->IsDeathRuneUsed(i))
+                                        continue;
+
+                                    if (plr->GetRuneCooldown(i) != plr->GetRuneBaseCooldown(i))
+                                        continue;
+
+                                    --runesLeft;
+                                    plr->AddRuneBySpell(i, RUNE_DEATH, dummySpell->Id);
+                                }
+                                break;
+                        }
+                        return true;
+                    }
+                    return false;
+                }
                 // Bone Shield cooldown
                 case 49222:
                 {

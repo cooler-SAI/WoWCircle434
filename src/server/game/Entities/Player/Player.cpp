@@ -24041,35 +24041,26 @@ uint32 Player::GetRuneTypeBaseCooldown(RuneType runeType) const
     return cooldown;
 }
 
-void Player::RemoveRunesByAuraEffect(AuraEffect const* aura)
+void Player::RemoveRunesBySpell(uint32 spell_id)
 {
     for (uint8 i = 0; i < MAX_RUNES; ++i)
     {
-        if (m_runes->runes[i].ConvertAura == aura)
+        if (m_runes->runes[i].spell_id == spell_id)
         {
             ConvertRune(i, GetBaseRune(i));
-            SetRuneConvertAura(i, NULL);
+            SetRuneConvertSpell(i, 0);
         }
     }
 }
 
 void Player::RestoreBaseRune(uint8 index)
 {
-    AuraEffect const* aura = m_runes->runes[index].ConvertAura;
-    // If rune was converted by a non-pasive aura that still active we should keep it converted
-    if (aura && !(aura->GetSpellInfo()->Attributes & SPELL_ATTR0_PASSIVE))
-        return;
+    uint32 spell_id = m_runes->runes[index].spell_id;
     ConvertRune(index, GetBaseRune(index));
-    SetRuneConvertAura(index, NULL);
-    // Don't drop passive talents providing rune convertion
-    if (!aura || aura->GetAuraType() != SPELL_AURA_CONVERT_RUNE)
-        return;
-    for (uint8 i = 0; i < MAX_RUNES; ++i)
-    {
-        if (aura == m_runes->runes[i].ConvertAura)
-            return;
-    }
-    aura->GetBase()->Remove();
+    SetRuneConvertSpell(index, 0);
+    // Only Blood Tap can be removed
+    if (spell_id == 45529)
+        RemoveAura(45529);
 }
 
 void Player::ConvertRune(uint8 index, RuneType newType)
@@ -24119,15 +24110,15 @@ void Player::InitRunes()
     m_runes = new Runes;
 
     m_runes->runeState = 0;
-    m_runes->lastUsedRune = RUNE_BLOOD;
 
     for (uint8 i = 0; i < MAX_RUNES; ++i)
     {
         SetBaseRune(i, runeSlotTypes[i]);                              // init base types
         SetCurrentRune(i, runeSlotTypes[i]);                           // init current types
         SetRuneCooldown(i, 0);                                         // reset cooldowns
-        SetRuneConvertAura(i, NULL);
+        SetRuneConvertSpell(i, 0);
         m_runes->SetRuneState(i);
+        SetDeathRuneUsed(i, false);
     }
 
     for (uint8 i = 0; i < NUM_RUNE_TYPES; ++i)
