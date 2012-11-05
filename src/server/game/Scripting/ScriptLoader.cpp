@@ -609,6 +609,12 @@ void AddSC_boss_karsh_steelbender();
 void AddSC_boss_beauty();
 void AddSC_boss_ascendant_lord_obsidius();
 
+void AddSC_instance_the_vortex_pinnacle(); // The Vortex Pinnacle
+void AddSC_the_vortex_pinnacle();
+void AddSC_boss_grand_vizier_ertan();
+void AddSC_boss_altairus();
+void AddSC_boss_asaad();
+
 // battlegrounds
 
 // outdoor pvp
@@ -1254,6 +1260,12 @@ void AddNorthrendScripts()
     AddSC_boss_karsh_steelbender();
     AddSC_boss_beauty();
     AddSC_boss_ascendant_lord_obsidius();
+
+    AddSC_instance_the_vortex_pinnacle(); // The Vortex Pinnacle
+    AddSC_the_vortex_pinnacle();
+    AddSC_boss_grand_vizier_ertan();
+    AddSC_boss_altairus();
+    AddSC_boss_asaad();
 #endif
 }
 

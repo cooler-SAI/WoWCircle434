@@ -3745,6 +3745,72 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // ENDOF BLACKROCK CAVERNS SPELLS
             //
+            // THE VORTEX PINNACLE SPELLS
+            //
+            // Grand Vizier Ertan
+            case 86292: // Cyclone Shield dmg
+            case 93991:
+                spellInfo->Effects[0].SetRadiusIndex(26);
+                spellInfo->Effects[1].SetRadiusIndex(26);
+                spellInfo->Effects[2].SetRadiusIndex(26);
+                break;
+            // Asaad
+            case 87551: // Supremacy of the Storm dmg
+            case 93994:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 87622: // Chain Lightning
+            case 93993:
+                spellInfo->Effects[0].SetRadiusIndex(12);
+                break;
+            case 87618: // Static Cling
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                spellInfo->Effects[1].SetRadiusIndex(28);
+                break;
+            // Altairus
+            case 88276: // Call of Wind Dummy
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 88282: // Upwind of Altairus
+                spellInfo->Effects[1].SetRadiusIndex(9);
+                break;
+            // Trash
+            case 87854: // Arcane Barrage
+            case 92756:
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 88073: // Starfall
+            case 92783:
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                break;
+            case 87761: // Rally
+                spellInfo->Effects[0].SetRadiusIndex(10);
+                break;
+            case 87933: // Air Nova
+            case 92753:
+                spellInfo->Effects[1].SetRadiusIndex(13);
+                break;
+            case 85159: // Howling Gale dmg
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                break;
+            case 85084: // Howling Gale
+                spellInfo->Effects[0].TriggerSpell = 85159;
+                break;
+            case 87765: // Lightning Lash Dummy
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 87768: // Lightning Nova
+            case 92780:
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                spellInfo->Effects[1].SetRadiusIndex(13);
+                break;
+            case 88170: // Cloudburst
+            case 92760:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            // ENDOF THE VORTEX PINNACLE SPELLS
+            //
             // Camouflage
             case 80325:
                 spellInfo->Effects[EFFECT_1].Effect = 0;

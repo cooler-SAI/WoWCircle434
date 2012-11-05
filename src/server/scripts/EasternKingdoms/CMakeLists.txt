@@ -207,6 +207,7 @@ set(scripts_STAT_SRCS
   EasternKingdoms/ThroneOfTheTides/throne_of_the_tides.h
   EasternKingdoms/BlackrockCaverns/boss_romogg_bonecrusher.cpp
   EasternKingdoms/BlackrockCaverns/boss_corla_hearld_of_twilight.cpp
+  EasternKingdoms/BlackrockCaverns/boss_karsh_steelbender.cpp
   EasternKingdoms/BlackrockCaverns/boss_beauty.cpp
   EasternKingdoms/BlackrockCaverns/boss_ascendant_lord_obsidius.cpp
   EasternKingdoms/BlackrockCaverns/instance_blackrock_caverns.cpp
