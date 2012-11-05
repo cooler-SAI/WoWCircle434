@@ -616,13 +616,28 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
     // Rage from Damage made (only from direct weapon damage)
     if (cleanDamage && damagetype == DIRECT_DAMAGE && this != victim && getPowerType() == POWER_RAGE)
     {
-        uint32 rage = uint32(GetAttackTime(cleanDamage->attackType) / 1000 * 8.125f);
-        switch (cleanDamage->attackType)
+        uint32 weaponSpeedHitFactor;
+        uint32 rage_damage = damage + cleanDamage->absorbed_damage;
+
+        switch(cleanDamage->attackType)
         {
-            case OFF_ATTACK:
-                rage /= 2;
             case BASE_ATTACK:
-                RewardRage(rage, true);
+            {
+                weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType) / 1000.0f * 6.5f);
+
+                RewardRage(weaponSpeedHitFactor, true);
+
+                break;
+            }
+            case OFF_ATTACK:
+            {
+                weaponSpeedHitFactor = uint32(GetAttackTime(cleanDamage->attackType) / 1000.0f * 3.25f);
+
+                RewardRage(weaponSpeedHitFactor, true);
+
+                break;
+            }
+            case RANGED_ATTACK:
                 break;
             default:
                 break;
@@ -633,7 +648,9 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
     {
         // Rage from absorbed damage
         if (cleanDamage && cleanDamage->absorbed_damage && victim->getPowerType() == POWER_RAGE)
+        {
             victim->RewardRage(cleanDamage->absorbed_damage, false);
+        }
 
         return 0;
     }
@@ -17229,25 +17246,34 @@ void Unit::SendRemoveFromThreatListOpcode(HostileReference* pHostileReference)
 // baseRage means damage taken when attacker = false
 void Unit::RewardRage(uint32 baseRage, bool attacker)
 {
-    float addRage;
+    float addRage = baseRage;
 
     if (attacker)
     {
-        addRage = baseRage;
         // talent who gave more rage on attack
-        AddPct(addRage, GetTotalAuraModifier(SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT));
+        addRage *= 1.0f + GetTotalAuraModifier(SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT) / 100.0f;
+
+        // Sentinel - Protection Warrior Mastery
+        if (AuraEffect * const sentiel = GetAuraEffect(29144, 1))
+            if (getVictim() && (!getVictim()->getVictim() || (getVictim()->getVictim() && this != getVictim()->getVictim())))
+                addRage *= float((sentiel->GetAmount() + 100.0f) / 100.0f);
     }
     else
     {
-        // Calculate rage from health and damage taken
-        //! ToDo: Check formula
-        addRage = floor(0.5f + (25.7f * baseRage / GetMaxHealth()));
+        addRage /= (GetCreateHealth()/35);
+
         // Berserker Rage effect
         if (HasAura(18499))
-            addRage *= 2.0f;
-    }
+        {
+            float mod = 2.0f;
 
-    addRage *= sWorld->getRate(RATE_POWER_RAGE_INCOME);
+            // Mastery Warrior
+            if (Aura* aur = GetAura(76856))
+                mod += float(aur->GetEffect(0)->GetAmount() / 100.0f);
+
+            addRage *= mod;
+        }
+    }
 
     ModifyPower(POWER_RAGE, uint32(addRage * 10));
 }

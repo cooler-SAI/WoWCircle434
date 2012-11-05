@@ -3263,8 +3263,6 @@ public:
                     (*itr)->DisappearAndDie();
         }
 
-        void EnterEvadeMode() { return; }
-
         void CheckIfMoveInRing(Unit *who)
         {
             if (who->isAlive() && me->IsInRange(who, 2.0f, 4.7f) && me->IsWithinLOSInMap(who) && Isready)
@@ -3314,7 +3312,7 @@ class npc_bloodworm : public CreatureScript
 public:
     npc_bloodworm() : CreatureScript("npc_bloodworm") { }
 
-	CreatureAI *GetAI(Creature *creature) const
+    CreatureAI *GetAI(Creature *creature) const
     {
         return new npc_bloodwormAI(creature);
     }
@@ -3322,58 +3320,53 @@ public:
     struct npc_bloodwormAI : public ScriptedAI
     {
         npc_bloodwormAI(Creature *c) : ScriptedAI(c) 
-		{
-		}
+        {
+        }
 
-		uint32 uiBurstTimer;
+        uint32 uiBurstTimer;
 
-		void Burst()
-		{
-			if (!me->isInCombat())
-				return;
+        void Burst()
+        {
+            if (!me->isInCombat())
+                return;
 
-			if (Aura* aura = me->GetAura(81277))
-			{
-				uint32 stacks = aura->GetStackAmount();
-				stacks = (stacks <= 10)? stacks: 10;
-				int32 damage = stacks * (me->GetMaxHealth() / 10);
-				me->CastCustomSpell(me, 81280, &damage, NULL, NULL, true);
-			}
-		}
+            if (Aura* aura = me->GetAura(81277))
+            {
+                uint32 stacks = std::min<uint32>(aura->GetStackAmount(), 10);
+                int32 damage = stacks * (me->GetMaxHealth() / 10);
+                me->CastCustomSpell(me, 81280, &damage, NULL, NULL, true);
+            }
+        }
 
-        void EnterCombat(Unit * /*who*/)
-		{
-		}
-
-		void JustDied(Unit* killer)
-		{
-			Burst();
-		}
+        void JustDied(Unit* killer)
+        {
+            Burst();
+        }
 
         void Reset()
         {
-			if (me->GetOwner())
-			{
-				me->SetMaxHealth(0.20 * me->GetOwner()->GetHealth());
-				me->SetHealth(0.20 * me->GetOwner()->GetHealth());
-			}
-
-			DoCast(me, 50453);
-
-			uiBurstTimer = 19000;
+            if (me->GetOwner())
+            {
+                me->SetMaxHealth(0.20 * me->GetOwner()->GetHealth());
+                me->SetHealth(0.20 * me->GetOwner()->GetHealth());
+            }
+            
+            DoCast(me, 50453);
+            
+            uiBurstTimer = 19000;
         }
-
+        
         void UpdateAI(const uint32 diff)
         {
-			if (uiBurstTimer <= diff)
-				Burst();
-			else
-				uiBurstTimer -= diff;
+            if (uiBurstTimer <= diff)
+                Burst();
+            else
+                uiBurstTimer -= diff;
 
             if (!UpdateVictim())
                 return;
 
-			DoMeleeAttackIfReady();
+            DoMeleeAttackIfReady();
         }
     };
 };

@@ -397,7 +397,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                                 uint32 count = 0;
                                 for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
                                     ++count;
-                                damage = damage / count;
+                                damage /= count;
                             }
                         }
                         break;
