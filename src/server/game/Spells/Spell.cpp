@@ -5167,6 +5167,17 @@ SpellCastResult Spell::CheckCast(bool strict)
         // for effects of spells that have only one target
         switch (m_spellInfo->Effects[i].Effect)
         {
+            case SPELL_EFFECT_SCHOOL_DAMAGE:
+            {
+                // Soul Swap
+                if (m_spellInfo->Id == 86213)
+                {
+                    if (Unit * target = m_targets.GetUnitTarget())
+                        if (m_caster->m_SoulSwapTarget == target)
+                            return SPELL_FAILED_BAD_TARGETS;
+                }
+                break;
+            }
             case SPELL_EFFECT_DUMMY:
             {
                 // Have Group, Will Travel

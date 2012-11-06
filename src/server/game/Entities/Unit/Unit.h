@@ -2230,6 +2230,10 @@ class Unit : public WorldObject
         void SetLastDamagedTime(time_t val) { _lastDamagedTime = val; }
 
         void OnEclipseBuff(bool sun);
+
+        Unit *m_SoulSwapTarget;
+        std::list<uint32> m_BufferAuras; // for soul swap
+
     protected:
         explicit Unit (bool isWorldObject);
 

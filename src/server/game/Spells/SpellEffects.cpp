@@ -433,6 +433,57 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             damage += damage / 6;
                     }
                 }
+                // Soul Swap
+                else if (m_spellInfo->Id == 86121)
+                {
+                    m_caster->CastSpell(m_caster, 86211, true);
+                    m_caster->m_BufferAuras.clear();
+                    m_caster->m_SoulSwapTarget = unitTarget;
+                    Unit::AuraApplicationMap const auraMap = unitTarget->GetAppliedAuras();
+                    if (auraMap.size() > 0)
+                    {
+                        for (Unit::AuraApplicationMap::const_iterator itr = auraMap.begin(); itr != auraMap.end(); ++itr)
+                        {
+                            // Check for caster
+                            if (itr->second->GetBase()->GetCaster() != m_caster)
+                                continue;
+
+                            // Check for schoolmask
+                            if (!(itr->second->GetBase()->GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
+                                continue;
+
+                            // Check for periodic effect
+                            bool bPeriodic = false;
+                            for (uint8 i = 0; i < 3; ++i)
+                                if (AuraEffect* aurEff = itr->second->GetBase()->GetEffect(i))
+                                    if (aurEff->IsPeriodic())
+                                        bPeriodic = true;
+                            if (!bPeriodic)
+                                continue;
+
+                            // All is done, add aura to buffer
+                            m_caster->m_BufferAuras.push_back(itr->first);
+                            if (!m_caster->HasAura(56226))
+                                unitTarget->RemoveAurasDueToSpell(itr->first);
+                        }
+                    }
+                    unitTarget->CastSpell(m_caster, 92795, true);
+                }
+                else if (m_spellInfo->Id == 86213)
+                {
+                     if (Aura * aur = m_caster->GetAura(86211))
+                    {
+                        aur->Remove();
+                        if (m_caster->m_BufferAuras.size() > 0)
+                            for (std::list<uint32>::const_iterator itr = m_caster->m_BufferAuras.begin(); itr != m_caster->m_BufferAuras.end(); ++itr)
+                                m_caster->AddAura((*itr), unitTarget);
+
+                        m_caster->m_BufferAuras.clear();
+                        m_caster->CastSpell(unitTarget, 92795, true);
+                         if (m_caster->HasAura(56226))
+                            m_caster->ToPlayer()->AddSpellCooldown(86121, 0, time(NULL) + 10);
+                    }
+                }
                 break;
             }
             case SPELLFAMILY_PRIEST:
