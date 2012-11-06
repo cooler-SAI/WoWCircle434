@@ -452,6 +452,16 @@ struct RepSpilloverTemplate
     uint32 faction_rank[MAX_SPILLOVER_FACTIONS];
 };
 
+struct CurrencyOnKillEntry
+{
+    uint32 currencyid1;
+    uint32 currencyid2;
+    uint32 currencyid3;
+    int32 currencycount1;
+    int32 currencycount2;
+    int32 currencycount3;
+};
+
 struct PointOfInterest
 {
     uint32 entry;
@@ -633,6 +643,7 @@ class ObjectMgr
         typedef UNORDERED_MAP<uint32, RepRewardRate > RepRewardRateContainer;
         typedef UNORDERED_MAP<uint32, ReputationOnKillEntry> RepOnKillContainer;
         typedef UNORDERED_MAP<uint32, RepSpilloverTemplate> RepSpilloverTemplateContainer;
+        typedef UNORDERED_MAP<uint32, CurrencyOnKillEntry> CurOnKillContainer;
 
         typedef UNORDERED_MAP<uint32, PointOfInterest> PointOfInterestContainer;
 
@@ -776,6 +787,14 @@ class ObjectMgr
             return NULL;
         }
 
+        CurrencyOnKillEntry const* GetCurrencyOnKillEntry(uint32 id) const
+		{
+			CurOnKillContainer::const_iterator itr = _curOnKillStore.find(id);
+			if (itr != _curOnKillStore.end())
+				return &itr->second;
+			return NULL;
+		}
+
         PointOfInterest const* GetPointOfInterest(uint32 id) const
         {
             PointOfInterestContainer::const_iterator itr = _pointsOfInterestStore.find(id);
@@ -918,6 +937,7 @@ class ObjectMgr
         void LoadReputationRewardRate();
         void LoadReputationOnKill();
         void LoadReputationSpilloverTemplate();
+        void LoadCurrencyOnKill();
 
         void LoadPointsOfInterest();
         void LoadQuestPOI();
@@ -1230,6 +1250,7 @@ class ObjectMgr
         RepRewardRateContainer _repRewardRateStore;
         RepOnKillContainer _repOnKillStore;
         RepSpilloverTemplateContainer _repSpilloverTemplateStore;
+        CurOnKillContainer _curOnKillStore;
 
         GossipMenusContainer _gossipMenusStore;
         GossipMenuItemsContainer _gossipMenuItemsStore;

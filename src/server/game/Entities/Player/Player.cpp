@@ -23316,8 +23316,50 @@ bool Player::GetsRecruitAFriendBonus(bool forXP)
     return recruitAFriend;
 }
 
+void Player::RewardCurrencyAtKill(Unit* pVictim)
+{
+    if (!pVictim || pVictim->GetTypeId() == TYPEID_PLAYER)
+        return;
+
+    if (!pVictim->ToCreature())
+        return;
+
+    if (!pVictim->ToCreature()->GetCreatureTemplate())
+        return;
+
+    CurrencyOnKillEntry const* Curr = sObjectMgr->GetCurrencyOnKillEntry(pVictim->ToCreature()->GetCreatureTemplate()->Entry);
+
+    if (!Curr)
+        return;
+
+    if (Curr->currencyid1 && Curr->currencycount1)
+        ModifyCurrency(Curr->currencyid1, Curr->currencycount1);
+
+    if (Curr->currencyid2 && Curr->currencycount2)
+        ModifyCurrency(Curr->currencyid2, Curr->currencycount2);
+
+    if (Curr->currencyid3 && Curr->currencycount3)
+        ModifyCurrency(Curr->currencyid3, Curr->currencycount3);
+}
+
 void Player::RewardPlayerAndGroupAtKill(Unit* victim, bool isBattleGround)
 {
+    //currency reward
+    if (sMapStore.LookupEntry(GetMapId())->IsDungeon())
+    {
+        if (Group *pGroup = GetGroup())
+        {
+            for (GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+            {
+                Player* pGroupGuy = itr->getSource();
+                if (IsInMap(pGroupGuy))
+                    pGroupGuy->RewardCurrencyAtKill(victim);
+            }
+        }
+        else
+            RewardCurrencyAtKill(victim);
+    }
+
     KillRewarder(this, victim, isBattleGround).Reward();
 }
 
