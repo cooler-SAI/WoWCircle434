@@ -38,7 +38,7 @@ bool Player::MasteryAffectsPet() const
 
 uint8 Player::GetMasteryScalingValue(SpellInfo const* spellInfo, int32& amount) const
 {
-    if (!spellInfo || !spellInfo->HasAttribute(SpellAttr8::SPELL_ATTR8_MASTERY))
+    if (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR8_MASTERY))
         return 0;
     
     amount = 0;
