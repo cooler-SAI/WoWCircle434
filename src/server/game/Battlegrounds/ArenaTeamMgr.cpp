@@ -134,3 +134,16 @@ void ArenaTeamMgr::LoadArenaTeams()
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u arena teams in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
+
+void ArenaTeamMgr::FinishWeek()
+{
+    for (ArenaTeamContainer::iterator titr = GetArenaTeamMapBegin(); titr != GetArenaTeamMapEnd(); ++titr)
+    {
+        if (ArenaTeam* at = titr->second)
+        {
+            at->FinishWeek();
+            at->SaveToDB();
+            at->NotifyStatsChanged();
+        }
+    }
+}

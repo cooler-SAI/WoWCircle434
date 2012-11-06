@@ -1967,6 +1967,7 @@ bool Player::BuildEnumData(PreparedQueryResult result, ByteBuffer* dataBuffer, B
     uint32 petDisplayId = 0;
     uint32 petLevel   = 0;
     uint32 petFamily  = 0;
+
     // show pet at selection character in character list only for non-ghost character
     if (result && !(playerFlags & PLAYER_FLAGS_GHOST) && (plrClass == CLASS_WARLOCK || plrClass == CLASS_HUNTER || plrClass == CLASS_DEATH_KNIGHT))
     {
@@ -7465,11 +7466,11 @@ uint8 Player::GetRankFromDB(uint64 guid)
     return 0;
 }
 
-void  Player::SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
+void Player::SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
 {
     SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + type, value);
     if (type == ARENA_TEAM_PERSONAL_RATING && value > _maxPersonalArenaRate)
-         _maxPersonalArenaRate = value;
+         SetMaxPersonalArenaRating(value);
 }
 
 uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
@@ -16762,6 +16763,9 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     SetByteValue(PLAYER_FIELD_BYTES, 2, fields[58].GetUInt8());
 
     InitDisplayIds();
+
+    // Currency Cap Data
+    m_currencyCap = sCurrencyMgr->getCurrencyCapData(guid);
 
     // cleanup inventory related item value fields (its will be filled correctly in _LoadInventory)
     for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
@@ -26507,4 +26511,37 @@ void Player::SendBattlegroundTimer(uint32 currentTime, uint32 maxTime)
     data << uint32(currentTime);
     data << uint32(maxTime);
     SendDirectMessage(&data);
+}
+
+void Player::SetMaxPersonalArenaRating(uint32 value)
+{
+    _maxPersonalArenaRate = value;
+    SQLTransaction trans = NULL;
+    PreparedStatement* stmt = NULL;
+    if (!IsHaveCap())
+    {
+        trans = CharacterDatabase.BeginTransaction();
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_CURRENCY_CAP);
+        stmt->setUInt32(0, GetGUIDLow());
+        stmt->setUInt16(1, _maxPersonalArenaRate);
+        stmt->setUInt16(2, 0);
+        stmt->setUInt16(3, DEFAULT_ARENA_CAP);
+        stmt->setUInt16(4, 0);
+        stmt->setUInt8(5, 1);
+        trans->Append(stmt);
+        sCurrencyMgr->AddCurrencyCapData(GetGUIDLow(), _maxPersonalArenaRate, 0, DEFAULT_ARENA_CAP, 0, 1);
+        m_currencyCap = sCurrencyMgr->getCurrencyCapData(GetGUIDLow());
+    }
+    else
+    {
+        m_currencyCap->highestArenaRating = _maxPersonalArenaRate;
+        m_currencyCap->requireReset = 1;
+        trans = CharacterDatabase.BeginTransaction();
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PLAYER_CURRENCY_CAP_RESET);
+        stmt->setUInt16(0, m_currencyCap->highestArenaRating);
+        stmt->setUInt16(1, 0);
+        stmt->setUInt32(2, GetGUIDLow());
+        trans->Append(stmt);
+    }
+    CharacterDatabase.CommitTransaction(trans);
 }

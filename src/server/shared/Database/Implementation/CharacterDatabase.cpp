@@ -269,6 +269,15 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PREPARE_STATEMENT(CHAR_SEL_PLAYER_CURRENCY, "SELECT currency, week_count, total_count, flags FROM character_currency WHERE guid = ?", CONNECTION_ASYNC);
     PREPARE_STATEMENT(CHAR_UPD_PLAYER_CURRENCY, "UPDATE character_currency SET week_count = ?, total_count = ?, flags = ? WHERE guid = ? AND currency = ?", CONNECTION_ASYNC);
     PREPARE_STATEMENT(CHAR_REP_PLAYER_CURRENCY, "REPLACE INTO character_currency (guid, currency, week_count, total_count, flags) VALUES (?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    
+
+    // Currency Cap
+    PREPARE_STATEMENT(CHAR_INS_PLAYER_CURRENCY_CAP, "INSERT INTO character_currency_cap (guid, highestArenaRating, highestRBgRating, currentArenaCap, currentRBgCap, requireReset) VALUES (?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC)
+    PREPARE_STATEMENT(CHAR_REP_PLAYER_CURRENCY_CAP, "REPLACE INTO character_currency_cap (guid, highestArenaRating, highestRBgRating, currentArenaCap, currentRBgCap, requireReset) VALUES (?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PREPARE_STATEMENT(CHAR_UPD_PLAYER_CURRENCY_CAP, "UPDATE character_currency_cap SET highestArenaRating = ?, highestRBgRating = ?, currentArenaCap = ?, currentRBgCap = ?, requireReset = ? WHERE guid = ?", CONNECTION_ASYNC);
+    PREPARE_STATEMENT(CHAR_UPD_PLAYER_CURRENCY_CAP_RESET, "UPDATE character_currency_cap SET highestArenaRating = ?, highestRBgRating = ?, requireReset = '1' WHERE guid = ?", CONNECTION_ASYNC);
+    PREPARE_STATEMENT(CHAR_INS_PLAYER_CURRENCY_CAP_PROGRESS, "REPLACE INTO currency_reset_save (id, lastguid) VALUES (?, ?)", CONNECTION_ASYNC);
+    PREPARE_STATEMENT(CHAR_DEL_PLAYER_CURRENCY_CAP_PROGRESS, "DELETE FROM currency_reset_save WHERE id = ?", CONNECTION_ASYNC);
 
     // Account data
     PREPARE_STATEMENT(CHAR_SEL_ACCOUNT_DATA, "SELECT type, time, data FROM account_data WHERE accountId = ?", CONNECTION_SYNCH)

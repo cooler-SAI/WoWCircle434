@@ -38,6 +38,7 @@
 #include "Util.h"                                           // for Tokens typedef
 #include "WorldSession.h"
 #include "PhaseMgr.h"
+#include "CurrencyMgr.h"
 
 // for template
 #include "SpellMgr.h"
@@ -2820,7 +2821,8 @@ class Player : public Unit, public GridObject<Player>
 
         void SendCurrencyWeekCap(uint32 id) const;
         void SendCurrencyWeekCap(const CurrencyTypesEntry* currency) const;
-        void ResetCurrencyWeekCap();
+        void FinishWeek();
+        void ResetCurrencyWeekCap(SQLTransaction* trans = NULL);
         uint32 GetRBGPersonalRating() const;
 
         /// modify currency flag
@@ -2835,12 +2837,21 @@ class Player : public Unit, public GridObject<Player>
         bool HasCurrency(uint32 id, uint32 count) const;
         /// initialize currency count for custom initialization at create character
         void SetCurrency(uint32 id, uint32 count, bool printLog = true);
-        /// return week cap by currency id
+
         uint32 GetCurrencyWeekCap(uint32 id, bool usePrecision) const;
+        uint32 GetArenaCap() { return m_currencyCap ? m_currencyCap->currentArenaCap : DEFAULT_ARENA_CAP; }
+        uint32 GetBattlegroundCap() { return m_currencyCap ? m_currencyCap->currentRBgCap : DEFAULT_ARENA_CAP; }
+        uint32 GetMaximumCap() { return GetArenaCap() > GetBattlegroundCap() ? GetArenaCap() : GetBattlegroundCap(); }
+
+        uint32 GetMaxPersonalArenaRating() { return _maxPersonalArenaRate; }
+        void SetMaxPersonalArenaRating(uint32 value);
+
+        bool IsHaveCap() { return m_currencyCap; }
+
         /// return count of currency gaind on current week
         uint32 GetCurrencyOnWeek(uint32 id, bool precision) const;
         /// send conquest currency points and their cap week/arena
-        void SendPvpRewards() const;
+        void SendPvpRewards();
 
         /**
           * @name   ModifyCurrency
@@ -3195,6 +3206,8 @@ class Player : public Unit, public GridObject<Player>
         uint8 m_grantableLevels;
 
         CUFProfile* _CUFProfiles[MAX_CUF_PROFILES];
+
+        CurrencyCap* m_currencyCap;
 
     private:
         // internal common parts for CanStore/StoreItem functions

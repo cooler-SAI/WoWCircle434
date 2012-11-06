@@ -1,0 +1,91 @@
+#ifndef _CURRENCYMGR_H
+#define _CURRENCYMGR_H
+
+#include "Player.h"
+#include "EventProcessor.h"
+
+#define DEFAULT_RATED_BATTLEGROUND_CAP 1650
+#define DEFAULT_ARENA_CAP 1350
+#define MAXIMUM_ARENA_CAP 2700
+
+struct CurrencyCap
+{
+    uint32 highestArenaRating;
+    uint32 highestRBgRating;
+    uint32 currentArenaCap;
+    uint32 currentRBgCap;
+    uint8 requireReset;
+};
+
+typedef std::map<uint32, CurrencyCap> PlayerCurrencyCapMap;
+
+class CurrencyMgr
+{
+    friend class ACE_Singleton<CurrencyMgr, ACE_Null_Mutex>;
+    friend class CapResetEvent;
+    CurrencyMgr();
+    ~CurrencyMgr();
+
+public:
+    void LoadPlayersCurrencyCap();
+
+    bool IsHaveCap(uint32 lowGuid) const
+    {
+        PlayerCurrencyCapMap::const_iterator itr = _capValuesStorage.find(lowGuid);
+        return itr != _capValuesStorage.end();
+    }
+
+    void AddCurrencyCapData(uint32 lowGuid, uint16 arenaRating = 0, uint16 RBgRating = 0, uint16 arenaCap = DEFAULT_ARENA_CAP, uint16 rbgCap = 0, uint8 reset = 0);
+    void CalculatingCurrencyCap(uint32 &rating, bool ratedBattleground = false);
+    
+    CurrencyCap* getCurrencyCapData(uint32 lowGuid);
+
+    PlayerCurrencyCapMap& getCapMap() { return _capValuesStorage; }
+    PlayerCurrencyCapMap::iterator getCapBegin() { return _capValuesStorage.begin(); }
+    PlayerCurrencyCapMap::iterator getCapEnd() { return _capValuesStorage.end(); }
+    PlayerCurrencyCapMap::iterator getLastItr() { return lastItr; }
+
+    uint32 getFirstGuid() { return _capValuesStorage.begin()->first; }
+    uint32 getLastGuid() { return lastGuid; }
+
+    bool capMapIsEmpty() { return _capValuesStorage.empty(); }
+    void UpdateEvents(uint32 diff);
+    void ResetCurrencyCapToAllPlayers();
+
+    void RestoreResettingCap();
+    bool CheckIfNeedRestore();
+
+    void setLastItr(PlayerCurrencyCapMap::iterator itr) { lastItr = itr; }
+    void setLastGuid(uint32 lowGuid, bool save = false);
+    void DeleteRestoreData();
+
+protected:
+    PlayerCurrencyCapMap _capValuesStorage; 
+
+private:
+    EventProcessor m_events;
+    PlayerCurrencyCapMap::iterator lastItr;
+    uint32 lastGuid;
+};
+
+/*
+    This class is used to reset currency week cap in parts
+*/
+
+class CapResetEvent : public BasicEvent
+{
+public:
+    CapResetEvent(uint32 lastGuid, uint16 part): m_lastGuid(lastGuid), m_part(part) {}
+    virtual ~CapResetEvent() {}
+
+    virtual bool Execute(uint64 e_time, uint32 p_time);
+    virtual void Abort(uint64 e_time);
+
+private:
+    uint32 m_lastGuid;
+    uint16 m_part;
+};
+
+#define sCurrencyMgr ACE_Singleton<CurrencyMgr, ACE_Null_Mutex>::instance()
+
+#endif

@@ -1,7 +1,15 @@
 #include "gamePCH.h"
-#include "Player.h"
+#include "CurrencyMgr.h"
 #include "Formulas.h"
 #include "ArenaTeamMgr.h"
+#include "World.h"
+
+CurrencyMgr::CurrencyMgr() 
+{
+    lastGuid = 0;
+}
+
+CurrencyMgr::~CurrencyMgr() {}
 
 void Player::SendNewCurrency(uint32 id) const
 {
@@ -280,11 +288,9 @@ uint32 Player::_GetCurrencyWeekCap(const CurrencyTypesEntry* currency) const
         case CURRENCY_TYPE_CONQUEST_POINTS:
             return _ConquestCurrencytotalWeekCap;
         case CURRENCY_TYPE_CONQUEST_META_ARENA:
-            // should add precision mod = 100
-            return Trinity::Currency::ConquestRatingCalculator(_maxPersonalArenaRate);
+            return const_cast<Player*>(this)->GetArenaCap();
         case CURRENCY_TYPE_CONQUEST_META_BG:
-            // should add precision mod = 100
-            return Trinity::Currency::BgConquestRatingCalculator(GetRBGPersonalRating());
+            return const_cast<Player*>(this)->GetBattlegroundCap();
         case CURRENCY_TYPE_HONOR_POINTS:
         {
             uint32 honorcap = sWorld->getIntConfig(CONFIG_CURRENCY_MAX_HONOR_POINTS);
@@ -302,7 +308,6 @@ uint32 Player::_GetCurrencyWeekCap(const CurrencyTypesEntry* currency) const
     }
 
     SendCurrencyWeekCap(currency);
-
     return cap;
 }
 
@@ -326,18 +331,9 @@ void Player::SendCurrencyWeekCap(const CurrencyTypesEntry* currency) const
     GetSession()->SendPacket(&packet);
 }
 
-void Player::ResetCurrencyWeekCap()
+void Player::FinishWeek()
 {
-    for (uint32 arenaSlot = 0; arenaSlot < MAX_ARENA_SLOT; arenaSlot++)
-    {
-        if (uint32 arenaTeamId = GetArenaTeamId(arenaSlot))
-        {
-            ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(arenaTeamId);
-            arenaTeam->FinishWeek();                              // set played this week etc values to 0 in memory, too
-            arenaTeam->SaveToDB();                                // save changes
-            arenaTeam->NotifyStatsChanged();                      // notify the players of the changes
-        }
-    }
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
     for (PlayerCurrenciesMap::iterator itr = _currencyStorage.begin(); itr != _currencyStorage.end(); ++itr)
     {
@@ -345,19 +341,244 @@ void Player::ResetCurrencyWeekCap()
         itr->second.state = PLAYERCURRENCY_CHANGED;
     }
 
+    _SaveCurrency(trans);
+    CharacterDatabase.CommitTransaction(trans);
+
     WorldPacket data(SMSG_WEEKLY_RESET_CURRENCY, 0);
     SendDirectMessage(&data);
 }
 
-void Player::SendPvpRewards() const
+void Player::ResetCurrencyWeekCap(SQLTransaction* trans /* = NULL */)
+{
+    if (!IsHaveCap())
+        return;
+
+    FinishWeek();
+
+    sCurrencyMgr->CalculatingCurrencyCap(m_currencyCap->currentArenaCap);
+    // we need it after rated bg implementation
+    //sCurrencyMgr->CalculatingCurrencyCap(m_currencyCap->currentRBgCap, true);
+
+    if (trans && !trans->null())
+        (*trans)->PAppend("UPDATE character_currency_cap SET currentArenaCap = %u, currentRBgCap = %u,"
+        " requireReset = 0, highestArenaRating = 0, highestRBgRating = 0 where guid = '%u'",
+        m_currencyCap->currentArenaCap, 0, GetGUIDLow());
+}
+
+void Player::SendPvpRewards()
 {
     WorldPacket packet(SMSG_REQUEST_PVP_REWARDS_RESPONSE, 24);
-    packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_POINTS, false);
+    packet << GetBattlegroundCap();
     packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_POINTS, true);
-    packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_ARENA, false);
+    packet << GetArenaCap();
     packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_ARENA, true);
     packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_BG, true);
-    packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_POINTS, false);
-    packet << GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_BG, false);
+    packet << GetMaximumCap();
+    packet << GetBattlegroundCap();
     GetSession()->SendPacket(&packet);
 }
+
+void CurrencyMgr::AddCurrencyCapData(uint32 lowGuid, uint16 arenaRating /* = 0 */, uint16 RBgRating /* = 0 */, uint16 cap /* = 1350 */, uint16 rbgCap /* = 0 */, uint8 reset /* = 0 */)
+{
+    CurrencyCap &data = _capValuesStorage[lowGuid];
+    data.highestArenaRating = arenaRating;
+    data.highestRBgRating = RBgRating;
+    data.currentArenaCap = cap;
+    data.currentRBgCap = cap;
+    data.requireReset = reset;
+}
+
+void CurrencyMgr::LoadPlayersCurrencyCap()
+{
+    QueryResult result = CharacterDatabase.Query(
+        "SELECT guid, highestArenaRating, highestRBgRating, currentArenaCap, currentRBgCap, requireReset"
+        " FROM character_currency_cap ORDER BY guid");
+
+    if (!result)
+    {
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 players who have any currency cap data. DB table `character_currency_cap` is empty!");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do 
+    {
+        Field* fields = result->Fetch();
+        uint32 lowGuid = fields[0].GetUInt32();
+
+        CurrencyCap cap;
+        cap.highestArenaRating  = fields[1].GetUInt16();
+        cap.highestRBgRating    = fields[2].GetUInt16();
+        cap.currentArenaCap     = fields[3].GetUInt16();
+        cap.currentRBgCap       = fields[4].GetUInt16();
+        cap.requireReset        = fields[5].GetUInt8();
+
+        _capValuesStorage[lowGuid] = cap;
+
+    } while (result->NextRow());
+
+    lastItr = getCapBegin();
+
+    // if server crashed when cap was not been reset we must restore it
+    if (CheckIfNeedRestore())
+        RestoreResettingCap();
+}
+
+bool CurrencyMgr::CheckIfNeedRestore()
+{
+    QueryResult result = CharacterDatabase.Query(
+        "SELECT lastguid FROM currency_reset_save WHERE id = 1");
+
+    if (!result)
+        return false;
+
+    Field* fields = result->Fetch();
+    uint32 lowGuid = fields[0].GetUInt32();
+
+    if (lowGuid != getCapEnd()->first)
+    {
+        lastGuid = lowGuid;
+        return true;
+    }
+
+    return false;
+}
+
+void CurrencyMgr::RestoreResettingCap()
+{
+    PlayerCurrencyCapMap::iterator itr = _capValuesStorage.find(lastGuid);
+    if (itr == _capValuesStorage.end())
+        return;
+
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+
+    for (; itr != sCurrencyMgr->getCapEnd(); ++itr)
+    {        
+        if (!itr->second.requireReset)
+            continue;
+
+        sCurrencyMgr->CalculatingCurrencyCap(itr->second.highestArenaRating);
+        trans->PAppend("UPDATE character_currency_cap SET currentArenaCap = %u, currentRBgCap = %u,"
+            " requireReset = 0, highestArenaRating = 0, highestRBgRating = 0 where guid = '%u'",
+            itr->second.highestArenaRating, 0, itr->first);
+    }
+    CharacterDatabase.CommitTransaction(trans);
+    DeleteRestoreData();
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Server crashed on resetting arena cap but cap restore now!");
+}
+
+void CurrencyMgr::CalculatingCurrencyCap(uint32 &rating, bool ratedBattleground /* = false */)
+{
+    if (!ratedBattleground)
+        Trinity::Currency::ConquestRatingCalculator(rating);
+    else
+        Trinity::Currency::BgConquestRatingCalculator(rating);
+}
+
+CurrencyCap* CurrencyMgr::getCurrencyCapData(uint32 lowGuid)
+{
+    std::map<uint32, CurrencyCap>::iterator itr = _capValuesStorage.find(lowGuid);
+    if (itr != _capValuesStorage.end())
+        return &itr->second;
+    else
+        return NULL;
+}
+
+void CurrencyMgr::ResetCurrencyCapToAllPlayers()
+{
+    if (capMapIsEmpty())
+        return;
+
+    lastItr = getCapBegin();
+
+    CapResetEvent* resetEvent = new CapResetEvent(getLastGuid(), 0);
+    // players need to know in advance about cap reset
+    m_events.AddEvent(resetEvent, m_events.CalculateTime(20000));
+    sWorld->SendWorldText(LANG_CURRENCY_CAP_RESET_STARTED);
+    sArenaTeamMgr->FinishWeek();
+}
+
+void CurrencyMgr::setLastGuid(uint32 lowGuid, bool save)
+{
+    lastGuid = lowGuid;
+    if (save)
+    {
+        PreparedStatement *stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_CURRENCY_CAP_PROGRESS);
+        stmt->setUInt8(0, 1);
+        stmt->setUInt32(1, lastGuid);
+        CharacterDatabase.Execute(stmt);
+    }
+}
+
+void CurrencyMgr::DeleteRestoreData()
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_CURRENCY_CAP_PROGRESS);
+    stmt->setUInt8(0, 1);
+    CharacterDatabase.Execute(stmt);
+}
+
+
+void CurrencyMgr::UpdateEvents(uint32 diff)
+{
+    m_events.Update(diff);
+}
+
+bool CapResetEvent::Execute(uint64 e_time, uint32 p_time)
+{
+    // check table if empty
+    if (!sCurrencyMgr->getLastItr()->first)
+    {
+        sLog->outError(LOG_FILTER_PLAYER, "There no players to reset cap!");
+        return false;
+    }
+
+    uint32 count = 0;
+    uint16 numberInPart = sWorld->getIntConfig(CONFIG_CURRENCY_RESET_CAP_PLAYERS_COUNT);
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+
+    PlayerCurrencyCapMap::iterator itr = sCurrencyMgr->getLastItr();
+    for (; itr != sCurrencyMgr->getCapEnd(); ++itr)
+    {
+        ++count;
+        if (!itr->second.requireReset)
+            continue;
+
+        if (Player* player = HashMapHolder<Player>::Find(itr->first))
+            player->ResetCurrencyWeekCap(&trans);
+        else
+        {
+            sCurrencyMgr->CalculatingCurrencyCap(itr->second.highestArenaRating);
+            // We need it after rated bg implementation
+            //sCurrencyMgr->CalculatingCurrencyCap(itr->second.highestRBgRating, true);
+
+            trans->PAppend("UPDATE character_currency_cap SET currentArenaCap = %u, currentRBgCap = %u,"
+                " requireReset = 0, highestArenaRating = 0, highestRBgRating = 0 where guid = '%u'",
+                itr->second.highestArenaRating, 0, itr->first);
+        }
+
+        if (count > numberInPart)
+        {
+            ++m_part;
+            CapResetEvent* resetEvent = new CapResetEvent(sCurrencyMgr->getLastGuid(), m_part);
+            sCurrencyMgr->m_events.AddEvent(resetEvent, sCurrencyMgr->m_events.CalculateTime(sWorld->getIntConfig(CONFIG_CURRENCY_RESET_CAP_TIMEOUT)));
+            sWorld->SendWorldText(LANG_CURRENCY_CAP_RESET_PART, m_part);
+            break;
+        }
+    }
+
+    CharacterDatabase.CommitTransaction(trans);
+    sCurrencyMgr->setLastItr(itr);
+    // for crash restore
+    sCurrencyMgr->setLastGuid(itr->first, true);
+
+    if (itr == sCurrencyMgr->getCapEnd())
+    {
+        sCurrencyMgr->DeleteRestoreData();
+        sWorld->SendWorldText(LANG_CURRENCY_CAP_RESET_END);
+        return true;
+    }
+
+    return false;
+}
+void CapResetEvent::Abort(uint64 e_time) {}

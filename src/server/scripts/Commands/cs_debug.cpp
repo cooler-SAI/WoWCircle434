@@ -31,6 +31,7 @@ EndScriptData */
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "GossipDef.h"
+#include "CurrencyMgr.h"
 
 #include <fstream>
 
@@ -48,6 +49,7 @@ public:
             { "sound",          SEC_MODERATOR,      false, &HandleDebugPlaySoundCommand,       "", NULL },
             { NULL,             SEC_PLAYER,     false, NULL,                               "", NULL }
         };
+
         static ChatCommand debugSendCommandTable[] =
         {
             { "buyerror",       SEC_ADMINISTRATOR,  false, &HandleDebugSendBuyErrorCommand,       "", NULL },
@@ -64,6 +66,13 @@ public:
             { "catCooldown",      SEC_ADMINISTRATOR,  false, &HandleDebugSendCategoryCooldownCommand,      "", NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                                  "", NULL }
         };
+
+        static ChatCommand debugResetCapCommandTable[] = 
+        {
+            { "reset",          SEC_ADMINISTRATOR,  false, &HandleDebugCapResetCommand,        "", NULL },
+            { "updaterating",   SEC_ADMINISTRATOR,  false, &HandleDebugCapRatingCommand,       "", NULL },
+        };
+
         static ChatCommand debugCommandTable[] =
         {
             { "setbit",         SEC_ADMINISTRATOR,  false, &HandleDebugSet32BitCommand,        "", NULL },
@@ -73,7 +82,7 @@ public:
             { "arena",          SEC_ADMINISTRATOR,  false, &HandleDebugArenaCommand,           "", NULL },
             { "bg",             SEC_ADMINISTRATOR,  false, &HandleDebugBattlegroundCommand,    "", NULL },
             { "getitemstate",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemStateCommand,    "", NULL },
-            { "lootrecipient",  SEC_GAMEMASTER,     false, &HandleDebugGetLootRecipientCommand, "", NULL },
+            { "lootrecipient",  SEC_GAMEMASTER,     false, &HandleDebugGetLootRecipientCommand,"", NULL },
             { "getvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugGetValueCommand,        "", NULL },
             { "getitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemValueCommand,    "", NULL },
             { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleDebugMod32ValueCommand,      "", NULL },
@@ -85,13 +94,14 @@ public:
             { "spawnvehicle",   SEC_ADMINISTRATOR,  false, &HandleDebugSpawnVehicleCommand,    "", NULL },
             { "setvid",         SEC_ADMINISTRATOR,  false, &HandleDebugSetVehicleIdCommand,    "", NULL },
             { "entervehicle",   SEC_ADMINISTRATOR,  false, &HandleDebugEnterVehicleCommand,    "", NULL },
-            { "uws",            SEC_ADMINISTRATOR,  false, &HandleDebugUpdateWorldStateCommand, "", NULL },
+            { "uws",            SEC_ADMINISTRATOR,  false, &HandleDebugUpdateWorldStateCommand,"", NULL },
             { "update",         SEC_ADMINISTRATOR,  false, &HandleDebugUpdateCommand,          "", NULL },
             { "itemexpire",     SEC_ADMINISTRATOR,  false, &HandleDebugItemExpireCommand,      "", NULL },
             { "areatriggers",   SEC_ADMINISTRATOR,  false, &HandleDebugAreaTriggersCommand,    "", NULL },
             { "los",            SEC_MODERATOR,      false, &HandleDebugLoSCommand,             "", NULL },
             { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "", NULL },
             { "phase",          SEC_MODERATOR,      false, &HandleDebugPhaseCommand,           "", NULL },
+            { "currencycap",    SEC_ADMINISTRATOR,  false, NULL,          "", debugResetCapCommandTable },
             { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
         };
         static ChatCommand commandTable[] =
@@ -1370,7 +1380,38 @@ public:
         player->GetPhaseMgr().SendDebugReportToPlayer(handler->GetSession()->GetPlayer());
         return true;
     }
+
+    static bool HandleDebugCapResetCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        sCurrencyMgr->ResetCurrencyCapToAllPlayers();
+        handler->PSendSysMessage("Cap resetting was started...");
+        return true;
+    }
+
+    static bool HandleDebugCapRatingCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!handler->GetSession()->GetPlayer())
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint32 arenaRating = atoi((char*)args);
+
+        handler->GetSession()->GetPlayer()->SetMaxPersonalArenaRating(arenaRating);
+        handler->PSendSysMessage("New currency arena rating is %u", arenaRating);
+        return true;
+    }
 };
+
 
 void AddSC_debug_commandscript()
 {

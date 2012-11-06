@@ -751,7 +751,10 @@ enum TrinityStrings
     LANG_COMMAND_CREATURESTORAGE_NOTFOUND  = 818,
 
     LANG_CHANNEL_CITY                   = 819,
-    // Room for in-game strings           820-999 not used
+    LANG_CURRENCY_CAP_RESET_STARTED     = 820,
+    LANG_CURRENCY_CAP_RESET_PART        = 821,
+    LANG_CURRENCY_CAP_RESET_END         = 822,
+    // Room for in-game strings           823-999 not used
 
     // Level 4 (CLI only commands)
     LANG_COMMAND_EXIT                   = 1000,

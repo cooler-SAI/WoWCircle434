@@ -80,6 +80,7 @@
 #include "Warden.h"
 #include "CalendarMgr.h"
 #include "BattlefieldMgr.h"
+#include "CurrencyMgr.h"
 
 ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
@@ -803,6 +804,20 @@ void World::LoadConfigSettings(bool reload)
     {
         sLog->outError(LOG_FILTER_SERVER_LOADING, "Currency.ResetInterval (%i) must be > 0, set to default 7.", m_int_configs[CONFIG_CURRENCY_RESET_INTERVAL]);
         m_int_configs[CONFIG_CURRENCY_RESET_INTERVAL] = 7;
+    }
+
+    m_int_configs[CONFIG_CURRENCY_RESET_CAP_PLAYERS_COUNT] = ConfigMgr::GetIntDefault("Currency.PlayersCountInResetPart", 2000);
+    if (int32(m_int_configs[CONFIG_CURRENCY_RESET_CAP_PLAYERS_COUNT]) <= 0)
+    {
+        sLog->outError(LOG_FILTER_SERVER_LOADING, "Currency.PlayersCountInResetPart (%i) must be > 0, set to default 2000.", m_int_configs[CONFIG_CURRENCY_RESET_CAP_PLAYERS_COUNT]);
+        m_int_configs[CONFIG_CURRENCY_RESET_CAP_PLAYERS_COUNT] = 2000;
+    }
+
+    m_int_configs[CONFIG_CURRENCY_RESET_CAP_TIMEOUT]  = ConfigMgr::GetIntDefault("Currency.TimeoutBetweenResets", 2500);
+    if (int32(m_int_configs[CONFIG_CURRENCY_RESET_CAP_TIMEOUT]) <= 0)
+    {
+        sLog->outError(LOG_FILTER_SERVER_LOADING, "Currency.TimeoutBetweenResets (%i) must be > 0, set to default 2500.", m_int_configs[CONFIG_CURRENCY_RESET_CAP_TIMEOUT]);
+        m_int_configs[CONFIG_CURRENCY_RESET_CAP_TIMEOUT] = 2500;
     }
 
     m_int_configs[CONFIG_CURRENCY_START_CONQUEST_POINTS] = ConfigMgr::GetIntDefault("Currency.StartConquestPoints", 0);
@@ -1537,6 +1552,9 @@ void World::SetInitialWorldSettings()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Player Create Data...");
     sObjectMgr->LoadPlayerInfo();
 
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Player Currency Cap Data...");
+    sCurrencyMgr->LoadPlayersCurrencyCap();
+
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Exploration BaseXP Data...");
     sObjectMgr->LoadExplorationBaseXP();
 
@@ -1724,6 +1742,7 @@ void World::SetInitialWorldSettings()
                             realmID, uint32(m_startTime), _FULLVERSION);       // One-time query
 
     m_timers[WUPDATE_WEATHERS].SetInterval(1*IN_MILLISECONDS);
+    m_timers[WUPDATE_RESETCAP].SetInterval(1*IN_MILLISECONDS);
     m_timers[WUPDATE_AUCTIONS].SetInterval(MINUTE*IN_MILLISECONDS);
     m_timers[WUPDATE_UPTIME].SetInterval(m_int_configs[CONFIG_UPTIME_UPDATE]*MINUTE*IN_MILLISECONDS);
                                                             //Update "uptime" table based on configuration entry in minutes.
@@ -2003,6 +2022,12 @@ void World::Update(uint32 diff)
     {
         m_timers[WUPDATE_WEATHERS].Reset();
         WeatherMgr::Update(uint32(m_timers[WUPDATE_WEATHERS].GetInterval()));
+    }
+
+    if (m_timers[WUPDATE_RESETCAP].Passed())
+    {
+        m_timers[WUPDATE_RESETCAP].Reset();
+        sCurrencyMgr->UpdateEvents(uint32(m_timers[WUPDATE_WEATHERS].GetInterval()));
     }
 
     /// <li> Update uptime table

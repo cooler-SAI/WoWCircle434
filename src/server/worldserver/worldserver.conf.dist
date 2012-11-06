@@ -2914,4 +2914,20 @@ Currency.ConquestPointsDefaultWeekCap = 1350
 Currency.ConquestPointsArenaReward = 150
 
 #
+#    Currency.PlayersCountInResetPart
+#        Number of players in one cap reset part
+#        Default: 2000
+#
+
+Currency.PlayersCountInResetPart = 2000
+
+#
+#    Currency.TimeoutBetweenResets
+#        Timeout between cap resets (in ms)
+#        Default: 2500
+#
+
+Currency.TimeoutBetweenResets = 2500
+
+#
 ###################################################################################################
