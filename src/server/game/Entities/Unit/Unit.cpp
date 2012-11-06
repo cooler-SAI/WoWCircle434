@@ -9408,7 +9408,7 @@ void Unit::UpdateMagnetTimer(Unit* victim, SpellInfo const* spellInfo, int32 upd
                 else if (magnetAura->GetDuration() == -1 || magnetAura->GetDuration() > updateTime)
                 {
                     magnetAura->SetAuraTimer(updateTime, victim->GetGUID());
-                    victim->ToTotem()->InitStats(updateTime);
+                    victim->ToTotem()->InitStats(updateTime+100);
                 }
                 break;
             }
@@ -9427,8 +9427,6 @@ Unit* Unit::GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo)
     {
         if (Unit* magnet = (*itr)->GetBase()->GetCaster())
             if (spellInfo->CheckExplicitTarget(this, magnet) == SPELL_CAST_OK
-                && spellInfo->CheckTarget(this, magnet, false) == SPELL_CAST_OK
-                && _IsValidAttackTarget(magnet, spellInfo)
                 && (IsWithinLOSInMap(magnet)
                 || magnet->isTotem()))
             {

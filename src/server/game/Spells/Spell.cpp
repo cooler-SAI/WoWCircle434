@@ -578,6 +578,8 @@ m_caster((info->AttributesEx6 & SPELL_ATTR6_CAST_BY_CHARMER && caster->GetCharme
 
     m_channelTargetEffectMask = 0;
 
+    m_redirected = false;
+
     // Determine if spell can be reflected back to the caster
     // Patch 1.2 notes: Spell Reflection no longer reflects abilities
     m_canReflect = m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC && !(m_spellInfo->Attributes & SPELL_ATTR0_ABILITY)
@@ -710,7 +712,10 @@ void Spell::SelectExplicitTargets()
                     break;
             }
             if (redirect && (redirect != target))
+            {
                 m_targets.SetUnitTarget(redirect);
+                m_redirected = true;
+            }
         }
     }
 }
@@ -1575,7 +1580,7 @@ void Spell::SelectImplicitTargetObjectTargets(SpellEffIndex effIndex, SpellImpli
     if (target)
     {
         if (Unit* unit = target->ToUnit())
-            AddUnitTarget(unit, 1 << effIndex, true, false);
+            AddUnitTarget(unit, 1 << effIndex, m_redirected == true ? false : true, false);
         else if (GameObject* gobj = target->ToGameObject())
             AddGOTarget(gobj, 1 << effIndex);
 
