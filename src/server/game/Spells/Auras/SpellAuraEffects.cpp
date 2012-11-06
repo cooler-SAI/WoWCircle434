@@ -509,6 +509,15 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
     // custom amount calculations go here
     switch (GetAuraType())
     {
+        case SPELL_AURA_BYPASS_ARMOR_FOR_CASTER:
+        {
+            if (m_spellInfo->Id == 86346) // Colossus Smash
+            {
+                if (GetBase()->GetOwner() && GetBase()->GetOwner()->GetTypeId() == TYPEID_PLAYER)
+                    amount /= 2;
+            }
+            break;
+        }
         case SPELL_AURA_MOD_RATING:
         {
             // Heart's Judgment, Heart of Ignacious trinket 
@@ -4859,6 +4868,13 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
             }
             switch (GetId())
             {
+                // Sudden Death
+                case 52437:
+                {
+                    if (caster && caster->ToPlayer()->HasSpellCooldown(86346))
+                        caster->ToPlayer()->RemoveSpellCooldown(86346,true);
+                    break;
+                }
                 case 1515:                                      // Tame beast
                     // FIX_ME: this is 2.0.12 threat effect replaced in 2.1.x by dummy aura, must be checked for correctness
                     if (caster && target->CanHaveThreatList())

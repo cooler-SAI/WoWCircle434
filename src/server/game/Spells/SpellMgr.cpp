@@ -3038,6 +3038,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 93987:
                 spellInfo->Effects[0].SetRadiusIndex(26);
                 break;
+            // Strikes of Opportunity
+            case 76838:
+                spellInfo->SpellFamilyName = SPELLFAMILY_WARRIOR;
+                break;
             // Have Group, Will Travel
             case 83967:
                 spellInfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;

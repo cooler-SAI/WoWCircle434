@@ -5726,6 +5726,15 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Strikes of Opportunity
+                case 76838:
+                {
+                    if (effIndex != 0 || !roll_chance_i(triggeredByAura->GetAmount()))
+                        return false;
+
+                    triggered_spell_id = 76858;
+                    break;
+                }
                 // Sweeping Strikes
                 case 12328:
                 {
