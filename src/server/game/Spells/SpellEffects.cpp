@@ -760,6 +760,58 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             }
             break;
         case SPELLFAMILY_DEATHKNIGHT:
+            // Chains of Ice
+            if (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_DK_CHAINS_OF_ICE)
+            {
+                if (m_caster->HasAura(50040))
+                {
+                    m_caster->CastSpell(unitTarget, 96293, true);
+                }
+                if (m_caster->HasAura(50041))
+                {
+                    m_caster->CastSpell(unitTarget, 96294, true);
+                }
+            }
+            // Death strike
+            if (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_DK_DEATH_STRIKE && !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_REQ_OFFHAND))
+            {
+                int32 healthPct = 7;
+
+                // Glyph of Dark Succor
+                if (AuraEffect const* aurEff = m_caster->GetAuraEffect(96279, EFFECT_0))
+                {
+                    if (m_caster->HasAura(48265) || m_caster->HasAura(48266)) // Work only in frost / unholy presence
+                        healthPct = aurEff->GetAmount();
+                }
+                
+                int32 minimumHp = int32(m_caster->CountPctFromMaxHealth(healthPct));
+                int32 takenDamage = int32(m_caster->GetDamageTakenInPastSecs(5) * 0.2f);
+
+                int32 bp = std::max(takenDamage, minimumHp);
+
+                // Improved Death Strike
+                if (AuraEffect const * aurEff = m_caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 2751, 0))
+                    AddPct(bp, m_caster->CalculateSpellDamage(m_caster, aurEff->GetSpellInfo(), EFFECT_2));
+
+                if (!m_triggeredByAuraSpell)
+                    m_caster->CastCustomSpell(m_caster, 45470, &bp, NULL, NULL, false);
+                return;
+            }
+            // Death Coil
+            if (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_DK_DEATH_COIL)
+            {
+                if (m_caster->IsFriendlyTo(unitTarget))
+                {
+                    int32 bp = (damage + m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.23f) * 3.5f;
+                    m_caster->CastCustomSpell(unitTarget, 47633, &bp, NULL, NULL, true);
+                }
+                else
+                {
+                    int32 bp = damage + m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.23f;
+                    m_caster->CastCustomSpell(unitTarget, 47632, &bp, NULL, NULL, true);
+                }
+                return;
+            }
             switch (m_spellInfo->Id)
             {
                 case 46584: // Raise Dead
