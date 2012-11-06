@@ -10873,6 +10873,14 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
     // Unit* owner = GetOwner() ? GetOwner() : this;
     // AuraEffectList const& mOverrideClassScript = owner->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
 
+    // SPELL_AURA_MOD_AUTOATTACK_DAMAGE
+    if (!spellProto)
+    {
+        AuraEffectList const &mDamageDoneAutoAttacks = GetAuraEffectsByType(SPELL_AURA_MOD_AUTOATTACK_DAMAGE);
+        for (AuraEffectList::const_iterator i = mDamageDoneAutoAttacks.begin(); i != mDamageDoneAutoAttacks.end(); ++i)
+                DoneTotalMod *= ((*i)->GetAmount()+100.0f)/100.0f;
+    }
+
     float tmpDamage = float(int32(pdamage) + DoneFlatBenefit) * DoneTotalMod;
 
     // apply spellmod to Done damage
