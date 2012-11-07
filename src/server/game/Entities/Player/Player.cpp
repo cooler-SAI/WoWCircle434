@@ -24741,6 +24741,10 @@ bool Player::LearnTalent(uint32 talentId, uint32 talentRank)
 
     // update free talent points
     SetFreeTalentPoints(CurTalentPoints - (talentRank - curtalent_maxrank + 1));
+
+    if (HasMastery())
+        ApplyMasterySpells();
+
     return true;
 }
 

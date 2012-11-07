@@ -2088,6 +2088,17 @@ uint32 Unit::CalculateDamage(WeaponAttackType attType, bool normalized, bool add
         }
     }
 
+    float DoneTotalMod = 1.0f;
+
+    // Master Demonologist (Warlock Demonology Mastery)
+    if (GetTypeId() == TYPEID_UNIT && this->ToCreature()->isPet())
+        if (Unit* owner = GetOwner())
+            if (Aura* masterDemonologist = owner->GetAura(77219))
+                DoneTotalMod *= float(masterDemonologist->GetEffect(0)->GetAmount() + 100.0f) / 100.0f;
+
+    min_damage *= DoneTotalMod;
+    max_damage *= DoneTotalMod;
+
     if (min_damage > max_damage)
         std::swap(min_damage, max_damage);
 
@@ -9878,6 +9889,12 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
             amount = 0;
         DoneTotalMod *= float(amount + 100.0f) / 100.0f;
     }
+
+    // Master Demonologist (Mastery Demonology Warlock)
+    if (GetTypeId() == TYPEID_UNIT && this->ToCreature()->isPet())
+        if (Unit* owner = GetOwner())
+            if (Aura* masterDemonologist = owner->GetAura(77219))
+                DoneTotalMod *= float(masterDemonologist->GetEffect(0)->GetAmount() + 100.0f) / 100.0f;
 
     // Done fixed damage bonus auras
     int32 DoneAdvertisedBenefit  = SpellBaseDamageBonusDone(spellProto->GetSchoolMask());

@@ -9,7 +9,8 @@ void Player::ApplyMasterySpells()
         {
             if (uint32 spell = talentTabEntry->spellIds[i])
             {
-                learnSpell(spell, true);
+                if (!HasSpell(spell))
+                    learnSpell(spell, true);
                 UpdateMastery();
             }
         }
