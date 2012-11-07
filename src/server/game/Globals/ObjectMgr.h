@@ -956,12 +956,16 @@ class ObjectMgr
         void LoadPhaseDefinitions();
         void LoadSpellPhaseInfo();
 
+        void LoadPetScalingAuras();
+
         void LoadResearchSiteZones();
         void LoadResearchSiteLoot();
         typedef std::vector<ResearchZoneEntry*> ResearchZoneVector;
         typedef std::vector<ResearchLootEntry*> ResearchLootVector;
         ResearchZoneVector  mResearchZones;
         ResearchLootVector mResearchLoot;
+
+        typedef std::map<uint32, uint8> PetScalingAurasMap;
 
         PhaseDefinitionStore const* GetPhaseDefinitionStore() { return &_PhaseDefinitionStore; }
         SpellPhaseStore const* GetSpellPhaseStore() { return &_SpellPhaseStore; }
@@ -1210,6 +1214,19 @@ class ObjectMgr
 
             return ret ? ret : time(NULL);
         }
+
+        PetScalingAurasMap petScalingAuras;
+
+        bool isPetScalingSpell(uint32 spellId) const
+        {
+            PetScalingAurasMap::const_iterator iter = petScalingAuras.find(spellId);
+            if (iter == petScalingAuras.end())
+                return false;
+
+            return true;
+        }
+        PetScalingAurasMap& GetPetScalingMap() { return petScalingAuras; }
+        PetScalingAurasMap const& GetPetScalingMap() const { return petScalingAuras; }
 
     private:
         // first free id for selected id type

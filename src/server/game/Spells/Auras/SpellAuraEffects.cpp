@@ -3891,6 +3891,12 @@ void AuraEffect::HandleModTargetResistance(AuraApplication const* aurApp, uint8 
     // show as spell penetration only full spell penetration bonuses (all resistances except armor and holy
     if (target->GetTypeId() == TYPEID_PLAYER && (GetMiscValue() & SPELL_SCHOOL_MASK_SPELL) == SPELL_SCHOOL_MASK_SPELL)
         target->ApplyModInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, GetAmount(), apply);
+
+    if (!target->ToPlayer())
+        return;
+
+    if (Pet* pPet = target->ToPlayer()->GetPet())
+        pPet->UpdateSpellPenetrationRating();
 }
 
 /********************************/

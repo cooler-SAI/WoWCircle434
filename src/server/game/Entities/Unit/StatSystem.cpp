@@ -487,6 +487,9 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
     value += (int32(GetMaxSkillValueForLevel()) - int32(GetMaxSkillValueForLevel())) * 0.04f;
     value = value < 0.0f ? 0.0f : value;
     SetStatFloatValue(index, value);
+
+    if (Pet* pPet = GetPet())
+        pPet->UpdateCriticalChance();
 }
 
 void Player::UpdateAllCritPercentages()
@@ -617,18 +620,27 @@ void Player::UpdateMeleeHitChances()
 {
     m_modMeleeHitChance = (float)GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
     m_modMeleeHitChance += GetRatingBonusValue(CR_HIT_MELEE);
+
+    if (Pet* pPet = GetPet())
+        pPet->UpdateMeleeHitChance();
 }
 
 void Player::UpdateRangedHitChances()
 {
     m_modRangedHitChance = (float)GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
     m_modRangedHitChance += GetRatingBonusValue(CR_HIT_RANGED);
+
+    if (Pet* pPet = GetPet())
+        pPet->UpdateMeleeHitChance();
 }
 
 void Player::UpdateSpellHitChances()
 {
     m_modSpellHitChance = (float)GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
     m_modSpellHitChance += GetRatingBonusValue(CR_HIT_SPELL);
+
+    if (Pet* pPet = GetPet())
+        pPet->UpdateSpellHitChance();
 }
 
 void Player::UpdateAllSpellCritChances()
@@ -666,6 +678,9 @@ void Player::UpdateExpertise(WeaponAttackType attack)
         case OFF_ATTACK:  SetUInt32Value(PLAYER_OFFHAND_EXPERTISE, expertise); break;
         default: break;
     }
+
+    if (Pet* pPet = GetPet())
+        pPet->UpdateExpertise();
 }
 
 void Player::ApplyManaRegenBonus(int32 amount, bool apply)
@@ -1216,4 +1231,89 @@ void Guardian::SetBonusDamage(int32 damage)
     m_bonusSpellDamage = damage;
     if (GetOwner()->GetTypeId() == TYPEID_PLAYER)
         GetOwner()->SetUInt32Value(PLAYER_PET_SPELL_POWER, damage);
+}
+
+void Guardian::UpdateAttackSpeed()
+{
+    if (!m_owner || m_owner->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    AuraEffectList const& petHasteAuras = GetAuraEffectsByType(SPELL_AURA_MELEE_SLOW);
+    for (AuraEffectList::const_iterator i = petHasteAuras.begin(); i != petHasteAuras.end(); ++i)
+    {
+        if (sObjectMgr->isPetScalingSpell((*i)->GetId()))
+            (*i)->RecalculateAmount(true);
+    }
+}
+
+void Guardian::UpdateMeleeHitChance()
+{
+    if (!m_owner || m_owner->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    AuraEffectList const& petHitAuras = GetAuraEffectsByType(SPELL_AURA_MOD_HIT_CHANCE);
+    for (AuraEffectList::const_iterator i = petHitAuras.begin(); i != petHitAuras.end(); ++i)
+    {
+        if (sObjectMgr->isPetScalingSpell((*i)->GetId()))
+        {
+            (*i)->RecalculateAmount(true);
+            m_modRangedHitChance = (*i)->GetAmount();
+            m_modMeleeHitChance = (*i)->GetAmount();
+        }
+    }
+}
+
+void Guardian::UpdateSpellHitChance()
+{
+    if (!m_owner || m_owner->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    AuraEffectList const& petSpellHitAuras = GetAuraEffectsByType(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
+    for (AuraEffectList::const_iterator i = petSpellHitAuras.begin(); i != petSpellHitAuras.end(); ++i)
+    {
+        if (sObjectMgr->isPetScalingSpell((*i)->GetId()))
+        {
+            (*i)->RecalculateAmount(true);
+            m_modSpellHitChance = (*i)->GetAmount();
+        }
+    }
+}
+
+void Guardian::UpdateExpertise()
+{
+    if (!m_owner || m_owner->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    AuraEffectList const& petExpertiseAuras = GetAuraEffectsByType(SPELL_AURA_MOD_EXPERTISE);
+    for (AuraEffectList::const_iterator i = petExpertiseAuras.begin(); i != petExpertiseAuras.end(); ++i)
+    {
+        if (sObjectMgr->isPetScalingSpell((*i)->GetId()))
+            (*i)->RecalculateAmount(true);
+    }
+}
+
+void Guardian::UpdateCriticalChance()
+{
+    if (!m_owner || m_owner->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    AuraEffectList const& petCriticalAuras = GetAuraEffectsByType(SPELL_AURA_MOD_CRIT_PCT);
+    for (AuraEffectList::const_iterator i = petCriticalAuras.begin(); i != petCriticalAuras.end(); ++i)
+    {
+        if (sObjectMgr->isPetScalingSpell((*i)->GetId()))
+            (*i)->RecalculateAmount(true);
+    }
+}
+
+void Guardian::UpdateSpellPenetrationRating()
+{
+    if (!m_owner || m_owner->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    AuraEffectList const& petSpellPenetrationAuras = GetAuraEffectsByType(SPELL_AURA_MOD_TARGET_RESISTANCE);
+    for (AuraEffectList::const_iterator i = petSpellPenetrationAuras.begin(); i != petSpellPenetrationAuras.end(); ++i)
+    {
+        if (sObjectMgr->isPetScalingSpell((*i)->GetId()))
+            (*i)->RecalculateAmount(true);
+    }
 }

@@ -314,6 +314,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         InitTalentForLevel();                               // re-init to check talent count
         _LoadSpellCooldowns();
         LearnPetPassives();
+        LearnPetScalingAuras();
         InitLevelupSpellsForLevel();
         CastPetAuras(current);
     }
@@ -778,6 +779,45 @@ bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phas
     return true;
 }
 
+void Pet::LearnPetScalingAuras()
+{
+    if (!m_owner || m_owner->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    ObjectMgr::PetScalingAurasMap const& scalingAuras = sObjectMgr->GetPetScalingMap();
+    for (ObjectMgr::PetScalingAurasMap::const_iterator iter = scalingAuras.begin(); iter != scalingAuras.end(); ++iter)
+    {
+        if (m_owner->getClass() != iter->second || HasSpell(iter->first))
+            continue;
+
+        addSpell(iter->first, ACT_DECIDE, PETSPELL_NEW, PETSPELL_FAMILY);
+    }
+
+    // Update pets dependencies
+    UpdateAllStats();
+    UpdateAttackSpeed();
+    UpdateMeleeHitChance();
+    UpdateSpellHitChance();
+    UpdateExpertise();
+    UpdateCriticalChance();
+    UpdateSpellPenetrationRating();
+}
+
+void Guardian::LearnPetScalingAuras()
+{
+    if (!m_owner || m_owner->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    ObjectMgr::PetScalingAurasMap const& scalingAuras = sObjectMgr->GetPetScalingMap();
+    for (ObjectMgr::PetScalingAurasMap::const_iterator iter = scalingAuras.begin(); iter != scalingAuras.end(); ++iter)
+    {
+        if (m_owner->getClass() != iter->second || HasAura(iter->first))
+            continue;
+
+        AddAura(iter->first, this);
+    }
+}
+
 // TODO: Move stat mods code to pet passive auras
 bool Guardian::InitStatsForLevel(uint8 petlevel)
 {
@@ -997,6 +1037,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                     SetBonusDamage(int32(m_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f));
                     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
                     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
+                    LearnPetScalingAuras();
                     break;
                 }
                 case 28017: // Bloodworms
@@ -1604,6 +1645,7 @@ void Pet::InitPetCreateSpells()
     m_spells.clear();
 
     LearnPetPassives();
+    LearnPetScalingAuras();
     InitLevelupSpellsForLevel();
 
     CastPetAuras(false);

@@ -78,6 +78,14 @@ class Guardian : public Minion
         void UpdateMaxPower(Powers power);
         void UpdateAttackPowerAndDamage(bool ranged = false);
         void UpdateDamagePhysical(WeaponAttackType attType);
+        void UpdateAttackSpeed();
+        void UpdateMeleeHitChance();
+        void UpdateSpellHitChance();
+        void UpdateHitChance();
+        void UpdateExpertise();
+        void UpdateCriticalChance();
+        void UpdateSpellPenetrationRating();
+        virtual void LearnPetScalingAuras();
 
         int32 GetBonusDamage() { return m_bonusSpellDamage; }
         void SetBonusDamage(int32 damage);

@@ -185,6 +185,7 @@ class Pet : public Guardian
         bool addSpell(uint32 spellId, ActiveStates active = ACT_DECIDE, PetSpellState state = PETSPELL_NEW, PetSpellType type = PETSPELL_NORMAL);
         bool learnSpell(uint32 spell_id);
         void learnSpellHighRank(uint32 spellid);
+        void LearnPetScalingAuras();
         void InitLevelupSpellsForLevel();
         bool unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
         bool removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);

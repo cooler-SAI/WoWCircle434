@@ -1,4 +1,4 @@
--- ----------------------------
+﻿-- ----------------------------
 -- Table structure for `currency_reset_save`
 -- ----------------------------
 DROP TABLE IF EXISTS `currency_reset_save`;

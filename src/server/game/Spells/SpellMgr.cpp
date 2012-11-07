@@ -3885,6 +3885,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 50385:
                 spellInfo->Effects[EFFECT_1].SpellClassMask = 0;
                 break;
+            // Death Knight Pet Scaling 02
+            // unused value but we can use it for gargoyle penetration
+            case 51996:
+                spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_MOD_TARGET_RESISTANCE;
+                spellInfo->Effects[EFFECT_2].MiscValue = 126;
+                break;
             default:
                 break;
         }

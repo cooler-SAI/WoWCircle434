@@ -8059,7 +8059,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                 break;
             case ITEM_MOD_SPELL_PENETRATION:
                 ApplyModInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, -val, apply);
-                m_spellPenetrationItemMod += apply ? val : -val;
+                SetSpellPenetrationItemMod(apply, val);
                 break;
             case ITEM_MOD_FIRE_RESISTANCE:
                 HandleStatModifier(UNIT_MOD_RESISTANCE_FIRE, BASE_VALUE, float(val), apply);
@@ -13515,7 +13515,7 @@ void Player::ApplyReforgeEnchantment(Item* item, bool apply)
             break;
         case ITEM_MOD_SPELL_PENETRATION:
             ApplyModInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, -int32(removeValue), apply);
-            m_spellPenetrationItemMod += apply ? -int32(removeValue) : int32(removeValue);
+            SetSpellPenetrationItemMod(apply, removeValue);
             break;
         case ITEM_MOD_BLOCK_VALUE:
             HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, -removeValue, apply);
@@ -13630,7 +13630,7 @@ void Player::ApplyReforgeEnchantment(Item* item, bool apply)
             break;
         case ITEM_MOD_SPELL_PENETRATION:
             ApplyModInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, int32(addValue), apply);
-            m_spellPenetrationItemMod += apply ? int32(addValue) : -int32(addValue);
+            SetSpellPenetrationItemMod(apply, addValue);
             break;
         case ITEM_MOD_BLOCK_VALUE:
             HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, addValue, apply);
@@ -13969,7 +13969,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             break;
                         case ITEM_MOD_SPELL_PENETRATION:
                             ApplyModInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, enchant_amount, apply);
-                            m_spellPenetrationItemMod += apply ? int32(enchant_amount) : -int32(enchant_amount);
+                            SetSpellPenetrationItemMod(apply, enchant_amount);
                             sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "+ %u SPELL_PENETRATION", enchant_amount);
                             break;
                         case ITEM_MOD_BLOCK_VALUE:
@@ -26544,4 +26544,15 @@ void Player::SetMaxPersonalArenaRating(uint32 value)
         trans->Append(stmt);
     }
     CharacterDatabase.CommitTransaction(trans);
+}
+
+void Player::SetSpellPenetrationItemMod(bool apply, int32 val)
+{
+    if (apply)
+        m_spellPenetrationItemMod += val;
+    else
+        m_spellPenetrationItemMod += -val;
+
+    if (Pet* pPet = GetPet())
+        pPet->UpdateSpellPenetrationRating();
 }

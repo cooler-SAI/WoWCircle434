@@ -2160,6 +2160,7 @@ class Player : public Unit, public GridObject<Player>
         /// Returns base spellpower bonus from spellpower stat on items, without spellpower from intellect stat
         uint32 GetBaseSpellPowerBonus() const { return m_baseSpellPower; }
         int32 GetSpellPenetrationItemMod() const { return m_spellPenetrationItemMod; }
+        void SetSpellPenetrationItemMod(bool apply, int32 val);
 
         float GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const;
         void UpdateBlockPercentage();

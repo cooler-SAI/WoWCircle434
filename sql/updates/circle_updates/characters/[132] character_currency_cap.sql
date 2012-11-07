@@ -1,4 +1,4 @@
--- ----------------------------
+﻿-- ----------------------------
 -- Table structure for `character_currency_cap`
 -- ----------------------------
 DROP TABLE IF EXISTS `character_currency_cap`;

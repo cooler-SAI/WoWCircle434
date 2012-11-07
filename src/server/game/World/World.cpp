@@ -1569,6 +1569,9 @@ void World::SetInitialWorldSettings()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading pet level stats...");
     sObjectMgr->LoadPetLevelInfo();
 
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading pet scaling data...");
+    sObjectMgr->LoadPetScalingAuras();
+
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Player Corpses...");
     sObjectMgr->LoadCorpses();
 

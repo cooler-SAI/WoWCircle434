@@ -8960,3 +8960,44 @@ void ObjectMgr::LoadResearchSiteLoot()
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u research site loot.", counter);
 }
+
+void ObjectMgr::LoadPetScalingAuras()
+{
+    QueryResult result = WorldDatabase.Query("SELECT spell_id, class FROM pet_scaling_data");
+    if (!result)
+    {
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 pet scaling auras. DB table `pet_scaling_data` is empty.");
+        return;
+    }
+
+    uint32 counter = 0;
+
+    do
+    {
+        Field *fields = result->Fetch();
+        uint32 spellId = fields[0].GetUInt32();
+        uint8 classId = fields[1].GetUInt8();
+
+        SpellEntry const *AdditionalSpellInfo = sSpellStore.LookupEntry(spellId);
+        if (!AdditionalSpellInfo)
+        {
+            sLog->outError(LOG_FILTER_SQL, "Pet aura (%u) doesn't exist", spellId);
+            continue;
+        }
+        if (classId >= MAX_CLASSES)
+        {
+            sLog->outError(LOG_FILTER_SQL, "Wrong class %u (%u spellId) in `pet_scaling_data` table, ignoring.", classId, spellId);
+            continue;
+        }
+        if (!sChrClassesStore.LookupEntry(classId))
+        {
+            sLog->outError(LOG_FILTER_SQL, "Wrong class %u (%u spellId) in `pet_scaling_data` table, ignoring.", classId, spellId);
+            continue;
+        }
+
+        petScalingAuras[spellId] = classId;
+    }
+    while (result->NextRow());
+
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u pet scaling auras.", counter);
+}
