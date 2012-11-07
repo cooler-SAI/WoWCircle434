@@ -9863,6 +9863,22 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
             }
     }
 
+    // Frostburn (Mage Frost Mastery)
+    if (Aura* Frostburn = GetAura(76613))
+        if ((spellProto->SpellFamilyFlags & Frostburn->GetSpellInfo()->Effects[EFFECT_0].SpellClassMask) && victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this) || spellProto->Id == 44614)
+            DoneTotalMod *= float(Frostburn->GetEffect(0)->GetAmount() + 100.0f) / 100.0f;
+
+    // Mana Adept (Mage Arcane Mastery)
+    if (Aura* ManaAdept = GetAura(76547))
+    {
+        float pct = float(GetPower(POWER_MANA)) / float(GetMaxPower(POWER_MANA));
+        int32 scale = int32(ManaAdept->GetSpellInfo()->Effects[EFFECT_1].BasePoints / 12.5f);
+        int32 amount = ManaAdept->GetEffect(0)->GetAmount() - scale + scale * pct;
+        if (amount < 0)
+            amount = 0;
+        DoneTotalMod *= float(amount + 100.0f) / 100.0f;
+    }
+
     // Done fixed damage bonus auras
     int32 DoneAdvertisedBenefit  = SpellBaseDamageBonusDone(spellProto->GetSchoolMask());
     // Pets just add their bonus damage to their spell damage

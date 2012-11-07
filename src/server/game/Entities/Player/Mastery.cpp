@@ -8,7 +8,10 @@ void Player::ApplyMasterySpells()
         for (uint8 i = 0; i < MAX_MASTERY_SPELL; ++i)
         {
             if (uint32 spell = talentTabEntry->spellIds[i])
+            {
                 learnSpell(spell, true);
+                UpdateMastery();
+            }
         }
     }
 }
