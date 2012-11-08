@@ -41,7 +41,6 @@ void WorldSession::HandleDismissCritter(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_DISMISS_CRITTER for GUID " UI64FMTD, guid);
 
     Unit* pet = ObjectAccessor::GetCreatureOrPetOrVehicle(*_player, guid);
-
     if (!pet)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "Vanitypet (guid: %u) does not exist - player '%s' (guid: %u / account: %u) attempted to dismiss it (possibly lagged out)",
