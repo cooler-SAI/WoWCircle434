@@ -2080,9 +2080,10 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
             level_diff = m_caster->getLevel() - 60;
             level_multiplier = 4;
             break;
-        case 31930:                                         // Judgements of the Wise
-        case 63375:                                         // Primal Wisdom
+        case 89906:                                         // Judgements of the Bold
+        case 63375:                                         // Improved Stormstrike
         case 68082:                                         // Glyph of Seal of Command
+        case 20167:                                         // Seal of Insight
             damage = int32(CalculatePct(unitTarget->GetCreateMana(), damage));
             break;
         case 67490:                                         // Runic Mana Injector (mana gain increased by 25% for engineers - 3.2.0 patch change)
@@ -4364,60 +4365,35 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         case SPELLFAMILY_PALADIN:
         {
             // Judgement (seal trigger)
-            if (m_spellInfo->Category == SPELLCATEGORY_JUDGEMENT)
+            if (m_spellInfo->Id == 20271)
             {
-                if (!unitTarget || !unitTarget->isAlive())
-                    return;
-                uint32 spellId1 = 0;
-                uint32 spellId2 = 0;
+                if (m_caster)
+                {
+                    if (m_caster->HasAura(89901))
+                        m_caster->CastSpell(m_caster, 89906, true);
+                    if (m_caster->HasAura(31878))
+                        m_caster->CastSpell(m_caster, 31930, true);
+                    if (m_caster->HasAura(31876))
+                        m_caster->CastSpell(m_caster, 57669, true);
+                }
 
-                // Judgement self add switch
-                switch (m_spellInfo->Id)
-                {
-                    case 53407: spellId1 = 20184; break;    // Judgement of Justice
-                    case 20271:                             // Judgement of Light
-                    case 57774: spellId1 = 20185; break;    // Judgement of Light
-                    case 53408: spellId1 = 20186; break;    // Judgement of Wisdom
-                    default:
-                        sLog->outError(LOG_FILTER_SPELLS_AURAS, "Unsupported Judgement (seal trigger) spell (Id: %u) in Spell::EffectScriptEffect", m_spellInfo->Id);
-                        return;
-                }
-                // all seals have aura dummy in 2 effect
-                Unit::AuraApplicationMap & sealAuras = m_caster->GetAppliedAuras();
-                for (Unit::AuraApplicationMap::iterator iter = sealAuras.begin(); iter != sealAuras.end();)
-                {
-                    Aura* aura = iter->second->GetBase();
-                    if (aura->GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_SEAL)
-                    {
-                        if (AuraEffect* aureff = aura->GetEffect(2))
-                            if (aureff->GetAuraType() == SPELL_AURA_DUMMY)
-                            {
-                                if (sSpellMgr->GetSpellInfo(aureff->GetAmount()))
-                                    spellId2 = aureff->GetAmount();
-                                break;
-                            }
-                        if (!spellId2)
-                        {
-                            switch (iter->first)
-                            {
-                                // Seal of light, Seal of wisdom, Seal of justice
-                                case 20165:
-                                case 20166:
-                                case 20164:
-                                    spellId2 = 54158;
-                            }
-                        }
-                        break;
-                    }
-                    else
-                        ++iter;
-                }
-                if (spellId1)
-                    m_caster->CastSpell(unitTarget, spellId1, true);
-                if (spellId2)
-                    m_caster->CastSpell(unitTarget, spellId2, true);
-                return;
+                uint32 spellId = 0;
+                if (m_caster->HasAura(20164) || // Seal of Justice
+                    m_caster->HasAura(20165))   // Seal of Insight
+                    spellId = 54158; 
+                else if (m_caster->HasAura(20154)) // Seal of Righteousness
+                    spellId = 20187;
+                else if (m_caster->HasAura(32801)) // Seal of Truth
+                    spellId = 31804;
+
+                if (spellId)
+                    m_caster->CastSpell(unitTarget, spellId, true);
+
+                // Replenishment
+                if (m_caster->HasAura(31876))
+                    m_caster->CastSpell((Unit*)NULL,57669,true);
             }
+            break;
         }
         case SPELLFAMILY_POTION:
         {
