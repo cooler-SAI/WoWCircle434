@@ -3007,6 +3007,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 59735:
                 spellInfo->Effects[EFFECT_1].TriggerSpell = 59736;
                 break;
+            case 879:   // Exorcism
+            case 85673: // Word of Glory
+            case 89023: // Blessed life (spell, not talent)
+            case 85222: // Light of Dawn
+                spellInfo->Effects[1].Effect = 0;
+                break;
             // wrong dbc, 7 days cooldown
             case 75141: // Dream of Skywall
             case 75142: // Dream of Deepholm

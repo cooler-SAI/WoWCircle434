@@ -6688,9 +6688,26 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     target = this;
                     break;
                 }
-                if (!victim)
-                    return false;
+                // Divine Purpose
+                case 85117: // rank 1
+                case 86172: // rank 2
+                {
+                    target = this;
+                    triggered_spell_id = 90174;
+                    break;
+                }
+                // Selfless Healer
+                case 85803:
+                case 85804:
+                {
+                    if (victim == this)
+                        return false;
 
+                    target = this;
+                    basepoints0 = triggerAmount * GetCurrentSpell(CURRENT_GENERIC_SPELL)->GetPowerCost();
+                    triggered_spell_id = 90811;
+                    break;
+                }
                 // Holy Power (Redemption Armor set)
                 case 28789:
                 {
@@ -10240,12 +10257,12 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                             crit_chance = 0.0f;
                         break;
                     case SPELLFAMILY_PALADIN:
-                        // Flash of light
-                        if (spellProto->SpellFamilyFlags[0] & 0x40000000)
+                        // Last Word - Word of Glory
+                        if (spellProto->Id == 85673)
                         {
-                            // Sacred Shield
-                            if (AuraEffect const* aura = victim->GetAuraEffect(58597, 1, GetGUID()))
-                                crit_chance += aura->GetAmount();
+                            if (AuraEffect *aur = GetDummyAuraEffect(SPELLFAMILY_PALADIN, 2139, 0))
+                                if (victim->HealthBelowPct(35))
+                                    crit_chance+=aur->GetAmount();
                             break;
                         }
                         // Exorcism

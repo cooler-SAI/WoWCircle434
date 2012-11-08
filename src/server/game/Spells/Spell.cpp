@@ -1330,6 +1330,12 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                             itr = unitTargets.erase(itr);
                     }
                 }
+                else if (m_spellInfo->Id == 85222) // Light of Dawn
+                {
+                    maxSize = m_caster->HasAura(54940) ? 6 : 5; // Glyph of Light of Dawn
+                    unitTargets.push_back(m_caster);
+                    power = POWER_HEALTH;
+                }
                 break;
             case SPELLFAMILY_DRUID:
                 if (m_spellInfo->SpellFamilyFlags[1] == 0x04000000) // Wild Growth
