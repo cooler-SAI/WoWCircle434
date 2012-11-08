@@ -6405,7 +6405,19 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     int32 tickcount = hemorrhageDot->GetMaxDuration() / hemorrhageDot->Effects[0].Amplitude;
                     basepoints0 = triggerAmount * damage / tickcount / 100;
                     break;
-                 }
+                }
+                // Main Gauche
+                case 76806:
+                {
+                    if (!victim || effIndex != 0 || !(procSpell->SpellFamilyFlags & dummySpell->Effects[0].SpellClassMask))
+                        return false;
+
+                    if (!roll_chance_i(triggeredByAura->GetAmount()))
+                        return false;
+
+                    triggered_spell_id = 86392;
+                    break;
+                }
                 // Serrated Blades
                 case 14171:
                 case 14172:
@@ -7076,6 +7088,30 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         }
                     }
                     return false;
+                }
+                // Elemental Overload (Shaman Elemental Mastery)
+                case 77222:
+                {
+                    if (!procSpell || !target || GetTypeId() != TYPEID_PLAYER || effIndex != 0)
+                        return false;
+
+                    if (procSpell->Id == 421)
+                    {
+                        if (ToPlayer()->GetSelectedUnit() != target)
+                            return false;
+                    }
+
+                    if (!roll_chance_i(triggeredByAura->GetAmount()))
+                        return false;
+
+                    basepoints0 = int32(damage * 0.75f);
+                    switch (procSpell->Id)
+                    {
+                        case 403: triggered_spell_id = 45284; break;
+                        case 421:  triggered_spell_id = 45297; break;
+                        case 51505: triggered_spell_id = 77451; break;
+                    }
+                    break;
                 }
                 // Item - Shaman T10 Elemental 4P Bonus
                 case 70817:
@@ -10444,6 +10480,21 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
             default:
                 break;
         }
+    }
+
+    // Mastery Shaman
+    if (victim && victim->isAlive())
+    {
+        if (Aura* deepHealing = GetAura(77226))
+            if (deepHealing->GetSpellInfo()->Effects[0].SpellClassMask.HasFlag(spellProto->SpellFamilyFlags[0], spellProto->SpellFamilyFlags[1], spellProto->SpellFamilyFlags[2]))
+            {
+                float effectAmount = float(deepHealing->GetEffect(0)->GetAmount());
+                float mod = 100.0f - victim->GetHealthPct();
+                if (mod < 1.0f)
+                    mod = 1.0f;
+                float amount_pct = mod * effectAmount / 100.0f;
+                AddPct(DoneTotalMod, amount_pct);
+            }
     }
 
     // Done fixed damage bonus auras
