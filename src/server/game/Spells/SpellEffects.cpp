@@ -874,6 +874,56 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
 
             }
             break;
+        case SPELLFAMILY_MAGE:
+            switch (m_spellInfo->Id)
+            {
+                case 42955: // Conjure Refreshment
+                {
+                    if (m_caster->getLevel() > 33 && m_caster->getLevel() < 44)
+                        m_caster->CastSpell(m_caster, 92739, true);
+                    if (m_caster->getLevel() > 43 && m_caster->getLevel() < 54)
+                        m_caster->CastSpell(m_caster, 92799, true);
+                    if (m_caster->getLevel() > 53 && m_caster->getLevel() < 65)
+                        m_caster->CastSpell(m_caster, 92802, true);
+                    if (m_caster->getLevel() > 64 && m_caster->getLevel() < 74)
+                        m_caster->CastSpell(m_caster, 92805, true);
+                    if (m_caster->getLevel() > 73 && m_caster->getLevel() < 80)
+                        m_caster->CastSpell(m_caster, 74625, true);
+                    if (m_caster->getLevel() > 79 && m_caster->getLevel() < 85)
+                        m_caster->CastSpell(m_caster, 92822, true);
+                    if (m_caster->getLevel() == 85)
+                        m_caster->CastSpell(m_caster, 92727, true);
+                    break;
+                }
+                case 82731: // Flame Orb
+                {
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        if (m_caster->GetDummyAuraEffect(SPELLFAMILY_MAGE, 4650, 1))
+                            m_caster->CastSpell(m_caster, 84714, true); // Summon Frost Fire Orb
+                        else
+                            m_caster->CastSpell(m_caster, 84765, true); // Summon Flame Orb
+                    }
+                    break;
+                }
+                case 43987: // Ritual of Refreshment
+                {
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        m_caster->ToPlayer()->RemoveSpellCooldown(74650, true); // Rank 1
+                        m_caster->ToPlayer()->RemoveSpellCooldown(92824, true); // Rank 2
+                        m_caster->ToPlayer()->RemoveSpellCooldown(92827, true); // Rank 3
+                        if (m_caster->getLevel() > 75 && m_caster->getLevel() < 80)
+                            m_caster->CastSpell(m_caster, 74650, true);
+                        if (m_caster->getLevel() > 80 && m_caster->getLevel() < 85)
+                            m_caster->CastSpell(m_caster, 92824, true);
+                        if (m_caster->getLevel() == 85)
+                            m_caster->CastSpell(m_caster, 92827, true);
+                    }
+                    break;
+                } 
+            }
+            break;
     }
 
     //spells triggered by dummy effect should not miss

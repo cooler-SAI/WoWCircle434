@@ -1051,6 +1051,37 @@ namespace Trinity
             NearestHostileUnitCheck(NearestHostileUnitCheck const&);
     };
 
+    class NearestHostileNoCCUnitCheck
+    {
+    public:
+        explicit NearestHostileNoCCUnitCheck(Creature const* creature, float dist = 0) : me(creature)
+        {
+            m_range = (dist == 0 ? 9999 : dist);
+        }
+        bool operator()(Unit* u)
+        {
+            if (!me->IsWithinDistInMap(u, m_range))
+                return false;
+
+            if (!me->canSeeOrDetect(u))
+                return false;
+
+            if (!me->IsValidAttackTarget(u))
+                return false;
+
+            if (u->HasAuraType(SPELL_AURA_MOD_CONFUSE))
+                return false;
+
+            m_range = me->GetDistance(u);   // use found unit range as new range limit for next check
+            return true;
+        }
+
+    private:
+        Creature const *me;
+        float m_range;
+        NearestHostileNoCCUnitCheck(NearestHostileNoCCUnitCheck const&);
+    };
+
     class NearestHostileUnitInAttackDistanceCheck
     {
         public:
