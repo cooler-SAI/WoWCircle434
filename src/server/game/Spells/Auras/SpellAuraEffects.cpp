@@ -4709,6 +4709,9 @@ void AuraEffect::HandleModDamagePercentDone(AuraApplication const* aurApp, uint8
     {
         // done in Player::_ApplyWeaponDependentAuraMods for SPELL_SCHOOL_MASK_NORMAL && EquippedItemClass != -1 and also for wand case
     }
+
+    if (target->isPet())
+        target->ToPet()->UpdateDamagePhysical(BASE_ATTACK);
 }
 
 void AuraEffect::HandleModOffhandDamagePercent(AuraApplication const* aurApp, uint8 mode, bool apply) const

@@ -2192,6 +2192,7 @@ class Player : public Unit, public GridObject<Player>
         bool HasMastery() const { return getLevel() >= 80 && HasAuraType(SPELL_AURA_MASTERY); }
         uint8 GetMasteryScalingValue(SpellInfo const* spellInfo, int32& amount) const;
         float GetMastery() const { return GetFloatValue(PLAYER_MASTERY); }
+        void UpdateMasteryDependentBuffs(uint32 spellId, bool updatePet = false);
 
         uint64 GetLootGUID() const { return m_lootGuid; }
         void SetLootGUID(uint64 guid) { m_lootGuid = guid; }

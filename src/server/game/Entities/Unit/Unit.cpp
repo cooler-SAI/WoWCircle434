@@ -5723,7 +5723,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
-                // Strikes of Opportunity
+                // Strikes of Opportunity (Mastery Arms Warrior)
                 case 76838:
                 {
                     if (effIndex != 0 || !roll_chance_i(triggeredByAura->GetAmount()))
@@ -6499,13 +6499,30 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
             switch (dummySpell->Id)
             {
-                case 34477: // Misdirection
+                // Misdirection
+                case 34477:
                 {
                     if (!GetMisdirectionTarget())
                         return false;
                     triggered_spell_id = 35079; // 4 sec buff on self
                     target = this;
                     break;
+                }
+                // Wild Quiver (Mastery Marksmanship Hunter)
+                case 76659:
+                {
+                    if (!victim || effIndex != 0)
+                        return false;
+
+                    if (!roll_chance_i(triggerAmount))
+                        return false;
+
+                    // It mustn't be triggered from Scatter Shot
+                    if (procSpell && procSpell->Id == 19503)
+                        return false;
+
+                    triggered_spell_id = 76663;
+                    basepoints0 = 0;
                 }
             }
             break;
@@ -8004,6 +8021,20 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                         }
                         break;
                     }
+                    // Hand of Light (Mastery Retribution Paladin)
+                    case 76672:
+                    {
+                        if (!victim || !procSpell || (procSpell->Id != 35395 && procSpell->Id != 53385 && procSpell->Id != 85256))
+                            return false;
+
+                        if (this->GetGUID() == victim->GetGUID())
+                            return false;
+
+                        trigger_spell_id = 96172;
+                        basepoints0 = int32(damage / 100.0f * triggeredByAura->GetAmount());
+                        target = victim;
+                        break;
+                    }
                     default:
                         break;
                 }
@@ -8615,8 +8646,6 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit* victim, uint32 /*damage*/, Au
 
     return true;
 }
-
-
 
 void Unit::setPowerType(Powers new_powertype)
 {
@@ -17533,7 +17562,7 @@ void Unit::RewardRage(uint32 baseRage, bool attacker)
         {
             float mod = 2.0f;
 
-            // Mastery Warrior
+            // Unshackled Fury (Mastery Fury Warrior)
             if (Aura* aur = GetAura(76856))
                 mod += float(aur->GetEffect(0)->GetAmount() / 100.0f);
 

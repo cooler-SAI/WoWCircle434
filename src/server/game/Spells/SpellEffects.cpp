@@ -1832,7 +1832,7 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
                 m_caster->RemoveAurasDueToSpell(90174);
         }
 
-        // Mastery Paladin
+        // Illuminated Healing (Mastery Holy Paladin)
         if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN)
             if (Aura* aur = m_caster->GetAura(76669))
                 switch (m_spellInfo->Id)

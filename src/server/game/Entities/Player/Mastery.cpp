@@ -7,11 +7,13 @@ void Player::ApplyMasterySpells()
     {
         for (uint8 i = 0; i < MAX_MASTERY_SPELL; ++i)
         {
-            if (uint32 spell = talentTabEntry->spellIds[i])
+            if (uint32 spellId = talentTabEntry->spellIds[i])
             {
-                if (!HasSpell(spell))
-                    learnSpell(spell, true);
+                if (!HasSpell(spellId))
+                    learnSpell(spellId, true);
+
                 UpdateMastery();
+                UpdateMasteryDependentBuffs(spellId, MasteryAffectsPet());
             }
         }
     }
@@ -104,6 +106,49 @@ void Player::UpdateMastery()
                     {
                         eff->SetCanBeRecalculated(true);
                         eff->ChangeAmount(amount, false);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Player::UpdateMasteryDependentBuffs(uint32 spellId, bool updatePet)
+{
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    if (!spellInfo)
+        return;
+
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_ADD_FLAT_MODIFIER ||
+            spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_ADD_PCT_MODIFIER)
+        {
+            if (AuraEffect* masteryBuff = GetAuraEffect(spellId, 0))
+            {
+                Unit::VisibleAuraMap const *visibleAuras = GetVisibleAuras();
+                for (Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
+                    if (masteryBuff->IsAffectingSpell(itr->second->GetBase()->GetSpellInfo()))
+                        itr->second->GetBase()->RecalculateAmountOfEffects();
+            }
+            if (updatePet)
+            {
+                if (Unit *mPet = GetPet())
+                {
+                    if (!mPet->GetOwner())
+                        break;
+
+                    if (AuraEffect* masteryBuff = mPet->GetOwner()->GetAuraEffect(spellId, i))
+                    {
+                        Unit::AuraApplicationMap const& uAuras = mPet->GetAppliedAuras();
+                        for (Unit::AuraApplicationMap::const_iterator mAura = uAuras.begin(); mAura != uAuras.end(); ++mAura)
+                        {
+                            if (masteryBuff->IsAffectingSpell(mAura->second->GetBase()->GetSpellInfo()))
+                            {
+                                mAura->second->GetBase()->RecalculateAmountOfEffects();
+                                break;
+                            }
+                        }
                     }
                 }
             }
