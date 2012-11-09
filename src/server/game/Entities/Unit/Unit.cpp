@@ -8113,6 +8113,20 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                         target = victim;
                         break;
                     }
+                    // Hand of Light
+                    case 76672:
+                    {
+                        if (!victim || !procSpell || (procSpell->Id != 35395 && procSpell->Id != 53385 && procSpell->Id != 85256))
+                            return false;
+
+                        if (this->GetGUID() == victim->GetGUID())
+                            return false;
+
+                        trigger_spell_id = 96172;
+                        basepoints0 = int32(damage / 100.0f * triggeredByAura->GetAmount());
+                        target = victim;
+                        break;
+                    }
                     default:
                         break;
                 }
@@ -8271,6 +8285,17 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
             basepoints0 = int32(CalculatePct(damage, 15));
             target = victim;
             trigger_spell_id = 26470;
+            break;
+        }
+        // Sacred Shield Proc
+        case 85285:
+        {
+            if (!this->HealthBelowPct(30) || !this->HealthBelowPctDamaged(30, damage))
+                return false;
+
+            basepoints0 = (1 + GetTotalAttackPowerValue(BASE_ATTACK)*2.8);
+            target = this;
+            trigger_spell_id = 96263;
             break;
         }
         // Unyielding Knights (item exploit 29108\29109)

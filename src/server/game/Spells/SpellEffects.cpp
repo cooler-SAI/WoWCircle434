@@ -688,6 +688,47 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 }
                 break;
             }
+            case SPELLFAMILY_PALADIN:
+            {
+                switch (m_spellInfo->Id)
+                {
+                    // Shield of Righteous
+                    case 53600: 
+                    {
+                        switch (GetPowerCost())
+                        {
+                            case 1:
+                                damage = damage * 1 + int32(0.1 * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                                break;
+                            case 2:
+                                damage = damage * 3 + int32(0.3 * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                                break;
+                            case 3:
+                                damage = damage * 6 + int32(0.6 * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                                break;
+                        }
+                        break;
+                    }
+                    // Hammer of Wrath
+                    case 24275:
+                    {
+                        float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                        int32 spd = m_caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->SchoolMask));
+                        damage += int32(0.15f * spd + 0.50f * ap);
+                        break;
+                    }
+                    // Exorcism 
+                    case 879:
+                    {
+                        float attackPower = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                        int32 spellPower = m_caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->ScalingClass));
+                        uint32 maxdmg = attackPower > spellPower ? (attackPower * 0.344f) : (spellPower * 0.344f);
+                        damage += int32(maxdmg);
+                        break;
+                    }
+                }
+                break;
+            }
         }
 
         if (m_originalCaster && damage > 0 && apply_direct_bonus)
