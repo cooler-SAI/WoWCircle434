@@ -11,10 +11,9 @@ void Player::ApplyMasterySpells()
             {
                 if (!HasSpell(spellId))
                     learnSpell(spellId, true);
-
-                UpdateMastery();
-                UpdateMasteryDependentBuffs(spellId);
             }
+
+            UpdateMastery();
         }
     }
 }
@@ -36,10 +35,7 @@ const uint32 ClassWithPetsMask = (1 << (CLASS_HUNTER - 1)) | (1 << (CLASS_DEATH_
 bool Player::MasteryAffectsPet() const
 {
     uint32 classMask = getClassMask();
-    if ((classMask & ClassWithPetsMask) == 0)
-        return false;
-
-    return true;
+    return (classMask & ClassWithPetsMask) > 0;
 }
 
 uint8 Player::GetMasteryScalingValue(SpellInfo const* spellInfo, int32& amount) const
@@ -75,9 +71,7 @@ void Player::UpdateMastery()
     if (!HasMastery())
         return;
 
-    float masteryPoints = GetRatingBonusValue(CR_MASTERY);
-    masteryPoints += float(GetTotalAuraModifier(SPELL_AURA_MASTERY));
-
+    float masteryPoints = GetRatingBonusValue(CR_MASTERY) + float(GetTotalAuraModifier(SPELL_AURA_MASTERY));
     SetFloatValue(PLAYER_MASTERY, masteryPoints);
 
     if (TalentTabEntry const* talentTabEntry = sTalentTabStore.LookupEntry(GetPrimaryTalentTree(GetActiveSpec())))
@@ -106,9 +100,10 @@ void Player::UpdateMastery()
                     {
                         eff->SetCanBeRecalculated(true);
                         eff->ChangeAmount(amount, false);
-                        UpdateMasteryDependentBuffs(spellId);
                     }
                 }
+
+                UpdateMasteryDependentBuffs(spellId);
             }
         }
     }
