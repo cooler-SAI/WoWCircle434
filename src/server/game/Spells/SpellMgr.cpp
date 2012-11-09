@@ -3947,7 +3947,6 @@ void SpellMgr::LoadDbcDataCorrections()
             case 77514: // Mastery DK Frost
             case 77515: // Mastery DK Unholy
                 spellInfo->Effects[EFFECT_0].SpellClassMask = 0;
-                count++;
                 break;
             default:
                 break;
