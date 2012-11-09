@@ -44,6 +44,7 @@ set(scripts_STAT_SRCS
   EasternKingdoms/ZulGurub/instance_zulgurub.cpp
   EasternKingdoms/ZulGurub/zulgurub.h
   EasternKingdoms/wetlands.cpp
+  EasternKingdoms/mount_hyjal.cpp
   EasternKingdoms/arathi_highlands.cpp
   EasternKingdoms/Gnomeregan/instance_gnomeregan.cpp
   EasternKingdoms/Gnomeregan/gnomeregan.cpp
