@@ -616,6 +616,11 @@ void AddSC_boss_grand_vizier_ertan();
 void AddSC_boss_altairus();
 void AddSC_boss_asaad();
 
+void AddSC_instance_baradin_hold(); // Baradin Hold
+void AddSC_boss_argaloth();
+void AddSC_boss_occuthar();
+void AddSC_boss_alizabal();
+
 // battlegrounds
 
 // outdoor pvp
@@ -1268,6 +1273,11 @@ void AddNorthrendScripts()
     AddSC_boss_grand_vizier_ertan();
     AddSC_boss_altairus();
     AddSC_boss_asaad();
+
+    AddSC_instance_baradin_hold(); // Baradin Hold
+    AddSC_boss_argaloth();
+    AddSC_boss_occuthar();
+    AddSC_boss_alizabal();
 #endif
 }
 

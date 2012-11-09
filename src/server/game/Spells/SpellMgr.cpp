@@ -3861,6 +3861,48 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // ENDOF THE VORTEX PINNACLE SPELLS
             //
+            // BARADIN HOLD SPELLS
+            //
+            // Occu'thar
+            case 96872: // Focused Fire
+                spellInfo->MaxAffectedTargets = 1;
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 96883: // Focused Fire dmg
+            case 101004:
+                spellInfo->Effects[0].SetRadiusIndex(17);
+                break;
+            case 96920: // Eye of Occu'thar
+            case 101006:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 96931: // Eye of Occu'thar script
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[0].TargetB = 0;
+                break;
+            case 96968: // Occu'thar's Destruction
+            case 101008:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 96946: // Eye of Occu'thar dmg
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_CASTER;
+                break;
+            // Alizabal
+            case 105065: // Seething Hate Dummy
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 105069: // Seething Hate dmg
+            case 108094:
+                spellInfo->Effects[0].SetRadiusIndex(29);
+                break;
+            case 106248: // Blade Dance Dummy
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 104994: // Blade Dance dmg
+                spellInfo->Effects[0].SetRadiusIndex(17);
+                break;
+            // ENDOF BARADIN HOLD SPELLS
+            //
             // Camouflage
             case 80325:
                 spellInfo->Effects[EFFECT_1].Effect = 0;

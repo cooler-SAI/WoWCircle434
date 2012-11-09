@@ -213,6 +213,11 @@ set(scripts_STAT_SRCS
   EasternKingdoms/BlackrockCaverns/instance_blackrock_caverns.cpp
   EasternKingdoms/BlackrockCaverns/blackrock_caverns_teleport.cpp
   EasternKingdoms/BlackrockCaverns/blackrock_caverns.h
+  EasternKingdoms/BaradinHold/boss_argaloth.cpp
+  EasternKingdoms/BaradinHold/boss_occuthar.cpp
+  EasternKingdoms/BaradinHold/boss_alizabal.cpp
+  EasternKingdoms/BaradinHold/instance_baradin_hold.cpp
+  EasternKingdoms/BaradinHold/baradin_hold.h
 )
 
 message("  -> Prepared: Eastern Kingdoms")
