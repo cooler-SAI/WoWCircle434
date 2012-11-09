@@ -1741,6 +1741,11 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
 
             addhealth += damageAmount;
         }
+        // Charged Crystal Focus
+        else if (m_spellInfo->Id == 41237)
+        {
+            addhealth = 2000;
+        }
         // Runic Healing Injector (heal increased by 25% for engineers - 3.2.0 patch change)
         else if (m_spellInfo->Id == 67489)
         {
@@ -4965,13 +4970,15 @@ void Spell::EffectInebriate(SpellEffIndex /*effIndex*/)
 
     Player* player = unitTarget->ToPlayer();
     uint8 currentDrunk = player->GetDrunkValue();
-    uint8 drunkMod = damage;
+    int8 drunkMod = damage;
     if (currentDrunk + drunkMod > 100)
     {
         currentDrunk = 100;
         if (rand_chance() < 25.0f)
             player->CastSpell(player, 67468, false);    // Drunken Vomit
     }
+    else if (currentDrunk + drunkMod < 0)
+        currentDrunk = 0;
     else
         currentDrunk += drunkMod;
 
@@ -6294,6 +6301,34 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
 
     float radius = 5.0f;
     int32 duration = m_spellInfo->GetDuration();
+
+    switch (m_spellInfo->Id)
+    {
+        case 1122: // Inferno
+        case 81283: // Fungal Growth
+        case 81291: // Fungal Growth
+            numGuardians = 1;
+            break;
+        case 94548: // Cardboard Assassin
+            numGuardians = 1;
+            duration = 15000;
+            break;
+        case 49028: // Dancing Rune Weapon
+            if (AuraEffect *aurEff = m_originalCaster->GetAuraEffect(63330, 0)) // glyph of Dancing Rune Weapon
+                duration += aurEff->GetAmount();
+            break;
+        case 48739: // Winterfin First Responder
+            numGuardians = 1;
+            break;
+        case 57879: // Snake Trap
+            if (m_originalCaster->HasAura(19376))
+                numGuardians += 2;
+            else if (m_originalCaster->HasAura(63457))
+                numGuardians += 4;
+            else if (m_originalCaster->HasAura(63458))
+                numGuardians += 6;
+            break;
+    }
 
     if (Player* modOwner = m_originalCaster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
