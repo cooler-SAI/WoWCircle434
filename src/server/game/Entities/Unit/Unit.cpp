@@ -7446,6 +7446,101 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
     return true;
 }
 
+bool Unit::HandleModifierAuraProc(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown)
+{
+    SpellInfo const* triggeredByAuraSpell = triggeredByAura->GetSpellInfo();
+
+    Item* castItem = triggeredByAura->GetBase()->GetCastItemGUID() && GetTypeId() == TYPEID_PLAYER
+        ? ToPlayer()->GetItemByGuid(triggeredByAura->GetBase()->GetCastItemGUID()) : NULL;
+
+    uint32 triggered_spell_id = 0;
+    Unit* target = victim;
+    int32 triggerAmount = triggeredByAura->GetAmount();
+    int32 basepoints0 = 0;
+
+    switch(triggeredByAuraSpell->SpellFamilyName)
+    {
+        case SPELLFAMILY_DRUID:
+        {
+            switch(triggeredByAuraSpell->Id)
+            {
+                // Item - Druid T11 Feral 4P Bonus
+                case 90165:
+                {
+                    target = this;
+                    triggered_spell_id = 90166;
+                    break;
+                }
+                // Harmony - Restoration Mastery
+                case 77495:
+                {
+                    target = this;
+                    basepoints0 = triggerAmount;
+                    triggered_spell_id = 100977;
+                    break;
+                }
+            }
+            break;
+        }
+        case SPELLFAMILY_WARLOCK:
+        {
+            switch (triggeredByAuraSpell->Id)
+            {
+                // Empowered Imp
+                case 47220:
+                case 47221:
+                    triggered_spell_id = 47283;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        }
+        case SPELLFAMILY_DEATHKNIGHT:
+        {
+            switch (triggeredByAuraSpell->Id)
+            {
+                // Unholy Command
+                case 49588:
+                case 49589:
+                    triggered_spell_id = 90289;
+                    break;
+                default:
+                    break;
+            }
+            break;
+        }
+    }
+
+    // processed charge only counting case
+    if (!triggered_spell_id)
+        return true;
+
+    SpellEntry const* triggerEntry = sSpellStore.LookupEntry(triggered_spell_id);
+    if (!triggerEntry)
+    {
+        sLog->outError(LOG_FILTER_UNITS, "Unit::HandleModifierAuraProc: Spell %u have not existed triggered spell %u", triggeredByAuraSpell->Id, triggered_spell_id);
+        return false;
+    }
+
+    // default case
+    if (!target || (target != this && !target->isAlive()))
+        return false;
+
+    if (cooldown && GetTypeId() == TYPEID_PLAYER && this->ToPlayer()->HasSpellCooldown(triggered_spell_id))
+        return false;
+
+    if (basepoints0)
+        CastCustomSpell(target, triggered_spell_id, &basepoints0, NULL, NULL, true, castItem, triggeredByAura);
+    else
+        CastSpell(target, triggered_spell_id, true, castItem, triggeredByAura);
+
+    if (cooldown && GetTypeId() == TYPEID_PLAYER)
+        this->ToPlayer()->AddSpellCooldown(triggered_spell_id, 0, time(NULL) + cooldown);
+
+    return true;
+}
+
 bool Unit::HandleObsModEnergyAuraProc(Unit* victim, uint32 /*damage*/, AuraEffect* triggeredByAura, SpellInfo const* /*procSpell*/, uint32 /*procFlag*/, uint32 /*procEx*/, uint32 cooldown)
 {
     SpellInfo const* dummySpell = triggeredByAura->GetSpellInfo();
@@ -8125,6 +8220,10 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Empowered Imp
+        case 54278:
+            target = GetCharmerOrOwnerOrSelf();
+            break;
         // Shield Specialization
         case 12298:
         case 12724:
@@ -8354,6 +8453,9 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         case 62606:
         {
             basepoints0 = CalculatePct(triggerAmount, GetTotalAttackPowerValue(BASE_ATTACK));
+            // Savage Defender (Druid Feral Combat Mastery)
+            if (AuraEffect const* savageDefender = GetDummyAuraEffect(SPELLFAMILY_HUNTER, 146, 0))
+                AddPct(basepoints0, savageDefender->GetAmount());
             break;
         }
         // Body and Soul
@@ -8488,6 +8590,8 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit* victim, uint32 /*damage*/, Au
 
     return true;
 }
+
+
 
 void Unit::setPowerType(Powers new_powertype)
 {
@@ -13893,6 +13997,8 @@ bool InitTriggerAuraData()
     isTriggerAura[SPELL_AURA_MOD_DAMAGE_FROM_CASTER] = true;
     isTriggerAura[SPELL_AURA_MOD_SPELL_CRIT_CHANCE] = true;
     isTriggerAura[SPELL_AURA_ABILITY_IGNORE_AURASTATE] = true;
+    isTriggerAura[SPELL_AURA_ADD_FLAT_MODIFIER] = true;
+    isTriggerAura[SPELL_AURA_ADD_PCT_MODIFIER] = true;
 
     isNonTriggerAura[SPELL_AURA_MOD_POWER_REGEN] = true;
     isNonTriggerAura[SPELL_AURA_REDUCE_PUSHBACK] = true;
@@ -14006,8 +14112,15 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
     }
 
     ProcTriggeredList procTriggered;
+    Unit* caster = this;
+
+    // Some pet spells should trigger owner talents
+    if (procSpell && caster->GetTypeId() != TYPEID_PLAYER)
+        if (procSpell->IsShouldProcOnOwner())
+            caster = GetProcOwner();
+
     // Fill procTriggered list
-    for (AuraApplicationMap::const_iterator itr = GetAppliedAuras().begin(); itr!= GetAppliedAuras().end(); ++itr)
+    for (AuraApplicationMap::const_iterator itr = caster->GetAppliedAuras().begin(); itr!= caster->GetAppliedAuras().end(); ++itr)
     {
         // Do not allow auras to proc from effect triggered by itself
         if (procAura && procAura->Id == itr->first)
@@ -14270,10 +14383,12 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                         }
                         break;
                     }
-                    //case SPELL_AURA_ADD_FLAT_MODIFIER:
-                    //case SPELL_AURA_ADD_PCT_MODIFIER:
-                        // HandleSpellModAuraProc
-                        //break;
+                    case SPELL_AURA_ADD_FLAT_MODIFIER:
+                    case SPELL_AURA_ADD_PCT_MODIFIER:
+                        sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "ProcDamageAndSpell: casting spell id %u (triggered by %s modifier aura of spell %u)", spellInfo->Id, (isVictim?"a victim's":"an attacker's"), triggeredByAura->GetId());
+                        HandleModifierAuraProc(target, damage, triggeredByAura, procSpell, procFlag, procExtra, cooldown);
+                        takeCharges = false;
+                        break;
                     default:
                         // nothing do, just charges counter
                         takeCharges = true;
@@ -17880,3 +17995,17 @@ void Unit::ResetHealingDoneInPastSecs(uint32 secs)
     for (uint32 i = 0; i < secs; i++)
         m_heal_done[i] = 0;
 };
+
+Unit* Unit::GetProcOwner()
+{
+    if (ToPet() && ToPet()->GetOwner())
+        return ToPet()->GetOwner();
+
+    if (ToTempSummon() && ToTempSummon()->GetOwner())
+        return ToTempSummon()->GetOwner();
+
+    if (this->isGuardian())
+        return GetCharmerOrOwner();
+
+    return this;
+}

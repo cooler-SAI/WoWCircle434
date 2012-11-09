@@ -530,6 +530,8 @@ public:
     bool IsBreakingCamouflageAfterHit() const;
     bool IsBreakingStealth() const;
 
+    bool IsShouldProcOnOwner() const;
+
     // loading helpers
     uint32 _GetExplicitTargetMask() const;
     bool _IsPositiveEffect(uint8 effIndex, bool deep) const;

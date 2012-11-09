@@ -2803,6 +2803,23 @@ bool SpellInfo::IsRequireAdditionalTargetCheck() const
     return true;
 }
 
+bool SpellInfo::IsShouldProcOnOwner() const
+{
+    switch (Id)
+    {
+        case 3110:  // Firebolt -> Burning Embers / Empowered Imp
+        case 6358:  // Seduction -> Glyph of Seduction
+        case 82739: // Fire Orb -> Ignite
+        case 86719:
+        case 83381: // Kill Command! -> Improved Kill Command
+        case 95969: // Frostfire Orb -> Fingers of Frost
+        case 84721:
+            return true;
+    }
+
+    return false;
+}
+
 bool SpellInfo::IsBreakingStealth() const
 {
     if (IsPositive())
