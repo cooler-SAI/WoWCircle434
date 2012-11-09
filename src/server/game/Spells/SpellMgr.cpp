@@ -3944,6 +3944,11 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_MOD_TARGET_RESISTANCE;
                 spellInfo->Effects[EFFECT_2].MiscValue = 126;
                 break;
+            case 77514: // Mastery DK Frost
+            case 77515: // Mastery DK Unholy
+                spellInfo->Effects[EFFECT_0].SpellClassMask = 0;
+                count++;
+                break;
             default:
                 break;
         }

@@ -1860,6 +1860,19 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
                     }
                 }
 
+            // Mastery DeathKnight
+            if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
+                if (Aura* aur = m_caster->GetAura(77513))
+                    if (m_spellInfo->Id == 45470)
+                    {
+                        int32 bp0 = int32(addhealth * float(aur->GetEffect(0)->GetAmount() / 100.0f));
+                        if (Aura* aurShield = m_caster->GetAura(77535))
+                            bp0 += aurShield->GetEffect(0)->GetAmount();
+                        if (bp0 > int32(m_caster->GetMaxHealth()))
+                            bp0 = int32(m_caster->GetMaxHealth());
+                        m_caster->CastCustomSpell(m_caster, 77535, &bp0, NULL, NULL, true);
+                    }
+
         // Divine Purpose
         if (m_spellInfo->Id == 85222)
             addhealth *= GetPowerCost();
