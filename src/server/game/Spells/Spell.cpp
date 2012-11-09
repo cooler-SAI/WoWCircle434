@@ -5214,6 +5214,24 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_BAD_TARGETS;
 
                 }
+                else if (m_spellInfo->Id == 34026) // Kill Command
+                {
+                    if (Unit* pet = m_caster->GetGuardianPet())
+                    {
+                        Unit* target = pet->getVictim();
+                        if (!target)
+                            target = m_caster->getVictim();
+                        if (!target || !m_caster)
+                            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+                        if (!pet->isInCombat())
+                            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+                        if (!pet->IsWithinDistInMap(target, 5))
+                            return SPELL_FAILED_OUT_OF_RANGE;
+                    }
+                    else
+                        return SPELL_FAILED_NO_PET;
+                    break;
+                }
                 break;
             }
             case SPELL_EFFECT_LEARN_SPELL:

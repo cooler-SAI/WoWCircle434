@@ -604,6 +604,52 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     if (m_caster->HasAura(57627))           // Charge 6 sec post-affect
                         damage *= 2;
                 }
+                switch (m_spellInfo->Id)
+                {
+                    // Kill Command
+                    case 83381:
+                    {
+                        if (Unit* _owner = m_caster->GetOwner())
+                            damage = (damage + (_owner->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.516f));
+                        break;
+                    }
+                    // Wolverine Bite
+                    case 53508:
+                    {
+                        if (Player* player = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself())
+                            damage += int32((player->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.4f) * 0.1f);
+                        break;
+                    }
+                    // Smack, Claw, Bite
+                    case 49966:
+                    case 16827:
+                    case 17253:
+                    {
+                        if (Player* player = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        {
+                            damage += int32((player->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.4f) * 0.2f);
+                            if (m_caster->ToPet()->HasSpell(62758)) // Wild Hunt (rank 1)
+                            {
+                                if (m_caster->getPowerType() == POWER_FOCUS
+                                    && m_caster->GetPower(POWER_FOCUS) > 50)
+                                {
+                                    damage *= 1.6;
+                                    m_caster->ModifyPower(POWER_FOCUS, -(GetPowerCost() * 0.5));
+                                }
+                            }
+                            else if (m_caster->ToPet()->HasSpell(62762)) // Wild Hunt (rank 2)
+                            {
+                                if (m_caster->getPowerType() == POWER_FOCUS
+                                    && m_caster->GetPower(POWER_FOCUS) > 50)
+                                {
+                                    damage *= 2.2;
+                                    m_caster->ModifyPower(POWER_FOCUS, -GetPowerCost());
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
                 break;
             }
             case SPELLFAMILY_DEATHKNIGHT:
@@ -871,7 +917,20 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     m_caster->CastCustomSpell(m_caster, spellInfo->Id, &basepoints0, NULL, NULL, true);
                     break;
                 }
-
+                // Kill Command
+                case 34026:
+                {
+                    if (Unit* pet = m_caster->GetGuardianPet())
+                    {
+                        Unit * victim = pet->getVictim();
+                        if (!victim)
+                            victim = m_caster->getVictim();
+                        if (pet->isInCombat())
+                            if (victim)
+                                pet->CastSpell(victim, 83381, false);
+                    }
+                    break;
+                }
             }
             break;
         case SPELLFAMILY_MAGE:
