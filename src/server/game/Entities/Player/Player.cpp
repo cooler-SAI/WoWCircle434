@@ -6115,15 +6115,7 @@ void Player::UpdateRating(CombatRating cr)
             if (affectStats)
                 UpdateAllSpellCritChances();
             break;
-        case CR_HIT_TAKEN_MELEE:                            // Implemented in Unit::MeleeMissChanceCalc
-        case CR_HIT_TAKEN_RANGED:
-            break;
-        case CR_HIT_TAKEN_SPELL:                            // Implemented in Unit::MagicSpellHitResult
-            break;
-        case CR_CRIT_TAKEN_MELEE:                           // Implemented in Unit::RollMeleeOutcomeAgainst (only for chance to crit)
-        case CR_CRIT_TAKEN_RANGED:
-            break;
-        case CR_CRIT_TAKEN_SPELL:                           // Implemented in Unit::SpellCriticalBonus (only for chance to crit)
+        case CR_RESILIENCE_TAKEN_ALL:
             break;
         case CR_HASTE_MELEE:                                // Implemented in Player::ApplyRatingMod
         case CR_HASTE_RANGED:
@@ -7978,24 +7970,6 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
             case ITEM_MOD_CRIT_SPELL_RATING:
                 ApplyRatingMod(CR_CRIT_SPELL, int32(val), apply);
                 break;
-            case ITEM_MOD_HIT_TAKEN_MELEE_RATING:
-                ApplyRatingMod(CR_HIT_TAKEN_MELEE, int32(val), apply);
-                break;
-            case ITEM_MOD_HIT_TAKEN_RANGED_RATING:
-                ApplyRatingMod(CR_HIT_TAKEN_RANGED, int32(val), apply);
-                break;
-            case ITEM_MOD_HIT_TAKEN_SPELL_RATING:
-                ApplyRatingMod(CR_HIT_TAKEN_SPELL, int32(val), apply);
-                break;
-            case ITEM_MOD_CRIT_TAKEN_MELEE_RATING:
-                ApplyRatingMod(CR_CRIT_TAKEN_MELEE, int32(val), apply);
-                break;
-            case ITEM_MOD_CRIT_TAKEN_RANGED_RATING:
-                ApplyRatingMod(CR_CRIT_TAKEN_RANGED, int32(val), apply);
-                break;
-            case ITEM_MOD_CRIT_TAKEN_SPELL_RATING:
-                ApplyRatingMod(CR_CRIT_TAKEN_SPELL, int32(val), apply);
-                break;
             case ITEM_MOD_HASTE_MELEE_RATING:
                 ApplyRatingMod(CR_HASTE_MELEE, int32(val), apply);
                 break;
@@ -8015,20 +7989,8 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                 ApplyRatingMod(CR_CRIT_RANGED, int32(val), apply);
                 ApplyRatingMod(CR_CRIT_SPELL, int32(val), apply);
                 break;
-            case ITEM_MOD_HIT_TAKEN_RATING:
-                ApplyRatingMod(CR_HIT_TAKEN_MELEE, int32(val), apply);
-                ApplyRatingMod(CR_HIT_TAKEN_RANGED, int32(val), apply);
-                ApplyRatingMod(CR_HIT_TAKEN_SPELL, int32(val), apply);
-                break;
-            case ITEM_MOD_CRIT_TAKEN_RATING:
-                ApplyRatingMod(CR_CRIT_TAKEN_MELEE, int32(val), apply);
-                ApplyRatingMod(CR_CRIT_TAKEN_RANGED, int32(val), apply);
-                ApplyRatingMod(CR_CRIT_TAKEN_SPELL, int32(val), apply);
-                break;
             case ITEM_MOD_RESILIENCE_RATING:
-                ApplyRatingMod(CR_CRIT_TAKEN_MELEE, int32(val), apply);
-                ApplyRatingMod(CR_CRIT_TAKEN_RANGED, int32(val), apply);
-                ApplyRatingMod(CR_CRIT_TAKEN_SPELL, int32(val), apply);
+                ApplyRatingMod(CR_RESILIENCE_TAKEN_ALL, int32(val), apply);
                 break;
             case ITEM_MOD_HASTE_RATING:
                 ApplyRatingMod(CR_HASTE_MELEE, int32(val), apply);
@@ -13482,9 +13444,7 @@ void Player::ApplyReforgeEnchantment(Item* item, bool apply)
             ApplyRatingMod(CR_CRIT_SPELL, -int32(removeValue), apply);
             break;
         case ITEM_MOD_RESILIENCE_RATING:
-            ApplyRatingMod(CR_CRIT_TAKEN_MELEE, -int32(removeValue), apply);
-            ApplyRatingMod(CR_CRIT_TAKEN_RANGED, -int32(removeValue), apply);
-            ApplyRatingMod(CR_CRIT_TAKEN_SPELL, -int32(removeValue), apply);
+            ApplyRatingMod(CR_RESILIENCE_TAKEN_ALL, -int32(removeValue), apply);
             break;
         case ITEM_MOD_HASTE_RATING:
             ApplyRatingMod(CR_HASTE_MELEE, -int32(removeValue), apply);
@@ -13591,15 +13551,8 @@ void Player::ApplyReforgeEnchantment(Item* item, bool apply)
             ApplyRatingMod(CR_HIT_RANGED, int32(addValue), apply);
             ApplyRatingMod(CR_HIT_SPELL, int32(addValue), apply);
             break;
-        case ITEM_MOD_CRIT_RATING:
-            ApplyRatingMod(CR_CRIT_MELEE, int32(addValue), apply);
-            ApplyRatingMod(CR_CRIT_RANGED, int32(addValue), apply);
-            ApplyRatingMod(CR_CRIT_SPELL, int32(addValue), apply);
-            break;
         case ITEM_MOD_RESILIENCE_RATING:
-            ApplyRatingMod(CR_CRIT_TAKEN_MELEE, int32(addValue), apply);
-            ApplyRatingMod(CR_CRIT_TAKEN_RANGED, int32(addValue), apply);
-            ApplyRatingMod(CR_CRIT_TAKEN_SPELL, int32(addValue), apply);
+            ApplyRatingMod(CR_RESILIENCE_TAKEN_ALL, int32(addValue), apply);
             break;
         case ITEM_MOD_HASTE_RATING:
             ApplyRatingMod(CR_HASTE_MELEE, int32(addValue), apply);
@@ -13927,9 +13880,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
 //                            ApplyRatingMod(CR_CRIT_TAKEN_SPELL, enchant_amount, apply);
 //                            break;
                         case ITEM_MOD_RESILIENCE_RATING:
-                            ApplyRatingMod(CR_CRIT_TAKEN_MELEE, enchant_amount, apply);
-                            ApplyRatingMod(CR_CRIT_TAKEN_RANGED, enchant_amount, apply);
-                            ApplyRatingMod(CR_CRIT_TAKEN_SPELL, enchant_amount, apply);
+                            ApplyRatingMod(CR_RESILIENCE_TAKEN_ALL, enchant_amount, apply);
                             sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "+ %u RESILIENCE", enchant_amount);
                             break;
                         case ITEM_MOD_HASTE_RATING:

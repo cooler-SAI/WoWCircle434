@@ -1044,10 +1044,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                 damage -= damageInfo->blocked;
             }
 
-            if (attackType != RANGED_ATTACK)
-                ApplyResilience(victim, NULL, &damage, crit, CR_CRIT_TAKEN_MELEE);
-            else
-                ApplyResilience(victim, NULL, &damage, crit, CR_CRIT_TAKEN_RANGED);
+            ApplyResilience(victim, &damage);
             break;
         }
         // Magical Attacks
@@ -1061,7 +1058,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                 damage = SpellCriticalDamageBonus(spellInfo, damage, victim);
             }
 
-            ApplyResilience(victim, NULL, &damage, crit, CR_CRIT_TAKEN_SPELL);
+            ApplyResilience(victim, &damage);
             break;
         }
         default:
@@ -1267,10 +1264,7 @@ void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* dam
         damageInfo->HitInfo |= HITINFO_AFFECTS_VICTIM;
 
     int32 resilienceReduction = damageInfo->damage;
-    if (attackType != RANGED_ATTACK)
-        ApplyResilience(victim, NULL, &resilienceReduction, (damageInfo->hitOutCome == MELEE_HIT_CRIT), CR_CRIT_TAKEN_MELEE);
-    else
-        ApplyResilience(victim, NULL, &resilienceReduction, (damageInfo->hitOutCome == MELEE_HIT_CRIT), CR_CRIT_TAKEN_RANGED);
+    ApplyResilience(victim, &resilienceReduction);
     resilienceReduction = damageInfo->damage - resilienceReduction;
     damageInfo->damage      -= resilienceReduction;
     damageInfo->cleanDamage += resilienceReduction;
@@ -2625,12 +2619,6 @@ float Unit::GetUnitCriticalChance(WeaponAttackType attackType, const Unit* victi
         crit += victim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_CHANCE);
 
     crit += victim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE);
-
-    // reduce crit chance from Rating for players
-    if (attackType != RANGED_ATTACK)
-        ApplyResilience(victim, &crit, NULL, false, CR_CRIT_TAKEN_MELEE);
-    else
-        ApplyResilience(victim, &crit, NULL, false, CR_CRIT_TAKEN_RANGED);
 
     if (crit < 0.0f)
         crit = 0.0f;
@@ -4620,15 +4608,15 @@ void Unit::SendSpellNonMeleeDamageLog(Unit* target, uint32 SpellID, uint32 Damag
     SendSpellNonMeleeDamageLog(&log);
 }
 
-void Unit::ProcDamageAndSpell(Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procExtra, uint32 amount, WeaponAttackType attType, SpellInfo const* procSpell, SpellInfo const* procAura)
+void Unit::ProcDamageAndSpell(Unit* victim, uint32 procAttacker, uint32 procVictim, uint32 procExtra, uint32 amount, uint32 absorb, WeaponAttackType attType, SpellInfo const* procSpell, SpellInfo const* procAura)
 {
      // Not much to do if no flags are set.
     if (procAttacker)
-        ProcDamageAndSpellFor(false, victim, procAttacker, procExtra, attType, procSpell, amount, procAura);
+        ProcDamageAndSpellFor(false, victim, procAttacker, procExtra, attType, procSpell, amount, absorb, procAura);
     // Now go on with a victim's events'n'auras
     // Not much to do if no flags are set or there is no victim
     if (victim && victim->isAlive() && procVictim)
-        victim->ProcDamageAndSpellFor(true, this, procVictim, procExtra, attType, procSpell, amount, procAura);
+        victim->ProcDamageAndSpellFor(true, this, procVictim, procExtra, attType, procSpell, amount, absorb, procAura);
 }
 
 void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo)
@@ -10295,7 +10283,6 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                     crit_chance += victim->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_ATTACKER_SPELL_CRIT_CHANCE, schoolMask);
                     // Modify critical chance by victim SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE
                     crit_chance += victim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE);
-                    ApplyResilience(victim, &crit_chance, NULL, false, CR_CRIT_TAKEN_SPELL);
                 }
                 // scripted (increase crit chance ... against ... target by x%
                 AuraEffectList const& mOverrideClassScript = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
@@ -14102,7 +14089,7 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
     return procEx;
 }
 
-void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpell, uint32 damage, SpellInfo const* procAura)
+void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpell, uint32 damage, uint32 absorb, SpellInfo const* procAura)
 {
     // Player is loaded now - do not allow passive spell casts to proc
     if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->GetSession()->PlayerLoading())
@@ -14265,6 +14252,23 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                 AuraEffect* triggeredByAura = i->aura->GetEffect(effIndex);
                 ASSERT(triggeredByAura);
 
+                switch(triggeredByAura->GetId())
+                {
+                    case 76672: // Hand of Light (Mastery Retribution Paladin)
+                        damage += absorb;
+                        break;
+                    case 48965: // Shadow Infusion
+                    case 49571:
+                    case 49572:
+                        damage += absorb;
+                        break;
+                    default:
+                        break; 
+                }
+                // venegance don't get lowered koz absorbs
+                if (triggeredByAura->GetSpellInfo()->SpellIconID == 3031)
+                    damage += absorb;
+
                 switch (triggeredByAura->GetAuraType())
                 {
                     case SPELL_AURA_PROC_TRIGGER_SPELL:
@@ -14410,19 +14414,31 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     case SPELL_AURA_MOD_ROOT:
                     case SPELL_AURA_TRANSFORM:
                     {
+                        // Dragon Breath & Living Bomb
+                        if (spellInfo->Category == 1215 && procSpell &&
+                            procSpell->SpellFamilyName == SPELLFAMILY_MAGE && procSpell->SpellFamilyFlags[1] == 0x00010000)
+                            break;
+
+                        // Sanguinary Vein and Gouge
+                        if (spellInfo->Id == 1776 && target && (procFlag & PROC_FLAG_TAKEN_PERIODIC) && (procSpell->GetAllEffectsMechanicMask() & (1<<MECHANIC_BLEED)))
+                            if (AuraEffect * aur = target->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 4821, 1))
+                                if (roll_chance_i(aur->GetAmount()))
+                                    break;
+
+                        damage += absorb;
                         // chargeable mods are breaking on hit
+                        // Spell own direct damage at apply wont break the CC
+                        if (procSpell && (procSpell->Id == triggeredByAura->GetId()))
+                        {
+                            Aura* aura = triggeredByAura->GetBase();
+                            // called from spellcast, should not have ticked yet
+                            if (aura->GetDuration() == aura->GetMaxDuration())
+                                break;
+                        }
                         if (useCharges)
                             takeCharges = true;
-                        else
+                        else if (isVictim && damage && (!procSpell || GetSpellMaxRangeForTarget(this, procSpell) < 100.0f))
                         {
-                            // Spell own direct damage at apply wont break the CC
-                            if (procSpell && (procSpell->Id == triggeredByAura->GetId()))
-                            {
-                                Aura* aura = triggeredByAura->GetBase();
-                                // called from spellcast, should not have ticked yet
-                                if (aura->GetDuration() == aura->GetMaxDuration())
-                                    break;
-                            }
                             int32 damageLeft = triggeredByAura->GetAmount();
                             // No damage left
                             if (damageLeft < int32(damage))
@@ -15414,7 +15430,7 @@ void Unit::Kill(Unit* victim, bool durabilityLoss)
         ProcDamageAndSpell(victim, PROC_FLAG_KILL, PROC_FLAG_KILLED, PROC_EX_NONE, 0);
 
     // Proc auras on death - must be before aura/combat remove
-    victim->ProcDamageAndSpell(NULL, PROC_FLAG_DEATH, PROC_FLAG_NONE, PROC_EX_NONE, 0, BASE_ATTACK, 0);
+    victim->ProcDamageAndSpell(NULL, PROC_FLAG_DEATH, PROC_FLAG_NONE, PROC_EX_NONE, 0, 0, BASE_ATTACK, 0);
 
     // update get killing blow achievements, must be done before setDeathState to be able to require auras on target
     // and before Spirit of Redemption as it also removes auras
@@ -16385,64 +16401,41 @@ void Unit::SendPlaySpellVisualKit(uint32 id, uint32 impact)
     SendMessageToSet(&data, true);
 }
 
-void Unit::ApplyResilience(Unit const* victim, float* crit, int32* damage, bool isCrit, CombatRating type) const
+void Unit::ApplyResilience(const Unit *pVictim, int32 *damage) const
 {
-    // player mounted on multi-passenger mount is also classified as vehicle
-    if (IsVehicle() || (victim->IsVehicle() && victim->GetTypeId() != TYPEID_PLAYER))
+    if (IsVehicle() || pVictim->IsVehicle())
         return;
 
-    Unit const* source = NULL;
-    if (GetTypeId() == TYPEID_PLAYER)
-        source = this;
-    else if (GetTypeId() == TYPEID_UNIT && GetOwner() && GetOwner()->GetTypeId() == TYPEID_PLAYER)
-        source = GetOwner();
+    const Unit *source = ToPlayer();
+    if (!source)
+    {
+        source = ToCreature();
+        if (source)
+        {
+            source = source->ToCreature()->GetOwner();
+            if (source)
+                source = source->ToPlayer();
+        }
+    }
 
-    Unit const* target = NULL;
-    if (victim->GetTypeId() == TYPEID_PLAYER)
-        target = victim;
-    else if (victim->GetTypeId() == TYPEID_UNIT && victim->GetOwner() && victim->GetOwner()->GetTypeId() == TYPEID_PLAYER)
-        target = victim->GetOwner();
+    const Unit *target = pVictim->ToPlayer();
+    if (!target)
+    {
+        target = pVictim->ToCreature();
+        if (target)
+        {
+            target = target->ToCreature()->GetOwner();
+            if (target)
+                target = target->ToPlayer();
+        }
+    }
 
     if (!target)
         return;
 
-    switch (type)
+    if (source && damage)
     {
-        case CR_CRIT_TAKEN_MELEE:
-            // Crit chance reduction works against nonpets
-            if (crit)
-                *crit -= target->GetMeleeCritChanceReduction();
-            if (source && damage)
-            {
-                if (isCrit)
-                    *damage -= target->GetMeleeCritDamageReduction(*damage);
-                *damage -= target->GetMeleeDamageReduction(*damage);
-            }
-            break;
-        case CR_CRIT_TAKEN_RANGED:
-            // Crit chance reduction works against nonpets
-            if (crit)
-                *crit -= target->GetRangedCritChanceReduction();
-            if (source && damage)
-            {
-                if (isCrit)
-                    *damage -= target->GetRangedCritDamageReduction(*damage);
-                *damage -= target->GetRangedDamageReduction(*damage);
-            }
-            break;
-        case CR_CRIT_TAKEN_SPELL:
-            // Crit chance reduction works against nonpets
-            if (crit)
-                *crit -= target->GetSpellCritChanceReduction();
-            if (source && damage)
-            {
-                if (isCrit)
-                    *damage -= target->GetSpellCritDamageReduction(*damage);
-                *damage -= target->GetSpellDamageReduction(*damage);
-            }
-            break;
-        default:
-            break;
+        *damage -= target->ToPlayer()->GetPlayerDamageReduction(*damage);
     }
 }
 

@@ -1320,6 +1320,7 @@ bool SpellInfo::IsAuraExclusiveBySpecificWith(SpellInfo const* spellInfo) const
         case SPELL_SPECIFIC_WARRIOR_ENRAGE:
         case SPELL_SPECIFIC_MAGE_ARCANE_BRILLANCE:
         case SPELL_SPECIFIC_PRIEST_DIVINE_SPIRIT:
+        case SPELL_SPECIFIC_PRIEST_SANCTUM:
             return spellSpec1 == spellSpec2;
         case SPELL_SPECIFIC_FOOD:
             return spellSpec2 == SPELL_SPECIFIC_FOOD
@@ -1979,6 +1980,10 @@ SpellSpecificType SpellInfo::GetSpellSpecific() const
             // Divine Spirit and Prayer of Spirit
             if (SpellFamilyFlags[0] & 0x20)
                 return SPELL_SPECIFIC_PRIEST_DIVINE_SPIRIT;
+
+            // Priest (Inner Will | Inner Fire)
+            if (Id == 588 || Id == 73413)
+                return SPELL_SPECIFIC_PRIEST_SANCTUM;
 
             break;
         }

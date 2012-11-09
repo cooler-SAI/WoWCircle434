@@ -1646,11 +1646,7 @@ void Spell::EffectPowerDrain(SpellEffIndex effIndex)
     damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
     damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
 
-    // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
     int32 power = damage;
-    if (powerType == POWER_MANA)
-        power -= unitTarget->GetSpellCritDamageReduction(power);
-
     int32 newDamage = -(unitTarget->ModifyPower(powerType, -int32(power)));
 
     float gainMultiplier = 0.0f;
@@ -1730,10 +1726,6 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
     }
 
     int32 power = damage;
-    // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
-    if (powerType == POWER_MANA)
-        power -= unitTarget->GetSpellCritDamageReduction(power);
-
     int32 newDamage = -(unitTarget->ModifyPower(powerType, -power));
 
     // NO - Not a typo - EffectPowerBurn uses effect value multiplier - not effect damage multiplier

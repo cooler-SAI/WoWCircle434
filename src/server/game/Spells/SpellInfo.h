@@ -155,6 +155,7 @@ enum SpellSpecificType
     SPELL_SPECIFIC_ELEMENTAL_SHIELD              = 10,
     SPELL_SPECIFIC_MAGE_POLYMORPH                = 11,
     SPELL_SPECIFIC_JUDGEMENT                     = 13,
+    SPELL_SPECIFIC_PRIEST_SANCTUM                = 14,
     SPELL_SPECIFIC_WARLOCK_CORRUPTION            = 17,
     SPELL_SPECIFIC_WELL_FED                      = 18,
     SPELL_SPECIFIC_FOOD                          = 19,
