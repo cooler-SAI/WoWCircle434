@@ -13,7 +13,7 @@ void Player::ApplyMasterySpells()
                     learnSpell(spellId, true);
 
                 UpdateMastery();
-                UpdateMasteryDependentBuffs(spellId, MasteryAffectsPet());
+                UpdateMasteryDependentBuffs(spellId);
             }
         }
     }
@@ -113,7 +113,7 @@ void Player::UpdateMastery()
     }
 }
 
-void Player::UpdateMasteryDependentBuffs(uint32 spellId, bool updatePet)
+void Player::UpdateMasteryDependentBuffs(uint32 spellId)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
@@ -121,35 +121,35 @@ void Player::UpdateMasteryDependentBuffs(uint32 spellId, bool updatePet)
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
-        if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_ADD_FLAT_MODIFIER ||
-            spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_ADD_PCT_MODIFIER)
-        {
-            if (AuraEffect* masteryBuff = GetAuraEffect(spellId, 0))
-            {
-                Unit::VisibleAuraMap const *visibleAuras = GetVisibleAuras();
-                for (Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
-                    if (masteryBuff->IsAffectingSpell(itr->second->GetBase()->GetSpellInfo()))
-                        itr->second->GetBase()->RecalculateAmountOfEffects();
-            }
-            if (updatePet)
-            {
-                if (Unit *mPet = GetPet())
-                {
-                    if (!mPet->GetOwner())
-                        break;
+        uint32 applyAuraName = spellInfo->Effects[i].ApplyAuraName;
+        if (applyAuraName != SPELL_AURA_ADD_FLAT_MODIFIER && applyAuraName != SPELL_AURA_ADD_PCT_MODIFIER)
+            continue;
 
-                    if (AuraEffect* masteryBuff = mPet->GetOwner()->GetAuraEffect(spellId, i))
-                    {
-                        Unit::AuraApplicationMap const& uAuras = mPet->GetAppliedAuras();
-                        for (Unit::AuraApplicationMap::const_iterator mAura = uAuras.begin(); mAura != uAuras.end(); ++mAura)
-                        {
-                            if (masteryBuff->IsAffectingSpell(mAura->second->GetBase()->GetSpellInfo()))
-                            {
-                                mAura->second->GetBase()->RecalculateAmountOfEffects();
-                                break;
-                            }
-                        }
-                    }
+        if (AuraEffect* masteryBuff = GetAuraEffect(spellId, i))
+        {
+            Unit::VisibleAuraMap const *visibleAuras = GetVisibleAuras();
+            for (Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
+            {
+                Aura* aura = itr->second->GetBase();
+                if (masteryBuff->IsAffectingSpell(aura->GetSpellInfo()))
+                    aura->RecalculateAmountOfEffects();
+            }
+        }
+
+        if (MasteryAffectsPet())
+        {
+            Pet* pet = GetPet();
+            if (!pet || !pet->GetOwner())
+                continue;
+
+            if (AuraEffect* masteryBuff = pet->GetOwner()->GetAuraEffect(spellId, i))
+            {
+                Unit::AuraApplicationMap const& uAuras = pet->GetAppliedAuras();
+                for (Unit::AuraApplicationMap::const_iterator itr = uAuras.begin(); itr != uAuras.end(); ++itr)
+                {
+                    Aura* aura = itr->second->GetBase();
+                    if (masteryBuff->IsAffectingSpell(aura->GetSpellInfo()))
+                        aura->RecalculateAmountOfEffects();
                 }
             }
         }

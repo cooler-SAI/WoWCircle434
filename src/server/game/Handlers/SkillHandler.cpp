@@ -73,6 +73,9 @@ void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
     }
 
     _player->SendTalentsInfoData(false);
+
+    if (_player->HasMastery())
+        _player->ApplyMasterySpells();
 }
 
 void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
