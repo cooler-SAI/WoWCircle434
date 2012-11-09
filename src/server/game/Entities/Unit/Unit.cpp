@@ -7701,6 +7701,15 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 /*damage*/, Aura* triggeredByAura
             break;
         case SPELLFAMILY_PALADIN:
         {
+            // Repentance aura drop
+            if (dummySpell->Id == 20066)
+            {
+                *handled = true;
+                if (procSpell && procSpell->SpellFamilyName == SPELLFAMILY_PALADIN &&
+                    procSpell->SpellFamilyFlags[0] == 0x20000000 && procSpell->SpellFamilyFlags[1] == 0x00000800)
+                    return false;
+                return true;
+            }
             break;
         }
         case SPELLFAMILY_MAGE:

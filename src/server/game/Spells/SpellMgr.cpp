@@ -3007,6 +3007,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 59735:
                 spellInfo->Effects[EFFECT_1].TriggerSpell = 59736;
                 break;
+            // Avenger's Shield
+            case 31935:
+                spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+                break;
             // Kill Command
             case 34026:
                 spellInfo->SetRangeIndex(2);
