@@ -757,6 +757,41 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
     // selection by spell family
     switch (m_spellInfo->SpellFamilyName)
     {
+        case SPELLFAMILY_GENERIC:
+        {
+            switch (m_spellInfo->Id)
+            {
+                case 82626: // Grounded Plasma Shield
+                {
+                    if (m_caster && m_caster->GetTypeId() == TYPEID_PLAYER)
+                        m_caster->CastSpell(m_caster, 82627, false);
+                    break; 
+                }
+                case 84348: // Invisibility Field
+                {
+                    if (m_caster && m_caster->GetTypeId() == TYPEID_PLAYER)
+                        m_caster->CastSpell(m_caster, 82820, false);
+                    break;
+                }
+                case 82174: // Synapse Strings
+                {
+                    if (m_caster && m_caster->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        float _str = m_caster->GetStat(STAT_STRENGTH);
+                        float _agi = m_caster->GetStat(STAT_AGILITY);
+                        float _int = m_caster->GetStat(STAT_INTELLECT);
+                        if (_agi > _str && _agi > _int)
+                            m_caster->CastSpell(m_caster, 96228, true);
+                        else if (_str > _agi && _str > _int)
+                            m_caster->CastSpell(m_caster, 96229, true);
+                        else if (_int > _str && _int > _agi)
+                            m_caster->CastSpell(m_caster, 96230, true);
+                    }
+                    break;
+                }
+            }
+            break;
+        }
         case SPELLFAMILY_WARLOCK:
             switch (m_spellInfo->Id)
             {
