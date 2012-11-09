@@ -2259,6 +2259,10 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     // If target reflect spell back to caster
     if (targetInfo.missCondition == SPELL_MISS_REFLECT)
     {
+        // process reflect removal (not delayed)
+        if (!targetInfo.timeDelay)
+            m_caster->ProcDamageAndSpell(target, PROC_FLAG_NONE, PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG, PROC_EX_REFLECT, 1, BASE_ATTACK, m_spellInfo);
+
         // Calculate reflected spell result on caster
         targetInfo.reflectResult = m_caster->SpellHitResult(m_caster, m_spellInfo, m_canReflect);
 
@@ -2270,9 +2274,6 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     }
     else
         targetInfo.reflectResult = SPELL_MISS_NONE;
-
-    // some helper to update magnet timer
-    m_caster->UpdateMagnetTimer(target, m_spellInfo, int32(targetInfo.timeDelay));
 
     // Add target to list
     m_UniqueTargetInfo.push_back(targetInfo);
@@ -2613,6 +2614,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
                 unitTarget->ToCreature()->AI()->AttackStart(m_caster);
         }
     }
+
+    // process reflect removal (delayed)
+    if (missInfo == SPELL_MISS_REFLECT && target->timeDelay)
+        caster->ProcDamageAndSpell(unit, PROC_FLAG_NONE, PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG, PROC_EX_REFLECT, 1, BASE_ATTACK, m_spellInfo);
 
     if (!m_spellInfo->IsIgnoringCombat() && missInfo != SPELL_MISS_EVADE && !m_caster->IsFriendlyTo(unit) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)))
     {
