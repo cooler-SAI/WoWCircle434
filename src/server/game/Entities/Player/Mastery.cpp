@@ -84,14 +84,14 @@ void Player::UpdateMastery()
     {
         for (uint8 i = 0; i < MAX_MASTERY_SPELL; ++i)
         {
-            uint32 spell = talentTabEntry->spellIds[i];
-            if (!spell)
+            uint32 spellId = talentTabEntry->spellIds[i];
+            if (!spellId)
                 continue;
 
-            if (!HasAura(spell))
-                CastSpell(this, spell, true);
+            if (!HasAura(spellId))
+                CastSpell(this, spellId, true);
 
-            if (Aura* aura = GetAura(spell))
+            if (Aura* aura = GetAura(spellId))
             {
                 int32 amount = 0;
                 uint8 effectIndex = GetMasteryScalingValue(aura->GetSpellInfo(), amount);
@@ -106,6 +106,7 @@ void Player::UpdateMastery()
                     {
                         eff->SetCanBeRecalculated(true);
                         eff->ChangeAmount(amount, false);
+                        UpdateMasteryDependentBuffs(spellId);
                     }
                 }
             }
