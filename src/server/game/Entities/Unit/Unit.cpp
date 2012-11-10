@@ -14914,17 +14914,26 @@ void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply
     float remainingTimePct = (float)m_attackTimer[att] / (GetAttackTime(att) * m_modAttackSpeedPct[att]);
     if (val > 0)
     {
+        if (this->GetTypeId() == TYPEID_PLAYER && att != OFF_ATTACK)
+            ApplyPercentModFloatValue(att == RANGED_ATTACK ? PLAYER_FIELD_MOD_RANGED_HASTE: PLAYER_FIELD_MOD_HASTE, val, !apply);
         ApplyPercentModFloatVar(m_modAttackSpeedPct[att], val, !apply);
         ApplyPercentModFloatValue(UNIT_FIELD_BASEATTACKTIME+att, val, !apply);
     }
     else
     {
+        if (this->GetTypeId() == TYPEID_PLAYER && att != OFF_ATTACK)
+            ApplyPercentModFloatValue(att == RANGED_ATTACK ? PLAYER_FIELD_MOD_RANGED_HASTE: PLAYER_FIELD_MOD_HASTE, -val, apply);
         ApplyPercentModFloatVar(m_modAttackSpeedPct[att], -val, apply);
         ApplyPercentModFloatValue(UNIT_FIELD_BASEATTACKTIME+att, -val, apply);
     }
 
     if (GetTypeId() == TYPEID_PLAYER)
     {
+        // Sanctity of Battle - update hacked spellmods
+        AuraEffectList const& hasteCooldownAura = GetAuraEffectsByType(SPELL_AURA_MOD_SPELL_COOLDOWN_BY_HASTE);
+        for (AuraEffectList::const_iterator i = hasteCooldownAura.begin(); i != hasteCooldownAura.end(); ++i)
+            (*i)->RecalculateAmount(true);
+
         // Update pets attack speed
         if (Pet* pPet = ToPlayer()->GetPet())
             pPet->UpdateAttackSpeed();

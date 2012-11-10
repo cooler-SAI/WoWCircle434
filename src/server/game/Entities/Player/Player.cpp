@@ -21640,12 +21640,12 @@ void Player::AddSpellCooldown(uint32 spellid, uint32 itemid, time_t end_time)
     m_spellCooldowns[spellid] = sc;
 }
 
-void Player::SendCategoryCooldown(uint32 categoryId, uint32 cooldown)
+void Player::SendCategoryCooldown(int32 categoryId, int32 cooldown)
 {
     WorldPacket data(SMSG_SPELL_CATEGORY_COOLDOWN, 12);
     data.WriteBits(1, 23);
-    data << uint32(categoryId);
-    data << uint32(cooldown);
+    data << int32(categoryId);
+    data << int32(-cooldown);
     SendDirectMessage(&data);
 }
 

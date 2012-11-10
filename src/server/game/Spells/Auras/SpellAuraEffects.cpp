@@ -398,7 +398,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleNoImmediateEffect,                         //338 SPELL_AURA_MOD_DURABILITY_LOSS
     &AuraEffect::HandleNULL,                                      //339 SPELL_AURA_INCREASE_SKILL_GAIN_CHANCE
     &AuraEffect::HandleNULL,                                      //340 SPELL_AURA_MOD_RESURRECTED_HEALTH_BY_GUILD_MEMBER
-    &AuraEffect::HandleNULL,                                      //341 SPELL_AURA_MOD_SPELL_CATEGORY_COOLDOWN
+    &AuraEffect::HandleModCategoryCooldown,                       //341 SPELL_AURA_MOD_SPELL_CATEGORY_COOLDOWN
     &AuraEffect::HandleModMeleeRangedSpeedPct,                    //342 SPELL_AURA_MOD_MELEE_RANGED_HASTE_2
     &AuraEffect::HandleNULL,                                      //343 SPELL_AURA_343
     &AuraEffect::HandleNoImmediateEffect,                         //344 SPELL_AURA_MOD_AUTOATTACK_DAMAGE implemented in Unit::MeleeDamageBonusDone
@@ -914,6 +914,27 @@ void AuraEffect::CalculateSpellMod()
                     break;
             }
             break;
+        case SPELL_AURA_MOD_SPELL_COOLDOWN_BY_HASTE:
+        {
+            if (!GetCaster()->ToPlayer())
+                break;
+
+            if (!m_spellmod)
+            {
+                m_spellmod = new SpellModifier(GetBase());
+                m_spellmod->op = SPELLMOD_COOLDOWN;
+                m_spellmod->type = SPELLMOD_PCT;
+                m_spellmod->spellId = GetId();
+                m_spellmod->mask[1] = 0x00028000;
+            }
+            float haste = GetCaster()->ToPlayer()->GetFloatValue(PLAYER_FIELD_MOD_HASTE) * 100.0f;
+            float newValue = -int32(100 - haste);
+            if (newValue > 0)
+                newValue = 0;
+            m_spellmod->value = newValue;
+            break;
+        }
+        break;
         case SPELL_AURA_ADD_FLAT_MODIFIER:
         case SPELL_AURA_ADD_PCT_MODIFIER:
             if (!m_spellmod)
@@ -960,7 +981,6 @@ void AuraEffect::ChangeAmount(int32 newAmount, bool mark, bool onStackOrReapply)
             m_amount = newAmount;
         else
             SetAmount(newAmount);
-        CalculateSpellMod();
     }
 
     for (std::list<AuraApplication*>::const_iterator apptItr = effectApplications.begin(); apptItr != effectApplications.end(); ++apptItr)
@@ -4828,6 +4848,22 @@ void AuraEffect::HandleAuraRetainComboPoints(AuraApplication const* aurApp, uint
 /*********************************************************/
 /***                    OTHERS                         ***/
 /*********************************************************/
+
+void AuraEffect::HandleModCategoryCooldown(AuraApplication const* aurApp, uint8 mode, bool apply) const
+{
+    if (!(mode & AURA_EFFECT_HANDLE_REAL))
+        return;
+
+    Unit* target = aurApp->GetTarget();
+
+    if (target->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    if (apply)
+        target->ToPlayer()->SendCategoryCooldown(GetMiscValue(), GetAmount());
+    else
+        target->ToPlayer()->SendCategoryCooldown(GetMiscValue(), 0);
+}
 
 void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool apply) const
 {

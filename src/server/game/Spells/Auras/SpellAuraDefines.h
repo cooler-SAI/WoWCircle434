@@ -400,7 +400,7 @@ enum AuraType
     SPELL_AURA_MOD_DURABILITY_LOSS                          = 338,
     SPELL_AURA_INCREASE_SKILL_GAIN_CHANCE                   = 339,  // NYI
     SPELL_AURA_MOD_RESURRECTED_HEALTH_BY_GUILD_MEMBER       = 340,  // Increases health gained when resurrected by a guild member by X
-    SPELL_AURA_MOD_SPELL_CATEGORY_COOLDOWN                  = 341,  // NYI
+    SPELL_AURA_MOD_SPELL_CATEGORY_COOLDOWN                  = 341,  // Reduction category cooldown on item spells
     SPELL_AURA_MOD_MELEE_RANGED_HASTE_2                     = 342,
     SPELL_AURA_343                                          = 343,
     SPELL_AURA_MOD_AUTOATTACK_DAMAGE                        = 344,

@@ -2153,7 +2153,8 @@ void WorldSession::HandleCemeteryListOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandlerCategoryCooldownOpocde(WorldPacket& recvPacket)
 {
-    WorldPacket data(SMSG_SPELL_CATEGORY_COOLDOWN, 4);
-    data.WriteBits(0, 23); // TODO: Implement
-    SendPacket(&data);
+    // only used when play entered in the world
+    Unit::AuraEffectList const& categoryCooldownAuras = GetPlayer()->GetAuraEffectsByType(SPELL_AURA_MOD_SPELL_CATEGORY_COOLDOWN);
+    for (Unit::AuraEffectList::const_iterator itr = categoryCooldownAuras.begin(); itr != categoryCooldownAuras.end(); ++itr)
+        GetPlayer()->SendCategoryCooldown((*itr)->GetMiscValue(), (*itr)->GetAmount());
 }
