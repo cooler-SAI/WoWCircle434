@@ -247,6 +247,8 @@ Unit::Unit(bool isWorldObject): WorldObject(isWorldObject)
 
     m_CombatTimer = 0;
 
+    simulacrumTarget = NULL;
+
     for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
         m_threatModifier[i] = 1.0f;
 
@@ -3758,6 +3760,17 @@ void Unit::RemoveAllAuras()
 
 void Unit::RemoveArenaAuras()
 {
+    // cleanup swap auras at first
+    AuraEffectList const &swapAuras = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS_2);
+    for (AuraEffectList::const_iterator i = swapAuras.begin(); i != swapAuras.end(); ++i)
+    {
+        if ((*i)->GetSpellInfo()->IsPassive())
+            continue;
+
+        CleanupSwapAuras((*i)->GetId());
+        RemoveAura((*i)->GetBase());
+    }
+
     // in join, remove positive buffs, on end, remove negative
     // used to remove positive visible auras in arenas
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
@@ -3771,6 +3784,15 @@ void Unit::RemoveArenaAuras()
         else
             ++iter;
     }
+}
+
+void Unit::CleanupSwapAuras(uint32 spellId)
+{
+    if (!this || !this->ToPlayer())
+        return;
+
+    Player* swapOwner = this->ToPlayer();
+    swapOwner->RemoveSpellSwap(spellId);
 }
 
 void Unit::RemoveAllAurasOnDeath()
@@ -7320,6 +7342,36 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     target = this;
                     break;
                 }
+                // Dark Simulacrum
+                case 77606:
+                {
+                    basepoints0 = procSpell->Id;
+                    Unit* caster = triggeredByAura->GetCaster();
+                    victim = this;
+
+                    if (!caster || !victim)
+                        return false;
+
+                    caster->removeSimulacrumTarget();
+
+                    if (!procSpell->IsCanBeStolen() || !triggeredByAura)
+                        return false;
+
+                    if (Creature* targetCreature = victim->ToCreature())
+                        if (!targetCreature->isCanGiveSpell(caster))
+                            return false;
+
+                    caster->setSimulacrumTarget(victim);
+
+                    // Replacer
+                    caster->CastCustomSpell(caster, 77616, &basepoints0, 0, 0, true);
+
+                    // SpellPower
+                    basepoints0 = victim->SpellBaseDamageBonusDone(SpellSchoolMask(procSpell->SchoolMask));
+                    int32 basepoints1 = victim->SpellBaseHealingBonusDone(SpellSchoolMask(procSpell->SchoolMask));
+                    caster->CastCustomSpell(caster, 94984, &basepoints0, &basepoints1, 0, true);
+                    return true;
+                }
             }
             // Blood-Caked Blade
             if (dummySpell->SpellIconID == 138)
@@ -10176,7 +10228,8 @@ int32 Unit::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
         if (((*i)->GetMiscValue() & schoolMask) != 0 &&
         (*i)->GetSpellInfo()->EquippedItemClass == -1 &&
                                                             // -1 == any item class (not wand then)
-        (*i)->GetSpellInfo()->EquippedItemInventoryTypeMask == 0)
+        ((*i)->GetSpellInfo()->EquippedItemInventoryTypeMask == 0
+        || (*i)->GetSpellInfo()->EquippedItemInventoryTypeMask == -1))
                                                             // 0 == any inventory type (not wand then)
             DoneAdvertisedBenefit += (*i)->GetAmount();
 

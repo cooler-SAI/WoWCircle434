@@ -450,6 +450,8 @@ class Spell
         SpellCastTargets m_targets;
         int8 m_comboPointGain;
         SpellCustomErrors m_customError;
+        bool isInstant;
+        bool isStolen;
 
         UsedSpellMods m_appliedMods;
 
@@ -489,6 +491,7 @@ class Spell
         bool HasGlobalCooldown() const;
         void TriggerGlobalCooldown();
         void CancelGlobalCooldown();
+        bool IsDarkSimulacrum() const;
 
         void SendLoot(uint64 guid, LootType loottype);
 

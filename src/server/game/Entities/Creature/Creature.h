@@ -520,6 +520,19 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
         bool AIM_Initialize(CreatureAI* ai = NULL);
         void Motion_Initialize();
 
+        bool isCanGiveSpell(Unit* caster)
+        {
+            if (IsPetGuardianStuff())
+                return true;
+
+            // TODO: we need to make a list spells that can be stolen from bosses/rare elites (there are some exceptions)
+            uint32 rank = GetCreatureTemplate()->rank;
+            if (rank > CREATURE_ELITE_NORMAL)
+                return false;
+
+            return true;
+        }
+
         void AI_SendMoveToPacket(float x, float y, float z, uint32 time, uint32 MovementFlags, uint8 type);
         CreatureAI* AI() const { return (CreatureAI*)i_AI; }
 

@@ -567,6 +567,8 @@ m_caster((info->AttributesEx6 & SPELL_ATTR6_CAST_BY_CHARMER && caster->GetCharme
     m_preCastSpell = 0;
     m_triggeredByAuraSpell  = NULL;
     m_spellAura = NULL;
+    isInstant = false;
+    isStolen = false;
 
     //Auto Shot & Shoot (wand)
     m_autoRepeat = m_spellInfo->IsAutoRepeatRangedSpell();
@@ -2834,6 +2836,14 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                         m_spellAura->SetMaxDuration(duration);
                         m_spellAura->SetDuration(duration);
                     }
+
+                    if (isStolen && (!duration || duration == -1 || duration > 60000))
+                    {
+                        duration = 60000;
+                        m_spellAura->SetMaxDuration(duration);
+                        m_spellAura->SetDuration(duration);
+                    }
+
                     m_spellAura->_RegisterForTargets();
                 }
             }
@@ -3087,6 +3097,9 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     if ((_triggeredCastFlags & TRIGGERED_IGNORE_COMBO_POINTS) || m_CastItem || !m_caster->m_movedPlayer)
         m_needComboPoints = false;
 
+    if (IsDarkSimulacrum())
+        isStolen = true;
+
     SpellCastResult result = CheckCast(true);
     if (result != SPELL_CAST_OK && !IsAutoRepeat())          //always cast autorepeat dummy for triggering
     {
@@ -3113,6 +3126,14 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
         m_caster->ToPlayer()->SetSpellModTakingSpell(this, true);
     // calculate cast time (calculated after first CheckCast check to prevent charge counting for first CheckCast fail)
     m_casttime = m_spellInfo->CalcCastTime(m_caster, this);
+
+    // If spell not channeled and was stolen he have no cast time
+    if (isStolen && !m_spellInfo->IsChanneled() && m_spellInfo->Id != 605)
+        m_casttime = 0;
+
+    if (!m_casttime)
+        isInstant = true;
+
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
     {
         m_caster->ToPlayer()->SetSpellModTakingSpell(this, false);
@@ -6061,6 +6082,10 @@ SpellCastResult Spell::CheckPower()
     if (m_CastItem)
         return SPELL_CAST_OK;
 
+    // Dark Simulacrum case
+    if (isStolen)
+        return SPELL_CAST_OK;
+
     // health as power used - need check health amount
     if (m_spellInfo->PowerType == POWER_HEALTH)
     {
@@ -7428,6 +7453,31 @@ void Spell::CancelGlobalCooldown()
         m_caster->GetCharmInfo()->GetGlobalCooldownMgr().CancelGlobalCooldown(m_spellInfo);
     else if (m_caster->GetTypeId() == TYPEID_PLAYER)
         m_caster->ToPlayer()->GetGlobalCooldownMgr().CancelGlobalCooldown(m_spellInfo);
+}
+
+bool Spell::IsDarkSimulacrum() const
+{
+    // Dark Simulacrum
+    if (AuraEffect* darkSimulacrum = m_caster->GetAuraEffect(77616, 0))
+    {
+        if (m_spellInfo->Id == darkSimulacrum->GetAmount())
+            return true;
+        else
+        {
+            SpellInfo const* amountSpell = sSpellMgr->GetSpellInfo(darkSimulacrum->GetAmount());
+            if (!amountSpell)
+                return false;
+
+            SpellInfo const* triggerSpell = sSpellMgr->GetSpellInfo(amountSpell->Effects[0].BasePoints);
+            if (!triggerSpell)
+                return false;
+
+            if (m_spellInfo->Id == triggerSpell->Id)
+                return true;
+        }
+    }
+
+    return false;
 }
 
 namespace Trinity

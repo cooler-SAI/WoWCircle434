@@ -532,6 +532,7 @@ public:
     bool IsBreakingStealth() const;
 
     bool IsShouldProcOnOwner() const;
+    bool IsCanBeStolen() const;
 
     // loading helpers
     uint32 _GetExplicitTargetMask() const;

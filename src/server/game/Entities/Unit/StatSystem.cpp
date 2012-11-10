@@ -977,6 +977,13 @@ bool Guardian::UpdateStats(Stats stat)
             ownersBonus = CalculatePct(owner->GetStat(stat), 30);
             value += ownersBonus;
         }
+        else if (owner->getClass() == CLASS_DEATH_KNIGHT && GetEntry() == 31216)
+        {
+            if (owner->getSimulacrumTarget())
+                ownersBonus = float(owner->getSimulacrumTarget()->GetStat(stat)) * 0.3f;
+            else
+                ownersBonus = float(owner->GetStat(stat)) * 0.3f;
+        }
     }
 /*
     else if (stat == STAT_STRENGTH)

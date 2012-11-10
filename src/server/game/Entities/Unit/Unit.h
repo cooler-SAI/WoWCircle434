@@ -1318,6 +1318,8 @@ class Unit : public WorldObject
         bool isTotem() const    { return m_unitTypeMask & UNIT_MASK_TOTEM; }
         bool IsVehicle() const  { return m_unitTypeMask & UNIT_MASK_VEHICLE; }
 
+        bool IsPetGuardianStuff() const { return m_unitTypeMask & ( UNIT_MASK_SUMMON | UNIT_MASK_GUARDIAN | UNIT_MASK_PET | UNIT_MASK_HUNTER_PET | UNIT_MASK_TOTEM ); }
+
         uint8 getLevel() const { return uint8(GetUInt32Value(UNIT_FIELD_LEVEL)); }
         uint8 getLevelForTarget(WorldObject const* /*target*/) const { return getLevel(); }
         void SetLevel(uint8 lvl);
@@ -1771,6 +1773,7 @@ class Unit : public WorldObject
         void RemoveAllAurasRequiringDeadTarget();
         void RemoveAllAurasExceptType(AuraType type);
         void DelayOwnedAuras(uint32 spellId, uint64 caster, int32 delaytime);
+        void CleanupSwapAuras(uint32 spellId);
 
         void _RemoveAllAuraStatMods();
         void _ApplyAllAuraStatMods();
@@ -2219,6 +2222,18 @@ class Unit : public WorldObject
 
         void OnEclipseBuff(bool sun);
 
+        std::map<uint32, uint32> _spellSwaps;
+        void AddSpellSwap(uint32 oldSpell, uint32 newSpell) { _spellSwaps[oldSpell] = newSpell; }
+        void RemoveSpellSwap(uint32 originalSpell) { _spellSwaps.erase(originalSpell); }
+        uint32 GetSpellForCast(uint32 spellId) const
+        {
+            std::map<uint32, uint32>::const_iterator itr = _spellSwaps.find(spellId);
+            if (itr != _spellSwaps.end())
+                return itr->second;
+
+            return spellId;
+        }
+
         Unit *m_SoulSwapTarget;
         std::list<uint32> m_BufferAuras; // for soul swap
 
@@ -2231,6 +2246,11 @@ class Unit : public WorldObject
         uint32 GetDamageTakenInPastSecs(uint32 secs);
         void ResetDamageDoneInPastSecs(uint32 secs);
         void ResetHealingDoneInPastSecs(uint32 secs);
+
+        // helper for dark simulacrum spell
+        Unit* getSimulacrumTarget() { return simulacrumTarget && simulacrumTarget->IsInWorld() ? simulacrumTarget : NULL; }
+        void setSimulacrumTarget(Unit* victim) { simulacrumTarget = victim; }
+        void removeSimulacrumTarget() { simulacrumTarget = NULL; }
 
     protected:
         explicit Unit (bool isWorldObject);
@@ -2343,6 +2363,8 @@ class Unit : public WorldObject
         uint32 m_state;                                     // Even derived shouldn't modify
         uint32 m_CombatTimer;
         TimeTrackerSmall m_movesplineTimer;
+
+        Unit* simulacrumTarget;
 
         Diminishing m_Diminishing;
         // Manage all Units that are threatened by us

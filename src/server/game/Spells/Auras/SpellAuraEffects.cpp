@@ -389,8 +389,8 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleNULL,                                      //329 SPELL_AURA_MOD_RUNE_POWER_REGEN
     &AuraEffect::HandleNoImmediateEffect,                         //330 SPELL_AURA_CAST_WHILE_WALKING
     &AuraEffect::HandleAuraForceWeather,                          //331 SPELL_AURA_FORCE_WEATHER
-    &AuraEffect::HandleNoImmediateEffect,                         //332 SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS implemented in WorldSession::HandleCastSpellOpcode
-    &AuraEffect::HandleNoImmediateEffect,                         //333 SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS_2 implemented in WorldSession::HandleCastSpellOpcode
+    &AuraEffect::HandleAuraSwapSpells,                            //332 SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS
+    &AuraEffect::HandleAuraSwapSpells,                            //333 SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS_2
     &AuraEffect::HandleNULL,                                      //334 SPELL_AURA_MOD_BLIND
     &AuraEffect::HandleNULL,                                      //335 SPELL_AURA_335
     &AuraEffect::HandleNoImmediateEffect,                         //336 SPELL_AURA_MOD_FLYING_RESTRICTIONS
@@ -2430,8 +2430,10 @@ void AuraEffect::HandleAuraCloneCaster(AuraApplication const* aurApp, uint8 mode
         if (!caster || caster == target)
             return;
 
+        Unit* displayOwner = caster->getSimulacrumTarget() ? caster->getSimulacrumTarget() : caster;
+
         // What must be cloned? at least display and scale
-        target->SetDisplayId(caster->GetDisplayId());
+        target->SetDisplayId(displayOwner->GetDisplayId());
         //target->SetObjectScale(caster->GetFloatValue(OBJECT_FIELD_SCALE_X)); // we need retail info about how scaling is handled (aura maybe?)
         target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_MIRROR_IMAGE);
     }
@@ -5528,6 +5530,82 @@ void AuraEffect::HandleAuraLinked(AuraApplication const* aurApp, uint8 mode, boo
         // change the stack amount to be equal to stack amount of our aura
         if (Aura* triggeredAura = target->GetAura(triggeredSpellId, casterGUID))
             triggeredAura->ModStackAmount(GetBase()->GetStackAmount() - triggeredAura->GetStackAmount());
+    }
+}
+
+void AuraEffect::HandleAuraSwapSpells(AuraApplication const * aurApp, uint8 mode, bool apply) const
+{
+    if (!(mode & AURA_EFFECT_HANDLE_REAL))
+        return;
+
+    Player* target = aurApp->GetTarget()->ToPlayer();
+
+    if (!target)
+        return;
+
+    uint32 newSpellId = uint32(GetAmount());
+
+    bool foundAny = false;
+    PlayerSpellMap const& spells = target->GetSpellMap();
+
+    for (PlayerSpellMap::const_iterator itr = spells.begin(); itr != spells.end(); ++itr)
+    {
+        if (itr->second->state == PLAYERSPELL_REMOVED)
+            continue;
+
+        if (!itr->second->active || itr->second->disabled)
+            continue;
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+
+        if (!IsAffectingSpell(spellInfo))
+            continue;
+
+        switch (itr->first)
+        {
+            // Trap Launcher
+            case 77769:
+            {
+                aurApp->GetBase()->SetDuration(50);
+                break;
+            }
+            // Nether Ward
+            case 6229:
+            {
+                if (target->HasAura(91713) && (target->HasAura(687) || target->HasAura(28176)))
+                    newSpellId = 91711;
+                break;
+            }
+            // Holy Word: Chastise
+            case 88625:
+            {
+                // Revelations
+                if (target->HasAura(88627))
+                    if (AuraEffect * aur = target->GetAuraEffect(SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS, SPELLFAMILY_PRIEST, 0x0, 0x00001000, 0x0))
+                        newSpellId = aur->GetAmount();
+                break;
+            }
+            default:
+                break;
+        }
+
+        if (!newSpellId)
+            continue;
+
+        foundAny = true;
+
+        if (apply)
+            target->AddSpellSwap(itr->first, newSpellId);
+        else
+            target->RemoveSpellSwap(itr->first);
+    }
+
+    if (foundAny)
+    {
+        if (apply)
+            target->AddTemporarySpell(newSpellId);
+        else
+            target->RemoveTemporarySpell(newSpellId);
     }
 }
 
