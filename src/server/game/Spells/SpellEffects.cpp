@@ -1059,6 +1059,46 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 } 
             }
             break;
+        case SPELLFAMILY_DRUID:
+            // Skull Bash
+            if  (m_spellInfo->SpellFamilyFlags[2] & 0x10000000)
+            {
+                if (AuraEffect const * brutalimpact = m_caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 473, 0))
+                    if (unitTarget->IsNonMeleeSpellCasted(false, false, true, false, true))
+                        m_caster->CastSpell(unitTarget, m_spellInfo->Id == 80964 ? 82364 : 82365, true);
+                 
+                return;
+            }
+            switch(m_spellInfo->Id)
+            {
+                // Wild Mushroom: Detonate
+                case 88751:
+                {
+                    std::list<Creature*> summons;
+                    m_caster->GetCreatureListWithEntryInGrid(summons, 47649, 50.f);
+                    for (std::list<Creature*>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                    {
+                        if (!(*itr) || !(*itr)->isAlive() ||
+                            (*itr)->GetOwnerGUID() != m_caster->GetGUID())
+                            continue;
+
+                        (*itr)->SetVisible(true);
+
+                        // Deal damage
+                        m_caster->CastSpell((*itr), 78777, true);
+
+                        // Fungal Growth
+                        if (AuraEffect * auraeff = m_caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 2681, 0))
+                            m_caster->CastSpell((*itr), auraeff->GetId() == 78789 ? 81283: 81291, true);
+
+                        (*itr)->CastSpell((*itr), 92701, true);
+                        (*itr)->CastSpell((*itr), 92853, true);
+                        (*itr)->DespawnOrUnsummon(500);
+                    }
+                    break;
+                }
+            }
+            break;
     }
 
     //spells triggered by dummy effect should not miss
@@ -2736,6 +2776,33 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                     float radius = m_spellInfo->Effects[effIndex].CalcRadius();
 
                     TempSummonType summonType = (duration == 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
+
+                    switch (m_spellInfo->Id)
+                    {
+                        // Wild Mushroom
+                        case 88747:
+                        {
+                            numSummons = 1;
+                            std::list<Creature*> summons;
+                            uint32 num = 0;
+                            m_originalCaster->GetCreatureListWithEntryInGrid(summons, 47649, 50.f);
+                            if (summons.size() > 0)
+                                for (std::list<Creature*>::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                                    if ((*itr)->GetOwnerGUID() == m_originalCaster->GetGUID())
+                                        num++;
+                            if (num >= 3)
+                                return;
+
+                            break;
+                        }
+                    }
+
+                    if (m_spellInfo->Id == 18662 || // Curse of Doom
+                        properties->Id == 2081)     // Mechanical Dragonling, Arcanite Dragonling, Mithril Dragonling TODO: Research on meaning of basepoints
+                        numSummons = 1;
+
+                    if ((properties->Id == 2081 || m_spellInfo->Id == 13258 || m_spellInfo->Id == 13166) && !m_CastItem)
+                         return;
 
                     for (uint32 count = 0; count < numSummons; ++count)
                     {

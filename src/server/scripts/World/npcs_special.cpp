@@ -3561,6 +3561,46 @@ public:
     }
 };
 
+class npc_wild_mushroom : public CreatureScript
+{
+public:
+    npc_wild_mushroom() : CreatureScript("npc_wild_mushroom") {}
+
+    struct npc_wild_mushroomAI : public ScriptedAI
+    {
+        npc_wild_mushroomAI(Creature *c) : ScriptedAI(c)
+        {
+            vis = true;
+            uiInvisTimer = 6000;
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetSpeed(MOVE_WALK, 0.0f);
+            DoCast(me, 94081);
+        }
+
+        uint32 uiInvisTimer;
+        bool vis;
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!vis)
+                return;
+
+            if (uiInvisTimer <= diff)
+            {
+                me->SetVisible(false);
+                vis = false;
+            } else uiInvisTimer -= diff;
+        }
+    };
+
+    CreatureAI *GetAI(Creature *creature) const
+    {
+        return new npc_wild_mushroomAI(creature);
+    }
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3601,4 +3641,5 @@ void AddSC_npcs_special()
     new npc_bloodworm();
     new npc_flame_orb();
     new npc_power_word_barrier();
+    new npc_wild_mushroom();
 }

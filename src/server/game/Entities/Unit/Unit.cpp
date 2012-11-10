@@ -12614,6 +12614,43 @@ void Unit::setDeathState(DeathState s)
         SetHealth(0);
         SetPower(getPowerType(), 0);
 
+        // Warlock: Demonic Rebirth
+        if (isPet())
+        {
+            if (Unit* owner = GetOwner())
+            {
+                Aura *aur = NULL;
+                if ((aur = owner->GetAura(88446)) || (aur = owner->GetAura(88447)))
+                {
+                    int32 bp0 = -aur->GetSpellInfo()->Effects[0].BasePoints;
+                    owner->CastCustomSpell(owner, 88448, &bp0, 0, 0, true);
+                }
+            }
+        }
+        // Druid: Fungal Growth
+        switch (GetEntry())
+        {
+            case 1964:
+            case 47649:
+                if (Unit* owner = GetOwner())
+                {
+                    if (owner->GetTypeId() != TYPEID_PLAYER
+                        || owner->ToPlayer()->HasSpellCooldown(81291)
+                        || owner->ToPlayer()->HasSpellCooldown(81283))
+                        break;
+
+                    uint32 spellId = 0;
+                    if (owner->HasAura(78788))
+                        spellId = 81291;
+                    else if (owner->HasAura(78789))
+                        spellId = 81283;
+
+                    if (spellId)
+                        owner->ToPlayer()->AddSpellCooldown(spellId, 0, time(NULL) + sSpellMgr->GetSpellInfo(spellId)->RecoveryTime / 1000);
+                }
+                break;
+        }
+
         // players in instance don't have ZoneScript, but they have InstanceScript
         if (ZoneScript* zoneScript = GetZoneScript() ? GetZoneScript() : (ZoneScript*)GetInstanceScript())
             zoneScript->OnUnitDeath(this);

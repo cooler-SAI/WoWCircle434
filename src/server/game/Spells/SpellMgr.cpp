@@ -3007,6 +3007,15 @@ void SpellMgr::LoadDbcDataCorrections()
             case 59735:
                 spellInfo->Effects[EFFECT_1].TriggerSpell = 59736;
                 break;
+            // Wild Mushroom: Detonate dmg
+            case 78777:
+                spellInfo->Effects[0].SetRadiusIndex(29);
+                break;
+            // Fungal Growth
+            case 81289:
+            case 81282:
+                spellInfo->Effects[0].BasePoints = 100;
+                break;
             // Avenger's Shield
             case 31935:
                 spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
@@ -3975,5 +3984,11 @@ void SpellMgr::LoadDbcDataCorrections()
     properties->Type = SUMMON_TYPE_TOTEM;
     properties = const_cast<SummonPropertiesEntry*>(sSummonPropertiesStore.LookupEntry(647)); // 52893
     properties->Type = SUMMON_TYPE_TOTEM;
+    properties = const_cast<SummonPropertiesEntry*>(sSummonPropertiesStore.LookupEntry(3002)); // 46157
+    properties->Type = SUMMON_TYPE_TOTEM;
+    properties = const_cast<SummonPropertiesEntry*>(sSummonPropertiesStore.LookupEntry(3001)); // Wild Mushrooms
+    properties->Type = SUMMON_TYPE_TOTEM;
+    properties->Flags &= ~512;
+
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded spell dbc data corrections in %u ms", GetMSTimeDiffToNow(oldMSTime));
 }
