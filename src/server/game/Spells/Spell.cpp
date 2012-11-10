@@ -2545,6 +2545,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     }
     CallScriptOnHitHandlers();
 
+    // garotta, cheap shot and kidney shot now procs poisons and stuff
+    if(caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE && m_spellInfo->SpellFamilyFlags[0] & 0x00200500)
+        caster->ToPlayer()->CastItemCombatSpell(unitTarget, m_attackType, PROC_FLAG_TAKEN_DAMAGE, procEx);
+
     // All calculated do it!
     // Do healing and triggers
     if (m_healing > 0)
