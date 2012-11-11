@@ -5049,6 +5049,16 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Wrath of Tarecgosa
+                case 101056:
+                {
+                    if (!roll_chance_i(4))
+                        return false;
+
+                    basepoints0 = damage;
+                    triggered_spell_id = 101085;
+                    break;
+                }
                 // Eye for an Eye
                 case 9799:
                 case 25988:
@@ -14126,6 +14136,7 @@ bool InitTriggerAuraData()
     isTriggerAura[SPELL_AURA_ABILITY_IGNORE_AURASTATE] = true;
     isTriggerAura[SPELL_AURA_ADD_FLAT_MODIFIER] = true;
     isTriggerAura[SPELL_AURA_ADD_PCT_MODIFIER] = true;
+    isTriggerAura[SPELL_AURA_PROC_TRIGGER_SPELL_COPY] = true;
 
     isNonTriggerAura[SPELL_AURA_MOD_POWER_REGEN] = true;
     isNonTriggerAura[SPELL_AURA_REDUCE_PUSHBACK] = true;
@@ -14390,6 +14401,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     }
                     case SPELL_AURA_MANA_SHIELD:
                     case SPELL_AURA_DUMMY:
+                    case SPELL_AURA_PROC_TRIGGER_SPELL_COPY:
                     {
                         sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "ProcDamageAndSpell: casting spell id %u (triggered by %s dummy aura of spell %u)", spellInfo->Id, (isVictim?"a victim's":"an attacker's"), triggeredByAura->GetId());
                         if (HandleDummyAuraProc(target, damage, triggeredByAura, procSpell, procFlag, procExtra, cooldown))
