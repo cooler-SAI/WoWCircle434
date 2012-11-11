@@ -24,6 +24,7 @@ set(scripts_STAT_SRCS
   Spells/spell_paladin.cpp
   Spells/spell_item.cpp
   Spells/spell_holiday.cpp
+  Spells/pet_scaling_auras.cpp
 )
 
 message("  -> Prepared: Spells")
