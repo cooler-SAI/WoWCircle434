@@ -1774,7 +1774,9 @@ bool Aura::CanStackWith(Aura const* existingAura) const
         }
     }
 
-    if (!petSpell && ((m_spellInfo->GetMaxDuration() <= 60*IN_MILLISECONDS && m_spellInfo->GetMaxDuration() != -1) || (existingSpellInfo->GetMaxDuration() <= 60*IN_MILLISECONDS && existingSpellInfo->GetMaxDuration() != -1)))
+    if (!petSpell && m_spellInfo->SpellIconID != existingSpellInfo->SpellIconID &&
+        ((m_spellInfo->GetMaxDuration() <= 60*IN_MILLISECONDS && m_spellInfo->GetMaxDuration() != -1) || 
+        (existingSpellInfo->GetMaxDuration() <= 60*IN_MILLISECONDS && existingSpellInfo->GetMaxDuration() != -1)))
         return true;
 
     if (m_spellInfo->Id == 16191) // mana tide buff
@@ -1786,15 +1788,19 @@ bool Aura::CanStackWith(Aura const* existingAura) const
             if ((m_spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA || m_spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID) &&
                 (existingSpellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA || existingSpellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID) &&
                 m_spellInfo->Effects[i].ApplyAuraName == existingSpellInfo->Effects[i].ApplyAuraName)
-                switch (m_spellInfo->Effects[i].Effect)
+                switch (m_spellInfo->Effects[i].ApplyAuraName)
                 {
                     case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
                     case SPELL_AURA_MOD_STAT:
                     case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:
                         if (m_spellInfo->Effects[i].MiscValue == existingSpellInfo->Effects[i].MiscValue || (m_spellInfo->Effects[i].MiscValueB != 0 && 
                             m_spellInfo->Effects[i].MiscValueB == existingSpellInfo->Effects[i].MiscValueB))
-                        return false;
-                    break;
+                            return false;
+                        break;
+                    case SPELL_AURA_MOD_RATING:
+                        if (m_spellInfo->SpellIconID == existingSpellInfo->SpellIconID && m_spellInfo->Effects[i].MiscValue == existingSpellInfo->Effects[i].MiscValue)
+                            return false;
+                        break;
                     default:
                         break;
             }

@@ -12055,7 +12055,8 @@ bool Unit::IsAlwaysDetectableFor(WorldObject const* seer) const
     if (WorldObject::IsAlwaysDetectableFor(seer))
         return true;
 
-    if (HasAuraTypeWithCaster(SPELL_AURA_MOD_STALKED, seer->GetGUID()))
+    // Hunter's Mark
+    if (HasAura(1130, seer->GetGUID()) && !HasAura(11327))
         return true;
 
     return false;
