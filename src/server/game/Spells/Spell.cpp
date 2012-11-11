@@ -2477,6 +2477,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
     if (spellHitTarget)
     {
+        bool targetcasting = spellHitTarget->IsNonMeleeSpellCasted(false);
+
         SpellMissInfo missInfo2 = DoSpellHitOnUnit(spellHitTarget, mask, target->scaleAura);
         if (missInfo2 != SPELL_MISS_NONE)
         {
@@ -2485,6 +2487,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
             m_damage = 0;
             spellHitTarget = NULL;
         }
+        else if( targetcasting && spellHitTarget->IsNonMeleeSpellCasted(false) == false)
+            procEx |= PROC_EX_INTERRUPT;
     }
 
     // Do not take combo points on dodge and miss
