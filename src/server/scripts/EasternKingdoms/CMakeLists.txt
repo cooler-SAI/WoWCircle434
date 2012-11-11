@@ -219,6 +219,8 @@ set(scripts_STAT_SRCS
   EasternKingdoms/BaradinHold/boss_alizabal.cpp
   EasternKingdoms/BaradinHold/instance_baradin_hold.cpp
   EasternKingdoms/BaradinHold/baradin_hold.h
+  EasternKingdoms/Firelands/instance_firelands.cpp
+  EasternKingdoms/Firelands/firelands.h
 )
 
 message("  -> Prepared: Eastern Kingdoms")
