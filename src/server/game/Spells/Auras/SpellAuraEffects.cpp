@@ -1647,6 +1647,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
                 target->RemoveAura(itr);
             else
                 ++itr;
+
         }
     }
 }

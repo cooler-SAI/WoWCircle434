@@ -195,6 +195,7 @@ enum AuraType
     SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT                  = 133,
     SPELL_AURA_MOD_MANA_REGEN_INTERRUPT                     = 134,
     SPELL_AURA_MOD_HEALING_DONE                             = 135,
+
     SPELL_AURA_MOD_HEALING_DONE_PERCENT                     = 136,
     SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE                    = 137,
     SPELL_AURA_MOD_MELEE_HASTE                              = 138,

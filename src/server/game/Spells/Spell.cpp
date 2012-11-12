@@ -7264,6 +7264,7 @@ bool Spell::CallScriptEffectHandlers(SpellEffIndex effIndex, SpellEffectHandleMo
     return preventDefault;
 }
 
+
 void Spell::CallScriptBeforeHitHandlers()
 {
     for (std::list<SpellScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
