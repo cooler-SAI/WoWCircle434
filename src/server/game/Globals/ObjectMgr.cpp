@@ -2098,7 +2098,7 @@ uint32 FillItemArmor(uint32 itemlevel, uint32 itemClass, uint32 itemSubclass, ui
         if (itemSubclass < ITEM_SUBCLASS_ARMOR_CLOTH)
             return 0;
 
-        return uint32(armorQuality->Value[quality] * armorToral->Value[quality] * location->Value[itemSubclass - 1] + 0.5f);
+        return uint32(armorQuality->Value[quality] * armorToral->Value[itemSubclass - 1] * location->Value[itemSubclass - 1] + 0.5f);
     }
 
     // shields
