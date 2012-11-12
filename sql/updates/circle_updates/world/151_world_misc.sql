@@ -1,4 +1,4 @@
-п»їDELETE FROM `creature` WHERE `id`=52368;
+DELETE FROM `creature` WHERE `id`=52368;
 DELETE FROM `creature` WHERE `id`=52389;
 DELETE FROM `creature` WHERE `id`=52369;
 DELETE FROM `creature` WHERE `guid`=345427 AND `id`=52428;
@@ -20,8 +20,8 @@ UPDATE `gameobject_template` SET `flags`=4 WHERE `entry`=207619;
 UPDATE `gameobject_template` SET `flags`=4 WHERE `entry`=208953;
 UPDATE `gameobject_template` SET `flags`=4 WHERE `entry`=209849;
 
-UPDATE `creature_template` SET minlevel=87, maxlevel=87, flagsextra=128 WHERE `entry`=52369;
-UPDATE `creature_template` SET minlevel=87, maxlevel=87, flagsextra=128 WHERE `entry`=52368;
+UPDATE `creature_template` SET minlevel=87, maxlevel=87, flags_extra=128 WHERE `entry`=52369;
+UPDATE `creature_template` SET minlevel=87, maxlevel=87, flags_extra=128 WHERE `entry`=52368;
 
 UPDATE `instance_template` SET `Script`='instance_baradin_hold' WHERE `map`=757;
 
@@ -61,18 +61,18 @@ INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language
 
 DELETE FROM `locales_creature_text` WHERE `entry`=55869;
 INSERT INTO `locales_creature_text` (`entry`, `textgroup`, `id`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`) VALUES
-(55869, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'РќРµРЅР°РІРёР¶Сѓ РёСЃРєР°С‚РµР»РµР№ РїСЂРёРєР»СЋС‡РµРЅРёР№.'),
-(55869, 1, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'РќРµРЅР°РІРёР¶Сѓ... РєР°Р¶РґРѕРіРѕ РёР· РІР°СЃ...'),
-(55869, 2, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'РљР°Рє Р¶Рµ СЏ РќР•РќРђР’РР–РЈ СЌС‚Рѕ РјРµСЃС‚Рѕ. РўРµ, РєС‚Рѕ РјРµРЅСЏ РїР»РµРЅРёР», РЅР°РІРµСЂРЅСЏРєР° РґР°РІРЅРѕ РјРµСЂС‚РІС‹, РЅРѕ СЌС‚Рѕ РЅРµ РїРѕРјРµС€Р°РµС‚ РјРЅРµ РІС‹РјРµСЃС‚РёС‚СЊ Р·Р»Рѕ РЅР° РІР°СЃ, Р¶Р°Р»РєРёРµ РёСЃРєР°С‚РµР»Рё СЃРѕРєСЂРѕРІРёС‰.'),
-(55869, 3, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'РќРµРЅР°РІРёР¶Сѓ РЅРµСѓРјРµР»С‹С… СЂРµР№РґРµСЂРѕРІ.'),
-(55869, 4, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'РЇ РЅРµРЅР°РІРёР¶Сѓ РјРµСЂС‚РІС‹С….'),
-(55869, 4, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'РќРµРЅР°РІРёРґРёС€СЊ РјРµРЅСЏ? РћС‚Р»РёС‡РЅРѕ.'),
-(55869, 4, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'РЇ РЅРµРЅР°РІРёР¶Сѓ СЃРѕСЃС‚СЂР°РґР°РЅРёРµ.'),
-(55869, 4, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Рђ РІРѕС‚ СЌС‚Рѕ СЏ РЅРµ РЅРµРЅР°РІРёР¶Сѓ.'),
-(55869, 5, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'РЇ РЅРµРЅР°РІРёР¶Сѓ Р±СЂРѕРЅСЋ.'),
-(55869, 5, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'РЇ РЅРµРЅР°РІРёР¶Сѓ РјСѓС‡РµРЅРёРєРѕРІ.'),
-(55869, 5, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'РџСЂРѕС‡СѓРІСЃС‚РІСѓР№ РјРѕСЋ РЅРµРЅР°РІРёСЃС‚СЊ!'),
-(55869, 5, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'РњРѕСЏ РЅРµРЅР°РІРёСЃС‚СЊ РЅРµСѓРіР°СЃРёРјР°!'),
-(55869, 5, 4, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'РњРѕСЏ РЅРµРЅР°РІРёСЃС‚СЊ РїРѕРіР»РѕС‚РёС‚ С‚РµР±СЏ!'),
-(55869, 6, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'РЇ РЅРµРЅР°РІРёР¶Сѓ РІР°СЃ РІСЃРµС…!'),
-(55869, 6, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'РЇ РЅРµРЅР°РІРёР¶Сѓ СЃС‚РѕСЏС‚СЊ РЅР° РјРµСЃС‚Рµ.');
+(55869, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Ненавижу искателей приключений.'),
+(55869, 1, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Ненавижу... каждого из вас...'),
+(55869, 2, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Как же я НЕНАВИЖУ это место. Те, кто меня пленил, наверняка давно мертвы, но это не помешает мне выместить зло на вас, жалкие искатели сокровищ.'),
+(55869, 3, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Ненавижу неумелых рейдеров.'),
+(55869, 4, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Я ненавижу мертвых.'),
+(55869, 4, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Ненавидишь меня? Отлично.'),
+(55869, 4, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Я ненавижу сострадание.'),
+(55869, 4, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'А вот это я не ненавижу.'),
+(55869, 5, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Я ненавижу броню.'),
+(55869, 5, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Я ненавижу мучеников.'),
+(55869, 5, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Прочувствуй мою ненависть!'),
+(55869, 5, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Моя ненависть неугасима!'),
+(55869, 5, 4, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Моя ненависть поглотит тебя!'),
+(55869, 6, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Я ненавижу вас всех!'),
+(55869, 6, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Я ненавижу стоять на месте.');
