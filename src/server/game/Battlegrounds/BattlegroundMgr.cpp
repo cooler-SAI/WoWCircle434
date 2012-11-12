@@ -150,11 +150,13 @@ void BattlegroundMgr::Update(uint32 diff)
 
 void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket *data, Battleground *bg, Player* player, uint8 QueueSlot, uint8 StatusID, uint32 Time1, uint32 Time2, uint8 arenatype, uint8 uiFrame)
 {
-    if (!bg)
-        StatusID = STATUS_NONE;
+    ObjectGuid playerGuid = player->GetGUID();	
+    ObjectGuid bgGuid;
 
-    ObjectGuid playerGuid = player->GetGUID();
-    ObjectGuid bgGuid = bg->GetGUID();
+    if (bg)
+        bgGuid = bg->GetGUID();	
+    else	
+        StatusID = STATUS_NONE;
 
     switch (StatusID)
     {
@@ -301,7 +303,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket *data, Battlegro
             data->WriteBit(bgGuid[7]);
             data->WriteBit(bgGuid[1]);
             data->WriteBit(playerGuid[5]);
-            data->WriteBit(bg->isArena() ? uiFrame : bg->GetPlayerTeam(playerGuid) == ALLIANCE);    // Arena Frames on Arenas and Faction on Battlegrounds
+            data->WriteBit(bg->isArena() ? uiFrame : player->GetBGTeam() == ALLIANCE);    // Arena Frames on Arenas and Faction on Battlegrounds
             data->WriteBit(bgGuid[0]);
             data->WriteBit(playerGuid[1]);
             data->WriteBit(bgGuid[3]);
@@ -407,7 +409,7 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
         data->WriteBit(guid[5]);
         data->WriteBit(guid[1]);
         data->WriteBit(guid[6]);
-        data->WriteBit(player->GetTeam() == ALLIANCE);
+        data->WriteBit(player->GetBGTeam() == ALLIANCE);
         data->WriteBit(guid[7]);
 
         buff << uint32(itr2->second->HealingDone);             // healing done
@@ -1182,8 +1184,6 @@ void BattlegroundMgr::SendToBattleground(Player* player, uint32 instanceId, Batt
         float x, y, z, O;
         uint32 mapid = bg->GetMapId();
         uint32 team = player->GetBGTeam();
-        if (team == 0)
-            team = player->GetTeam();
 
         bg->GetTeamStartLoc(team, x, y, z, O);
         sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattlegroundMgr::SendToBattleground: Sending %s to map %u, X %f, Y %f, Z %f, O %f (bgType %u)", player->GetName(), mapid, x, y, z, O, bgTypeId);

@@ -47,7 +47,7 @@ bool ArenaTeam::Create(uint64 captainGuid, uint8 slot, std::string teamName, uin
         return false;
 
     // Check if arena team name is already taken
-    if (sArenaTeamMgr->GetArenaTeamByName(TeamName))
+    if (sArenaTeamMgr->GetArenaTeamByName(teamName))
         return false;
 
     // Generate new arena team id

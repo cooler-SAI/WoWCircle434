@@ -2263,6 +2263,7 @@ void AchievementMgr<Player>::SendAchievementInfo(Player* receiver, uint32 /*achi
 
 template<>
 void AchievementMgr<Guild>::SendAchievementInfo(Player* receiver, uint32 achievementId /*= 0*/) const
+
 {
     //will send response to criteria progress request
     AchievementCriteriaEntryList const* criteria = sAchievementMgr->GetAchievementCriteriaByAchievement(achievementId);
@@ -3065,13 +3066,20 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_ITEM_QUALITY_MIN: // 14
-            case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_ITEM_QUALITY_EQUALS: // 15
             {
                 // miscValue1 is itemid
                 ItemTemplate const * const item = sObjectMgr->GetItemTemplate(uint32(miscValue1));
                 if (!item || item->Quality < reqValue)
                     return false;
                 break;
+            }
+            case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_ITEM_QUALITY_EQUALS: // 15
+            {	
+                // miscValue1 is itemid	
+                ItemTemplate const * const item = sObjectMgr->GetItemTemplate(uint32(miscValue1));	
+                if (!item || item->Quality != reqValue)	
+                    return false;
+                break;	
             }
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_MAP_DIFFICULTY: // 20
             {

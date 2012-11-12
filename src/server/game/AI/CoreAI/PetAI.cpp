@@ -137,7 +137,7 @@ void PetAI::UpdateAI(const uint32 diff)
         }
     }
     else if (owner && !me->HasUnitState(UNIT_STATE_FOLLOW)) // no charm info and no victim
-        HandleReturnMovement();
+        me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
 
     if (!me->GetCharmInfo())
         return;
@@ -240,6 +240,7 @@ void PetAI::UpdateAI(const uint32 diff)
             targets.SetUnitTarget(target);
 
             if (!me->HasInArc(M_PI, target))
+
             {
                 me->SetInFront(target);
                 if (target && target->GetTypeId() == TYPEID_PLAYER)

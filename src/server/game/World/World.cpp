@@ -1956,6 +1956,7 @@ void World::Update(uint32 diff)
         if (m_updateTimeSum > m_int_configs[CONFIG_INTERVAL_LOG_UPDATE])
         {
             sLog->outDebug(LOG_FILTER_GENERAL, "Update time diff: %u. Players online: %u.", m_updateTimeSum / m_updateTimeCount, GetActiveSessionCount());
+            LoginDatabase.PExecute("UPDATE realmlist set online=%u where id=%u", GetActiveSessionCount(), realmID);
             m_updateTimeSum = m_updateTime;
             m_updateTimeCount = 1;
         }

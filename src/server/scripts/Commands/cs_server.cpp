@@ -113,11 +113,13 @@ public:
         std::string uptime          = secsToTimeString(sWorld->GetUptime());
         uint32 updateTime           = sWorld->GetUpdateTime();
 
-        handler->SendSysMessage(_FULLVERSION);
-        handler->PSendSysMessage(LANG_CONNECTED_PLAYERS, playersNum, maxPlayersNum);
+        handler->PSendSysMessage("WoW Circle Cataclysm Development 4.3.4");
+        handler->PSendSysMessage("WoW Circle Core: Last Update: 12.11.2012 Updatepack: 1");
+        handler->PSendSysMessage("WoW Circle DB: Last Update: 12.11.2012 Updatepack: 1");
         handler->PSendSysMessage(LANG_CONNECTED_USERS, activeClientsNum, maxActiveClientsNum, queuedClientsNum, maxQueuedClientsNum);
         handler->PSendSysMessage(LANG_UPTIME, uptime.c_str());
-        handler->PSendSysMessage(LANG_UPDATE_DIFF, updateTime);
+        handler->PSendSysMessage("Server delay: %u ms", updateTime);
+
         // Can't use sWorld->ShutdownMsg here in case of console command
         if (sWorld->IsShuttingDown())
             handler->PSendSysMessage(LANG_SHUTDOWN_TIMELEFT, secsToTimeString(sWorld->GetShutDownTimeLeft()).c_str());
