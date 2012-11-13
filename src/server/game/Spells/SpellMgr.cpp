@@ -4164,6 +4164,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 77515:
                 spellInfo->Effects[EFFECT_0].SpellClassMask = 0;
                 break;
+            // Frost Nova
+            case 122:
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                spellInfo->Effects[1].SetRadiusIndex(13);
+                break;
             default:
                 break;
         }
