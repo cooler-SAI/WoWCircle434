@@ -4176,6 +4176,13 @@ void SpellMgr::LoadDbcDataCorrections()
             case 86150:
                 spellInfo->Effects[0].TargetA = 1;
                 break;
+            case 1160:  // Demoralizing Shout
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                spellInfo->AttributesEx |= SPELL_ATTR1_NOT_BREAK_STEALTH;
+                break;
+            case 12323: // Piercing Howl
+                spellInfo->AttributesEx |= SPELL_ATTR1_NOT_BREAK_STEALTH;
+                break;
             default:
                 break;
         }
