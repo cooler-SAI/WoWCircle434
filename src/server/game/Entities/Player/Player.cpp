@@ -4417,35 +4417,7 @@ void Player::RemoveAllSpellCooldown()
 {
     if (!m_spellCooldowns.empty())
     {
-        ObjectGuid guid = GetGUID();
-        WorldPacket data(SMSG_CLEAR_COOLDOWNS, 1 + 8 + m_spellCooldowns.size() * 4);
-        data.WriteBit(guid[1]);
-        data.WriteBit(guid[3]);
-        data.WriteBit(guid[6]);
-
-        data.WriteBits(m_spellCooldowns.size(), 24);      // cooldown count
-
-        data.WriteBit(guid[7]);
-        data.WriteBit(guid[5]);
-        data.WriteBit(guid[2]);
-        data.WriteBit(guid[4]);
-        data.WriteBit(guid[0]);
-
-        data.WriteByteSeq(guid[7]);
-        data.WriteByteSeq(guid[2]);
-        data.WriteByteSeq(guid[4]);
-        data.WriteByteSeq(guid[5]);
-        data.WriteByteSeq(guid[1]);
-        data.WriteByteSeq(guid[3]);
-
-        for (SpellCooldowns::const_iterator itr = m_spellCooldowns.begin(); itr != m_spellCooldowns.end(); ++itr)
-            data << uint32(itr->first);
-
-        data.WriteByteSeq(guid[0]);
-        data.WriteByteSeq(guid[6]);
-
-        SendDirectMessage(&data);
-
+        SendClearAllCooldowns(this);
         m_spellCooldowns.clear();
     }
 }
@@ -25260,7 +25232,7 @@ void Player::RemoveAtLoginFlag(AtLoginFlags flags, bool persist /*= false*/)
 void Player::SendClearCooldown(uint32 spell_id, Unit* target)
 {
     ObjectGuid guid = target->GetGUID();
-    WorldPacket data(SMSG_CLEAR_COOLDOWNS, 1 + 8 + 4);
+    WorldPacket data(SMSG_CLEAR_COOLDOWNS, 3 + 1 + 8 + 4);
     data.WriteBit(guid[1]);
     data.WriteBit(guid[3]);
     data.WriteBit(guid[6]);
@@ -25284,6 +25256,39 @@ void Player::SendClearCooldown(uint32 spell_id, Unit* target)
 
     data.WriteByteSeq(guid[0]);
     data.WriteByteSeq(guid[6]);
+    SendDirectMessage(&data);
+}
+
+void Player::SendClearAllCooldowns(Unit* target)
+{
+    uint32 spellCount = m_spellCooldowns.size();
+    ObjectGuid guid = target ? target->GetGUID() : 0;
+    
+    WorldPacket data(SMSG_CLEAR_COOLDOWNS, 4+8);
+    data.WriteBit(guid[1]);
+    data.WriteBit(guid[3]);
+    data.WriteBit(guid[6]);
+    data.WriteBits(spellCount, 24); // Spell Count
+    data.WriteBit(guid[7]);
+    data.WriteBit(guid[5]);
+    data.WriteBit(guid[2]);
+    data.WriteBit(guid[4]);
+    data.WriteBit(guid[0]);
+    
+    data.FlushBits();
+    
+    data.WriteByteSeq(guid[7]);
+    data.WriteByteSeq(guid[2]);
+    data.WriteByteSeq(guid[4]);
+    data.WriteByteSeq(guid[5]);
+    data.WriteByteSeq(guid[1]);
+    data.WriteByteSeq(guid[3]);
+    for (SpellCooldowns::const_iterator itr = m_spellCooldowns.begin(); itr != m_spellCooldowns.end(); ++itr)
+        data << uint32(itr->first); // Spell ID
+    
+    data.WriteByteSeq(guid[0]);
+    data.WriteByteSeq(guid[6]);
+    
     SendDirectMessage(&data);
 }
 
