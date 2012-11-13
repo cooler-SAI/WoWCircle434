@@ -865,7 +865,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
-                    sLog->outError(LOG_FILTER_SERVER_LOADING, " spec %u", m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()));
+
                     switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
                     {
                         case TALENT_TREE_PALADIN_HOLY:
