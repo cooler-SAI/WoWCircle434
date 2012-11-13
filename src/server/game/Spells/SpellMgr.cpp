@@ -3962,6 +3962,161 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // ENDOF STONECORE SPELLS
             //
+            // GRIM BATOL SPELLS
+            //
+            // Trash
+            case 76517: // Eruption Fire
+            case 90693:
+                spellInfo->Effects[0].SetRadiusIndex(15);
+                break;
+            case 76782: // Rock Smash dmg
+            case 90862:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                break;
+            case 76786: // Fissure dmg
+            case 90863:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                break;
+            case 76101: // Lightning Strike dmg
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 76392: // Arcane Slash
+            case 90660:
+                spellInfo->Effects[0].SetRadiusIndex(15);
+                break;
+            case 76370: // Warped Twilight
+            case 90300:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 76620: // Azure Blast
+            case 90697:
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                break;
+            case 76404: // Crimson Charge
+                spellInfo->EquippedItemClass = 0;
+                spellInfo->EquippedItemSubClassMask = 0;
+                break;
+            case 76409: // Crimson Shockwave
+            case 90312:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                spellInfo->Effects[1].SetRadiusIndex(8);
+                break;
+            case 76327: // Blaze
+            case 90307:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                break;
+            case 76693: // Empowering Twilight dmg
+            case 90707:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                spellInfo->Effects[1].SetRadiusIndex(8);
+                break;
+            case 76627: // Mortal Strike
+                spellInfo->EquippedItemClass = 0;
+                spellInfo->EquippedItemSubClassMask = 0;
+                break;
+            case 76603: // Earth Spike
+            case 90487:
+                spellInfo->Effects[0].SetRadiusIndex(15);
+                break;
+            case 76411: // Meat Grinder
+            case 90665:
+                spellInfo->EquippedItemClass = 0;
+                spellInfo->EquippedItemSubClassMask = 0;
+                break;
+            case 76413: // Meat Grinder dmg
+            case 90664:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                break;
+            case 76668: // Flame Conduit
+            case 90850:
+                spellInfo->Effects[0].SetRadiusIndex(29);
+                break;
+            case 76578: // Chain Lightning
+            case 90856:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                break;
+            // General Umbriss
+            case 74675: // Blitz dmg
+            case 90251:
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                spellInfo->Effects[1].SetRadiusIndex(14);
+                break;
+            case 74837: // Modgud Malady
+            case 90179:
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                spellInfo->Effects[1].SetRadiusIndex(14);
+                break;
+            case 90170: // Modgud Malice aura
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                spellInfo->Effects[1].SetRadiusIndex(14);
+                spellInfo->Effects[2].Effect = 0;
+                break;
+            // Forgemaster Throngus
+            case 74976: // Disorenting Roar
+            case 90737:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 90754: // Lava Patch dmg
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                break;
+            case 74986: // Cave In dmg
+            case 90722:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                break;
+            case 74984: // Mighty Stomp
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            // Drahga Shadowburner
+            case 75238: // Supernova
+            case 90972:
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                spellInfo->Effects[2].SetRadiusIndex(14);
+                break;
+            case 75245: // Burning Shadowbolt
+            case 90915:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 75317: // Seeping Twilight dmg
+            case 90964:
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                break;
+            // Erudax
+            case 75861: // Binding Shadows aura
+            case 91079:
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                spellInfo->Effects[1].SetRadiusIndex(14);
+                spellInfo->Effects[2].SetRadiusIndex(14);
+                break;
+            case 75520: // Twilight Corruption
+            case 91049:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 75694: // Shadow Gale Speed
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 75664: // Shadow Gale
+            case 91086:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 75692: // Shadow Gale dmg
+            case 91087:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                spellInfo->Effects[1].SetRadiusIndex(28);
+                break;
+            case 76194: // Twilight Blast dmg
+            case 91042:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 75809: // Shield of Nightmare
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 75763: // Umbral Mending
+            case 91040:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            // ENDOF GRIM BATOL SPELLS
+            //
             // Camouflage
             case 80325:
                 spellInfo->Effects[EFFECT_1].Effect = 0;

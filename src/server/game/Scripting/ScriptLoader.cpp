@@ -630,6 +630,13 @@ void AddSC_boss_slabhide();
 void AddSC_boss_ozruk();
 void AddSC_boss_high_priestess_azil();
 
+void AddSC_instance_grim_batol(); // Grim Batol
+void AddSC_grim_batol();
+void AddSC_boss_general_umbriss();
+void AddSC_boss_forgemaster_throngus();
+void AddSC_boss_drahga_shadowburner();
+void AddSC_boss_erudax();
+
 // battlegrounds
 
 // outdoor pvp
@@ -1296,6 +1303,14 @@ void AddNorthrendScripts()
     AddSC_boss_slabhide();
     AddSC_boss_ozruk();
     AddSC_boss_high_priestess_azil();
+
+    AddSC_instance_grim_batol(); // Grim Batol
+    AddSC_grim_batol();
+    AddSC_boss_general_umbriss();
+    AddSC_boss_forgemaster_throngus();
+    AddSC_boss_drahga_shadowburner();
+    AddSC_boss_erudax();
+
 #endif
 }
 

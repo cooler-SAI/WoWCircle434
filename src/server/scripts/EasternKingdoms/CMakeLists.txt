@@ -228,6 +228,12 @@ set(scripts_STAT_SRCS
   EasternKingdoms/TheStonecore/instance_the_stonecore.cpp
   EasternKingdoms/TheStonecore/the_stonecore.cpp
   EasternKingdoms/TheStonecore/the_stonecore.h
+  EasternKingdoms/GrimBatol/boss_general_umbriss.cpp
+  EasternKingdoms/GrimBatol/boss_forgemaster_throngus.cpp
+  EasternKingdoms/GrimBatol/boss_drahga_shadowburner.cpp
+  EasternKingdoms/GrimBatol/boss_erudax.cpp
+  EasternKingdoms/GrimBatol/instance_grim_batol.cpp
+  EasternKingdoms/GrimBatol/grim_batol.cpp
 )
 
 message("  -> Prepared: Eastern Kingdoms")
