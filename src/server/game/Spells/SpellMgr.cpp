@@ -4172,6 +4172,10 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].SetRadiusIndex(13);
                 spellInfo->Effects[1].SetRadiusIndex(13);
                 break;
+            // Guardian of Ancient Kings
+            case 86150:
+                spellInfo->Effects[0].TargetA = 1;
+                break;
             default:
                 break;
         }

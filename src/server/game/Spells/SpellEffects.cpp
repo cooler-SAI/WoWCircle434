@@ -859,13 +859,15 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     // Replenishment
                     if (m_caster->HasAura(31876))
                         m_caster->CastSpell((Unit*)NULL,57669,true);
+
+                    break;
                 }
                 // Guardian of ancient kings
                 case 86150:
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
-
+                    
                     switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
                     {
                         case TALENT_TREE_PALADIN_HOLY:
