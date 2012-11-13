@@ -1640,6 +1640,27 @@ void Spell::EffectApplyAura(SpellEffIndex effIndex)
 
     if (!m_spellAura || !unitTarget)
         return;
+
+    switch (m_spellInfo->SpellFamilyName)
+    {
+        case SPELLFAMILY_PALADIN:
+        {
+            if (m_spellInfo->Id == 84963) // Inquisition
+            {
+                uint32 mod = 0;
+                // Item - Paladin T11 Retribution 4P Bonus
+                if (AuraEffect* aur = m_caster->GetAuraEffect(90299, EFFECT_0))
+                    mod = aur->GetAmount() / 10;
+                // Divine Purpose
+                if (unitTarget->HasAura(90174))
+                    m_spellAura->SetDuration(m_spellAura->GetDuration() * (3 + mod));
+                else
+                    m_spellAura->SetDuration(m_spellAura->GetDuration() * (GetPowerCost() + mod));
+            }
+            break;
+        }
+    }
+
     ASSERT(unitTarget == m_spellAura->GetOwner());
     m_spellAura->_ApplyEffectForTargets(effIndex);
 }
