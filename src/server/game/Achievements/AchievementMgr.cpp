@@ -1097,7 +1097,7 @@ void AchievementMgr<T>::UpdateAchievementCriteria(AchievementCriteriaTypes type,
     sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "UpdateAchievementCriteria(%u, %u, %u)", type, miscValue1, miscValue2);
 
     // disable for gamemasters with GM-mode enabled
-    if (referencePlayer->isGameMaster())
+    if (referencePlayer && referencePlayer->isGameMaster())
         return;
 
     // Lua_GetGuildLevelEnabled() is checked in achievement UI to display guild tab

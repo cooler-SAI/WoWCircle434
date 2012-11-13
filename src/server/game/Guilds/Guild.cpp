@@ -1543,11 +1543,11 @@ void Guild::HandleSetEmblem(WorldSession* session, const EmblemInfo& emblemInfo)
         m_emblemInfo.SaveToDB(m_id);
 
         // "Guild Emblem saved."
-        SendSaveEmblemResult(session, ERR_GUILDEMBLEM_SUCCESS);
+        SendSaveEmblemResult(session, ERR_GUILDEMBLEM_SUCCESS );
 
         HandleQuery(session);
 
-        m_achievementMgr.UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_TABARD, 1);
+        m_achievementMgr.UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_TABARD, 1, 0, NULL, player);
     }
 }
 
