@@ -831,12 +831,41 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         case SPELLFAMILY_PALADIN:
             switch (m_spellInfo->Id)
             {
+                // Judgement (seal trigger)
+                case 20271:
+                {
+                    if (m_caster)
+                    {
+                        if (m_caster->HasAura(89901))
+                            m_caster->CastSpell(m_caster, 89906, true);
+                        if (m_caster->HasAura(31878))
+                            m_caster->CastSpell(m_caster, 31930, true);
+                        if (m_caster->HasAura(31876))
+                            m_caster->CastSpell(m_caster, 57669, true);
+                    }
+
+                    uint32 spellId = 0;
+                    if (m_caster->HasAura(20164) || // Seal of Justice
+                        m_caster->HasAura(20165))   // Seal of Insight
+                        spellId = 54158; 
+                    else if (m_caster->HasAura(20154)) // Seal of Righteousness
+                        spellId = 20187;
+                    else if (m_caster->HasAura(32801)) // Seal of Truth
+                        spellId = 31804;
+
+                    if (spellId)
+                        m_caster->CastSpell(unitTarget, spellId, true);
+
+                    // Replenishment
+                    if (m_caster->HasAura(31876))
+                        m_caster->CastSpell((Unit*)NULL,57669,true);
+                }
                 // Guardian of ancient kings
                 case 86150:
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
-
+                    sLog->outError(LOG_FILTER_SERVER_LOADING, " spec %u", m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()));
                     switch (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()))
                     {
                         case TALENT_TREE_PALADIN_HOLY:
@@ -4599,35 +4628,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         }
         case SPELLFAMILY_PALADIN:
         {
-            // Judgement (seal trigger)
-            if (m_spellInfo->Id == 20271)
-            {
-                if (m_caster)
-                {
-                    if (m_caster->HasAura(89901))
-                        m_caster->CastSpell(m_caster, 89906, true);
-                    if (m_caster->HasAura(31878))
-                        m_caster->CastSpell(m_caster, 31930, true);
-                    if (m_caster->HasAura(31876))
-                        m_caster->CastSpell(m_caster, 57669, true);
-                }
-
-                uint32 spellId = 0;
-                if (m_caster->HasAura(20164) || // Seal of Justice
-                    m_caster->HasAura(20165))   // Seal of Insight
-                    spellId = 54158; 
-                else if (m_caster->HasAura(20154)) // Seal of Righteousness
-                    spellId = 20187;
-                else if (m_caster->HasAura(32801)) // Seal of Truth
-                    spellId = 31804;
-
-                if (spellId)
-                    m_caster->CastSpell(unitTarget, spellId, true);
-
-                // Replenishment
-                if (m_caster->HasAura(31876))
-                    m_caster->CastSpell((Unit*)NULL,57669,true);
-            }
             break;
         }
         case SPELLFAMILY_POTION:
