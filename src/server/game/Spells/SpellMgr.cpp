@@ -106,6 +106,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Ring of Frost
             else if (spellproto->Id == 82691)
                 return DIMINISHING_DISORIENT;
+            // Slow
+            else if (spellproto->Id == 31589)
+                return DIMINISHING_LIMITONLY;
             break;
         }
         case SPELLFAMILY_WARRIOR:
