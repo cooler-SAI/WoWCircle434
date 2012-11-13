@@ -2006,6 +2006,13 @@ void WorldSession::HandleObjectUpdateFailedOpcode(WorldPacket& recvPacket)
 
     WorldObject* obj = ObjectAccessor::GetWorldObject(*GetPlayer(), guid);
     sLog->outError(LOG_FILTER_NETWORKIO, "Object update failed for object "UI64FMTD" (%s) for player %s (%u)", uint64(guid), obj ? obj->GetName() : "object-not-found", GetPlayerName().c_str(), GetGuidLow());
+
+    // workaround to fix visiblity objects bug
+    if (obj && obj->IsInWorld() && obj->ToPlayer())
+    {
+        GetPlayer()->SendUpdateToPlayer(obj->ToPlayer());
+        obj->ToPlayer()->SendUpdateToPlayer(GetPlayer());
+    }
 }
 
 void WorldSession::HandleSaveCUFProfiles(WorldPacket& recvPacket)
