@@ -441,6 +441,7 @@ class EventMap : private std::map<uint32, uint32>
             {
                 if (itr->second & groupMask)
                 {
+
                     ScheduleEvent(itr->second, itr->first - _time + delay);
                     erase(itr);
                     itr = begin();

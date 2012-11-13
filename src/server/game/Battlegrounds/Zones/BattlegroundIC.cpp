@@ -382,6 +382,7 @@ bool BattlegroundIC::SetupBattleground()
         {
             sLog->outError(LOG_FILTER_BATTLEGROUND, "Isle of Conquest: There was an error spawning gameobject %u", BG_IC_ObjSpawnlocs[i].entry);
             return false;
+
         }
     }
 
@@ -480,6 +481,7 @@ void BattlegroundIC::EndBattleground(uint32 winner)
 
     Battleground::EndBattleground(winner);
 }
+
 
 void BattlegroundIC::RealocatePlayers(ICNodePointType nodeType)
 {
