@@ -6416,7 +6416,10 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 // Main Gauche
                 case 76806:
                 {
-                    if (!victim || effIndex != 0 || !(procSpell->SpellFamilyFlags & dummySpell->Effects[0].SpellClassMask))
+                    if (!victim || effIndex != 0)
+                        return false;
+
+                    if (procSpell && !(procSpell->SpellFamilyFlags & dummySpell->Effects[0].SpellClassMask))
                         return false;
 
                     if (!roll_chance_i(triggeredByAura->GetAmount()))

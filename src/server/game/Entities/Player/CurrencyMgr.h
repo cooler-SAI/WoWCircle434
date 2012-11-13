@@ -6,7 +6,9 @@
 
 #define DEFAULT_RATED_BATTLEGROUND_CAP 1650
 #define DEFAULT_ARENA_CAP 1350
+#define DEFAULT_BATTLEGROUND_CAP 1650 // need rated bg to use it
 #define MAXIMUM_ARENA_CAP 2700
+#define MAXIMUM_BATTLEGROUND_CAP 3200 // (it is arena cap * 0.22)
 
 struct CurrencyCap
 {

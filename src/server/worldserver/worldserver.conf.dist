@@ -2887,7 +2887,7 @@ Currency.ResetInterval = 7
 #        Default: 3 (Wednesday)
 #
 
-Currency.ResetWeekDay = 3
+Currency.ResetDay = 3
 
 #
 #    Currency.ResetHour
