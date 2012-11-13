@@ -14291,6 +14291,10 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
 
         SpellInfo const* spellProto = itr->second->GetBase()->GetSpellInfo();
 
+        // fix for not gain enchant buffs for pets
+        if (caster != this && (spellProto->SpellFamilyName == SPELLFAMILY_GENERIC || spellProto->SpellFamilyName == SPELLFAMILY_POTION))
+            continue;
+
         // only auras that has triggered spell should proc from fully absorbed damage
         if (procExtra & PROC_EX_ABSORB && isVictim)
             if (damage || spellProto->Effects[EFFECT_0].TriggerSpell || spellProto->Effects[EFFECT_1].TriggerSpell || spellProto->Effects[EFFECT_2].TriggerSpell)
