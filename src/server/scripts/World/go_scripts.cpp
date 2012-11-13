@@ -1361,6 +1361,62 @@ public:
     }
 };
 
+class go_portal_to_vashjir : public GameObjectScript
+{
+public:
+    go_portal_to_vashjir() : GameObjectScript("go_portal_to_vashjir") { }
+
+    bool OnGossipSelect(Player* pPlayer, GameObject* pGo, uint32 sender, uint32 action)
+    {
+        if (pPlayer && pPlayer->getLevel() >= 80)
+            pPlayer->TeleportTo(0, -6561.970f, 6140.030f, -671.060f, 1.148350f);
+
+        return false;
+    }
+};
+
+class go_teleport_to_vashjir : public GameObjectScript
+{
+public:
+    go_teleport_to_vashjir() : GameObjectScript("go_teleport_to_vashjir") { }
+
+    bool OnGossipSelect(Player* pPlayer, GameObject* pGo, uint32 sender, uint32 action)
+    {
+        if (pPlayer && pPlayer->getLevel() >= 80)
+            pPlayer->TeleportTo(0, -6884.060f, 5963.370f, -765.3850f, 2.856590f);
+
+        return false;
+    }
+};
+
+class go_portal_to_stormwind : public GameObjectScript
+{
+public:
+    go_portal_to_stormwind() : GameObjectScript("go_portal_to_stormwind") { }
+
+    bool OnGossipSelect(Player* pPlayer, GameObject* pGo, uint32 sender, uint32 action)
+    {
+        if (pPlayer && pPlayer->getLevel())
+            pPlayer->TeleportTo(0, -8208.250f, 429.2440f, 118.110f, 3.47750f);
+
+        return false;
+    }
+};
+
+class go_portal_to_orgrimmar : public GameObjectScript
+{
+public:
+    go_portal_to_orgrimmar() : GameObjectScript("go_portal_to_orgrimmar") { }
+
+    bool OnGossipSelect(Player* pPlayer, GameObject* pGo, uint32 sender, uint32 action)
+    {
+        if (pPlayer && pPlayer->getLevel() >= 80)
+            pPlayer->TeleportTo(1, 2049.20f, -4376.80f, 98.84460f, 0.7853980f);
+
+        return false;
+    }
+};
+
 void AddSC_go_scripts()
 {
     new go_cat_figurine;
@@ -1403,4 +1459,8 @@ void AddSC_go_scripts()
     new go_veil_skith_cage;
     new go_frostblade_shrine;
     new go_midsummer_bonfire;
+    new go_portal_to_vashjir();
+    new go_teleport_to_vashjir();
+    new go_portal_to_stormwind();
+    new go_portal_to_orgrimmar();
 }
