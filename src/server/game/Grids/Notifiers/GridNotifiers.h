@@ -60,37 +60,6 @@ namespace Trinity
         void Visit(DynamicObjectMapType &);
     };
 
-    struct PlayerRelocationNotifier : public VisibleNotifier
-    {
-        PlayerRelocationNotifier(Player &player) : VisibleNotifier(player) {}
-
-        template<class T> void Visit(GridRefManager<T> &m) { VisibleNotifier::Visit(m); }
-        void Visit(CreatureMapType &);
-        void Visit(PlayerMapType &);
-    };
-
-    struct CreatureRelocationNotifier
-    {
-        Creature &i_creature;
-        CreatureRelocationNotifier(Creature &c) : i_creature(c) {}
-        template<class T> void Visit(GridRefManager<T> &) {}
-        void Visit(CreatureMapType &);
-        void Visit(PlayerMapType &);
-    };
-
-    struct DelayedUnitRelocation
-    {
-        Map &i_map;
-        Cell &cell;
-        CellCoord &p;
-        const float i_radius;
-        DelayedUnitRelocation(Cell &c, CellCoord &pair, Map &map, float radius) :
-            i_map(map), cell(c), p(pair), i_radius(radius) {}
-        template<class T> void Visit(GridRefManager<T> &) {}
-        void Visit(CreatureMapType &);
-        void Visit(PlayerMapType   &);
-    };
-
     struct AIRelocationNotifier
     {
         Unit &i_unit;

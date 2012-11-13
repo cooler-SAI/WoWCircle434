@@ -44,8 +44,7 @@ void VisibleNotifier::SendToSelf()
 
                 i_player.UpdateVisibilityOf((*itr), i_data, i_visibleNow);
 
-                if (!(*itr)->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
-                    (*itr)->UpdateVisibilityOf(&i_player);
+                (*itr)->UpdateVisibilityOf(&i_player);
             }
         }
 
@@ -57,7 +56,7 @@ void VisibleNotifier::SendToSelf()
         if (IS_PLAYER_GUID(*it))
         {
             Player* player = ObjectAccessor::FindPlayer(*it);
-            if (player && player->IsInWorld() && !player->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
+            if (player && player->IsInWorld())
                 player->UpdateVisibilityOf(&i_player);
         }
     }
@@ -117,114 +116,6 @@ inline void CreatureUnitRelocationWorker(Creature* c, Unit* u)
     if (c->HasReactState(REACT_AGGRESSIVE) && !c->HasUnitState(UNIT_STATE_SIGHTLESS))
         if (c->IsAIEnabled && c->canSeeOrDetect(u, false, true))
             c->AI()->MoveInLineOfSight_Safe(u);
-}
-
-void PlayerRelocationNotifier::Visit(PlayerMapType &m)
-{
-    for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-    {
-        Player* player = iter->getSource();
-
-        vis_guids.erase(player->GetGUID());
-
-        i_player.UpdateVisibilityOf(player, i_data, i_visibleNow);
-
-        if (player->m_seer->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
-            continue;
-
-        player->UpdateVisibilityOf(&i_player);
-    }
-}
-
-void PlayerRelocationNotifier::Visit(CreatureMapType &m)
-{
-    bool relocated_for_ai = (&i_player == i_player.m_seer);
-
-    for (CreatureMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
-    {
-        Creature* c = iter->getSource();
-
-        vis_guids.erase(c->GetGUID());
-
-        i_player.UpdateVisibilityOf(c, i_data, i_visibleNow);
-
-        if (relocated_for_ai && !c->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
-            CreatureUnitRelocationWorker(c, &i_player);
-    }
-}
-
-void CreatureRelocationNotifier::Visit(PlayerMapType &m)
-{
-    for (PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
-    {
-        Player* player = iter->getSource();
-
-        if (!player->m_seer->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
-            player->UpdateVisibilityOf(&i_creature);
-
-        CreatureUnitRelocationWorker(&i_creature, player);
-    }
-}
-
-void CreatureRelocationNotifier::Visit(CreatureMapType &m)
-{
-    if (!i_creature.isAlive())
-        return;
-
-    for (CreatureMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
-    {
-        Creature* c = iter->getSource();
-        CreatureUnitRelocationWorker(&i_creature, c);
-
-        if (!c->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
-            CreatureUnitRelocationWorker(c, &i_creature);
-    }
-}
-
-void DelayedUnitRelocation::Visit(CreatureMapType &m)
-{
-    for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-    {
-        Creature* unit = iter->getSource();
-        if (!unit->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
-            continue;
-
-        CreatureRelocationNotifier relocate(*unit);
-
-        TypeContainerVisitor<CreatureRelocationNotifier, WorldTypeMapContainer > c2world_relocation(relocate);
-        TypeContainerVisitor<CreatureRelocationNotifier, GridTypeMapContainer >  c2grid_relocation(relocate);
-
-        cell.Visit(p, c2world_relocation, i_map, *unit, i_radius);
-        cell.Visit(p, c2grid_relocation, i_map, *unit, i_radius);
-    }
-}
-
-void DelayedUnitRelocation::Visit(PlayerMapType &m)
-{
-    for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-    {
-        Player* player = iter->getSource();
-        WorldObject const* viewPoint = player->m_seer;
-
-        if (!viewPoint->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
-            continue;
-
-        if (player != viewPoint && !viewPoint->IsPositionValid())
-            continue;
-
-        CellCoord pair2(Trinity::ComputeCellCoord(viewPoint->GetPositionX(), viewPoint->GetPositionY()));
-        Cell cell2(pair2);
-        //cell.SetNoCreate(); need load cells around viewPoint or player, that's why its commented
-
-        PlayerRelocationNotifier relocate(*player);
-        TypeContainerVisitor<PlayerRelocationNotifier, WorldTypeMapContainer > c2world_relocation(relocate);
-        TypeContainerVisitor<PlayerRelocationNotifier, GridTypeMapContainer >  c2grid_relocation(relocate);
-
-        cell2.Visit(pair2, c2world_relocation, i_map, *viewPoint, i_radius);
-        cell2.Visit(pair2, c2grid_relocation, i_map, *viewPoint, i_radius);
-
-        relocate.SendToSelf();
-    }
 }
 
 void AIRelocationNotifier::Visit(CreatureMapType &m)

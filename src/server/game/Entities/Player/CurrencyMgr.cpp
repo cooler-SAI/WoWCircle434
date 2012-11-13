@@ -307,7 +307,6 @@ uint32 Player::_GetCurrencyWeekCap(const CurrencyTypesEntry* currency) const
         }
     }
 
-    SendCurrencyWeekCap(currency);
     return cap;
 }
 

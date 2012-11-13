@@ -2217,6 +2217,8 @@ class Unit : public WorldObject
         // Movement info
         Movement::MoveSpline * movespline;
 
+        void OnRelocated();
+
         // Part of Evade mechanics
         time_t GetLastDamagedTime() const { return _lastDamagedTime; }
         void SetLastDamagedTime(time_t val) { _lastDamagedTime = val; }
@@ -2359,6 +2361,11 @@ class Unit : public WorldObject
         void SetRooted(bool apply);
 
     private:
+        class AINotifyTask;
+        class VisibilityUpdateTask;
+        Position m_lastVisibilityUpdPos;
+        bool m_VisibilityUpdScheduled;
+
         uint32 m_rootTimes;
 
         uint32 m_state;                                     // Even derived shouldn't modify

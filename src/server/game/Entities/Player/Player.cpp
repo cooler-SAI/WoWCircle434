@@ -22179,22 +22179,11 @@ template void Player::UpdateVisibilityOf(Corpse*        target, UpdateData& data
 template void Player::UpdateVisibilityOf(GameObject*    target, UpdateData& data, std::set<Unit*>& visibleNow);
 template void Player::UpdateVisibilityOf(DynamicObject* target, UpdateData& data, std::set<Unit*>& visibleNow);
 
-void Player::UpdateObjectVisibility(bool forced)
-{
-    if (!forced)
-        AddToNotify(NOTIFY_VISIBILITY_CHANGED);
-    else
-    {
-        Unit::UpdateObjectVisibility(true);
-        UpdateVisibilityForPlayer();
-    }
-}
-
 void Player::UpdateVisibilityForPlayer()
 {
     // updates visibility of all objects around point of view for current player
     Trinity::VisibleNotifier notifier(*this);
-    m_seer->VisitNearbyObject(GetSightRange(), notifier);
+    m_seer->VisitNearbyObject(GetSightRange(), notifier, true);
     notifier.SendToSelf();   // send gathered data
 }
 

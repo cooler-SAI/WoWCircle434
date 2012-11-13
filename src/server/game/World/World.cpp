@@ -94,6 +94,9 @@ int32 World::m_visibility_notify_periodOnContinents = DEFAULT_VISIBILITY_NOTIFY_
 int32 World::m_visibility_notify_periodInInstances  = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
 int32 World::m_visibility_notify_periodInBGArenas   = DEFAULT_VISIBILITY_NOTIFY_PERIOD;
 
+float World::Visibility_RelocationLowerLimit = 10.0f;
+uint32 World::Visibility_AINotifyDelay = 1000;
+
 /// World constructor
 World::World()
 {
@@ -1097,6 +1100,9 @@ void World::LoadConfigSettings(bool reload)
         sLog->outError(LOG_FILTER_SERVER_LOADING, "Visibility.Distance.Continents can't be greater %f", MAX_VISIBILITY_DISTANCE);
         m_MaxVisibleDistanceOnContinents = MAX_VISIBILITY_DISTANCE;
     }
+
+    Visibility_RelocationLowerLimit = ConfigMgr::GetFloatDefault("Visibility.RelocationLowerLimit", 10.f);
+    Visibility_AINotifyDelay = ConfigMgr::GetFloatDefault("Visibility.AINotifyDelay", 1000);
 
     //visibility in instances
     m_MaxVisibleDistanceInInstances = ConfigMgr::GetFloatDefault("Visibility.Distance.Instances", DEFAULT_VISIBILITY_INSTANCE);
