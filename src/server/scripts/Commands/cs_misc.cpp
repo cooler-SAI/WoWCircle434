@@ -704,6 +704,7 @@ public:
         return true;
     }
 
+
     static bool HandleGUIDCommand(ChatHandler* handler, char const* /*args*/)
     {
         uint64 guid = handler->GetSession()->GetPlayer()->GetSelection();
@@ -1657,6 +1658,12 @@ public:
                 break;
             case RACE_DRAENEI:
                 raceStr = "Draenei";
+                break;
+            case RACE_GOBLIN:	
+                raceStr = "Goblin";
+                break;	
+            case RACE_WORGEN:	
+                raceStr = "Worgen";
                 break;
         }
 
