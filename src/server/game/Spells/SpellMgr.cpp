@@ -181,6 +181,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Freezing Arrow
             else if (spellproto->SpellFamilyFlags[0] & 0x8)
                 return DIMINISHING_DISORIENT;
+            // Bad Manner (Pet Monkey)
+            else if (spellproto->Id == 90337)
+                return DIMINISHING_STUN;
             break;
         }
         case SPELLFAMILY_PALADIN:
