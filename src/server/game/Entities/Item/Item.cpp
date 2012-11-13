@@ -242,6 +242,7 @@ Item::Item()
     m_objectType |= TYPEMASK_ITEM;
     m_objectTypeId = TYPEID_ITEM;
 
+
     m_updateFlag = 0;
 
     m_valuesCount = ITEM_END;
@@ -456,6 +457,7 @@ bool Item::LoadFromDB(uint32 guid, uint64 owner_guid, Field* fields, uint32 entr
     if (durability > proto->MaxDurability)
     {
         SetUInt32Value(ITEM_FIELD_DURABILITY, proto->MaxDurability);
+
         need_save = true;
     }
 
