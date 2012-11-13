@@ -94,7 +94,7 @@ public:
             char dataHead1, dataHead2, dataHead3;
 
             std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2, dataHead3;
+            loadStream >> dataHead1 >> dataHead2 >> dataHead3;
 
             if (dataHead1 == 'H' && dataHead2 == 'o' && dataHead3 == 'T')
             {

@@ -3916,6 +3916,49 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // ENDOF BARADIN HOLD SPELLS
             //
+            // THE STONECORE SPELLS
+            //
+            // Corborus
+            case 82415: // Dumpening Wave
+            case 92650:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                spellInfo->Effects[1].SetRadiusIndex(28);
+                break;
+            case 92122: // Crystal Shard dmg
+                spellInfo->Effects[1].SetRadiusIndex(8);
+                break;
+            // Slabhide
+            case 80800: // Eruption
+            case 92657:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                break;
+            case 80801: // Eruption aura
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                break;
+            // Ozruk
+            case 78807: // Shatter
+            case 92662:
+                spellInfo->Effects[0].SetRadiusIndex(18);
+                spellInfo->Effects[1].SetRadiusIndex(18);
+                break;
+            case 92426: // Paralyze
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                spellInfo->Effects[1].SetRadiusIndex(28);
+                break;
+            // High Priestess Azil
+            case 79251: // Gratity Well aura
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                break;
+            case 79249: // Gravity Well aura dmg
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                spellInfo->Effects[0].BasePoints = 3000;
+                break;
+            case 79050: // Arcane Shield dmg
+            case 92667:
+                spellInfo->Effects[2].SetRadiusIndex(8);
+                break;
+            // ENDOF STONECORE SPELLS
+            //
             // Camouflage
             case 80325:
                 spellInfo->Effects[EFFECT_1].Effect = 0;

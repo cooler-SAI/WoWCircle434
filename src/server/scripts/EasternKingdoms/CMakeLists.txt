@@ -221,6 +221,13 @@ set(scripts_STAT_SRCS
   EasternKingdoms/BaradinHold/baradin_hold.h
   EasternKingdoms/Firelands/instance_firelands.cpp
   EasternKingdoms/Firelands/firelands.h
+  EasternKingdoms/TheStonecore/boss_corborus.cpp
+  EasternKingdoms/TheStonecore/boss_slabhide.cpp
+  EasternKingdoms/TheStonecore/boss_ozruk.cpp
+  EasternKingdoms/TheStonecore/boss_high_priestess_azil.cpp
+  EasternKingdoms/TheStonecore/instance_the_stonecore.cpp
+  EasternKingdoms/TheStonecore/the_stonecore.cpp
+  EasternKingdoms/TheStonecore/the_stonecore.h
 )
 
 message("  -> Prepared: Eastern Kingdoms")

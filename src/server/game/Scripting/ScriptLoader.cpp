@@ -623,6 +623,13 @@ void AddSC_boss_argaloth();
 void AddSC_boss_occuthar();
 void AddSC_boss_alizabal();
 
+void AddSC_instance_the_stonecore(); // The Stonecore
+void AddSC_the_stonecore();
+void AddSC_boss_corborus();
+void AddSC_boss_slabhide();
+void AddSC_boss_ozruk();
+void AddSC_boss_high_priestess_azil();
+
 // battlegrounds
 
 // outdoor pvp
@@ -1282,6 +1289,13 @@ void AddNorthrendScripts()
     AddSC_boss_argaloth();
     AddSC_boss_occuthar();
     AddSC_boss_alizabal();
+
+    AddSC_instance_the_stonecore(); // The Stonecore
+    AddSC_the_stonecore();
+    AddSC_boss_corborus();
+    AddSC_boss_slabhide();
+    AddSC_boss_ozruk();
+    AddSC_boss_high_priestess_azil();
 #endif
 }
 
