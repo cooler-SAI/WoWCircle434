@@ -4859,14 +4859,29 @@ void AuraEffect::HandleModCategoryCooldown(AuraApplication const* aurApp, uint8 
         return;
 
     Unit* target = aurApp->GetTarget();
-
     if (target->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    if (apply)
-        target->ToPlayer()->SendCategoryCooldown(GetMiscValue(), GetAmount());
-    else
-        target->ToPlayer()->SendCategoryCooldown(GetMiscValue(), 0);
+    uint32 categoryId = uint32(GetMiscValue());
+    int32 value = apply ? -GetAmount() : 0;
+
+    SpellCategoriesEntry* spellCategory = const_cast<SpellCategoriesEntry*>(sSpellCategoriesStore.LookupEntry(categoryId));
+    if (!sSpellCategoriesStore.LookupEntry(categoryId))
+    {
+        sLog->outError(LOG_FILTER_SPELLS_AURAS, "HandleModCategoryCooldown: spell (id: %u) has wrong cooldown category id (id: %u)", m_spellInfo->Id, categoryId);
+        return;
+    }
+
+    for (uint32 i = 1; i < sSpellStore.GetNumRows(); ++i)
+    {
+        SpellInfo const* _spellInfo = sSpellMgr->GetSpellInfo(i);
+        if (!_spellInfo || _spellInfo->Category != categoryId)
+            continue;
+
+        sSpellMgr->mSpellInfoMap[i]->CategoryRecoveryTime += apply ? GetAmount() : -GetAmount();
+    }
+
+    target->ToPlayer()->SendCategoryCooldown(categoryId, value);
 }
 
 void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool apply) const

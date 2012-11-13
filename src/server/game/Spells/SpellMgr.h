@@ -748,6 +748,7 @@ class SpellMgr
         SkillLineAbilityMap        mSkillLineAbilityMap;
         PetLevelupSpellMap         mPetLevelupSpellMap;
         PetDefaultSpellsMap        mPetDefaultSpellsMap;           // only spells not listed in related mPetLevelupSpellMap entry
+    public:
         SpellInfoMap               mSpellInfoMap;
 };
 

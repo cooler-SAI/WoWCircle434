@@ -13921,7 +13921,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "+ %u HEALTH_REGENERATION", enchant_amount);
                             break;
                         case ITEM_MOD_SPELL_PENETRATION:
-                            ApplyModInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, -enchant_amount, apply);
+                            ApplyModInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, -int32(enchant_amount), apply);
                             SetSpellPenetrationItemMod(apply, enchant_amount);
                             sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "+ %u SPELL_PENETRATION", enchant_amount);
                             break;
@@ -21639,12 +21639,12 @@ void Player::AddSpellCooldown(uint32 spellid, uint32 itemid, time_t end_time)
     m_spellCooldowns[spellid] = sc;
 }
 
-void Player::SendCategoryCooldown(int32 categoryId, int32 cooldown)
+void Player::SendCategoryCooldown(uint32 categoryId, int32 cooldown)
 {
     WorldPacket data(SMSG_SPELL_CATEGORY_COOLDOWN, 12);
     data.WriteBits(1, 23);
-    data << int32(categoryId);
-    data << int32(-cooldown);
+    data << uint32(categoryId);
+    data << uint32(cooldown);
     SendDirectMessage(&data);
 }
 
