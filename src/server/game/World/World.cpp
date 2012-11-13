@@ -2044,15 +2044,6 @@ void World::Update(uint32 diff)
         uint32 maxOnlinePlayers = GetMaxPlayerCount();
 
         m_timers[WUPDATE_UPTIME].Reset();
-
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_UPTIME_PLAYERS);
-
-        stmt->setUInt32(0, tmpDiff);
-        stmt->setUInt16(1, uint16(maxOnlinePlayers));
-        stmt->setUInt32(2, realmID);
-        stmt->setUInt32(3, uint32(m_startTime));
-
-        LoginDatabase.Execute(stmt);
     }
 
     /// <li> Clean logs table
@@ -2061,13 +2052,6 @@ void World::Update(uint32 diff)
         if (m_timers[WUPDATE_CLEANDB].Passed())
         {
             m_timers[WUPDATE_CLEANDB].Reset();
-
-            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_OLD_LOGS);
-
-            stmt->setUInt32(0, sWorld->getIntConfig(CONFIG_LOGDB_CLEARTIME));
-            stmt->setUInt32(1, uint32(time(0)));
-
-            LoginDatabase.Execute(stmt);
         }
     }
 
@@ -2741,23 +2725,6 @@ void World::UpdateRealmCharCount(uint32 accountId)
 
 void World::_UpdateRealmCharCount(PreparedQueryResult resultCharCount)
 {
-    if (resultCharCount)
-    {
-        Field* fields = resultCharCount->Fetch();
-        uint32 accountId = fields[0].GetUInt32();
-        uint8 charCount = uint8(fields[1].GetUInt64());
-
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_REALM_CHARACTERS_BY_REALM);
-        stmt->setUInt32(0, accountId);
-        stmt->setUInt32(1, realmID);
-        LoginDatabase.Execute(stmt);
-
-        stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_REALM_CHARACTERS);
-        stmt->setUInt8(0, charCount);
-        stmt->setUInt32(1, accountId);
-        stmt->setUInt32(2, realmID);
-        LoginDatabase.Execute(stmt);
-    }
 }
 
 void World::InitWeeklyQuestResetTime()
