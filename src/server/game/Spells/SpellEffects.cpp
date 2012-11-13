@@ -418,6 +418,8 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         damage += int32(CalculatePct(m_caster->GetTotalAttackPowerValue(BASE_ATTACK), pct));
                     break;
                 }
+                else if (m_spellInfo->Id == 78) // Heroic Strike
+                    damage += ((m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 60) / 100);
                 break;
             }
             case SPELLFAMILY_WARLOCK:
