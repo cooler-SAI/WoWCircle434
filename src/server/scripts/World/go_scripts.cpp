@@ -1366,12 +1366,12 @@ class go_portal_to_vashjir : public GameObjectScript
 public:
     go_portal_to_vashjir() : GameObjectScript("go_portal_to_vashjir") { }
 
-    bool OnGossipSelect(Player* pPlayer, GameObject* pGo, uint32 sender, uint32 action)
+    bool OnGossipHello(Player* pPlayer, GameObject* pGo)
     {
         if (pPlayer && pPlayer->getLevel() >= 80)
             pPlayer->TeleportTo(0, -6561.970f, 6140.030f, -671.060f, 1.148350f);
 
-        return false;
+        return true;
     }
 };
 
@@ -1380,12 +1380,12 @@ class go_teleport_to_vashjir : public GameObjectScript
 public:
     go_teleport_to_vashjir() : GameObjectScript("go_teleport_to_vashjir") { }
 
-    bool OnGossipSelect(Player* pPlayer, GameObject* pGo, uint32 sender, uint32 action)
+    bool OnGossipHello(Player* pPlayer, GameObject* pGo)
     {
         if (pPlayer && pPlayer->getLevel() >= 80)
             pPlayer->TeleportTo(0, -6884.060f, 5963.370f, -765.3850f, 2.856590f);
 
-        return false;
+        return true;
     }
 };
 
@@ -1394,12 +1394,12 @@ class go_portal_to_stormwind : public GameObjectScript
 public:
     go_portal_to_stormwind() : GameObjectScript("go_portal_to_stormwind") { }
 
-    bool OnGossipSelect(Player* pPlayer, GameObject* pGo, uint32 sender, uint32 action)
+    bool OnGossipHello(Player* pPlayer, GameObject* pGo)
     {
         if (pPlayer && pPlayer->getLevel())
             pPlayer->TeleportTo(0, -8208.250f, 429.2440f, 118.110f, 3.47750f);
 
-        return false;
+        return true;
     }
 };
 
@@ -1408,12 +1408,12 @@ class go_portal_to_orgrimmar : public GameObjectScript
 public:
     go_portal_to_orgrimmar() : GameObjectScript("go_portal_to_orgrimmar") { }
 
-    bool OnGossipSelect(Player* pPlayer, GameObject* pGo, uint32 sender, uint32 action)
+    bool OnGossipHello(Player* pPlayer, GameObject* pGo)
     {
         if (pPlayer && pPlayer->getLevel() >= 80)
             pPlayer->TeleportTo(1, 2049.20f, -4376.80f, 98.84460f, 0.7853980f);
 
-        return false;
+        return true;
     }
 };
 
