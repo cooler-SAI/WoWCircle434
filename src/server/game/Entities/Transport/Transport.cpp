@@ -690,6 +690,7 @@ void Transport::UpdatePosition(MovementInfo* mi)
 
 void Transport::UpdateNPCPositions()
 {
+
     for (CreatureSet::iterator itr = m_NPCPassengerSet.begin(); itr != m_NPCPassengerSet.end(); ++itr)
     {
         Creature* npc = *itr;
