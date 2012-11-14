@@ -3007,6 +3007,9 @@ void SpellMgr::LoadDbcDataCorrections()
 
         switch (spellInfo->Id)
         {
+            case 34130: // Create Healthstone
+                spellInfo->Effects[0].BasePoints = 1;
+                break;
             case 99:
             case 1160:
             case 5857:
