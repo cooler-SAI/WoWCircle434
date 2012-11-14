@@ -2326,7 +2326,12 @@ void UnitAura::FillTargetMap(std::map<Unit*, uint8> & targets, Unit* caster)
         }
         else
         {
-            float radius = GetSpellInfo()->Effects[effIndex].CalcRadius(caster);
+            float radius = 0.0f;
+
+            if (GetSpellInfo()->Effects[effIndex].Effect == SPELL_EFFECT_APPLY_AREA_AURA_ENEMY)
+                radius = GetSpellInfo()->Effects[effIndex].CalcRadius(caster, NULL, false);
+            else
+                radius = GetSpellInfo()->Effects[effIndex].CalcRadius(caster, NULL, true);
 
             if (!GetUnitOwner()->HasUnitState(UNIT_STATE_ISOLATED))
             {

@@ -829,7 +829,8 @@ void Spell::SelectEffectImplicitTargets(SpellEffIndex effIndex, SpellImplicitTar
                 if (GetSpellInfo()->IsRequireAdditionalTargetCheck() && GetSpellInfo()->Effects[effIndex].TargetA.GetTarget() == GetSpellInfo()->Effects[j].TargetA.GetTarget() &&
                     GetSpellInfo()->Effects[effIndex].TargetB.GetTarget() == GetSpellInfo()->Effects[j].TargetB.GetTarget() &&
                     GetSpellInfo()->Effects[effIndex].ImplicitTargetConditions == GetSpellInfo()->Effects[j].ImplicitTargetConditions &&
-                    GetSpellInfo()->Effects[effIndex].CalcRadius(m_caster) == GetSpellInfo()->Effects[j].CalcRadius(m_caster))
+                    GetSpellInfo()->Effects[effIndex].CalcRadius(m_caster, NULL, false) == GetSpellInfo()->Effects[j].CalcRadius(m_caster, NULL, false) &&
+                    GetSpellInfo()->Effects[effIndex].CalcRadius(m_caster, NULL, true) == GetSpellInfo()->Effects[j].CalcRadius(m_caster, NULL, true))
                     effectMask |= 1 << j;
             processedEffectMask |= effectMask;
             break;
@@ -1055,7 +1056,7 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
     SpellTargetCheckTypes selectionType = targetType.GetCheckType();
     ConditionList* condList = m_spellInfo->Effects[effIndex].ImplicitTargetConditions;
     float coneAngle = M_PI/2;
-    float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster) * m_spellValue->RadiusMod;
+    float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster, NULL, GetSpellInfo()->IsPositive()) * m_spellValue->RadiusMod;
 
     if (uint32 containerTypeMask = GetSearcherTypeMask(objectType, condList))
     {
@@ -1145,7 +1146,7 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
              return;
     }
     std::list<WorldObject*> targets;
-    float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster) * m_spellValue->RadiusMod;
+    float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster, NULL, GetSpellInfo()->IsPositive()) * m_spellValue->RadiusMod;
     SearchAreaTargets(targets, radius, center, referer, targetType.GetObjectType(), targetType.GetCheckType(), m_spellInfo->Effects[effIndex].ImplicitTargetConditions);
 
     // Custom entries
@@ -1456,7 +1457,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
     if (targetType.GetTarget() == TARGET_DEST_CASTER_SUMMON)
         dist = PET_FOLLOW_DIST;
     else
-        dist = m_spellInfo->Effects[effIndex].CalcRadius(m_caster);
+        dist = m_spellInfo->Effects[effIndex].CalcRadius(m_caster, NULL, GetSpellInfo()->IsPositive());
 
     if (dist < objSize)
         dist = objSize;
@@ -1487,7 +1488,7 @@ void Spell::SelectImplicitTargetDestTargets(SpellEffIndex effIndex, SpellImplici
 
     float angle = targetType.CalcDirectionAngle();
     float objSize = target->GetObjectSize();
-    float dist = m_spellInfo->Effects[effIndex].CalcRadius(m_caster);
+    float dist = m_spellInfo->Effects[effIndex].CalcRadius(m_caster, NULL, m_spellInfo->IsPositive());
     if (dist < objSize)
         dist = objSize;
     else if (targetType.GetTarget() == TARGET_DEST_TARGET_RANDOM)
@@ -1523,7 +1524,7 @@ void Spell::SelectImplicitDestDestTargets(SpellEffIndex effIndex, SpellImplicitT
     }
 
     float angle = targetType.CalcDirectionAngle();
-    float dist = m_spellInfo->Effects[effIndex].CalcRadius(m_caster);
+    float dist = m_spellInfo->Effects[effIndex].CalcRadius(m_caster, NULL, m_spellInfo->IsPositive());
     if (targetType.GetTarget() == TARGET_DEST_DEST_RANDOM)
         dist *= (float)rand_norm();
 

@@ -277,7 +277,7 @@ public:
     float CalcDamageMultiplier(Unit* caster, Spell* spell = NULL) const;
 
     bool HasRadius() const;
-    float CalcRadius(Unit* caster = NULL, Spell* = NULL) const;
+    float CalcRadius(Unit* caster, Spell* spell, bool positive) const;
 
     uint32 GetProvidedTargetMask() const;
     uint32 GetMissingTargetMask(bool srcSet = false, bool destSet = false, uint32 mask = 0) const;

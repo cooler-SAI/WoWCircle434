@@ -2262,7 +2262,7 @@ void Spell::EffectPersistentAA(SpellEffIndex effIndex)
     if (!m_spellAura)
     {
         Unit* caster = m_caster->GetEntry() == WORLD_TRIGGER ? m_originalCaster : m_caster;
-        float radius = m_spellInfo->Effects[effIndex].CalcRadius(caster);
+        float radius = m_spellInfo->Effects[effIndex].CalcRadius(caster, NULL, true);
 
         // Caster not in world, might be spell triggered from aura removal
         if (!caster->IsInWorld())
@@ -2827,7 +2827,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                 }
                 default:
                 {
-                    float radius = m_spellInfo->Effects[effIndex].CalcRadius();
+                    float radius = m_spellInfo->Effects[effIndex].CalcRadius(NULL, NULL, false);
 
                     TempSummonType summonType = (duration == 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
 
@@ -3120,7 +3120,7 @@ void Spell::EffectAddFarsight(SpellEffIndex effIndex)
     if (m_caster->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    float radius = m_spellInfo->Effects[effIndex].CalcRadius();
+    float radius = m_spellInfo->Effects[effIndex].CalcRadius(NULL, NULL, true);
     int32 duration = m_spellInfo->GetDuration();
     // Caster not in world, might be spell triggered from aura removal
     if (!m_caster->IsInWorld())
@@ -3160,7 +3160,7 @@ void Spell::EffectTeleUnitsFaceCaster(SpellEffIndex effIndex)
     if (unitTarget->isInFlight())
         return;
 
-    float dis = m_spellInfo->Effects[effIndex].CalcRadius(m_caster);
+    float dis = m_spellInfo->Effects[effIndex].CalcRadius(m_caster, NULL, !m_caster->IsHostileTo(unitTarget));
 
     float fx, fy, fz;
     m_caster->GetClosePoint(fx, fy, fz, unitTarget->GetObjectSize(), dis);
@@ -4252,7 +4252,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                 case 45151:
                 {
                     //Workaround for Range ... should be global for every ScriptEffect
-                    float radius = m_spellInfo->Effects[effIndex].CalcRadius();
+                    float radius = m_spellInfo->Effects[effIndex].CalcRadius(NULL, NULL, false);
                     if (unitTarget && unitTarget->GetTypeId() == TYPEID_PLAYER && unitTarget->GetDistance(m_caster) >= radius && !unitTarget->HasAura(46394) && unitTarget != m_caster)
                         unitTarget->CastSpell(unitTarget, 46394, true);
 
@@ -4384,7 +4384,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                         return;
 
                     float x, y, z;
-                    float radius = m_spellInfo->Effects[effIndex].CalcRadius();
+                    float radius = m_spellInfo->Effects[effIndex].CalcRadius(NULL, NULL, true);
                     for (uint8 i = 0; i < 15; ++i)
                     {
                         m_caster->GetRandomPoint(*destTarget, radius, x, y, z);
@@ -5866,7 +5866,7 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
     //FIXME: this can be better check for most objects but still hack
     else if (m_spellInfo->Effects[effIndex].HasRadius() && m_spellInfo->Speed == 0)
     {
-        float dis = m_spellInfo->Effects[effIndex].CalcRadius(m_originalCaster);
+        float dis = m_spellInfo->Effects[effIndex].CalcRadius(m_originalCaster, NULL, true);
         m_caster->GetClosePoint(fx, fy, fz, DEFAULT_WORLD_OBJECT_SIZE, dis);
     }
     else
