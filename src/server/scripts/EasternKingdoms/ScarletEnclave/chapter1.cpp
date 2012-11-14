@@ -329,18 +329,9 @@ public:
     bool OnGossipHello(Player* player, GameObject* go)
     {
         if (Creature* anchor = go->FindNearestCreature(29521, 15))
-        {
-            sLog->outError(LOG_FILTER_SERVER_LOADING, "test1");
             if (uint64 prisonerGUID = anchor->AI()->GetGUID())
-            {
-                sLog->outError(LOG_FILTER_SERVER_LOADING, "test2");
                 if (Creature* prisoner = Creature::GetCreature(*player, prisonerGUID))
-                {
-                    sLog->outError(LOG_FILTER_SERVER_LOADING, "test3");
                     CAST_AI(npc_unworthy_initiate::npc_unworthy_initiateAI, prisoner->AI())->EventStart(anchor, player);
-                }
-            }
-        }
 
         return false;
     }
