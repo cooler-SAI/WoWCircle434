@@ -3236,13 +3236,14 @@ public:
     struct npc_ring_of_frostAI : public ScriptedAI
     {
         npc_ring_of_frostAI(Creature *c) : ScriptedAI(c) {}
-        bool Isready;
-        uint32 timer;
+
+        bool isReady;
+        uint32 releaseTimer;
 
         void Reset()
         {
-            timer = 3000; // 3sec
-            Isready = false;
+            releaseTimer = 3000;
+            isReady = false;
         }
 
         void InitializeAI()
@@ -3257,39 +3258,61 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
             std::list<Creature*> templist;
-            me->GetCreatureListWithEntryInGrid(templist, me->GetEntry(), 200.0f);            if (!templist.empty())
-            for (std::list<Creature*>::const_iterator itr = templist.begin(); itr != templist.end(); ++itr)
-                if ((*itr)->GetOwner() == me->GetOwner() && *itr != me)
-                    (*itr)->DisappearAndDie();
+            me->GetCreatureListWithEntryInGrid(templist, me->GetEntry(), 200.0f);            
+            if (!templist.empty())
+                for (std::list<Creature*>::const_iterator itr = templist.begin(); itr != templist.end(); ++itr)
+                    if ((*itr)->GetOwner() == me->GetOwner() && *itr != me)
+                        (*itr)->DisappearAndDie();
         }
 
-        void CheckIfMoveInRing(Unit *who)
+        void CheckIfMoveInRing(Unit *who, bool preSearch)
         {
-            if (who->isAlive() && me->IsInRange(who, 2.0f, 4.7f) && me->IsWithinLOSInMap(who) && Isready)
+            if (who->isAlive() && me->IsWithinLOSInMap(who) && me->IsInRange(who, 0.0f, 5.0f))
             {
-                if (!who->HasAura(82691))
+                bool isImmune = true;
+                if (preSearch)
                 {
-                    if (!who->HasAura(91264))
-                        me->CastSpell(who, 82691, true);
+                    _immuneList.insert(who);
+                    isImmune = false;
                 }
-                else who->CastSpell(who, 91264, true);
+                else
+                {
+                    if (me->IsInRange(who, 2.5f, 5.0f))
+                    {
+                        // player leave from circle
+                        _immuneList.erase(who);
+                        if (!who->HasAura(82691))
+                            me->CastSpell(who, 82691, true);
+                    }
+                    if (isImmune)
+                    {
+                        std::set<Unit* >::const_iterator itr = _immuneList.find(who);
+                        if (itr == _immuneList.end())
+                            isImmune = false;
+
+                        if (!who->HasAura(82691) && !isImmune)
+                            me->CastSpell(who, 82691, true);
+                    }
+                }
             }
         }
 
         void UpdateAI(const uint32 diff)
         {
-            if (timer <= diff)
+            if (releaseTimer <= diff)
             {
-                if (!Isready)
+                if (!isReady)
                 {
-                    Isready = true;
-                    timer = 9000; // 9sec
+                    isReady = true;
+                    releaseTimer = 9000; // 9sec
                 }
                 else
+                {
+                    _immuneList.clear();
                     me->DisappearAndDie();
+                }
             }
-            else
-                timer -= diff;
+            else releaseTimer -= diff;
 
             // Find all the enemies
             std::list<Unit*> targets;
@@ -3297,8 +3320,11 @@ public:
             Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
             me->VisitNearbyObject(5.0f, searcher);
             for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
-                CheckIfMoveInRing(*iter);
+                CheckIfMoveInRing(*iter, !isReady);
         }
+        
+        private:
+            std::set<Unit*> _immuneList;
     };
 
     CreatureAI* GetAI(Creature* pCreature) const

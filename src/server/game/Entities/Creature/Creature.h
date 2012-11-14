@@ -282,6 +282,7 @@ struct CreatureModelInfo
     float combat_reach;
     uint8 gender;
     uint32 modelid_other_gender;
+    uint32 negative_modelId;
 };
 
 // Benchmarked: Faster than std::map (insert/find)

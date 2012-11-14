@@ -90,7 +90,6 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T &owner)
 
     Movement::MoveSplineInit init(owner);
     init.MoveTo(x,y,z);
-    init.SetWalk(((D*)this)->EnableWalking());
     init.Launch();
 }
 

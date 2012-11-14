@@ -712,7 +712,6 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* 
                     if (GetTypeId() == TYPEID_UNIT)
                     {
                         CreatureTemplate const* cinfo = ToCreature()->GetCreatureTemplate();
-
                         // this also applies for transform auras
                         if (SpellInfo const* transform = sSpellMgr->GetSpellInfo(ToUnit()->getTransForm()))
                             for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -741,7 +740,17 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* 
                             }
                         }
                         else
-                            *data << m_uint32Values[index];
+                        {
+                            // some models must be sent differently when player is unfriendly
+                            CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelInfo(cinfo->Modelid1);
+                            if (!minfo)
+                                minfo = sObjectMgr->GetCreatureModelInfo(cinfo->Modelid2);
+
+                            if (minfo && minfo->negative_modelId && !target->IsFriendlyTo(ToUnit()))
+                                *data << minfo->negative_modelId;
+                            else
+                                *data << m_uint32Values[index];
+                        }
                     }
                     else
                         *data << m_uint32Values[index];
