@@ -830,6 +830,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
         return;
     }
 
+    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_CUSTOMIZE))
+        KickPlayer();
+
     pCurrChar->GetMotionMaster()->Initialize();
     pCurrChar->SendDungeonDifficulty(false);
 
@@ -1075,6 +1078,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
 
     if (!pCurrChar->IsStandState() && !pCurrChar->HasUnitState(UNIT_STATE_STUNNED))
         pCurrChar->SetStandState(UNIT_STAND_STATE_STAND);
+
+    if (pCurrChar->HasAuraType(SPELL_AURA_AOE_CHARM))
+        pCurrChar->Kill(pCurrChar, false);
 
     m_playerLoading = false;
 

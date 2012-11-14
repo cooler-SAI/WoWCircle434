@@ -1041,7 +1041,10 @@ bool Item::IsBindedNotWith(Player const* player) const
         return false;
 
     // own item
-    if (GetOwnerGUID() == player->GetGUID())
+    uint64 item_owner_guid = GetOwnerGUID();
+    uint64 player_guid = player->GetGUID();
+
+    if (item_owner_guid == player_guid)
         return false;
 
     if (HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_BOP_TRADEABLE))

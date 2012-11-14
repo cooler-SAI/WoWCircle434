@@ -872,21 +872,10 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
 
-        // save GM account without delay and output message
-        if (!AccountMgr::IsPlayerAccount(handler->GetSession()->GetSecurity()))
-        {
-            if (Player* target = handler->getSelectedPlayer())
-                target->SaveToDB();
-            else
-                player->SaveToDB();
-            handler->SendSysMessage(LANG_PLAYER_SAVED);
-            return true;
-        }
-
         // save if the player has last been saved over 20 seconds ago
         uint32 saveInterval = sWorld->getIntConfig(CONFIG_INTERVAL_SAVE);
         if (saveInterval == 0 || (saveInterval > 20 * IN_MILLISECONDS && player->GetSaveTimer() <= saveInterval - 20 * IN_MILLISECONDS))
-            player->SaveToDB();
+            handler->SendSysMessage(LANG_PLAYER_SAVED);
 
         return true;
     }

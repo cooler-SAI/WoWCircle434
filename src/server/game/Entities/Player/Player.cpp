@@ -2196,6 +2196,10 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     if (!InBattleground() && mEntry->IsBattlegroundOrArena())
         return false;
 
+    if (Unit* charm = GetCharm())
+        if (charm->IsVehicle())
+            ExitVehicle();
+
     // client without expansion support
     if (GetSession()->Expansion() < mEntry->Expansion())
     {
@@ -6932,6 +6936,9 @@ void Player::CheckAreaExploreAndOutdoor()
                     XP = uint32(sObjectMgr->GetBaseXP(areaEntry->area_level)*sWorld->getRate(RATE_XP_EXPLORE));
                 }
 
+		  if (GetSession()->IsPremium())
+                    XP *= sWorld->getRate(RATE_XP_EXPLORE_PREMIUM);
+
                 GiveXP(XP, NULL);
                 SendExplorationExperience(area, XP);
             }
@@ -7278,6 +7285,10 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
     }
 
     honor_f *= sWorld->getRate(RATE_HONOR);
+
+    if (GetSession()->IsPremium())
+        honor_f *= sWorld->getRate(RATE_HONOR_PREMIUM);
+
     // Back to int now
     honor = int32(honor_f);
     // honor - for show honor points in log
@@ -9824,7 +9835,7 @@ uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) c
             {
                 if (ItemTemplate const* mhWeaponProto = mhWeapon->GetTemplate())
                 {
-                    if (mhWeaponProto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM || mhWeaponProto->SubClass == ITEM_SUBCLASS_WEAPON_STAFF)
+                    if ((mhWeaponProto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM || mhWeaponProto->SubClass == ITEM_SUBCLASS_WEAPON_STAFF) && mhWeaponProto->InventoryType == INVTYPE_2HWEAPON)
                     {
                         const_cast<Player*>(this)->AutoUnequipOffhandIfNeed(true);
                         break;
@@ -15003,6 +15014,9 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     Unit::AuraEffectList const& ModXPPctAuras = GetAuraEffectsByType(SPELL_AURA_MOD_XP_QUEST_PCT);
     for (Unit::AuraEffectList::const_iterator i = ModXPPctAuras.begin(); i != ModXPPctAuras.end(); ++i)
         AddPct(XP, (*i)->GetAmount());
+
+    if (GetSession()->IsPremium())
+        XP *= sWorld->getRate(RATE_XP_QUEST_PREMIUM);
 
     int32 moneyRew = 0;
     if (getLevel() < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
@@ -21447,7 +21461,7 @@ void Player::UpdateHomebindTime(uint32 time)
     else
     {
         // instance is invalid, start homebind timer
-        m_HomebindTimer = 60000;
+        m_HomebindTimer = 2000;
         // send message to player
         WorldPacket data(SMSG_RAID_GROUP_ONLY, 4+4);
         data << uint32(m_HomebindTimer);
