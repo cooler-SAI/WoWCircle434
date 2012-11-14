@@ -676,6 +676,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             return;
                         break;
                     case 82739: // Flame Orb
+                    case 86719:
                     case 95969: // Frostfire Orb R1
                     case 84721: // Frostfire Orb R2
                         if (Unit* owner = m_caster->GetOwner())
@@ -1067,7 +1068,9 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 {
                     if (m_caster->GetTypeId() == TYPEID_PLAYER)
                     {
-                        if (m_caster->GetDummyAuraEffect(SPELLFAMILY_MAGE, 4650, 1))
+                        if (m_caster->HasAura(84726) ||
+                            m_caster->HasAura(84727) ||
+                            m_caster->HasAura(84728))
                             m_caster->CastSpell(m_caster, 84714, true); // Summon Frost Fire Orb
                         else
                             m_caster->CastSpell(m_caster, 84765, true); // Summon Flame Orb

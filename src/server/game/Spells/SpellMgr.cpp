@@ -4188,6 +4188,11 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->ProcFlags = 0x00015510;
                 spellInfo->ProcChance = 100;
                 spellInfo->ProcCharges = 0;
+                break;
+            // Fire Power
+            case 54734:
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                break;
             default:
                 break;
         }

@@ -3427,43 +3427,25 @@ public:
             angle = me->GetOwner()->GetAngle(me);
             newx = me->GetPositionX() + FLAME_ORB_DISTANCE/2 * cos(angle);
             newy = me->GetPositionY() + FLAME_ORB_DISTANCE/2 * sin(angle);
-            CombatCheck = false;
+            InCombat = false;
         }
 
         float x, y, z, o, newx, newy, angle;
-        bool CombatCheck;
+        bool InCombat;
         uint32 uiDespawnTimer;
-        uint32 uiDespawnCheckTimer;
         uint32 uiDamageTimer;
-
-        void EnterCombat(Unit* /*target*/)
-        {
-            me->GetMotionMaster()->MoveCharge(newx, newy, z, 1.14286f); // Normal speed
-            uiDespawnTimer = 15*IN_MILLISECONDS;
-            CombatCheck = true;
-        }
 
         void Reset()
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_NON_ATTACKABLE);
             me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
             me->SetReactState(REACT_PASSIVE);
-            if (CombatCheck == true)
-                uiDespawnTimer = 15*IN_MILLISECONDS;
-            else
-                uiDespawnTimer = 4*IN_MILLISECONDS;
             uiDamageTimer = 1*IN_MILLISECONDS;
             me->GetMotionMaster()->MovePoint(0, newx, newy, z);
         }
 
         void UpdateAI(const uint32 diff)
         {
-            if (!me->isInCombat() && CombatCheck == false)
-            {
-                me->SetSpeed(MOVE_RUN, 2, true);
-                me->SetSpeed(MOVE_FLIGHT, 2, true);
-            }
-
             if (uiDespawnTimer <= diff)
             {
                 if (Unit* owner = me->GetOwner())
@@ -3473,10 +3455,9 @@ public:
                         (aura = owner->GetAura(18460)) ||
                         (aura = owner->GetAura(18459)))
                         if (roll_chance_i(aura->GetSpellInfo()->ProcChance))
-                            owner->CastSpell(me, SPELL_FIRE_POWER, true);
+                            me->CastSpell(me, SPELL_FIRE_POWER, true);
                 }
-                me->SetVisible(false);
-                me->DisappearAndDie();
+                me->DespawnOrUnsummon(800);
             }
             else
                 uiDespawnTimer -= diff;
@@ -3485,6 +3466,12 @@ public:
             {
                 if (Unit* target = me->SelectNearestTargetNoCC(20))
                 {
+                    if (!InCombat)
+                    {
+                        InCombat = true;
+                        me->SetSpeed(MOVE_RUN, 0.1f, true);
+                        me->SetSpeed(MOVE_FLIGHT, 0.1f, true);
+                    }
                     if (me->GetEntry() == 44214)
                         DoCast(target, SPELL_FLAME_ORB_DAMAGE);
                     else
@@ -3495,6 +3482,13 @@ public:
                             DoCast(target, SPELL_FROSTFIRE_ORB_DAMAGE_RANK2);
                     }
                 }
+                else
+                    if (InCombat)
+                    {
+                        InCombat = false;
+                        me->SetSpeed(MOVE_RUN, 0.5f, true);
+                        me->SetSpeed(MOVE_FLIGHT, 0.5f, true);
+                    }
 
                 uiDamageTimer = 1*IN_MILLISECONDS;
             }
