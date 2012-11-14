@@ -2040,6 +2040,10 @@ void Spell::EffectHealPct(SpellEffIndex /*effIndex*/)
     if (!m_originalCaster)
         return;
 
+    // Victory Rush
+    if (m_spellInfo->Id == 34428 && m_originalCaster->HasAura(82368))
+        damage = 5;
+
     // Rune Tap - Party
     if (m_spellInfo->Id == 59754 && unitTarget == m_caster)
         return;
