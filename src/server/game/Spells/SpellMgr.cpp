@@ -3007,6 +3007,14 @@ void SpellMgr::LoadDbcDataCorrections()
 
         switch (spellInfo->Id)
         {
+            case 99:
+            case 1160:
+            case 5857:
+            case 15237:
+            case 23455:
+            case 52212:
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                break;
             case 6343: // Thunder Clap (Battle, Defensive Stance)
             case 77758: // Thrash (Bear Form)
                 spellInfo->Effects[0].SetRadiusIndex(14);
