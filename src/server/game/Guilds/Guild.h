@@ -824,6 +824,7 @@ public:
     AchievementMgr<Guild> const& GetAchievementMgr() const { return m_achievementMgr; }
 
     // Guild leveling
+
     uint32 GetLevel() const { return _level; }
     void GiveXP(uint32 xp, Player* source);
     uint64 GetExperience() const { return _experience; }

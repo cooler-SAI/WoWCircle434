@@ -388,6 +388,7 @@ void InstanceSaveManager::LoadResetTimes()
         uint32 map_diff_pair = itr->first;
         uint32 mapid = PAIR32_LOPART(map_diff_pair);
         Difficulty difficulty = Difficulty(PAIR32_HIPART(map_diff_pair));
+
         MapDifficulty const* mapDiff = &itr->second;
         if (!mapDiff->resetTime)
             continue;

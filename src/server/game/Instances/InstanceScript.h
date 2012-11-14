@@ -111,6 +111,7 @@ struct BossInfo
     DoorSet door[MAX_DOOR_TYPES];
     MinionSet minion;
     BossBoundaryMap boundary;
+
 };
 
 struct DoorInfo

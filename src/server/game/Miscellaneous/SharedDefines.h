@@ -309,6 +309,7 @@ enum SpellAttr0
     SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY    = 0x20000000, // 29 unaffected by invulnerability (hmm possible not...)
     SPELL_ATTR0_BREAKABLE_BY_DAMAGE              = 0x40000000, // 30
     SPELL_ATTR0_CANT_CANCEL                      = 0x80000000  // 31 positive aura can't be canceled
+
 };
 
 enum SpellAttr1
