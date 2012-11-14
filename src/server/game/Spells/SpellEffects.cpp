@@ -1148,6 +1148,27 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         }
     }
 
+    switch (m_spellInfo->Id)
+    {
+        case 61316:     // Dalaran Brilliance
+        {
+            // kinda exception
+            m_caster->DoBuffPartyOrSingle(damage, 79057, unitTarget);
+            break;
+        }
+        case 27683:     // Shadow Protection
+        case 21562:     // Power Word : Fortitude
+        case 1459:      // Arcane Brilliance
+        case 1126:      // Mark of the Wild
+        case 19740:     // Blessing of Might
+        case 20217:     // Blessing of Kings
+        {
+            m_caster->DoBuffPartyOrSingle(damage, damage+1, unitTarget);
+            break;
+        }
+        default: break;
+    }
+
     //spells triggered by dummy effect should not miss
     if (spell_id)
     {

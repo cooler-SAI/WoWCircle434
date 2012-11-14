@@ -18245,3 +18245,24 @@ Unit* Unit::GetProcOwner()
 
     return this;
 }
+
+void Unit::DoBuffPartyOrSingle(uint32 single_buff, uint32 party_buff, Unit *target)
+{
+    bool Continue = false;
+    if (GetTypeId() == TYPEID_PLAYER)
+    {
+        uint32 player = 0;
+        std::list<Unit*> PartyMembers;
+        GetPartyMembers(PartyMembers);
+        for(std::list<Unit*>::iterator itr = PartyMembers.begin(); itr != PartyMembers.end(); ++itr) // If caster is in party with a player
+        {
+            ++player;
+            if (Continue == false && player > 1)
+                Continue = true;
+        }
+    }
+    if (Continue == true)
+        CastSpell(target, party_buff, true);
+    else
+        CastSpell(target, single_buff, true);
+}

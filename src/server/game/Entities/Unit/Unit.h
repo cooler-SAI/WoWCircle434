@@ -2249,6 +2249,9 @@ class Unit : public WorldObject
         uint32 GetDamageTakenInPastSecs(uint32 secs);
         void ResetDamageDoneInPastSecs(uint32 secs);
         void ResetHealingDoneInPastSecs(uint32 secs);
+        
+        void DoBuffPartyOrSingle(uint32 single_buff, uint32 party_buff, Unit * target);
+
 
         // helper for dark simulacrum spell
         Unit* getSimulacrumTarget() { return simulacrumTarget && simulacrumTarget->IsInWorld() ? simulacrumTarget : NULL; }
