@@ -4183,6 +4183,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 12323: // Piercing Howl
                 spellInfo->AttributesEx |= SPELL_ATTR1_NOT_BREAK_STEALTH;
                 break;
+            // Blood of the North
+            case 54637:
+                spellInfo->ProcFlags = 0x00015510;
+                spellInfo->ProcChance = 100;
+                spellInfo->ProcCharges = 0;
             default:
                 break;
         }
