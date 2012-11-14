@@ -8318,7 +8318,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         // Impending Victory Rank 2
         case 80128:
         case 80129:
-            if (!pVictim->HealthBelowPct(20))
+            if (!victim->HealthBelowPct(20))
                 return false;
             break;
         // Empowered Imp

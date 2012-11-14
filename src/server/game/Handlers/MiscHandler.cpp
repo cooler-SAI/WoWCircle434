@@ -56,6 +56,7 @@
 #include "BattlegroundMgr.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
+#include "DBCStore.h"
 
 void WorldSession::HandleRepopRequestOpcode(WorldPacket& recvData)
 {
@@ -811,7 +812,7 @@ void WorldSession::SendAreaTriggerMessage(const char* Text, ...)
 
 void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recvData)
 {
-    uint32 triggerId;
+    int32 triggerId;
     recvData >> triggerId;
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_AREATRIGGER. Trigger ID: %u", triggerId);
@@ -1769,7 +1770,13 @@ void WorldSession::SendSetPhaseShift(std::set<uint32> const& phaseIds, std::set<
 
     data.WriteByteSeq(guid[1]);
 
-    data << uint32(0);  // flags (not phasemask)
+    uint32 flag = 0;
+
+    for (std::set<uint32>::const_iterator itr = phaseIds.begin(); itr != phaseIds.end(); ++itr)
+        if (PhaseEntry const* phaseEntry = sPhaseStore.LookupEntry(*itr))
+             flag |= phaseEntry->Flag;
+
+    data << uint32(flag ? flag : 8);
 
     data.WriteByteSeq(guid[2]);
     data.WriteByteSeq(guid[6]);

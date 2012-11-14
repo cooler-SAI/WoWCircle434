@@ -1492,7 +1492,7 @@ struct PhaseEntry
 {
     uint32    ID;                                           // 0
     char*     Name;                                         // 1
-    uint32    flag;                                         // 2
+    uint32    Flag;                                         // 2
 };
 
 struct MailTemplateEntry
