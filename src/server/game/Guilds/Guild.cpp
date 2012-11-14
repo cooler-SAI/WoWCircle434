@@ -666,11 +666,10 @@ bool Guild::Member::LoadFromDB(Field* fields)
     SetWeeklyReputation(fields[29].GetUInt32());
 
     SetAchievementPoints(fields[30].GetUInt32());
-    sLog->outError(LOG_FILTER_SERVER_LOADING, "ach %u", this->GetAchievementPoints());
+ 
     SetProfession(0, fields[31].GetUInt32(), fields[32].GetUInt32(), fields[33].GetUInt32());
     SetProfession(1, fields[34].GetUInt32(), fields[35].GetUInt32(), fields[36].GetUInt32());
-    sLog->outError(LOG_FILTER_SERVER_LOADING, "prof1 %u, %u, %u", m_professions[0].level, m_professions[0].rank, m_professions[0].skillID);
-    sLog->outError(LOG_FILTER_SERVER_LOADING, "prof2 %u, %u, %u", m_professions[1].level, m_professions[1].rank, m_professions[1].skillID);
+   
     if (!CheckStats())
         return false;
 
