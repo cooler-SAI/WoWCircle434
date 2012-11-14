@@ -108,7 +108,7 @@ public:
     {
         npc_unworthy_initiateAI(Creature* creature) : ScriptedAI(creature)
         {
-            me->SetReactState(REACT_PASSIVE);
+            me->SetReactState(REACT_DEFENSIVE);
             if (!me->GetEquipmentId())
                 if (const CreatureTemplate* info = sObjectMgr->GetCreatureTemplate(28406))
                     if (info->equipmentId)
@@ -129,13 +129,17 @@ public:
             phase = PHASE_CHAINED;
             events.Reset();
             me->setFaction(7);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            //me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 8);
             me->LoadEquipment(0, true);
         }
 
         void EnterCombat(Unit* /*who*/)
         {
+            phase = PHASE_ATTACKING;
+            me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+            me->setFaction(14);
             events.ScheduleEvent(EVENT_ICY_TOUCH, 1000, GCD_CAST);
             events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 3000, GCD_CAST);
             events.ScheduleEvent(EVENT_BLOOD_STRIKE, 2000, GCD_CAST);
@@ -161,6 +165,9 @@ public:
 
         void EventStart(Creature* anchor, Player* target)
         {
+            if (phase != PHASE_CHAINED)
+                return;
+
             wait_timer = 5000;
             phase = PHASE_TO_EQUIP;
 
@@ -322,9 +329,18 @@ public:
     bool OnGossipHello(Player* player, GameObject* go)
     {
         if (Creature* anchor = go->FindNearestCreature(29521, 15))
+        {
+            sLog->outError(LOG_FILTER_SERVER_LOADING, "test1");
             if (uint64 prisonerGUID = anchor->AI()->GetGUID())
+            {
+                sLog->outError(LOG_FILTER_SERVER_LOADING, "test2");
                 if (Creature* prisoner = Creature::GetCreature(*player, prisonerGUID))
+                {
+                    sLog->outError(LOG_FILTER_SERVER_LOADING, "test3");
                     CAST_AI(npc_unworthy_initiate::npc_unworthy_initiateAI, prisoner->AI())->EventStart(anchor, player);
+                }
+            }
+        }
 
         return false;
     }
