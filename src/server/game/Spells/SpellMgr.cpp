@@ -3007,6 +3007,14 @@ void SpellMgr::LoadDbcDataCorrections()
 
         switch (spellInfo->Id)
         {
+            case 6343: // Thunder Clap (Battle, Defensive Stance)
+            case 77758: // Thrash (Bear Form)
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                spellInfo->Effects[1].SetRadiusIndex(14);
+                break;
+            case 44203: // Tranquility
+                spellInfo->Effects[1].SetRadiusIndex(10);
+                break;
             case 42730:
                 spellInfo->Effects[EFFECT_1].TriggerSpell = 42739;
                 break;
