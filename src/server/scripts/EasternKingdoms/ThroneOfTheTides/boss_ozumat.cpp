@@ -246,7 +246,7 @@ class npc_neptulon : public CreatureScript
                                 if (Group* pGroup = pPlayer->GetGroup())
                                     if (pPlayer->GetGuildId() && pGroup->IsGuildGroup(pPlayer->GetGuildId(), true, true))
                                     {
-                                        pGroup->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_KILL_OZUMAT, 0, NULL, me);
+                                        pGroup->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_KILL_OZUMAT, 0, 0, NULL, me);
                                         break;
                                     }
                         }

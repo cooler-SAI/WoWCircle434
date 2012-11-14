@@ -2536,7 +2536,7 @@ bool Group::IsGuildGroup(uint32 guildId, bool AllInSameMap, bool AllInSameInstan
     return ret;
 }
 
-void Group::UpdateGuildAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1, uint32 miscValue2, Unit* pUnit, WorldObject* pRewardSource)
+void Group::UpdateGuildAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1, uint32 miscValue2, uint32 miscValue3, Unit* pUnit, WorldObject* pRewardSource)
 {
     // We will update criteria for each guild in grouplist but only once
     std::list<uint32> guildList;
@@ -2578,7 +2578,7 @@ void Group::UpdateGuildAchievementCriteria(AchievementCriteriaTypes type, uint32
                 {
                     guildList.push_back(guildId);
                     if (Guild* pGuild = sGuildMgr->GetGuildById(guildId))
-                        pGuild->GetAchievementMgr().UpdateAchievementCriteria(type, miscValue1, miscValue2, pUnit, pPlayer);
+                        pGuild->GetAchievementMgr().UpdateAchievementCriteria(type, miscValue1, miscValue2, miscValue3, pUnit, pPlayer);
                 }
             }
             else
@@ -2587,7 +2587,7 @@ void Group::UpdateGuildAchievementCriteria(AchievementCriteriaTypes type, uint32
                 // then add to the list and update criteria
                 guildList.push_back(guildId);
                 if (Guild* pGuild = sGuildMgr->GetGuildById(guildId))
-                    pGuild->GetAchievementMgr().UpdateAchievementCriteria(type, miscValue1, miscValue2, pUnit, pPlayer);
+                    pGuild->GetAchievementMgr().UpdateAchievementCriteria(type, miscValue1, miscValue2, miscValue3, pUnit, pPlayer);
             }
         }
     }

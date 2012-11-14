@@ -122,6 +122,7 @@ bool ConfusedMovementGenerator<T>::Update(T &unit, const uint32 &diff)
 
         if (unit.movespline->Finalized())
         {
+
             i_nextMove = urand(1, MAX_CONF_WAYPOINTS);
             i_nextMoveTime.Reset(urand(500, 1200)); // Guessed
         }
