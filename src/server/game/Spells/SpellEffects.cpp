@@ -1132,6 +1132,20 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 }
             }
             break;
+        case SPELLFAMILY_WARRIOR:
+        {
+            switch (m_spellInfo->Id)
+            {
+                // Rallying Cry
+                case 97462:
+                    if (!unitTarget)
+                        return;
+                    
+                    m_caster->CastSpell(unitTarget, 97463, true);
+                    break;  
+            }
+            break;
+        }
     }
 
     //spells triggered by dummy effect should not miss
