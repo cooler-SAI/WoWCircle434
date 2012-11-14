@@ -8314,6 +8314,13 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Impending Victory Rank 1
+        // Impending Victory Rank 2
+        case 80128:
+        case 80129:
+            if (!pVictim->HealthBelowPct(20))
+                return false;
+            break;
         // Empowered Imp
         case 54278:
             target = GetCharmerOrOwnerOrSelf();
