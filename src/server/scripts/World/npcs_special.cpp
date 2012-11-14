@@ -3419,6 +3419,12 @@ public:
     {
         npc_flame_orbAI(Creature *c) : ScriptedAI(c)
         {
+            if (!me->GetOwner())
+            {
+                me->DespawnOrUnsummon();
+                return;
+            }
+
             x = me->GetPositionX();
             y = me->GetPositionY();
             z = me->GetOwner()->GetPositionZ()+2;
