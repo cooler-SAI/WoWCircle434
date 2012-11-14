@@ -812,7 +812,7 @@ void WorldSession::SendAreaTriggerMessage(const char* Text, ...)
 
 void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recvData)
 {
-    int32 triggerId;
+    uint32 triggerId;
     recvData >> triggerId;
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_AREATRIGGER. Trigger ID: %u", triggerId);
