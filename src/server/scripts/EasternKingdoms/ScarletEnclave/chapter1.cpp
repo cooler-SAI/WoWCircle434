@@ -659,6 +659,11 @@ public:
                 }
             }
         }
+        
+        void IsSummonedBy(Unit* owner)
+        {
+            MoveInLineOfSight(owner);
+        }
 
         void MoveInLineOfSight(Unit* who)
         {
@@ -736,6 +741,9 @@ public:
                 deathcharger->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
                 deathcharger->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 deathcharger->setFaction(2096);
+                me->ExitVehicle();
+                CAST_PLR(killer)->GroupEventHappens(12687, me);
+                me->DespawnOrUnsummon();
             }
         }
     };
