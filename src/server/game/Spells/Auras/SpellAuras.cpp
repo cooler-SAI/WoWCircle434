@@ -1334,6 +1334,12 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (target->HasAura(58039)) // Glyph of Blurred Speed
                         target->CastSpell(target, 61922, true); // Sprint (waterwalk)
                 break;
+            case SPELLFAMILY_WARRIOR:
+                // Heroic Fury
+                if (m_spellInfo->Id == 60970)
+                    if (target->GetTypeId() == TYPEID_PLAYER)
+                        target->ToPlayer()->RemoveSpellCooldown(20252, true);
+                break;
         }
     }
     // mods at aura remove
