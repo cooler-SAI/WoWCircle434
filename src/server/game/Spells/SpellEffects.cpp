@@ -3801,7 +3801,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 break;
             }
             // Death Strike
-            if (m_spellInfo->SpellFamilyFlags[0] & 0x10)
+            if (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_DK_DEATH_STRIKE)
             {
                 // Glyph of Death Strike
                 // 2% more damage per 5 runic power, up to a maximum of 40%
