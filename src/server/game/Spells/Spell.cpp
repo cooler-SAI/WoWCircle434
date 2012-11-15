@@ -4689,6 +4689,10 @@ void Spell::TakeRunePower(bool didHit)
                 player->SetRuneCooldown(i, didHit ? player->GetRuneBaseCooldown(i) : uint32(RUNE_MISS_COOLDOWN));
                 runeCost[rune]--;
 
+                bool takePower = didHit;
+                if (uint32 spell = player->GetRuneConvertSpell(i))
+                    takePower = spell != 54637 && spell != 89056;
+
                 // keep Death Rune type if missed
                 if (didHit)
                 {

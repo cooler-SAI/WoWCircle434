@@ -969,6 +969,9 @@ bool Aura::IsDeathPersistent() const
 
 bool Aura::CanBeSaved() const
 {
+    if (GetId() == 54637 || GetId() == 98056)
+        return true;
+
     if (IsPassive())
         return false;
 

@@ -2789,6 +2789,7 @@ class Player : public Unit, public GridObject<Player>
         RuneType GetCurrentRune(uint8 index) const { return RuneType(m_runes->runes[index].CurrentRune); }
         uint32 GetRuneCooldown(uint8 index) const { return m_runes->runes[index].Cooldown; }
         uint32 GetRuneBaseCooldown(uint8 index) const { return GetRuneTypeBaseCooldown(GetBaseRune(index)); }
+        uint32 GetRuneConvertSpell(uint8 index) const { return m_runes->runes[index].spell_id; }
         uint32 GetRuneTypeBaseCooldown(RuneType runeType) const;
         bool IsBaseRuneSlotsOnCooldown(RuneType runeType) const;
         void SetDeathRuneUsed(uint8 index, bool apply) { m_runes->runes[index].DeathUsed = apply; }
