@@ -8320,6 +8320,12 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Shield Mastery
+        case 29598:
+        case 84607:
+        case 84608:
+            basepoints0 = triggerAmount;
+            break;
         // Incite
         case 50685:
         case 50686:
