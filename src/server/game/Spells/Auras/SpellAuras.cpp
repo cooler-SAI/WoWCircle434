@@ -980,21 +980,23 @@ bool Aura::CanBeSaved() const
     if (HasEffectType(SPELL_AURA_CONVERT_RUNE))
         return false;
 
-    // No point in saving this, since the stable dialog can't be open on aura load anyway.
-    if (HasEffectType(SPELL_AURA_OPEN_STABLE))
-        return false;
-
-    // Incanter's Absorbtion - considering the minimal duration and problems with aura stacking
-    // we skip saving this aura
-    if (GetId() == 44413)
-        return false;
-
-    // When a druid logins, he doesnt have either eclipse power, nor the marker auras, nor the eclipse buffs. Dont save them.
-    if (GetId() == 67483 || GetId() == 67484 || GetId() == 48517 || GetId() == 48518)
-        return false;
+    switch (GetId())
+    {
+        // When a druid logins, he doesnt have either eclipse power, nor the marker auras, nor the eclipse buffs. Dont save them.
+        case 67483:
+        case 67484:
+        case 48517:
+        case 48518:
+        // Incanter's Absorbtion
+        case 44413:
+            return false;
+    }
 
     // don't save auras removed by proc system
     if (IsUsingCharges() && !GetCharges())
+        return false;
+
+    if (HasEffectType(SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS) || HasEffectType(SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS_2) || HasEffectType(SPELL_AURA_OPEN_STABLE))
         return false;
 
     return true;

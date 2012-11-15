@@ -3264,6 +3264,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 34477: // Misdirection
             case 44401: // Missile Barrage
             case 47283: // Empowered Imp
+            case 88688: // Surge of Light
                 spellInfo->ProcCharges = 1;
                 break;
             case 44544: // Fingers of Frost
