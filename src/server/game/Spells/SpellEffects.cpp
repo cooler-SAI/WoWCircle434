@@ -413,6 +413,9 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 // Cleave
                 else if (m_spellInfo->Id == 845)
                     damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)* 0.45);
+                // Intercept
+                else if (m_spellInfo->Id == 20253)
+                    damage = uint32(1 + m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.12);
                 // Shockwave
                 else if (m_spellInfo->Id == 46968)
                 {
