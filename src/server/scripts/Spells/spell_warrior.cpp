@@ -346,7 +346,7 @@ class spell_warr_bloodthirst_heal : public SpellScriptLoader
             void HandleHeal(SpellEffIndex /*effIndex*/)
             {
                 if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_BLOODTHIRST_DAMAGE))
-                    SetHitHeal(GetCaster()->CountPctFromMaxHealth(spellInfo->Effects[EFFECT_1].CalcValue(GetCaster())) / 100);
+                    SetHitHeal(GetCaster()->CountPctFromMaxHealth(spellInfo->Effects[EFFECT_1].CalcValue(GetCaster())) / 1000);
             }
 
             void Register()
