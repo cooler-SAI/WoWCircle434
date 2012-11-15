@@ -8320,6 +8320,13 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Incite
+        case 50685:
+        case 50686:
+        case 50687:
+            if (HasAura(86627))
+                return false;
+            break;
         // Slaughter
         case 84583:
         case 84587:
