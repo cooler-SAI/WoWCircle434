@@ -71,8 +71,8 @@ void Player::UpdateMastery()
     if (!HasMastery())
         return;
 
-    float masteryPoints = GetRatingBonusValue(CR_MASTERY) + float(GetTotalAuraModifier(SPELL_AURA_MASTERY));
-    SetFloatValue(PLAYER_MASTERY, masteryPoints);
+    float masteryPoints = GetMasteryPoints();
+    SetFloatValue(PLAYER_MASTERY, GetMasteryPoints());
 
     if (TalentTabEntry const* talentTabEntry = sTalentTabStore.LookupEntry(GetPrimaryTalentTree(GetActiveSpec())))
     {
@@ -107,6 +107,11 @@ void Player::UpdateMastery()
             }
         }
     }
+}
+
+float Player::GetMasteryPoints()
+{
+    return GetRatingBonusValue(CR_MASTERY) + float(GetTotalAuraModifier(SPELL_AURA_MASTERY));
 }
 
 void Player::UpdateMasteryDependentBuffs(uint32 spellId)

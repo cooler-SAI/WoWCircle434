@@ -5975,14 +5975,20 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!target)
                         return false;
 
-                    // Multiple effects stack, so let's try to find this aura.
-                    int32 bonus = 0;
-                    if (AuraEffect const* aurEff = target->GetAuraEffect(47753, 0))
-                        bonus = aurEff->GetAmount();
+                    // Procs from Prayer of healing or crit effect of heals
+                    if (procSpell->Id != 596 && !(procEx & PROC_EX_CRITICAL_HIT))
+                        return false;
 
-                    basepoints0 = CalculatePct(int32(damage), triggerAmount) + bonus;
-                    if (basepoints0 > target->getLevel() * 125)
-                        basepoints0 = target->getLevel() * 125;
+                    basepoints0 = CalculatePct(int32(damage), triggerAmount);
+                    if (AuraEffect const* shieldDiscipline = GetDummyAuraEffect(SPELLFAMILY_HUNTER, 566, 0))
+                        basepoints0 *= (shieldDiscipline->GetAmount() + 100.0f) / 100.0f;
+
+                    // Multiple effects stack, so let's try to find this aura.
+                    if (AuraEffect *aurEff = target->GetAuraEffect(47753, 0))
+                        basepoints0 += aurEff->GetAmount();
+
+                    if (basepoints0 > int32(GetMaxHealth()*40/100))
+                        basepoints0 = int32(GetMaxHealth()*40/100);
 
                     triggered_spell_id = 47753;
                     break;
