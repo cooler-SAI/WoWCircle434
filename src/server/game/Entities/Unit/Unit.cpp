@@ -8320,6 +8320,12 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Die by the Sword
+        case 81913:
+        case 81914:
+            if (!(HealthBelowPct(20) || HealthBelowPctDamaged(20, damage)))
+                return false;
+            break;
         // Incite
         case 50685:
         case 50686:
