@@ -1363,6 +1363,26 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_MAGE:
                 switch (GetId())
                 {
+                    // Early Frost
+                    case 83162:
+                    case 83239:
+                    {
+                        if (removeMode == AURA_REMOVE_BY_EXPIRE && !target->HasAura(94315))
+                            target->CastSpell(target, 94315, true);
+                        break;
+                    }
+                    case 94315:
+                        if (removeMode == AURA_REMOVE_BY_EXPIRE)
+                        {
+                            target->CastSpell(target, 94315, true);
+                            target->RemoveAurasDueToSpell(83162);
+                            target->RemoveAurasDueToSpell(83239);
+                        }
+                        else if (target->HasAura(83049))
+                            target->CastSpell(target, 83162, true);
+                        else if (target->HasAura(83050))
+                            target->CastSpell(target, 83239, true);
+                        break;
                     case 66: // Invisibility
                         if (removeMode != AURA_REMOVE_BY_EXPIRE)
                             break;

@@ -39,6 +39,7 @@ enum MageSpells
     SPELL_MAGE_SUMMON_WATER_ELEMENTAL_PERMANENT  = 70908,
     SPELL_MAGE_SUMMON_WATER_ELEMENTAL_TEMPORARY  = 70907,
     SPELL_MAGE_GLYPH_OF_BLAST_WAVE               = 62126,
+    SPELL_MAGE_FROSTBOLT                         = 116
 };
 
 class spell_mage_blast_wave : public SpellScriptLoader
@@ -380,6 +381,61 @@ class spell_mage_living_bomb : public SpellScriptLoader
         }
 };
 
+class spell_mage_frostbolt: public SpellScriptLoader
+{
+public:
+    spell_mage_frostbolt(): SpellScriptLoader("spell_mage_frostbolt"){}
+
+    class spell_mage_frostbolt_SpellScript: public SpellScript
+    {
+        enum Spells
+        {
+
+        };
+
+        PrepareSpellScript(spell_mage_frostbolt_SpellScript);
+
+        bool Validate(const SpellInfo *spell)
+        {
+            return true;
+        }
+        void HandleOnHit()
+        {
+            // Early Frost
+            if (Player * player = dynamic_cast<Player*>(GetCaster()))
+            {
+                if (AuraEffect* aurEff = player->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_MAGE, 189, 0))
+                {
+                    uint32 spellId = 0;
+                    switch (aurEff->GetId())
+                    {
+                        case 83049:
+                            spellId = 83162;
+                            break;
+                        case 83050:
+                            spellId = 83239;
+                            break;
+                    }
+                    Spell* spell = GetSpell();
+                    if(spellId && !player->HasAura(spellId) && !spell->isearlyfrostaffected)
+                    {
+                        player->CastSpell(player, spellId, true);
+                        player->RemoveAurasDueToSpell(94315);
+                    }
+                }
+            }
+        }
+        void Register()
+        {
+            OnCast += SpellCastFn(spell_mage_frostbolt_SpellScript::HandleOnHit);
+        }
+    };
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_mage_frostbolt_SpellScript();
+    }
+};
+
 void AddSC_mage_spell_scripts()
 {
     new spell_mage_blast_wave();
@@ -390,4 +446,5 @@ void AddSC_mage_spell_scripts()
     new spell_mage_polymorph_cast_visual();
     new spell_mage_summon_water_elemental();
     new spell_mage_living_bomb();
+    new spell_mage_frostbolt();
 }

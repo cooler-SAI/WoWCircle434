@@ -20598,6 +20598,10 @@ void Player::DropModCharge(SpellModifier* mod, Spell* spell)
     if (sSpellMgr->GetSpellProcEvent(mod->spellId))
         return;
 
+    // Ugly hack for Early frost
+    if (spell && mod->ownerAura && !spell->isearlyfrostaffected && (mod->ownerAura->GetId() == 83239 || mod->ownerAura->GetId() == 83162))
+        spell->isearlyfrostaffected = true;
+
     if (spell && mod->ownerAura && mod->charges > 0)
     {
         if (--mod->charges == 0)
