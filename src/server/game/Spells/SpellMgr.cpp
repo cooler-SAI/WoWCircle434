@@ -2793,6 +2793,12 @@ void SpellMgr::LoadSpellCustomAttr()
 
         switch (spellInfo->Id)
         {
+            // Glyph of Totemic Recall
+            case 55438:
+                spellInfo->Effects[0].MiscValue= SPELLMOD_EFFECT1;
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_ADD_PCT_MODIFIER;
+                spellInfo->Effects[0].BasePoints = 200;
+                break;
             case 60256:
                 //Crashes client on pressing ESC (Maybe because of ReqSpellFocus and GameObject)
                 spellInfo->AttributesEx4 &= ~SPELL_ATTR4_TRIGGERED;
