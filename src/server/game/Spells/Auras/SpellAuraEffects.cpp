@@ -1178,7 +1178,7 @@ void AuraEffect::UpdatePeriodic(Unit* caster)
                         case 92797:
                         case 92800:
                         case 92803:
-                        case 100367
+                        case 100367:
                             if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
                                 return;
                             // Get SPELL_AURA_MOD_POWER_REGEN aura from spell
