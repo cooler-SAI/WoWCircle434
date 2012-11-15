@@ -34,6 +34,7 @@ enum WarriorSpells
     SPELL_DEEP_WOUNDS_RANK_PERIODIC         = 12721,
     SPELL_JUGGERNAUT_CRIT_BONUS_TALENT      = 64976,
     SPELL_JUGGERNAUT_CRIT_BONUS_BUFF        = 65156,
+    SPELL_INTERCEPT                         = 20252, 
     SPELL_CHARGE                            = 34846,
     SPELL_SLAM                              = 50782,
     ICON_ID_SUDDEN_DEATH                    = 1989,
@@ -151,15 +152,21 @@ class spell_warr_charge : public SpellScriptLoader
                     return false;
                 return true;
             }
-            void HandleDummy(SpellEffIndex /*effIndex*/)
+            void  HandleDummy(SpellEffIndex /*effIndex*/)
             {
+                if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                    return;
+
                 int32 chargeBasePoints0 = GetEffectValue();
-                Unit* caster = GetCaster();
+                Player* caster = GetCaster()->ToPlayer();
                 caster->CastCustomSpell(caster, SPELL_CHARGE, &chargeBasePoints0, NULL, NULL, true);
 
                 //Juggernaut crit bonus
                 if (caster->HasAura(SPELL_JUGGERNAUT_CRIT_BONUS_TALENT))
+                {
                     caster->CastSpell(caster, SPELL_JUGGERNAUT_CRIT_BONUS_BUFF, true);
+                    caster->AddSpellCooldown(SPELL_INTERCEPT, 0, time(NULL) + 30);
+                }
             }
 
             void Register()
