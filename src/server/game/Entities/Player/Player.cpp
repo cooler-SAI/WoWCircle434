@@ -21147,10 +21147,11 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
 
 bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uint32 currency, uint32 count)
 {
-    vendorSlot += 1;
+    //vendorSlot += 1;
 
     // cheating attempt
-    if (count < 1) count = 1;
+    if (count < 1) 
+        count = 1;
 
     if (!isAlive())
         return false;
