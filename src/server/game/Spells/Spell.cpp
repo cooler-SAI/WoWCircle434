@@ -4694,7 +4694,7 @@ void Spell::TakeRunePower(bool didHit)
                     takePower = spell != 54637 && spell != 89056;
 
                 // keep Death Rune type if missed
-                if (didHit)
+                if (takePower)
                 {
                     player->RestoreBaseRune(i);
                     player->SetDeathRuneUsed(i, true);
