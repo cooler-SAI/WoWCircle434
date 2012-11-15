@@ -2005,7 +2005,7 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
             // Mastery DeathKnight
             if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
                 if (Aura* aur = m_caster->GetAura(77513))
-                    if (m_spellInfo->Id == 45470)
+                    if (m_spellInfo->Id == 45470 && m_caster->HasAura(48263))
                     {
                         int32 bp0 = int32(addhealth * float(aur->GetEffect(0)->GetAmount() / 100.0f));
                         if (Aura* aurShield = m_caster->GetAura(77535))
