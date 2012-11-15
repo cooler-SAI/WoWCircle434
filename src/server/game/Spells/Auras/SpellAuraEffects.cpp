@@ -6617,11 +6617,12 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
                 // Field Dressing
                 target->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DOT, damage);
             }
-            case 29841: // Second Win2 Rank 1
+            case 29841: // Second Wind Rank 1
             case 29842: // Second Wind Rank 2
                 if (!target->ToPlayer() || !target->IsInWorld())
                     return;
 
+                damage = int32(damage / (m_spellInfo->GetMaxDuration() / 2000)); 
                 target->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DOT, damage);
                 break;
             case 55694: // Enraged Regeneration
