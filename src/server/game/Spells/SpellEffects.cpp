@@ -410,6 +410,9 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 // Victory Rush
                 if (m_spellInfo->Id == 34428)
                     ApplyPct(damage, m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                // Cleave
+                else if (m_spellInfo->Id == 845)
+                    damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)* 0.45);
                 // Shockwave
                 else if (m_spellInfo->Id == 46968)
                 {
@@ -418,7 +421,8 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         damage += int32(CalculatePct(m_caster->GetTotalAttackPowerValue(BASE_ATTACK), pct));
                     break;
                 }
-                else if (m_spellInfo->Id == 78) // Heroic Strike
+                // Heroic Strike
+                else if (m_spellInfo->Id == 78) 
                     damage += ((m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 60) / 100);
                 break;
             }
