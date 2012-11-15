@@ -743,6 +743,8 @@ public:
                 deathcharger->setFaction(2096);
                 me->ExitVehicle();
                 CAST_PLR(killer)->GroupEventHappens(12687, me);
+                if (CAST_PLR(killer)->HasAura(REALM_OF_SHADOWS))
+                    killer->RemoveAurasDueToSpell(REALM_OF_SHADOWS);
                 me->DespawnOrUnsummon();
             }
         }
