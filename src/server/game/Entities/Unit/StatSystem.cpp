@@ -312,7 +312,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
             attPowerMod += int32(GetArmor() / (*iter)->GetAmount());
     }
 
-    SetInt32Value(index, (uint32)base_attPower);            // UNIT_FIELD_(RANGED)_ATTACK_POWER field
+    SetInt32Value(index, uint32(base_attPower + attPowerMod));            // UNIT_FIELD_(RANGED)_ATTACK_POWER field
     SetFloatValue(index_mult, attPowerMultiplier);          // UNIT_FIELD_(RANGED)_ATTACK_POWER_MULTIPLIER field
 
     Pet* pet = GetPet();                                //update pet's AP
