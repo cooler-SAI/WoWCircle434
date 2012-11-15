@@ -411,6 +411,11 @@ class Battleground
         bool HasFreeSlots() const;
         uint32 GetFreeSlotsForTeam(uint32 Team) const;
 
+        uint8 GetAwaitingPlayers(uint32 team) { return (team == ALLIANCE) ? m_AllianceAwaitingPlayers : m_HordeAwaitingPlayers; }
+        void IncreaseAwaitingPlayers(uint32 team) { (team == ALLIANCE) ? ++m_AllianceAwaitingPlayers : ++m_HordeAwaitingPlayers; }
+        void DecreaseAwaitingPlayers(uint32 team) { (team == ALLIANCE) ? --m_AllianceAwaitingPlayers : --m_HordeAwaitingPlayers; }
+        void ClearAwaitingPlayers() { m_AllianceAwaitingPlayers = 0; m_HordeAwaitingPlayers = 0; }
+
         bool isArena() const        { return m_IsArena; }
         bool isBattleground() const { return !m_IsArena; }
         bool isRated() const        { return m_IsRated; }
@@ -645,6 +650,8 @@ class Battleground
         bool   m_IsRated;                                   // is this battle rated?
         bool   m_PrematureCountDown;
         uint32 m_PrematureCountDownTimer;
+        uint8  m_AllianceAwaitingPlayers;
+        uint8  m_HordeAwaitingPlayers;
         char const* m_Name;
         uint64 m_Guid;
 

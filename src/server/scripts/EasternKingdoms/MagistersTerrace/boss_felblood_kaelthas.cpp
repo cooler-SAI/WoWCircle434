@@ -688,6 +688,18 @@ public:
 
 };
 
+class go_movie_orb : public GameObjectScript
+{
+    public:
+       go_movie_orb() : GameObjectScript("go_movie_orb") { }
+
+        bool OnGossipHello(Player* player, GameObject* go)
+        {
+            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            return false;
+        }
+};
+
 void AddSC_boss_felblood_kaelthas()
 {
     new boss_felblood_kaelthas();
@@ -695,4 +707,5 @@ void AddSC_boss_felblood_kaelthas()
     new mob_felkael_phoenix();
     new mob_felkael_phoenix_egg();
     new mob_felkael_flamestrike();
+    new go_movie_orb();
 }

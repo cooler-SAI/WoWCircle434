@@ -1721,6 +1721,17 @@ void Player::Update(uint32 p_time)
         }
     }
 
+    if (!IsBeingTeleported() && !m_taxi.GetCurrentTaxiPath() && !GetTransport() && isAlive())
+    {
+        if (IsForbiddenMapForLevel(GetMapId(), GetZoneId()) && !HasAura(41955))
+            CastSpell(this, 41955, true);
+    }
+    else
+    {
+        if (HasAura(41955))
+            RemoveAurasDueToSpell(41955);
+    }
+
     if (m_weaponChangeTimer > 0)
     {
         if (p_time >= m_weaponChangeTimer)
@@ -2407,6 +2418,10 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             // if the player is saved before worldportack (at logout for example)
             // this will be used instead of the current location in SaveToDB
 
+            // move packet sent by client always after far teleport
+            // code for finish transfer to new map called in WorldSession::HandleMoveWorldportAckOpcode at client packet
+            SetSemaphoreTeleportFar(true);
+
             if (!GetSession()->PlayerLogout())
             {
                 WorldPacket data(SMSG_NEW_WORLD, 4 + 4 + 4 + 4 + 4);
@@ -2419,10 +2434,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 GetSession()->SendPacket(&data);
                 SendSavedInstances();
             }
-
-            // move packet sent by client always after far teleport
-            // code for finish transfer to new map called in WorldSession::HandleMoveWorldportAckOpcode at client packet
-            SetSemaphoreTeleportFar(true);
         }
         //else
         //    return false;
@@ -5732,7 +5743,7 @@ void Player::UpdateLocalChannels(uint32 newZone)
 
             for (JoinedChannelsList::iterator itr = m_channels.begin(); itr != m_channels.end(); ++itr)
             {
-                if ((*itr)->GetChannelId() == i)
+                if ((*itr) && (*itr)->GetChannelId() == i)
                 {
                     usedChannel = *itr;
                     break;
@@ -11242,7 +11253,8 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
                             return EQUIP_ERR_NOT_DURING_ARENA_MATCH;
                 }
 
-                if (isInCombat()&& (pProto->Class == ITEM_CLASS_WEAPON || pProto->InventoryType == INVTYPE_RELIC) && m_weaponChangeTimer != 0)
+                if (isInCombat() && (pProto->Class == ITEM_CLASS_WEAPON || (pProto->InventoryType == INVTYPE_RELIC && pProto->SubClass != ITEM_SUBCLASS_ARMOR_LIBRAM)) 
+                    && m_weaponChangeTimer != 0)
                     return EQUIP_ERR_CLIENT_LOCKED_OUT;         // maybe exist better err
 
                 if (IsNonMeleeSpellCasted(false))
@@ -11962,7 +11974,8 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
             _ApplyItemMods(pItem, slot, true);
 
-            if (pProto && isInCombat() && (pProto->Class == ITEM_CLASS_WEAPON || pProto->InventoryType == INVTYPE_RELIC) && m_weaponChangeTimer == 0)
+            if (pProto && isInCombat() && (pProto->Class == ITEM_CLASS_WEAPON || (pProto->InventoryType == INVTYPE_RELIC && pProto->SubClass != ITEM_SUBCLASS_ARMOR_LIBRAM)) 
+                && m_weaponChangeTimer == 0)
             {
                 uint32 cooldownSpell = getClass() == CLASS_ROGUE ? 6123 : 6119;
                 SpellInfo const* spellProto = sSpellMgr->GetSpellInfo(cooldownSpell);
@@ -22710,7 +22723,7 @@ void Player::SendAurasForTarget(Unit* target)
         target->SendMovementWaterWalking();
 
     if (target->HasAuraType(SPELL_AURA_HOVER))
-        target->SendMovementHover();
+        target->SendMovementHover(true);
 
     WorldPacket data(SMSG_AURA_UPDATE_ALL);
     data.append(target->GetPackGUID());
@@ -25524,6 +25537,50 @@ void Player::ActivateSpec(uint8 spec)
             if (talentInfo->RankID[rank] == 0)
                 continue;
             removeSpell(talentInfo->RankID[rank], true); // removes the talent, and all dependant, learned, and chained spells..
+
+            if (SpellEntry const* spellProto = sSpellStore.LookupEntry(talentInfo->RankID[rank]))
+            {
+                bool bRemoveAura = false;
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellProto->Id);
+
+                for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                {
+                    if (!spellInfo)
+                        break;
+
+                    if ((spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA || spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID)
+                        && spellInfo->IsPositiveEffect(i))
+                    {
+                        bRemoveAura = true;
+                        break;
+                    }
+                }
+
+                Group *group = GetGroup();
+
+                if (bRemoveAura && group)
+                {
+                    for (GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                    {
+                        if (Player* member = itr->getSource())
+                        {
+                            if (member->GetGUID() == GetGUID())
+                                continue;
+
+                            AuraApplicationMap &itsAuras = member->GetAppliedAuras();
+                            for (AuraApplicationMap::iterator i = itsAuras.begin(); i != itsAuras.end();)
+                            {
+                                Aura const* aura = i->second->GetBase();
+                                if (aura->GetCasterGUID() == GetGUID() && aura->GetId() == spellInfo->Id)
+                                    member->RemoveAura(i);
+                                else
+                                    ++i;
+                            }
+                        }
+                    }
+                }
+            }
+
             if (const SpellInfo* _spellEntry = sSpellMgr->GetSpellInfo(talentInfo->RankID[rank]))
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)                  // search through the SpellInfo for valid trigger spells
                     if (_spellEntry->Effects[i].TriggerSpell > 0 && _spellEntry->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
@@ -26520,4 +26577,30 @@ void Player::SetSpellPenetrationItemMod(bool apply, int32 val)
 
     if (Pet* pPet = GetPet())
         pPet->UpdateSpellPenetrationRating();
+}
+
+bool Player::IsForbiddenMapForLevel(uint32 mapid, uint32 zone)
+{
+    // ignore gamemasters
+    if (isGameMaster())
+        return false;
+
+    // Outland
+    if (mapid == 530)
+    {
+        if (getLevel() < 58)
+        {
+            // Nagrand, Terrokar Forest, Netherstorm, Blade's Edge Mountains, Hellfire Peninsula, Zangarmarsh, Shadowmoon Valley
+            if (zone == 3518 || zone == 3519 || zone == 3523 || zone == 3522 || zone == 3483 || zone == 3521 || zone == 3520)
+                return true;
+        }
+    }
+    // Northrend
+    else if (mapid == 571)
+    {
+        if (getLevel() < 68)
+            return true;
+    }
+
+    return false;
 }

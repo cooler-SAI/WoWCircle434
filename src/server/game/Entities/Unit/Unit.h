@@ -1607,7 +1607,7 @@ class Unit : public WorldObject
             which are sent with movementinfo. Furthermore, these packets are broadcast to nearby players as well
             as the current unit.
         */
-        void SendMovementHover();
+        void SendMovementHover(bool apply);
         void SendMovementFeatherFall();
         void SendMovementWaterWalking();
         void SendMovementGravityChange();

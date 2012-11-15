@@ -906,7 +906,7 @@ template<class T>
 void AchievementMgr<T>::SendAchievementEarned(AchievementEntry const* achievement) const
 {
     // Don't send for achievements with ACHIEVEMENT_FLAG_HIDDEN
-    if (achievement->flags & ACHIEVEMENT_FLAG_HIDDEN)
+    if (achievement && achievement->flags & ACHIEVEMENT_FLAG_HIDDEN)
         return;
 
     sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::SendAchievementEarned(%u)", achievement->ID);

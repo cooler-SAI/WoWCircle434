@@ -1326,6 +1326,8 @@ class Player : public Unit, public GridObject<Player>
         }
         bool TeleportToBGEntryPoint();
 
+        bool IsForbiddenMapForLevel(uint32 mapid, uint32 zone);
+
         void SetSummonPoint(uint32 mapid, float x, float y, float z)
         {
             m_summon_expire = time(NULL) + MAX_PLAYER_SUMMON_DELAY;
@@ -3280,6 +3282,8 @@ class Player : public Unit, public GridObject<Player>
         uint32 m_timeSyncTimer;
         uint32 m_timeSyncClient;
         uint32 m_timeSyncServer;
+
+        uint32 m_leavingTimer;
 
         InstanceTimeMap _instanceResetTimes;
         uint32 _pendingBindId;

@@ -3119,6 +3119,9 @@ void SpellMgr::LoadDbcDataCorrections()
             case 42835: // Spout, remove damage effect, only anim is needed
                 spellInfo->Effects[EFFECT_0].Effect = 0;
                 break;
+            case 41955:
+                spellInfo->SetDurationIndex(28);
+                break;
             case 30657: // Quake
                 spellInfo->Effects[EFFECT_0].TriggerSpell = 30571;
                 break;

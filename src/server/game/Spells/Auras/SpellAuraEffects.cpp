@@ -3006,7 +3006,7 @@ void AuraEffect::HandleAuraHover(AuraApplication const* aurApp, uint8 mode, bool
     }
 
     target->SetHover(apply);    //! Sets movementflags
-    target->SendMovementHover();
+    target->SendMovementHover(apply);
 }
 
 void AuraEffect::HandleWaterBreathing(AuraApplication const* aurApp, uint8 mode, bool /*apply*/) const
@@ -5807,6 +5807,15 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
         case SPELLFAMILY_GENERIC:
             switch (GetId())
             {
+                case 41955: // No Man's Land
+                {
+                    if (Player * plr = target->ToPlayer())
+                    {
+                        if (PlayerInfo const* pInfo = sObjectMgr->GetPlayerInfo(plr->getRace(), plr->getClass()))
+                            plr->TeleportTo(pInfo->mapId, pInfo->positionX, pInfo->positionY, pInfo->positionZ, pInfo->orientation);
+                    }
+                    break;
+                }
                 case 66149: // Bullet Controller Periodic - 10 Man
                 case 68396: // Bullet Controller Periodic - 25 Man
                 {

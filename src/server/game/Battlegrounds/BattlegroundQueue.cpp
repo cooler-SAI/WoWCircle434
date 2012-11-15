@@ -54,7 +54,13 @@ BattlegroundQueue::~BattlegroundQueue()
         for (uint32 j = 0; j < BG_QUEUE_GROUP_TYPES_COUNT; ++j)
         {
             for (GroupsQueueType::iterator itr = m_QueuedGroups[i][j].begin(); itr!= m_QueuedGroups[i][j].end(); ++itr)
+            {
+                if (Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate((*itr)->BgTypeId))
+                    if (bg->GetAwaitingPlayers(ALLIANCE) || bg->GetAwaitingPlayers(HORDE))
+                        bg->ClearAwaitingPlayers();
+
                 delete (*itr);
+            }
             m_QueuedGroups[i][j].clear();
         }
     }
@@ -345,6 +351,9 @@ void BattlegroundQueue::RemovePlayer(uint64 guid, bool decreaseInvitedCount)
     if (pitr != group->Players.end())
         group->Players.erase(pitr);
 
+    if (Battleground* bg = sBattlegroundMgr->GetBattleground(group->IsInvitedToBGInstanceGUID, group->BgTypeId == BATTLEGROUND_AA ? BATTLEGROUND_TYPE_NONE : group->BgTypeId))
+        bg->DecreaseAwaitingPlayers(group->Team);
+
     // if invited to bg, and should decrease invited count, then do it
     if (decreaseInvitedCount && group->IsInvitedToBGInstanceGUID)
         if (Battleground* bg = sBattlegroundMgr->GetBattleground(group->IsInvitedToBGInstanceGUID, group->BgTypeId))
@@ -462,6 +471,7 @@ bool BattlegroundQueue::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg,
 
             // set invited player counters
             bg->IncreaseInvitedCount(ginfo->Team);
+            bg->IncreaseAwaitingPlayers(ginfo->Team);
 
             player->SetInviteForBattlegroundQueueType(bgQueueTypeId, ginfo->IsInvitedToBGInstanceGUID);
 

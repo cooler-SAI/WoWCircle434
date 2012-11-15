@@ -195,6 +195,9 @@ Battleground::Battleground()
     m_TeamScores[TEAM_ALLIANCE]      = 0;
     m_TeamScores[TEAM_HORDE]         = 0;
 
+    m_AllianceAwaitingPlayers           = 0;
+    m_HordeAwaitingPlayers              = 0;
+
     m_PrematureCountDown = false;
 
     m_HonorMode = BG_NORMAL;
@@ -1945,9 +1948,9 @@ void Battleground::CheckArenaAfterTimerConditions()
 
 void Battleground::CheckArenaWinConditions()
 {
-    if (!GetAlivePlayersCountByTeam(ALLIANCE) && GetPlayersCountByTeam(HORDE))
+    if (!GetAlivePlayersCountByTeam(ALLIANCE) && GetPlayersCountByTeam(HORDE) && !GetAwaitingPlayers(ALLIANCE))
         EndBattleground(HORDE);
-    else if (GetPlayersCountByTeam(ALLIANCE) && !GetAlivePlayersCountByTeam(HORDE))
+    else if (GetPlayersCountByTeam(ALLIANCE) && !GetAlivePlayersCountByTeam(HORDE) && !GetAwaitingPlayers(HORDE))
         EndBattleground(ALLIANCE);
 }
 

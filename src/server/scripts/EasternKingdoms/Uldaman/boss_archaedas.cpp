@@ -435,6 +435,10 @@ class go_altar_of_the_keepers : public GameObjectScript
             if (!instance)
                 return false;
 
+            if (GetMSTimeDiffToNow(instance->GetData(DATA_ALTAR_OF_KEEPERS)) < 60000)
+                return true;
+
+            instance->SetData(DATA_ALTAR_OF_KEEPERS, getMSTime());
             player->CastSpell (player, SPELL_BOSS_OBJECT_VISUAL, false);
 
             instance->SetData(DATA_STONE_KEEPERS, IN_PROGRESS); // activate the Stone Keepers

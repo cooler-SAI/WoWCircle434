@@ -1953,6 +1953,8 @@ void GameObject::SetDestructibleState(GameObjectDestructibleState state, Player*
             break;
         }
     }
+
+    UpdateObjectVisibility();
 }
 
 void GameObject::SetLootState(LootState state, Unit* unit)

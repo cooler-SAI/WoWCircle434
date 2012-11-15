@@ -64,6 +64,7 @@ class instance_uldaman : public InstanceMapScript
                 uiKeystoneGUID = 0;
 
                 uiIronayaSealDoorTimer = 27000; //animation time
+                uiAltarofKeepersTime = 0;
                 bKeystoneCheck = false;
             }
 
@@ -88,6 +89,7 @@ class instance_uldaman : public InstanceMapScript
             uint64 uiKeystoneGUID;
 
             uint32 uiIronayaSealDoorTimer;
+            uint32 uiAltarofKeepersTime;
             bool bKeystoneCheck;
 
             std::vector<uint64> vStoneKeeper;
@@ -374,6 +376,9 @@ class instance_uldaman : public InstanceMapScript
                     case DATA_IRONAYA_SEAL:
                         bKeystoneCheck = true;
                         break;
+                    case DATA_ALTAR_OF_KEEPERS:
+                        uiAltarofKeepersTime = data;
+                        break;
                 }
 
                 if (data == DONE)
@@ -483,6 +488,17 @@ class instance_uldaman : public InstanceMapScript
 
                 return 0;
             } // end GetData64
+
+            uint32 GetData(uint32 DataId)
+            {
+                switch(DataId)
+                {
+                case DATA_ALTAR_OF_KEEPERS:
+                    return uiAltarofKeepersTime;
+                default:
+                    return 0;
+                }
+            }
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const

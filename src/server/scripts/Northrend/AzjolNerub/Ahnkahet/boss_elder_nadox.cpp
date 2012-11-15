@@ -155,7 +155,8 @@ class boss_elder_nadox : public CreatureScript
                             events.ScheduleEvent(EVENT_PLAGUE, 15*IN_MILLISECONDS);
                             break;
                         case EVENT_RAGE:
-                            DoCast(H_SPELL_BROOD_RAGE);
+                            if (Creature* swarmer = me->FindNearestCreature(NPC_AHNKAHAR_SWARMER, 35.0f))
+                                DoCast(swarmer, H_SPELL_BROOD_RAGE, true);
                             events.ScheduleEvent(EVENT_RAGE, urand(10*IN_MILLISECONDS, 50*IN_MILLISECONDS));
                             break;
                         case EVENT_SUMMON_SWARMER:

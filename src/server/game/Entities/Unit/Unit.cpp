@@ -18039,15 +18039,18 @@ bool Unit::SetHover(bool enable)
     return true;
 }
 
-void Unit::SendMovementHover()
+void Unit::SendMovementHover(bool apply)
 {
     if (GetTypeId() == TYPEID_PLAYER)
         ToPlayer()->SendMovementSetHover(HasUnitMovementFlag(MOVEMENTFLAG_HOVER));
 
-    WorldPacket data(MSG_MOVE_HOVER, 64);
-    data.append(GetPackGUID());
-    BuildMovementPacket(&data);
-    SendMessageToSet(&data, false);
+    if (apply)
+    {
+        WorldPacket data(MSG_MOVE_HOVER, 64);
+        data.append(GetPackGUID());
+        BuildMovementPacket(&data);
+        SendMessageToSet(&data, false);
+    }
 }
 
 void Unit::SendMovementWaterWalking()

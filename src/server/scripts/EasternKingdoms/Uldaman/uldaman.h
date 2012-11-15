@@ -36,6 +36,7 @@ enum eData
     DATA_STONE_KEEPERS                  = 4,
     DATA_MINIONS                        = 5,
     DATA_IRONAYA_SEAL                   = 6,
+    DATA_ALTAR_OF_KEEPERS               = 7,
 };
 
 #define MAX_ENCOUNTER                   3
