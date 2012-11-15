@@ -511,10 +511,10 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
     {
         case SPELL_AURA_BYPASS_ARMOR_FOR_CASTER:
         {
-            if (m_spellInfo->Id == 86346) // Colossus Smash
+            if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR) // Colossus Smash
             {
-                if (GetBase()->GetOwner() && GetBase()->GetOwner()->GetTypeId() == TYPEID_PLAYER)
-                    amount /= 2;
+                if (GetBase()->GetOwner()->GetTypeId() == TYPEID_PLAYER) // not null check is not necessary (why ? look at line 476)
+                    amount /= 2; // Bypasses less armor on players for warrior bypass_armor spells
             }
             break;
         }

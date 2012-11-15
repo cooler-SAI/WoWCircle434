@@ -4213,10 +4213,6 @@ void SpellMgr::LoadDbcDataCorrections()
             case 54734:
                 spellInfo->Effects[0].SetRadiusIndex(13);
                 break;
-            // Colossus Smash
-            case 108126:
-                spellInfo->Effects[0].BasePoints = 50;
-                break;
             default:
                 break;
         }
