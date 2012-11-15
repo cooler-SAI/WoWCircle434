@@ -858,7 +858,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                         spellId = 54158; 
                     else if (m_caster->HasAura(20154)) // Seal of Righteousness
                         spellId = 20187;
-                    else if (m_caster->HasAura(32801)) // Seal of Truth
+                    else if (m_caster->HasAura(31801)) // Seal of Truth
                         spellId = 31804;
 
                     if (spellId)

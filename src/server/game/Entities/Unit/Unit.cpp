@@ -8320,6 +8320,13 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Slaughter
+        case 84583:
+        case 84587:
+        case 84588:
+            if (Aura* aur = victim->GetAura(94009, GetGUID()))
+                aur->RefreshDuration();
+            break;
         // Impending Victory Rank 1
         // Impending Victory Rank 2
         case 80128:
