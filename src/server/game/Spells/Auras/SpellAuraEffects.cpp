@@ -6624,6 +6624,12 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
 
                 target->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DOT, damage);
                 break;
+            case 55694: // Enraged Regeneration
+                if (!target->ToPlayer() || !target->IsInWorld())
+                    return;
+
+                target->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DOT, damage);
+                break;
             default:
                 break;
         }
