@@ -12238,23 +12238,23 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
     SetSpeed(mtype, speed, forced);
 }
 
-float Unit::GetSpeed(UnitMoveType mtype) const
-{
-    return m_speed_rate[mtype]*(IsControlledByPlayer() ? playerBaseMoveSpeed[mtype] : baseMoveSpeed[mtype]);
-}
-
 void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
 {
     if (rate < 0)
         rate = 0.0f;
 
     // Update speed only on change
-    if (m_speed_rate[mtype] == rate)
-        return;
+    bool clientSideOnly = m_speed_rate[mtype] == rate;
 
     m_speed_rate[mtype] = rate;
 
-    propagateSpeedChange();
+    if (!clientSideOnly)
+        propagateSpeedChange();
+
+    // Don't build packets because we've got noone to send
+    // them to except self, and self is not created at client.
+    if (!IsInWorld())
+        return;
 
     WorldPacket data;
     ObjectGuid guid = GetGUID();
@@ -12263,7 +12263,7 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
         switch (mtype)
         {
             case MOVE_WALK:
-                data.Initialize(SMSG_SPLINE_MOVE_SET_WALK_SPEED, 8+4+2+4+4+4+4+4+4+4);
+                data.Initialize(SMSG_SPLINE_MOVE_SET_WALK_SPEED, 1 + 8 + 4);
                 data.WriteBit(guid[0]);
                 data.WriteBit(guid[6]);
                 data.WriteBit(guid[7]);

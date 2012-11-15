@@ -1274,7 +1274,8 @@ void Player::SendMirrorTimer(MirrorTimerType Type, uint32 MaxValue, uint32 Curre
             StopMirrorTimer(Type);
         return;
     }
-    WorldPacket data(SMSG_START_MIRROR_TIMER, (21));
+
+    WorldPacket data(SMSG_START_MIRROR_TIMER, 21);
     data << (uint32)Type;
     data << CurrentValue;
     data << MaxValue;
