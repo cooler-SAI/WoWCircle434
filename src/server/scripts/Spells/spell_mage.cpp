@@ -436,6 +436,69 @@ public:
     }
 };
 
+// Cauterize
+class spell_mage_cauterize : public SpellScriptLoader
+{
+public:
+    spell_mage_cauterize() : SpellScriptLoader("spell_mage_cauterize") { }
+
+    class spell_mage_cauterize_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_mage_cauterize_AuraScript);
+
+        uint32 absorbChance;
+        uint32 healtPct;
+
+        enum Spell
+        {
+            SPELL_MAGE_CAUTERIZE = 87023
+        };
+
+        bool Load()
+        {
+            absorbChance = GetSpellInfo()->Effects[EFFECT_0].CalcValue(GetCaster());
+            healtPct = GetSpellInfo()->Effects[EFFECT_1].CalcValue(GetCaster());
+            return GetUnitOwner()->ToPlayer();
+        }
+
+        void CalculateAmount(AuraEffect const* /*auraEffect*/, int32& amount, bool& canBeRecalculated)
+        {
+            amount = -1;
+        }
+
+        void Absorb(AuraEffect* /*auraEffect*/, DamageInfo& dmgInfo, uint32& absorbAmount)
+        {
+            Unit* target = GetTarget();
+
+            if (dmgInfo.GetDamage() < target->GetHealth())
+                return;
+
+            if (target->ToPlayer()->HasSpellCooldown(SPELL_MAGE_CAUTERIZE))
+                return;
+
+            if (!roll_chance_i(absorbChance))
+                return;
+
+            int bp1 = target->CountPctFromMaxHealth(healtPct);
+            target->CastCustomSpell(target, SPELL_MAGE_CAUTERIZE, NULL, &bp1, NULL, true);
+            target->ToPlayer()->AddSpellCooldown(SPELL_MAGE_CAUTERIZE, 0, time(NULL) + 60);
+
+            absorbAmount = dmgInfo.GetDamage();
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_cauterize_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_mage_cauterize_AuraScript::Absorb, EFFECT_0);
+        }
+    };
+
+    AuraScript *GetAuraScript() const
+    {
+        return new spell_mage_cauterize_AuraScript();
+    }
+};
+
 void AddSC_mage_spell_scripts()
 {
     new spell_mage_blast_wave();
@@ -447,4 +510,5 @@ void AddSC_mage_spell_scripts()
     new spell_mage_summon_water_elemental();
     new spell_mage_living_bomb();
     new spell_mage_frostbolt();
+    new spell_mage_cauterize();
 }
