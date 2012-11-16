@@ -4216,6 +4216,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 54734:
                 spellInfo->Effects[0].SetRadiusIndex(13);
                 break;
+            // Speed of Light
+            case 85495:
+            case 85498:
+            case 85499:
+                spellInfo->Effects[1].TargetA = 1;
+                break;
             default:
                 break;
         }
