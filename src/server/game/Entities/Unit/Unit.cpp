@@ -8752,7 +8752,7 @@ void Unit::setPowerType(Powers new_powertype)
     {
         default:
         case POWER_MANA:
-            break;
+            return;
         case POWER_RAGE:
             SetMaxPower(POWER_RAGE, GetCreatePowers(POWER_RAGE));
             SetPower(POWER_RAGE, 0);
@@ -8765,6 +8765,7 @@ void Unit::setPowerType(Powers new_powertype)
             SetMaxPower(POWER_ENERGY, GetCreatePowers(POWER_ENERGY));
             break;
     }
+    UpdateMaxPower(new_powertype);
 }
 
 FactionTemplateEntry const* Unit::getFactionTemplateEntry() const

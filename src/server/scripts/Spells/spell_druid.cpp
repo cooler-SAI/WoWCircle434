@@ -825,6 +825,59 @@ class spell_dru_t10_restoration_4p_bonus : public SpellScriptLoader
         }
 };
 
+// Primal Madness
+// 5229 Enrage
+// 5217 Name: Tiger's Fury
+// 50334 Berserk
+class spell_dru_primal_madness : public SpellScriptLoader
+{
+    public:
+        spell_dru_primal_madness() : SpellScriptLoader("spell_dru_primal_madness") {}
+
+        class spell_dru_primal_madness_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dru_primal_madness_SpellScript);
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    if (caster->getClass() != CLASS_DRUID)
+                        return;
+
+                    if (caster->HasAura(80316) || caster->HasAura(80317))
+                    {
+                       if (caster->GetShapeshiftForm() == FORM_BEAR)
+                        {
+                            int spell_id = caster->HasAura(80316) ? 80316 : 80317;
+                            int bp0 = int32(sSpellMgr->GetSpellInfo(spell_id)->Effects[0].BasePoints);
+                            caster->CastCustomSpell(caster, 17080, &bp0, NULL, NULL, true);
+                        }
+                        else if (caster->GetShapeshiftForm() == FORM_CAT)
+                        {
+                            int spell_id = caster->HasAura(80316) ? 80879 : 80886;
+                            caster->CastSpell(caster, spell_id , true);
+
+                            int bp = int32(sSpellMgr->GetSpellInfo(spell_id)->Effects[0].BasePoints);
+                            caster->ModifyPower(POWER_ENERGY, bp);
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHit += SpellEffectFn(spell_dru_primal_madness_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dru_primal_madness_SpellScript();
+        }
+};
+
+
 void AddSC_druid_spell_scripts()
 {
     new spell_dru_enrage();
@@ -843,4 +896,5 @@ void AddSC_druid_spell_scripts()
     new spell_dru_tiger_s_fury();
     new spell_dru_t10_restoration_4p_bonus();
     new spell_dru_eclipse_energize();
+    new spell_dru_primal_madness();
 }
