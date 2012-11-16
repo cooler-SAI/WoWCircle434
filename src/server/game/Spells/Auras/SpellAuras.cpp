@@ -1418,6 +1418,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         target->CastSpell(target, 32612, true, NULL, GetEffect(1));
                         target->CombatStop();
                         break;
+                    // Ring of Frost - 3 sec immune
+                    case 82691:
+                        target->AddAura(91264, target);
+                        break;
                     default:
                         break;
                 }

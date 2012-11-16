@@ -3236,7 +3236,6 @@ public:
     struct npc_ring_of_frostAI : public ScriptedAI
     {
         npc_ring_of_frostAI(Creature *c) : ScriptedAI(c) {}
-
         bool isReady;
         uint32 releaseTimer;
 
@@ -3265,35 +3264,16 @@ public:
                         (*itr)->DisappearAndDie();
         }
 
-        void CheckIfMoveInRing(Unit *who, bool preSearch)
+        void CheckIfMoveInRing(Unit *who)
         {
-            if (who->isAlive() && me->IsWithinLOSInMap(who) && me->IsInRange(who, 0.0f, 5.0f))
+            if (who->isAlive() && me->IsInRange(who, 2.5f, 5.0f) && me->IsWithinLOSInMap(who) && isReady)
             {
-                bool isImmune = true;
-                if (preSearch)
+                if (!who->HasAura(82691))
                 {
-                    _immuneList.insert(who);
-                    isImmune = false;
+                    if (!who->HasAura(91264))
+                        me->CastSpell(who, 82691, true);
                 }
-                else
-                {
-                    if (me->IsInRange(who, 2.5f, 5.0f))
-                    {
-                        // player leave from circle
-                        _immuneList.erase(who);
-                        if (!who->HasAura(82691))
-                            me->CastSpell(who, 82691, true);
-                    }
-                    if (isImmune)
-                    {
-                        std::set<Unit* >::const_iterator itr = _immuneList.find(who);
-                        if (itr == _immuneList.end())
-                            isImmune = false;
-
-                        if (!who->HasAura(82691) && !isImmune)
-                            me->CastSpell(who, 82691, true);
-                    }
-                }
+                else me->CastSpell(who, 91264, true);
             }
         }
 
@@ -3307,10 +3287,7 @@ public:
                     releaseTimer = 9000; // 9sec
                 }
                 else
-                {
-                    _immuneList.clear();
                     me->DisappearAndDie();
-                }
             }
             else releaseTimer -= diff;
 
@@ -3320,11 +3297,8 @@ public:
             Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
             me->VisitNearbyObject(5.0f, searcher);
             for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
-                CheckIfMoveInRing(*iter, !isReady);
+                CheckIfMoveInRing(*iter);
         }
-        
-        private:
-            std::set<Unit*> _immuneList;
     };
 
     CreatureAI* GetAI(Creature* pCreature) const
