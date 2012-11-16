@@ -682,8 +682,8 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
         case SPELL_AURA_PERIODIC_ENERGIZE:
             switch (m_spellInfo->Id)
             {
-            case 57669: // Replenishment (0.2% from max)
-                amount = CalculatePct(GetBase()->GetUnitOwner()->GetMaxPower(POWER_MANA), amount);
+            case 57669: // Replenishment (0.1% from max)
+                amount = int32(CalculatePct(GetBase()->GetUnitOwner()->GetMaxPower(POWER_MANA), amount) / 10);
                 break;
             case 61782: // Infinite Replenishment
                 amount = GetBase()->GetUnitOwner()->GetMaxPower(POWER_MANA) * 0.0025f;
