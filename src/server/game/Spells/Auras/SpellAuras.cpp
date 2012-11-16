@@ -1340,6 +1340,17 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (target->GetTypeId() == TYPEID_PLAYER)
                         target->ToPlayer()->RemoveSpellCooldown(20252, true);
                 break;
+            case SPELLFAMILY_PALADIN:
+                // Avenging Wrath
+                if (m_spellInfo->Id == 31884)
+                {
+                    if (!caster)
+                        return;
+
+                    if (AuraEffect const* auraEff = caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_PALADIN, 3029, 0))
+                        caster->CastSpell(caster, 57318, true);
+                }
+                break;
         }
     }
     // mods at aura remove
@@ -1472,9 +1483,9 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     target->RemoveAurasWithFamily(SPELLFAMILY_ROGUE, 0x0000800, 0, 0, target->GetGUID());
                 break;
             case SPELLFAMILY_PALADIN:
-                // Remove the immunity shield marker on Forbearance removal if AW marker is not present
-                if (GetId() == 25771 && target->HasAura(61988) && !target->HasAura(61987))
-                    target->RemoveAura(61988);
+                // Avenging Wrath
+                if (m_spellInfo->Id == 31884)
+                    target->RemoveAura(57318);
                 break;
             case SPELLFAMILY_DEATHKNIGHT:
                 // Blood of the North
