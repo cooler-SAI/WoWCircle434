@@ -8320,6 +8320,15 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Tower of Radiance
+        case 84800:
+        case 85511:
+        case 85512:
+            if (!victim->HasAura(53563))
+                return false;
+            target = this;
+            trigger_spell_id = 88852;
+            break;
         // Die by the Sword
         case 81913:
         case 81914:

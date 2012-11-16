@@ -4239,6 +4239,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 36946:
                 spellInfo->SetDurationIndex(1);
                 break;
+            // Tower of Radiance rank 3
+            case 85512:
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL;
+                break;
             default:
                 break;
         }
