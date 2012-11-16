@@ -990,6 +990,7 @@ class WorldSession
         void HandleUpdateMissileTrajectory(WorldPacket& recvPacket);
         void HandleViolenceLevel(WorldPacket& recvPacket);
         void HandleObjectUpdateFailedOpcode(WorldPacket& recvPacket);
+        void HandleObjectUpdateRescuedOpcode(WorldPacket& recvPacket);
         void HandleChangeCurrencyFlags(WorldPacket& recvPacket);
         void HandleCemeteryListOpcode(WorldPacket& recvPacket);
         void HandlerCategoryCooldownOpocde(WorldPacket& recvPacket);
