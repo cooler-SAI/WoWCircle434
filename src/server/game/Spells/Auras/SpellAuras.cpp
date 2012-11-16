@@ -1412,15 +1412,26 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     default:
                         break;
                 }
-                if (!caster)
+                if (!caster || !GetEffect(EFFECT_0) || !target || !GetSpellInfo())
                     break;
-                // Ice barrier - dispel/absorb remove
-                if (removeMode == AURA_REMOVE_BY_ENEMY_SPELL && GetSpellInfo()->SpellFamilyFlags[1] & 0x1)
+
+                if (removeMode == AURA_REMOVE_BY_ENEMY_SPELL)
                 {
-                    // Shattered Barrier
-                    if (AuraEffect * dummy = caster->GetDummyAuraEffect(SPELLFAMILY_MAGE, 3260, 0))
-                        if (roll_chance_i(dummy->GetSpellInfo()->ProcChance))
-                            caster->CastSpell(target, 55080, true, NULL, GetEffect(0));
+                    // Molten Shields - absorb remove
+                    if (GetSpellInfo()->SpellFamilyFlags[0] & 0x8)
+                    {
+                        if (target->HasAura(11094))
+                            caster->CastSpell(target, 31643, true);
+                    }
+                    // Ice barrier - absorb remove
+                    if (GetSpellInfo()->SpellFamilyFlags[1] & 0x1 && GetEffect(EFFECT_0)->GetAmount() <= 0)
+                    {
+                        // Shattered Barrier
+                        if (target->HasAura(44745))
+                            caster->CastSpell(target, 55080, true);
+                        if (target->HasAura(54787))
+                            caster->CastSpell(target, 83073, true);
+                    }
                 }
                 break;
             case SPELLFAMILY_WARLOCK:
