@@ -1139,6 +1139,24 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             }
             break;
         }
+        case SPELLFAMILY_PRIEST:
+        {
+            switch (m_spellInfo->Id)
+            {
+                case 527:
+                    if (!unitTarget)
+                        return;
+
+                    if (m_caster->IsFriendlyTo(unitTarget))
+                        m_caster->CastSpell(unitTarget, 97690, true);
+                    else
+                        m_caster->CastSpell(unitTarget, 97691, true);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        }
     }
 
     switch (m_spellInfo->Id)
