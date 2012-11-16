@@ -4229,6 +4229,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 1022:
                 spellInfo->ExcludeTargetAuraSpell = 25771;
                 break;
+             // Consecration
+            case 36946:
+                spellInfo->SetDurationIndex(1);
+                break;
             default:
                 break;
         }
