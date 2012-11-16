@@ -6311,8 +6311,7 @@ void Spell::EffectActivateRune(SpellEffIndex effIndex)
     // needed later
     m_runesState = m_caster->ToPlayer()->GetRunesState();
 
-    uint32 count = damage;
-    if (count == 0) count = 1;
+    uint32 count = std::max<uint32>(damage, 1);
     for (uint32 j = 0; j < MAX_RUNES && count > 0; ++j)
     {
         if (player->GetRuneCooldown(j) && player->GetCurrentRune(j) == RuneType(m_spellInfo->Effects[effIndex].MiscValue))
@@ -6328,10 +6327,11 @@ void Spell::EffectActivateRune(SpellEffIndex effIndex)
     // Blood Tap
     if (m_spellInfo->Id == 45529 && count > 0)
     {
+        RuneType rune = RuneType(m_spellInfo->Effects[effIndex].MiscValueB);
         for (uint32 l = 0; l < MAX_RUNES && count > 0; ++l)
         {
             // Check if both runes are on cd as that is the only time when this needs to come into effect
-            if ((player->GetRuneCooldown(l) && player->GetCurrentRune(l) == RuneType(m_spellInfo->Effects[effIndex].MiscValueB)) && (player->GetRuneCooldown(l+1) && player->GetCurrentRune(l+1) == RuneType(m_spellInfo->Effects[effIndex].MiscValueB)))
+            if ((player->GetRuneCooldown(l) && player->GetCurrentRune(l) == rune) && (player->GetRuneCooldown(l+1) && player->GetCurrentRune(l+1) == rune))
             {
                 // Should always update the rune with the lowest cd
                 if (player->GetRuneCooldown(l) >= player->GetRuneCooldown(l+1))
