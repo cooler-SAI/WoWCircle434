@@ -3013,6 +3013,12 @@ void SpellMgr::LoadDbcDataCorrections()
 
         switch (spellInfo->Id)
         {
+            // Nature's Blessing
+            case 30869:
+            case 30868:
+            case 30867:
+                spellInfo->Effects[0].SpellClassMask = flag96(0x000001C0, 0, 0x00010010); // Greater Healing Wave & Riptide
+                break;
             case 34130: // Create Healthstone
                 spellInfo->Effects[0].BasePoints = 1;
                 break;

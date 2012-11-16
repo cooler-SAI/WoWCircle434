@@ -10779,6 +10779,14 @@ uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, u
     if (maxval)
         AddPct(TakenTotalMod, maxval);
 
+    if (spellProto->SpellFamilyName == SPELLFAMILY_SHAMAN)
+    {
+        // Nature's Blessing
+        if (AuraEffect * aur = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 2012, 0))
+            if (aur->IsAffectingSpell(spellProto) && HasAura(974)) // earth shield
+                AddPct(TakenTotalMod, aur->GetAmount());
+    }
+
     // Tenacity increase healing % taken
     if (AuraEffect const* Tenacity = GetAuraEffect(58549, 0))
         AddPct(TakenTotalMod, Tenacity->GetAmount());
