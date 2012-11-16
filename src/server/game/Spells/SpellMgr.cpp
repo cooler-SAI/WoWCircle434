@@ -4222,6 +4222,13 @@ void SpellMgr::LoadDbcDataCorrections()
             case 85499:
                 spellInfo->Effects[1].TargetA = 1;
                 break;
+            // Forbearance
+            case 642:
+                spellInfo->ExcludeCasterAuraSpell = 25771;
+            case 633:
+            case 1022:
+                spellInfo->ExcludeTargetAuraSpell = 25771;
+                break;
             default:
                 break;
         }

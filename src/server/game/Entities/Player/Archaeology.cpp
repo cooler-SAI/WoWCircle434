@@ -134,7 +134,7 @@ uint32 Player::GetSurveyBotEntry(float &orientation)
         else if (skill_now >= 75) { curr_min = 2; curr_max = 4; }
         else if (skill_now >= 1) { curr_min = 2; curr_max = 3; }
 
-        ModifyCurrency(curr_id, urand(curr_min, curr_max) * 100);
+        ModifyCurrency(curr_id, urand(curr_min, curr_max));
     }
 
     // We cannot implement special race fragments, so don't  spawn go
