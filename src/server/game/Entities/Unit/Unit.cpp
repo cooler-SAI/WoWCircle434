@@ -9945,8 +9945,9 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
 
         switch ((*i)->GetMiscValue())
         {
-            case 4920: // Molten Fury
-            case 4919:
+            case 4920:  // Molten Fury (Rank 1)
+            case 4919:  // Molten Fury (Rank 2)
+            case 12368: // Molten Fury (Rank 3)
             {
                 if (victim->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, spellProto, this))
                     AddPct(DoneTotalMod, (*i)->GetAmount());
