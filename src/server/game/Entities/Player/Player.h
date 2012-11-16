@@ -354,12 +354,14 @@ enum ActionButtonUpdateState
 
 enum ActionButtonType
 {
-    ACTION_BUTTON_SPELL     = 0x00,
-    ACTION_BUTTON_C         = 0x01,                         // click?
-    ACTION_BUTTON_EQSET     = 0x20,
-    ACTION_BUTTON_MACRO     = 0x40,
-    ACTION_BUTTON_CMACRO    = ACTION_BUTTON_C | ACTION_BUTTON_MACRO,
-    ACTION_BUTTON_ITEM      = 0x80
+    ACTION_BUTTON_SPELL         = 0x00,
+    ACTION_BUTTON_C             = 0x01,                         // click?
+    ACTION_BUTTON_UNKNOWN       = 0x10,
+    ACTION_BUTTON_EQSET         = 0x20,
+    ACTION_BUTTON_MULTISPELL    = ACTION_BUTTON_EQSET | ACTION_BUTTON_UNKNOWN, // 0x30=48
+    ACTION_BUTTON_MACRO         = 0x40,
+    ACTION_BUTTON_CMACRO        = ACTION_BUTTON_C | ACTION_BUTTON_MACRO,
+    ACTION_BUTTON_ITEM          = 0x80
 };
 
 #define ACTION_BUTTON_ACTION(X) (uint32(X) & 0x00FFFFFF)

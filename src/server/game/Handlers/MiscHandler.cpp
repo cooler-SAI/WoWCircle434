@@ -1073,6 +1073,9 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recvData)
             case ACTION_BUTTON_ITEM:
                 sLog->outInfo(LOG_FILTER_NETWORKIO, "MISC: Added Item %u into button %u", action, button);
                 break;
+            case ACTION_BUTTON_MULTISPELL:
+                sLog->outInfo(LOG_FILTER_NETWORKIO, "MISC: Added Multispell %u into button %u", action, button);
+                break;
             default:
                 sLog->outError(LOG_FILTER_NETWORKIO, "MISC: Unknown action button type %u for action %u into button %u for player %s (GUID: %u)", type, action, button, _player->GetName(), _player->GetGUIDLow());
                 return;
