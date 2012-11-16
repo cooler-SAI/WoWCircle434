@@ -4828,12 +4828,19 @@ void Spell::HandleHolyPower(Player* caster)
             }
         }
 
+        bool returnResources = false;
+        if (AuraEffect* const _effect = caster->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 2944, EFFECT_0))
+            returnResources = roll_chance_i(_effect->GetAmount());
+
         // The spell did hit the target, apply aura cost mods if there are any.
         if (hit)
         {
             modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, m_powerCost);
             m_caster->ModifyPower(POWER_HOLY_POWER, -m_powerCost);
         }
+
+        if (returnResources)
+            caster->CastCustomSpell(88676, SPELLVALUE_BASE_POINT0, m_powerCost, caster);
     }
 }
 
