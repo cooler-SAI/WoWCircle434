@@ -672,6 +672,14 @@ public:
                     if (player->GetQuestStatus(12746) == QUEST_STATUS_INCOMPLETE)
                         return true;
                     break;
+                case 49355:                                     // Lord Harford
+                    if (player->GetQuestStatus(28649) == QUEST_STATUS_INCOMPLETE)
+                        return true;
+                    break;
+                case 49356:                                     // Gally Lumpstain
+                    if (player->GetQuestStatus(28650) == QUEST_STATUS_INCOMPLETE)
+                        return true;
+                    break;
             }
 
             return false;
@@ -1004,6 +1012,37 @@ public:
                                     return;
                             }
                             break;
+                        case RACE_WORGEN:
+                        case RACE_GOBLIN:
+                            switch (ExecuteSpeech_Counter)
+                            {
+                                case 0: break;
+                                case 1: me->SetStandState(UNIT_STAND_STATE_STAND); break;
+                                case 2: break;
+                                case 3: break;
+                                case 4: break;
+                                case 5: break;
+                                case 6: break;
+                                case 7: break;
+                                case 8:
+                                    if (Creature* Plaguefist = GetClosestCreatureWithEntry(me, NPC_PLAGUEFIST, 85.0f))
+                                        DoScriptText(SAY_PLAGUEFIST, Plaguefist, player);
+                                    break;
+                                case 9:
+                                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                    break;
+                                case 10:
+                                    DoScriptText(SAY_EXEC_WAITING, me, player);
+                                    break;
+                                case 11:
+                                    DoScriptText(EMOTE_DIES, me);
+                                    me->setDeathState(JUST_DIED);
+                                    me->SetHealth(0);
+                                    return;
+                            }
+                            break;
+
                     }
 
                     if (ExecuteSpeech_Counter >= 9)
