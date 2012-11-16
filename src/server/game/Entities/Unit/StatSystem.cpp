@@ -621,7 +621,18 @@ void Player::UpdateArmorPenetration(int32 amount)
 
 void Player::UpdateMeleeHitChances()
 {
-    m_modMeleeHitChance = (float)GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
+    m_modMeleeHitChance = 0;
+    AuraEffectList const & alist = GetAuraEffectsByType(SPELL_AURA_MOD_HIT_CHANCE);
+    Item *weapon = this->GetWeaponForAttack(BASE_ATTACK);
+    for (AuraEffectList::const_iterator itr = alist.begin(); itr != alist.end(); ++itr)
+    {
+        if ((*itr)->GetSpellInfo()->EquippedItemSubClassMask && !weapon)
+            continue;
+        if (weapon && !weapon->IsFitToSpellRequirements((*itr)->GetSpellInfo()))
+            continue;
+        m_modMeleeHitChance += (*itr)->GetAmount();
+    }
+    SetFloatValue(PLAYER_FIELD_UI_HIT_MODIFIER, m_modMeleeHitChance);
     m_modMeleeHitChance += GetRatingBonusValue(CR_HIT_MELEE);
 
     if (Pet* pPet = GetPet())
