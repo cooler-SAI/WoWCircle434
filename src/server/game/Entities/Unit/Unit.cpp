@@ -11641,6 +11641,9 @@ void Unit::UpdateMount()
         if (oldFlyer != newFlyer)
             SetCanFly(newFlyer);
 
+        if (!(oldFlyer ^ newFlyer))
+            SetCanFly(newFlyer);
+
         Player* player = ToPlayer();
         if (!player)
             player = m_movedPlayer;
