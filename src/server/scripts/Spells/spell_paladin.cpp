@@ -414,61 +414,6 @@ class spell_pal_divine_storm_dummy : public SpellScriptLoader
         }
 };
 
-class spell_pal_lay_on_hands : public SpellScriptLoader
-{
-    public:
-        spell_pal_lay_on_hands() : SpellScriptLoader("spell_pal_lay_on_hands") { }
-
-        class spell_pal_lay_on_hands_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_pal_lay_on_hands_SpellScript);
-
-            bool Validate(SpellInfo const* /*spell*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_FORBEARANCE))
-                    return false;
-                if (!sSpellMgr->GetSpellInfo(SPELL_AVENGING_WRATH_MARKER))
-                    return false;
-                if (!sSpellMgr->GetSpellInfo(SPELL_IMMUNE_SHIELD_MARKER))
-                    return false;
-                return true;
-            }
-
-            SpellCastResult CheckCast()
-            {
-                Unit* caster = GetCaster();
-                if (Unit* target = GetExplTargetUnit())
-                    if (caster == target)
-                        if (target->HasAura(SPELL_FORBEARANCE) || target->HasAura(SPELL_AVENGING_WRATH_MARKER) || target->HasAura(SPELL_IMMUNE_SHIELD_MARKER))
-                            return SPELL_FAILED_TARGET_AURASTATE;
-
-                return SPELL_CAST_OK;
-            }
-
-            void HandleScript()
-            {
-                Unit* caster = GetCaster();
-                if (caster == GetHitUnit())
-                {
-                    caster->CastSpell(caster, SPELL_FORBEARANCE, true);
-                    caster->CastSpell(caster, SPELL_AVENGING_WRATH_MARKER, true);
-                    caster->CastSpell(caster, SPELL_IMMUNE_SHIELD_MARKER, true);
-                }
-            }
-
-            void Register()
-            {
-                OnCheckCast += SpellCheckCastFn(spell_pal_lay_on_hands_SpellScript::CheckCast);
-                AfterHit += SpellHitFn(spell_pal_lay_on_hands_SpellScript::HandleScript);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_pal_lay_on_hands_SpellScript();
-        }
-};
-
 class spell_pal_righteous_defense : public SpellScriptLoader
 {
     public:
@@ -626,7 +571,7 @@ class spell_pal_divine_sacrifice : public SpellScriptLoader
                 if (Unit* caster = GetCaster())
                     if (remainingAmount <= 0 || (caster->GetHealthPct() < minHpPct))
                         caster->RemoveAura(SPELL_DIVINE_SACRIFICE);
-            }
+            }                  
 
             void Register()
             {
@@ -649,7 +594,6 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_holy_shock();
     new spell_pal_divine_storm();
     new spell_pal_divine_storm_dummy();
-    new spell_pal_lay_on_hands();
     new spell_pal_righteous_defense();
     new spell_pal_exorcism_and_holy_wrath_damage();
     new spell_pal_hand_of_sacrifice();

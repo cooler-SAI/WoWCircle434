@@ -864,10 +864,6 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     if (spellId)
                         m_caster->CastSpell(unitTarget, spellId, true);
 
-                    // Replenishment
-                    if (m_caster->HasAura(31876))
-                        m_caster->CastSpell((Unit*)NULL,57669,true);
-
                     break;
                 }
                 // Guardian of ancient kings
@@ -1971,28 +1967,11 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
             // Guarded by the Light
             AuraEffect* aur = NULL;
             if ((aur = m_caster->GetAuraEffect(85646, 0)) || (aur = m_caster->GetAuraEffect(85639, 0)))
-            {
+            {                   
                 if (unitTarget == m_caster)
                     AddPct(addhealth, aur->GetAmount());
                 m_caster->CastSpell(m_caster, 20925, true);
             }
-
-            // Eternal Glory
-            if (AuraEffect* eternalGlory = m_caster->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 2944, 0))
-            {
-                if (roll_chance_i(eternalGlory->GetAmount()))
-                {
-                    int32 bp = GetPowerCost();
-                    if (costWasModified())
-                        bp = 0;
-
-                    m_caster->CastCustomSpell(m_caster, 88676, &bp, 0, 0, true);
-                }
-                else
-                    m_caster->RemoveAurasDueToSpell(90174);
-            }
-            else
-                m_caster->RemoveAurasDueToSpell(90174);
         }
         else
             addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);

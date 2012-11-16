@@ -1359,6 +1359,9 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         caster->CastCustomSpell(caster, 85497, &bp0, 0, 0, true);
                     }
                 }
+                // Communion
+                else if (m_spellInfo->SpellFamilyFlags[2] & 0x20)
+                    caster->CastSpell(caster, 63531, true);
                 break;
         }
     }
@@ -1510,6 +1513,9 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Avenging Wrath
                 if (m_spellInfo->Id == 31884)
                     target->RemoveAura(57318);
+                // Comunion
+                else if (m_spellInfo->SpellFamilyFlags[2] & 0x20)
+                    caster->RemoveAurasDueToSpell(63531);
                 break;
             case SPELLFAMILY_DEATHKNIGHT:
                 // Blood of the North
