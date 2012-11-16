@@ -2383,6 +2383,8 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                 case 64844: // Divine Hymn
                 case 64904: // Hymn of Hope
                 case 47585: // Dispersion
+                case 87195: // Paralysis
+                case 87192:
                     return true;
                 case 47666: // Penance: damage
                     return false;
@@ -2500,6 +2502,8 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                     }
                 case SPELL_AURA_PROC_TRIGGER_SPELL:
                     // many positive auras have negative triggered spells at damage for example and this not make it negative (it can be canceled for example)
+                    if (this->IsPassive())
+                        return true;
                     break;
                 case SPELL_AURA_MOD_STUN:                   //have positive and negative spells, we can't sort its correctly at this moment.
                     if (effIndex == 0 && Effects[1].Effect == 0 && Effects[2].Effect == 0)
