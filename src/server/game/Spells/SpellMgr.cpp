@@ -3013,6 +3013,9 @@ void SpellMgr::LoadDbcDataCorrections()
 
         switch (spellInfo->Id)
         {
+            case 69176:
+                spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_NOT_SEATED;
+                break;
             // Nature's Blessing
             case 30869:
             case 30868:
