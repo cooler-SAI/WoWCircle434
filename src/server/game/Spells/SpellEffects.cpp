@@ -5537,6 +5537,11 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         unitTarget->GetFirstCollisionPosition(pos, unitTarget->GetObjectSize(), angle);
 
         m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + unitTarget->GetObjectSize());
+    
+        // Intercept && Juggernaut cd
+        if (m_spellInfo->Id == 20252 && m_caster->GetTypeId() == TYPEID_PLAYER)
+            if (m_caster->HasAura(64976))
+                m_caster->ToPlayer()->AddSpellCooldown(100, 0, time(NULL) + 30);    
     }
 
     if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET)

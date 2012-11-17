@@ -169,9 +169,18 @@ class spell_warr_charge : public SpellScriptLoader
                 }
             }
 
+            void HandleCharge(SpellEffIndex /*effIndex*/)
+            {
+                if (!GetCaster() || !GetHitUnit())
+                    return;
+
+                GetCaster()->CastSpell(GetHitUnit(), 96273, true);
+            }
+
             void Register()
             {
                 OnEffectHitTarget += SpellEffectFn(spell_warr_charge_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+                OnEffectHitTarget += SpellEffectFn(spell_warr_charge_SpellScript::HandleCharge, EFFECT_0, SPELL_EFFECT_CHARGE);
             }
         };
 
