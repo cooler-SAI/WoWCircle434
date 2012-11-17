@@ -4540,27 +4540,17 @@ void Spell::TakePower()
         TakeRunePower(hit);
         return;
     }
-
+    
+    // In Spell::HandleHolyPower
     if (m_spellInfo->PowerType == POWER_HOLY_POWER)
     {
-        // Divine Purpose
+        m_powerCost = m_caster->GetPower(POWER_HOLY_POWER); 
         if (m_caster->HasAura(90174))
-        {
             m_powerCost = 3;
-            m_costModified = true;
-            if (hit && m_spellInfo->Id != 85696 && m_spellInfo->Id != 85673) // Zealotry & Divine Purpose
-                m_caster->RemoveAurasDueToSpell(90174);
-            return;
-        }
-        else if (hit)
-            m_powerCost = m_caster->GetPower(POWER_HOLY_POWER);
-        else
-            m_powerCost = 0;
 
-        if (m_spellInfo->Id == 85696)
-            return;
-    }
-
+        return;
+    }        
+       
     if (!m_powerCost)
         return;
 
@@ -4810,8 +4800,6 @@ void Spell::HandleHolyPower(Player* caster)
     bool hit = true;
     Player* modOwner = caster->GetSpellModOwner();
 
-    m_powerCost = caster->GetPower(POWER_HOLY_POWER); // Always use all the holy power we have
-
     if (!m_powerCost || !modOwner)
         return;
 
@@ -4827,21 +4815,26 @@ void Spell::HandleHolyPower(Player* caster)
                 break;
             }
         }
-
-        bool returnResources = false;
-        if (AuraEffect* const _effect = caster->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 2944, EFFECT_0))
-            returnResources = roll_chance_i(_effect->GetAmount());
-
-        // The spell did hit the target, apply aura cost mods if there are any.
-        if (hit)
-        {
-            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, m_powerCost);
-            m_caster->ModifyPower(POWER_HOLY_POWER, -m_powerCost);
-        }
-
-        if (returnResources)
-            caster->CastCustomSpell(88676, SPELLVALUE_BASE_POINT0, m_powerCost, caster);
     }
+        
+    // Zealotry
+    if (m_spellInfo->Id == 85696)
+        return;
+    
+    bool returnResources = false;
+    if (AuraEffect* const _effect = caster->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 2944, EFFECT_0))
+        returnResources = roll_chance_i(_effect->GetAmount());
+
+    // The spell did hit the target, apply aura cost mods if there are any.
+    if (hit)
+    {
+        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, m_powerCost);
+        m_caster->ModifyPower(POWER_HOLY_POWER, -m_powerCost);
+        m_caster->RemoveAurasDueToSpell(90174);
+    }
+        
+    if (returnResources && m_powerCost && !caster->HasSpellCooldown(88676))
+        caster->CastCustomSpell(88676, SPELLVALUE_BASE_POINT0, m_powerCost, caster);
 }
 
 void Spell::HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGOTarget, uint32 i, SpellEffectHandleMode mode)
