@@ -3013,6 +3013,9 @@ void SpellMgr::LoadDbcDataCorrections()
 
         switch (spellInfo->Id)
         {
+            case 97463: // Rallying Cry
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
+                break;
             case 69176:
                 spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_NOT_SEATED;
                 break;
