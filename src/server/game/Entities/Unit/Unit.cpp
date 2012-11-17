@@ -8237,6 +8237,8 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
 
                         trigger_spell_id = 96172;
                         basepoints0 = int32(damage / 100.0f * triggeredByAura->GetAmount());
+                        if (AuraEffect* aurEff = GetAuraEffect(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, SPELLFAMILY_PALADIN, 5155, 0))
+                            AddPct(basepoints0, aurEff->GetAmount());
                         target = victim;
                         break;
                     }
