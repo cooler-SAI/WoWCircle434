@@ -261,6 +261,7 @@ void Player::SetCurrency(uint32 id, uint32 count, bool printLog /*= true*/)
        cur.state = PLAYERCURRENCY_NEW;
        cur.totalCount = count;
        cur.weekCount = 0;
+       cur.flags = 0;
        _currencyStorage[id] = cur;
    }
 }
