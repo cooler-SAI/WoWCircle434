@@ -8347,6 +8347,17 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Seal of Insight
+        case 20165:
+        {
+            if (!victim)
+                return false;
+
+            if (GetGUID() == victim->GetGUID())
+                return false;
+            
+            break;
+        }
         // Blessed Life
         case 31828:
         case 31829:

@@ -1978,6 +1978,9 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
                 m_caster->CastSpell(m_caster, 20925, true);
             }
         }
+        // Seal of Insight
+        else if (m_spellInfo->Id == 20167)
+            addhealth = int32(0.15f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + 0.15f * m_caster->SpellBaseHealingBonusDone(SpellSchoolMask(m_spellInfo->ScalingClass)));
         else
             addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
 
