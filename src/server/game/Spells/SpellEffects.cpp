@@ -1512,6 +1512,11 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
     if (!m_targets.HasDst())
         return;
 
+    // Heroic Leap
+    if (m_spellInfo->Id == 6544 && m_caster->GetTypeId() == TYPEID_PLAYER)
+        if (Battleground* bg = m_caster->ToPlayer()->GetBattleground())
+            bg->EventPlayerDroppedFlag(m_caster->ToPlayer());
+
     // Init dest coordinates
     float x, y, z;
     destTarget->GetPosition(x, y, z);

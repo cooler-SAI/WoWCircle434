@@ -5184,6 +5184,27 @@ SpellCastResult Spell::CheckCast(bool strict)
         // for effects of spells that have only one target
         switch (m_spellInfo->Effects[i].Effect)
         {
+            case SPELL_EFFECT_JUMP_DEST:
+            {
+                // Heroic Leap
+                if (m_spellInfo->Id == 6544)
+                {
+                    if (m_caster->HasUnitState(UNIT_STATE_ROOT))
+                    {
+                        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                            return SPELL_FAILED_ROOTED;
+                    }
+                    // some rules for heroic leap cast
+                    if (m_targets.GetDstPos()->GetPositionZ() && m_caster->GetBaseMap())
+                    {
+                        float groundZ = m_caster->GetBaseMap()->GetHeight(m_caster->GetPositionX(), m_caster->GetPositionY(), MAX_HEIGHT);
+                        if ((m_targets.GetDstPos()->GetPositionZ() - m_caster->GetPositionZ()) > 2.0f)
+                            if ((m_targets.GetDstPos()->GetPositionZ() - groundZ) > 7.0f)
+                                return SPELL_FAILED_LINE_OF_SIGHT;
+                    }
+                }
+                break;
+            } 
             case SPELL_EFFECT_SCHOOL_DAMAGE:
             {
                 // Soul Swap
