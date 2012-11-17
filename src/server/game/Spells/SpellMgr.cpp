@@ -3068,6 +3068,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 85673: // Word of Glory
             case 89023: // Blessed life (spell, not talent)
             case 85222: // Light of Dawn
+            case 89024: // Pursuit of Justice
                 spellInfo->Effects[1].Effect = 0;
                 break;
             // wrong dbc, 7 days cooldown

@@ -5050,6 +5050,33 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Pursuit of Justice
+                case 26022:
+                case 26023:
+                {
+                    if (!procSpell)
+                        return false;
+
+                    // Root, stun, immobilize
+                    if (!(procSpell->GetAllEffectsMechanicMask() & ((1<<MECHANIC_ROOT) | (1<<MECHANIC_STUN)
+                        | (1<<MECHANIC_FEAR))))
+                        return false;
+
+                    if (GetTypeId() == TYPEID_PLAYER)
+                    {
+                        if (ToPlayer()->HasSpellCooldown(31828) ||
+                            ToPlayer()->HasSpellCooldown(31829))
+                            return false;
+                    }
+
+                    // Denounce shouldn't give hp
+                    if (procSpell->Id == 2812)
+                        return false;
+
+                    target = this;
+                    triggered_spell_id = 89024;
+                    break;
+                }
                 // Wrath of Tarecgosa
                 case 101056:
                 {
@@ -5063,7 +5090,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 // Eye for an Eye
                 case 9799:
                 case 25988:
-                {
+                {     
                     // return damage % to attacker but < 50% own total health
                     basepoints0 = int32(std::min(CalculatePct(damage, triggerAmount), CountPctFromMaxHealth(50)));
                     triggered_spell_id = 25997;
@@ -8320,6 +8347,16 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Blessed Life
+        case 31828:
+        case 31829:
+            if (GetTypeId() == TYPEID_PLAYER)
+            {
+                if (ToPlayer()->HasSpellCooldown(26022) ||
+                    ToPlayer()->HasSpellCooldown(26023))
+                    return false;
+            }
+            break;
         // Tower of Radiance
         case 84800:
         case 85511:
