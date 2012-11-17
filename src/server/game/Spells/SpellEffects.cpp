@@ -1129,8 +1129,8 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 case 97462:
                     if (!unitTarget)
                         return;
-                    
-                    m_caster->CastSpell(unitTarget, 97463, true);
+
+                    m_caster->CastCustomSpell(unitTarget, 97463, &damage, NULL, NULL, true, NULL);
                     break;  
             }
             break;
