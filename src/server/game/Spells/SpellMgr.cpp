@@ -4247,6 +4247,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 85512:
                 spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL;
                 break;
+            // War Stomp
+            case 20549:
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                break;
             default:
                 break;
         }
