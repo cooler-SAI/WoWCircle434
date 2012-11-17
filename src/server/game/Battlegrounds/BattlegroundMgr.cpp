@@ -437,7 +437,7 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
         buff.WriteByteSeq(guid[1]);
         buff.WriteByteSeq(guid[6]);
 
-        buff << int32(player->GetPrimaryTalentTree(player->GetActiveSpec()));
+        buff << int32(itr2->second->Spec);
 
         switch (bg->GetTypeID(true))                             // Custom values
         {
