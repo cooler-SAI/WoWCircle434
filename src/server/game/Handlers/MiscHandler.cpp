@@ -2015,20 +2015,17 @@ void WorldSession::HandleObjectUpdateFailedOpcode(WorldPacket& recvPacket)
     recvPacket.ReadByteSeq(guid[5]);
 
     Player* player = GetPlayer();
-    WorldObject* obj = ObjectAccessor::GetWorldObject(*player, guid);
+    WorldObject* object = ObjectAccessor::GetWorldObject(*player, guid);
     sLog->outError(LOG_FILTER_NETWORKIO, 
         "CMSG_OBJECT_UPDATE_FAILED: Object Guid=[" UI64FMTD "] Object Name: [%s] Local Player=[%u, %s] "
         "Position=(%f, %f, %f) Map=%u", uint64(guid),
-        obj ? obj->GetName() : "NULL", player->GetGUIDLow(), player->GetName(),
+        object ? object->GetName() : "NULL", player->GetGUIDLow(), player->GetName(),
         player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(),
         player->GetMapId());
 
     // workaround to fix visibility objects bug
-    if (obj && obj->IsInWorld() && obj->ToPlayer())
-    {
-        GetPlayer()->SendUpdateToPlayer(obj->ToPlayer());
-        obj->ToPlayer()->SendUpdateToPlayer(GetPlayer());
-    }
+    if (object && object->IsInWorld() && object->ToPlayer())
+        object->SendForcedObjectUpdate();
 }
 
 void WorldSession::HandleObjectUpdateRescuedOpcode(WorldPacket& recvPacket)
@@ -2053,20 +2050,13 @@ void WorldSession::HandleObjectUpdateRescuedOpcode(WorldPacket& recvPacket)
     recvPacket.ReadByteSeq(guid[7]);
 
     Player* player = GetPlayer();
-    WorldObject* obj = ObjectAccessor::GetWorldObject(*player, guid);
+    WorldObject* object = ObjectAccessor::GetWorldObject(*player, guid);
     sLog->outError(LOG_FILTER_NETWORKIO, 
         "CMSG_OBJECT_UPDATE_RESCUED: Object Guid=[" UI64FMTD "] Object Name: [%s] Local Player=[%u, %s] "
         "Position=(%f, %f, %f) Map=%u", uint64(guid),
-        obj ? obj->GetName() : "NULL", player->GetGUIDLow(), player->GetName(),
+        object ? object->GetName() : "NULL", player->GetGUIDLow(), player->GetName(),
         player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(),
         player->GetMapId());
-
-    // workaround to fix visibility objects bug
-    if (obj && obj->IsInWorld() && obj->ToPlayer())
-    {
-        GetPlayer()->SendUpdateToPlayer(obj->ToPlayer());
-        obj->ToPlayer()->SendUpdateToPlayer(GetPlayer());
-    }
 }
 
 void WorldSession::HandleSaveCUFProfiles(WorldPacket& recvPacket)

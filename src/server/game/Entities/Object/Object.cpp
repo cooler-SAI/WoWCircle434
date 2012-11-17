@@ -178,6 +178,23 @@ void Object::RemoveFromWorld()
     ClearUpdateMask(true);
 }
 
+void Object::SendForcedObjectUpdate()
+{
+    if (!m_inWorld || !ToPlayer())
+        return;
+
+    UpdateDataMapType update_players;
+
+    BuildUpdate(update_players);
+    sObjectAccessor->RemoveUpdateObject(this);
+
+    for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
+    {
+        SendUpdateToPlayer(iter->first);
+        iter->first->SendUpdateToPlayer(ToPlayer());
+    }
+}
+
 void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const
 {
     if (!target)

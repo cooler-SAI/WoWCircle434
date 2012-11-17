@@ -186,7 +186,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
     if (newWeekCount < 0)
         newWeekCount = 0;
 
-    ASSERT(weekCap >= oldWeekCount);
+    //ASSERT(weekCap >= oldWeekCount);
 
     // if we get more then weekCap just set to limit
     if (weekCap && int32(weekCap) < newWeekCount)

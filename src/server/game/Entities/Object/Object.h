@@ -199,6 +199,7 @@ class Object
         bool isType(uint16 mask) const { return (mask & m_objectType); }
 
         virtual void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const;
+        void SendForcedObjectUpdate();
         void SendUpdateToPlayer(Player* player);
 
         void BuildValuesUpdateBlockForPlayer(UpdateData* data, Player* target) const;
