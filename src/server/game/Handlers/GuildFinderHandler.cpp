@@ -290,6 +290,15 @@ void WorldSession::HandleGuildFinderGetRecruits(WorldPacket& recvPacket)
         MembershipRequest request = *itr;
         ObjectGuid playerGuid(MAKE_NEW_GUID(request.GetPlayerGUID(), 0, HIGHGUID_PLAYER));
 
+        CharacterNameData const* nameData = sWorld->GetCharacterNameData(request.GetPlayerGUID());
+        if (nameData == NULL)
+        {
+            char buff[100];
+            sprintf(buff, "HandleGuildFinderGetRecruits: nameData is null, player guid: %u, guild id: %u", request.GetPlayerGUID(), request.GetGuildId());
+            sLog->outError(LOG_FILTER_GENERAL, buff);
+            ASSERT(false && buff);
+        }
+
         data.WriteBits(request.GetComment().size(), 11);
         data.WriteBit(playerGuid[2]);
         data.WriteBit(playerGuid[4]);
