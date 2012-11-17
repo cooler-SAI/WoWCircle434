@@ -10139,26 +10139,37 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     }
 
     // Frostburn (Mage Frost Mastery)
-    if (Aura* Frostburn = GetAura(76613))
-        if ((spellProto->SpellFamilyFlags & Frostburn->GetSpellInfo()->Effects[EFFECT_0].SpellClassMask) && victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this) || spellProto->Id == 44614)
-            DoneTotalMod *= float(Frostburn->GetEffect(0)->GetAmount() + 100.0f) / 100.0f;
+    if (Aura* frostburn = GetAura(76613))
+    {
+        if (victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this) || spellProto->Id == 44614)
+        {
+            if (AuraEffect const* _effect = frostburn->GetEffect(EFFECT_0))
+            {
+                if (_effect->IsAffectingSpell(spellProto))
+                    AddPct(DoneTotalMod, _effect->GetAmount());
+            }
+        }
+    }
 
     // Mana Adept (Mage Arcane Mastery)
-    if (Aura* ManaAdept = GetAura(76547))
+    if (AuraEffect const* _effect = GetAuraEffect(76547, EFFECT_0))
     {
-        float pct = float(GetPower(POWER_MANA)) / float(GetMaxPower(POWER_MANA));
-        int32 scale = int32(ManaAdept->GetSpellInfo()->Effects[EFFECT_1].BasePoints / 12.5f);
-        int32 amount = ManaAdept->GetEffect(0)->GetAmount() - scale + scale * pct;
-        if (amount < 0)
-            amount = 0;
-        DoneTotalMod *= float(amount + 100.0f) / 100.0f;
+        float maximum = _effect->GetAmount();
+        float ratio = 1.0f - (GetPower(POWER_MANA) / float(GetMaxPower(POWER_MANA)));
+        float amount = maximum * ratio;
+
+        AddPct(DoneTotalMod, amount);
     }
 
     // Master Demonologist (Mastery Demonology Warlock)
-    if (GetTypeId() == TYPEID_UNIT && this->ToCreature()->isPet())
+    if (GetTypeId() == TYPEID_UNIT && ToCreature()->isPet())
+    {
         if (Unit* owner = GetOwner())
-            if (Aura* masterDemonologist = owner->GetAura(77219))
-                DoneTotalMod *= float(masterDemonologist->GetEffect(0)->GetAmount() + 100.0f) / 100.0f;
+        {
+            if (AuraEffect const* _effect = owner->GetAuraEffect(77219, EFFECT_0))
+                AddPct(DoneTotalMod, _effect->GetAmount());
+        }
+    }
 
     // Done fixed damage bonus auras
     int32 DoneAdvertisedBenefit  = SpellBaseDamageBonusDone(spellProto->GetSchoolMask());
