@@ -4251,6 +4251,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 20549:
                 spellInfo->Effects[0].SetRadiusIndex(14);
                 break;
+            // Blood Frenzy
+            case 30069:
+            case 30070:
+                spellInfo->SetDurationIndex(3);
+                break;
             default:
                 break;
         }
