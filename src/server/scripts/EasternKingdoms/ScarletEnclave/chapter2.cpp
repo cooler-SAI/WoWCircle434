@@ -347,7 +347,8 @@ public:
                             break;
                         case 6:
                             DoScriptText(SAY_BREAKOUT10, me);
-                            SetEscortPaused(false);
+                            //SetEscortPaused(false);
+                            me->DespawnOrUnsummon();
                             break;
                     }
 
