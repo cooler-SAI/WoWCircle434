@@ -10467,14 +10467,6 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                     int32 modChance = 0;
                     switch ((*i)->GetMiscValue())
                     {
-                        // Shatter
-                        case  911: modChance+= 16;
-                        case  910: modChance+= 17;
-                        case  849: modChance+= 17;
-                            if (!victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this))
-                                break;
-                            crit_chance+=modChance;
-                            break;
                         case 7917: // Glyph of Shadowburn
                             if (victim->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, spellProto, this))
                                 crit_chance+=(*i)->GetAmount();
@@ -10496,7 +10488,12 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                         if (spellProto->SpellFamilyFlags[0] == 0x2 && spellProto->SpellIconID == 12)
                             if (victim->HasAuraWithMechanic((1<<MECHANIC_STUN) | (1<<MECHANIC_KNOCKOUT)))
                                 if (AuraEffect const* aurEff = GetAuraEffect(56369, EFFECT_0))
-                                    crit_chance += aurEff->GetAmount();
+                        // Shatter (same misc values now)
+                        if (victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this))
+                        {
+                            if (AuraEffect const* Shatter = GetDummyAuraEffect(SPELLFAMILY_MAGE, 976, 1))
+                                crit_chance *= (float(shatter->GetAmount()) / 10.0f) + 1.0f;
+                        }
                         break;
                     case SPELLFAMILY_DRUID:
                         // Improved Faerie Fire
@@ -10515,7 +10512,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                                     crit_chance += aurEff->GetAmount();
                            break;
                         }
-                    break;
+                        break;
                     case SPELLFAMILY_ROGUE:
                         // Shiv-applied poisons can't crit
                         if (FindCurrentSpellBySpellId(5938))
@@ -10537,7 +10534,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                                 return true;
                             break;
                         }
-                    break;
+                        break;
                     case SPELLFAMILY_SHAMAN:
                         // Lava Burst
                         if (spellProto->SpellFamilyFlags[1] & 0x00001000)
@@ -10547,7 +10544,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                                     return true;
                             break;
                         }
-                    break;
+                        break;
                 }
             }
             break;
