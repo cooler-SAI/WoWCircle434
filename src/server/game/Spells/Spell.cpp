@@ -5211,20 +5211,31 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
             case SPELL_EFFECT_DUMMY:
             {
+                // Death Coil
+                if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && m_spellInfo->SpellFamilyFlags[0] == 0x2000)
+                {
+                    Unit* target = m_targets.GetUnitTarget();
+                    if (!target || (target->IsFriendlyTo(m_caster) && target->GetCreatureType() != CREATURE_TYPE_UNDEAD))
+                        return SPELL_FAILED_BAD_TARGETS;
+                    if (!target->IsFriendlyTo(m_caster) && !m_caster->HasInArc(static_cast<float>(M_PI), target))
+                        return SPELL_FAILED_UNIT_NOT_INFRONT;
+                }
                 // Have Group, Will Travel
-                if (m_spellInfo->Id == 83967)
+                else if (m_spellInfo->Id == 83967)
                 {
                     Map* pMap = m_caster->GetMap();
                     if (!pMap || pMap->Instanceable())
                         return SPELL_FAILED_SPELL_UNAVAILABLE;
                 }
-                else if (m_spellInfo->Id == 19938)          // Awaken Peon
+                // Awaken Peon
+                else if (m_spellInfo->Id == 19938)          
                 {
                     Unit* unit = m_targets.GetUnitTarget();
                     if (!unit || !unit->HasAura(17743))
                         return SPELL_FAILED_BAD_TARGETS;
                 }
-                else if (m_spellInfo->Id == 31789)          // Righteous Defense
+                // Righteous Defense
+                else if (m_spellInfo->Id == 31789)          
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return SPELL_FAILED_DONT_REPORT;
@@ -5234,7 +5245,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_BAD_TARGETS;
 
                 }
-                else if (m_spellInfo->Id == 34026) // Kill Command
+                // Kill Command
+                else if (m_spellInfo->Id == 34026) 
                 {
                     if (Unit* pet = m_caster->GetGuardianPet())
                     {
