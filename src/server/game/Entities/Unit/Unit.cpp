@@ -10073,7 +10073,6 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
             if (spellProto->SpellIconID == 186)
                 if (victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this))
                     DoneTotalMod *= 2.0f;
-
             // Torment the weak
             if (spellProto->GetSchoolMask() & SPELL_SCHOOL_MASK_ARCANE)
             {
@@ -10089,6 +10088,17 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
                         }
                     }
                 }
+            }
+            // Shatter bonus damage for frostbolt
+            if (spellProto->SpellFamilyFlags[0] & 0x20)
+            {
+                // Frost Specialization - additional 15% to frostbolt
+                if (AuraEffect const* frostSpec = GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_MAGE, 2458, 2))
+                    AddPct(DoneTotalMod, frostSpec->GetAmount());
+                // Increase damage on frozen target
+                if (victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this))
+                    if (AuraEffect const* Shatter = GetDummyAuraEffect(SPELLFAMILY_MAGE, 976, 1))
+                        AddPct(DoneTotalMod, Shatter->GetAmount());
             }
             break;
         case SPELLFAMILY_PRIEST:
@@ -10492,7 +10502,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                         if (victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this))
                         {
                             if (AuraEffect const* Shatter = GetDummyAuraEffect(SPELLFAMILY_MAGE, 976, 1))
-                                crit_chance *= (float(shatter->GetAmount()) / 10.0f) + 1.0f;
+                                crit_chance *= (float(Shatter->GetAmount()) / 10.0f) + 1.0f;
                         }
                         break;
                     case SPELLFAMILY_DRUID:
