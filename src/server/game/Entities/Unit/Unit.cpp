@@ -10165,13 +10165,11 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     }
 
     // Mana Adept (Mage Arcane Mastery)
-    if (AuraEffect const* _effect = GetAuraEffect(76547, EFFECT_0))
+    if (AuraEffect const* manaAdept = GetAuraEffect(76547, EFFECT_0))
     {
-        float maximum = _effect->GetAmount();
-        float ratio = 1.0f - (GetPower(POWER_MANA) / float(GetMaxPower(POWER_MANA)));
-        float amount = maximum * ratio;
-
-        AddPct(DoneTotalMod, amount);
+        float manaPct = float(GetPower(POWER_MANA)) / float(GetMaxPower(POWER_MANA)) * 100.0f;
+        float bonusDmg = manaPct * manaAdept->GetAmount() / 100.0f;
+        AddPct(DoneTotalMod, bonusDmg);
     }
 
     // Master Demonologist (Mastery Demonology Warlock)
