@@ -24069,14 +24069,18 @@ void Player::UpdateCharmedAI()
 uint32 Player::GetRuneTypeBaseCooldown(RuneType runeType) const
 {
     float cooldown = RUNE_BASE_COOLDOWN;
-    float hastePct = CalculateMeleeHastMod();
+    float hastePct = GetRatingBonusValue(CR_HASTE_MELEE);
+
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE);
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
 
     AuraEffectList const& regenAura = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
     for (AuraEffectList::const_iterator i = regenAura.begin();i != regenAura.end(); ++i)
         if ((*i)->GetMiscValue() == POWER_RUNES && (*i)->GetMiscValueB() == runeType)
             cooldown *= 1.0f - (*i)->GetAmount() / 100.0f;
 
-    return cooldown * hastePct;
+    cooldown *=  1.0f - (hastePct / 100.0f);
+    return cooldown;
 }
 
 void Player::RemoveRunesBySpell(uint32 spell_id)
