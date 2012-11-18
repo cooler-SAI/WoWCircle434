@@ -281,13 +281,22 @@ void WorldSession::HandleGuildFinderGetRecruits(WorldPacket& recvPacket)
         return;
 
     std::vector<MembershipRequest> recruitsList = sGuildFinderMgr->GetAllMembershipRequestsForGuild(player->GetGuildId());
-    uint32 recruitCount = recruitsList.size();
 
-    for (std::vector<MembershipRequest>::const_iterator itr = recruitsList.begin(); itr != recruitsList.end(); ++itr)
+    // Temporary fix
+    for (std::vector<MembershipRequest>::const_iterator itr = recruitsList.begin(); itr != recruitsList.end();)
     {
         if (!sWorld->GetCharacterNameData((*itr).GetPlayerGUID()))
-            --recruitCount;
+        {
+            if (sObjectMgr->IsPlayerDeleted((*itr).GetPlayerGUID()))
+                sLog->outFatal(LOG_FILTER_PLAYER, "HandleGuildFinderGetRecruits: player [lowGuid %u] was deleted but still in recruits list!", (*itr).GetPlayerGUID());
+
+            recruitsList.erase(itr);
+        }
+        else
+            ++itr;
     }
+
+    uint32 recruitCount = recruitsList.size();
 
     ByteBuffer dataBuffer(53 * recruitCount);
     WorldPacket data(SMSG_LF_GUILD_RECRUIT_LIST_UPDATED, 7 + 26 * recruitCount + 53 * recruitCount);
@@ -296,12 +305,7 @@ void WorldSession::HandleGuildFinderGetRecruits(WorldPacket& recvPacket)
     for (std::vector<MembershipRequest>::const_iterator itr = recruitsList.begin(); itr != recruitsList.end(); ++itr)
     {
         MembershipRequest request = *itr;
-
-        uint32 playerLowGuid = request.GetPlayerGUID();
-        if (!sWorld->GetCharacterNameData(playerLowGuid))
-            continue;
-
-        ObjectGuid playerGuid(MAKE_NEW_GUID(playerLowGuid, 0, HIGHGUID_PLAYER));
+        ObjectGuid playerGuid(MAKE_NEW_GUID(request.GetPlayerGUID(), 0, HIGHGUID_PLAYER));
 
         data.WriteBits(request.GetComment().size(), 11);
         data.WriteBit(playerGuid[2]);
