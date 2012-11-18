@@ -103,6 +103,12 @@ void GuildFinderMgr::LoadMembershipRequests()
         std::string comment = fields[5].GetString();
         uint32 submitTime   = fields[6].GetUInt32();
 
+        if (sObjectMgr->IsPlayerDeleted(playerId))
+        {
+            sLog->outError(LOG_FILTER_SQL, "Player %u was deleted.", playerId);
+            continue;
+        }
+
         MembershipRequest request(playerId, guildId, availability, classRoles, interests, comment, time_t(submitTime));
 
         _membershipRequests[guildId].push_back(request);

@@ -69,6 +69,8 @@ void WorldSession::HandleGuildFinderAddRecruit(WorldPacket& recvPacket)
         return;
     if (!(guildInterests & ALL_INTERESTS) || guildInterests > ALL_INTERESTS)
         return;
+    if (sObjectMgr->IsPlayerDeleted(guildLowGuid))
+        return;
 
     MembershipRequest request = MembershipRequest(GetPlayer()->GetGUIDLow(), guildLowGuid, availability, classRoles, guildInterests, comment, time(NULL));
     sGuildFinderMgr->AddMembershipRequest(guildLowGuid, request);
@@ -280,15 +282,6 @@ void WorldSession::HandleGuildFinderGetRecruits(WorldPacket& recvPacket)
 
     std::vector<MembershipRequest> recruitsList = sGuildFinderMgr->GetAllMembershipRequestsForGuild(player->GetGuildId());
     
-    // Temporary fix
-    for (std::vector<MembershipRequest>::const_iterator itr = recruitsList.begin(); itr != recruitsList.end();)
-    {
-        if (!sWorld->GetCharacterNameData((*itr).GetPlayerGUID()))
-            recruitsList.erase(itr);
-        else
-            ++itr;
-    }
-    
     uint32 recruitCount = recruitsList.size();
 
     ByteBuffer dataBuffer(53 * recruitCount);
@@ -299,15 +292,6 @@ void WorldSession::HandleGuildFinderGetRecruits(WorldPacket& recvPacket)
     {
         MembershipRequest request = *itr;
         ObjectGuid playerGuid(MAKE_NEW_GUID(request.GetPlayerGUID(), 0, HIGHGUID_PLAYER));
-
-        CharacterNameData const* nameData = sWorld->GetCharacterNameData(request.GetPlayerGUID());
-        if (nameData == NULL)
-        {
-            char buff[100];
-            sprintf(buff, "HandleGuildFinderGetRecruits: nameData is null, player guid: %u, guild id: %u", request.GetPlayerGUID(), request.GetGuildId());
-            sLog->outError(LOG_FILTER_GENERAL, buff);
-            ASSERT(false && buff);
-        }
 
         data.WriteBits(request.GetComment().size(), 11);
         data.WriteBit(playerGuid[2]);

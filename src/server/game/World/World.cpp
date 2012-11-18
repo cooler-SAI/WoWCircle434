@@ -1617,6 +1617,9 @@ void World::SetInitialWorldSettings()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Skill Fishing base level requirements...");
     sObjectMgr->LoadFishingBaseSkillLevel();
 
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading deleted players...");
+    sObjectMgr->LoadPlayerDeleteInfo();
+
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Achievements...");
     sAchievementMgr->LoadAchievementReferenceList();
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Achievement Criteria Lists...");

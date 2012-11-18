@@ -325,6 +325,7 @@ typedef std::multimap<uint32, ScriptInfo> ScriptMap;
 typedef std::map<uint32, ScriptMap > ScriptMapMap;
 typedef std::multimap<uint32, uint32> SpellScriptsContainer;
 typedef std::pair<SpellScriptsContainer::iterator, SpellScriptsContainer::iterator> SpellScriptsBounds;
+typedef std::set<uint32> PlayerDeleteInfoStore;
 extern ScriptMapMap sQuestEndScripts;
 extern ScriptMapMap sQuestStartScripts;
 extern ScriptMapMap sSpellScripts;
@@ -958,6 +959,8 @@ class ObjectMgr
 
         void LoadPetScalingAuras();
 
+        void LoadPlayerDeleteInfo();
+
         void LoadResearchSiteZones();
         void LoadResearchSiteLoot();
         typedef std::vector<ResearchZoneEntry*> ResearchZoneVector;
@@ -1228,6 +1231,15 @@ class ObjectMgr
         PetScalingAurasMap& GetPetScalingMap() { return petScalingAuras; }
         PetScalingAurasMap const& GetPetScalingMap() const { return petScalingAuras; }
 
+        bool IsPlayerDeleted(uint32 lowGuid) const
+        {
+            PlayerDeleteInfoStore::const_iterator iter = _playerDeleteInfoStore.find(lowGuid);
+            if (iter == _playerDeleteInfoStore.end())
+                return false;
+
+            return true;
+        }
+
     private:
         // first free id for selected id type
         uint32 _auctionId;
@@ -1302,6 +1314,8 @@ class ObjectMgr
 
         PhaseDefinitionStore _PhaseDefinitionStore;
         SpellPhaseStore _SpellPhaseStore;
+
+        PlayerDeleteInfoStore _playerDeleteInfoStore;
 
     private:
         void LoadScripts(ScriptsType type);

@@ -9002,3 +9002,24 @@ void ObjectMgr::LoadPetScalingAuras()
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u pet scaling auras.", counter);
 }
+
+void ObjectMgr::LoadPlayerDeleteInfo()
+{
+    QueryResult result = CharacterDatabase.Query("SELECT guid FROM characters WHERE deleteDate IS NOT NULL");
+    if (!result)
+    {
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 players who have delete date.");
+        return;
+    }
+
+    uint32 counter = 0;
+
+    do 
+    {
+        Field *fields = result->Fetch();
+        _playerDeleteInfoStore.insert(fields[0].GetUInt32());
+
+    } while (result->NextRow());
+
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u players who have delete date", counter);
+}
