@@ -4259,6 +4259,14 @@ void SpellMgr::LoadDbcDataCorrections()
             case 30070:
                 spellInfo->SetDurationIndex(3);
                 break;
+            case 118:   // Polymorph
+            case 61305: // Polymorph (other animal)
+            case 28272: // polymorph (other animal)
+            case 61721: // Polymorph (other animal)
+            case 61780: // Polymorph (other animal)
+            case 28271: // Polymorph (other animal)
+                spellInfo->AuraInterruptFlags = AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
+                break;
             default:
                 break;
         }
