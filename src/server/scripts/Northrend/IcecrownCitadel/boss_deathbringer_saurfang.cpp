@@ -821,7 +821,12 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                         _guardList.sort(Trinity::ObjectDistanceOrderPred(me));
                         uint32 x = 1;
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++x, ++itr)
+                        {
+                            if (!(*itr)->GetAI())
+                                continue;
+
                             (*itr)->AI()->SetData(0, x);
+                        }
 
                         me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                         Talk(SAY_INTRO_ALLIANCE_1);

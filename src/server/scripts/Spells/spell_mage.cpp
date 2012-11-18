@@ -48,7 +48,7 @@ enum OtherSpells
 {
     SHAMAN_SPELL_SATED                           = 57724,
     SHAMAN_SPELL_EXHAUSTION                      = 57723,
-    HUNTER_SPELL_INSANITY                        = 95809,
+    HUNTER_SPELL_INSANITY                        = 95809
 };
 
 class spell_mage_blast_wave : public SpellScriptLoader
