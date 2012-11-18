@@ -5672,29 +5672,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 }
                 break;
             }
-
-            // Hot Streak & Improved Hot Streak
-            if (dummySpell->SpellIconID == 2999)
-            {
-                if (effIndex != 0)
-                    return false;
-                AuraEffect* counter = triggeredByAura->GetBase()->GetEffect(EFFECT_1);
-                if (!counter)
-                    return true;
-
-                // Count spell criticals in a row in second aura
-                if (procEx & PROC_EX_CRITICAL_HIT)
-                {
-                    counter->SetAmount(counter->GetAmount() * 2);
-                    if (counter->GetAmount() < 100 && dummySpell->Id != 44445) // not enough or Hot Streak spell
-                        return true;
-                    // Crititcal counted -> roll chance
-                    if (roll_chance_i(triggerAmount))
-                        CastSpell(this, 48108, true, castItem, triggeredByAura);
-                }
-                counter->SetAmount(25);
-                return true;
-            }
             // Incanter's Regalia set (add trigger chance to Mana Shield)
             if (dummySpell->SpellFamilyFlags[0] & 0x8000)
             {
@@ -5762,6 +5739,49 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     }
                     target = victim;
                     triggered_spell_id = 64413;
+                    break;
+                }
+                // Hot Streak
+                case 44445:
+                {
+                    // Selfproc from instant pyroblast
+                    if (procSpell->Id == 92315 && !procSpell->CalcCastTime(this))
+                        return false;
+
+                    target = this;
+                    triggered_spell_id = 48108;
+                    break;
+                }
+                // Improved Hot Streak
+                case 44446:
+                case 44448:
+                {
+                    if (effIndex != 0)
+                        return false;
+
+                    if (!roll_chance_i(triggerAmount))
+                        return false;
+
+                    // Selfproc from instant pyroblast
+                    if (procSpell->Id == 92315 && !procSpell->CalcCastTime(this))
+                        return false;
+
+                    if (procEx & PROC_EX_CRITICAL_HIT && (procSpell->SpellFamilyFlags[1] & 0x00001000 || procSpell->SpellFamilyFlags[0] & 0x00400013))
+                    {
+                        if (triggeredByAura->GetBase()->GetCharges() <= 1)
+                        {
+                            triggeredByAura->GetBase()->SetCharges(2);
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        triggeredByAura->GetBase()->SetCharges(0);
+                        return false;
+                    }
+                    triggeredByAura->GetBase()->SetCharges(0);
+                    triggered_spell_id = 48108;
+                    target = this;
                     break;
                 }
             }

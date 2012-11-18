@@ -3351,6 +3351,36 @@ void Spell::cast(bool skipCheck)
             }
             break;
         }
+        case SPELLFAMILY_MAGE:
+        {
+            if (!m_caster || !m_caster->IsInWorld())
+                break;
+
+            switch (m_spellInfo->Id)
+            {
+                // Freeze
+                case 33395:
+                {
+                    // Improved Freeze
+                    if (Unit* pOwner = m_caster->GetCharmerOrOwnerOrSelf())
+                    {
+                        if (AuraEffect const* improvedFreeze = pOwner->GetDummyAuraEffect(SPELLFAMILY_MAGE, 94, 0))
+                            if (roll_chance_i(improvedFreeze->GetAmount()))
+                            {
+                                pOwner->CastSpell(pOwner, 44544, true);
+                                if (Aura* fingersOfFrost = pOwner->GetAura(44544))
+                                    fingersOfFrost->SetStackAmount(2);
+                            }
+                    }
+                    break;
+                }
+                // Pyroblast
+                case 92315:
+                    m_caster->RemoveAurasDueToSpell(48108);
+                    break;
+            }
+            break;
+        }
     }
 
     CallScriptOnCastHandlers();
