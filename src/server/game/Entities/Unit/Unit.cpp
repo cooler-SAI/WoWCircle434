@@ -10152,16 +10152,10 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     }
 
     // Frostburn (Mage Frost Mastery)
-    if (Aura* frostburn = GetAura(76613))
+    if (AuraEffect const* frostBurn = GetAuraEffect(76613, EFFECT_0))
     {
-        if (victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this) || spellProto->Id == 44614)
-        {
-            if (AuraEffect const* _effect = frostburn->GetEffect(EFFECT_0))
-            {
-                if (_effect->IsAffectingSpell(spellProto))
-                    AddPct(DoneTotalMod, _effect->GetAmount());
-            }
-        }
+        if (victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this))
+            AddPct(DoneTotalMod, frostBurn->GetAmount());
     }
 
     // Mana Adept (Mage Arcane Mastery)
