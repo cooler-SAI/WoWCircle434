@@ -3868,6 +3868,18 @@ void Spell::finish(bool ok)
     // Stop Attack for some spells
     if (m_spellInfo->Attributes & SPELL_ATTR0_STOP_ATTACK_TARGET)
         m_caster->AttackStop();
+
+    switch (m_spellInfo->Id)
+    {
+        case 30455: // Ice Lance
+        case 44572: // Deep Freeze
+            m_caster->RemoveAuraFromStack(44544);
+            break;
+        case 44614: // Instant Frostfire Bolt
+            if (isInstant)
+                m_caster->RemoveAuraFromStack(44544);
+            break;
+    }
 }
 
 void Spell::SendCastResult(SpellCastResult result)

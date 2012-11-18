@@ -1425,6 +1425,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     case 82691:
                         target->AddAura(91264, target);
                         break;
+                    // Fingers of Frost
+                    // Remove the IGNORE_AURASTATE aura
+                    case 74396: 
+                        target->RemoveAurasDueToSpell(44544);
+                        break;
                     default:
                         break;
                 }

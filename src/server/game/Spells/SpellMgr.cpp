@@ -3289,9 +3289,6 @@ void SpellMgr::LoadDbcDataCorrections()
             case 88688: // Surge of Light
                 spellInfo->ProcCharges = 1;
                 break;
-            case 44544: // Fingers of Frost
-                spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(685904631, 1151048, 0);
-                break;
             case 74396: // Fingers of Frost visual buff
                 spellInfo->ProcCharges = 2;
                 spellInfo->StackAmount = 0;
@@ -4266,6 +4263,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 61780: // Polymorph (other animal)
             case 28271: // Polymorph (other animal)
                 spellInfo->AuraInterruptFlags = AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
+                break;
+            // Fingers of Frost
+            case 44544:
+                spellInfo->Effects[0].SpellClassMask = flag96(0x00020000, 0x00100000, 0x00000008);
                 break;
             default:
                 break;
