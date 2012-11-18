@@ -105,7 +105,7 @@ void GuildFinderMgr::LoadMembershipRequests()
 
         if (sObjectMgr->IsPlayerDeleted(playerId))
         {
-            sLog->outError(LOG_FILTER_SQL, "Player %u was deleted.", playerId);
+            sLog->outError(LOG_FILTER_SQL, "Player %u was deleted, skipped.", playerId);
             continue;
         }
 
