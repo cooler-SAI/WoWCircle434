@@ -4633,6 +4633,17 @@ bool Player::ResetTalents(bool no_cost)
                 removeSpell(specSpells->at(i), true);
     }
 
+    // Remove endless auras
+    std::map <uint8, AuraApplication*> listAuras = *GetVisibleAuras();
+    for (Unit::VisibleAuraMap::const_iterator itr = listAuras.begin(); itr != listAuras.end(); ++itr)
+    {
+        SpellInfo const* spellInfo = itr->second->GetBase()->GetSpellInfo();
+        if (spellInfo->IsPassive() || spellInfo->GetMaxDuration() != -1)
+            continue;
+
+        RemoveAurasDueToSpell(spellInfo->Id, GetGUID());
+    }
+
     SetPrimaryTalentTree(GetActiveSpec(), 0);
     SetFreeTalentPoints(talentPointsForLevel);
 
