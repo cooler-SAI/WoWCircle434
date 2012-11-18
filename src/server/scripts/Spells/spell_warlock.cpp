@@ -32,8 +32,6 @@ enum WarlockSpells
     WARLOCK_DEMONIC_EMPOWERMENT_FELGUARD    = 54508,
     WARLOCK_DEMONIC_EMPOWERMENT_FELHUNTER   = 54509,
     WARLOCK_DEMONIC_EMPOWERMENT_IMP         = 54444,
-    WARLOCK_IMPROVED_HEALTHSTONE_R1         = 18692,
-    WARLOCK_IMPROVED_HEALTHSTONE_R2         = 18693,
     WARLOCK_DEMONIC_CIRCLE_SUMMON           = 48018,
     WARLOCK_DEMONIC_CIRCLE_TELEPORT         = 48020,
     WARLOCK_DEMONIC_CIRCLE_ALLOW_CAST       = 62388,
@@ -50,6 +48,8 @@ enum WarlockSpells
     WARLOCK_LIFE_TAP_ENERGIZE_2             = 32553,
     WARLOCK_IMPROVED_LIFE_TAP_ICON_ID       = 208,
     WARLOCK_MANA_FEED_ICON_ID               = 1982,
+    WARLOCK_HEALTHSTONE_CREATE              = 34130,
+    WARLOCK_HEALTHSTONE_HEAL                = 6262,
 };
 
 /// Updated 4.3.4
@@ -179,55 +179,24 @@ class spell_warl_create_healthstone : public SpellScriptLoader
         {
             PrepareSpellScript(spell_warl_create_healthstone_SpellScript);
 
-            static uint32 const iTypes[8][3];
-
             bool Validate(SpellInfo const* /*spellEntry*/)
             {
-                if (!sSpellMgr->GetSpellInfo(WARLOCK_IMPROVED_HEALTHSTONE_R1) || !sSpellMgr->GetSpellInfo(WARLOCK_IMPROVED_HEALTHSTONE_R2))
+                if (!sSpellMgr->GetSpellInfo(WARLOCK_HEALTHSTONE_CREATE))
+                    return false;
+                if (!sSpellMgr->GetSpellInfo(WARLOCK_HEALTHSTONE_HEAL))
                     return false;
                 return true;
-            }
-
-            SpellCastResult CheckCast()
-            {
-                if (Player* caster = GetCaster()->ToPlayer())
-                {
-                    uint8 spellRank = sSpellMgr->GetSpellRank(GetSpellInfo()->Id);
-                    ItemPosCountVec dest;
-                    InventoryResult msg = caster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, iTypes[spellRank - 1][0], 1, NULL);
-                    if (msg != EQUIP_ERR_OK)
-                        return SPELL_FAILED_TOO_MANY_OF_ITEM;
-                }
-                return SPELL_CAST_OK;
             }
 
             void HandleScriptEffect(SpellEffIndex effIndex)
             {
                 if (Unit* unitTarget = GetHitUnit())
-                {
-                    uint32 rank = 0;
-                    // Improved Healthstone
-                    if (AuraEffect const* aurEff = unitTarget->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, 284, 0))
-                    {
-                        switch (aurEff->GetId())
-                        {
-                            case WARLOCK_IMPROVED_HEALTHSTONE_R1: rank = 1; break;
-                            case WARLOCK_IMPROVED_HEALTHSTONE_R2: rank = 2; break;
-                            default:
-                                sLog->outError(LOG_FILTER_SPELLS_AURAS, "Unknown rank of Improved Healthstone id: %d", aurEff->GetId());
-                                break;
-                        }
-                    }
-                    uint8 spellRank = sSpellMgr->GetSpellRank(GetSpellInfo()->Id);
-                    if (spellRank > 0 && spellRank <= 8)
-                        CreateItem(effIndex, iTypes[spellRank - 1][rank]);
-                }
+                    unitTarget->CastSpell(unitTarget, WARLOCK_HEALTHSTONE_CREATE, false);
             }
 
             void Register()
             {
                 OnEffectHitTarget += SpellEffectFn(spell_warl_create_healthstone_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-                OnCheckCast += SpellCheckCastFn(spell_warl_create_healthstone_SpellScript::CheckCast);
             }
         };
 
@@ -235,17 +204,6 @@ class spell_warl_create_healthstone : public SpellScriptLoader
         {
             return new spell_warl_create_healthstone_SpellScript();
         }
-};
-
-uint32 const spell_warl_create_healthstone::spell_warl_create_healthstone_SpellScript::iTypes[8][3] = {
-    { 5512, 19004, 19005},              // Minor Healthstone
-    { 5511, 19006, 19007},              // Lesser Healthstone
-    { 5509, 19008, 19009},              // Healthstone
-    { 5510, 19010, 19011},              // Greater Healthstone
-    { 9421, 19012, 19013},              // Major Healthstone
-    {22103, 22104, 22105},              // Master Healthstone
-    {36889, 36890, 36891},              // Demonic Healthstone
-    {36892, 36893, 36894}               // Fel Healthstone
 };
 
 // 47422 Everlasting Affliction

@@ -10742,6 +10742,9 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
         case 64801: // Gift of the Earthmother
         case 81751: // Atonement
             return healamount;
+        case 6262: // Warlock Healthstone
+            healamount = uint32(0.45f * GetCreateHealth());
+            break;
         default:
             break;
     }
