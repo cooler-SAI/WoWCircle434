@@ -29,23 +29,16 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_DISMISS_CONTROLLED_VEHICLE");
 
     uint64 vehicleGUID = _player->GetCharmGUID();
-
     if (!vehicleGUID)                                       // something wrong here...
     {
         recvData.rfinish();                                // prevent warnings spam
         return;
     }
 
-    uint64 guid;
+    MovementInfo movementInfo;
+    ReadMovementInfo(recvData, &movementInfo);
 
-    recvData.readPackGUID(guid);
-
-    MovementInfo mi;
-    mi.guid = guid;
-    ReadMovementInfo(recvData, &mi);
-
-    _player->m_movementInfo = mi;
-
+    _player->m_movementInfo = movementInfo;
     _player->ExitVehicle();
 }
 
