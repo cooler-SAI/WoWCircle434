@@ -15125,11 +15125,11 @@ void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply
 
         switch (att)
         {
-            case WeaponAttackType::BASE_ATTACK:
-            case WeaponAttackType::OFF_ATTACK:
+            case BASE_ATTACK:
+            case OFF_ATTACK:
                 ToPlayer()->UpdateMeleeHastMod();
                 break;
-            case WeaponAttackType::RANGED_ATTACK:
+            case RANGED_ATTACK:
                 ToPlayer()->UpdateRangeHastMod();
                 break;
         }
