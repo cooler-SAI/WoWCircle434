@@ -8997,6 +8997,7 @@ void ObjectMgr::LoadPetScalingAuras()
         }
 
         petScalingAuras[spellId] = classId;
+        ++counter;
     }
     while (result->NextRow());
 
@@ -9018,8 +9019,9 @@ void ObjectMgr::LoadPlayerDeleteInfo()
     {
         Field *fields = result->Fetch();
         _playerDeleteInfoStore.insert(fields[0].GetUInt32());
-
-    } while (result->NextRow());
+        ++counter;
+    } 
+    while (result->NextRow());
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u players who have delete date", counter);
 }
