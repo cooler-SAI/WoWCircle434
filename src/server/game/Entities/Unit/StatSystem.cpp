@@ -168,6 +168,8 @@ bool Player::UpdateAllStats()
     RecalculateRating(CR_ARMOR_PENETRATION);
     for (int i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
         UpdateResistances(i);
+    if (getClass() == CLASS_DEATH_KNIGHT)
+        UpdateAllRunesRegen();
 
     return true;
 }
@@ -756,6 +758,52 @@ void Player::UpdateAllRunesRegen()
     for (uint8 i = 0; i < NUM_RUNE_TYPES; ++i)
         if (uint32 cooldown = GetRuneTypeBaseCooldown(RuneType(i)))
             SetFloatValue(PLAYER_RUNE_REGEN_1 + i, float(1 * IN_MILLISECONDS) / float(cooldown));
+}
+
+float Player::CalculateMeleeHastMod() const
+{
+    float hastePct = GetRatingBonusValue(CR_HASTE_MELEE);
+
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE);
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE_2);
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE_3);
+
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE_2);
+
+    return 1.0f - (hastePct / 100.0f);
+}
+
+float Player::CalculateRangeHastMod() const
+{
+    float hastePct = GetRatingBonusValue(CR_HASTE_RANGED);
+
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_RANGED_HASTE);
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_RANGED_HASTE_2);
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_RANGED_HASTE_3);
+
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE_2);
+
+    return 1.0f - (hastePct / 100.0f);
+}
+
+void Player::UpdateMeleeHastMod()
+{
+    float mod = CalculateMeleeHastMod();
+
+    SetFloatValue(PLAYER_FIELD_MOD_HASTE, mod);
+    SetFloatValue(PLAYER_FIELD_MOD_PET_HASTE, mod);
+    SetFloatValue(PLAYER_FIELD_MOD_HASTE_REGEN, mod);
+
+    if (getClass() == CLASS_DEATH_KNIGHT)
+        UpdateAllRunesRegen();
+}
+
+void Player::UpdateRangeHastMod()
+{
+    float mod = CalculateRangeHastMod();
+    SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, mod);
 }
 
 void Player::_ApplyAllStatBonuses()

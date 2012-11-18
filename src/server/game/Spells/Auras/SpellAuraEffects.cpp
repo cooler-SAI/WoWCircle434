@@ -275,7 +275,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleArenaPreparation,                          //215 SPELL_AURA_ARENA_PREPARATION
     &AuraEffect::HandleModCastingSpeed,                           //216 SPELL_AURA_HASTE_SPELLS
     &AuraEffect::HandleModMeleeSpeedPct,                          //217 SPELL_AURA_MOD_MELEE_HASTE_2
-    &AuraEffect::HandleAuraModRangedHaste,                        //218 SPELL_AURA_HASTE_RANGED
+    &AuraEffect::HandleAuraModRangedHaste,                        //218 SPELL_AURA_MOD_RANGED_HASTE_2
     &AuraEffect::HandleModManaRegen,                              //219 SPELL_AURA_MOD_MANA_REGEN_FROM_STAT
     &AuraEffect::HandleModRatingFromStat,                         //220 SPELL_AURA_MOD_RATING_FROM_STAT
     &AuraEffect::HandleNULL,                                      //221 SPELL_AURA_MOD_DETAUNT
@@ -377,7 +377,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleAuraModSpellPowerPercent,                  //317 SPELL_AURA_MOD_SPELL_POWER_PCT
     &AuraEffect::HandleAuraModMastery,                            //318 SPELL_AURA_MASTERY (base mastery value)
     &AuraEffect::HandleModMeleeSpeedPct,                          //319 SPELL_AURA_MOD_MELEE_HASTE_3
-    &AuraEffect::HandleAuraModRangedHaste,                        //320 SPELL_AURA_MOD_RANGED_HASTE_2
+    &AuraEffect::HandleAuraModRangedHaste,                        //320 SPELL_AURA_MOD_RANGED_HASTE_3
     &AuraEffect::HandleNULL,                                      //321 SPELL_AURA_321
     &AuraEffect::HandleNULL,                                      //322 SPELL_AURA_INTERFERE_TARGETTING
     &AuraEffect::HandleUnused,                                    //323 unused (4.3.4)

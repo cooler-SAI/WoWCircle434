@@ -3339,6 +3339,8 @@ void Player::InitStatsForLevel(bool reapplyMods)
     SetFloatValue(UNIT_MOD_CAST_HASTE, 1.0f);
     SetFloatValue(PLAYER_FIELD_MOD_HASTE, 1.0f);
     SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, 1.0f);
+    SetFloatValue(PLAYER_FIELD_MOD_PET_HASTE, 1.0f);
+    SetFloatValue(PLAYER_FIELD_MOD_HASTE_REGEN, 1.0f);
 
     // reset size before reapply auras
     SetObjectScale(1.0f);
@@ -6044,8 +6046,6 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
             float RatingChange = value * GetRatingMultiplier(cr);
             ApplyAttackTimePercentMod(BASE_ATTACK, RatingChange, apply);
             ApplyAttackTimePercentMod(OFF_ATTACK, RatingChange, apply);
-            if (getClass() == CLASS_DEATH_KNIGHT)
-                UpdateAllRunesRegen();
             break;
         }
         case CR_HASTE_RANGED:
@@ -6123,7 +6123,11 @@ void Player::UpdateRating(CombatRating cr)
         case CR_RESILIENCE_TAKEN_ALL:
             break;
         case CR_HASTE_MELEE:                                // Implemented in Player::ApplyRatingMod
+            UpdateMeleeHastMod();
+            break;
         case CR_HASTE_RANGED:
+            UpdateRangeHastMod();
+            break;
         case CR_HASTE_SPELL:
             break;
         case CR_WEAPON_SKILL_MAINHAND:                      // Implemented in Unit::RollMeleeOutcomeAgainst
@@ -24065,24 +24069,14 @@ void Player::UpdateCharmedAI()
 uint32 Player::GetRuneTypeBaseCooldown(RuneType runeType) const
 {
     float cooldown = RUNE_BASE_COOLDOWN;
-    float hastePct = 0.0f;
+    float hastePct = CalculateMeleeHastMod();
 
     AuraEffectList const& regenAura = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
     for (AuraEffectList::const_iterator i = regenAura.begin();i != regenAura.end(); ++i)
         if ((*i)->GetMiscValue() == POWER_RUNES && (*i)->GetMiscValueB() == runeType)
             cooldown *= 1.0f - (*i)->GetAmount() / 100.0f;
 
-    // Runes cooldown are now affected by player's haste from equipment ...
-    hastePct = GetRatingBonusValue(CR_HASTE_MELEE);
-
-    // ... and some auras.
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE);
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE_2);
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE_3);
-
-    cooldown *=  1.0f - (hastePct / 100.0f);
-
-    return cooldown;
+    return cooldown * hastePct;
 }
 
 void Player::RemoveRunesBySpell(uint32 spell_id)
@@ -24165,8 +24159,7 @@ void Player::InitRunes()
         SetDeathRuneUsed(i, false);
     }
 
-    for (uint8 i = 0; i < NUM_RUNE_TYPES; ++i)
-        SetFloatValue(PLAYER_RUNE_REGEN_1 + i, 0.1f);                  // set a base regen timer equal to 10 sec
+    UpdateAllRunesRegen();
 }
 
 bool Player::IsBaseRuneSlotsOnCooldown(RuneType runeType) const

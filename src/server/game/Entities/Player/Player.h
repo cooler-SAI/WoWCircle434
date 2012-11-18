@@ -2188,6 +2188,11 @@ class Player : public Unit, public GridObject<Player>
         void UpdateManaRegen();
         void UpdateRuneRegen(RuneType rune);
         void UpdateAllRunesRegen();
+        float CalculateMeleeHastMod() const;
+        float CalculateRangeHastMod() const;
+        void UpdateMeleeHastMod();
+        void UpdateRangeHastMod();
+
         void UpdateArmorSpecializations(uint8 Slot = NULL);
         bool CheckArmorSpecializationItemConditions(SpellInfo const* spellInfo) const;
 

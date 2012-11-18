@@ -15108,6 +15108,17 @@ void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply
         // Update pets attack speed
         if (Pet* pPet = ToPlayer()->GetPet())
             pPet->UpdateAttackSpeed();
+
+        switch (att)
+        {
+            case WeaponAttackType::BASE_ATTACK:
+            case WeaponAttackType::OFF_ATTACK:
+                ToPlayer()->UpdateMeleeHastMod();
+                break;
+            case WeaponAttackType::RANGED_ATTACK:
+                ToPlayer()->UpdateRangeHastMod();
+                break;
+        }
     }
 
     m_attackTimer[att] = uint32(GetAttackTime(att) * m_modAttackSpeedPct[att] * remainingTimePct);
