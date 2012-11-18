@@ -1957,7 +1957,7 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
         // Word of Glory
         else if (m_spellInfo->Id == 85673)
         {
-            addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
+            addhealth += int32(0.209f * m_caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->SchoolMask)) + 0.198f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
 
             // Divine Purpose
             addhealth *= GetPowerCost();
@@ -1977,6 +1977,8 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
                     AddPct(addhealth, aur->GetAmount());
                 m_caster->CastSpell(m_caster, 20925, true);
             }
+
+            addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
         }
         // Seal of Insight
         else if (m_spellInfo->Id == 20167)

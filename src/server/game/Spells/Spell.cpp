@@ -569,6 +569,7 @@ m_caster((info->AttributesEx6 & SPELL_ATTR6_CAST_BY_CHARMER && caster->GetCharme
     m_spellAura = NULL;
     isInstant = false;
     isStolen = false;
+    m_costModified = false;
 
     //Auto Shot & Shoot (wand)
     m_autoRepeat = m_spellInfo->IsAutoRepeatRangedSpell();
@@ -4573,13 +4574,28 @@ void Spell::TakePower()
     
     // In Spell::HandleHolyPower
     if (m_spellInfo->PowerType == POWER_HOLY_POWER)
-    {
-        m_powerCost = m_caster->GetPower(POWER_HOLY_POWER); 
+    { 
         if (m_caster->HasAura(90174))
+        {
             m_powerCost = 3;
+            m_costModified = true;
+            if (hit && m_spellInfo->Id != 85696)
+                m_caster->RemoveAurasDueToSpell(90174);
+            return;
+        }
+        else if (hit)
+            m_powerCost = m_caster->GetPower(POWER_HOLY_POWER);
+        else
+            m_powerCost = 0;
+
+        if (m_spellInfo->Id == 85696)
+            return;
+
+        if (m_powerCost)
+            m_caster->ModifyPower(POWER_HOLY_POWER, -m_powerCost);
 
         return;
-    }        
+    }       
        
     if (!m_powerCost)
         return;
@@ -4827,43 +4843,12 @@ void Spell::HandleHolyPower(Player* caster)
     if (!caster)
         return;
 
-    bool hit = true;
-    Player* modOwner = caster->GetSpellModOwner();
-
-    if (!m_powerCost || !modOwner)
-        return;
-
-    if (uint64 targetGUID = m_targets.GetUnitTargetGUID())
-    {
-        for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
-        {
-            if (ihit->targetGUID == targetGUID)
-            {
-                if (ihit->missCondition != SPELL_MISS_NONE && ihit->missCondition != SPELL_MISS_MISS)
-                    hit = false;
-
-                break;
-            }
-        }
-    }
-        
-    // Zealotry
-    if (m_spellInfo->Id == 85696)
-        return;
-    
+    // Eternal Glory
     bool returnResources = false;
     if (AuraEffect* const _effect = caster->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 2944, EFFECT_0))
-        returnResources = roll_chance_i(_effect->GetAmount());
+        returnResources = (roll_chance_i(_effect->GetAmount()) && (m_spellInfo->Id == 85673));
 
-    // The spell did hit the target, apply aura cost mods if there are any.
-    if (hit)
-    {
-        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, m_powerCost);
-        m_caster->ModifyPower(POWER_HOLY_POWER, -m_powerCost);
-        m_caster->RemoveAurasDueToSpell(90174);
-    }
-        
-    if (returnResources && m_powerCost && !caster->HasSpellCooldown(88676))
+    if (returnResources && !m_costModified && !caster->HasSpellCooldown(88676))
         caster->CastCustomSpell(88676, SPELLVALUE_BASE_POINT0, m_powerCost, caster);
 }
 
