@@ -707,7 +707,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     {
                         float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
                         int32 holy = m_caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_HOLY);
-                        damage = int32((m_caster->GetAttackTime(BASE_ATTACK) / 1000) * (0.005f * ap + 0.01f * holy));;
+                        damage = int32((m_caster->GetAttackTime(BASE_ATTACK) / 1000) * (0.005f * ap + 0.01f * holy));
                         break;
                     }
                     // Shield of Righteous
@@ -852,12 +852,19 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 {
                     if (m_caster)
                     {
-                        if (m_caster->HasAura(89901))
+                        if (m_caster->HasAura(89901)) // Judgement of the Bold
                             m_caster->CastSpell(m_caster, 89906, true);
-                        if (m_caster->HasAura(31878))
+                        if (m_caster->HasAura(31878)) // Judgement of the Wise
                             m_caster->CastSpell(m_caster, 31930, true);
-                        if (m_caster->HasAura(31876))
+                        if (m_caster->HasAura(31876)) // Replenishment
                             m_caster->CastSpell(m_caster, 57669, true);
+                        
+                        // Judgement of the Just 
+                        if (AuraEffect* aurEff = m_caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_PALADIN, 3015, 0))
+                        {
+                            int32 bp0 = aurEff->GetAmount();
+                            m_caster->CastCustomSpell(unitTarget, 68055, &bp0, 0, 0, true);
+                        }
                     }
 
                     uint32 spellId = 0;
