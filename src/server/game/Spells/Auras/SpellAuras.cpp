@@ -1362,6 +1362,13 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Communion
                 else if (m_spellInfo->SpellFamilyFlags[2] & 0x20)
                     caster->CastSpell(caster, 63531, true);
+                // Grand Crusader
+                else if (m_spellInfo->Id == 85416)
+                {
+                    if (!caster)
+                        return;
+                    caster->ToPlayer()->RemoveSpellCooldown(31925, true);
+                }
                 break;
         }
     }
