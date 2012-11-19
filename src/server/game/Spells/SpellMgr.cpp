@@ -4272,6 +4272,15 @@ void SpellMgr::LoadDbcDataCorrections()
             case 44457:
                 spellInfo->MaxAffectedTargets = 3;
                 break;
+            // Seals of Command
+            case 85126:
+                spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_ADD_FLAT_MODIFIER;
+                spellInfo->Effects[1].BasePoints = 2;
+                break;
+            // Seal of Righteousness
+            case 25742:
+                spellInfo->Effects[0].ChainTarget = 1;
+                break;
             default:
                 break;
         }

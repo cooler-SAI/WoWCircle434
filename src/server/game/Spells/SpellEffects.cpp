@@ -702,6 +702,14 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             {
                 switch (m_spellInfo->Id)
                 {
+                    // Seal of Justice
+                    case 20170:
+                    {
+                        float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                        int32 holy = m_caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_HOLY);
+                        damage = int32((m_caster->GetAttackTime(BASE_ATTACK) / 1000) * (0.005f * ap + 0.01f * holy));;
+                        break;
+                    }
                     // Shield of Righteous
                     case 53600: 
                     {

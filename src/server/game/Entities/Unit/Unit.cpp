@@ -6695,18 +6695,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     }
                 return true;
             }
-            // Seal of Righteousness - melee proc dummy (addition  (MWS * (0.011 * AP.022 * holy spell power) * 100 / 100) damage)
-            if (dummySpell->SpellFamilyFlags[0] & 0x8000000)
-            {
-                if (effIndex != 0)
-                    return false;
-                triggered_spell_id = 25742;
-                float ap = GetTotalAttackPowerValue(BASE_ATTACK);
-                int32 holy = SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_HOLY) +
-                             victim->SpellBaseDamageBonusTaken(SPELL_SCHOOL_MASK_HOLY);
-                basepoints0 = (int32)GetAttackTime(BASE_ATTACK) * int32(ap * 0.011f + 0.022f * holy) / 1000;
-                break;
-            }
             // Light's Beacon - Beacon of Light
             if (dummySpell->Id == 53651)
             {
@@ -6772,6 +6760,18 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             switch (dummySpell->Id)
             {
+                // Seal of Righteousness
+                case 20154:
+                {
+                    if (!victim || (GetGUID() == victim->GetGUID()))
+                        return false;
+
+                    triggered_spell_id = 25742;
+                    float ap = GetTotalAttackPowerValue(BASE_ATTACK);
+                    int32 holy = this->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_HOLY);
+                    basepoints0 = int32((GetAttackTime(BASE_ATTACK) / 1000) * (0.0011f * ap + 0.022f * holy));
+                    break;
+                }
                 // Long Arm of The law
                 case 87168:
                 case 87172:
@@ -8408,6 +8408,15 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Seals of Command
+        case 85126:
+            if (!victim || (GetGUID() == victim->GetGUID()))
+                return false;
+
+            if (!HasAura(31801) && !HasAura(20154) && !HasAura(20164))
+                return false;
+            
+            break;
         // Arcane Concentration
         case 11213:
         case 12574:
@@ -10233,6 +10242,16 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
                         break;
                 }
             }
+        case SPELLFAMILY_PALADIN:
+            // Judgement of Truth
+            if (spellProto->Id == 31804)
+            {
+                uint8 stacks = 0;
+                if (Aura* aur = victim->GetAura(31803, GetGUID()))
+                    stacks = aur->GetStackAmount();
+                AddPct(DoneTotalMod, 20 * stacks);                
+            }
+            break;
     }
 
     // Frostburn (Mage Frost Mastery)
