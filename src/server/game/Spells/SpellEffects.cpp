@@ -4666,10 +4666,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
             }
             break;
         }
-        case SPELLFAMILY_PALADIN:
-        {
-            break;
-        }
         case SPELLFAMILY_POTION:
         {
             switch (m_spellInfo->Id)
@@ -4775,6 +4771,30 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     m_caster->CastCustomSpell(m_caster, spellInfo->Id, &basepoints0, NULL, NULL, true);
                     break;
                 }
+            }
+            break;
+        }
+        case SPELLFAMILY_MAGE:
+        {
+            switch (m_spellInfo->Id)
+            {
+                // Combustion
+                case 11129:
+                    int32 basepoints0 = 0;
+                    Unit::AuraEffectList const& aurasPereodic = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
+                    for (Unit::AuraEffectList::const_iterator i = aurasPereodic.begin(); i !=  aurasPereodic.end(); ++i)
+                    {
+                        if ((*i)->GetCasterGUID() != m_caster->GetGUID() || !(*i)->GetSpellInfo()->HasSchoolMask(SPELL_SCHOOL_MASK_FIRE))
+                            continue;
+
+                        if (!(*i)->GetAmplitude())
+                            continue;
+
+                        basepoints0 += m_caster->SpellDamageBonusDone(unitTarget, (*i)->GetSpellInfo(), (*i)->GetAmount(), DOT) * 1000 / (*i)->GetAmplitude();
+                    }
+                    if (basepoints0)
+                        m_caster->CastCustomSpell(unitTarget, 83853, &basepoints0, NULL, NULL, true);
+                    break;
             }
             break;
         }
