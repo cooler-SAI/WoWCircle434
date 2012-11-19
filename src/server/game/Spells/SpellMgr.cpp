@@ -4281,6 +4281,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 25742:
                 spellInfo->Effects[0].ChainTarget = 1;
                 break;
+            // Holy Radiance
+            case 86452:
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                break;
             default:
                 break;
         }

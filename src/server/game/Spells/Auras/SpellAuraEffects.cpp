@@ -6019,6 +6019,10 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                  // timer expired - remove death runes
                 target->ToPlayer()->RemoveRunesBySpell(GetId());
             }
+        case SPELLFAMILY_PALADIN:
+            // Holy Radiance
+            if (GetId() == 82327)
+                caster->CastSpell(target, 86452, true);
             break;
         default:
             break;
