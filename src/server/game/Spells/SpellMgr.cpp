@@ -4291,7 +4291,8 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // Ancient Guardian
             case 86657:
-                spellInfo->Effects[0].TargetA = TARGET_UNIT_TARGET_ANY; 
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
             default:
                 break;
         }
