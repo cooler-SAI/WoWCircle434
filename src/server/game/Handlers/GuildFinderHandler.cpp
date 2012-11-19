@@ -282,7 +282,7 @@ void WorldSession::HandleGuildFinderGetRecruits(WorldPacket& recvPacket)
 
     std::vector<MembershipRequest> recruitsList = sGuildFinderMgr->GetAllMembershipRequestsForGuild(player->GetGuildId());
 
-    // Temporary fix
+    /* // Temporary fix
     for (std::vector<MembershipRequest>::iterator itr = recruitsList.begin(); itr != recruitsList.end();)
     {
         if (!sWorld->GetCharacterNameData((*itr).GetPlayerGUID()))
@@ -294,7 +294,7 @@ void WorldSession::HandleGuildFinderGetRecruits(WorldPacket& recvPacket)
         }
         else
             ++itr;
-    }
+    }*/
 
     uint32 recruitCount = recruitsList.size();
 

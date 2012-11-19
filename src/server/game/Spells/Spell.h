@@ -476,8 +476,8 @@ class Spell
 
         CurrentSpellTypes GetCurrentContainer() const;
 
-        Unit* GetCaster() const { return m_caster; }
-        Unit* GetOriginalCaster() const { return m_originalCaster; }
+        inline Unit* GetCaster() const { return m_caster; }
+        inline Unit* GetOriginalCaster() const { return m_originalCaster; }
         SpellInfo const* GetSpellInfo() const { return m_spellInfo; }
         int32 GetPowerCost() const { return m_powerCost; }
         bool costWasModified() const { return m_costModified; }

@@ -1240,6 +1240,8 @@ class ObjectMgr
             return true;
         }
 
+        void AddDeletedPlayer(uint32 lowGuid) { _playerDeleteInfoStore.insert(lowGuid); }
+
     private:
         // first free id for selected id type
         uint32 _auctionId;

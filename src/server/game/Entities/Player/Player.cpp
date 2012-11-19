@@ -5154,6 +5154,8 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
             stmt->setUInt32(0, guid);
 
             CharacterDatabase.Execute(stmt);
+
+            sObjectMgr->AddDeletedPlayer(guid);
             break;
         }
         default:
