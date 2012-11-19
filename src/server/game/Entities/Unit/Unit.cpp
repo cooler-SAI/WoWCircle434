@@ -6657,7 +6657,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 if (!HasAura(86669))
                 {
                     RemoveAurasDueToSpell(86674);
-                   return false;
+                    return false;
                 }
 
                 // check for single target spell (TARGET_SINGLE_FRIEND, NO_TARGET)
@@ -6676,21 +6676,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         Unit* pPet = (*itr);
                         if (pPet->GetOwnerGUID() == GetGUID())
                         {
-                            //need to save num of heals up to 5
-                            //I've done it with AI, maybe there's better way
-                            uint32 heals = pPet->GetAI()->GetData(1001);
                             int32 bp0 = damage;
                             int32 bp1 = damage / 10;
                             pPet->CastCustomSpell(victim, 86678, &bp0, &bp1, NULL, true);
-                            if (heals > 3)
-                           {
-                                //Dismiss guardian and remove auras
-                                pPet->ToCreature()->DespawnOrUnsummon();
-                                RemoveAurasDueToSpell(86669);
-                                RemoveAurasDueToSpell(86674);
-                            }
-                            else
-                                pPet->GetAI()->SetData(1001, heals + 1);
                         }
                     }
                 return true;
@@ -8537,10 +8525,10 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
         // Sacred Shield Proc
         case 85285:
         {
-            if (!this->HealthBelowPct(30) || !this->HealthBelowPctDamaged(30, damage))
+            if (!HealthBelowPct(30) || !HealthBelowPctDamaged(30, damage))
                 return false;
 
-            basepoints0 = (1 + GetTotalAttackPowerValue(BASE_ATTACK)*2.8);
+            basepoints0 = int32(1 + 2.8 * GetTotalAttackPowerValue(BASE_ATTACK));
             target = this;
             trigger_spell_id = 96263;
             break;

@@ -3098,15 +3098,11 @@ public:
     {
         npc_guardian_of_ancient_kingsAI(Creature *c) : ScriptedAI(c)
         {
-            uiHeals = 0;
         }
-
-        uint32 uiHeals;
 
         void Reset()
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             
             if (me->GetEntry() == 46506)
                 me->SetReactState(REACT_AGGRESSIVE);
@@ -3128,19 +3124,6 @@ public:
                     DoCast(me, 86703, true);
                 }
              }
-        }
-
-        void SetData(uint32 type, uint32 data)
-        {
-            if (type == 1001)
-                uiHeals = data;
-        }
-
-        uint32 GetData(uint32 type)
-        {
-            if (type == 1001)
-                return uiHeals;
-                return 0;
         }
 
         void UpdateAI(const uint32 diff)

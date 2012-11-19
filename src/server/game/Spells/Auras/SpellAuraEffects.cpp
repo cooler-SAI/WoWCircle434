@@ -5372,8 +5372,8 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                     break;
                 //Guardian of Ancient Kings (holy)
                 case 86669:
-                if (!apply)
-                    caster->RemoveAurasDueToSpell(86674);
+                    if (!apply)
+                        caster->RemoveAurasDueToSpell(86674);
                 break;
             }
             break;

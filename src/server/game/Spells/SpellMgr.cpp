@@ -4285,6 +4285,13 @@ void SpellMgr::LoadDbcDataCorrections()
             case 86452:
                 spellInfo->Effects[0].SetRadiusIndex(13);
                 break;
+            // Ancient Healer
+            case 86674:
+                spellInfo->ProcCharges = 5;
+                break;
+            // Ancient Guardian
+            case 86657:
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_TARGET_ANY; 
             default:
                 break;
         }
