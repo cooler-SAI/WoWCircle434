@@ -784,7 +784,7 @@ public:
 
         if (!*args)
         {
-            target->RemoveAllSpellCooldown();
+            target->RemoveAllSpellCooldown(true);
             handler->PSendSysMessage(LANG_REMOVEALL_COOLDOWN, nameLink.c_str());
         }
         else

@@ -4436,13 +4436,25 @@ void Player::RemoveArenaSpellCooldowns(bool removeActivePetCooldowns)
         }
 }
 
-void Player::RemoveAllSpellCooldown()
+void Player::RemoveAllSpellCooldown(bool removeActivePetCooldowns /* = false */)
 {
     if (!m_spellCooldowns.empty())
     {
         SendClearAllCooldowns(this);
         m_spellCooldowns.clear();
     }
+
+    // pet cooldowns
+    if (removeActivePetCooldowns)
+        if (Pet* pet = GetPet())
+        {
+            // notify player
+            for (CreatureSpellCooldowns::const_iterator itr2 = pet->m_CreatureSpellCooldowns.begin(); itr2 != pet->m_CreatureSpellCooldowns.end(); ++itr2)
+                SendClearCooldown(itr2->first, pet);
+
+            // actually clear cooldowns
+            pet->m_CreatureSpellCooldowns.clear();
+        }
 }
 
 void Player::_LoadSpellCooldowns(PreparedQueryResult result)
@@ -5993,12 +6005,24 @@ float Player::GetRatingMultiplier(CombatRating cr) const
     if (!Rating || !classRating)
         return 1.0f;                                        // By default use minimum coefficient (not must be called)
 
+    if (cr == CR_RESILIENCE_TAKEN_ALL)
+        return Rating->ratio;
+
     return classRating->ratio / Rating->ratio;
 }
 
 float Player::GetRatingBonusValue(CombatRating cr) const
 {
     return float(GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + cr)) * GetRatingMultiplier(cr);
+}
+
+float Player::GetResilienceBonusValue() const
+{
+    // temporary hack for resilience calculating
+    float playerResilience = float(GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_RESILIENCE_TAKEN_ALL));
+    float degree = pow(0.99f, (playerResilience / GetRatingMultiplier(CR_RESILIENCE_TAKEN_ALL)));
+    float result = (1 - degree) * 100.0f;
+    return ceilf(result * 100) / 100;
 }
 
 float Player::GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const

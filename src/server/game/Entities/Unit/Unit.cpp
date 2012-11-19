@@ -17019,21 +17019,21 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
     }
 }
 
-float Unit::GetCombatRatingReduction(CombatRating cr) const
+float Unit::GetCombatRatingReduction() const
 {
     if (Player const* player = ToPlayer())
-        return player->GetRatingBonusValue(cr);
+        return player->GetResilienceBonusValue();
     // Player's pet get resilience from owner
     else if (isPet() && GetOwner())
         if (Player* owner = GetOwner()->ToPlayer())
-            return owner->GetRatingBonusValue(cr);
+            return owner->GetResilienceBonusValue();
 
     return 0.0f;
 }
 
-uint32 Unit::GetCombatRatingDamageReduction(CombatRating cr, float rate, float cap, uint32 damage) const
+uint32 Unit::GetCombatRatingDamageReduction(float rate, float cap, uint32 damage) const
 {
-    float percent = std::min(GetCombatRatingReduction(cr) * rate, cap);
+    float percent = std::min(GetCombatRatingReduction() * rate, cap);
     return CalculatePct(damage, percent);
 }
 
