@@ -1,0 +1,1 @@
+INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `comments`) VALUES ('92315', '1.15', '0.05', 'Mage - Pyroblast (Instant)');
