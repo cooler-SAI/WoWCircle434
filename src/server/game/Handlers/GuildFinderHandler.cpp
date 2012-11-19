@@ -283,7 +283,7 @@ void WorldSession::HandleGuildFinderGetRecruits(WorldPacket& recvPacket)
     std::vector<MembershipRequest> recruitsList = sGuildFinderMgr->GetAllMembershipRequestsForGuild(player->GetGuildId());
 
     // Temporary fix
-    for (std::vector<MembershipRequest>::const_iterator itr = recruitsList.begin(); itr != recruitsList.end();)
+    for (std::vector<MembershipRequest>::iterator itr = recruitsList.begin(); itr != recruitsList.end();)
     {
         if (!sWorld->GetCharacterNameData((*itr).GetPlayerGUID()))
         {
