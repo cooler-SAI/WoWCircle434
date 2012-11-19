@@ -694,6 +694,12 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             case 48391: // Owlkin Frenzy
                 ApplyPct(amount, GetBase()->GetUnitOwner()->GetCreatePowers(POWER_MANA));
                 break;
+            case 31930: // Judgements of the Wise
+                amount = int32(CalculatePct(GetBase()->GetUnitOwner()->GetCreateMana(), 3));
+                break;
+            case 89906: // Judgements of the Bold
+                amount = int32(GetBase()->GetUnitOwner()->GetCreateMana() * 2.5f);
+                break;
             default:
                 break;
             }

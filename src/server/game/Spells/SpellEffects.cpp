@@ -2381,7 +2381,6 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
             level_diff = m_caster->getLevel() - 60;
             level_multiplier = 4;
             break;
-        case 89906:                                         // Judgements of the Bold
         case 63375:                                         // Improved Stormstrike
         case 68082:                                         // Glyph of Seal of Command
         case 20167:                                         // Seal of Insight
