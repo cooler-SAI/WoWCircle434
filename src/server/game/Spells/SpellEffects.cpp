@@ -2004,6 +2004,10 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
         if (unitTarget->HasAura(48920) && (unitTarget->GetHealth() + addhealth >= unitTarget->GetMaxHealth()))
             unitTarget->RemoveAura(48920);
         
+        // Light of Dawn
+        if (m_spellInfo->Id == 85222)
+            addhealth *= GetPowerCost();
+
         // Illuminated Healing (Mastery Holy Paladin)
         if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN)
             if (Aura* aur = m_caster->GetAura(76669))
