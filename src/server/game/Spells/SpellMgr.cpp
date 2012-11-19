@@ -4268,6 +4268,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 44544:
                 spellInfo->Effects[0].SpellClassMask = flag96(0x00020000, 0x00100000, 0x00000008);
                 break;
+            // Living Bomb
+            case 44457:
+                spellInfo->MaxAffectedTargets = 3;
+                break;
             default:
                 break;
         }
