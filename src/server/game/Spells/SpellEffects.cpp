@@ -2345,6 +2345,15 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
     int level_diff = 0;
     switch (m_spellInfo->Id)
     {
+        // Improved Mana Gem
+        case 5405:
+            if (AuraEffect const* improvedManaGem = m_caster->GetDummyAuraEffect(SPELLFAMILY_MAGE, 1036, 0))
+            {
+                int32 basepoints0 = m_caster->GetMaxPower(POWER_MANA);
+                ApplyPct(basepoints0, improvedManaGem->GetAmount());
+                m_caster->CastCustomSpell(m_caster, 83098, &basepoints0, &basepoints0, NULL, true);
+            }
+            break;
         case 9512:                                          // Restore Energy
             level_diff = m_caster->getLevel() - 40;
             level_multiplier = 2;
