@@ -174,6 +174,9 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     GetPlayer()->GetZoneAndAreaId(newzone, newarea);
     GetPlayer()->UpdateZone(newzone, newarea);
 
+    for (uint8 i = 0; i < 9; ++i)
+        GetPlayer()->UpdateSpeed(UnitMoveType(i), true);
+
     // honorless target
     if (GetPlayer()->pvpInfo.inHostileArea)
         GetPlayer()->CastSpell(GetPlayer(), 2479, true);
