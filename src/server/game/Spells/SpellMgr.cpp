@@ -3235,7 +3235,6 @@ void SpellMgr::LoadDbcDataCorrections()
             case 46771: // Flame Sear
             case 45248: // Shadow Blades
             case 41303: // Soul Drain
-            case 54172: // Divine Storm (heal)
             case 29213: // Curse of the Plaguebringer - Noth
             case 28542: // Life Drain - Sapphiron
             case 66588: // Flaming Spear
@@ -3243,7 +3242,6 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->MaxAffectedTargets = 3;
                 break;
             case 38310: // Multi-Shot
-            case 53385: // Divine Storm (Damage)
                 spellInfo->MaxAffectedTargets = 4;
                 break;
             case 42005: // Bloodboil
@@ -4292,6 +4290,10 @@ void SpellMgr::LoadDbcDataCorrections()
             // Ancient Guardian
             case 86657:
                 spellInfo->Effects[0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            // Divine Storm
+            case 53385:
+                spellInfo->Effects[0].BasePoints = 0;
                 break;
             default:
                 break;

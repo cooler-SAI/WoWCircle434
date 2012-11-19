@@ -1367,7 +1367,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 {
                     if (!caster)
                         return;
-                    caster->ToPlayer()->RemoveSpellCooldown(31925, true);
+                    caster->ToPlayer()->RemoveSpellCooldown(31935, true);
                 }
                 break;
         }

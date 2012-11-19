@@ -8404,6 +8404,13 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Protector of the Innocent
+        case 20138:
+        case 20139:
+        case 20140:
+            if (!victim || (GetGUID() == victim->GetGUID()))
+                return false;
+            break;
         // Seals of Command
         case 85126:
             if (!victim || (GetGUID() == victim->GetGUID()))

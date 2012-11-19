@@ -243,6 +243,8 @@ class spell_pal_divine_storm : public SpellScriptLoader
             PrepareSpellScript(spell_pal_divine_storm_SpellScript);
 
             uint32 healPct;
+            uint32 _targetCount;
+            uint32 _damage;
 
             bool Validate(SpellInfo const* /* spell */)
             {
@@ -254,18 +256,35 @@ class spell_pal_divine_storm : public SpellScriptLoader
             bool Load()
             {
                 healPct = GetSpellInfo()->Effects[EFFECT_1].CalcValue(GetCaster());
+                _targetCount = 0;
+                _damage = 0;
+                
                 return true;
+            }
+            
+            void CountTargets(std::list<WorldObject*>& targetList)
+            {
+                _targetCount = targetList.size();
+            }
+            
+            void CalcDamage()
+            {
+                _damage += GetHitDamage();
             }
 
             void TriggerHeal()
             {
                 Unit* caster = GetCaster();
-                caster->CastCustomSpell(SPELL_DIVINE_STORM_DUMMY, SPELLVALUE_BASE_POINT0, (GetHitDamage() * healPct) / 100, caster, true);
+                if (_targetCount > 3)
+                    caster->EnergizeBySpell(caster, 53385, 1, POWER_HOLY_POWER);
+                caster->CastCustomSpell(SPELL_DIVINE_STORM_DUMMY, SPELLVALUE_BASE_POINT0, (_damage * healPct) / 100, caster, true);
             }
 
             void Register()
             {
-                AfterHit += SpellHitFn(spell_pal_divine_storm_SpellScript::TriggerHeal);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_pal_divine_storm_SpellScript::CountTargets, EFFECT_2, TARGET_UNIT_SRC_AREA_ENEMY);
+                AfterHit += SpellHitFn(spell_pal_divine_storm_SpellScript::CalcDamage);
+                AfterCast += SpellCastFn(spell_pal_divine_storm_SpellScript::TriggerHeal);
             }
         };
 

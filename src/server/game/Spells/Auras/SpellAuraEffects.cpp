@@ -698,7 +698,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 amount = int32(CalculatePct(GetBase()->GetUnitOwner()->GetCreateMana(), 3));
                 break;
             case 89906: // Judgements of the Bold
-                amount = int32(GetBase()->GetUnitOwner()->GetCreateMana() * 2.5f);
+                amount = int32(CalculatePct(GetBase()->GetUnitOwner()->GetCreateMana(),  2.5f));
                 break;
             default:
                 break;
