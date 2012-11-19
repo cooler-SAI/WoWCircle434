@@ -6748,10 +6748,18 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             switch (dummySpell->Id)
             {
+                // Guarded by the Light
+                case 85646:
+                {
+                    int32 overheal = int32(damage + GetHealth() - GetMaxHealth());
+                    if (overheal > 0)
+                        CastCustomSpell(this, 88063, &overheal, 0, 0, true);
+                    break;
+                }
                 // Seal of Righteousness
                 case 20154:
                 {
-                    if (!victim || (GetGUID() == victim->GetGUID()))
+                    if (!victim || (GetGUID() == victim->GetGUID()) || effIndex != 0)
                         return false;
 
                     triggered_spell_id = 25742;

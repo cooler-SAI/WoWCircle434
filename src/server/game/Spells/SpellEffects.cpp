@@ -1986,12 +1986,9 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
 
             // Guarded by the Light
             AuraEffect* aur = NULL;
-            if ((aur = m_caster->GetAuraEffect(85646, 0)) || (aur = m_caster->GetAuraEffect(85639, 0)))
-            {                   
+            if ((aur = m_caster->GetAuraEffect(85646, 0)) || (aur = m_caster->GetAuraEffect(85639, 0)))            
                 if (unitTarget == m_caster)
                     AddPct(addhealth, aur->GetAmount());
-                m_caster->CastSpell(m_caster, 20925, true);
-            }
 
             addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
         }
@@ -2006,7 +2003,7 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
         // Remove Grievious bite if fully healed
         if (unitTarget->HasAura(48920) && (unitTarget->GetHealth() + addhealth >= unitTarget->GetMaxHealth()))
             unitTarget->RemoveAura(48920);
-
+        
         // Illuminated Healing (Mastery Holy Paladin)
         if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN)
             if (Aura* aur = m_caster->GetAura(76669))
