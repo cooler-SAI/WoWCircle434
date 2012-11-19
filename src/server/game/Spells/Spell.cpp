@@ -807,6 +807,16 @@ void Spell::SelectSpellTargets()
             m_delayMoment = (uint64) floor(dist / m_spellInfo->Speed * 1000.0f);
         }
     }
+
+    // Improved Flamestrike
+    if (AuraEffect const * imprflamestrike = m_caster->GetDummyAuraEffect(SPELLFAMILY_MAGE, 37, 0))
+    {
+        if (m_spellInfo->Id == 11113 && m_UniqueTargetInfo.size() > 1)
+        {
+            if (roll_chance_i(imprflamestrike->GetAmount()))
+                m_caster->CastSpell(m_targets.GetDstPos()->GetPositionX(), m_targets.GetDstPos()->GetPositionY(), m_targets.GetDstPos()->GetPositionZ(), 2120, true);
+        }
+    }
 }
 
 void Spell::SelectEffectImplicitTargets(SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType, uint32& processedEffectMask)
