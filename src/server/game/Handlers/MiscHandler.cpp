@@ -2022,11 +2022,11 @@ void WorldSession::HandleObjectUpdateFailedOpcode(WorldPacket& recvPacket)
         object ? object->GetName() : "NULL", player->GetGUIDLow(), player->GetName(),
         player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(),
         player->GetMapId());
-    if (Unit* unit = object->ToUnit())
+    if (object && object->ToUnit())
     {
         for (uint8 i = 0; i < MAX_MOVE_TYPE; i++)
         {
-            if (!unit->GetSpeed(UnitMoveType(i)))
+            if (!object->ToUnit()->GetSpeed(UnitMoveType(i)))
                 sLog->outError(LOG_FILTER_NETWORKIO, 
                 "CMSG_OBJECT_UPDATE_FAILED: Object's UnitMoveType %u is NULL", i); 
         }
