@@ -660,16 +660,16 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 amount += uint32(CalculatePct(caster->GetTotalAttackPowerValue(BASE_ATTACK), cp));
             }
             // Rend
-            else if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_WARRIOR && GetSpellInfo()->SpellFamilyFlags[0] & 0x20)
+            else if (GetId() == 94009)
             {
                 m_canBeRecalculated = false;
-                // ${0.25 * 6 * (($MWB + $mwb) / 2 + $AP / 14 * $MWS)}  bonus per tick
+                // ${0.2 * 6 * (($MWB + $mwb) / 2 + $AP / 14 * $MWS)}  bonus per tick
                 float ap = caster->GetTotalAttackPowerValue(BASE_ATTACK);
-                int32 mws = caster->GetAttackTime(BASE_ATTACK);
+                float mws = 0.001 * caster->GetAttackTime(BASE_ATTACK);
                 float mwb_min = caster->GetWeaponDamageRange(BASE_ATTACK, MINDAMAGE);
                 float mwb_max = caster->GetWeaponDamageRange(BASE_ATTACK, MAXDAMAGE);
-                float mwb = ((mwb_min + mwb_max) / 2 + ap * mws / 14000) * 0.25f * 6.0f;
-                amount += int32(caster->ApplyEffectModifiers(m_spellInfo, m_effIndex, mwb));
+                float mwb = ((mwb_min + mwb_max) / 2 + (ap / 14) * mws) * 0.25f * 6.0f;
+                amount += int32(caster->ApplyEffectModifiers(m_spellInfo, m_effIndex, mwb) / GetTotalTicks());
             }
             // Unholy Blight damage over time effect
             else if (GetId() == 50536)
