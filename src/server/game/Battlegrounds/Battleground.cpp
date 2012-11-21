@@ -130,6 +130,13 @@ void Battleground::BroadcastWorker(Do& _do)
             _do(player);
 }
 
+template<class Do>
+void Battleground::BroadcastWorker(Do& _do, Player const* player)
+{
+    if (player)
+        _do(const_cast<Player*>(player));
+}
+
 Battleground::Battleground()
 {
     m_Guid              = 0;
@@ -147,6 +154,7 @@ Battleground::Battleground()
     m_IsArena           = false;
     m_Winner            = 2;
     m_StartTime         = 0;
+    m_CountdownTimer    = 0;
     m_ResetStatTimer    = 0;
     m_ValidStartPositionTimer = 0;
     m_Events            = 0;
@@ -158,6 +166,7 @@ Battleground::Battleground()
     m_LevelMax          = 0;
     m_InBGFreeSlotQueue = false;
     m_SetDeleteThis     = false;
+    m_lastMessageId     = 0;
 
     m_MaxPlayersPerTeam = 0;
     m_MaxPlayers        = 0;
@@ -459,6 +468,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
     // ***           BATTLEGROUND STARTING SYSTEM            ***
     // *********************************************************
     ModifyStartDelayTime(diff);
+    ModifyCountdownTimer(diff);
 
     // I know it's a too big but it's the value sent in packet, I get it from retail sniff.
     // I think it's link to the countdown when bgs start
@@ -492,6 +502,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
         StartingEventCloseDoors();
         SetStartDelayTime(StartDelayTimes[BG_STARTING_EVENT_FIRST]);
+        SetCountdownTimer(StartDelayTimes[BG_STARTING_EVENT_FIRST]);
         // First start warning - 2 or 1 minute
         SendMessageToAll(StartMessageIds[BG_STARTING_EVENT_FIRST], CHAT_MSG_BG_SYSTEM_NEUTRAL);
     }
@@ -500,14 +511,13 @@ inline void Battleground::_ProcessJoin(uint32 diff)
     {
         m_Events |= BG_STARTING_EVENT_2;
         SendMessageToAll(StartMessageIds[BG_STARTING_EVENT_SECOND], CHAT_MSG_BG_SYSTEM_NEUTRAL);
-        SendTimerToAll(m_Events);
+        SendCountdownTimer();
     }
     // After 30 or 15 seconds, warning is signaled
     else if (GetStartDelayTime() <= StartDelayTimes[BG_STARTING_EVENT_THIRD] && !(m_Events & BG_STARTING_EVENT_3))
     {
         m_Events |= BG_STARTING_EVENT_3;
         SendMessageToAll(StartMessageIds[BG_STARTING_EVENT_THIRD], CHAT_MSG_BG_SYSTEM_NEUTRAL);
-        SendTimerToAll(m_Events);
     }
     // Delay expired (after 2 or 1 minute)
     else if (GetStartDelayTime() <= 0 && !(m_Events & BG_STARTING_EVENT_4))
@@ -1211,6 +1221,7 @@ void Battleground::AddPlayer(Player* player)
         {
             player->CastSpell(player, SPELL_ARENA_PREPARATION, true);
             player->ResetAllPowers();
+            SendCountdownTimer();
         }
 
         WorldPacket teammate;
@@ -1223,6 +1234,10 @@ void Battleground::AddPlayer(Player* player)
         if (GetStatus() == STATUS_WAIT_JOIN)                 // not started yet
             player->CastSpell(player, SPELL_PREPARATION, true);   // reduces all mana cost of spells.
     }
+
+    // Send last message for player if he missed it
+    if (GetStartDelayTime() <= 59000 && GetStartDelayTime() >= 0)
+        SendMessageToPlayer(m_lastMessageId, CHAT_MSG_BG_SYSTEM_NEUTRAL, player);
 
     player->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, ACHIEVEMENT_CRITERIA_CONDITION_BG_MAP, GetMapId(), true);
     player->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, ACHIEVEMENT_CRITERIA_CONDITION_BG_MAP, GetMapId(), true);
@@ -1701,9 +1716,21 @@ void Battleground::SendMessageToAll(int32 entry, ChatMsg type, Player const* sou
     if (!entry)
         return;
 
+    m_lastMessageId = entry;
     Trinity::BattlegroundChatBuilder bg_builder(type, entry, source);
     Trinity::LocalizedPacketDo<Trinity::BattlegroundChatBuilder> bg_do(bg_builder);
     BroadcastWorker(bg_do);
+}
+
+void Battleground::SendMessageToPlayer(int32 entry, ChatMsg type, Player const* source)
+{
+    if (!entry)
+        return;
+
+    m_lastMessageId = entry;
+    Trinity::BattlegroundChatBuilder bg_builder(type, entry, source);
+    Trinity::LocalizedPacketDo<Trinity::BattlegroundChatBuilder> bg_do(bg_builder);
+    BroadcastWorker(bg_do, source);
 }
 
 void Battleground::PSendMessageToAll(int32 entry, ChatMsg type, Player const* source, ...)
@@ -1762,26 +1789,16 @@ void Battleground::SendMessage2ToAll(int32 entry, ChatMsg type, Player const* so
     BroadcastWorker(bg_do);
 }
 
-void Battleground::SendTimerToAll(uint8 Flags)
+void Battleground::SendCountdownTimer()
 {
-    if (isArena())
-    {
-        if (Flags & BG_STARTING_EVENT_2)
-        {
-            for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
-                if (Player* player = ObjectAccessor::FindPlayer(itr->first))
-                    player->SendBattlegroundTimer(30, 30);
-        }
-    }
-    else
-    {
-        if (Flags & BG_STARTING_EVENT_3)
-        {
-            for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
-                if (Player* player = ObjectAccessor::FindPlayer(itr->first))
-                    player->SendBattlegroundTimer(30, 30);
-        }
-    }
+    if (m_CountdownTimer <= 0 || m_CountdownTimer >= 30000)
+        return;
+
+    int countdownSec = ceil(float(m_CountdownTimer) / 1000);
+
+    for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+        if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+            player->SendBattlegroundTimer(countdownSec, GetMaxCountdownTimer());
 }
 
 void Battleground::EndNow()

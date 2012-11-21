@@ -113,7 +113,10 @@ enum BattlegroundTimeIntervals
     MAX_OFFLINE_TIME                = 300,                  // secs
     RESPAWN_ONE_DAY                 = 86400,                // secs
     RESPAWN_IMMEDIATELY             = 0,                    // secs
-    BUFF_RESPAWN_TIME               = 180                   // secs
+    BUFF_RESPAWN_TIME               = 180,                  // secs
+    ARENA_COUNTDOWN_MAX             = 60000,                // ms
+    BATTLEGROUND_COUNTDOWN_MAX      = 120000                // ms
+
 };
 
 enum BattlegroundStartTimeIntervals
@@ -396,6 +399,11 @@ class Battleground
         void SetWinner(uint8 winner)        { m_Winner = winner; }
         void SetScriptId(uint32 scriptId)   { ScriptId = scriptId; }
 
+        void ResetCountdownTimer() { m_CountdownTimer = m_IsArena ? ARENA_COUNTDOWN_MAX : BATTLEGROUND_COUNTDOWN_MAX; }
+        void SetCountdownTimer(int Time) { m_CountdownTimer = Time; }
+        void ModifyCountdownTimer(int diff) { m_CountdownTimer -= diff; }
+        int32 GetMaxCountdownTimer() { return m_IsArena ? ARENA_COUNTDOWN_MAX / 1000 : BATTLEGROUND_COUNTDOWN_MAX / 1000; }
+
         void ModifyStartDelayTime(int diff) { m_StartDelayTime -= diff; }
         void SetStartDelayTime(int Time)    { m_StartDelayTime = Time; }
 
@@ -472,6 +480,8 @@ class Battleground
 
         template<class Do>
         void BroadcastWorker(Do& _do);
+        template<class Do>
+        void BroadcastWorker(Do& _do, Player const* player);
 
         void PlaySoundToTeam(uint32 SoundID, uint32 TeamID);
         void PlaySoundToAll(uint32 SoundID);
@@ -486,8 +496,9 @@ class Battleground
 
         void SendWarningToAll(int32 entry, ...);
         void SendMessageToAll(int32 entry, ChatMsg type, Player const* source = NULL);
+        void SendMessageToPlayer(int32 entry, ChatMsg type, Player const* source);
         void PSendMessageToAll(int32 entry, ChatMsg type, Player const* source, ...);
-        void SendTimerToAll(uint8 Flags);
+        void SendCountdownTimer();
 
         // specialized version with 2 string id args
         void SendMessage2ToAll(int32 entry, ChatMsg type, Player const* source, int32 strId1 = 0, int32 strId2 = 0);
@@ -639,6 +650,7 @@ class Battleground
         uint32 m_ClientInstanceID;                          // the instance-id which is sent to the client and without any other internal use
         uint32 m_StartTime;
         uint32 m_ResetStatTimer;
+        int32 m_CountdownTimer;
         uint32 m_ValidStartPositionTimer;
         int32 m_EndTime;                                    // it is set to 120000 when bg is ending and it decreases itself
         uint32 m_LastResurrectTime;
@@ -654,6 +666,7 @@ class Battleground
         uint32 m_PrematureCountDownTimer;
         uint8  m_AllianceAwaitingPlayers;
         uint8  m_HordeAwaitingPlayers;
+        int32  m_lastMessageId;
         char const* m_Name;
         uint64 m_Guid;
 
