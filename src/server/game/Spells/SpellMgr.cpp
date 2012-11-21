@@ -4295,6 +4295,15 @@ void SpellMgr::LoadDbcDataCorrections()
             case 53385:
                 spellInfo->Effects[0].BasePoints = 0;
                 break;
+            // Soul Harvest
+            case 79268:
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_PERIODIC_ENERGIZE;
+                spellInfo->Effects[0].BasePoints = 1;
+                spellInfo->Effects[0].MiscValue = 7;
+                spellInfo->Effects[0].Amplitude = 3000;
+                spellInfo->Effects[1].BasePoints = 15;
+                spellInfo->Effects[1].Amplitude = 3000;
+                break;
             default:
                 break;
         }
