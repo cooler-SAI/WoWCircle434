@@ -6686,64 +6686,27 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             // Light's Beacon - Beacon of Light
             if (dummySpell->Id == 53651)
             {
-                if (!victim)
-                    return false;
-                triggered_spell_id = 0;
-                Unit* beaconTarget = NULL;
-                if (GetTypeId() != TYPEID_PLAYER)
+                // Get target of beacon of light
+                if (Unit* beaconTarget = triggeredByAura->GetBase()->GetCaster())
                 {
-                    beaconTarget = triggeredByAura->GetBase()->GetCaster();
-                    if (!beaconTarget || beaconTarget == this || !(beaconTarget->GetAura(53563, victim->GetGUID())))
+                    // do not proc when target of beacon of light is healed
+                    if (beaconTarget->GetGUID() == GetGUID())
                         return false;
-                    basepoints0 = int32(damage);
-                    triggered_spell_id = procSpell->IsRankOf(sSpellMgr->GetSpellInfo(635)) ? 53652 : 53654;
-                }
-                else
-                {    // Check Party/Raid Group
-                    if (Group* group = ToPlayer()->GetGroup())
-                    {
-                        for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
-                        {
-                            if (Player* member = itr->getSource())
-                            {
-                                // check if it was heal by paladin which casted this beacon of light
-                                if (member->GetAura(53563, victim->GetGUID()))
-                                {
-                                    // do not proc when target of beacon of light is healed
-                                    if (member == this)
-                                        return false;
 
-                                    beaconTarget = member;
-                                    basepoints0 = int32(damage);
-                                    triggered_spell_id = procSpell->IsRankOf(sSpellMgr->GetSpellInfo(635)) ? 53652 : 53654;
-                                    break;
-                                }
-                            }
+                    float healing = 1.0f;
+                    if (procSpell->Id != 635)
+                        healing = 0.5f;
+                    // check if it was heal by paladin which casted this beacon of light
+                    if (beaconTarget->GetAura(53563, victim->GetGUID()))
+                    {
+                        if (beaconTarget->IsWithinLOSInMap(victim))
+                        {
+                            basepoints0 = damage * healing;
+                            victim->CastCustomSpell(beaconTarget, 53652, &basepoints0, 0, 0, true);
+                            return true;
                         }
                     }
                 }
-
-                if (triggered_spell_id && beaconTarget)
-                {
-                    int32 percent = 0;
-                    switch (procSpell->Id)
-                    {
-                        case 85673: // Word of Glory
-                        case 20473: // Holy Shock
-                        case 19750: // Flash of Light
-                        case 82326: // Divine Light
-                        case 85222: // Light of Dawn
-                            percent = triggerAmount; // 50% heal from these spells
-                            break;
-                        case 635:   // Holy Light
-                            percent = triggerAmount * 2; // 100% heal from Holy Light
-                            break;
-                    }
-                    basepoints0 = CalculatePct(damage, percent);
-                    victim->CastCustomSpell(beaconTarget, triggered_spell_id, &basepoints0, NULL, NULL, true, 0, triggeredByAura);
-                    return true;
-                }
-                
                 return false;
             }
             switch (dummySpell->Id)
@@ -12402,7 +12365,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
     // now we ready for speed calculation
     float speed = std::max(non_stack_bonus, stack_bonus);
     if (main_speed_mod)
-        AddPct(speed, main_speed_mod);
+        speed += float(main_speed_mod / 100);
 
     switch (mtype)
     {
