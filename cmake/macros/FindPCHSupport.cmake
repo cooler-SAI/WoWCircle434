@@ -280,18 +280,18 @@ MACRO(ADD_NATIVE_PRECOMPILED_HEADER _targetName _input)
     if (${oldProps} MATCHES NOTFOUND)
         SET(oldProps "")
     endif(${oldProps} MATCHES NOTFOUND)
-	
-	GET_FILENAME_COMPONENT(_name ${_input} NAME)
+    
+    GET_FILENAME_COMPONENT(_name ${_input} NAME)
 
     SET(newProperties "${oldProps} /Yu\"${_name}.h\"")
-	IF( NOT "${ARGN}" STREQUAL "0")
+    IF( NOT "${ARGN}" STREQUAL "0")
 	SET(newProperties "${newProperties}  /FI\"${_name}.h\"")
-	ELSE( NOT "${ARGN}" STREQUAL "0")
+    ELSE( NOT "${ARGN}" STREQUAL "0")
 
 
-	# enable edit and continue if PCH is handled properly and we are building in debug
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")
-	ENDIF( NOT "${ARGN}" STREQUAL "0")
+    # enable edit and continue if PCH is handled properly and we are building in debug
+    #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")
+    ENDIF( NOT "${ARGN}" STREQUAL "0")
     SET_TARGET_PROPERTIES(${_targetName} PROPERTIES COMPILE_FLAGS "${newProperties}")
 
     #also inlude ${oldProps} to have the same compile options
