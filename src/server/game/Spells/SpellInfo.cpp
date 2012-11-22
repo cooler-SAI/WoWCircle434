@@ -2114,11 +2114,11 @@ uint32 SpellInfo::CalcCastTime(Unit* caster, Spell* spell) const
     if (!castTime)
         return 0;
 
-    if (caster)
-        caster->ModSpellCastTime(this, castTime, spell);
-
     if (Attributes & SPELL_ATTR0_REQ_AMMO && (!IsAutoRepeatRangedSpell()))
         castTime += 500;
+
+    if (caster)
+        caster->ModSpellCastTime(this, castTime, spell);
 
     return (castTime > 0) ? uint32(castTime) : 0;
 }
