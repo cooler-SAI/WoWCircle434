@@ -12416,8 +12416,11 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
 
 void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
 {
-    if (rate < 0)
-        rate = 0.0f;
+    if (fabs(rate) <= 0.00000023841858) // From client
+    {
+        sLog->outError(LOG_FILTER_GENERAL, "Failed to set speed of unit [" I64FMT "] to %f, set to %f instead.", uint64(GetGUID()), rate, 1.0f);
+        rate = 1.0f;
+    }
 
     // Update speed only on change
     bool clientSideOnly = m_speed_rate[mtype] == rate;
