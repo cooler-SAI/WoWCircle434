@@ -1316,8 +1316,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     }
                 }
                 // Power Word: Shield
-                else if (m_spellInfo->SpellFamilyFlags[0] & 0x1 && m_spellInfo->SpellFamilyFlags[2] & 0x400 && GetEffect(0))
+                else if (m_spellInfo->SpellFamilyFlags[0] & 0x1 && GetEffect(0))
                 {
+                    // Weakened Soul
+                    caster->CastSpell(GetUnitOwner(), 6788, true);
+
                     // Glyph of Power Word: Shield
                     if (AuraEffect* glyph = caster->GetAuraEffect(55672, 0))
                     {
