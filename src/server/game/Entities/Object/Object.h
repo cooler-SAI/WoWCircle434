@@ -692,6 +692,12 @@ class WorldObject : public Object, public WorldLocation
             MovePosition(pos, dist, angle);
         }
         void MovePositionToFirstCollision(Position &pos, float dist, float angle);
+        inline bool IsOnGround()
+        {
+            float z = this->GetPositionZ();
+            float ground_z = GetMap()->GetHeight(m_positionX, m_positionY, MAX_HEIGHT, true);
+            return fabs(z - ground_z) < 1.0f;
+        }
         void GetFirstCollisionPosition(Position &pos, float dist, float angle)
         {
             GetPosition(&pos);

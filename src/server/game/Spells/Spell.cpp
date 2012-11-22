@@ -1477,7 +1477,27 @@ void Spell::SelectImplicitTargetDestTargets(SpellEffIndex effIndex, SpellImplici
         dist = objSize + (dist - objSize) * (float)rand_norm();
 
     Position pos;
-    target->GetNearPosition(pos, dist, angle);
+    bool checkCollision = false;
+
+    switch (m_spellInfo->Id)
+    {
+        case 36563: // Shadowstep
+        case 57840: // Killing Spree
+            checkCollision = true;
+            break;
+        default:
+            break;
+    }
+
+    if (checkCollision && target->IsOnGround())
+    {
+        target->GetFirstCollisionPosition(pos, dist, angle);
+    }
+    else
+    {
+        target->GetNearPosition(pos, dist, angle);
+    }
+
     m_targets.SetDst(*target);
     m_targets.ModDst(pos);
 }
