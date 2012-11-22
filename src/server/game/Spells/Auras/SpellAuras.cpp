@@ -1497,6 +1497,22 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             caster->CastSpell(target, spellId, true);
                     }
                 }
+                // Shadowburn
+                else if (m_spellInfo->Id == 29341 && aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+                {
+                    if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
+                        caster->ModifyPower(POWER_SOUL_SHARDS, 3);
+                }
+                // Drain Soul
+                else if (m_spellInfo->Id == 1120 && aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+                {
+                    if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
+                        caster->ModifyPower(POWER_SOUL_SHARDS, 3);
+                    
+                    // Glyph of Drain Soul
+                    if (caster->HasAura(58070))
+                        caster->CastSpell(caster, 58068, true);
+                }
                 break;
             case SPELLFAMILY_PRIEST:
                 if (!caster)
