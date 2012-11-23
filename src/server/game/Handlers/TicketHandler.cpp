@@ -231,7 +231,7 @@ void WorldSession::HandleGMResponseResolve(WorldPacket& /*recvPacket*/)
         if (float(rand_chance()) < sWorld->getFloatConfig(CONFIG_CHANCE_OF_GM_SURVEY))
             getSurvey = 1;
 
-        WorldPacket data(SMSG_GMRESPONSE_STATUS_UPDATE, 4);
+        WorldPacket data(SMSG_GMRESPONSE_STATUS_UPDATE, 1);
         data << uint8(getSurvey);
         SendPacket(&data);
 

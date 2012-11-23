@@ -804,7 +804,6 @@ void WorldSession::SendPlayerNotFoundNotice(std::string name)
     WorldPacket data(SMSG_CHAT_PLAYER_NOT_FOUND, name.size()+1);
     data << name;
     SendPacket(&data);
-
 }
 
 void WorldSession::SendPlayerAmbiguousNotice(std::string name)
