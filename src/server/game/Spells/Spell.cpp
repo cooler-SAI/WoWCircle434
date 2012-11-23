@@ -4499,11 +4499,9 @@ void Spell::SendResurrectRequest(Player* target)
     WorldPacket data(SMSG_RESURRECT_REQUEST, (8+4+strlen(resurrectorName)+1+1+1+4));
     data << uint64(m_caster->GetGUID()); // resurrector guid
     data << uint32(strlen(resurrectorName) + 1);
-
     data << resurrectorName;
-    data << uint8(0); // use timer according to client symbols
-
-    data << uint8(m_caster->GetTypeId() == TYPEID_PLAYER ? 0 : 1); // "you'll be afflicted with resurrection sickness"
+    data << uint8(m_caster->GetTypeId() == TYPEID_PLAYER ? 0 : 1); // Script_ResurrectHasSickness
+    data << uint8(0);                                              // Script_ResurrectHasTimer
     // override delay sent with SMSG_CORPSE_RECLAIM_DELAY, set instant resurrection for spells with this attribute
     // 4.2.2 edit : id of the spell used to resurect. (used client-side for Mass Resurect)
     data << uint32(m_spellInfo->Id);
