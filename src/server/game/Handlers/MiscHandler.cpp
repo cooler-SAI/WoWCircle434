@@ -1318,19 +1318,19 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recvData)
 {
-    uint32 time;
     uint32 mapid;
     float PositionX;
     float PositionY;
     float PositionZ;
     float Orientation;
 
-    recvData >> time;                                      // time in m.sec.
     recvData >> mapid;
-    recvData >> PositionX;
+    recvData >> Orientation;
     recvData >> PositionY;
+    recvData >> PositionX;
     recvData >> PositionZ;
-    recvData >> Orientation;                               // o (3.141593 = 180 degrees)
+
+    recvData.rfinish(); // Do not read guid data
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_WORLD_TELEPORT");
 
@@ -1340,7 +1340,7 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recvData)
         return;
     }
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_WORLD_TELEPORT: Player = %s, Time = %u, map = %u, x = %f, y = %f, z = %f, o = %f", GetPlayer()->GetName(), time, mapid, PositionX, PositionY, PositionZ, Orientation);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_WORLD_TELEPORT: Player = %s, Map = %u, x = %f, y = %f, z = %f, o = %f", GetPlayer()->GetName(), mapid, PositionX, PositionY, PositionZ, Orientation);
 
     if (AccountMgr::IsAdminAccount(GetSecurity()))
         GetPlayer()->TeleportTo(mapid, PositionX, PositionY, PositionZ, Orientation);
