@@ -525,8 +525,8 @@ void WorldSession::SendBindPoint(Creature* npc)
 void WorldSession::HandleListStabledPetsOpcode(WorldPacket & recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recv MSG_LIST_STABLED_PETS");
-    uint64 npcGUID;
 
+    uint64 npcGUID;
     recvData >> npcGUID;
 
     if (!CheckStableMaster(npcGUID))
@@ -560,25 +560,24 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
     if (!GetPlayer())
         return;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recv MSG_LIST_STABLED_PETS Send.");
-
-    WorldPacket data(MSG_LIST_STABLED_PETS, 200);           // guess size
-
-    data << uint64 (guid);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Send MSG_LIST_STABLED_PETS.");
 
     Pet* pet = _player->GetPet();
 
+    WorldPacket data(MSG_LIST_STABLED_PETS, 8 + 1 + 1 + 
+        ((pet && pet->isAlive() && pet->getPetType() == HUNTER_PET) ? 17 + strlen(pet->GetName()) : 0) +
+        result ? (result->GetRowCount() * 30) : 0);
+
+    data << uint64(guid);
+
     size_t wpos = data.wpos();
     data << uint8(0);                                       // place holder for slot show number
-
     data << uint8(GetPlayer()->m_stableSlots);
 
-    uint8 num = 0;                                          // counter for place holder
-
-    // not let move dead pet in slot
-    if (pet && pet->isAlive() && pet->getPetType() == HUNTER_PET)
+    uint8 num = 0;
+    if (pet && pet->isAlive() && pet->getPetType() == HUNTER_PET) // not let move dead pet in slot
     {
-        data << uint32(0);                                  // 4.x unknown, some kind of order?
+        data << uint32(0);                                  // 4.x petSlot
         data << uint32(pet->GetCharmInfo()->GetPetNumber());
         data << uint32(pet->GetEntry());
         data << uint32(pet->getLevel());
@@ -593,6 +592,7 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
         {
             Field* fields = result->Fetch();
 
+            data << uint32(0);                              // 4.x petSlot
             data << uint32(fields[1].GetUInt32());          // petnumber
             data << uint32(fields[2].GetUInt32());          // creature entry
             data << uint32(fields[3].GetUInt16());          // level
