@@ -63,7 +63,8 @@ public:
             { "sellerror",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSellErrorCommand,      "", NULL },
             { "setphaseshift",  SEC_ADMINISTRATOR,  false, &HandleDebugSendSetPhaseShiftCommand,  "", NULL },
             { "spellfail",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSpellFailCommand,      "", NULL },
-            { "catCooldown",      SEC_ADMINISTRATOR,  false, &HandleDebugSendCategoryCooldownCommand,      "", NULL },
+            { "catCooldown",    SEC_ADMINISTRATOR,  false, &HandleDebugSendCategoryCooldownCommand,      "", NULL },
+            { "mountresult",    SEC_ADMINISTRATOR,  false, &HandleDebugSendMountResultCommand,    "", NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                                  "", NULL }
         };
 
@@ -243,6 +244,20 @@ public:
 
         uint32 categoryId = (uint32)atoi(result);
         handler->GetSession()->GetPlayer()->SendCategoryCooldown(categoryId, 900000);
+        return true;
+    }
+
+    static bool HandleDebugSendMountResultCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* result = strtok((char*)args, " ");
+        if (!result)
+            return false;
+
+        MountResult error = MountResult(atoi(result));
+        handler->GetSession()->GetPlayer()->SendMountResult(error);
         return true;
     }
 

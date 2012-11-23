@@ -11780,6 +11780,16 @@ void Unit::UpdateMount()
     }
 }
 
+void Unit::SendMountResult(MountResult error)
+{
+    ASSERT(uint32(error) < 0xB);
+    ASSERT(ToPlayer());
+
+    WorldPacket data(SMSG_MOUNTRESULT, 4);
+    data << uint32(error);
+    ToPlayer()->SendDirectMessage(&data);
+}
+
 void Unit::SetInCombatWith(Unit* enemy)
 {
     Unit* eOwner = enemy->GetCharmerOrOwnerOrSelf();
