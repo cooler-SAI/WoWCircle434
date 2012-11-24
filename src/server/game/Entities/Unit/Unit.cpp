@@ -12375,7 +12375,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
     // now we ready for speed calculation
     float speed = std::max(non_stack_bonus, stack_bonus);
     if (main_speed_mod)
-        speed += float(main_speed_mod / 100);
+        AddPct(speed, main_speed_mod);
 
     switch (mtype)
     {

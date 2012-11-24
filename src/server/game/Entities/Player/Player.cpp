@@ -18613,7 +18613,7 @@ bool Player::Satisfy(AccessRequirement const* ar, uint32 target_map, bool report
 
         Difficulty target_difficulty = GetDifficulty(mapEntry->IsRaid());
         MapDifficulty const* mapDiff = GetDownscaledMapDifficultyData(target_map, target_difficulty);
-        if (LevelMin || LevelMax || missingItem || missingQuest || missingAchievement)
+        if (LevelMin || LevelMax || missingItem || missingQuest || missingAchievement || missingLeaderAchievement)
         {
             if (report)
             {
