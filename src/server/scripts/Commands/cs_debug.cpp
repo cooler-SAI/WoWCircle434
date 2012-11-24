@@ -65,6 +65,7 @@ public:
             { "spellfail",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSpellFailCommand,      "", NULL },
             { "catCooldown",    SEC_ADMINISTRATOR,  false, &HandleDebugSendCategoryCooldownCommand,      "", NULL },
             { "mountresult",    SEC_ADMINISTRATOR,  false, &HandleDebugSendMountResultCommand,    "", NULL },
+            { "messagebox",     SEC_ADMINISTRATOR,  false, &HandleDebugSendMessageBoxCommand,     "", NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                                  "", NULL }
         };
 
@@ -258,6 +259,20 @@ public:
 
         MountResult error = MountResult(atoi(result));
         handler->GetSession()->GetPlayer()->SendMountResult(error);
+        return true;
+    }
+
+    static bool HandleDebugSendMessageBoxCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* result = strtok((char*)args, " ");
+        if (!result)
+            return false;
+
+        std::string text = args;
+        handler->GetSession()->GetPlayer()->SendMessageBox(text);
         return true;
     }
 

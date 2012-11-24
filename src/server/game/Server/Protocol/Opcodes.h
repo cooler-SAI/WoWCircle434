@@ -1000,7 +1000,6 @@ enum Opcodes
     SMSG_LFG_DISABLED                                 = 0x0815,
     SMSG_LFG_JOIN_RESULT                              = 0x38B6,
     SMSG_LFG_OFFER_CONTINUE                           = 0x6B27,
-    SMSG_LFG_OPEN_FROM_GOSSIP                         = UNKNOWN_OPCODE,
     SMSG_LFG_PARTY_INFO                               = 0x2325,
     SMSG_LFG_PLAYER_INFO                              = 0x4B36,
     SMSG_LFG_PLAYER_REWARD                            = 0x6834,

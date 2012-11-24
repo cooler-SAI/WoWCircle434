@@ -20232,6 +20232,14 @@ void Player::Whisper(const std::string& text, uint32 language, uint64 receiver)
         ToggleDND();
 }
 
+void Player::SendMessageBox(const std::string& text)
+{
+    WorldPacket data(SMSG_MESSAGE_BOX, 4 + text.size() + 1);
+    data << int(text.size() + 1);
+    data << text.c_str();
+    SendDirectMessage(&data);
+}
+
 void Player::PetSpellInitialize()
 {
     Pet* pet = GetPet();
