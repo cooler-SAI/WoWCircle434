@@ -221,36 +221,35 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvPacket)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Guid " UI64FMTD, uint64(guid));
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Flags %u, time %u", flags, time/IN_MILLISECONDS);
 
-    Player* plMover = _player->m_mover->ToPlayer();
+    ASSERT(_player->m_mover);
+    Player* _playerMover = _player->m_mover->ToPlayer();
 
-    if (!plMover || !plMover->IsBeingTeleportedNear())
+    if (!_playerMover || !_playerMover->IsBeingTeleportedNear())
         return;
 
-    if (guid != plMover->GetGUID())
+    if (guid != _playerMover->GetGUID())
         return;
 
-    plMover->SetSemaphoreTeleportNear(false);
+    _playerMover->SetSemaphoreTeleportNear(false);
 
-    uint32 old_zone = plMover->GetZoneId();
-
-    WorldLocation const& dest = plMover->GetTeleportDest();
-
-    plMover->UpdatePosition(dest, true);
+    WorldLocation const& dest = _playerMover->GetTeleportDest();
+    _playerMover->UpdatePosition(dest, true);
 
     uint32 newzone, newarea;
-    plMover->GetZoneAndAreaId(newzone, newarea);
-    plMover->UpdateZone(newzone, newarea);
+    uint32 old_zone = _playerMover->GetZoneId();
+    _playerMover->GetZoneAndAreaId(newzone, newarea);
+    _playerMover->UpdateZone(newzone, newarea);
 
     // new zone
     if (old_zone != newzone)
     {
         // honorless target
-        if (plMover->pvpInfo.inHostileArea)
-            plMover->CastSpell(plMover, 2479, true);
+        if (_playerMover->pvpInfo.inHostileArea)
+            _playerMover->CastSpell(_playerMover, 2479, true);
 
         // in friendly area
-        else if (plMover->IsPvP() && !plMover->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
-            plMover->UpdatePvP(false, false);
+        else if (_playerMover->IsPvP() && !_playerMover->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
+            _playerMover->UpdatePvP(false, false);
     }
 
     // resummon pet
@@ -573,30 +572,16 @@ void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_HOVER_ACK");
 
-    uint64 guid;                                            // guid - unused
-    recvData.readPackGUID(guid);
-
-    recvData.read_skip<uint32>();                          // unk
-
     MovementInfo movementInfo;
     ReadMovementInfo(recvData, &movementInfo);
-
-    recvData.read_skip<uint32>();                          // unk2
 }
 
 void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_WATER_WALK_ACK");
 
-    uint64 guid;                                            // guid - unused
-    recvData.readPackGUID(guid);
-
-    recvData.read_skip<uint32>();                          // unk
-
     MovementInfo movementInfo;
     ReadMovementInfo(recvData, &movementInfo);
-
-    recvData.read_skip<uint32>();                          // unk2
 }
 
 void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
@@ -604,8 +589,8 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
     if (!_player->isAlive() || _player->isInCombat())
         return;
 
-    uint64 summonerGuid;
     bool agree;
+    uint64 summonerGuid;
     recvData >> summonerGuid;
     recvData >> agree;
 
@@ -1079,10 +1064,8 @@ void WorldSession::WriteMovementInfo(WorldPacket &data, MovementInfo* mi)
                     data << mi->splineElevation;
                 break;
             case MSEZeroBit:
-                data.WriteBit(0);
-                break;
             case MSEOneBit:
-                data.WriteBit(1);
+                data.WriteBit(element == MSEOneBit);
                 break;
             case MSEMovementCounter:
                 data << uint32(0); // counter
