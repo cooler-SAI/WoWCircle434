@@ -2017,18 +2017,19 @@ void WorldSession::HandleObjectUpdateFailedOpcode(WorldPacket& recvPacket)
     Player* player = GetPlayer();
     WorldObject* object = ObjectAccessor::GetWorldObject(*player, guid);
     sLog->outError(LOG_FILTER_NETWORKIO, 
-        "CMSG_OBJECT_UPDATE_FAILED: Object Guid=[" UI64FMTD "] Object Name: [%s] Local Player=[%u, %s] "
+        "CMSG_OBJECT_UPDATE_FAILED: Object Guid=[" UI64FMTD "] Object Name: [%s] ObjectType: %i Local Player=[%u, %s] "
         "Position=(%f, %f, %f) Map=%u", uint64(guid),
-        object ? object->GetName() : "NULL", player->GetGUIDLow(), player->GetName(),
+        object ? object->GetName() : "NULL", object ? int(object->GetTypeId()) : -int(1), player->GetGUIDLow(), player->GetName(),
         player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(),
         player->GetMapId());
+
     if (object && object->ToUnit())
     {
         for (uint8 i = 0; i < MAX_MOVE_TYPE; i++)
         {
             if (!object->ToUnit()->GetSpeed(UnitMoveType(i)))
                 sLog->outError(LOG_FILTER_NETWORKIO, 
-                "CMSG_OBJECT_UPDATE_FAILED: Object's UnitMoveType %u is NULL", i); 
+                "CMSG_OBJECT_UPDATE_FAILED: Object's UnitMoveType %u is zero", i); 
         }
     }
     // workaround to fix visibility objects bug

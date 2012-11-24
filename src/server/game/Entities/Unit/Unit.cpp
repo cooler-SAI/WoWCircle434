@@ -12367,6 +12367,9 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                 GetVehicleBase()->UpdateSpeed(MOVE_FLIGHT, true);
             break;
         }
+        case MOVE_TURN_RATE:
+        case MOVE_PITCH_RATE:
+            return;
         default:
             sLog->outError(LOG_FILTER_UNITS, "Unit::UpdateSpeed: Unsupported move type (%d)", mtype);
             return;
