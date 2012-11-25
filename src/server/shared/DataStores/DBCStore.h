@@ -68,6 +68,8 @@ struct SqlDbc
 template<class T>
 class DBCStorage
 {
+    friend void LoadDBCStores(const std::string&);
+
     typedef std::list<char*> StringPoolList;
     public:
         explicit DBCStorage(const char *f) :
@@ -270,6 +272,32 @@ class DBCStorage
         }
 
     private:
+        void ResizeToFit(uint32 id)
+        {
+            if (id < nCount)
+                return;
+
+            auto newCount = id + 1 + 10;
+            auto newIndexTable = new T*[newCount];
+
+            memcpy(newIndexTable, indexTable.asT, nCount * sizeof(T*));
+            memset(newIndexTable + nCount, 0, (newCount - nCount) * sizeof(T*));
+
+            delete[] (char*)indexTable.asT;
+            indexTable.asT = newIndexTable;
+            nCount = newCount;
+        }
+
+        void Insert(uint32 id, T* value)
+        {
+            if (id >= nCount)
+                ResizeToFit(id);
+
+            ASSERT(!LookupEntry(id));
+
+            indexTable.asT[id] = value;
+        }
+
         char const* fmt;
         uint32 nCount;
         uint32 fieldCount;
