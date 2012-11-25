@@ -1383,10 +1383,10 @@ enum Opcodes
     SMSG_WARGAME_CHECK_ENTRY                          = 0x3DA4,
     SMSG_WARGAME_REQUEST_SENT                         = 0x59B2,
     SMSG_WEATHER                                      = 0x2904,
-    SMSG_WEEKLY_LAST_RESET                            = 0x50A5,
+    SMSG_WEEKLY_LAST_RESET                            = 0x50A5, // uint32
     SMSG_WEEKLY_RESET_CURRENCY                        = 0x3CA1,
-    SMSG_WEEKLY_SPELL_USAGE                           = 0x39B7,
-    SMSG_WEEKLY_SPELL_USAGE_UPDATE                    = 0x11B5,
+    SMSG_WEEKLY_SPELL_USAGE                           = 0x39B7, // sub_6DEA10
+    SMSG_WEEKLY_SPELL_USAGE_UPDATE                    = 0x11B5, // sub_6AEF10
     SMSG_WHO                                          = 0x6907,
     SMSG_WHOIS                                        = 0x6917,
     SMSG_WORLD_SERVER_INFO                            = 0x31A2,

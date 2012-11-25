@@ -399,6 +399,8 @@ typedef UNORDERED_MAP<int32, TrinityStringLocale> TrinityStringLocaleContainer;
 typedef UNORDERED_MAP<uint32, GossipMenuItemsLocale> GossipMenuItemsLocaleContainer;
 typedef UNORDERED_MAP<uint32, PointOfInterestLocale> PointOfInterestLocaleContainer;
 
+typedef std::multiset<uint32> QuestObject;
+typedef std::map<uint32, QuestObject> QuestStarter;
 typedef std::multimap<uint32, uint32> QuestRelations;
 typedef std::pair<QuestRelations::const_iterator, QuestRelations::const_iterator> QuestRelationBounds;
 
@@ -863,6 +865,16 @@ class ObjectMgr
         {
             return &_creatureQuestRelations;
         }
+        
+        QuestStarter* GetCreatureQuestStarterMap()
+        {
+            return &_creatureQuestStarter;
+        }
+        
+        QuestStarter* GetGOQuestStarterMap()
+        {
+            return &_goQuestStarter;
+        }
 
         QuestRelationBounds GetCreatureQuestRelationBounds(uint32 creature_entry)
         {
@@ -1293,6 +1305,9 @@ class ObjectMgr
         QuestRelations _goQuestInvolvedRelations;
         QuestRelations _creatureQuestRelations;
         QuestRelations _creatureQuestInvolvedRelations;
+        
+        QuestStarter _goQuestStarter;
+        QuestStarter _creatureQuestStarter;
 
         //character reserved names
         typedef std::set<std::wstring> ReservedNamesContainer;
@@ -1322,7 +1337,7 @@ class ObjectMgr
     private:
         void LoadScripts(ScriptsType type);
         void CheckScripts(ScriptsType type, std::set<int32>& ids);
-        void LoadQuestRelationsHelper(QuestRelations& map, std::string table, bool starter, bool go);
+        void LoadQuestRelationsHelper(QuestRelations& map, QuestStarter& _map, std::string table, bool starter, bool go);
         void PlayerCreateInfoAddItemHelper(uint32 race_, uint32 class_, uint32 itemId, int32 count);
 
         MailLevelRewardContainer _mailLevelRewardStore;
