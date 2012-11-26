@@ -1187,11 +1187,43 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
     // mods at aura apply
     if (apply)
     {
+        // Need for worshipping, Cho'gall, unique mechanic
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            if (!HasEffect(i))
+                continue;
+
+            if (AuraEffect* aurEff = GetEffect(i))
+            {
+                switch (aurEff->GetAuraType())
+                {
+                    case SPELL_AURA_MOD_CONFUSE:
+                    case SPELL_AURA_MOD_CHARM:
+                    case SPELL_AURA_MOD_FEAR:
+                    case SPELL_AURA_MOD_STUN:
+                    case SPELL_AURA_MOD_SILENCE:
+                        target->RemoveAurasDueToSpell(91317);
+                        target->RemoveAurasDueToSpell(93365);
+                        target->RemoveAurasDueToSpell(93366);
+                        target->RemoveAurasDueToSpell(93367);
+                        break;
+                }
+            }
+        }
+
         switch (GetSpellInfo()->SpellFamilyName)
         {
             case SPELLFAMILY_GENERIC:
                 switch (GetId())
                 {
+                    // Arion - Swirling Winds
+                    case 83500:
+                        target->RemoveAurasDueToSpell(83581);
+                        break;
+                    // Terrastra - Grounded
+                    case 83581:
+                        target->RemoveAurasDueToSpell(83500);
+                        break;
                     case 32474: // Buffeting Winds of Susurrus
                         if (target->GetTypeId() == TYPEID_PLAYER)
                             target->ToPlayer()->ActivateTaxiPathTo(506, GetId());

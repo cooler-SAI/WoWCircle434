@@ -4157,6 +4157,393 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // ENDOF GRIM BATOL SPELLS
             //
+            // BASTION OF TWILIGHT SPELLS
+            //
+            // Trash
+            case 85647: // Mind Sear dmg
+                spellInfo->Effects[2].SetRadiusIndex(13);
+                break;
+            case 85697:
+                spellInfo->Effects[2].SetRadiusIndex(29);
+                break;
+
+            // Halfus Wyrmbreaker
+            //
+            case 83710: // Furious Roar
+            case 86169:
+            case 86170:
+            case 86171:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                spellInfo->Effects[1].SetRadiusIndex(28);
+                spellInfo->Effects[2].SetRadiusIndex(28);
+                break;
+            case 83719: // Fireball Barrage T
+                spellInfo->Effects[0].TargetA = 1;
+                break;
+            case 83855: // Scorching Breath dmg
+            case 86163:
+            case 86164:
+            case 86165:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 83734: // Fireball Barrage dmg0
+            case 86154:
+            case 86155:
+            case 86156:
+            case 83721: // Fireball Barrage dmg1
+            case 86151:
+            case 86152:
+            case 86153:
+                spellInfo->Effects[0].SetRadiusIndex(26);
+                break;
+            //
+            // - Theralion & Valiona
+            //
+            case 86380: // Dazzling Destruction Summon Missile
+            case 92923:
+            case 92924:
+            case 92925:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 86369: // Twilight Blast
+            case 92898:
+            case 92899:
+            case 92900:
+                spellInfo->Speed = 15;
+                break;
+            case 86371: // Twilight Blast dmg
+            case 92903:
+            case 92904:
+            case 92905:
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                break;
+            case 86386: // Dazzling Destruction Missile
+            case 92920:
+            case 92921:
+            case 92922:
+                spellInfo->Speed = 15;
+                break;
+            case 86406: // Dazzling Destruction dmg
+            case 92926:
+            case 92927:
+            case 92928:
+                spellInfo->Effects[0].SetRadiusIndex(32);
+                spellInfo->Effects[1].SetRadiusIndex(32);
+                spellInfo->Effects[1].TargetB = 15;
+                break;
+            case 86505: // Fabolous Flames dmg
+            case 92907:
+            case 92908:
+            case 92909:
+                spellInfo->Effects[0].SetRadiusIndex(32);
+                break;
+            case 86607: // Engulfing Magic
+            case 92912:
+            case 92913:
+            case 92914:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 86825: // Blackout dmg
+            case 92879:
+            case 92880:
+            case 92881:
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                break;
+            case 86013: // Twilight Meteorite
+            case 92859:
+            case 92860:
+            case 92861:
+                spellInfo->Speed = 15;
+                break;
+            case 86014: // Twilight Meteorite dmg
+            case 92863:
+            case 92864:
+            case 92865:
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                break;
+            case 88518: // Twilight Meteorite Mark
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 86199: // Twilight Flame dmg1
+            case 92868:
+            case 92869:
+            case 92870:
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                spellInfo->Effects[1].Effect = 0;
+                spellInfo->Effects[2].SetRadiusIndex(14);
+                break;
+            case 86228: // Twilight Flame dmg2
+            case 92867:
+                spellInfo->TargetAuraSpell = 0;
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                break;
+            case 86305: // Unstable Twilight dmg
+            case 92882:
+            case 92883:
+            case 92884:
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                break;
+            case 86202: // Twilight Shift Aura 1
+            case 92889:
+            case 92890:
+            case 92891:
+            case 88436: // Twilight Shift Aura 2
+            case 92892:
+            case 92893:
+            case 92894:
+                spellInfo->Effects[0].MiscValue = 16;
+                break;
+            case 86210: // Twilight Zone
+                spellInfo->Effects[0].Effect = 0;
+                break;
+            case 86214: // Twilight Zone dmg
+            case 92885:
+            case 92886:
+            case 92887:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                spellInfo->Effects[1].SetRadiusIndex(28);
+                break;
+            case 93019: // Rift Blast
+            case 93020:
+                spellInfo->MaxAffectedTargets = 1;
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 93055: // Shifting Reality
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                break;
+            // Cho'gall
+            case 91303: // Conversion
+            case 93203:
+            case 93204:
+            case 93205:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 81571: // Unleashed Shadows dmg
+            case 93221:
+            case 93222:
+            case 93223:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 81538: // Blaze dmg
+            case 93212:
+            case 93213:
+            case 93214:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                break;
+            case 81713: // Depravity
+            case 93175:
+            case 93176:
+            case 93177:
+                spellInfo->Effects[0].SetRadiusIndex(9);
+                break;
+            case 81761: // Spilled Blood of the Old God dmg
+            case 93172:
+            case 93173:
+            case 93174:
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                spellInfo->Effects[1].SetRadiusIndex(13);
+                break;
+            case 82919: // Sprayed Corruption
+            case 93108:
+            case 93109:
+            case 93110:
+                spellInfo->Effects[0].SetRadiusIndex(9);
+                spellInfo->Effects[1].SetRadiusIndex(9);
+                break;
+            case 82299: // Fester Blood
+                spellInfo->Effects[0].TargetA = 1;
+                spellInfo->Effects[0].TargetB = 0;
+                spellInfo->Effects[0].Effect = 3;
+                spellInfo->Effects[1].Effect = 0;
+                break;
+            case 82630: // Comsume Blood of the Old God
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                spellInfo->Effects[1].SetRadiusIndex(28);
+                spellInfo->Effects[2].SetRadiusIndex(28);
+                break;
+            case 82414: // Darkened Creations
+            case 93160:
+            case 93161:
+            case 93162:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 82433: // Darkened Creations sum
+                spellInfo->Effects[0].TargetA = 1;
+                break;
+            case 82361: // Corruption of the Old God
+                spellInfo->Effects[1].Effect = 0;
+                break;
+            case 82363: // Corruption of the Old God dmg
+            case 93169:
+            case 93170:
+            case 93171:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                spellInfo->Effects[1].SetRadiusIndex(28);
+                break;
+            case 82151: // Shadow Bolt
+            case 93193:
+            case 93194:
+            case 93195:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 91317: // Worshipping
+            case 93365:
+            case 93366:
+            case 93367:
+                spellInfo->Effects[2].Effect = 0;
+            case 91331: // Twisted Devotion
+            case 93206:
+            case 93207:
+            case 93208:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 93103: // Corrupted Blood aura
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                spellInfo->ExcludeTargetAuraSpell = 93103;
+                break;
+            // Sinestra
+            case 95822: // Twilight Flame dmg
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                break;
+            case 95855: // Call of Flames
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 89435: // Wrack aoe
+            case 92956:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 89421: // Wrack dmg
+            case 92955:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_DONE_PCT_DAMAGE_MODS;
+                break;
+            case 90028: // Unleash Essence
+            case 92947:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 90045: // Indomitable dmg
+            case 92946:
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                spellInfo->Effects[1].SetRadiusIndex(14);
+                break;
+            case 87655: // Twilight Infusion dummy
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 87231: // Fiery Barrier aura
+                spellInfo->Effects[0].SetRadiusIndex(10);
+                break;
+            case 88146: // Twilight Essence dmg
+                spellInfo->Effects[0].SetRadiusIndex(22);
+                spellInfo->Effects[1].SetRadiusIndex(22);
+                break;
+            case 92950: // Twilight Essence dmg
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                spellInfo->Effects[1].SetRadiusIndex(14);
+                break;
+            case 92852: // Twilight Slicer dmg
+            case 92954:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 95564: // Twilight Infusion missile
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 89299: // Twilight Spit dmg
+            case 92953:
+                spellInfo->AttributesEx3  |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 92958: // Twilight Pulse dmg
+            case 92959:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                break;
+            // Council of Ascendents
+            case 82746: // Glaciate
+            case 92506:
+            case 92507:
+            case 92508:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                spellInfo->Effects[1].SetRadiusIndex(28);
+                break;
+            case 92548: // Glaciate 2
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 82699: // Water Bomb
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 82762: // Waterlogged
+                spellInfo->Effects[0].SetRadiusIndex(29);
+                break;
+            case 77347: // Water Bomb Summon
+                spellInfo->Effects[0].SetRadiusIndex(12);
+                spellInfo->Effects[1].SetRadiusIndex(12);
+                break;
+            case 82666: // Frost Imbued
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                break;
+            case 82859: // Inferno Rush
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 82856: // Inferno Jump
+                spellInfo->Effects[1].Effect = 0;
+                break;
+            case 82663: // Flame Imbued
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                break;
+            case 83067: // Thundershock
+            case 92469:
+            case 92470:
+            case 92471:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 83099: // Lightning Rod
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 83300: // Chain Lightning dummy
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 83282: // Chain Lightning
+            case 92448:
+            case 92449:
+            case 92450:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                break;
+            case 83070: // Lightning Blast
+            case 92454:
+            case 92455:
+            case 92456:
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[0].TargetB = 0;
+                spellInfo->Effects[1].Effect = 0;
+                break;
+            case 83078: // Disperse 1
+                spellInfo->Effects[0].Effect = 0;
+                break;
+            case 83565: // Quake
+            case 92544:
+            case 92545:
+            case 92546:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            case 84915: // Liquid Ice dmg
+            case 92497:
+            case 92498:
+            case 92499:
+                spellInfo->Effects[0].SetRadiusIndex(8);
+                spellInfo->Effects[1].SetRadiusIndex(8);
+                break;
+            case 84948: // Gravity Crush
+            case 92486:
+            case 92487:
+            case 92488:
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                spellInfo->Effects[1].SetRadiusIndex(28);
+                spellInfo->Effects[2].SetRadiusIndex(28);
+                break;
+            case 84913: // Lava Seed
+                spellInfo->Effects[0].SetRadiusIndex(28);
+                break;
+            // ENDOF BASTION OF TWILIGHT SPELLS
+            //
             // Camouflage
             case 80325:
                 spellInfo->Effects[EFFECT_1].Effect = 0;
@@ -4301,8 +4688,8 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].BasePoints = 1;
                 spellInfo->Effects[0].MiscValue = 7;
                 spellInfo->Effects[0].Amplitude = 3000;
-                spellInfo->Effects[1].BasePoints = 15;
-                spellInfo->Effects[1].Amplitude = 3000;
+                spellInfo->Effects[1].BasePoints = 5;
+                spellInfo->Effects[1].Amplitude = 1000;
                 break;
             default:
                 break;
