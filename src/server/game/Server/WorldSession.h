@@ -537,6 +537,7 @@ class WorldSession
         void HandleRequestVehicleExit(WorldPacket& recvData);
         void HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData);
         void HandleMoveTimeSkippedOpcode(WorldPacket& recvData);
+        void BuildMoveUpdatePacket(Unit* mover, MovementInfo* movementInfo, Player* skip = NULL);
 
         void HandleRequestRaidInfoOpcode(WorldPacket& recvData);
 

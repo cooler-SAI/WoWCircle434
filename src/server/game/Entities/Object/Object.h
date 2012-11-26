@@ -604,6 +604,10 @@ struct MovementInfo
     void SetFallTime(uint32 time) { fallTime = time; }
 
     void OutDebug();
+
+    bool Check(Player* target);
+    bool AcceptClientChanges(Player* player, MovementInfo& client);
+    bool HasTransportData() const { return t_guid != 0LL; }
 };
 
 #define MAPID_INVALID 0xFFFFFFFF

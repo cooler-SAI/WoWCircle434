@@ -1445,6 +1445,160 @@ void MovementInfo::OutDebug()
         sLog->outInfo(LOG_FILTER_GENERAL, "splineElevation: %f", splineElevation);
 }
 
+bool MovementInfo::Check(Player* target)
+{
+    Unit* mover = target->m_mover;
+    ASSERT(mover != NULL);                                  // there must always be a mover
+
+    Player* plMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL;
+
+    // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
+    if (plMover && plMover->IsBeingTeleported())
+    {
+        sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Session %u Mover is being teleported",
+            target->GetSession()->GetAccountId()
+            );
+        return false;
+    }
+
+    if (!pos.IsPositionValid())
+    {
+        sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Session %u Invalid Position: (%f,%f,%f,%f)",
+            target->GetSession()->GetAccountId(),
+            pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()
+            );
+        return false;
+    }
+
+    if (mover->GetGUID() != guid)
+    {
+        sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Session %u Invalid mover guid: client's " I64FMT " vs server's " I64FMT,
+            target->GetSession()->GetAccountId(),
+            guid, mover->GetGUID()
+            );
+        return false;
+    }
+
+    /* handle special cases */
+    if (HasTransportData())
+    {
+        // transports size limited
+        // (also received at zeppelin leave by some reason with t_* as absolute in continent coordinates, can be safely skipped)
+        if (!t_pos.IsPositionValid() ||
+            t_pos.GetPositionX() > 50 || t_pos.GetPositionY() > 50 || t_pos.GetPositionZ() > 50)
+        {
+            sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Session %u Invalid transport coords (%f, %f, %f)",
+                target->GetSession()->GetAccountId(),
+                t_pos.GetPositionX(), t_pos.GetPositionY(), t_pos.GetPositionZ()
+                );
+            return false;
+        }
+
+        if (!Trinity::IsValidMapCoord(pos.GetPositionX() + t_pos.GetPositionX(), pos.GetPositionY() + t_pos.GetPositionY(),
+            pos.GetPositionZ() + t_pos.GetPositionZ(), pos.GetOrientation() + t_pos.GetOrientation()))
+        {
+            sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Session %u Invalid transport coords (%f, %f, %f)",
+                target->GetSession()->GetAccountId(),
+                t_pos.GetPositionX(), t_pos.GetPositionY(), t_pos.GetPositionZ()
+                );
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool MovementInfo::AcceptClientChanges(Player* player, MovementInfo& client)
+{
+    Unit* mover = player->m_mover;
+    ASSERT(mover != NULL);                                  // there must always be a mover
+
+    Player* plMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL;
+
+    if (!client.Check(player))
+        return false;
+
+    /* handle special cases */
+    if (client.HasTransportData())
+    {
+        // if we boarded a transport, add us to it
+        if (plMover && !plMover->GetTransport())
+        {
+            // elevators also cause the client to send HasTransportData - just dismount if the guid can be found in the transport list
+            for (MapManager::TransportSet::const_iterator iter = sMapMgr->m_Transports.begin(); iter != sMapMgr->m_Transports.end(); ++iter)
+            {
+                if ((*iter)->GetGUID() == client.t_guid)
+                {
+                    plMover->SetTransport(*iter);
+                    (*iter)->AddPassenger(plMover);
+                    break;
+                }
+            }
+        }
+
+        if (!mover->GetTransport() && !mover->GetVehicle())
+        {
+            GameObject* go = mover->GetMap()->GetGameObject(client.t_guid);
+            if (!go || go->GetGoType() != GAMEOBJECT_TYPE_TRANSPORT)
+                client.t_guid = 0;
+        }
+    }
+    else if (plMover && plMover->GetTransport())                // if we were on a transport, leave
+    {
+        plMover->GetTransport()->RemovePassenger(plMover);
+        plMover->SetTransport(NULL);
+        client.t_pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
+        client.t_time = 0;
+        client.t_seat = -1;
+    }
+
+    // this is almost never true (not sure why it is sometimes, but it is), normally use mover->IsVehicle()
+    if (mover->GetVehicle())
+    {
+        mover->SetOrientation(client.pos.GetOrientation());
+        return false;
+    }
+
+    mover->UpdatePosition(client.pos);
+
+    if (plMover && ((client.flags & MOVEMENTFLAG_SWIMMING) != 0) != plMover->IsInWater())
+    {
+        // now client not include swimming flag in case jumping under water
+        plMover->SetInWater(!plMover->IsInWater() || plMover->GetBaseMap()->IsUnderWater(client.pos.GetPositionX(), client.pos.GetPositionY(), client.pos.GetPositionZ()));
+    }
+
+    memcpy(this, &client, sizeof(MovementInfo));
+    this->time = getMSTime();
+
+    if (plMover)                                            // nothing is charmed, or player charmed
+    {
+        plMover->UpdateFallInformationIfNeed(client, 0);
+
+        if (client.pos.GetPositionZ() < -500.0f)
+        {
+            if (!(plMover->InBattleground()
+                && plMover->GetBattleground()
+                && plMover->GetBattleground()->HandlePlayerUnderMap(player)))
+            {
+                // NOTE: this is actually called many times while falling
+                // even after the player has been teleported away
+                // TODO: discard movement packets after the player is rooted
+                if (plMover->isAlive())
+                {
+                    plMover->EnvironmentalDamage(DAMAGE_FALL_TO_VOID, player->GetMaxHealth());
+                    // player can be alive if GM/etc
+                    // change the death state to CORPSE to prevent the death timer from
+                    // starting in the next player update
+                    if (!plMover->isAlive())
+                        plMover->KillPlayer();
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
 WorldObject::WorldObject(bool isWorldObject): WorldLocation(),
 m_name(""), m_isActive(false), m_isWorldObject(isWorldObject), m_zoneScript(NULL),
 m_transport(NULL), m_currMap(NULL), m_InstanceId(0),
