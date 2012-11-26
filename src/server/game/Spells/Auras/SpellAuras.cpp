@@ -1332,8 +1332,18 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_PRIEST:
                 if (!caster)
                     break;
+                // Inner Fire
+                if (GetSpellInfo()->Id == 588)
+                {
+                    // Inner Sanctum
+                    if (AuraEffect * aur = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 51, 0))
+                    {
+                        int32 basepoints = -aur->GetAmount();
+                        caster->CastCustomSpell(caster, 91724, &basepoints, 0, 0, true);
+                    }
+                }
                 // Devouring Plague
-                if (GetSpellInfo()->SpellFamilyFlags[0] & 0x02000000 && GetEffect(0))
+                else if (GetSpellInfo()->SpellFamilyFlags[0] & 0x02000000 && GetEffect(0))
                 {
                     // Improved Devouring Plague
                     if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3790, 0))
