@@ -4691,6 +4691,13 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[1].BasePoints = 5;
                 spellInfo->Effects[1].Amplitude = 1000;
                 break;
+            // Improved Mind Blast
+            case 15273:
+            case 15312:
+            case 15313:
+                spellInfo->Effects[1].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_DUMMY;
+                break;
             default:
                 break;
         }

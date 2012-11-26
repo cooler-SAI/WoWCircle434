@@ -497,22 +497,26 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             }
             case SPELLFAMILY_PRIEST:
             {
-                // Improved Mind Blast (Mind Blast in shadow form bonus)
-                if (m_caster->GetShapeshiftForm() == FORM_SHADOW && (m_spellInfo->SpellFamilyFlags[0] & 0x00002000))
+                // Mind Blast - applies Mind Trauma if:
+                if (m_spellInfo->Id == 8092)
                 {
-                    Unit::AuraEffectList const& ImprMindBlast = m_caster->GetAuraEffectsByType(SPELL_AURA_ADD_FLAT_MODIFIER);
-                    for (Unit::AuraEffectList::const_iterator i = ImprMindBlast.begin(); i != ImprMindBlast.end(); ++i)
-                    {
-                        if ((*i)->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_PRIEST &&
-                            ((*i)->GetSpellInfo()->SpellIconID == 95))
-                        {
-                            int chance = (*i)->GetSpellInfo()->Effects[EFFECT_1].CalcValue(m_caster);
-                            if (roll_chance_i(chance))
-                                // Mind Trauma
-                                m_caster->CastSpell(unitTarget, 48301, true, 0);
-                            break;
-                        }
-                    }
+                    // We are in Shadow Form
+                    if (m_caster->GetShapeshiftForm() == FORM_SHADOW)
+                        if (AuraEffect* aur = m_caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PRIEST, 95, 1))
+                            if (roll_chance_i(aur->GetAmount()))
+                                m_caster->CastSpell(unitTarget, 48301, true); 
+
+                    //Mind Melt Aura remove
+                    m_caster->RemoveAurasDueToSpell(87160);
+                    m_caster->RemoveAurasDueToSpell(81292);
+                }
+                // Mind Spike - removing dots
+                else if (m_spellInfo->Id == 73510)
+                {
+                    unitTarget->RemoveAurasDueToSpell(34914, m_caster->GetGUID());
+                    unitTarget->RemoveAurasDueToSpell(2944, m_caster->GetGUID());
+                    unitTarget->RemoveAurasDueToSpell(589, m_caster->GetGUID());
+                    break;
                 }
                 // Shadow Apparition
                 else if (m_spellInfo->Id == 87532)

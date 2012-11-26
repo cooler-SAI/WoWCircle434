@@ -10177,6 +10177,16 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
                     if (victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x100000, 0, 0, GetGUID()))
                         AddPct(DoneTotalMod, aurEff->GetAmount());
             }
+            // Triple damage for Shadow word: death
+            else if (spellProto->Id == 32379)
+                if (victim->GetHealthPct() < 25)
+                {
+                    int32 mod = 300;
+                    // Mind Melt
+                    if (AuraEffect* aur = GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3139, 0))
+                        mod += aur->GetAmount();
+                    AddPct(DoneTotalMod, 300);
+                }
             break;
         case SPELLFAMILY_WARLOCK:
             // Fire and Brimstone
