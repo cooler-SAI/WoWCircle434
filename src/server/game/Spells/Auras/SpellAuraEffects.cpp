@@ -592,22 +592,26 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                     break;
                 case SPELLFAMILY_PRIEST:
                     // Power Word: Shield
-                    if (GetSpellInfo()->SpellFamilyFlags[0] & 0x1)
+                    if (GetSpellInfo()->Id == 17)
                     {
-                        // +80.68% from sp bonus
-                        DoneActualBenefit += caster->SpellBaseHealingBonusDone(m_spellInfo->GetSchoolMask()) * 0.8068f;
+                        //+87% from sp bonus
+                        float bonus = 0.87f;
+
+                        DoneActualBenefit += caster->SpellBaseHealingBonusDone(SpellSchoolMask(m_spellInfo->SchoolMask)) * bonus;
                         DoneActualBenefit *= caster->CalculateLevelPenalty(GetSpellInfo());
+                        amount += (int32)DoneActualBenefit;
 
-                        amount += int32(DoneActualBenefit);
+                        // Improved Power Word: Shield
+                        if (AuraEffect const* pAurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 566, 0))
+                            amount = int32(amount * (100.0f + pAurEff->GetAmount()) / 100.0f);
 
-                        // Twin Disciplines
-                        if (AuraEffect const* pAurEff = caster->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, SPELLFAMILY_PRIEST, 2292, 0))
-                            AddPct(amount, pAurEff->GetAmount());
-
+                        // Focused Power
                         // Reuse variable, not sure if this code below can be moved before Twin Disciplines
-                        DoneActualBenefit = float(amount);
-                        DoneActualBenefit *= caster->GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
-                        amount = int32(DoneActualBenefit);
+                        amount *= caster->GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
+
+                        // Mastery Priest
+                        if (Aura* aur = caster->GetAura(77484))
+                            AddPct(amount, aur->GetEffect(0)->GetAmount());
 
                         return amount;
                     }
@@ -6438,6 +6442,13 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
                 case 72855: // Unbound Plague
                 case 72856: // Unbound Plague
                     damage *= uint32(pow(1.25f, int32(m_tickNumber)));
+                    break;
+                // Sinestra - Wrack
+                case 89435:
+                case 92956:
+                case 89421:
+                case 92955:
+                    damage = m_tickNumber * 2000;
                     break;
                 default:
                     break;
