@@ -277,8 +277,8 @@ class DBCStorage
             if (id < nCount)
                 return;
 
-            auto newCount = id + 1 + 10;
-            auto newIndexTable = new T*[newCount];
+            unsigned int newCount = id + 1 + 10;
+            T** newIndexTable = new T*[newCount];
 
             memcpy(newIndexTable, indexTable.asT, nCount * sizeof(T*));
             memset(newIndexTable + nCount, 0, (newCount - nCount) * sizeof(T*));
