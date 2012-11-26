@@ -291,18 +291,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
 
 void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
 {
-    uint32 opcode = recvData.GetOpcode();
-
-    MovementInfo movementInfo;
-    ReadMovementInfo(recvData, &movementInfo);
-
-    // now can skip not our packet
-    if (_player->GetGUID() != movementInfo.guid)
-    {
-        recvData.rfinish();                   // prevent warnings spam
-        return;
-    }
-
     // client ACK send one packet for mounted/run case and need skip all except last from its
     // in other cases anti-cheat check can be fail in false case
     UnitMoveType move_type;
@@ -310,7 +298,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
 
     static char const* move_type_name[MAX_MOVE_TYPE] = {  "Walk", "Run", "RunBack", "Swim", "SwimBack", "TurnRate", "Flight", "FlightBack", "PitchRate" };
 
-    switch (opcode)
+    switch (recvData.GetOpcode())
     {
         case CMSG_MOVE_FORCE_WALK_SPEED_CHANGE_ACK:          move_type = MOVE_WALK;          force_move_type = MOVE_WALK;        break;
         case CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK:           move_type = MOVE_RUN;           force_move_type = MOVE_RUN;         break;
@@ -322,8 +310,18 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
         case CMSG_MOVE_FORCE_FLIGHT_BACK_SPEED_CHANGE_ACK:   move_type = MOVE_FLIGHT_BACK;   force_move_type = MOVE_FLIGHT_BACK; break;
         case CMSG_MOVE_FORCE_PITCH_RATE_CHANGE_ACK:          move_type = MOVE_PITCH_RATE;    force_move_type = MOVE_PITCH_RATE;  break;*/
         default:
-            //sLog->outError(LOG_FILTER_NETWORKIO, "WorldSession::HandleForceSpeedChangeAck: Unknown move type opcode: %u", opcode);
+            //sLog->outError(LOG_FILTER_NETWORKIO, "WorldSession::HandleForceSpeedChangeAck: Unknown move type opcode: %u", uint32(recvData.GetOpcode()));
             return;
+    }
+
+    MovementInfo movementInfo;
+    ReadMovementInfo(recvData, &movementInfo);
+
+    // now can skip not our packet
+    if (_player->GetGUID() != movementInfo.guid)
+    {
+        recvData.rfinish();                   // prevent warnings spam
+        return;
     }
 
     // skip all forced speed changes except last and unexpected
