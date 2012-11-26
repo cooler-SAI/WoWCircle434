@@ -6077,6 +6077,24 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             switch (dummySpell->Id)
             {
+                // Evangelism  Rank 1
+                case 81659: 
+                {
+                    if (procSpell->Id == 15407)
+                        triggered_spell_id = 87117;
+                    else
+                        triggered_spell_id = 81660;
+                    break;
+                }
+                // Evangelism  Rank 2
+                case 81662: 
+                {
+                    if (procSpell->Id == 15407)
+                        triggered_spell_id = 87118;
+                    else
+                        triggered_spell_id = 81661;
+                    break;
+                }
                 // Vampiric Embrace
                 case 15286:
                 {
