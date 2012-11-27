@@ -154,7 +154,10 @@ public:
         std::string str = handler->GetTrinityString(LANG_GLOBAL_NOTIFY);
         str += args;
 
-        WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
+        size_t len = str.size() + 1;
+        WorldPacket data(SMSG_NOTIFICATION, 2 + len);
+        data.WriteBits(len, 13);
+        data.FlushBits();
         data << str;
         sWorld->SendGlobalMessage(&data);
 
@@ -169,7 +172,10 @@ public:
         std::string str = handler->GetTrinityString(LANG_GM_NOTIFY);
         str += args;
 
-        WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
+        size_t len = str.size() + 1;
+        WorldPacket data(SMSG_NOTIFICATION, 2 + len);
+        data.WriteBits(len, 13);
+        data.FlushBits();
         data << str;
         sWorld->SendGlobalGMMessage(&data);
 

@@ -675,20 +675,21 @@ void Battleground::SendPacketToTeam(uint32 TeamID, WorldPacket* packet, Player* 
 
 void Battleground::PlaySoundToAll(uint32 SoundID)
 {
-    WorldPacket data;
-    sBattlegroundMgr->BuildPlaySoundPacket(&data, SoundID);
-    SendPacketToAll(&data);
+    for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    {
+        if (Player* player = _GetPlayer(itr, "SendPacketToAll"))
+            player->SendSound(SoundID, player->GetGUID());
+    }
 }
 
 void Battleground::PlaySoundToTeam(uint32 SoundID, uint32 TeamID)
 {
     WorldPacket data;
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    {
         if (Player* player = _GetPlayerForTeam(TeamID, itr, "PlaySoundToTeam"))
-        {
-            sBattlegroundMgr->BuildPlaySoundPacket(&data, SoundID);
-            player->GetSession()->SendPacket(&data);
-        }
+            player->SendSound(SoundID, player->GetGUID());
+    }
 }
 
 void Battleground::CastSpellOnTeam(uint32 SpellID, uint32 TeamID)

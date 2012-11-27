@@ -969,17 +969,51 @@ public:
         target->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
         target->Mount(mId);
 
-        WorldPacket data(SMSG_MOVE_SET_RUN_SPEED, (8+4+1+4));
-        data.append(target->GetPackGUID());
-        data << (uint32)0;
-        data << (uint8)0;                                       //new 2.1.0
+        WorldPacket data;
+        ObjectGuid guid = target->GetGUID();
+        
+        data.Initialize(SMSG_MOVE_SET_RUN_SPEED, 1 + 8 + 4 + 4);
+        data.WriteBit(guid[6]);
+        data.WriteBit(guid[1]);
+        data.WriteBit(guid[5]);
+        data.WriteBit(guid[2]);
+        data.WriteBit(guid[7]);
+        data.WriteBit(guid[0]);
+        data.WriteBit(guid[3]);
+        data.WriteBit(guid[4]);
+        data.WriteByteSeq(guid[5]);
+        data.WriteByteSeq(guid[3]);
+        data.WriteByteSeq(guid[1]);
+        data.WriteByteSeq(guid[4]);
+        data << uint32(0);
         data << float(speed);
+        data.WriteByteSeq(guid[6]);
+        data.WriteByteSeq(guid[0]);
+        data.WriteByteSeq(guid[7]);
+        data.WriteByteSeq(guid[2]);
+
         target->SendMessageToSet(&data, true);
 
-        data.Initialize(SMSG_MOVE_SET_SWIM_SPEED, (8+4+4));
-        data.append(target->GetPackGUID());
-        data << (uint32)0;
+        data.Initialize(SMSG_MOVE_SET_SWIM_SPEED, 1 + 8 + 4 + 4);
+        data.WriteBit(guid[5]);
+        data.WriteBit(guid[4]);
+        data.WriteBit(guid[7]);
+        data.WriteBit(guid[3]);
+        data.WriteBit(guid[2]);
+        data.WriteBit(guid[0]);
+        data.WriteBit(guid[1]);
+        data.WriteBit(guid[6]);
+        data.WriteByteSeq(guid[0]);
+        data << uint32(0);
+        data.WriteByteSeq(guid[6]);
+        data.WriteByteSeq(guid[3]);
+        data.WriteByteSeq(guid[5]);
+        data.WriteByteSeq(guid[2]);
         data << float(speed);
+        data.WriteByteSeq(guid[1]);
+        data.WriteByteSeq(guid[7]);
+        data.WriteByteSeq(guid[4]);
+                
         target->SendMessageToSet(&data, true);
 
         return true;

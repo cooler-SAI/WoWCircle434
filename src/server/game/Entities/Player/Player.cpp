@@ -26691,3 +26691,33 @@ bool Player::IsForbiddenMapForLevel(uint32 mapid, uint32 zone)
 
     return false;
 }
+
+void Player::SendMusic(uint32 musicId, uint64 source)
+{
+    WorldPacket data(SMSG_PLAY_MUSIC, 12);
+    data << uint32(musicId);
+    data << uint64(source);
+    GetSession()->SendPacket(&data);
+}
+
+void Player::SendSound(uint32 soundId, uint64 source)
+{
+    WorldPacket data(SMSG_PLAY_SOUND, 12);
+    data << uint32(soundId);
+    data << uint64(source);
+    GetSession()->SendPacket(&data);
+}
+
+void Player::SendSoundToAll(uint32 soundId, uint64 source)
+{
+    Map* map = GetMap();
+    Map::PlayerList const &_list = map->GetPlayers();
+    if (_list.isEmpty())
+        return;
+
+    for (Map::PlayerList::const_iterator i = _list.begin(); i != _list.end(); ++i)
+    {
+        if (Player* player = i->getSource())
+            player->SendSound(soundId, source);
+    }
+}

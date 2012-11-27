@@ -1122,9 +1122,18 @@ class boss_the_lich_king : public CreatureScript
         private:
             void SendMusicToPlayers(uint32 musicId) const
             {
-                WorldPacket data(SMSG_PLAY_MUSIC, 4);
-                data << uint32(musicId);
-                SendPacketToPlayers(&data);
+                Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                if (!players.isEmpty())
+                {
+                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    {
+                        if (Player* player = itr->getSource())
+                        {
+                            if (player->GetAreaId() == AREA_THE_FROZEN_THRONE)
+                                player->SendMusic(musicId, player->GetGUID());
+                        }
+                    }
+                }
             }
 
             void SendLightOverride(uint32 overrideId, uint32 fadeInTime) const

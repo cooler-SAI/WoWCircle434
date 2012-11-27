@@ -2277,12 +2277,16 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj) const
 
 void WorldObject::SendPlaySound(uint32 Sound, bool OnlySelf)
 {
-    WorldPacket data(SMSG_PLAY_SOUND, 4);
-    data << Sound;
     if (OnlySelf && GetTypeId() == TYPEID_PLAYER)
-        this->ToPlayer()->GetSession()->SendPacket(&data);
-    else
-        SendMessageToSet(&data, true); // ToSelf ignored in this case
+    {
+        ToPlayer()->SendSound(Sound, GetGUID());
+        return;
+    }
+
+    WorldPacket data(SMSG_PLAY_SOUND, 12);
+    data << uint32(Sound);
+    data << uint64(GetGUID());
+    SendMessageToSet(&data, true); // ToSelf ignored in this case
 }
 
 void Object::ForceValuesUpdateAtIndex(uint32 i)
@@ -3243,6 +3247,8 @@ void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
 
 void WorldObject::PlayDistanceSound(uint32 sound_id, Player* target /*= NULL*/)
 {
+   #pragma warning Packet - uint32 uint64 uint64 - target
+
     WorldPacket data(SMSG_PLAY_OBJECT_SOUND, 4+8);
     data << uint32(sound_id);
     data << uint64(GetGUID());
@@ -3254,12 +3260,16 @@ void WorldObject::PlayDistanceSound(uint32 sound_id, Player* target /*= NULL*/)
 
 void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= NULL*/)
 {
-    WorldPacket data(SMSG_PLAY_SOUND, 4);
-    data << uint32(sound_id);
     if (target)
-        target->SendDirectMessage(&data);
-    else
-        SendMessageToSet(&data, true);
+    {
+        target->SendSound(sound_id, GetGUID());
+        return;
+    }
+
+    WorldPacket data(SMSG_PLAY_SOUND, 12);
+    data << uint32(sound_id);
+    data << uint64(GetGUID());
+    SendMessageToSet(&data, true);
 }
 
 void WorldObject::DestroyForNearbyPlayers()

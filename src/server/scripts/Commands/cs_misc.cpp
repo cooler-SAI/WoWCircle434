@@ -2725,10 +2725,8 @@ public:
             return false;
         }
 
-        WorldPacket data(SMSG_PLAY_SOUND, 4);
-        data << uint32(soundId) << handler->GetSession()->GetPlayer()->GetGUID();
-        sWorld->SendGlobalMessage(&data);
-
+        Player* player = handler->GetSession()->GetPlayer();
+        player->SendSoundToAll(soundId, player->GetGUID());
         handler->PSendSysMessage(LANG_COMMAND_PLAYED_TO_ALL, soundId);
         return true;
     }

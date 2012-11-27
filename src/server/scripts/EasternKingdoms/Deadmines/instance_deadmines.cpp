@@ -237,17 +237,17 @@ class instance_deadmines : public InstanceMapScript
 
             void DoPlaySound(GameObject* unit, uint32 sound)
             {
-                WorldPacket data;
-                data.SetOpcode(SMSG_PLAY_SOUND);
+                WorldPacket data(SMSG_PLAY_SOUND, 12);
                 data << uint32(sound);
+                data << uint64(unit->GetGUID());
                 unit->SendMessageToSet(&data, false);
             }
 
             void DoPlaySoundCreature(Unit* unit, uint32 sound)
             {
-                WorldPacket data;
-                data.SetOpcode(SMSG_PLAY_SOUND);
+                WorldPacket data(SMSG_PLAY_SOUND, 12);
                 data << uint32(sound);
+                data << uint64(unit->GetGUID());
                 unit->SendMessageToSet(&data, false);
             }
         };

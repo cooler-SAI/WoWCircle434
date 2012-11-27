@@ -356,14 +356,15 @@ void Battlefield::EndBattle(bool endByTimer)
 
 void Battlefield::DoPlaySoundToAll(uint32 SoundID)
 {
-    WorldPacket data;
-    data.Initialize(SMSG_PLAY_SOUND, 4);
-    data << uint32(SoundID);
-
     for (int team = 0; team < BG_TEAMS_COUNT; team++)
+    {
         for (GuidSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
-            if (Player* player = sObjectAccessor->FindPlayer(*itr))
-                player->GetSession()->SendPacket(&data);
+        {
+            uint64 guid = (*itr);
+            if (Player* player = sObjectAccessor->FindPlayer(guid))
+                player->SendSound(SoundID, guid);
+        }
+    }
 }
 
 bool Battlefield::HasPlayer(Player* player) const
