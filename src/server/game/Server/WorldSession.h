@@ -434,8 +434,6 @@ class WorldSession
         void HandlePlayedTime(WorldPacket& recvPacket);
 
         // new
-        void HandleMoveUnRootAck(WorldPacket& recvPacket);
-        void HandleMoveRootAck(WorldPacket& recvPacket);
         void HandleLookingForGroup(WorldPacket& recvPacket);
         void HandleReturnToGraveyard(WorldPacket& recvPacket);
 
@@ -444,11 +442,6 @@ class WorldSession
 
         // new party stats
         void HandleInspectHonorStatsOpcode(WorldPacket& recvPacket);
-
-        void HandleMoveWaterWalkAck(WorldPacket& recvPacket);
-        void HandleFeatherFallAck(WorldPacket& recvData);
-
-        void HandleMoveHoverAck(WorldPacket& recvData);
 
         void HandleMountSpecialAnimOpcode(WorldPacket& recvdata);
 
@@ -537,7 +530,7 @@ class WorldSession
         void HandleRequestVehicleExit(WorldPacket& recvData);
         void HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData);
         void HandleMoveTimeSkippedOpcode(WorldPacket& recvData);
-        void BuildMoveUpdatePacket(Unit* mover, MovementInfo* movementInfo, Player* skip = NULL);
+        void BuildMoveUpdatePacket(Unit* mover, MovementInfo* movementInfo, size_t size, Player* skip = NULL);
 
         void HandleRequestRaidInfoOpcode(WorldPacket& recvData);
 
@@ -823,7 +816,6 @@ class WorldSession
         void HandleFarSightOpcode(WorldPacket& recvData);
         void HandleSetDungeonDifficultyOpcode(WorldPacket& recvData);
         void HandleSetRaidDifficultyOpcode(WorldPacket& recvData);
-        void HandleMoveSetCanFlyAckOpcode(WorldPacket& recvData);
         void HandleSetTitleOpcode(WorldPacket& recvData);
         void HandleRealmSplitOpcode(WorldPacket& recvData);
         void HandleTimeSyncResp(WorldPacket& recvData);

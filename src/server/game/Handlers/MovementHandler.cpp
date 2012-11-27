@@ -283,7 +283,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
     if (!mover->m_movementInfo.AcceptClientChanges(_player, movementInfo))
         return;
 
-    BuildMoveUpdatePacket(mover, &movementInfo, _player);
+    BuildMoveUpdatePacket(mover, &movementInfo, recvPacket.size(), _player);
 
     if (fall)
         plrMover->SetFallInformation(mover->m_movementInfo.fallTime, mover->m_movementInfo.pos.GetPositionZ());
@@ -391,15 +391,15 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recvData)
     if (!_player->m_movementInfo.AcceptClientChanges(_player, mi))
         return;
 
-    BuildMoveUpdatePacket(_player->m_mover, &_player->m_mover->m_movementInfo, _player);
+    BuildMoveUpdatePacket(_player->m_mover, &_player->m_mover->m_movementInfo, recvData.size(), _player);
 }
 
-void WorldSession::BuildMoveUpdatePacket(Unit* mover, MovementInfo* movementInfo, Player* skip)
+void WorldSession::BuildMoveUpdatePacket(Unit* mover, MovementInfo* movementInfo, size_t size, Player* skip)
 {
     ASSERT(mover);
     ASSERT(movementInfo);
 
-    WorldPacket data(SMSG_PLAYER_MOVE, 50);
+    WorldPacket data(SMSG_PLAYER_MOVE, size);
     WriteMovementInfo(data, movementInfo);
     mover->SendMessageToSet(&data, skip);
 }
@@ -419,30 +419,12 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket & recvData)
     MovementInfo movementInfo;
     ReadMovementInfo(recvData, &movementInfo);
 
-    if (_player->m_mover->GetGUID() != movementInfo.guid)
+    if (!_player->m_movementInfo.AcceptClientChanges(_player, movementInfo))
         return;
 
     WorldPacket data(SMSG_MOVE_UPDATE_KNOCK_BACK, recvData.size());
     WriteMovementInfo(data, &movementInfo);
-
-    _player->m_movementInfo = movementInfo;
     _player->SendMessageToSet(&data, false);
-}
-
-void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
-{
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_HOVER_ACK");
-
-    MovementInfo movementInfo;
-    ReadMovementInfo(recvData, &movementInfo);
-}
-
-void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recvData)
-{
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_WATER_WALK_ACK");
-
-    MovementInfo movementInfo;
-    ReadMovementInfo(recvData, &movementInfo);
 }
 
 void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)

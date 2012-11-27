@@ -1137,64 +1137,6 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
     */
 }
 
-void WorldSession::HandleFeatherFallAck(WorldPacket& recvData)
-{
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_MOVE_FEATHER_FALL_ACK");
-
-    // no used
-    recvData.rfinish();                       // prevent warnings spam
-}
-
-void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
-{
-    // no used
-    recvData.rfinish();                       // prevent warnings spam
-/*
-    uint64 guid;
-    recvData >> guid;
-
-    // now can skip not our packet
-    if (_player->GetGUID() != guid)
-    {
-        recvData.rfinish();                   // prevent warnings spam
-        return;
-    }
-
-    sLog->outDebug(LOG_FILTER_PACKETIO, "WORLD: CMSG_FORCE_MOVE_UNROOT_ACK");
-
-    recvData.read_skip<uint32>();                          // unk
-
-    MovementInfo movementInfo;
-    movementInfo.guid = guid;
-    ReadMovementInfo(recvData, &movementInfo);
-    recvData.read_skip<float>();                           // unk2
-*/
-}
-
-void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
-{
-    // no used
-    recvData.rfinish();                       // prevent warnings spam
-/*
-    uint64 guid;
-    recvData >> guid;
-
-    // now can skip not our packet
-    if (_player->GetGUID() != guid)
-    {
-        recvData.rfinish();                   // prevent warnings spam
-        return;
-    }
-
-    sLog->outDebug(LOG_FILTER_PACKETIO, "WORLD: CMSG_FORCE_MOVE_ROOT_ACK");
-
-    recvData.read_skip<uint32>();                          // unk
-
-    MovementInfo movementInfo;
-    ReadMovementInfo(recvData, &movementInfo);
-*/
-}
-
 void WorldSession::HandleSetActionBarToggles(WorldPacket& recvData)
 {
     uint8 actionBar;
@@ -1682,17 +1624,6 @@ void WorldSession::HandleCancelMountAuraOpcode(WorldPacket& /*recvData*/)
 
     _player->Dismount();
     _player->RemoveAurasByType(SPELL_AURA_MOUNTED);
-}
-
-void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recvData)
-{
-    // fly mode on/off
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_MOVE_SET_CAN_FLY_ACK");
-
-    MovementInfo movementInfo;
-    ReadMovementInfo(recvData, &movementInfo);
-
-    _player->m_mover->m_movementInfo.flags = movementInfo.GetMovementFlags();
 }
 
 void WorldSession::HandleRequestPetInfoOpcode(WorldPacket& /*recvData */)
