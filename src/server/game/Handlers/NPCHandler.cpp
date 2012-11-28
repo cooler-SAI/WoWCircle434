@@ -563,10 +563,10 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Send MSG_LIST_STABLED_PETS.");
 
     Pet* pet = _player->GetPet();
+    bool petCheck = pet && pet->isAlive() && pet->getPetType() == HUNTER_PET;
 
     WorldPacket data(MSG_LIST_STABLED_PETS, 8 + 1 + 1 + 
-        ((pet && pet->isAlive() && pet->getPetType() == HUNTER_PET) ? 17 + strlen(pet->GetName()) : 0) +
-        result ? (result->GetRowCount() * 30) : 0);
+        (petCheck ? (17 + strlen(pet->GetName())) : 0) + (5 * 30));
 
     data << uint64(guid);
 
@@ -575,7 +575,7 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
     data << uint8(GetPlayer()->m_stableSlots);
 
     uint8 num = 0;
-    if (pet && pet->isAlive() && pet->getPetType() == HUNTER_PET) // not let move dead pet in slot
+    if (petCheck) // not let move dead pet in slot
     {
         data << uint32(0);                                  // 4.x petSlot
         data << uint32(pet->GetCharmInfo()->GetPetNumber());
