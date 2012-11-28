@@ -6059,11 +6059,24 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 // Body and Soul
                 case 2218:
                 {
-                    // Proc only from Cure Disease on self cast
-                    if (procSpell->Id != 528 || victim != this || !roll_chance_i(triggerAmount))
-                        return false;
-                    triggered_spell_id = 64136;
-                    target = this;
+                    // Proc only from Cure desease on self cast
+                    switch(procSpell->Id)
+                    {
+                        case 528: // Cure desease
+                        {
+                            if (victim != this || !roll_chance_i(triggerAmount) || effIndex != 1)
+                                return false;
+                            triggered_spell_id = 64136;
+                            target = this;
+                            break;
+                        }
+                        case 17:    // Power Word: Shield
+                        case 73325: // Leap of Faith
+                        {
+                            triggered_spell_id = dummySpell->Id == 64127 ? 64128: 65081; // first-second rank handling
+                            break;
+                        }
+                    }
                     break;
                 }
                 // Atonement
