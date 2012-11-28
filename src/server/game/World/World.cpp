@@ -850,6 +850,13 @@ void World::LoadConfigSettings(bool reload)
         sLog->outError(LOG_FILTER_SERVER_LOADING, "Currency.MaxHonorPoints (%i) can't be negative. Set to 0.", m_int_configs[CONFIG_CURRENCY_MAX_HONOR_POINTS]);
         m_int_configs[CONFIG_CURRENCY_MAX_HONOR_POINTS] = 0;
     }
+    
+    m_int_configs[CONFIG_CURRENCY_MAX_JUSTICE_POINTS] = ConfigMgr::GetIntDefault("Currency.MaxJusticePoints", 400000);
+    if (int32(m_int_configs[CONFIG_CURRENCY_MAX_JUSTICE_POINTS]) < 0)
+    {
+        sLog->outError(LOG_FILTER_SERVER_LOADING, "Currency.MaxJusticePoints (%i) can't be negative. Set to 0.", m_int_configs[CONFIG_CURRENCY_MAX_JUSTICE_POINTS]);
+        m_int_configs[CONFIG_CURRENCY_MAX_JUSTICE_POINTS] = 0;
+    }
 
     m_int_configs[CONFIG_CURRENCY_CONQUEST_POINTS_WEEK_CAP] = ConfigMgr::GetIntDefault("Currency.ConquestPointsWeekCap", 1650);
     if (int32(m_int_configs[CONFIG_CURRENCY_CONQUEST_POINTS_WEEK_CAP]) <= 0)

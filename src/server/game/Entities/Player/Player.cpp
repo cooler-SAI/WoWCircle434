@@ -21292,13 +21292,13 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
                 return false;
             }
 
-            uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1;
-
-            if (!HasCurrency(iece->RequiredCurrency[i], (iece->RequiredCurrencyCount[i] * count) / precision))
+            if (!HasCurrency(iece->RequiredCurrency[i], iece->RequiredCurrencyCount[i]))
             {
                 SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL); // Find correct error
                 return false;
             }
+
+            ModifyCurrency(iece->RequiredCurrency[i], -int32(iece->RequiredCurrencyCount[i]), false, true);
         }
 
         // check for personal arena rating requirement
@@ -21315,8 +21315,7 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
         return false;
     }
 
-    ModifyCurrency(currency, crItem->maxcount, true, true);
-
+    ModifyCurrency(currency, int32(crItem->maxcount * proto->GetPrecision()), true, true);
     return true;
 }
 
