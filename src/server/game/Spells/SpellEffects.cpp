@@ -4825,6 +4825,45 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     break;
             }
             break;
+        case SPELLFAMILY_PRIEST:
+            switch (m_spellInfo->Id)
+            {
+                // Archangel
+                case 87151:
+                {
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                        break;
+
+                    bool is_shadow = m_caster->HasAura(15473);
+                    Aura* aur = NULL;
+                    if ((is_shadow && ((aur = m_caster->GetAura(87117)) || (aur = m_caster->GetAura(87118))))
+                        || (!is_shadow && ((aur = m_caster->GetAura(81660)) || (aur = m_caster->GetAura(81661)))))
+                    {
+                        uint8 count = aur->GetStackAmount();
+
+                        SpellInfo const* sp = sSpellMgr->GetSpellInfo(is_shadow ? 87153 : 81700);
+
+                        int32 bp0 = sp->Effects[0].BasePoints * count;
+                        int32 bp1 = 0;
+                        int32 bp_mana = 0;
+
+                        if (is_shadow)
+                        {
+                            bp1 = sp->Effects[1].BasePoints * count;
+                            bp_mana = sp->Effects[2].BasePoints * count;
+                        }
+                        else
+                            bp_mana = sSpellMgr->GetSpellInfo(87152)->Effects[0].BasePoints * count;
+
+                        m_caster->CastCustomSpell(m_caster, 87152, &bp_mana, 0, 0, true);
+                        m_caster->CastCustomSpell(m_caster, sp->Id, &bp0, &bp1, 0, true);
+                        m_caster->ToPlayer()->AddSpellCooldown(87151, 0, time(NULL) + m_spellInfo->Effects[is_shadow ? 2 : 1].BasePoints);
+                        aur->Remove();
+                    }
+                    break;
+                }
+            }
+            break;
         }
     }
 
