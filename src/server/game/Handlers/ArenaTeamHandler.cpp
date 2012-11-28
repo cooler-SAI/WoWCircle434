@@ -32,11 +32,12 @@
 void WorldSession::HandleArenaTeamCreateOpcode(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_CREATE");
-    uint32 slot, icon, iconcolor, border, bordercolor, background;
+    uint32 slot, icon, iconcolor, border, bordercolor, background, size;
     std::string name;
 
     recvData >> slot >> iconcolor >> bordercolor >> border >> background >> icon;
-    name = recvData.ReadString(recvData.ReadBits(8));
+    size = recvData.ReadBits(8);
+    recvData.read(name, size);
 
     // Check for valid arena bracket (2v2, 3v3, 5v5)
     if (slot >= MAX_ARENA_SLOT)
@@ -390,16 +391,19 @@ void WorldSession::HandleArenaTeamLeaderOpcode(WorldPacket & recvData)
 
 void WorldSession::SendArenaTeamCommandResult(uint32 teamAction, const std::string& team, const std::string& player, uint32 errorId)
 {
-    WorldPacket data(SMSG_ARENA_TEAM_COMMAND_RESULT, 2 + team.length() + player.length() + 4 + 4);
+    uint32 playerSize = uint32(player.size());
+    uint32 teamSize = uint32(team.size());
 
-    data.WriteBits(player.length(), 7);
-    data.WriteBits(team.length(), 8);
-    data.FlushBits();
+    WorldPacket data(SMSG_ARENA_TEAM_COMMAND_RESULT, 2 + playerSize + teamSize + 4 + 4);
 
-    data.WriteString(player);
-    data << uint32(teamAction);
-    data << uint32(errorId);
-    data.WriteString(team);
+    data 
+        << WriteAsUnaligned<7>(playerSize)
+        << WriteAsUnaligned<8>(teamSize)
+        << WriteBuffer(player.c_str(), playerSize)
+        << uint32(teamAction)
+        << uint32(errorId)
+        << WriteBuffer(team.c_str(), teamSize);
+
     SendPacket(&data);
 }
 

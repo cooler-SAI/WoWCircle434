@@ -225,8 +225,9 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
     ByteBuffer bitBuffer;
     ByteBuffer dataBuffer;
 
-    bitBuffer.WriteBits(0, 23);
-    bitBuffer.WriteBit(1);
+    bitBuffer.WriteBits<int>(0, 23);
+    bitBuffer.WriteBit(true);
+
     if (result)
     {
         _allowedCharsToLogin.clear();
@@ -235,7 +236,7 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
         bitBuffer.reserve(24 * charCount / 8);
         dataBuffer.reserve(charCount * 381);
 
-        bitBuffer.WriteBits(charCount, 17);
+        bitBuffer << WriteAsUnaligned<17>(charCount);
 
         do
         {
@@ -247,11 +248,9 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
 
             _allowedCharsToLogin.insert(guidLow);
         } while (result->NextRow());
-
-        bitBuffer.FlushBits();
     }
     else
-        bitBuffer.WriteBits(0, 17);
+        bitBuffer << WriteAsUnaligned<17>(0);
 
     WorldPacket data(SMSG_CHAR_ENUM, 7 + bitBuffer.size() + dataBuffer.size());
     data.append(bitBuffer);
@@ -762,23 +761,25 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
     ObjectGuid playerGuid;
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd Player Logon Message");
-    playerGuid[2] = recvData.ReadBit();
-    playerGuid[3] = recvData.ReadBit();
-    playerGuid[0] = recvData.ReadBit();
-    playerGuid[6] = recvData.ReadBit();
-    playerGuid[4] = recvData.ReadBit();
-    playerGuid[5] = recvData.ReadBit();
-    playerGuid[1] = recvData.ReadBit();
-    playerGuid[7] = recvData.ReadBit();
 
-    recvData.ReadByteSeq(playerGuid[2]);
-    recvData.ReadByteSeq(playerGuid[7]);
-    recvData.ReadByteSeq(playerGuid[0]);
-    recvData.ReadByteSeq(playerGuid[3]);
-    recvData.ReadByteSeq(playerGuid[5]);
-    recvData.ReadByteSeq(playerGuid[6]);
-    recvData.ReadByteSeq(playerGuid[1]);
-    recvData.ReadByteSeq(playerGuid[4]);
+    recvData
+        .ReadByteMask(playerGuid[2])
+        .ReadByteMask(playerGuid[3])
+        .ReadByteMask(playerGuid[0])
+        .ReadByteMask(playerGuid[6])
+        .ReadByteMask(playerGuid[4])
+        .ReadByteMask(playerGuid[5])
+        .ReadByteMask(playerGuid[1])
+        .ReadByteMask(playerGuid[7])
+
+        .ReadByteSeq(playerGuid[2])
+        .ReadByteSeq(playerGuid[7])
+        .ReadByteSeq(playerGuid[0])
+        .ReadByteSeq(playerGuid[3])
+        .ReadByteSeq(playerGuid[5])
+        .ReadByteSeq(playerGuid[6])
+        .ReadByteSeq(playerGuid[1])
+        .ReadByteSeq(playerGuid[4]);
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Character (Guid: %u) logging in", GUID_LOPART(playerGuid));
 
@@ -855,13 +856,12 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     data << uint32(1);
     data << uint32(2);
     data << uint32(0);
-    data.WriteBit(1);
-    data.WriteBit(1);
-    data.WriteBit(0);
+    data.WriteBit(true);
+    data.WriteBit(true);
+    data.WriteBit(false);
     data.WriteBit(featureBit4);
-    data.WriteBit(0);
-    data.WriteBit(0);
-    data.FlushBits();
+    data.WriteBit(false);
+    data.WriteBit(false);
     if (featureBit4)
     {
         data << uint32(1);
@@ -939,7 +939,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     data.Initialize(SMSG_HOTFIX_INFO);
     HotfixData const& hotfix = sObjectMgr->GetHotfixData();
     data.WriteBits(hotfix.size(), 22);
-    data.FlushBits();
     for (uint32 i = 0; i < hotfix.size(); ++i)
     {
         data << uint32(hotfix[i].Type);
@@ -2203,9 +2202,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
 void WorldSession::HandleRandomizeCharNameOpcode(WorldPacket& recvData)
 {
     uint8 gender, race;
-
-    recvData >> race;
-    recvData >> gender;
+    recvData >> race >> gender;
 
     if (!Player::IsValidRace(race))
     {
@@ -2220,10 +2217,14 @@ void WorldSession::HandleRandomizeCharNameOpcode(WorldPacket& recvData)
     }
 
     std::string const* name = GetRandomCharacterName(race, gender);
+    uint32 nameSize = uint32(name->size());
+
     WorldPacket data(SMSG_RANDOMIZE_CHAR_NAME, 10);
-    data.WriteBit(0); // unk
-    data.WriteBits(name->size(), 7);
-    data.WriteString(*name);
+    data
+        << WriteAsBit(false)
+        << WriteAsUnaligned<7>(nameSize)
+        << WriteBuffer(name->c_str(), nameSize);
+
     SendPacket(&data);
 }
 
@@ -2236,30 +2237,33 @@ void WorldSession::HandleReorderCharacters(WorldPacket& recvData)
 
     for (uint8 i = 0; i < charactersCount; ++i)
     {
-        guids[i][1] = recvData.ReadBit();
-        guids[i][4] = recvData.ReadBit();
-        guids[i][5] = recvData.ReadBit();
-        guids[i][3] = recvData.ReadBit();
-        guids[i][0] = recvData.ReadBit();
-        guids[i][7] = recvData.ReadBit();
-        guids[i][6] = recvData.ReadBit();
-        guids[i][2] = recvData.ReadBit();
+        recvData
+            .ReadByteMask(guids[i][1])
+            .ReadByteMask(guids[i][4])
+            .ReadByteMask(guids[i][5])
+            .ReadByteMask(guids[i][3])
+            .ReadByteMask(guids[i][0])
+            .ReadByteMask(guids[i][7])
+            .ReadByteMask(guids[i][6])
+            .ReadByteMask(guids[i][2]);
     }
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     for (uint8 i = 0; i < charactersCount; ++i)
     {
-        recvData.ReadByteSeq(guids[i][6]);
-        recvData.ReadByteSeq(guids[i][5]);
-        recvData.ReadByteSeq(guids[i][1]);
-        recvData.ReadByteSeq(guids[i][4]);
-        recvData.ReadByteSeq(guids[i][0]);
-        recvData.ReadByteSeq(guids[i][3]);
+        recvData
+            .ReadByteSeq(guids[i][6])
+            .ReadByteSeq(guids[i][5])
+            .ReadByteSeq(guids[i][1])
+            .ReadByteSeq(guids[i][4])
+            .ReadByteSeq(guids[i][0])
+            .ReadByteSeq(guids[i][3]);
 
         recvData >> position;
 
-        recvData.ReadByteSeq(guids[i][2]);
-        recvData.ReadByteSeq(guids[i][7]);
+        recvData
+            .ReadByteSeq(guids[i][2])
+            .ReadByteSeq(guids[i][7]);
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_LIST_SLOT);
         stmt->setUInt8(0, position);

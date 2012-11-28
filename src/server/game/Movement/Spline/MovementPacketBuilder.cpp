@@ -122,7 +122,8 @@ namespace Movement
     {
         uint32 count = spline.getPointCount() - 3;
         data << count;
-        data.append<Vector3>(&spline.getPoint(2), count);
+        for (uint32 i = 2; i < count+2; ++i)
+            data << spline.getPoint(i);
     }
 
     void WriteCatmullRomCyclicPath(const Spline<int32>& spline, ByteBuffer& data)
@@ -130,7 +131,8 @@ namespace Movement
         uint32 count = spline.getPointCount() - 3;
         data << uint32(count + 1);
         data << spline.getPoint(1); // fake point, client will erase it from the spline after first cycle done
-        data.append<Vector3>(&spline.getPoint(1), count);
+        for (uint32 i = 1; i < count+1; ++i)
+            data << spline.getPoint(i);
     }
 
     void PacketBuilder::WriteMonsterMove(const MoveSpline& move_spline, WorldPacket& data)
@@ -152,7 +154,9 @@ namespace Movement
 
     void PacketBuilder::WriteCreateBits(MoveSpline const& moveSpline, ByteBuffer& data)
     {
-        if (!data.WriteBit(!moveSpline.Finalized()))
+        bool notFinalized = !moveSpline.Finalized();
+        data.WriteBit(notFinalized);
+        if (!notFinalized)
             return;
 
         data.WriteBits(uint8(moveSpline.spline.mode()), 2);
@@ -164,14 +168,14 @@ namespace Movement
             {
                 ObjectGuid targetGuid = moveSpline.facing.target;
                 data.WriteBits(2, 2);
-                data.WriteBit(targetGuid[4]);
-                data.WriteBit(targetGuid[3]);
-                data.WriteBit(targetGuid[7]);
-                data.WriteBit(targetGuid[2]);
-                data.WriteBit(targetGuid[6]);
-                data.WriteBit(targetGuid[1]);
-                data.WriteBit(targetGuid[0]);
-                data.WriteBit(targetGuid[5]);
+                data.WriteByteMask(targetGuid[4]);
+                data.WriteByteMask(targetGuid[3]);
+                data.WriteByteMask(targetGuid[7]);
+                data.WriteByteMask(targetGuid[2]);
+                data.WriteByteMask(targetGuid[6]);
+                data.WriteByteMask(targetGuid[1]);
+                data.WriteByteMask(targetGuid[0]);
+                data.WriteByteMask(targetGuid[5]);
                 break;
             }
             case MoveSplineFlag::Final_Angle:

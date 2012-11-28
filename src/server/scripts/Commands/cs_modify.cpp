@@ -973,14 +973,14 @@ public:
         ObjectGuid guid = target->GetGUID();
         
         data.Initialize(SMSG_MOVE_SET_RUN_SPEED, 1 + 8 + 4 + 4);
-        data.WriteBit(guid[6]);
-        data.WriteBit(guid[1]);
-        data.WriteBit(guid[5]);
-        data.WriteBit(guid[2]);
-        data.WriteBit(guid[7]);
-        data.WriteBit(guid[0]);
-        data.WriteBit(guid[3]);
-        data.WriteBit(guid[4]);
+        data.WriteByteMask(guid[6]);
+        data.WriteByteMask(guid[1]);
+        data.WriteByteMask(guid[5]);
+        data.WriteByteMask(guid[2]);
+        data.WriteByteMask(guid[7]);
+        data.WriteByteMask(guid[0]);
+        data.WriteByteMask(guid[3]);
+        data.WriteByteMask(guid[4]);
         data.WriteByteSeq(guid[5]);
         data.WriteByteSeq(guid[3]);
         data.WriteByteSeq(guid[1]);
@@ -995,14 +995,14 @@ public:
         target->SendMessageToSet(&data, true);
 
         data.Initialize(SMSG_MOVE_SET_SWIM_SPEED, 1 + 8 + 4 + 4);
-        data.WriteBit(guid[5]);
-        data.WriteBit(guid[4]);
-        data.WriteBit(guid[7]);
-        data.WriteBit(guid[3]);
-        data.WriteBit(guid[2]);
-        data.WriteBit(guid[0]);
-        data.WriteBit(guid[1]);
-        data.WriteBit(guid[6]);
+        data.WriteByteMask(guid[5]);
+        data.WriteByteMask(guid[4]);
+        data.WriteByteMask(guid[7]);
+        data.WriteByteMask(guid[3]);
+        data.WriteByteMask(guid[2]);
+        data.WriteByteMask(guid[0]);
+        data.WriteByteMask(guid[1]);
+        data.WriteByteMask(guid[6]);
         data.WriteByteSeq(guid[0]);
         data << uint32(0);
         data.WriteByteSeq(guid[6]);

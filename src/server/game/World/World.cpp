@@ -2703,32 +2703,30 @@ void World::SendAutoBroadcast()
     if (m_Autobroadcasts.empty())
         return;
 
-    std::string msg;
-
-    msg = Trinity::Containers::SelectRandomContainerElement(m_Autobroadcasts);
+    std::string msg = Trinity::Containers::SelectRandomContainerElement(m_Autobroadcasts);
 
     uint32 abcenter = sWorld->getIntConfig(CONFIG_AUTOBROADCAST_CENTER);
 
+    uint32 msgSize = uint32(msg.length());
+
     if (abcenter == 0)
         sWorld->SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
-
     else if (abcenter == 1)
     {
-        WorldPacket data(SMSG_NOTIFICATION, 2 + msg.length());
-        data.WriteBits(msg.length(), 13);
-        data.FlushBits();
-        data.WriteString(msg);
+        WorldPacket data(SMSG_NOTIFICATION, 2 + msgSize);
+        data
+            << WriteAsUnaligned<13>(msgSize)
+            << WriteBuffer(msg.c_str(), msgSize);
         sWorld->SendGlobalMessage(&data);
     }
-
     else if (abcenter == 2)
     {
         sWorld->SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
 
-        WorldPacket data(SMSG_NOTIFICATION, 2 + msg.length());
-        data.WriteBits(msg.length(), 13);
-        data.FlushBits();
-        data.WriteString(msg);
+        WorldPacket data(SMSG_NOTIFICATION, 2 + msgSize);
+        data
+            << WriteAsUnaligned<13>(msgSize)
+            << WriteBuffer(msg.c_str(), msgSize);
         sWorld->SendGlobalMessage(&data);
     }
 

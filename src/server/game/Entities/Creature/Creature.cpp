@@ -2536,14 +2536,14 @@ bool Creature::SetWalk(bool enable)
     if (enable)
     {
         data.Initialize(SMSG_SPLINE_MOVE_SET_WALK_MODE, 9);
-        data.WriteBit(guid[7]);
-        data.WriteBit(guid[6]);
-        data.WriteBit(guid[5]);
-        data.WriteBit(guid[1]);
-        data.WriteBit(guid[3]);
-        data.WriteBit(guid[4]);
-        data.WriteBit(guid[2]);
-        data.WriteBit(guid[0]);
+        data.WriteByteMask(guid[7]);
+        data.WriteByteMask(guid[6]);
+        data.WriteByteMask(guid[5]);
+        data.WriteByteMask(guid[1]);
+        data.WriteByteMask(guid[3]);
+        data.WriteByteMask(guid[4]);
+        data.WriteByteMask(guid[2]);
+        data.WriteByteMask(guid[0]);
 
         data.WriteByteSeq(guid[4]);
         data.WriteByteSeq(guid[2]);
@@ -2557,14 +2557,14 @@ bool Creature::SetWalk(bool enable)
     else
     {
         data.Initialize(SMSG_SPLINE_MOVE_SET_RUN_MODE, 9);
-        data.WriteBit(guid[5]);
-        data.WriteBit(guid[6]);
-        data.WriteBit(guid[3]);
-        data.WriteBit(guid[7]);
-        data.WriteBit(guid[2]);
-        data.WriteBit(guid[0]);
-        data.WriteBit(guid[4]);
-        data.WriteBit(guid[1]);
+        data.WriteByteMask(guid[5]);
+        data.WriteByteMask(guid[6]);
+        data.WriteByteMask(guid[3]);
+        data.WriteByteMask(guid[7]);
+        data.WriteByteMask(guid[2]);
+        data.WriteByteMask(guid[0]);
+        data.WriteByteMask(guid[4]);
+        data.WriteByteMask(guid[1]);
 
         data.WriteByteSeq(guid[7]);
         data.WriteByteSeq(guid[0]);
@@ -2595,14 +2595,14 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
     if (disable)
     {
         data.Initialize(SMSG_SPLINE_MOVE_GRAVITY_DISABLE, 9);
-        data.WriteBit(guid[7]);
-        data.WriteBit(guid[3]);
-        data.WriteBit(guid[4]);
-        data.WriteBit(guid[2]);
-        data.WriteBit(guid[5]);
-        data.WriteBit(guid[1]);
-        data.WriteBit(guid[0]);
-        data.WriteBit(guid[6]);
+        data.WriteByteMask(guid[7]);
+        data.WriteByteMask(guid[3]);
+        data.WriteByteMask(guid[4]);
+        data.WriteByteMask(guid[2]);
+        data.WriteByteMask(guid[5]);
+        data.WriteByteMask(guid[1]);
+        data.WriteByteMask(guid[0]);
+        data.WriteByteMask(guid[6]);
 
         data.WriteByteSeq(guid[7]);
         data.WriteByteSeq(guid[1]);
@@ -2616,14 +2616,14 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
     else
     {
         data.Initialize(SMSG_SPLINE_MOVE_GRAVITY_ENABLE, 9);
-        data.WriteBit(guid[5]);
-        data.WriteBit(guid[4]);
-        data.WriteBit(guid[7]);
-        data.WriteBit(guid[1]);
-        data.WriteBit(guid[3]);
-        data.WriteBit(guid[6]);
-        data.WriteBit(guid[2]);
-        data.WriteBit(guid[0]);
+        data.WriteByteMask(guid[5]);
+        data.WriteByteMask(guid[4]);
+        data.WriteByteMask(guid[7]);
+        data.WriteByteMask(guid[1]);
+        data.WriteByteMask(guid[3]);
+        data.WriteByteMask(guid[6]);
+        data.WriteByteMask(guid[2]);
+        data.WriteByteMask(guid[0]);
 
         data.WriteByteSeq(guid[7]);
         data.WriteByteSeq(guid[3]);
@@ -2659,14 +2659,14 @@ bool Creature::SetHover(bool enable)
     if (enable)
     {
         data.Initialize(SMSG_SPLINE_MOVE_SET_HOVER, 9);
-        data.WriteBit(guid[3]);
-        data.WriteBit(guid[7]);
-        data.WriteBit(guid[0]);
-        data.WriteBit(guid[1]);
-        data.WriteBit(guid[4]);
-        data.WriteBit(guid[6]);
-        data.WriteBit(guid[2]);
-        data.WriteBit(guid[5]);
+        data.WriteByteMask(guid[3]);
+        data.WriteByteMask(guid[7]);
+        data.WriteByteMask(guid[0]);
+        data.WriteByteMask(guid[1]);
+        data.WriteByteMask(guid[4]);
+        data.WriteByteMask(guid[6]);
+        data.WriteByteMask(guid[2]);
+        data.WriteByteMask(guid[5]);
 
         data.WriteByteSeq(guid[2]);
         data.WriteByteSeq(guid[4]);
@@ -2680,14 +2680,14 @@ bool Creature::SetHover(bool enable)
     else
     {
         data.Initialize(SMSG_SPLINE_MOVE_UNSET_HOVER, 9);
-        data.WriteBit(guid[6]);
-        data.WriteBit(guid[7]);
-        data.WriteBit(guid[4]);
-        data.WriteBit(guid[0]);
-        data.WriteBit(guid[3]);
-        data.WriteBit(guid[1]);
-        data.WriteBit(guid[5]);
-        data.WriteBit(guid[2]);
+        data.WriteByteMask(guid[6]);
+        data.WriteByteMask(guid[7]);
+        data.WriteByteMask(guid[4]);
+        data.WriteByteMask(guid[0]);
+        data.WriteByteMask(guid[3]);
+        data.WriteByteMask(guid[1]);
+        data.WriteByteMask(guid[5]);
+        data.WriteByteMask(guid[2]);
 
         data.WriteByteSeq(guid[4]);
         data.WriteByteSeq(guid[5]);

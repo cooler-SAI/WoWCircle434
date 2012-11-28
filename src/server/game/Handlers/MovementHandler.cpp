@@ -202,23 +202,24 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvPacket)
     uint32 flags, time;
     recvPacket >> flags >> time;
 
-    guid[5] = recvPacket.ReadBit();
-    guid[0] = recvPacket.ReadBit();
-    guid[1] = recvPacket.ReadBit();
-    guid[6] = recvPacket.ReadBit();
-    guid[3] = recvPacket.ReadBit();
-    guid[7] = recvPacket.ReadBit();
-    guid[2] = recvPacket.ReadBit();
-    guid[4] = recvPacket.ReadBit();
+    recvPacket
+        .ReadByteMask(guid[5])
+        .ReadByteMask(guid[0])
+        .ReadByteMask(guid[1])
+        .ReadByteMask(guid[6])
+        .ReadByteMask(guid[3])
+        .ReadByteMask(guid[7])
+        .ReadByteMask(guid[5])
+        .ReadByteMask(guid[4])
 
-    recvPacket.ReadByteSeq(guid[4]);
-    recvPacket.ReadByteSeq(guid[2]);
-    recvPacket.ReadByteSeq(guid[7]);
-    recvPacket.ReadByteSeq(guid[6]);
-    recvPacket.ReadByteSeq(guid[5]);
-    recvPacket.ReadByteSeq(guid[1]);
-    recvPacket.ReadByteSeq(guid[3]);
-    recvPacket.ReadByteSeq(guid[0]);
+        .ReadByteSeq(guid[4])
+        .ReadByteSeq(guid[2])
+        .ReadByteSeq(guid[7])
+        .ReadByteSeq(guid[6])
+        .ReadByteSeq(guid[5])
+        .ReadByteSeq(guid[1])
+        .ReadByteSeq(guid[3])
+        .ReadByteSeq(guid[0]);
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_MOVE_TELEPORT_ACK: Guid " UI64FMTD "Flags: %u, Time: %u", uint64(guid), flags, time/IN_MILLISECONDS);
 
@@ -356,23 +357,24 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvPacket)
 
     ObjectGuid guid;
 
-    guid[7] = recvPacket.ReadBit();
-    guid[2] = recvPacket.ReadBit();
-    guid[1] = recvPacket.ReadBit();
-    guid[0] = recvPacket.ReadBit();
-    guid[4] = recvPacket.ReadBit();
-    guid[5] = recvPacket.ReadBit();
-    guid[6] = recvPacket.ReadBit();
-    guid[3] = recvPacket.ReadBit();
+    recvPacket
+        .ReadByteMask(guid[7])
+        .ReadByteMask(guid[2])
+        .ReadByteMask(guid[1])
+        .ReadByteMask(guid[0])
+        .ReadByteMask(guid[4])
+        .ReadByteMask(guid[5])
+        .ReadByteMask(guid[6])
+        .ReadByteMask(guid[3])
 
-    recvPacket.ReadByteSeq(guid[3]);
-    recvPacket.ReadByteSeq(guid[2]);
-    recvPacket.ReadByteSeq(guid[4]);
-    recvPacket.ReadByteSeq(guid[0]);
-    recvPacket.ReadByteSeq(guid[5]);
-    recvPacket.ReadByteSeq(guid[1]);
-    recvPacket.ReadByteSeq(guid[6]);
-    recvPacket.ReadByteSeq(guid[7]);
+        .ReadByteSeq(guid[3])
+        .ReadByteSeq(guid[2])
+        .ReadByteSeq(guid[4])
+        .ReadByteSeq(guid[0])
+        .ReadByteSeq(guid[5])
+        .ReadByteSeq(guid[1])
+        .ReadByteSeq(guid[6])
+        .ReadByteSeq(guid[7]);
 
     if (GetPlayer()->IsInWorld())
     {
@@ -473,7 +475,7 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
 
         if (element >= MSEHasGuidByte0 && element <= MSEHasGuidByte7)
         {
-            guid[element - MSEHasGuidByte0] = data.ReadBit();
+            data.ReadByteMask(guid[element - MSEHasGuidByte0]);
             continue;
         }
 
@@ -481,7 +483,7 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
             element <= MSEHasTransportGuidByte7)
         {
             if (hasTransportData)
-                tguid[element - MSEHasTransportGuidByte0] = data.ReadBit();
+                data.ReadByteMask(tguid[element - MSEHasTransportGuidByte0]);
             continue;
         }
 
@@ -757,7 +759,7 @@ void WorldSession::WriteMovementInfo(WorldPacket &data, MovementInfo* mi)
 
         if (element >= MSEHasGuidByte0 && element <= MSEHasGuidByte7)
         {
-            data.WriteBit(guid[element - MSEHasGuidByte0]);
+            data.WriteByteMask(guid[element - MSEHasGuidByte0]);
             continue;
         }
 
@@ -765,7 +767,7 @@ void WorldSession::WriteMovementInfo(WorldPacket &data, MovementInfo* mi)
             element <= MSEHasTransportGuidByte7)
         {
             if (hasTransportData)
-                data.WriteBit(tguid[element - MSEHasTransportGuidByte0]);
+                data.WriteByteMask(tguid[element - MSEHasTransportGuidByte0]);
             continue;
         }
 

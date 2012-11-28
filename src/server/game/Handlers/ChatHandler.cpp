@@ -247,24 +247,24 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         case CHAT_MSG_RAID_WARNING:
         case CHAT_MSG_BATTLEGROUND:
             textLength = recvData.ReadBits(9);
-            msg = recvData.ReadString(textLength);
+            recvData.read(msg, textLength);
             break;
         case CHAT_MSG_WHISPER:
             receiverLength = recvData.ReadBits(10);
             textLength = recvData.ReadBits(9);
-            to = recvData.ReadString(receiverLength);
-            msg = recvData.ReadString(textLength);
+            recvData.read(to, receiverLength);
+            recvData.read(msg, textLength);
             break;
         case CHAT_MSG_CHANNEL:
             receiverLength = recvData.ReadBits(10);
             textLength = recvData.ReadBits(9);
-            msg = recvData.ReadString(textLength);
-            channel = recvData.ReadString(receiverLength);
+            recvData.read(msg, textLength);
+            recvData.read(channel, receiverLength);
             break;
         case CHAT_MSG_AFK:
         case CHAT_MSG_DND:
             textLength = recvData.ReadBits(9);
-            msg = recvData.ReadString(textLength);
+            recvData.read(msg, textLength);
             ignoreChecks = true;
             break;
     }
@@ -559,9 +559,9 @@ void WorldSession::HandleAddonMessagechatOpcode(WorldPacket& recvData)
             uint32 msgLen = recvData.ReadBits(9);
             uint32 prefixLen = recvData.ReadBits(5);
             uint32 targetLen = recvData.ReadBits(10);
-            message = recvData.ReadString(msgLen);
-            prefix = recvData.ReadString(prefixLen);
-            targetName = recvData.ReadString(targetLen);
+            recvData.read(message, msgLen);
+            recvData.read(prefix, prefixLen);
+            recvData.read(targetName, targetLen);
             break;
         }
         case CHAT_MSG_PARTY:
@@ -570,8 +570,8 @@ void WorldSession::HandleAddonMessagechatOpcode(WorldPacket& recvData)
         {
             uint32 prefixLen = recvData.ReadBits(5);
             uint32 msgLen = recvData.ReadBits(9);
-            prefix = recvData.ReadString(prefixLen);
-            message = recvData.ReadString(msgLen);
+            recvData.read(prefix, prefixLen);
+            recvData.read(message, msgLen);
             break;
         }
         case CHAT_MSG_GUILD:
@@ -579,8 +579,8 @@ void WorldSession::HandleAddonMessagechatOpcode(WorldPacket& recvData)
         {
             uint32 prefixLen = recvData.ReadBits(5);
             uint32 msgLen = recvData.ReadBits(9);
-            prefix = recvData.ReadString(prefixLen);
-            message = recvData.ReadString(msgLen);
+            recvData.read(prefix, prefixLen);
+            recvData.read(message, msgLen);
             break;
         }
         default:
@@ -767,23 +767,25 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
     //sLog->outDebug(LOG_FILTER_PACKETIO, "WORLD: Received CMSG_CHAT_IGNORED");
 
     recvData >> unk;                                       // probably related to spam reporting
-    guid[5] = recvData.ReadBit();
-    guid[2] = recvData.ReadBit();
-    guid[6] = recvData.ReadBit();
-    guid[4] = recvData.ReadBit();
-    guid[7] = recvData.ReadBit();
-    guid[0] = recvData.ReadBit();
-    guid[1] = recvData.ReadBit();
-    guid[3] = recvData.ReadBit();
 
-    recvData.ReadByteSeq(guid[0]);
-    recvData.ReadByteSeq(guid[6]);
-    recvData.ReadByteSeq(guid[5]);
-    recvData.ReadByteSeq(guid[1]);
-    recvData.ReadByteSeq(guid[4]);
-    recvData.ReadByteSeq(guid[3]);
-    recvData.ReadByteSeq(guid[7]);
-    recvData.ReadByteSeq(guid[2]);
+    recvData
+        .ReadByteMask(guid[5])
+        .ReadByteMask(guid[2])
+        .ReadByteMask(guid[6])
+        .ReadByteMask(guid[4])
+        .ReadByteMask(guid[7])
+        .ReadByteMask(guid[0])
+        .ReadByteMask(guid[1])
+        .ReadByteMask(guid[3])
+
+        .ReadByteSeq(guid[0])
+        .ReadByteSeq(guid[6])
+        .ReadByteSeq(guid[5])
+        .ReadByteSeq(guid[1])
+        .ReadByteSeq(guid[4])
+        .ReadByteSeq(guid[3])
+        .ReadByteSeq(guid[7])
+        .ReadByteSeq(guid[2]);
 
     Player* player = ObjectAccessor::FindPlayer(guid);
     if (!player || !player->GetSession())

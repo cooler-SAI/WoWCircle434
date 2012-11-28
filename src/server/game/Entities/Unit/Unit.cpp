@@ -12484,36 +12484,35 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
         {
             case MOVE_WALK:
                 data.Initialize(SMSG_SPLINE_MOVE_SET_WALK_SPEED, 1 + 8 + 4);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[7]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[2]);
-                data.WriteBit(guid[4]);
-                data.FlushBits();
-                data.WriteByteSeq(guid[0]);
-                data.WriteByteSeq(guid[4]);
-                data.WriteByteSeq(guid[7]);
-                data.WriteByteSeq(guid[1]);
-                data.WriteByteSeq(guid[5]);
-                data.WriteByteSeq(guid[3]);
+                data.WriteByteMask(guid[0])
+                    .WriteByteMask(guid[6])
+                    .WriteByteMask(guid[7])
+                    .WriteByteMask(guid[3])
+                    .WriteByteMask(guid[5])
+                    .WriteByteMask(guid[1])
+                    .WriteByteMask(guid[2])
+                    .WriteByteMask(guid[4])
+                    .WriteByteSeq(guid[0])
+                    .WriteByteSeq(guid[4])
+                    .WriteByteSeq(guid[7])
+                    .WriteByteSeq(guid[1])
+                    .WriteByteSeq(guid[5])
+                    .WriteByteSeq(guid[3]);
                 data << float(GetSpeed(mtype));
-                data.WriteByteSeq(guid[2]);
-                data.WriteByteSeq(guid[5]);
+                data
+                    .WriteByteSeq(guid[2])
+                    .WriteByteSeq(guid[5]);
                 break;
             case MOVE_RUN:
                 data.Initialize(SMSG_SPLINE_MOVE_SET_RUN_SPEED, 1 + 8 + 4);
-                data.WriteBit(guid[4]);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[7]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[2]);
-                data.FlushBits();
+                data.WriteByteMask(guid[4]);
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[7]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[2]);
                 data.WriteByteSeq(guid[0]);
                 data.WriteByteSeq(guid[7]);
                 data.WriteByteSeq(guid[6]);
@@ -12526,15 +12525,14 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 break;
             case MOVE_RUN_BACK:
                 data.Initialize(SMSG_SPLINE_MOVE_SET_RUN_BACK_SPEED, 1 + 8 + 4);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[2]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[7]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[4]);
-                data.FlushBits();
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[2]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[7]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[4]);
                 data.WriteByteSeq(guid[1]);
                 data << float(GetSpeed(mtype));
                 data.WriteByteSeq(guid[2]);
@@ -12547,15 +12545,14 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 break;
             case MOVE_SWIM:
                 data.Initialize(SMSG_SPLINE_MOVE_SET_SWIM_SPEED, 1 + 8 + 4);
-                data.WriteBit(guid[4]);
-                data.WriteBit(guid[2]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[7]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[1]);
-                data.FlushBits();
+                data.WriteByteMask(guid[4]);
+                data.WriteByteMask(guid[2]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[7]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[1]);
                 data.WriteByteSeq(guid[5]);
                 data.WriteByteSeq(guid[6]);
                 data.WriteByteSeq(guid[1]);
@@ -12568,15 +12565,14 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 break;
             case MOVE_SWIM_BACK:
                 data.Initialize(SMSG_SPLINE_MOVE_SET_SWIM_BACK_SPEED, 1 + 8 + 4);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[4]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[7]);
-                data.WriteBit(guid[2]);
-                data.FlushBits();
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[4]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[7]);
+                data.WriteByteMask(guid[2]);
                 data.WriteByteSeq(guid[5]);
                 data.WriteByteSeq(guid[3]);
                 data.WriteByteSeq(guid[1]);
@@ -12589,15 +12585,15 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 break;
             case MOVE_TURN_RATE:
                 data.Initialize(SMSG_SPLINE_MOVE_SET_TURN_RATE, 1 + 8 + 4);
-                data.WriteBit(guid[2]);
-                data.WriteBit(guid[4]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[7]);
-                data.WriteBit(guid[0]);
-                data.FlushBits();
+                data.WriteByteMask(guid[2]);
+                data.WriteByteMask(guid[4]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[7]);
+                data.WriteByteMask(guid[0]);
+
                 data << float(GetSpeed(mtype));
                 data.WriteByteSeq(guid[1]);
                 data.WriteByteSeq(guid[5]);
@@ -12610,15 +12606,14 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 break;
             case MOVE_FLIGHT:
                 data.Initialize(SMSG_SPLINE_MOVE_SET_FLIGHT_SPEED, 1 + 8 + 4);
-                data.WriteBit(guid[7]);
-                data.WriteBit(guid[4]);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[2]);
-                data.FlushBits();
+                data.WriteByteMask(guid[7]);
+                data.WriteByteMask(guid[4]);
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[2]);
                 data.WriteByteSeq(guid[0]);
                 data.WriteByteSeq(guid[5]);
                 data.WriteByteSeq(guid[4]);
@@ -12631,15 +12626,14 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 break;
             case MOVE_FLIGHT_BACK:
                 data.Initialize(SMSG_SPLINE_MOVE_SET_FLIGHT_BACK_SPEED, 1 + 8 + 4);
-                data.WriteBit(guid[2]);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[4]);
-                data.WriteBit(guid[7]);
-                data.FlushBits();
+                data.WriteByteMask(guid[2]);
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[4]);
+                data.WriteByteMask(guid[7]);
                 data.WriteByteSeq(guid[5]);
                 data << float(GetSpeed(mtype));
                 data.WriteByteSeq(guid[6]);
@@ -12652,15 +12646,14 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 break;
             case MOVE_PITCH_RATE:
                 data.Initialize(SMSG_SPLINE_MOVE_SET_PITCH_RATE, 1 + 8 + 4);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[4]);
-                data.WriteBit(guid[7]);
-                data.WriteBit(guid[2]);
-                data.FlushBits();
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[4]);
+                data.WriteByteMask(guid[7]);
+                data.WriteByteMask(guid[2]);
                 data.WriteByteSeq(guid[1]);
                 data.WriteByteSeq(guid[5]);
                 data.WriteByteSeq(guid[7]);
@@ -12695,14 +12688,14 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
         {
             case MOVE_WALK:
                 data.Initialize(SMSG_MOVE_SET_WALK_SPEED, 1 + 8 + 4 + 4);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[4]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[2]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[7]);
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[4]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[2]);
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[7]);
                 data.WriteByteSeq(guid[6]);
                 data.WriteByteSeq(guid[1]);
                 data.WriteByteSeq(guid[5]);
@@ -12716,14 +12709,14 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 break;
             case MOVE_RUN:
                 data.Initialize(SMSG_MOVE_SET_RUN_SPEED, 1 + 8 + 4 + 4);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[2]);
-                data.WriteBit(guid[7]);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[4]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[2]);
+                data.WriteByteMask(guid[7]);
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[4]);
                 data.WriteByteSeq(guid[5]);
                 data.WriteByteSeq(guid[3]);
                 data.WriteByteSeq(guid[1]);
@@ -12737,14 +12730,14 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 break;
             case MOVE_RUN_BACK:
                 data.Initialize(SMSG_MOVE_SET_RUN_BACK_SPEED, 1 + 8 + 4 + 4);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[2]);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[4]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[7]);
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[2]);
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[4]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[7]);
                 data.WriteByteSeq(guid[5]);
                 data << uint32(0);
                 data << float(GetSpeed(mtype));
@@ -12758,14 +12751,14 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 break;
             case MOVE_SWIM:
                 data.Initialize(SMSG_MOVE_SET_SWIM_SPEED, 1 + 8 + 4 + 4);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[4]);
-                data.WriteBit(guid[7]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[2]);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[6]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[4]);
+                data.WriteByteMask(guid[7]);
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[2]);
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[6]);
                 data.WriteByteSeq(guid[0]);
                 data << uint32(0);
                 data.WriteByteSeq(guid[6]);
@@ -12779,14 +12772,14 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 break;
             case MOVE_SWIM_BACK:
                 data.Initialize(SMSG_MOVE_SET_SWIM_BACK_SPEED, 1 + 8 + 4 + 4);
-                data.WriteBit(guid[4]);
-                data.WriteBit(guid[2]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[7]);
+                data.WriteByteMask(guid[4]);
+                data.WriteByteMask(guid[2]);
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[7]);
                 data << uint32(0);
                 data.WriteByteSeq(guid[0]);
                 data.WriteByteSeq(guid[3]);
@@ -12800,14 +12793,14 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 break;
             case MOVE_TURN_RATE:
                 data.Initialize(SMSG_MOVE_SET_TURN_RATE, 1 + 8 + 4 + 4);
-                data.WriteBit(guid[7]);
-                data.WriteBit(guid[2]);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[4]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[3]);
+                data.WriteByteMask(guid[7]);
+                data.WriteByteMask(guid[2]);
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[4]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[3]);
                 data.WriteByteSeq(guid[5]);
                 data.WriteByteSeq(guid[7]);
                 data.WriteByteSeq(guid[2]);
@@ -12821,14 +12814,14 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 break;
             case MOVE_FLIGHT:
                 data.Initialize(SMSG_MOVE_SET_FLIGHT_SPEED, 1 + 8 + 4 + 4);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[2]);
-                data.WriteBit(guid[7]);
-                data.WriteBit(guid[4]);
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[2]);
+                data.WriteByteMask(guid[7]);
+                data.WriteByteMask(guid[4]);
                 data.WriteByteSeq(guid[0]);
                 data.WriteByteSeq(guid[1]);
                 data.WriteByteSeq(guid[7]);
@@ -12842,14 +12835,14 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 break;
             case MOVE_FLIGHT_BACK:
                 data.Initialize(SMSG_MOVE_SET_FLIGHT_BACK_SPEED, 1 + 8 + 4 + 4);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[2]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[4]);
-                data.WriteBit(guid[7]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[5]);
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[2]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[4]);
+                data.WriteByteMask(guid[7]);
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[5]);
                 data.WriteByteSeq(guid[3]);
                 data << uint32(0);
                 data.WriteByteSeq(guid[6]);
@@ -12863,14 +12856,14 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 break;
             case MOVE_PITCH_RATE:
                 data.Initialize(SMSG_MOVE_SET_PITCH_RATE, 1 + 8 + 4 + 4);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[2]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[7]);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[4]);
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[2]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[7]);
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[4]);
                 data << float(GetSpeed(mtype));
                 data.WriteByteSeq(guid[6]);
                 data.WriteByteSeq(guid[4]);
@@ -16060,14 +16053,14 @@ void Unit::SendMoveRoot(uint32 value)
 {
     ObjectGuid guid = GetGUID();
     WorldPacket data(SMSG_MOVE_ROOT, 1 + 8 + 4);
-    data.WriteBit(guid[2]);
-    data.WriteBit(guid[7]);
-    data.WriteBit(guid[6]);
-    data.WriteBit(guid[0]);
-    data.WriteBit(guid[5]);
-    data.WriteBit(guid[4]);
-    data.WriteBit(guid[1]);
-    data.WriteBit(guid[3]);
+    data.WriteByteMask(guid[2]);
+    data.WriteByteMask(guid[7]);
+    data.WriteByteMask(guid[6]);
+    data.WriteByteMask(guid[0]);
+    data.WriteByteMask(guid[5]);
+    data.WriteByteMask(guid[4]);
+    data.WriteByteMask(guid[1]);
+    data.WriteByteMask(guid[3]);
 
     data.WriteByteSeq(guid[1]);
     data.WriteByteSeq(guid[0]);
@@ -16089,14 +16082,14 @@ void Unit::SendMoveUnroot(uint32 value)
 {
     ObjectGuid guid = GetGUID();
     WorldPacket data(SMSG_MOVE_UNROOT, 1 + 8 + 4);
-    data.WriteBit(guid[0]);
-    data.WriteBit(guid[1]);
-    data.WriteBit(guid[3]);
-    data.WriteBit(guid[7]);
-    data.WriteBit(guid[5]);
-    data.WriteBit(guid[2]);
-    data.WriteBit(guid[4]);
-    data.WriteBit(guid[6]);
+    data.WriteByteMask(guid[0]);
+    data.WriteByteMask(guid[1]);
+    data.WriteByteMask(guid[3]);
+    data.WriteByteMask(guid[7]);
+    data.WriteByteMask(guid[5]);
+    data.WriteByteMask(guid[2]);
+    data.WriteByteMask(guid[4]);
+    data.WriteByteMask(guid[6]);
 
     data.WriteByteSeq(guid[3]);
     data.WriteByteSeq(guid[6]);
@@ -16173,15 +16166,14 @@ void Unit::SetRooted(bool apply)
         {
             ObjectGuid guid = GetGUID();
             WorldPacket data(SMSG_SPLINE_MOVE_ROOT, 8);
-            data.WriteBit(guid[5]);
-            data.WriteBit(guid[4]);
-            data.WriteBit(guid[6]);
-            data.WriteBit(guid[1]);
-            data.WriteBit(guid[3]);
-            data.WriteBit(guid[7]);
-            data.WriteBit(guid[2]);
-            data.WriteBit(guid[0]);
-            data.FlushBits();
+            data.WriteByteMask(guid[5]);
+            data.WriteByteMask(guid[4]);
+            data.WriteByteMask(guid[6]);
+            data.WriteByteMask(guid[1]);
+            data.WriteByteMask(guid[3]);
+            data.WriteByteMask(guid[7]);
+            data.WriteByteMask(guid[2]);
+            data.WriteByteMask(guid[0]);
             data.WriteByteSeq(guid[2]);
             data.WriteByteSeq(guid[1]);
             data.WriteByteSeq(guid[7]);
@@ -16204,15 +16196,14 @@ void Unit::SetRooted(bool apply)
             {
                 ObjectGuid guid = GetGUID();
                 WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
-                data.WriteBit(guid[0]);
-                data.WriteBit(guid[1]);
-                data.WriteBit(guid[6]);
-                data.WriteBit(guid[5]);
-                data.WriteBit(guid[3]);
-                data.WriteBit(guid[2]);
-                data.WriteBit(guid[7]);
-                data.WriteBit(guid[4]);
-                data.FlushBits();
+                data.WriteByteMask(guid[0]);
+                data.WriteByteMask(guid[1]);
+                data.WriteByteMask(guid[6]);
+                data.WriteByteMask(guid[5]);
+                data.WriteByteMask(guid[3]);
+                data.WriteByteMask(guid[2]);
+                data.WriteByteMask(guid[7]);
+                data.WriteByteMask(guid[4]);
                 data.WriteByteSeq(guid[6]);
                 data.WriteByteSeq(guid[3]);
                 data.WriteByteSeq(guid[1]);
@@ -16750,15 +16741,14 @@ void Unit::SendPlaySpellVisualKit(uint32 id, uint32 impact)
     data << uint32(0);
     data << uint32(id);     // SpellVisualKit.dbc index
     data << uint32(impact);
-    data.WriteBit(guid[4]);
-    data.WriteBit(guid[7]);
-    data.WriteBit(guid[5]);
-    data.WriteBit(guid[3]);
-    data.WriteBit(guid[1]);
-    data.WriteBit(guid[2]);
-    data.WriteBit(guid[0]);
-    data.WriteBit(guid[6]);
-    data.FlushBits();
+    data.WriteByteMask(guid[4]);
+    data.WriteByteMask(guid[7]);
+    data.WriteByteMask(guid[5]);
+    data.WriteByteMask(guid[3]);
+    data.WriteByteMask(guid[1]);
+    data.WriteByteMask(guid[2]);
+    data.WriteByteMask(guid[0]);
+    data.WriteByteMask(guid[6]);
     data.WriteByteSeq(guid[0]);
     data.WriteByteSeq(guid[4]);
     data.WriteByteSeq(guid[1]);
@@ -16975,14 +16965,14 @@ void Unit::SendMoveKnockBack(Player* player, float speedXY, float speedZ, float 
 {
     ObjectGuid guid = GetGUID();
     WorldPacket data(SMSG_MOVE_KNOCK_BACK, (1+8+4+4+4+4+4));
-    data.WriteBit(guid[0]);
-    data.WriteBit(guid[3]);
-    data.WriteBit(guid[6]);
-    data.WriteBit(guid[7]);
-    data.WriteBit(guid[2]);
-    data.WriteBit(guid[5]);
-    data.WriteBit(guid[1]);
-    data.WriteBit(guid[4]);
+    data.WriteByteMask(guid[0]);
+    data.WriteByteMask(guid[3]);
+    data.WriteByteMask(guid[6]);
+    data.WriteByteMask(guid[7]);
+    data.WriteByteMask(guid[2]);
+    data.WriteByteMask(guid[5]);
+    data.WriteByteMask(guid[1]);
+    data.WriteByteMask(guid[4]);
 
     data.WriteByteSeq(guid[1]);
 
@@ -17710,15 +17700,14 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     {
         WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
         ObjectGuid guid = GetGUID();
-        data.WriteBit(guid[0]);
-        data.WriteBit(guid[1]);
-        data.WriteBit(guid[6]);
-        data.WriteBit(guid[5]);
-        data.WriteBit(guid[3]);
-        data.WriteBit(guid[2]);
-        data.WriteBit(guid[7]);
-        data.WriteBit(guid[4]);
-        data.FlushBits();
+        data.WriteByteMask(guid[0]);
+        data.WriteByteMask(guid[1]);
+        data.WriteByteMask(guid[6]);
+        data.WriteByteMask(guid[5]);
+        data.WriteByteMask(guid[3]);
+        data.WriteByteMask(guid[2]);
+        data.WriteByteMask(guid[7]);
+        data.WriteByteMask(guid[4]);
         data.WriteByteSeq(guid[6]);
         data.WriteByteSeq(guid[3]);
         data.WriteByteSeq(guid[1]);
@@ -17792,8 +17781,6 @@ void Unit::BuildMovementPacket(ByteBuffer *data) const
 
     data->WriteBit(splineElevation);
     data->WriteBit(splineData);
-
-    data->FlushBits(); // reset bit stream
 
     *data << uint64(GetGUID());
     *data << uint32(getMSTime());

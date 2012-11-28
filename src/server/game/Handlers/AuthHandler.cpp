@@ -25,11 +25,9 @@ void WorldSession::SendAuthResponse(uint8 code, bool queued, uint32 queuePos)
     WorldPacket packet(SMSG_AUTH_RESPONSE, 1 /*bits*/ + 4 + 1 + 4 + 1 + 4 + 1 + 1 + (queued ? 4 : 0));
     packet.WriteBit(queued);
     if (queued)
-        packet.WriteBit(0);
+        packet.WriteBit(false);
 
-    packet.WriteBit(1);                                    // has account info
-
-    packet.FlushBits();
+    packet.WriteBit(true);                                    // has account info
 
     // account info
     packet << uint32(0);                                   // BillingTimeRemaining

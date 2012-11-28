@@ -154,11 +154,11 @@ public:
         std::string str = handler->GetTrinityString(LANG_GLOBAL_NOTIFY);
         str += args;
 
-        size_t len = str.size() + 1;
-        WorldPacket data(SMSG_NOTIFICATION, 2 + len);
-        data.WriteBits(len, 13);
-        data.FlushBits();
-        data << str;
+        uint32 msgSize = uint32(str.length());
+        WorldPacket data(SMSG_NOTIFICATION, 2 + msgSize);
+        data
+            << WriteAsUnaligned<13>(msgSize)
+            << WriteBuffer(str.c_str(), msgSize);
         sWorld->SendGlobalMessage(&data);
 
         return true;
@@ -172,11 +172,11 @@ public:
         std::string str = handler->GetTrinityString(LANG_GM_NOTIFY);
         str += args;
 
-        size_t len = str.size() + 1;
-        WorldPacket data(SMSG_NOTIFICATION, 2 + len);
-        data.WriteBits(len, 13);
-        data.FlushBits();
-        data << str;
+        uint32 msgSize = uint32(str.length());
+        WorldPacket data(SMSG_NOTIFICATION, 2 + msgSize);
+        data
+            << WriteAsUnaligned<13>(msgSize)
+            << WriteBuffer(str.c_str(), msgSize);
         sWorld->SendGlobalGMMessage(&data);
 
         return true;

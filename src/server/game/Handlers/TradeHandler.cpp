@@ -36,37 +36,31 @@ void WorldSession::SendTradeStatus(TradeStatus status)
     WorldPacket data;
 
     data.Initialize(SMSG_TRADE_STATUS, 1+4+4);
-    data.WriteBit(0); // unk bit, usually 0
+    data.WriteBit(false); // unk bit, usually 0
     data.WriteBits(status, 5);
 
     switch (status)
     {
         case TRADE_STATUS_BEGIN_TRADE:
             data.WriteBits(0, 8); // zero guid
-            data.FlushBits();
             break;
         case TRADE_STATUS_OPEN_WINDOW:
-            data.FlushBits();
             data << uint32(0); // unk
             break;
         case TRADE_STATUS_CLOSE_WINDOW:
-            data.WriteBit(0); // unk
-            data.FlushBits();
+            data.WriteBit(false); // unk
             data << uint32(0); // unk
             data << uint32(0); // unk
             break;
         case TRADE_STATUS_ONLY_CONJURED:
         case TRADE_STATUS_NOT_ELIGIBLE:
-            data.FlushBits();
             data << uint8(0); // unk
             break;
         case TRADE_STATUS_CURRENCY: // Not implemented
         case TRADE_STATUS_CURRENCY_NOT_TRADABLE: // Not implemented
-            data.FlushBits();
             data << uint32(0); // unk
             data << uint32(0); // unk
         default:
-            data.FlushBits();
             break;
     }
 
@@ -114,22 +108,23 @@ void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
         ObjectGuid giftCreatorGuid = item->GetUInt64Value(ITEM_FIELD_GIFTCREATOR);
         ObjectGuid creatorGuid = item->GetUInt64Value(ITEM_FIELD_CREATOR);
 
-        data.WriteBit(giftCreatorGuid[7]);
-        data.WriteBit(giftCreatorGuid[1]);
-        bool notWrapped = data.WriteBit(!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED));
-        data.WriteBit(giftCreatorGuid[3]);
+        data.WriteByteMask(giftCreatorGuid[7]);
+        data.WriteByteMask(giftCreatorGuid[1]);
+        bool notWrapped = !item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED);
+        data.WriteBit(notWrapped);
+        data.WriteByteMask(giftCreatorGuid[3]);
 
         if (notWrapped)
         {
-            data.WriteBit(creatorGuid[7]);
-            data.WriteBit(creatorGuid[1]);
-            data.WriteBit(creatorGuid[4]);
-            data.WriteBit(creatorGuid[6]);
-            data.WriteBit(creatorGuid[2]);
-            data.WriteBit(creatorGuid[3]);
-            data.WriteBit(creatorGuid[5]);
+            data.WriteByteMask(creatorGuid[7]);
+            data.WriteByteMask(creatorGuid[1]);
+            data.WriteByteMask(creatorGuid[4]);
+            data.WriteByteMask(creatorGuid[6]);
+            data.WriteByteMask(creatorGuid[2]);
+            data.WriteByteMask(creatorGuid[3]);
+            data.WriteByteMask(creatorGuid[5]);
             data.WriteBit(item->GetTemplate()->LockID != 0);
-            data.WriteBit(creatorGuid[0]);
+            data.WriteByteMask(creatorGuid[0]);
 
             itemData.WriteByteSeq(creatorGuid[1]);
 
@@ -159,11 +154,11 @@ void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
             itemData.WriteByteSeq(creatorGuid[5]);
         }
 
-        data.WriteBit(giftCreatorGuid[6]);
-        data.WriteBit(giftCreatorGuid[4]);
-        data.WriteBit(giftCreatorGuid[2]);
-        data.WriteBit(giftCreatorGuid[0]);
-        data.WriteBit(giftCreatorGuid[5]);
+        data.WriteByteMask(giftCreatorGuid[6]);
+        data.WriteByteMask(giftCreatorGuid[4]);
+        data.WriteByteMask(giftCreatorGuid[2]);
+        data.WriteByteMask(giftCreatorGuid[0]);
+        data.WriteByteMask(giftCreatorGuid[5]);
 
         itemData.WriteByteSeq(giftCreatorGuid[6]);
         itemData.WriteByteSeq(giftCreatorGuid[1]);
@@ -184,7 +179,6 @@ void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
         itemData.WriteByteSeq(giftCreatorGuid[3]);
     }
 
-    data.FlushBits();
     data.append(itemData);
 
     SendPacket(&data);
@@ -610,23 +604,24 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
 {
     ObjectGuid guid;
 
-    guid[0] = recvPacket.ReadBit();
-    guid[3] = recvPacket.ReadBit();
-    guid[5] = recvPacket.ReadBit();
-    guid[1] = recvPacket.ReadBit();
-    guid[4] = recvPacket.ReadBit();
-    guid[6] = recvPacket.ReadBit();
-    guid[7] = recvPacket.ReadBit();
-    guid[2] = recvPacket.ReadBit();
+    recvPacket
+        .ReadByteMask(guid[0])
+        .ReadByteMask(guid[3])
+        .ReadByteMask(guid[5])
+        .ReadByteMask(guid[1])
+        .ReadByteMask(guid[4])
+        .ReadByteMask(guid[6])
+        .ReadByteMask(guid[7])
+        .ReadByteMask(guid[2])
 
-    recvPacket.ReadByteSeq(guid[7]);
-    recvPacket.ReadByteSeq(guid[4]);
-    recvPacket.ReadByteSeq(guid[3]);
-    recvPacket.ReadByteSeq(guid[5]);
-    recvPacket.ReadByteSeq(guid[1]);
-    recvPacket.ReadByteSeq(guid[2]);
-    recvPacket.ReadByteSeq(guid[6]);
-    recvPacket.ReadByteSeq(guid[0]);
+        .ReadByteSeq(guid[7])
+        .ReadByteSeq(guid[4])
+        .ReadByteSeq(guid[3])
+        .ReadByteSeq(guid[5])
+        .ReadByteSeq(guid[1])
+        .ReadByteSeq(guid[2])
+        .ReadByteSeq(guid[6])
+        .ReadByteSeq(guid[0]);
 
     if (GetPlayer()->m_trade)
         return;
@@ -728,19 +723,19 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
     pOther->m_trade = new TradeData(pOther, _player);
 
     WorldPacket data(SMSG_TRADE_STATUS, 2+7);
-    data.WriteBit(0); // unk bit, usually 0
+    data.WriteBit(false); // unk bit, usually 0
     data.WriteBits(TRADE_STATUS_BEGIN_TRADE, 5);
 
     ObjectGuid playerGuid = _player->GetGUID();
-    // WTB StartBitStream...
-    data.WriteBit(playerGuid[2]);
-    data.WriteBit(playerGuid[4]);
-    data.WriteBit(playerGuid[6]);
-    data.WriteBit(playerGuid[0]);
-    data.WriteBit(playerGuid[1]);
-    data.WriteBit(playerGuid[3]);
-    data.WriteBit(playerGuid[7]);
-    data.WriteBit(playerGuid[5]);
+
+    data.WriteByteMask(playerGuid[2]);
+    data.WriteByteMask(playerGuid[4]);
+    data.WriteByteMask(playerGuid[6]);
+    data.WriteByteMask(playerGuid[0]);
+    data.WriteByteMask(playerGuid[1]);
+    data.WriteByteMask(playerGuid[3]);
+    data.WriteByteMask(playerGuid[7]);
+    data.WriteByteMask(playerGuid[5]);
 
     data.WriteByteSeq(playerGuid[4]);
     data.WriteByteSeq(playerGuid[1]);

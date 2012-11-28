@@ -829,13 +829,13 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     recvPacket.ReadBit();
     uint32 accountNameLength = recvPacket.ReadBits(12);
-    account = recvPacket.ReadString(accountNameLength);
+    recvPacket.read(account, accountNameLength);
 
     if (sWorld->IsClosed())
     {
         WorldPacket packet(SMSG_AUTH_RESPONSE, 1);
-        packet.WriteBit(0); // has queue info
-        packet.WriteBit(0); // has account info
+        packet.WriteBit(false); // has queue info
+        packet.WriteBit(false); // has account info
         packet << uint8(AUTH_REJECT);
         SendPacket(packet);
 
@@ -854,8 +854,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     if (!result)
     {
         WorldPacket packet(SMSG_AUTH_RESPONSE, 1);
-        packet.WriteBit(0); // has queue info
-        packet.WriteBit(0); // has account info
+        packet.WriteBit(false); // has queue info
+        packet.WriteBit(true); // has account info
         packet << uint8(AUTH_UNKNOWN_ACCOUNT);
 
         SendPacket(packet);
@@ -881,8 +881,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         if (strcmp (fields[2].GetCString(), GetRemoteAddress().c_str()))
         {
             WorldPacket packet(SMSG_AUTH_RESPONSE, 1);
-            packet.WriteBit(0); // has queue info
-            packet.WriteBit(0); // has account info
+            packet.WriteBit(false); // has queue info
+            packet.WriteBit(false); // has account info
             packet << uint8(AUTH_FAILED);
             SendPacket(packet);
 
@@ -947,8 +947,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     if (banresult) // if account banned
     {
         WorldPacket packet(SMSG_AUTH_RESPONSE, 1);
-        packet.WriteBit(0); // has queue info
-        packet.WriteBit(0); // has account info
+        packet.WriteBit(false); // has queue info
+        packet.WriteBit(false); // has account info
         packet << uint8(AUTH_BANNED);
         SendPacket(packet);
 
@@ -973,8 +973,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     if (allowedAccountType > SEC_PLAYER && AccountTypes(security) < allowedAccountType)
     {
         WorldPacket packet(SMSG_AUTH_RESPONSE, 1);
-        packet.WriteBit(0); // has queue info
-        packet.WriteBit(0); // has account info
+        packet.WriteBit(false); // has queue info
+        packet.WriteBit(false); // has account info
         packet << uint8(AUTH_UNAVAILABLE);
 
         SendPacket(packet);
@@ -999,8 +999,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     if (memcmp(sha.GetDigest(), digest, 20))
     {
         WorldPacket packet(SMSG_AUTH_RESPONSE, 1);
-        packet.WriteBit(0); // has queue info
-        packet.WriteBit(0); // has account info
+        packet.WriteBit(false); // has queue info
+        packet.WriteBit(false); // has account info
         packet << uint8(AUTH_FAILED);
         SendPacket(packet);
 

@@ -630,7 +630,6 @@ void WorldSession::SendNotification(const char *format, ...)
         size_t len = strlen(szStr);
         WorldPacket data(SMSG_NOTIFICATION, 2 + len);
         data.WriteBits(len, 13);
-        data.FlushBits();
         data.append(szStr, len);
         SendPacket(&data);
     }
@@ -651,7 +650,6 @@ void WorldSession::SendNotification(uint32 string_id, ...)
         size_t len = strlen(szStr);
         WorldPacket data(SMSG_NOTIFICATION, 2 + len);
         data.WriteBits(len, 13);
-        data.FlushBits();
         data.append(szStr, len);
         SendPacket(&data);
     }
@@ -691,19 +689,17 @@ void WorldSession::SendAuthWaitQue(uint32 position)
     if (position == 0)
     {
         WorldPacket packet(SMSG_AUTH_RESPONSE, 1);
-        packet.WriteBit(0); // has queue info
-        packet.WriteBit(0); // has account info
-        packet.FlushBits();
+        packet.WriteBit(false); // has queue info
+        packet.WriteBit(false); // has account info
         packet << uint8(AUTH_OK);
         SendPacket(&packet);
     }
     else
     {
         WorldPacket packet(SMSG_AUTH_RESPONSE, 6);
-        packet.WriteBit(1); // has queue info
-        packet.WriteBit(0); // unk queue bool
-        packet.WriteBit(0); // has account info
-        packet.FlushBits();
+        packet.WriteBit(true); // has queue info
+        packet.WriteBit(false); // unk queue bool
+        packet.WriteBit(false); // has account info
         packet << uint8(AUTH_WAIT_QUEUE);
         packet << uint32(position);
         SendPacket(&packet);
@@ -1014,7 +1010,11 @@ void WorldSession::HandleAddonRegisteredPrefixesOpcode(WorldPacket& recvPacket)
         lengths[i] = recvPacket.ReadBits(5);
 
     for (uint32 i = 0; i < count; ++i)
-        _registeredAddonPrefixes.push_back(recvPacket.ReadString(lengths[i]));
+    {
+        std::string temp;
+        recvPacket.read(temp, lengths[i]);
+        _registeredAddonPrefixes.push_back(temp);
+    }
 
     if (_registeredAddonPrefixes.size() > REGISTERED_ADDON_PREFIX_SOFTCAP) // shouldn't happen
     {
