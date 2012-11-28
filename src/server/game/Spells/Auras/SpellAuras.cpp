@@ -1332,8 +1332,17 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_PRIEST:
                 if (!caster)
                     break;
+                // Inner Focus
+                if (GetSpellInfo()->Id == 89485)
+                {
+                    // Strength of Soul
+                    if (caster->HasAura(89488))
+                        caster->CastSpell(caster, 96266, true);
+                    else if (caster->HasAura(89489))
+                        caster->CastSpell(caster, 96267, true);
+                }
                 // Inner Fire
-                if (GetSpellInfo()->Id == 588)
+                else if (GetSpellInfo()->Id == 588)
                 {
                     // Inner Sanctum
                     if (AuraEffect * aur = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 51, 0))

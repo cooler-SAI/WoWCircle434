@@ -4704,6 +4704,11 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->ProcCharges = 1;
                 spellInfo->ProcFlags = PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS;
                 break;
+            // Strength of Soul
+            case 89488:
+            case 89489:
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE;
+                break;
             default:
                 break;
         }

@@ -4862,6 +4862,11 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     }
                     break;
                 }
+                // Strength of Soul
+                case 89490:
+                    if (Aura * aur = unitTarget->GetAura(6788, m_caster->GetGUID()))
+                        aur->SetAuraTimer(std::max(aur->GetDuration() - damage*1000, 0), m_caster->GetGUID());
+                    break;
             }
             break;
         }
