@@ -262,7 +262,6 @@ public:
                     unit->RemoveAurasDueToSpell(SPELL_GRAVITY_LAPSE_DOT);
 
                     unit->ToPlayer()->SendMovementSetCanFly(false);
-                    unit->SendMessageToSet(&data, true);
                 }
             }
         }
