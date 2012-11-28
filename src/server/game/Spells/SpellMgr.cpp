@@ -4709,6 +4709,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 89489:
                 spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE;
                 break;
+            // Circle of Healing
+            case 34861:
+                spellInfo->Effects[0].SetRadiusIndex(10);
+                spellInfo->Effects[0].TargetB = TARGET_UNIT_CASTER_AREA_RAID;
+                break;
             default:
                 break;
         }
