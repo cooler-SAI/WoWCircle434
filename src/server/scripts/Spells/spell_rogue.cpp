@@ -163,6 +163,12 @@ class spell_rog_preparation : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
+                if (!GetCaster())
+                    return;
+
+                if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                    return;
+
                 Player* caster = GetCaster()->ToPlayer();
 
                 //immediately finishes the cooldown on certain Rogue abilities
