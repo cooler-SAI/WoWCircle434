@@ -4698,6 +4698,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[1].Effect = SPELL_EFFECT_APPLY_AURA;
                 spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_DUMMY;
                 break;
+            // Inner Focus
+            case 89485:
+                spellInfo->ProcChance = 100;
+                spellInfo->ProcCharges = 1;
+                spellInfo->ProcFlags = PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS;
+                break;
             default:
                 break;
         }
