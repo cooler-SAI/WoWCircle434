@@ -1361,7 +1361,8 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 else if (m_spellInfo->SpellFamilyFlags[0] & 0x1 && GetEffect(0))
                 {
                     // Weakened Soul
-                    caster->CastSpell(GetUnitOwner(), 6788, true);
+                    if (!target->HasAura(6788))
+                        caster->CastSpell(target, 6788, true);
 
                     // Glyph of Power Word: Shield
                     if (AuraEffect* glyph = caster->GetAuraEffect(55672, 0))
@@ -1369,6 +1370,16 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // instantly heal m_amount% of the absorb-value
                         int32 heal = glyph->GetAmount() * GetEffect(0)->GetAmount()/100;
                         caster->CastCustomSpell(GetUnitOwner(), 56160, &heal, NULL, NULL, true, 0, GetEffect(0));
+                    }
+                }
+                // Renew
+                else if (GetSpellInfo()->SpellFamilyFlags[0] & 0x00000040 && GetEffect(0))
+                {
+                    // Divine Touch
+                    if (AuraEffect const * aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3021, 0))
+                    {
+                        int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * caster->SpellHealingBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), HEAL) / 100;
+                        caster->CastCustomSpell(target, 63544, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
                     }
                 }
                 break;
@@ -1563,29 +1574,28 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 if (!caster)
                     break;
                 // Power word: shield
-                if (removeMode == AURA_REMOVE_BY_ENEMY_SPELL && GetSpellInfo()->SpellFamilyFlags[0] & 0x00000001)
+                if (m_spellInfo->Id == 17)
                 {
-                    // Rapture
-                    if (Aura const* aura = caster->GetAuraOfRankedSpell(47535))
+                    if (removeMode == AURA_REMOVE_BY_ENEMY_SPELL || removeMode == AURA_REMOVE_BY_DEFAULT)
                     {
-                        // check cooldown
-                        if (caster->GetTypeId() == TYPEID_PLAYER)
+                        // Rapture
+                        if (AuraEffect* auraEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PRIEST, 2894, 0))
                         {
-                            if (caster->ToPlayer()->HasSpellCooldown(aura->GetId()))
+                            // check cooldown
+                            if (caster->GetTypeId() == TYPEID_PLAYER)
                             {
-                                // This additional check is needed to add a minimal delay before cooldown in in effect
-                                // to allow all bubbles broken by a single damage source proc mana return
-                                if (caster->ToPlayer()->GetSpellCooldownDelay(aura->GetId()) <= 11)
-                                    break;
+                                if (caster->ToPlayer()->HasSpellCooldown(auraEff->GetId()))
+                                {
+                                    // This additional check is needed to add a minimal delay before cooldown in in effect
+                                    // to allow all bubbles broken by a single damage source proc mana return
+                                    if (caster->ToPlayer()->GetSpellCooldownDelay(auraEff->GetId()) <= 11)
+                                        break;
+                                }
+                                else    // and add if needed
+                                    caster->ToPlayer()->AddSpellCooldown(auraEff->GetId(), 0, uint32(time(NULL) + 12));
                             }
-                            else    // and add if needed
-                                caster->ToPlayer()->AddSpellCooldown(aura->GetId(), 0, uint32(time(NULL) + 12));
-                        }
 
-                        // effect on caster
-                        if (AuraEffect const* aurEff = aura->GetEffect(0))
-                        {
-                            float multiplier = float(aurEff->GetAmount());
+                            float multiplier = float(auraEff->GetAmount());
                             int32 basepoints0 = int32(CalculatePct(caster->GetMaxPower(POWER_MANA), multiplier));
                             caster->CastCustomSpell(caster, 47755, &basepoints0, NULL, NULL, true);
                         }
