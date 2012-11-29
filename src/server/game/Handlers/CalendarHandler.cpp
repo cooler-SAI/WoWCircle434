@@ -478,7 +478,7 @@ void WorldSession::HandleCalendarEventRsvp(WorldPacket& recvData)
     uint64 guid = _player->GetGUID();
     uint64 eventId;
     uint64 inviteId;
-    uint8 status;
+    uint32 status;
 
     recvData >> eventId >> inviteId >> status;
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_CALENDAR_EVENT_RSVP [" UI64FMTD"] EventId ["
@@ -530,7 +530,7 @@ void WorldSession::HandleCalendarEventStatus(WorldPacket& recvData)
     uint64 eventId;
     uint64 inviteId;
     uint64 owninviteId;
-    uint8 status;
+    uint32 status;
 
     recvData.readPackGUID(invitee);
     recvData >> eventId >>  inviteId >> owninviteId >> status;
@@ -557,7 +557,7 @@ void WorldSession::HandleCalendarEventModeratorStatus(WorldPacket& recvData)
     uint64 eventId;
     uint64 inviteId;
     uint64 owninviteId;
-    uint8 status;
+    uint32 status;
 
     recvData.readPackGUID(invitee);
     recvData >> eventId >>  inviteId >> owninviteId >> status;

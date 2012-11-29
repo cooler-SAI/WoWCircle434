@@ -474,6 +474,7 @@ void Unit::UpdateSplinePosition()
 void Unit::DisableSpline()
 {
     m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FORWARD);
+    m_movementInfo.RemoveServerMovementFlag(ServerMovementFlags(SERVERMOVEFLAG_SPLINE1));
     movespline->_Interrupt();
 }
 
@@ -17062,6 +17063,18 @@ void Unit::UpdateObjectVisibility(bool forced)
 
 void Unit::SendMoveKnockBack(Player* player, float speedXY, float speedZ, float vcos, float vsin)
 {
+    /*Update movementInfo data*/
+    {
+        m_movementInfo.AddServerMovementFlag(SERVERMOVEFLAG_FALLDATA);
+        m_movementInfo.AddServerMovementFlag(SERVERMOVEFLAG_FALLDIRECTION);
+
+        m_movementInfo.fallTime = 0;
+        m_movementInfo.j_cosAngle = vcos;
+        m_movementInfo.j_sinAngle = vsin;
+        m_movementInfo.j_xyspeed = speedXY;
+        m_movementInfo.j_zspeed = speedZ;
+    }
+
     ObjectGuid guid = GetGUID();
     WorldPacket data(SMSG_MOVE_KNOCK_BACK, (1+8+4+4+4+4+4));
     data.WriteByteMask(guid[0]);
@@ -17075,20 +17088,20 @@ void Unit::SendMoveKnockBack(Player* player, float speedXY, float speedZ, float 
 
     data.WriteByteSeq(guid[1]);
 
-    data << float(vsin);
+    data << float(m_movementInfo.j_sinAngle);
     data << uint32(0);
 
     data.WriteByteSeq(guid[6]);
     data.WriteByteSeq(guid[7]);
 
-    data << float(speedXY);
+    data << float(m_movementInfo.j_xyspeed);
 
     data.WriteByteSeq(guid[4]);
     data.WriteByteSeq(guid[5]);
     data.WriteByteSeq(guid[3]);
 
-    data << float(speedZ);
-    data << float(vcos);
+    data << float(m_movementInfo.j_zspeed);
+    data << float(m_movementInfo.j_cosAngle);
 
     data.WriteByteSeq(guid[2]);
     data.WriteByteSeq(guid[0]);

@@ -103,6 +103,7 @@ namespace Movement
         if (moveFlags & MOVEMENTFLAG_ROOT)
             moveFlags &= ~MOVEMENTFLAG_MASK_MOVING;
 
+        unit.m_movementInfo.AddServerMovementFlag(SERVERMOVEFLAG_SPLINE1);
         unit.m_movementInfo.SetMovementFlags(moveFlags);
         move_spline.Initialize(args);
 

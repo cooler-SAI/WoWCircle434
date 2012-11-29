@@ -556,6 +556,7 @@ struct MovementInfo
     uint64 guid;
     uint32 flags;
     uint16 flags2;
+    uint16 flags_s;
     Position pos;
     uint32 time;
     // transport
@@ -582,6 +583,7 @@ struct MovementInfo
         guid = 0;
         flags = 0;
         flags2 = 0;
+        flags_s = 0;
         time = t_time = t_time2 = t_time3 = fallTime = 0;
         splineElevation = 0;
         speed = 0.0f;
@@ -601,10 +603,16 @@ struct MovementInfo
     void AddExtraMovementFlag(uint16 flag) { flags2 |= flag; }
     bool HasExtraMovementFlag(uint16 flag) const { return flags2 & flag; }
 
+    uint16 GetServerMovementFlags() const { return flags_s; }
+    void AddServerMovementFlag(uint16 flag) { flags_s |= flag; }
+    bool HasServerMovementFlag(uint16 flag) const { return flags_s & flag; }
+    void RemoveServerMovementFlag(uint16 flag) { flags_s &= ~flag; }
+
     void SetFallTime(uint32 time) { fallTime = time; }
 
     void OutDebug();
 
+    void Normalize();
     bool Check(Player* target);
     bool AcceptClientChanges(Player* player, MovementInfo& client);
     bool HasTransportData() const { return t_guid != 0LL; }
