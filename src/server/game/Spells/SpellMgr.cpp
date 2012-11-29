@@ -4733,6 +4733,14 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[1].SetRadiusIndex(14);
                 spellInfo->Effects[2].SetRadiusIndex(14);
                 break;
+            // Shadow Orbs
+            case 77486:
+                spellInfo->ProcChance = 0;
+                spellInfo->ProcCharges = 0;
+                spellInfo->ProcFlags = 0;
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_DUMMY;
+                spellInfo->Effects[0].TriggerSpell = 0;
+                break;
             default:
                 break;
         }

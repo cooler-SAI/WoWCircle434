@@ -6090,6 +6090,16 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             switch (dummySpell->Id)
             {
+                // Shadow Orbs
+                case 95740:
+                {
+                    uint32 chance = 10;
+                    if (AuraEffect* aurEff = GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_PRIEST, 554, 0))
+                        chance += aurEff->GetAmount();
+                    if (!roll_chance_i(chance))
+                        return false;
+                    break;
+                }
                 // Chakra
                 case 14751:
                 {
@@ -10227,24 +10237,48 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
             }
             break;
         case SPELLFAMILY_PRIEST:
-            // Smite
-            if (spellProto->SpellFamilyFlags[0] & 0x80)
+            switch (spellProto->Id)
             {
-                // Glyph of Smite
-                if (AuraEffect* aurEff = GetAuraEffect(55692, 0))
-                    if (victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x100000, 0, 0, GetGUID()))
-                        AddPct(DoneTotalMod, aurEff->GetAmount());
-            }
-            // Triple damage for Shadow word: death
-            else if (spellProto->Id == 32379)
-                if (victim->GetHealthPct() < 25)
+                // Smite
+                case 585:
                 {
-                    int32 mod = 300;
-                    // Mind Melt
-                    if (AuraEffect* aur = GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3139, 0))
-                        mod += aur->GetAmount();
-                    AddPct(DoneTotalMod, 300);
+                    // Glyph of Smite
+                    if (AuraEffect* aurEff = GetAuraEffect(55692, 0))
+                        if (victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x100000, 0, 0, GetGUID()))
+                            AddPct(DoneTotalMod, aurEff->GetAmount());
                 }
+                // Triple damage for Shadow word: death
+                case 2379:
+                {
+                    if (victim->GetHealthPct() < 25)
+                    {
+                        int32 mod = 300;
+                        // Mind Melt
+                        if (AuraEffect* aur = GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3139, 0))
+                            mod += aur->GetAmount();
+                        AddPct(DoneTotalMod, 300);
+                    }
+                }
+                case 73510: // Mind Blast
+                case 8092:  // Mind Spike
+                {
+                    // Damage with shadow orbs
+                    if (Aura* sphere = GetAura(77487))
+                    {
+                        int32 mod = sphere->GetStackAmount() * 10;
+                        int32 mastery = 0;
+                        if (Aura* aur = GetAura(77486))
+                            mastery = aur->GetEffect(0)->GetAmount();
+                        mod += mastery * sphere->GetStackAmount();
+                        AddPct(DoneTotalMod, mod);
+                        int32 bp = 10 + mastery;
+                        if (victim)
+                            CastCustomSpell(victim, 95799, &bp, &bp, NULL, true);
+                        RemoveAurasDueToSpell(77487);
+                    }
+                    break;
+                }
+            }
             break;
         case SPELLFAMILY_WARLOCK:
             // Fire and Brimstone
@@ -10763,10 +10797,17 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
     if (Player* modOwner = GetSpellModOwner())
         modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_CRITICAL_CHANCE, crit_chance);
 
-    AuraEffectList const& critAuras = victim->GetAuraEffectsByType(SPELL_AURA_MOD_CRIT_CHANCE_FOR_CASTER);
-    for (AuraEffectList::const_iterator i = critAuras.begin(); i != critAuras.end(); ++i)
-        if ((*i)->GetCasterGUID() == GetGUID() && (*i)->IsAffectingSpell(spellProto))
-            crit_chance += (*i)->GetAmount();
+    if (victim)
+    {
+        AuraEffectList const& critAuras = victim->GetAuraEffectsByType(SPELL_AURA_MOD_CRIT_CHANCE_FOR_CASTER);
+        for (AuraEffectList::const_iterator i = critAuras.begin(); i != critAuras.end(); ++i)
+            if ((*i)->GetCasterGUID() == GetGUID() && (*i)->IsAffectingSpell(spellProto))
+                crit_chance += (*i)->GetAmount();
+
+        // Mind Blast & Mind Spike debuff
+        if (spellProto->Id == 8092)
+            victim->RemoveAurasDueToSpell(87178, GetGUID());
+    }
 
     crit_chance = crit_chance > 0.0f ? crit_chance : 0.0f;
     if (roll_chance_f(crit_chance))
