@@ -8427,6 +8427,13 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Masochism
+        case 88994:
+        case 88995:
+            if (damage < CountPctFromMaxHealth(10))
+                if (!procSpell || (procSpell && procSpell->Id != 32409))
+                    return false;
+            break;
         // Protector of the Innocent
         case 20138:
         case 20139:
