@@ -246,7 +246,7 @@ class WorldSession
         bool IsAddonRegistered(const std::string& prefix) const;
 
         void ReadMovementInfo(WorldPacket& data, MovementInfo* mi);
-        void WriteMovementInfo(WorldPacket& data, MovementInfo* mi);
+        static void WriteMovementInfo(WorldPacket& data, MovementInfo* mi);
 
         void SendPacket(WorldPacket const* packet, bool forced = false);
 

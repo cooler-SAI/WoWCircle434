@@ -434,9 +434,7 @@ public:
             me->Relocate(x, y, z + 0.94f);
             me->SetDisableGravity(true);
             me->HandleEmoteCommand(EMOTE_ONESHOT_DANCE);
-            WorldPacket data;                       //send update position to client
-            me->BuildHeartBeatMsg(&data);
-            me->SendMessageToSet(&data, true);
+            me->SendMovementFlagUpdate(true);
         }
 
         void UpdateAI(uint32 const diff)
@@ -463,9 +461,7 @@ public:
                 me->SetInFront(player);
                 Active = false;
 
-                WorldPacket data;
-                me->BuildHeartBeatMsg(&data);
-                me->SendMessageToSet(&data, true);
+                me->SendMovementFlagUpdate(true);
                 switch (emote)
                 {
                     case TEXT_EMOTE_KISS:

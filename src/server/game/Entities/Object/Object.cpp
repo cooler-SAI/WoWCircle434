@@ -2478,13 +2478,6 @@ void WorldObject::BuildMonsterChat(WorldPacket* data, uint8 msgtype, char const*
     *data << (uint8)0;                                      // ChatTag
 }
 
-void Unit::BuildHeartBeatMsg(WorldPacket* data) const
-{
-    data->Initialize(MSG_MOVE_HEARTBEAT, 32);
-    data->append(GetPackGUID());
-    BuildMovementPacket(data);
-}
-
 void WorldObject::SendMessageToSet(WorldPacket* data, bool self)
 {
     if (IsInWorld())
@@ -3245,11 +3238,10 @@ void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
 
 void WorldObject::PlayDistanceSound(uint32 sound_id, Player* target /*= NULL*/)
 {
-   #pragma warning Packet - uint32 uint64 uint64 - target
-
-    WorldPacket data(SMSG_PLAY_OBJECT_SOUND, 4+8);
+    WorldPacket data(SMSG_PLAY_OBJECT_SOUND, 4+8+8);
     data << uint32(sound_id);
     data << uint64(GetGUID());
+    data << uint64(target ? target->GetGUID() : GetGUID());
     if (target)
         target->SendDirectMessage(&data);
     else

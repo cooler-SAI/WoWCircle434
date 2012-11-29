@@ -20251,7 +20251,6 @@ void Player::SendMessageBox(const std::string& text)
 void Player::PetSpellInitialize()
 {
     Pet* pet = GetPet();
-
     if (!pet)
         return;
 
@@ -20337,7 +20336,6 @@ void Player::PossessSpellInitialize()
         return;
 
     CharmInfo* charmInfo = charm->GetCharmInfo();
-
     if (!charmInfo)
     {
         sLog->outError(LOG_FILTER_PLAYER, "Player::PossessSpellInitialize(): charm ("UI64FMTD") has no charminfo!", charm->GetGUID());

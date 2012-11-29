@@ -15067,8 +15067,8 @@ void Unit::StopMoving()
 
 void Unit::SendMovementFlagUpdate(bool self /* = false */)
 {
-    WorldPacket data;
-    BuildHeartBeatMsg(&data);
+    WorldPacket data(MSG_MOVE_HEARTBEAT, 30);
+    WorldSession::WriteMovementInfo(data, &m_movementInfo);
     SendMessageToSet(&data, self);
 }
 
@@ -18473,10 +18473,7 @@ void Unit::SendMovementFeatherFall()
 
 void Unit::SendMovementGravityChange()
 {
-    WorldPacket data(MSG_MOVE_GRAVITY_CHNG, 64);
-    data.append(GetPackGUID());
-    BuildMovementPacket(&data);
-    SendMessageToSet(&data, false);
+#pragma warning "MSG_MOVE_GRAVITY_CHNG not found in 434, replaced by SMSG_SPLINE_* opcode ?"
 }
 
 void Unit::SendMovementCanFlyChange()
@@ -18498,12 +18495,7 @@ void Unit::SendMovementCanFlyChange()
     if (GetTypeId() == TYPEID_PLAYER)
         ToPlayer()->SendMovementSetCanFly(CanFly());
 
-    //SMSG_SPLINE_MOVE_SET_FLYING
-    //SMSG_SPLINE_MOVE_UNSET_FLYING
-    WorldPacket data(MSG_MOVE_UPDATE_CAN_FLY, 64);
-    data.append(GetPackGUID());
-    BuildMovementPacket(&data);
-    SendMessageToSet(&data, false);
+#pragma warning "MSG_MOVE_UPDATE_CAN_FLY not found, replaced by SMSG_SPLINE_MOVE_SET_FLYING, SMSG_SPLINE_MOVE_UNSET_FLYING ???"
 }
 
 bool Unit::IsSplineEnabled() const
