@@ -4828,6 +4828,13 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         case SPELLFAMILY_PRIEST:
             switch (m_spellInfo->Id)
             {
+                // Chakra: Serenity - renew update proc
+                case 81585:
+                {
+                    if (Aura * aur = unitTarget->GetAura(139, m_caster->GetGUID()))
+                        aur->RefreshDuration();
+                    break;
+                }
                 // Archangel
                 case 87151:
                 {

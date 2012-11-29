@@ -6090,6 +6090,35 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             switch (dummySpell->Id)
             {
+                // Chakra
+                case 14751:
+                {
+                    if (!procSpell)
+                        return false;
+
+                    target = this;
+
+                    switch (procSpell->Id)
+                    {
+                        case 585: // Smite
+                        case 73510: // Mind Spike
+                            triggered_spell_id = 81209;
+                            break;
+                        case 2050: // Heal
+                        case 2060: // Greater Heal
+                        case 2061: // Flash Heal
+                        case 32546: // Binding heal
+                            triggered_spell_id = 81208;
+                            break;
+                        case 596: // Prayer of Healing
+                        case 33076: // Prayer of Mending
+                            triggered_spell_id = 81206;
+                            break;
+                        default:
+                            return false;
+                    }
+                    break;
+                }
                 // Evangelism  Rank 1
                 case 81659: 
                 {

@@ -4714,6 +4714,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].SetRadiusIndex(10);
                 spellInfo->Effects[0].TargetB = TARGET_UNIT_CASTER_AREA_RAID;
                 break;
+            // Chakra
+            case 14751:
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_DUMMY;
+                spellInfo->Effects[1].Effect = 0;
+                spellInfo->Effects[2].Effect = 0;
+                break;
             default:
                 break;
         }
