@@ -3103,6 +3103,16 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
     if (success_list.empty())
         return;
 
+    // Glyph of Dispel Magic
+    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && m_spellInfo->SpellFamilyFlags[1] & 1)
+        if (AuraEffect* aurEff = m_caster->GetAuraEffect(55677, 0))
+            if (m_caster->IsFriendlyTo(unitTarget))
+            {
+                int32 bp = int32(unitTarget->CountPctFromMaxHealth(aurEff->GetAmount()));
+                m_caster->CastCustomSpell(unitTarget, 56131, &bp, 0, 0, true); 
+            }
+
+
     WorldPacket dataSuccess(SMSG_SPELLDISPELLOG, 8+8+4+1+4+success_list.size()*5);
     // Send packet header
     dataSuccess.append(unitTarget->GetPackGUID());         // Victim GUID

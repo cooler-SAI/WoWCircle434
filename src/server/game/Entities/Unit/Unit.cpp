@@ -6091,6 +6091,33 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             switch (dummySpell->Id)
             {
+                // Phantasm
+                case 47570:
+                case 47569:
+                {
+                    RemoveMovementImpairingAuras();
+                    break;
+                }
+                // Sin and Punishment
+                case 87099:
+                case 87100:
+                {
+                    ToPlayer()->ReduceSpellCooldown(34433, (triggerAmount * 1000));
+                    break;
+                }
+                // Train of Thought
+                case 92295:
+                case 92297:
+                {
+                    if (GetTypeId() != TYPEID_PLAYER)
+                        return false;
+
+                    if (procSpell->Id == 585)
+                        ToPlayer()->ReduceSpellCooldown(47540, 500);
+                    else
+                        ToPlayer()->ReduceSpellCooldown(89485, 5000);
+                    break;
+                }
                 // Shadow Orbs
                 case 95740:
                 {
@@ -6186,26 +6213,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                     int32 tickcount = GoPoH->GetMaxDuration() / GoPoH->Effects[EFFECT_0].Amplitude;
                     basepoints0 = CalculatePct(int32(damage), triggerAmount) / tickcount;
-                    break;
-                }
-                // Phantasm
-                case 47569:
-                case 47570:
-                {
-                    if (!roll_chance_i(triggerAmount))
-                        return false;
-
-                    RemoveMovementImpairingAuras();
-                    break;
-                }
-                // Glyph of Dispel Magic
-                case 55677:
-                {
-                    if (!target || !target->IsFriendlyTo(this))
-                        return false;
-
-                    basepoints0 = int32(target->CountPctFromMaxHealth(triggerAmount));
-                    triggered_spell_id = 56131;
                     break;
                 }
                 // Oracle Healing Bonus ("Garments of the Oracle" set)
