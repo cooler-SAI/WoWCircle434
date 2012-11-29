@@ -8660,6 +8660,15 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // dummy basepoints or other customs
     switch (trigger_spell_id)
     {
+        // Power Word: Barrier
+        case 81782:
+        case 90785:
+            if (Aura* aur = victim->GetAura(trigger_spell_id))
+            {
+                aur->SetDuration(aur->GetMaxDuration(), true);
+                return false;
+            }
+            break;
         // Auras which should proc on area aura source (caster in this case):
         // Cast positive spell on enemy target
         case 7099:  // Curse of Mending
