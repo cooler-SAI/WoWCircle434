@@ -18321,13 +18321,55 @@ void Unit::SendMovementHover(bool apply)
     if (GetTypeId() == TYPEID_PLAYER)
         ToPlayer()->SendMovementSetHover(HasUnitMovementFlag(MOVEMENTFLAG_HOVER));
 
+    ObjectGuid guid = GetGUID();
+
+    WorldPacket data;
     if (apply)
     {
-        WorldPacket data(MSG_MOVE_HOVER, 64);
-        data.append(GetPackGUID());
-        BuildMovementPacket(&data);
-        SendMessageToSet(&data, false);
+        data.Initialize(SMSG_SPLINE_MOVE_SET_HOVER, 1 + 8);
+        data
+            .WriteByteMask(guid[3])
+            .WriteByteMask(guid[7])
+            .WriteByteMask(guid[0])
+            .WriteByteMask(guid[1])
+            .WriteByteMask(guid[4])
+            .WriteByteMask(guid[6])
+            .WriteByteMask(guid[2])
+            .WriteByteMask(guid[5])
+
+            .WriteByteSeq(guid[2])
+            .WriteByteSeq(guid[4])
+            .WriteByteSeq(guid[3])
+            .WriteByteSeq(guid[1])
+            .WriteByteSeq(guid[7])
+            .WriteByteSeq(guid[0])
+            .WriteByteSeq(guid[5])
+            .WriteByteSeq(guid[6]);
     }
+    else
+    {
+        data.Initialize(SMSG_SPLINE_MOVE_UNSET_HOVER, 1 + 8);
+        data
+            .WriteByteMask(guid[6])
+            .WriteByteMask(guid[7])
+            .WriteByteMask(guid[4])
+            .WriteByteMask(guid[0])
+            .WriteByteMask(guid[3])
+            .WriteByteMask(guid[1])
+            .WriteByteMask(guid[5])
+            .WriteByteMask(guid[2])
+
+            .WriteByteSeq(guid[4])
+            .WriteByteSeq(guid[5])
+            .WriteByteSeq(guid[3])
+            .WriteByteSeq(guid[0])
+            .WriteByteSeq(guid[2])
+            .WriteByteSeq(guid[7])
+            .WriteByteSeq(guid[6])
+            .WriteByteSeq(guid[1]);
+    }
+
+    SendMessageToSet(&data, false);
 }
 
 void Unit::SendMovementWaterWalking()
@@ -18335,9 +18377,27 @@ void Unit::SendMovementWaterWalking()
     if (GetTypeId() == TYPEID_PLAYER)
         ToPlayer()->SendMovementSetWaterWalking(HasUnitMovementFlag(MOVEMENTFLAG_WATERWALKING));
 
-    WorldPacket data(MSG_MOVE_WATER_WALK, 64);
-    data.append(GetPackGUID());
-    BuildMovementPacket(&data);
+    ObjectGuid guid = GetGUID();
+    WorldPacket data(SMSG_SPLINE_MOVE_WATER_WALK, 1 + 8);
+    data
+        .WriteByteMask(guid[6])
+        .WriteByteMask(guid[1])
+        .WriteByteMask(guid[4])
+        .WriteByteMask(guid[2])
+        .WriteByteMask(guid[3])
+        .WriteByteMask(guid[7])
+        .WriteByteMask(guid[5])
+        .WriteByteMask(guid[0])
+
+        .WriteByteSeq(guid[0])
+        .WriteByteSeq(guid[6])
+        .WriteByteSeq(guid[3])
+        .WriteByteSeq(guid[7])
+        .WriteByteSeq(guid[4])
+        .WriteByteSeq(guid[2])
+        .WriteByteSeq(guid[5])
+        .WriteByteSeq(guid[1]);
+
     SendMessageToSet(&data, false);
 }
 
@@ -18346,9 +18406,27 @@ void Unit::SendMovementFeatherFall()
     if (GetTypeId() == TYPEID_PLAYER)
         ToPlayer()->SendMovementSetFeatherFall(HasUnitMovementFlag(MOVEMENTFLAG_FALLING_SLOW));
 
-    WorldPacket data(MSG_MOVE_FEATHER_FALL, 64);
-    data.append(GetPackGUID());
-    BuildMovementPacket(&data);
+    ObjectGuid guid = GetGUID();
+    WorldPacket data(SMSG_SPLINE_MOVE_SET_FEATHER_FALL, 1 + 8);
+    data
+        .WriteByteMask(guid[3])
+        .WriteByteMask(guid[2])
+        .WriteByteMask(guid[7])
+        .WriteByteMask(guid[5])
+        .WriteByteMask(guid[4])
+        .WriteByteMask(guid[6])
+        .WriteByteMask(guid[1])
+        .WriteByteMask(guid[0])
+
+        .WriteByteSeq(guid[1])
+        .WriteByteSeq(guid[4])
+        .WriteByteSeq(guid[7])
+        .WriteByteSeq(guid[6])
+        .WriteByteSeq(guid[2])
+        .WriteByteSeq(guid[0])
+        .WriteByteSeq(guid[5])
+        .WriteByteSeq(guid[3]);
+
     SendMessageToSet(&data, false);
 }
 
@@ -18379,6 +18457,8 @@ void Unit::SendMovementCanFlyChange()
     if (GetTypeId() == TYPEID_PLAYER)
         ToPlayer()->SendMovementSetCanFly(CanFly());
 
+    //SMSG_SPLINE_MOVE_SET_FLYING
+    //SMSG_SPLINE_MOVE_UNSET_FLYING
     WorldPacket data(MSG_MOVE_UPDATE_CAN_FLY, 64);
     data.append(GetPackGUID());
     BuildMovementPacket(&data);
