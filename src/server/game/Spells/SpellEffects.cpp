@@ -1158,6 +1158,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                // Dispel Magic
                 case 527:
                     if (!unitTarget)
                         return;
@@ -1167,6 +1168,12 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     else
                         m_caster->CastSpell(unitTarget, 97691, true);
                     break;
+                // Leap of faith
+                case 73325: 
+                {
+                    unitTarget->CastSpell(m_caster, 92832, true);
+                    break;
+                }
                 default:
                     break;
             }

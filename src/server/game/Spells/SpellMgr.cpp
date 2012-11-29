@@ -3028,12 +3028,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 34130: // Create Healthstone
                 spellInfo->Effects[0].BasePoints = 1;
                 break;
-            case 99:
-            case 5857:
-            case 15237:
-            case 23455:
-            case 49203:
-            case 52212:
+            case 99:    // Demoralizing Roar
+            case 5857:  // Hellfire Effect
+            case 49203: // Hungering Cold
+            case 52212: // Death and Decay
                 spellInfo->Effects[0].SetRadiusIndex(13);
                 break;
             case 6343: // Thunder Clap (Battle, Defensive Stance)
@@ -4719,6 +4717,15 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_DUMMY;
                 spellInfo->Effects[1].Effect = 0;
                 spellInfo->Effects[2].Effect = 0;
+                break;
+            // Holy Nova dmg
+            case 15237:
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                break;
+            // Holy Nova heal
+            case 23455: 
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                spellInfo->MaxAffectedTargets = 5;
                 break;
             default:
                 break;
