@@ -4727,6 +4727,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].SetRadiusIndex(13);
                 spellInfo->MaxAffectedTargets = 5;
                 break;
+            // Mental Scream
+            case 8122:
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                spellInfo->Effects[1].SetRadiusIndex(14);
+                spellInfo->Effects[2].SetRadiusIndex(14);
+                break;
             default:
                 break;
         }
