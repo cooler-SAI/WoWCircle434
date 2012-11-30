@@ -103,13 +103,15 @@ class spell_mage_cold_snap : public SpellScriptLoader
             {
                 Player* caster = GetCaster()->ToPlayer();
 
-                caster->RemoveSpellCooldown(120, true); // Cone of Cold
-                caster->RemoveSpellCooldown(122, true); // Frost Nova
-                caster->RemoveSpellCooldown(11426, true); // Ice Barrier
-                caster->RemoveSpellCooldown(12472, true); // Icy Veins
-                caster->RemoveSpellCooldown(31687, true); // Summon Water Elemental
-                caster->RemoveSpellCooldown(44572, true); // Deep Freeze
-                caster->RemoveSpellCooldown(45438, true); // Ice Block
+                caster->RemoveSpellCooldown(120, true, true); // Cone of Cold
+                caster->RemoveSpellCooldown(122, true, true); // Frost Nova
+                caster->RemoveSpellCooldown(11426, true, true); // Ice Barrier
+                caster->RemoveSpellCooldown(12472, true, true); // Icy Veins
+                caster->RemoveSpellCooldown(31687, true, true); // Summon Water Elemental
+                caster->RemoveSpellCooldown(44572, true, true); // Deep Freeze
+                caster->RemoveSpellCooldown(45438, true, true); // Ice Block
+
+                caster->SendClearCooldownMap(caster);
             }
 
             void Register()

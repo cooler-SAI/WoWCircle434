@@ -230,7 +230,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
                 return;
             }
 
-            WorldPacket packet(SMSG_UPDATE_CURRENCY, 4 + (weekCap != 0) ? 4 : 0);
+            WorldPacket packet(SMSG_UPDATE_CURRENCY, 4 + (weekCap != 0 ? 4 : 0));
 
             packet
                 .WriteBit(weekCap != 0)

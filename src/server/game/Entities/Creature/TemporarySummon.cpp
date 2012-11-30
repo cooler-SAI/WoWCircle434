@@ -190,8 +190,9 @@ void TempSummon::InitStats(uint32 duration)
 
     if (owner)
     {
-        if (uint32 slot = m_Properties->Slot)
+        if (uint8 slot = uint8(m_Properties->Slot))
         {
+            ASSERT(slot < MAX_SUMMON_SLOT);
             if (owner->m_SummonSlot[slot] && owner->m_SummonSlot[slot] != GetGUID())
             {
                 Creature* oldSummon = GetMap()->GetCreature(owner->m_SummonSlot[slot]);
@@ -258,14 +259,18 @@ bool ForcedUnsummonDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 
 void TempSummon::RemoveFromWorld()
 {
-    if (!IsInWorld())
+    if (!IsInWorld() || !m_Properties)
         return;
 
-    if (m_Properties)
-        if (uint32 slot = m_Properties->Slot)
-            if (Unit* owner = GetSummoner())
-                if (owner->m_SummonSlot[slot] == GetGUID())
-                    owner->m_SummonSlot[slot] = 0;
+    if (uint8 slot = uint8(m_Properties->Slot))
+    {
+        ASSERT(slot < MAX_SUMMON_SLOT);
+        if (Unit* owner = GetSummoner())
+        {
+            if (owner->m_SummonSlot[slot] == GetGUID())
+                owner->m_SummonSlot[slot] = 0;
+        }
+    }
 
     //if (GetOwnerGUID())
     //    sLog->outError(LOG_FILTER_UNITS, "Unit %u has owner guid when removed from world", GetEntry());

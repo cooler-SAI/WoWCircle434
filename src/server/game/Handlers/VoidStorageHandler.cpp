@@ -558,7 +558,7 @@ void WorldSession::HandleVoidSwapItem(WorldPacket& recvData)
         return;
     }
 
-    WorldPacket data(SMSG_VOID_ITEM_SWAP_RESPONSE, 1 + (usedSrcSlot + usedDestSlot) * (1 + 7 + 4));
+    WorldPacket data(SMSG_VOID_ITEM_SWAP_RESPONSE, 1 + (uint8(usedSrcSlot) + uint8(usedDestSlot)) * (1 + 7 + 4));
 
     data.WriteBit(!usedDestSlot);
     data.WriteBit(!usedSrcSlot);

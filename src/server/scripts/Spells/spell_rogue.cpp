@@ -165,16 +165,18 @@ class spell_rog_preparation : public SpellScriptLoader
             {
                 Player* caster = GetCaster()->ToPlayer();
 
-                caster->RemoveSpellCooldown(1856, true); // Vanish
-                caster->RemoveSpellCooldown(2983, true); // Sprint
-                caster->RemoveSpellCooldown(36554, true); // Shadowstep
+                caster->RemoveSpellCooldown(1856, true, true); // Vanish
+                caster->RemoveSpellCooldown(2983, true, true); // Sprint
+                caster->RemoveSpellCooldown(36554, true, true); // Shadowstep
 
                 if (caster->HasAura(ROGUE_SPELL_GLYPH_OF_PREPARATION))
                 {
-                    caster->RemoveSpellCooldown(1756, true); // Kick
-                    caster->RemoveSpellCooldown(51722, true); // Dismantle
-                    caster->RemoveSpellCooldown(76577, true); // Smoke Bomb
+                    caster->RemoveSpellCooldown(1756, true, true); // Kick
+                    caster->RemoveSpellCooldown(51722, true, true); // Dismantle
+                    caster->RemoveSpellCooldown(76577, true, true); // Smoke Bomb
                 }
+
+                caster->SendClearCooldownMap(caster);
             }
 
             void Register()

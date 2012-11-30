@@ -343,10 +343,12 @@ class spell_hun_readiness : public SpellScriptLoader
                         spellInfo->Id != HUNTER_SPELL_BESTIAL_WRATH &&
                         spellInfo->Id != DRAENEI_SPELL_GIFT_OF_THE_NAARU &&
                         spellInfo->GetRecoveryTime() > 0)
-                        caster->RemoveSpellCooldown((itr++)->first, true);
+                        caster->RemoveSpellCooldown((itr++)->first, true, true);
                     else
                         ++itr;
                 }
+
+                caster->SendClearCooldownMap(caster);
             }
 
             void Register()

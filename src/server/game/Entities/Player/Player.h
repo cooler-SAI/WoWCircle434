@@ -334,6 +334,7 @@ struct SpellCooldown
 };
 
 typedef std::map<uint32, SpellCooldown> SpellCooldowns;
+typedef std::list<uint32> SpellCooldownToRemove;
 typedef UNORDERED_MAP<uint32 /*instanceId*/, time_t/*releaseTime*/> InstanceTimeMap;
 
 enum TrainerSpellState
@@ -2008,9 +2009,10 @@ class Player : public Unit, public GridObject<Player>
         void SendCooldownEvent(SpellInfo const* spellInfo, uint32 itemId = 0, Spell* spell = NULL, bool setCooldown = true);
         void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs);
         void ReduceSpellCooldown(uint32 spell_id, time_t modifyTime);
-        void RemoveSpellCooldown(uint32 spell_id, bool update = false);
+        void RemoveSpellCooldown(uint32 spell_id, bool update = false, bool manySpells = false);
         void RemoveSpellCategoryCooldown(uint32 cat, bool update = false);
         void SendClearCooldown(uint32 spell_id, Unit* target);
+        void SendClearCooldownMap(Unit* target);
         void SendClearAllCooldowns(Unit* target);
 
         GlobalCooldownMgr& GetGlobalCooldownMgr() { return m_GlobalCooldownMgr; }
@@ -3285,6 +3287,7 @@ class Player : public Unit, public GridObject<Player>
         ReputationMgr  m_reputationMgr;
 
         SpellCooldowns m_spellCooldowns;
+        SpellCooldownToRemove m_spellCooldownToRemove;
 
         uint32 m_ChampioningFaction;
         uint32 m_ChampioningFactionDungeonLevel;

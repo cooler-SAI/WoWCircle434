@@ -4378,12 +4378,14 @@ void Player::ReduceSpellCooldown(uint32 spell_id, time_t modifyTime)
     SendDirectMessage(&data);
 }
 
-void Player::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)
+void Player::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */, bool manySpells /* = false */)
 {
     m_spellCooldowns.erase(spell_id);
 
-    if (update)
+    if (update && !manySpells)
         SendClearCooldown(spell_id, this);
+    if (manySpells)
+        m_spellCooldownToRemove.push_back(spell_id);
 }
 
 // I am not sure which one is more efficient
@@ -4392,7 +4394,9 @@ void Player::RemoveCategoryCooldown(uint32 cat)
     SpellCategoryStore::const_iterator i_scstore = sSpellCategoryStore.find(cat);
     if (i_scstore != sSpellCategoryStore.end())
         for (SpellCategorySet::const_iterator i_scset = i_scstore->second.begin(); i_scset != i_scstore->second.end(); ++i_scset)
-            RemoveSpellCooldown(*i_scset, true);
+            RemoveSpellCooldown(*i_scset, true, true);
+
+    SendClearCooldownMap(this);
 }
 
 void Player::RemoveSpellCategoryCooldown(uint32 cat, bool update /* = false */)
@@ -4405,10 +4409,12 @@ void Player::RemoveSpellCategoryCooldown(uint32 cat, bool update /* = false */)
     for (SpellCooldowns::const_iterator i = m_spellCooldowns.begin(); i != m_spellCooldowns.end();)
     {
         if (ct_set.find(i->first) != ct_set.end())
-            RemoveSpellCooldown((i++)->first, update);
+            RemoveSpellCooldown((i++)->first, update, true);
         else
             ++i;
     }
+
+    SendClearCooldownMap(this);
 }
 
 void Player::RemoveArenaSpellCooldowns(bool removeActivePetCooldowns)
@@ -4427,10 +4433,12 @@ void Player::RemoveArenaSpellCooldowns(bool removeActivePetCooldowns)
             entry->CategoryRecoveryTime <= 10 * MINUTE * IN_MILLISECONDS)
         {
             // remove & notify
-            RemoveSpellCooldown(itr->first, true);
+            RemoveSpellCooldown(itr->first, true, true);
 
         }
     }
+
+    SendClearCooldownMap(this);
 
     // pet cooldowns
     if (removeActivePetCooldowns)
@@ -7532,25 +7540,30 @@ uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
 
 uint32 Player::GetZoneIdFromDB(uint64 guid)
 {
+    PreparedStatement* stmt = NULL;
+    PreparedQueryResult result = NULL;
+
     uint32 guidLow = GUID_LOPART(guid);
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_ZONE);
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_ZONE);
     stmt->setUInt32(0, guidLow);
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+    result = CharacterDatabase.Query(stmt);
 
     if (!result)
         return 0;
+
     Field* fields = result->Fetch();
     uint32 zone = fields[0].GetUInt16();
 
     if (!zone)
     {
         // stored zone is zero, use generic and slow zone detection
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_POSITION_XYZ);
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_POSITION_XYZ);
         stmt->setUInt32(0, guidLow);
-        PreparedQueryResult result = CharacterDatabase.Query(stmt);
+        result = CharacterDatabase.Query(stmt);
 
         if (!result)
             return 0;
+
         fields = result->Fetch();
         uint32 map = fields[0].GetUInt16();
         float posx = fields[1].GetFloat();
@@ -7561,7 +7574,7 @@ uint32 Player::GetZoneIdFromDB(uint64 guid)
 
         if (zone > 0)
         {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ZONE);
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ZONE);
 
             stmt->setUInt16(0, uint16(zone));
             stmt->setUInt32(1, guidLow);
@@ -25379,6 +25392,47 @@ void Player::SendClearCooldown(uint32 spell_id, Unit* target)
     data.WriteByteSeq(guid[0]);
     data.WriteByteSeq(guid[6]);
     SendDirectMessage(&data);
+}
+
+void Player::SendClearCooldownMap(Unit* target)
+{
+    uint32 size = uint32(m_spellCooldownToRemove.size());
+    if (size == 0)
+        return;
+
+    ObjectGuid guid = target->GetGUID();
+    WorldPacket data(SMSG_CLEAR_COOLDOWNS, 3 + 1 + 8 + (4 * size));
+
+    data
+        .WriteByteMask(guid[1])
+        .WriteByteMask(guid[3])
+        .WriteByteMask(guid[6])
+
+        .WriteBits(size, 24)
+
+        .WriteByteMask(guid[7])
+        .WriteByteMask(guid[5])
+        .WriteByteMask(guid[2])
+        .WriteByteMask(guid[4])
+        .WriteByteMask(guid[0])
+
+        .WriteByteSeq(guid[7])
+        .WriteByteSeq(guid[2])
+        .WriteByteSeq(guid[4])
+        .WriteByteSeq(guid[5])
+        .WriteByteSeq(guid[1])
+        .WriteByteSeq(guid[3]);
+
+    for (SpellCooldownToRemove::const_iterator itr = m_spellCooldownToRemove.begin(); itr != m_spellCooldownToRemove.end(); ++itr)
+        data << uint32((*itr));
+
+    data
+        .WriteByteSeq(guid[0])
+        .WriteByteSeq(guid[6]);
+
+    SendDirectMessage(&data);
+
+    m_spellCooldownToRemove.clear();
 }
 
 void Player::SendClearAllCooldowns(Unit* target)
