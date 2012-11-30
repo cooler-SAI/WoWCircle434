@@ -4119,6 +4119,19 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                // Feral Swiftness Movement Imparing Removal
+                case 97985:
+                {
+                    int chance = 0;
+                    if (AuraEffect * AuraEff = m_caster->GetAuraEffect(SPELL_AURA_MOD_INCREASE_SPEED, SPELLFAMILY_DRUID, 67, 0))
+                    {
+                        chance = AuraEff->GetAmount()*100/15; // 15 for ammount, 100% for 2nd rank val
+                    }
+
+                    if (roll_chance_i(chance))
+                        unitTarget->RemoveMovementImpairingAuras();
+                    break;
+                }
                 // Transmute: Living Elements
                 case 78866: 
                 {
