@@ -259,16 +259,19 @@ bool ForcedUnsummonDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 
 void TempSummon::RemoveFromWorld()
 {
-    if (!IsInWorld() || !m_Properties)
+    if (!IsInWorld())
         return;
 
-    if (uint8 slot = uint8(m_Properties->Slot))
+    if (m_Properties)
     {
-        ASSERT(slot < MAX_SUMMON_SLOT);
-        if (Unit* owner = GetSummoner())
+        if (uint8 slot = uint8(m_Properties->Slot))
         {
-            if (owner->m_SummonSlot[slot] == GetGUID())
-                owner->m_SummonSlot[slot] = 0;
+            ASSERT(slot < MAX_SUMMON_SLOT);
+            if (Unit* owner = GetSummoner())
+            {
+                if (owner->m_SummonSlot[slot] == GetGUID())
+                    owner->m_SummonSlot[slot] = 0;
+            }
         }
     }
 
