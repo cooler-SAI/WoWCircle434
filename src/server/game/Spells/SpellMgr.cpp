@@ -4557,6 +4557,7 @@ void SpellMgr::LoadDbcDataCorrections()
             // Atonement
             case 81751:
                 spellInfo->MaxAffectedTargets = 1;
+                spellInfo->Effects[0].SetRadiusIndex(18);
                 break;
             // Whirlwind (MH+OH)
             case 1680:
