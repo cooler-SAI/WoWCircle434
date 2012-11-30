@@ -165,33 +165,15 @@ class spell_rog_preparation : public SpellScriptLoader
             {
                 Player* caster = GetCaster()->ToPlayer();
 
-                //immediately finishes the cooldown on certain Rogue abilities
-                const SpellCooldowns& cm = caster->GetSpellCooldownMap();
-                for (SpellCooldowns::const_iterator itr = cm.begin(); itr != cm.end(); ++itr)
+                caster->RemoveSpellCooldown(1856, true); // Vanish
+                caster->RemoveSpellCooldown(2983, true); // Sprint
+                caster->RemoveSpellCooldown(36554, true); // Shadowstep
+
+                if (caster->HasAura(ROGUE_SPELL_GLYPH_OF_PREPARATION))
                 {
-                    uint32 spellId = itr->first;
-
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-                    if (!spellInfo)
-                    {
-                        sLog->outError(LOG_FILTER_SPELLS_AURAS, "Player %u has unknown spell %u cooldown.", caster->GetGUIDLow(), spellId);
-                        continue;
-                    }
-
-                    if (spellInfo->SpellFamilyName != SPELLFAMILY_ROGUE)
-                        continue;
-
-                    if (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_COLDB_SHADOWSTEP ||      // Cold Blood, Shadowstep
-                        spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_VAN_EVAS_SPRINT)          // Vanish, Evasion, Sprint
-                        caster->RemoveSpellCooldown(spellId, true);
-                    else if (caster->HasAura(ROGUE_SPELL_GLYPH_OF_PREPARATION))
-                    {
-                        if (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_DISMANTLE ||         // Dismantle
-                            spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_KICK ||               // Kick
-                            (spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_BLADE_FLURRY &&      // Blade Flurry
-                            spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_BLADE_FLURRY))
-                            caster->RemoveSpellCooldown(spellId, true);
-                    }
+                    caster->RemoveSpellCooldown(1756, true); // Kick
+                    caster->RemoveSpellCooldown(51722, true); // Dismantle
+                    caster->RemoveSpellCooldown(76577, true); // Smoke Bomb
                 }
             }
 

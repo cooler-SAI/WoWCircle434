@@ -102,25 +102,14 @@ class spell_mage_cold_snap : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
                 Player* caster = GetCaster()->ToPlayer();
-                // immediately finishes the cooldown on Frost spells
-                const SpellCooldowns& cm = caster->GetSpellCooldownMap();
-                for (SpellCooldowns::const_iterator itr = cm.begin(); itr != cm.end(); ++itr)
-                {
-                    uint32 spellId = itr->first;
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-                    if (!spellInfo)
-                    {
-                        sLog->outError(LOG_FILTER_SPELLS_AURAS, "Player %u has unknown spell %u cooldown.", caster->GetGUIDLow(), spellId);
-                        continue;
-                    }
 
-                    if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE &&
-                        (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) &&
-                        spellInfo->Id != SPELL_MAGE_COLD_SNAP && spellInfo->GetRecoveryTime() > 0)
-                    {
-                        caster->RemoveSpellCooldown(spellId, true);
-                    }
-                }
+                caster->RemoveSpellCooldown(120, true); // Cone of Cold
+                caster->RemoveSpellCooldown(122, true); // Frost Nova
+                caster->RemoveSpellCooldown(11426, true); // Ice Barrier
+                caster->RemoveSpellCooldown(12472, true); // Icy Veins
+                caster->RemoveSpellCooldown(31687, true); // Summon Water Elemental
+                caster->RemoveSpellCooldown(44572, true); // Deep Freeze
+                caster->RemoveSpellCooldown(45438, true); // Ice Block
             }
 
             void Register()
