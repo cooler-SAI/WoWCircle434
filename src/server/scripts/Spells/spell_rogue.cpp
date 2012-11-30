@@ -151,7 +151,7 @@ class spell_rog_preparation : public SpellScriptLoader
 
             bool Load()
             {
-                return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+                return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
             }
 
             bool Validate(SpellInfo const* /*spellEntry*/)
@@ -163,40 +163,35 @@ class spell_rog_preparation : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-                if (!GetCaster())
-                    return;
-
-                if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
-                    return;
-
                 Player* caster = GetCaster()->ToPlayer();
 
                 //immediately finishes the cooldown on certain Rogue abilities
                 const SpellCooldowns& cm = caster->GetSpellCooldownMap();
-                for (SpellCooldowns::const_iterator itr = cm.begin(); itr != cm.end();)
+                for (SpellCooldowns::const_iterator itr = cm.begin(); itr != cm.end(); ++itr)
                 {
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                    uint32 spellId = itr->first;
 
-                    if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
+                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                    if (!spellInfo)
                     {
-                        if (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_COLDB_SHADOWSTEP ||      // Cold Blood, Shadowstep
-                            spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_VAN_EVAS_SPRINT)           // Vanish, Evasion, Sprint
-                            caster->RemoveSpellCooldown((itr++)->first, true);
-                        else if (caster->HasAura(ROGUE_SPELL_GLYPH_OF_PREPARATION))
-                        {
-                            if (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_DISMANTLE ||         // Dismantle
-                                spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_KICK ||               // Kick
-                                (spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_BLADE_FLURRY &&     // Blade Flurry
-                                spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_BLADE_FLURRY))
-                                caster->RemoveSpellCooldown((itr++)->first, true);
-                            else
-                                ++itr;
-                        }
-                        else
-                            ++itr;
+                        sLog->outError(LOG_FILTER_SPELLS_AURAS, "Player %u has unknown spell %u cooldown.", caster->GetGUIDLow(), spellId);
+                        continue;
                     }
-                    else
-                        ++itr;
+
+                    if (spellInfo->SpellFamilyName != SPELLFAMILY_ROGUE)
+                        continue;
+
+                    if (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_COLDB_SHADOWSTEP ||      // Cold Blood, Shadowstep
+                        spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_VAN_EVAS_SPRINT)          // Vanish, Evasion, Sprint
+                        caster->RemoveSpellCooldown(spellId, true);
+                    else if (caster->HasAura(ROGUE_SPELL_GLYPH_OF_PREPARATION))
+                    {
+                        if (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_DISMANTLE ||         // Dismantle
+                            spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_KICK ||               // Kick
+                            (spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_BLADE_FLURRY &&      // Blade Flurry
+                            spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_BLADE_FLURRY))
+                            caster->RemoveSpellCooldown(spellId, true);
+                    }
                 }
             }
 

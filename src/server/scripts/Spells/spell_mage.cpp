@@ -96,27 +96,30 @@ class spell_mage_cold_snap : public SpellScriptLoader
 
             bool Load()
             {
-                return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+                return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
             }
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-
                 Player* caster = GetCaster()->ToPlayer();
                 // immediately finishes the cooldown on Frost spells
                 const SpellCooldowns& cm = caster->GetSpellCooldownMap();
-                for (SpellCooldowns::const_iterator itr = cm.begin(); itr != cm.end();)
+                for (SpellCooldowns::const_iterator itr = cm.begin(); itr != cm.end(); ++itr)
                 {
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                    uint32 spellId = itr->first;
+                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                    if (!spellInfo)
+                    {
+                        sLog->outError(LOG_FILTER_SPELLS_AURAS, "Player %u has unknown spell %u cooldown.", caster->GetGUIDLow(), spellId);
+                        continue;
+                    }
 
                     if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE &&
                         (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) &&
                         spellInfo->Id != SPELL_MAGE_COLD_SNAP && spellInfo->GetRecoveryTime() > 0)
                     {
-                        caster->RemoveSpellCooldown((itr++)->first, true);
+                        caster->RemoveSpellCooldown(spellId, true);
                     }
-                    else
-                        ++itr;
                 }
             }
 
