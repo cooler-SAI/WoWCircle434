@@ -10763,6 +10763,17 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                                 crit_chance += rendAndTear->GetAmount();
                             break;
                         }
+                        // Predatory Strikes - bonus critical strike chance for Ravage
+                        if (spellProto->SpellFamilyFlags[0] & 0x00010000
+                            && spellProto->SpellIconID == 1531)
+                        {
+                            if (AuraEffect * predatory = GetDummyAuraEffect(SPELLFAMILY_DRUID, 1563, 0))
+                            {
+                                 if (victim->HealthAbovePct(80))
+                                    crit_chance += predatory->GetAmount();
+                            }
+                            break;
+                        }
                         break;
                     case SPELLFAMILY_WARRIOR:
                         // Victory Rush
