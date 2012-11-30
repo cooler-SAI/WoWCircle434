@@ -26,6 +26,7 @@
 #include "ObjectDefines.h"
 #include "GridDefines.h"
 #include "Map.h"
+#include "Opcodes.h"
 
 #include <set>
 #include <string>
@@ -613,8 +614,8 @@ struct MovementInfo
     void OutDebug();
 
     void Normalize();
-    bool Check(Player* target);
-    bool AcceptClientChanges(Player* player, MovementInfo& client);
+    bool Check(Player* target, Opcodes opcode);
+    bool AcceptClientChanges(Player* player, MovementInfo& client, Opcodes opcode);
     bool HasTransportData() const { return t_guid != 0LL; }
 };
 

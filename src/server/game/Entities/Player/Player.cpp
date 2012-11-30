@@ -21713,6 +21713,16 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
 
 void Player::AddSpellCooldown(uint32 spellid, uint32 itemid, time_t end_time)
 {
+    if (spellid)
+    {
+        #pragma warning "Remove after fix!!!!!!!!!!!!!!!"
+        if (!sSpellMgr->GetSpellInfo(spellid))
+        {
+            ACE_Stack_Trace trace;
+            sLog->outError(LOG_FILTER_SPELLS_AURAS, "AddSpellCooldown: Player %u has unknown spell %u\n%s, skipping.", GetGUIDLow(), spellid, trace.c_str());
+            return;
+        }
+    }
     SpellCooldown sc;
     sc.end = end_time;
     sc.itemid = itemid;

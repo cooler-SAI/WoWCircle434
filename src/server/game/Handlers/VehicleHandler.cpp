@@ -38,7 +38,7 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recvData)
     MovementInfo movementInfo;
     ReadMovementInfo(recvData, &movementInfo);
 
-    if (!_player->m_movementInfo.AcceptClientChanges(_player, movementInfo))
+    if (!_player->m_movementInfo.AcceptClientChanges(_player, movementInfo, recvData.GetOpcode()))
         return;
 
     _player->ExitVehicle();

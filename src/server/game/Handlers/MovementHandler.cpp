@@ -275,13 +275,13 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
 
     if (fall)
     {
-        if (!movementInfo.Check(plrMover))
+        if (!movementInfo.Check(plrMover, recvPacket.GetOpcode()))
             return;
 
         plrMover->HandleFall(movementInfo);
     }
 
-    if (!mover->m_movementInfo.AcceptClientChanges(_player, movementInfo))
+    if (!mover->m_movementInfo.AcceptClientChanges(_player, movementInfo, recvPacket.GetOpcode()))
         return;
 
     BuildMoveUpdatePacket(mover, &movementInfo, recvPacket.size(), _player);
@@ -390,7 +390,7 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recvData)
     MovementInfo mi;
     ReadMovementInfo(recvData, &mi);
 
-    if (!_player->m_movementInfo.AcceptClientChanges(_player, mi))
+    if (!_player->m_movementInfo.AcceptClientChanges(_player, mi, recvData.GetOpcode()))
         return;
 
     BuildMoveUpdatePacket(_player->m_mover, &_player->m_mover->m_movementInfo, recvData.size(), _player);
@@ -421,7 +421,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket & recvData)
     MovementInfo movementInfo;
     ReadMovementInfo(recvData, &movementInfo);
 
-    if (!_player->m_movementInfo.AcceptClientChanges(_player, movementInfo))
+    if (!_player->m_movementInfo.AcceptClientChanges(_player, movementInfo, recvData.GetOpcode()))
         return;
 
     WorldPacket data;
@@ -653,11 +653,16 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
             case MSEOneBit:
                 data.ReadBit();
                 break;
+            case MSEGenericDword0:
+            case MSEGenericDword1:
             case MSEMovementCounter:
                 data.read_skip<uint32>();
                 break;
             case MSESpeed:
                 data >> mi->speed;
+                break;
+            case MSE2Bits:
+                data.ReadBits(2);
                 break;
             default:
                 ASSERT(false && "Incorrect sequence element detected at ReadMovementInfo");
@@ -930,11 +935,16 @@ void WorldSession::WriteMovementInfo(WorldPacket &data, MovementInfo* mi)
             case MSEOneBit:
                 data.WriteBit(element == MSEOneBit);
                 break;
+            case MSEGenericDword0:
+            case MSEGenericDword1:
             case MSEMovementCounter:
                 data << uint32(0); // counter
                 break;
             case MSESpeed:
                 data << mi->speed;
+                break;
+            case MSE2Bits:
+                data.WriteBits(0, 2);
                 break;
             default:
                 ASSERT(false && "Incorrect sequence element detected at ReadMovementInfo");

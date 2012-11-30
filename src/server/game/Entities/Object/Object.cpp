@@ -331,6 +331,19 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     if (unit)
         const_cast<Unit*>(unit)->m_movementInfo.Normalize();
 
+    bool hasOrientation = false;
+    uint32 movementFlags = 0;
+    uint16 movementFlagsExtra = 0;
+    if (unit)
+    {
+        movementFlags = unit->m_movementInfo.GetMovementFlags();
+        movementFlagsExtra = unit->m_movementInfo.GetExtraMovementFlags();
+        if (GetTypeId() == TYPEID_UNIT)
+            movementFlags &= MOVEMENTFLAG_MASK_CREATURE_ALLOWED;
+
+        hasOrientation = !G3D::fuzzyEq(unit->GetOrientation(), 0.0f);
+    }
+
     uint32 unkLoopCounter = 0;
 
     data->WriteBit(false);
@@ -352,13 +365,9 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     if ((flags & UPDATEFLAG_LIVING) && unit)
     {
         ObjectGuid guid = GetGUID();
-        uint32 movementFlags = unit->m_movementInfo.GetMovementFlags();
-        uint16 movementFlagsExtra = unit->m_movementInfo.GetExtraMovementFlags();
-        if (GetTypeId() == TYPEID_UNIT)
-            movementFlags &= MOVEMENTFLAG_MASK_CREATURE_ALLOWED;
 
         data->WriteBit(!movementFlags);
-        data->WriteBit(G3D::fuzzyEq(unit->GetOrientation(), 0.0f));             // Has Orientation
+        data->WriteBit(!hasOrientation);
         data->WriteByteMask(guid[7]);
         data->WriteByteMask(guid[3]);
         data->WriteByteMask(guid[2]);
@@ -374,7 +383,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         data->WriteBit(!(movementFlags & MOVEMENTFLAG_SPLINE_ELEVATION));       // Has spline elevation
         data->WriteByteMask(guid[5]);
         data->WriteBit(unit->m_movementInfo.HasTransportData());
-        data->WriteBit(false);                                                  // Is missing time
+        data->WriteBit(!unit->m_movementInfo.time);
         if (unit->m_movementInfo.HasTransportData())
         {
             ObjectGuid transGuid = unit->m_movementInfo.t_guid;
@@ -452,11 +461,6 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     {
         ObjectGuid guid = GetGUID();
 
-        uint32 movementFlags = unit->m_movementInfo.GetMovementFlags();
-        uint16 movementFlagsExtra = unit->m_movementInfo.GetExtraMovementFlags();
-        if (GetTypeId() == TYPEID_UNIT)
-            movementFlags &= MOVEMENTFLAG_MASK_CREATURE_ALLOWED;
-
         data->WriteByteSeq(guid[4]);
         *data << unit->GetSpeed(MOVE_RUN_BACK);
         if (unit->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA))
@@ -520,13 +524,13 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         data->WriteByteSeq(guid[2]);
         *data << unit->GetSpeed(MOVE_WALK);
 
-        //if (true)   // Has time, controlled by bit just after HasTransport
-        *data << uint32(getMSTime());
+        if (unit->m_movementInfo.time)
+            *data << uint32(unit->m_movementInfo.time);
 
         *data << unit->GetSpeed(MOVE_FLIGHT_BACK);
         data->WriteByteSeq(guid[6]);
         *data << unit->GetSpeed(MOVE_TURN_RATE);
-        if (!G3D::fuzzyEq(unit->GetOrientation(), 0.0f))
+        if (hasOrientation)
             *data << float(unit->GetOrientation());
 
         *data << unit->GetSpeed(MOVE_RUN);
@@ -1456,8 +1460,11 @@ void MovementInfo::OutDebug()
         sLog->outInfo(LOG_FILTER_GENERAL, "splineElevation: %f", splineElevation);
 }
 
-bool MovementInfo::Check(Player* target)
+bool MovementInfo::Check(Player* target, Opcodes opcode)
 {
+    if (opcode == CMSG_FORCE_MOVE_ROOT_ACK || opcode == CMSG_FORCE_MOVE_UNROOT_ACK)
+        return true; // Skip check for this opcode
+
     Unit* mover = target->m_mover;
     ASSERT(mover != NULL);                                  // there must always be a mover
 
@@ -1466,16 +1473,16 @@ bool MovementInfo::Check(Player* target)
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
     if (plMover && plMover->IsBeingTeleported())
     {
-        sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Session %u Mover is being teleported",
-            target->GetSession()->GetAccountId()
+        sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Opcode %u Session %u Mover is being teleported",
+            uint32(opcode), target->GetSession()->GetAccountId()
             );
         return false;
     }
 
     if (!pos.IsPositionValid())
     {
-        sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Session %u Invalid Position: (%f,%f,%f,%f)",
-            target->GetSession()->GetAccountId(),
+        sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Opcode %u Session %u Invalid Position: (%f,%f,%f,%f)",
+            uint32(opcode), target->GetSession()->GetAccountId(),
             pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()
             );
         return false;
@@ -1483,8 +1490,8 @@ bool MovementInfo::Check(Player* target)
 
     if (mover->GetGUID() != guid)
     {
-        sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Session %u Invalid mover guid: client's " I64FMT " vs server's " I64FMT,
-            target->GetSession()->GetAccountId(),
+        sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Opcode %u Session %u Invalid mover guid: client's " I64FMT " vs server's " I64FMT,
+            uint32(opcode), target->GetSession()->GetAccountId(),
             guid, mover->GetGUID()
             );
         return false;
@@ -1498,8 +1505,8 @@ bool MovementInfo::Check(Player* target)
         if (!t_pos.IsPositionValid() ||
             t_pos.GetPositionX() > 50 || t_pos.GetPositionY() > 50 || t_pos.GetPositionZ() > 50)
         {
-            sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Session %u Invalid transport coords (%f, %f, %f)",
-                target->GetSession()->GetAccountId(),
+            sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Opcode %u Session %u Invalid transport coords (%f, %f, %f)",
+                uint32(opcode), target->GetSession()->GetAccountId(),
                 t_pos.GetPositionX(), t_pos.GetPositionY(), t_pos.GetPositionZ()
                 );
             return false;
@@ -1508,8 +1515,8 @@ bool MovementInfo::Check(Player* target)
         if (!Trinity::IsValidMapCoord(pos.GetPositionX() + t_pos.GetPositionX(), pos.GetPositionY() + t_pos.GetPositionY(),
             pos.GetPositionZ() + t_pos.GetPositionZ(), pos.GetOrientation() + t_pos.GetOrientation()))
         {
-            sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Session %u Invalid transport coords (%f, %f, %f)",
-                target->GetSession()->GetAccountId(),
+            sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Opcode %u Session %u Invalid transport coords (%f, %f, %f)",
+                uint32(opcode), target->GetSession()->GetAccountId(),
                 t_pos.GetPositionX(), t_pos.GetPositionY(), t_pos.GetPositionZ()
                 );
             return false;
@@ -1519,14 +1526,14 @@ bool MovementInfo::Check(Player* target)
     return true;
 }
 
-bool MovementInfo::AcceptClientChanges(Player* player, MovementInfo& client)
+bool MovementInfo::AcceptClientChanges(Player* player, MovementInfo& client, Opcodes opcode)
 {
     Unit* mover = player->m_mover;
     ASSERT(mover != NULL);                                  // there must always be a mover
 
     Player* plMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL;
 
-    if (!client.Check(player))
+    if (!client.Check(player, opcode))
         return false;
 
     /* handle special cases */

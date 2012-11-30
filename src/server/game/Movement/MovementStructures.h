@@ -94,6 +94,9 @@ enum MovementStatusElements
     // Special
     MSEZeroBit, // writes bit value 0 or skips read bit
     MSEOneBit,  // writes bit value 1 or skips read bit
+    MSEGenericDword0,
+    MSEGenericDword1,
+    MSE2Bits,
     MSEEnd,     // marks end of parsing
     MSE_COUNT
 };
@@ -3626,10 +3629,87 @@ MovementStatusElements MoveUnRootAck[] =
     MSEEnd,
 };
 
+MovementStatusElements MoveCollisionHeightAck[] =
+{
+    MSEGenericDword0,
+    MSEPositionX,
+    MSEPositionZ,
+    MSEMovementCounter,
+    MSEPositionY,
+    MSEHasGuidByte6,
+    MSEHasGuidByte4,
+    MSE2Bits,
+    MSEHasPitch,
+    MSEHasGuidByte5,
+    MSEZeroBit,
+    MSEHasGuidByte2,
+    MSEHasGuidByte1,
+    MSEHasFallData,
+    MSEHasGuidByte3,
+    MSEHasSpline,
+    MSEHasGuidByte7,
+    MSEHasMovementFlags,
+    MSEHasTransportData,
+    MSEHasTimestamp,
+    MSEHasSplineElevation,
+    MSEHasMovementFlags2,
+    MSEHasOrientation,
+    MSEHasGuidByte0,
+    MSEHasTransportGuidByte4,
+    MSEHasTransportGuidByte3,
+    MSEHasTransportTime2,
+    MSEHasTransportTime3,
+    MSEHasTransportGuidByte5,
+    MSEHasTransportGuidByte1,
+    MSEHasTransportGuidByte7,
+    MSEHasTransportGuidByte2,
+    MSEHasTransportGuidByte6,
+    MSEHasTransportGuidByte0,
+    MSEMovementFlags2,
+    MSEMovementFlags,
+    MSEHasFallDirection,
+    MSEGuidByte0,
+    MSEGuidByte3,
+    MSEGuidByte1,
+    MSEGuidByte5,
+    MSEGuidByte7,
+    MSEGuidByte6,
+    MSEGuidByte2,
+    MSEGuidByte4,
+    MSETransportPositionX,
+    MSETransportGuidByte4,
+    MSETransportTime2,
+    MSETransportGuidByte0,
+    MSETransportOrientation,
+    MSETransportPositionY,
+    MSETransportGuidByte7,
+    MSETransportSeat,
+    MSETransportGuidByte5,
+    MSETransportGuidByte2,
+    MSETransportTime,
+    MSETransportGuidByte6,
+    MSETransportGuidByte3,
+    MSETransportGuidByte1,
+    MSETransportTime3,
+    MSETransportPositionZ,
+    MSEFallVerticalSpeed,
+    MSEFallTime,
+    MSEFallSinAngle,
+    MSEFallCosAngle,
+    MSEFallHorizontalSpeed,
+    MSETimestamp,
+    MSESplineElevation,
+    MSEOrientation,
+    MSEPitch,
+    MSEEnd,
+};
+
 MovementStatusElements* GetMovementStatusElementsSequence(Opcodes opcode)
 {
     switch (opcode)
     {
+        case CMSG_MOVE_SET_COLLISION_HEIGHT_ACK:
+            return MoveCollisionHeightAck;
         case CMSG_MOVE_FORCE_WALK_SPEED_CHANGE_ACK:
             return MoveForceWalkSpeedChangeAckSequence;
         case CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK:
