@@ -330,7 +330,7 @@ struct CUFProfile
 struct SpellCooldown
 {
     time_t end;
-    uint16 itemid;
+    uint32 itemid;
 };
 
 typedef std::map<uint32, SpellCooldown> SpellCooldowns;
