@@ -1583,7 +1583,7 @@ bool MovementInfo::AcceptClientChanges(Player* player, MovementInfo& client)
 
     if (plMover)                                            // nothing is charmed, or player charmed
     {
-        plMover->UpdateFallInformationIfNeed(client, 0);
+        plMover->UpdateFallInformationIfNeed(client);
 
         if (client.pos.GetPositionZ() < -500.0f)
         {
@@ -1630,6 +1630,12 @@ m_phaseMask(PHASEMASK_NORMAL)
 {
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
     m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
+}
+
+void WorldObject::SetTransport(Transport* transport)
+{
+    m_transport = transport;
+    m_movementInfo.t_guid = transport ? transport->GetGUID() : UI64LIT(0);
 }
 
 void WorldObject::SetWorldObject(bool on)

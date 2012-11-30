@@ -104,7 +104,6 @@ void BattlegroundIC::DoAction(uint32 action, uint64 var)
     player->m_movementInfo.t_pos.m_positionX = TransportMovementInfo.GetPositionX();
     player->m_movementInfo.t_pos.m_positionY = TransportMovementInfo.GetPositionY();
     player->m_movementInfo.t_pos.m_positionZ = TransportMovementInfo.GetPositionZ();
-    player->m_movementInfo.t_guid = (player->GetTeamId() == TEAM_ALLIANCE ? gunshipAlliance : gunshipHorde)->GetGUID();
 
     if (player->TeleportTo(GetMapId(), TeleportToTransportPosition.GetPositionX(),
                         TeleportToTransportPosition.GetPositionY(),

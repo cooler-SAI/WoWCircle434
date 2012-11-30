@@ -587,7 +587,7 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
                 break;
             case MSEOrientation:
                 if (hasOrientation)
-                    mi->pos.SetOrientation(data.read<float>());
+                    data >> mi->pos.m_orientation;
                 break;
             case MSETransportPositionX:
                 if (hasTransportData)
@@ -603,7 +603,7 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
                 break;
             case MSETransportOrientation:
                 if (hasTransportData)
-                    mi->pos.SetOrientation(data.read<float>());
+                    data >> mi->t_pos.m_orientation;
                 break;
             case MSETransportSeat:
                 if (hasTransportData)
@@ -667,6 +667,8 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
 
     mi->guid = guid;
     mi->t_guid = tguid;
+
+    mi->Normalize();
 
    if (hasTransportData && mi->pos.m_positionX != mi->t_pos.m_positionX)
        if (GetPlayer()->GetTransport())
@@ -747,9 +749,6 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
 
 void WorldSession::WriteMovementInfo(WorldPacket &data, MovementInfo* mi)
 {
-    bool hasMovementFlags = mi->GetMovementFlags() != 0;
-    bool hasMovementFlags2 = mi->GetExtraMovementFlags() != 0;
-    bool hasTimestamp = mi->time != 0;
     bool hasOrientation = !G3D::fuzzyEq(mi->pos.GetOrientation(), 0.0f);
     bool hasTransportData = mi->HasTransportData();
     bool hasPitch = mi->HasMovementFlag(MovementFlags(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || mi->HasExtraMovementFlag(MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING);
@@ -804,13 +803,13 @@ void WorldSession::WriteMovementInfo(WorldPacket &data, MovementInfo* mi)
         switch (element)
         {
             case MSEHasMovementFlags:
-                data.WriteBit(!hasMovementFlags);
+                data.WriteBit(mi->GetMovementFlags() == 0);
                 break;
             case MSEHasMovementFlags2:
-                data.WriteBit(!hasMovementFlags2);
+                data.WriteBit(mi->GetExtraMovementFlags() == 0);
                 break;
             case MSEHasTimestamp:
-                data.WriteBit(!hasTimestamp);
+                data.WriteBit(mi->time == 0);
                 break;
             case MSEHasOrientation:
                 data.WriteBit(!hasOrientation);
@@ -843,15 +842,15 @@ void WorldSession::WriteMovementInfo(WorldPacket &data, MovementInfo* mi)
                 data.WriteBit(mi->HasServerMovementFlag(SERVERMOVEFLAG_SPLINE1));
                 break;
             case MSEMovementFlags:
-                if (hasMovementFlags)
+                if (mi->GetMovementFlags() != 0)
                     data.WriteBits(mi->flags, 30);
                 break;
             case MSEMovementFlags2:
-                if (hasMovementFlags2)
+                if (mi->GetExtraMovementFlags() != 0)
                     data.WriteBits(mi->flags2, 12);
                 break;
             case MSETimestamp:
-                if (hasTimestamp)
+                if (mi->time != 0)
                     data << mi->time;
                 break;
             case MSEPositionX:

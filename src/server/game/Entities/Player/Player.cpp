@@ -24922,9 +24922,9 @@ void Player::AddKnownCurrency(uint32 itemId)
         SetFlag64(0, (1LL << (ctEntry->ID-1)));
 }
 
-void Player::UpdateFallInformationIfNeed(MovementInfo const& minfo, uint16 opcode)
+void Player::UpdateFallInformationIfNeed(MovementInfo const& minfo)
 {
-    if (m_lastFallTime >= minfo.fallTime || m_lastFallZ <= minfo.pos.GetPositionZ() || opcode == MSG_MOVE_FALL_LAND)
+    if (m_lastFallTime >= minfo.fallTime || m_lastFallZ <= minfo.pos.GetPositionZ())
         SetFallInformation(minfo.fallTime, minfo.pos.GetPositionZ());
 }
 

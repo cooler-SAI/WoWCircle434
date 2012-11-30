@@ -941,7 +941,7 @@ class WorldObject : public Object, public WorldLocation
         virtual uint32 GetTransTime()   const { return 0; }
         virtual int8 GetTransSeat()     const { return -1; }
         virtual uint64 GetTransGUID()   const;
-        void SetTransport(Transport* t) { m_transport = t; }
+        void SetTransport(Transport* transport);
 
         MovementInfo m_movementInfo;
     protected:
