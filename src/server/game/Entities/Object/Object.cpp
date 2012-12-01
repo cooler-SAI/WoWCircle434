@@ -1462,8 +1462,8 @@ void MovementInfo::OutDebug()
 
 bool MovementInfo::Check(Player* target, Opcodes opcode)
 {
-    if (opcode == CMSG_FORCE_MOVE_ROOT_ACK || opcode == CMSG_FORCE_MOVE_UNROOT_ACK)
-        return true; // Skip check for this opcode
+    //if (opcode == CMSG_FORCE_MOVE_ROOT_ACK || opcode == CMSG_FORCE_MOVE_UNROOT_ACK)
+       // return true; // Skip check for this opcode
 
     Unit* mover = target->m_mover;
     ASSERT(mover != NULL);                                  // there must always be a mover
