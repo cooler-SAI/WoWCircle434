@@ -396,7 +396,7 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recvData)
     BuildMoveUpdatePacket(_player->m_mover, &_player->m_mover->m_movementInfo, recvData.size(), _player);
 }
 
-void WorldSession::BuildMoveUpdatePacket(Unit* mover, MovementInfo* movementInfo, size_t size, Player* skip)
+void WorldSession::BuildMoveUpdatePacket(Unit* mover, MovementInfo* movementInfo, size_t size, Player const* skip) const
 {
     ASSERT(mover);
     ASSERT(movementInfo);

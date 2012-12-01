@@ -23494,6 +23494,11 @@ void Player::SetClientControl(Unit* target, uint8 allowMove)
 
 void Player::SetMover(Unit* target)
 {
+        sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Opcode %u Session %i Set mover guid: new " I64FMT " vs old " I64FMT,
+            uint32(SMSG_MOVE_SET_ACTIVE_MOVER), target->ToPlayer() ? target->ToPlayer()->GetSession()->GetAccountId() : -int32(1),
+            target->GetGUID(), m_mover ? m_mover->GetGUID() : UI64LIT(0)
+            );
+
     m_mover->m_movedPlayer = NULL;
     m_mover = target;
     m_mover->m_movedPlayer = this;
