@@ -60,7 +60,7 @@ public:
             { "mount",          SEC_MODERATOR,      false, &HandleModifyMountCommand,         "", NULL },
             { "honor",          SEC_MODERATOR,      false, &HandleModifyHonorCommand,         "", NULL },
             { "reputation",     SEC_GAMEMASTER,     false, &HandleModifyRepCommand,           "", NULL },
-            { "arenapoints",    SEC_MODERATOR,      false, &HandleModifyArenaCommand,         "", NULL },
+            { "currency",       SEC_GAMEMASTER,     false, &HandleModifyCurrencyCommand,      "", NULL },
             { "drunk",          SEC_MODERATOR,      false, &HandleModifyDrunkCommand,         "", NULL },
             { "standstate",     SEC_GAMEMASTER,     false, &HandleModifyStandStateCommand,    "", NULL },
             { "phase",          SEC_ADMINISTRATOR,  false, &HandleModifyPhaseCommand,         "", NULL },
@@ -1337,7 +1337,7 @@ public:
         return true;
     }
 
-    static bool HandleModifyArenaCommand(ChatHandler* handler, const char* args)
+    static bool HandleModifyCurrencyCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
             return false;
@@ -1345,17 +1345,21 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->PSendSysMessage(LANG_PLAYER_NOT_FOUND);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        int32 amount = (uint32)atoi(args);
+        uint32 currencyId = atoi(strtok((char*)args, " "));
+        const CurrencyTypesEntry* currencyType =  sCurrencyTypesStore.LookupEntry(currencyId);
+        if (!currencyType)
+            return false;
 
-        target->ModifyCurrency(CURRENCY_TYPE_CONQUEST_POINTS, amount, true, true);
+        uint32 amount = atoi(strtok(NULL, " "));
+        if (!amount)
+            return false;
 
-        handler->PSendSysMessage(LANG_COMMAND_MODIFY_ARENA, handler->GetNameLink(target).c_str(), target->GetCurrency(CURRENCY_TYPE_CONQUEST_POINTS, false));
-
+        target->ModifyCurrency(currencyId, amount, true, true);
         return true;
     }
 

@@ -3762,11 +3762,12 @@ enum CalendarSendEventType
 
 enum CalendarEventType
 {
-    CALENDAR_TYPE_RAID,
+    CALENDAR_TYPE_RAID = 0,
     CALENDAR_TYPE_DUNGEON,
     CALENDAR_TYPE_PVP,
     CALENDAR_TYPE_MEETING,
-    CALENDAR_TYPE_OTHER
+    CALENDAR_TYPE_OTHER,
+    CALENDAR_TYPE_HEROIC,
 };
 
 enum CalendarInviteStatus

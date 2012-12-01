@@ -96,6 +96,8 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
             data.AppendPackedTime(calendarEvent->GetTime());
             data << uint32(calendarEvent->GetFlags());
             data << uint32(calendarEvent->GetDungeonId());
+            Guild* guild = sGuildMgr->GetGuildById(calendarEvent->GetGuildId());
+            data << uint64(guild ? guild->GetGUID() : 0);
             data.appendPackGUID(calendarEvent->GetCreatorGUID());
         }
         else
@@ -623,7 +625,9 @@ void WorldSession::SendCalendarEvent(CalendarEvent const& calendarEvent, Calenda
     data << uint32(calendarEvent.GetFlags());
     data.AppendPackedTime(calendarEvent.GetTime());
     data.AppendPackedTime(calendarEvent.GetTimeZoneTime());
-    data << uint32(calendarEvent.GetGuildId());
+
+    Guild* guild = sGuildMgr->GetGuildById(calendarEvent.GetGuildId());
+    data << uint64(guild ? guild->GetGUID() : 0);
 
     CalendarInviteIdList const& invites = calendarEvent.GetInviteIdList();
     data << uint32(invites.size());
@@ -704,6 +708,10 @@ void WorldSession::SendCalendarEventInviteAlert(CalendarEvent const& calendarEve
     data << uint32(calendarEvent.GetType());
     data << uint32(calendarEvent.GetDungeonId());
     data << uint64(inviteId);
+
+    Guild* guild = sGuildMgr->GetGuildById(calendarEvent.GetGuildId());
+    data << uint64(guild ? guild->GetGUID() : 0);
+
     data << uint8(invite.GetStatus());
     data << uint8(invite.GetRank());
     data.appendPackGUID(calendarEvent.GetCreatorGUID());
