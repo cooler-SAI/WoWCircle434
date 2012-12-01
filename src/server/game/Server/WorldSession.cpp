@@ -203,12 +203,14 @@ void WorldSession::SendPacket(WorldPacket const* packet, bool forced /*= false*/
 
     if (packet->GetOpcode() == NULL_OPCODE)
     {
-        sLog->outError(LOG_FILTER_OPCODES, "Prevented sending of NULL_OPCODE to %s", GetPlayerName(false).c_str());
+        ACE_Stack_Trace trace;
+        sLog->outError(LOG_FILTER_OPCODES, "Prevented sending of NULL_OPCODE to %s\n%s", GetPlayerName(false).c_str(), trace.c_str());
         return;
     }
     else if (packet->GetOpcode() == UNKNOWN_OPCODE)
     {
-        sLog->outError(LOG_FILTER_OPCODES, "Prevented sending of UNKNOWN_OPCODE to %s", GetPlayerName(false).c_str());
+        ACE_Stack_Trace trace;
+        sLog->outError(LOG_FILTER_OPCODES, "Prevented sending of UNKNOWN_OPCODE to %s\n%s", GetPlayerName(false).c_str(), trace.c_str());
         return;
     }
 

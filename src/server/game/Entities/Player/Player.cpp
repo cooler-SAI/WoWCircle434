@@ -17282,7 +17282,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
         uint32 talentTree = atol(talentTrees[i]); // talentThreeId, 0 - not selected
         if (sTalentTabStore.LookupEntry(talentTree))
             SetPrimaryTalentTree(i, talentTree);
-        else if (i == GetActiveSpec())
+        else if (i == GetActiveSpec() && talentTree != 0)
             SetAtLoginFlag(AT_LOGIN_RESET_TALENTS); // invalid tree, reset talents
     }
 
