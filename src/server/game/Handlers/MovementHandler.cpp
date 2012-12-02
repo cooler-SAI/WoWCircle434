@@ -293,7 +293,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
 void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
 {
     static char const* move_type_name[MAX_MOVE_TYPE] = {  "Walk", "Run", "RunBack", "Swim", "SwimBack", "TurnRate", "Flight", "FlightBack", "PitchRate" };
-    static int const move_type_speed_pos[MAX_MOVE_TYPE] = { 8, 8, 0, 8, 0, 8, 16, 16, 8};
 
     UnitMoveType move_type;
     switch (recvData.GetOpcode())
@@ -302,33 +301,23 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
         case CMSG_MOVE_FORCE_RUN_SPEED_CHANGE_ACK:           move_type = MOVE_RUN;         break;
         case CMSG_MOVE_FORCE_RUN_BACK_SPEED_CHANGE_ACK:      move_type = MOVE_RUN_BACK;    break;
         case CMSG_MOVE_FORCE_SWIM_SPEED_CHANGE_ACK:          move_type = MOVE_SWIM;        break;
-        case CMSG_MOVE_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:     move_type = MOVE_SWIM_BACK;   break;
-        case CMSG_MOVE_FORCE_TURN_RATE_CHANGE_ACK:           move_type = MOVE_TURN_RATE;   break;
+        //case CMSG_MOVE_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:     move_type = MOVE_SWIM_BACK;   break;
+        //case CMSG_MOVE_FORCE_TURN_RATE_CHANGE_ACK:           move_type = MOVE_TURN_RATE;   break;
         case CMSG_MOVE_FORCE_FLIGHT_SPEED_CHANGE_ACK:        move_type = MOVE_FLIGHT;      break;
-        case CMSG_MOVE_FORCE_FLIGHT_BACK_SPEED_CHANGE_ACK:   move_type = MOVE_FLIGHT_BACK; break;
-        case CMSG_MOVE_FORCE_PITCH_RATE_CHANGE_ACK:          move_type = MOVE_PITCH_RATE;  break;
+        //case CMSG_MOVE_FORCE_FLIGHT_BACK_SPEED_CHANGE_ACK:   move_type = MOVE_FLIGHT_BACK; break;
+        //case CMSG_MOVE_FORCE_PITCH_RATE_CHANGE_ACK:          move_type = MOVE_PITCH_RATE;  break;
         default:
-            sLog->outError(LOG_FILTER_NETWORKIO, "WorldSession::HandleForceSpeedChangeAck: Unknown move type opcode: %u", uint32(recvData.GetOpcode()));
+            //sLog->outError(LOG_FILTER_NETWORKIO, "WorldSession::HandleForceSpeedChangeAck: Unknown move type opcode: %u", uint32(recvData.GetOpcode()));
             return;
     }
 
-    uint8* dest = new uint8[20];
-    {
-        recvData.read(dest, 20);
-        recvData.rfinish();
-    }
-
-    float speed = *(float *)(dest + move_type_speed_pos[move_type]);
-
-    /*MovementInfo movementInfo;
+    MovementInfo movementInfo;
     ReadMovementInfo(recvData, &movementInfo);
 
-    // now can skip not our packet
-    if (_player->GetGUID() != movementInfo.guid)
-    {
-        recvData.rfinish();                   // prevent warnings spam
+    if (!movementInfo.Check(_player, recvData.GetOpcode()))
         return;
-    }*/
+
+    float speed = movementInfo.speed;
 
     // skip all forced speed changes except last and unexpected
     // in run/mounted case used one ACK and it must be skipped.m_forced_speed_changes[MOVE_RUN} store both.
