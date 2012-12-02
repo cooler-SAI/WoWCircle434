@@ -1,4 +1,4 @@
-#include "gamePCH.h"
+
 #include "CurrencyMgr.h"
 #include "Formulas.h"
 #include "ArenaTeamMgr.h"

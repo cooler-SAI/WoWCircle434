@@ -9,7 +9,7 @@ SDComment: This AI is under development
 SDCategory: Npc
 EndScriptData */
 
-#include "gamePCH.h"
+
 #include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedFollowerAI.h"

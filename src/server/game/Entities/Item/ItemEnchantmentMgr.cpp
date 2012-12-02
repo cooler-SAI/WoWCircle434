@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gamePCH.h"
+
 #include <stdlib.h>
 #include <functional>
 #include "ItemEnchantmentMgr.h"

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gamePCH.h"
+
 #include "Map.h"
 #include "GridStates.h"
 #include "ScriptMgr.h"

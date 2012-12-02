@@ -20,7 +20,7 @@
 // TODO: Use spell victory/defeat in wg instead of RewardMarkOfHonor() && RewardHonor
 // TODO: Add proper implement of achievement
 
-#include "gamePCH.h"
+
 #include "ObjectMgr.h"
 #include "BattlefieldWG.h"
 #include "SpellAuras.h"

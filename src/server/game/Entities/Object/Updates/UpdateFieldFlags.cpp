@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gamePCH.h"
+
 #include "UpdateFieldFlags.h"
 
 uint32 ItemUpdateFieldFlags[CONTAINER_END] =
