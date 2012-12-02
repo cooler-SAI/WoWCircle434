@@ -2793,6 +2793,11 @@ void SpellMgr::LoadSpellCustomAttr()
 
         switch (spellInfo->Id)
         {
+            // Eclipse
+            case 48517:
+            case 48518:
+                spellInfo->Attributes |= SPELL_ATTR0_CANT_CANCEL;
+                break;
             // Glyph of Totemic Recall
             case 55438:
                 spellInfo->Effects[0].MiscValue= SPELLMOD_EFFECT1;
