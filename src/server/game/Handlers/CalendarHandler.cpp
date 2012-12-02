@@ -43,6 +43,7 @@ SMSG_CALENDAR_EVENT_INVITE_STATUS_ALERT [ Structure unkown ]
 #include "Player.h"
 #include "CalendarMgr.h"
 #include "ObjectMgr.h"
+#include "GuildMgr.h"
 #include "ObjectAccessor.h"
 #include "DatabaseEnv.h"
 

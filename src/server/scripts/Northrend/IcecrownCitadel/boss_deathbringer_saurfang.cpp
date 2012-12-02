@@ -515,6 +515,7 @@ class boss_deathbringer_saurfang : public CreatureScript
                     {
                         if (GameObject* teleporter = GameObject::GetGameObject(*me, instance->GetData64(GO_SCOURGE_TRANSPORTER_SAURFANG)))
                         {
+
                             instance->HandleGameObject(0, false, teleporter);
                             teleporter->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
                         }
@@ -777,8 +778,8 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
         {
             player->PlayerTalkClass->ClearMenus();
             player->CLOSE_GOSSIP_MENU();
-            if (action == -ACTION_START_EVENT)
-                creature->AI()->DoAction(ACTION_START_EVENT);
+            //if (action == -ACTION_START_EVENT)
+            //    creature->AI()->DoAction(ACTION_START_EVENT);
 
             return true;
         }
@@ -930,8 +931,8 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
         {
             player->PlayerTalkClass->ClearMenus();
             player->CLOSE_GOSSIP_MENU();
-            if (action == -ACTION_START_EVENT + 1)
-                creature->AI()->DoAction(ACTION_START_EVENT);
+            //if (action == -ACTION_START_EVENT + 1)
+            //    creature->AI()->DoAction(ACTION_START_EVENT);
 
             return true;
         }
