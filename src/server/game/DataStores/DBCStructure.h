@@ -1964,9 +1964,9 @@ struct SpellFocusObjectEntry
 struct SpellRadiusEntry
 {
     uint32    ID;
-    float     radiusHostile;
-    //uint32    Unk    //always 0
-    float     radiusFriend;
+    float     RadiusMin;
+    float     RadiusPerLevel;
+    float     RadiusMax;
 };
 
 struct SpellRangeEntry

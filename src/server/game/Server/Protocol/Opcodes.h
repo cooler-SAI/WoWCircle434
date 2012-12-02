@@ -259,7 +259,6 @@ enum Opcodes
     CMSG_GUILD_INFO                                   = UNKNOWN_OPCODE,
     CMSG_GUILD_INFO_TEXT                              = 0x3227,
     CMSG_GUILD_INVITE                                 = 0x24B0,
-    CMSG_GUILD_LEADER                                 = UNKNOWN_OPCODE,
     CMSG_GUILD_LEAVE                                  = 0x1021,
     CMSG_GUILD_MEMBER_SEND_SOR_REQUEST                = 0x3225,
     CMSG_GUILD_MOTD                                   = 0x1035,

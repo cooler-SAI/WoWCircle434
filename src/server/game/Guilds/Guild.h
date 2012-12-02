@@ -748,7 +748,7 @@ public:
     void HandleSetMOTD(WorldSession* session, const std::string& motd);
     void HandleSetInfo(WorldSession* session, const std::string& info);
     void HandleSetEmblem(WorldSession* session, const EmblemInfo& emblemInfo);
-    void HandleSetLeader(WorldSession* session, const std::string& name);
+    void HandleSetNewGuildMaster(WorldSession* session, std::string& name);
     void HandleSetBankTabInfo(WorldSession* session, uint8 tabId, const std::string& name, const std::string& icon);
     void HandleSetMemberNote(WorldSession* session, std::string const& note, uint64 guid, bool isPublic);
     void HandleSetRankInfo(WorldSession* session, uint32 rankId, const std::string& name, uint32 rights, uint32 moneyPerDay, GuildBankRightsAndSlotsVec rightsAndSlots);
@@ -891,6 +891,14 @@ private:
                 return itr->second;
 
         SendCommandResult(session, GUILD_INVITE_S, ERR_GUILD_PLAYER_NOT_IN_GUILD_S, name);
+        return NULL;
+    }
+    inline Member* GetMember(std::string const& name)
+    {
+        for (Members::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+            if (itr->second->GetName() == name)
+                return itr->second;
+
         return NULL;
     }
     inline void _DeleteMemberFromDB(uint32 lowguid) const
