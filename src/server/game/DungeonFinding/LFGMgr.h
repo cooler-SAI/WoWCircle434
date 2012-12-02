@@ -155,11 +155,14 @@ struct LfgJoinResultData
 // Data needed by SMSG_LFG_UPDATE_PARTY and SMSG_LFG_UPDATE_PLAYER
 struct LfgUpdateData
 {
-    LfgUpdateData(LfgUpdateType _type = LFG_UPDATETYPE_DEFAULT): updateType(_type), comment("") {}
+    LfgUpdateData(LfgUpdateType _type = LFG_UPDATETYPE_DEFAULT): updateType(_type), state(LFG_STATE_NONE), comment("") { }
     LfgUpdateData(LfgUpdateType _type, LfgDungeonSet const& _dungeons, std::string _comment):
-        updateType(_type), dungeons(_dungeons), comment(_comment) {}
+        updateType(_type), state(LFG_STATE_NONE), dungeons(_dungeons), comment(_comment) { }
+    LfgUpdateData(LfgUpdateType _type, LfgState _state, LfgDungeonSet const& _dungeons, std::string const& _comment = ""):
+        updateType(_type), state(_state), dungeons(_dungeons), comment(_comment) { }
 
     LfgUpdateType updateType;
+    LfgState state;
     LfgDungeonSet dungeons;
     std::string comment;
 };
@@ -250,7 +253,7 @@ struct LfgPlayerBoot
 {
     time_t cancelTime;                                     ///< Time left to vote
     bool inProgress;                                       ///< Vote in progress
-    LfgAnswerContainer votes;                                    ///< Player votes (-1 not answer | 0 Not agree | 1 agree)
+    LfgAnswerContainer votes;                              ///< Player votes (-1 not answer | 0 Not agree | 1 agree)
     uint64 victim;                                         ///< Player guid to be kicked (can't vote)
     std::string reason;                                    ///< kick reason
 };
@@ -361,7 +364,7 @@ class LFGMgr
         bool isOptionEnabled(uint32 option);
         uint32 GetOptions();
         void SetOptions(uint32 options);
-        LfgState GetLfgStatus(uint64 guid, LfgUpdateData& data);
+        LfgUpdateData GetLfgStatus(uint64 guid);
         bool IsSeasonActive(uint32 dungeonId);
 
         std::string DumpQueueInfo(bool full = false);
