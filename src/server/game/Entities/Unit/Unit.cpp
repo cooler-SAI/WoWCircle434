@@ -5985,6 +5985,38 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             switch (dummySpell->Id)
             {
+                // Improved Soul Fire
+                case 18119:
+                case 18120:
+                {
+                    triggered_spell_id = 85383;
+                    basepoints0 = triggerAmount;
+                    CastSpell(this, 85385, true);
+                    break;
+                }
+                // Burning Embers
+                case 85112:
+                case 91986:
+                {
+                    if (effIndex != 0)
+                        return false;
+
+                    Unit* caster = GetOwner() ? GetOwner() : this;
+                    if (!caster)
+                        return false;
+
+                    triggered_spell_id = 85421;
+                    basepoints0 = int32(CalculatePct(damage, triggerAmount) / 7);
+                    int32 cap = int32(caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE) / 7);
+                    if (dummySpell->Id == 91986)
+                        cap /= 2;
+                    if (AuraEffect * aurEff = target->GetAuraEffect(triggered_spell_id, 0, caster->GetGUID()))
+                        basepoints0 += aurEff->GetAmount();
+                    basepoints0 = std::min(cap, basepoints0);
+                    // Pet and owner should have the same aura
+                    caster->CastCustomSpell(target, triggered_spell_id, &basepoints0, NULL, NULL, true);
+                    return true;
+                }
                 // Nether Protection
                 case 30299:
                 case 30301:
