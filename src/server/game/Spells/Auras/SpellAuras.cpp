@@ -1477,6 +1477,8 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         break;
                     }
                     case 94315:
+                        if (!target->HasAura(83049) && !target->HasAura(83050))
+                            return;
                         if (removeMode == AURA_REMOVE_BY_EXPIRE)
                         {
                             target->CastSpell(target, 94315, true);
