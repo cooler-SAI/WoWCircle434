@@ -4906,6 +4906,34 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     break;
             }
             break;
+        case SPELLFAMILY_WARLOCK:
+            // Fel Flame
+            if (m_spellInfo->Id == 77799)
+            {
+                Unit::AuraEffectList const &mPeriodic = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
+                for (Unit::AuraEffectList::const_iterator i = mPeriodic.begin(); i != mPeriodic.end(); ++i)
+                {
+                    AuraEffect const* aurEff = *i;
+                    SpellInfo const* spellInfo = aurEff->GetSpellInfo();
+                    
+                    // search our Immolate or Unstable Affliction on target
+                    
+                    if ((spellInfo->Id == 348 || spellInfo->Id == 30108) 
+                        && aurEff->GetCasterGUID() == m_caster->GetGUID())
+                    {
+                        uint32 now_duration = aurEff->GetBase()->GetDuration()+6000;
+                        uint32 max_duration = spellInfo->GetMaxDuration();
+
+                        // Inferno
+                        if (AuraEffect const* inferno = m_caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_WARLOCK, 5007, 1))
+                            if (spellInfo->Id == 348)
+                                max_duration += inferno->GetAmount();
+
+                        aurEff->GetBase()->SetDuration(std::min(now_duration, max_duration));
+                    }
+                }
+            }
+            break;
         }
     }
 
