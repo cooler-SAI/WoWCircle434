@@ -10254,7 +10254,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
                 }
                 // Fingers of Frost
                 if (HasAura(44544))
-                    DoneTotalMod *= 1.15f;
+                    DoneTotalMod *= 1.25f;
                 break;
             }
             // Torment the weak
