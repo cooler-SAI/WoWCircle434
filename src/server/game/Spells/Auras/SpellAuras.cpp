@@ -1579,6 +1579,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (caster->HasAura(58070))
                         caster->CastSpell(caster, 58068, true);
                 }
+                // Dark Intent
+                else if (m_spellInfo->Id == 85767)
+                {
+                    caster->RemoveAurasDueToSpell(85767);
+                }
                 break;
             case SPELLFAMILY_PRIEST:
                 if (!caster)

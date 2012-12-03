@@ -4751,6 +4751,17 @@ void SpellMgr::LoadDbcDataCorrections()
             case 28176: // Fel Armor
                 spellInfo->Effects[2].BasePoints = 91711;
                 break;
+            // Dark Intent
+            case 80398:
+                spellInfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;
+                spellInfo->Effects[0].TriggerSpell = 0;
+                spellInfo->ProcChance = 0;
+                spellInfo->ProcFlags = 0;
+                break;
+            // Dark Intent proc
+            case 85768:
+                spellInfo->SpellFamilyName = SPELLFAMILY_WARLOCK;
+                break;
             default:
                 break;
         }

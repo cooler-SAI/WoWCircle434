@@ -50,6 +50,7 @@ enum WarlockSpells
     WARLOCK_MANA_FEED_ICON_ID               = 1982,
     WARLOCK_HEALTHSTONE_CREATE              = 34130,
     WARLOCK_HEALTHSTONE_HEAL                = 6262,
+    WARLOCK_DARK_INTENT_EFFECT              = 85767,
 };
 
 /// Updated 4.3.4
@@ -655,6 +656,40 @@ public:
     }
 };
 
+//80398 Dark Intent
+class spell_warlock_dark_intent : public SpellScriptLoader
+{
+public:
+    spell_warlock_dark_intent() : SpellScriptLoader("spell_warlock_dark_intent") { }
+
+    class spell_warlock_dark_intent_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_warlock_dark_intent_SpellScript)
+
+        void HandleScriptEffect(SpellEffIndex effIndex)
+        {
+            Unit* caster = GetCaster();
+            Unit* target = GetHitUnit();
+
+            if(!caster || !target)
+                return;
+
+            caster->CastSpell(target, WARLOCK_DARK_INTENT_EFFECT, true);
+            target->CastSpell(caster, WARLOCK_DARK_INTENT_EFFECT, true);        
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_warlock_dark_intent_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_warlock_dark_intent_SpellScript();
+    }
+};
+
 void AddSC_warlock_spell_scripts()
 {
     new spell_warl_banish();
@@ -670,4 +705,5 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_unstable_affliction();
     new spell_warl_bane_of_doom();
     new spell_warl_health_funnel();
+    new spell_warlock_dark_intent();
 }

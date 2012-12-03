@@ -4839,6 +4839,37 @@ bool Unit::HandleHasteAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             break;
         }
+        case SPELLFAMILY_WARLOCK:
+        {
+            switch (hasteSpell->Id)
+            {
+                // Dark Intent Proc
+                case 85768:
+                case 85767:
+                {
+                    if (Unit * caster = triggeredByAura->GetCaster())
+                    {
+                        switch(caster->getClass())
+                        {
+                            case CLASS_WARRIOR:         triggered_spell_id = 94313; break;
+                            case CLASS_PALADIN:         triggered_spell_id = 94323; break;
+                            case CLASS_HUNTER:          triggered_spell_id = 94320; break;
+                            case CLASS_ROGUE:           triggered_spell_id = 94324; break;
+                            case CLASS_PRIEST:          triggered_spell_id = 94311; break;
+                            case CLASS_DEATH_KNIGHT:    triggered_spell_id = 94312; break;
+                            case CLASS_SHAMAN:          triggered_spell_id = 94319; break;
+                            case CLASS_MAGE:            triggered_spell_id = 85759; break;
+                            case CLASS_WARLOCK:         triggered_spell_id = 94310; break;
+                            case CLASS_DRUID:           triggered_spell_id = 94318; break;
+                            default: break;
+                        }
+                        caster->CastSpell(caster, triggered_spell_id, true);
+                    }
+                    return true;
+                }
+            }
+            break;
+        }
     }
 
     // processed charge only counting case
@@ -14527,6 +14558,7 @@ bool InitTriggerAuraData()
     isTriggerAura[SPELL_AURA_ADD_PCT_MODIFIER] = true;
     isTriggerAura[SPELL_AURA_PROC_TRIGGER_SPELL_COPY] = true;
     isTriggerAura[SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS_2] = true;
+    isTriggerAura[SPELL_AURA_MELEE_SLOW] = true;
 
     isNonTriggerAura[SPELL_AURA_MOD_POWER_REGEN] = true;
     isNonTriggerAura[SPELL_AURA_REDUCE_PUSHBACK] = true;
@@ -14820,6 +14852,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                             takeCharges = true;
                         break;
                     case SPELL_AURA_MOD_MELEE_HASTE:
+                    case SPELL_AURA_MELEE_SLOW:
                     case SPELL_AURA_MOD_MELEE_HASTE_3:
                     {
                         sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "ProcDamageAndSpell: casting spell id %u (triggered by %s haste aura of spell %u)", spellInfo->Id, (isVictim?"a victim's":"an attacker's"), triggeredByAura->GetId());
