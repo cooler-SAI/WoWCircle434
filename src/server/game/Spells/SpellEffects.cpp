@@ -442,6 +442,36 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             damage += damage / 6;
                     }
                 }
+                // Conflagrate - consumes Immolate
+                else if (m_spellInfo->Id == 17962)
+                {
+                    AuraEffect const* aura = NULL;                // found req. aura for damage calculation
+
+                    Unit::AuraEffectList const &mPeriodic = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
+                    for (Unit::AuraEffectList::const_iterator i = mPeriodic.begin(); i != mPeriodic.end(); ++i)
+                    {
+                        // for caster applied auras only
+                        if ((*i)->GetSpellInfo()->SpellFamilyName != SPELLFAMILY_WARLOCK ||
+                            (*i)->GetCasterGUID() != m_caster->GetGUID())
+                            continue;
+
+                        // Immolate
+                        if ((*i)->GetSpellInfo()->SpellFamilyFlags[0] & 0x4)
+                        {
+                            aura = *i;                      // it selected always if exist
+                            break;
+                        }
+                    }
+                    if (aura)
+                    {
+                        uint32 pdamage = aura->GetAmount() > 0 ? aura->GetAmount() : 0;
+                        pdamage = m_caster->SpellDamageBonusDone(unitTarget, aura->GetSpellInfo(), pdamage, DOT);
+                        pdamage = unitTarget->SpellDamageBonusTaken(m_caster, aura->GetSpellInfo(), pdamage, DOT);
+                        damage += pdamage * aura->GetTotalTicks() * 0.6f;
+                        apply_direct_bonus = false;
+                        break;
+                    }
+                }
                 // Soul Swap
                 else if (m_spellInfo->Id == 86121)
                 {
