@@ -4762,6 +4762,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 85768:
                 spellInfo->SpellFamilyName = SPELLFAMILY_WARLOCK;
                 break;
+            // Howl of Terror
+            case 5484:
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                spellInfo->Effects[1].SetRadiusIndex(13);
+                break;
             default:
                 break;
         }

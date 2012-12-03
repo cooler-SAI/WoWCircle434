@@ -4945,6 +4945,25 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     }
                 }
             }
+            // Demon Soul
+            else if (m_spellInfo->Id == 77801)
+            {
+                if (m_caster)
+                {
+                    if (!unitTarget || !unitTarget->isAlive())
+                        return;
+                    if (unitTarget->GetEntry() == 416)            // Summoned Imp
+                        m_caster->CastSpell(m_caster, 79459, true);
+                    if (unitTarget->GetEntry() == 1860)           // Summoned Voidwalker
+                        m_caster->CastSpell(m_caster, 79464, true);
+                    if (unitTarget->GetEntry() == 417)            // Summoned Felhunter
+                        m_caster->CastSpell(m_caster, 79460, true);
+                    if (unitTarget->GetEntry() == 1863)           // Summoned Succubus
+                        m_caster->CastSpell(m_caster, 79463, true);
+                    if (unitTarget->GetEntry() == 17252)          // Summoned Felguard
+                        m_caster->CastSpell(m_caster, 79462, true);
+                }
+            }
             break;
         }
     }
