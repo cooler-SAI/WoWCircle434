@@ -5658,8 +5658,10 @@ void AuraEffect::HandleAuraSwapSpells(AuraApplication const * aurApp, uint8 mode
             // Nether Ward
             case 6229:
             {
-                if (target->HasAura(91713) && (target->HasAura(687) || target->HasAura(28176)))
+                if (target->HasAura(91713))
                     newSpellId = 91711;
+                else
+                    newSpellId = 0;
                 break;
             }
             // Holy Word: Chastise

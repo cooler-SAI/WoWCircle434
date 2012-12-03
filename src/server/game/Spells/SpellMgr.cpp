@@ -4747,6 +4747,10 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_DUMMY;
                 spellInfo->Effects[0].TriggerSpell = 0;
                 break;
+            case 687:   // Demonic Armor
+            case 28176: // Fel Armor
+                spellInfo->Effects[2].BasePoints = 91711;
+                break;
             default:
                 break;
         }

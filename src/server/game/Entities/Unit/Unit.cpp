@@ -5948,6 +5948,39 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             switch (dummySpell->Id)
             {
+                // Nether Protection
+                case 30299:
+                case 30301:
+                {
+                    if (!procSpell)
+                        return false;
+
+                    // Check Shadow Ward or Nether Ward
+                    if (!HasAura(6229) && !HasAura(91711))
+                        return false;
+
+                    for (uint8 school = SPELL_SCHOOL_HOLY; school != MAX_SPELL_SCHOOL; ++school)
+                    {
+                        uint32 spellId = 0;
+                        uint32 var = (SpellSchoolMask(procSpell->SchoolMask) & (1 << school)) >> 1;
+                        switch(var)
+                        {
+                            case SPELL_SCHOOL_HOLY: spellId = 54370; break;
+                            case SPELL_SCHOOL_FIRE: spellId = 54371; break;
+                            case SPELL_SCHOOL_FROST: spellId = 54372; break;
+                            case SPELL_SCHOOL_ARCANE: spellId = 54373; break;
+                            case SPELL_SCHOOL_SHADOW: spellId = 54374; break;
+                            case SPELL_SCHOOL_NATURE: spellId = 54375; break;
+                            default: break;
+                        }
+                        if (spellId)
+                        {
+                            int32 bp0 = -triggerAmount;
+                            CastCustomSpell(this, spellId, &bp0, 0, 0, true);
+                        }
+                    }
+                    break;
+                }
                 // Glyph of Shadowflame
                 case 63310:
                 {
