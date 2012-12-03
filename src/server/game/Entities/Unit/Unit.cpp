@@ -5795,6 +5795,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 // Hot Streak
                 case 44445:
                 {
+                    if (effIndex != 0)
+                        return false;
+
                     // Selfproc from instant pyroblast
                     if (procSpell->Id == 92315 && !procSpell->CalcCastTime(this))
                         return false;
@@ -7948,6 +7951,14 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, uint32 absorb, Aura* trig
         {
             switch (dummySpell->Id)
             {
+                // Arcane Missiles!
+                case 79684:
+                {
+                    // Hot Streak
+                    if (HasAura(44445))
+                        *handled = true;
+                    break;
+                }
                 // Empowered Fire
                 case 31656:
                 case 31657:
