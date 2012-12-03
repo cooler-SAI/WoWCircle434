@@ -57,19 +57,29 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
         return;
     }
 
-    uint8 numDungeons;
+    std::string comment;
+    uint32 commentSize;
+    uint32 numDungeons;
     uint32 dungeon;
     uint32 roles;
 
     recvData >> roles;
-    recvData.read_skip<uint16>();                          // uint8 (always 0) - uint8 (always 0)
-    recvData >> numDungeons;
+
+    for (int i = 0; i < 3; ++i)
+    {
+        recvData.read_skip<uint32>();
+    }
+
+    commentSize = recvData.ReadBits(9);
+    numDungeons = recvData.ReadBits(24);
     if (!numDungeons)
     {
         sLog->outDebug(LOG_FILTER_LFG, "CMSG_LFG_JOIN %s no dungeons selected", GetPlayer()->GetGUID());
         recvData.rfinish();
         return;
     }
+
+    recvData.read(comment, commentSize);
 
     LfgDungeonSet newDungeons;
     for (int8 i = 0; i < numDungeons; ++i)
@@ -78,10 +88,6 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
         newDungeons.insert((dungeon & 0x00FFFFFF));        // remove the type from the dungeon entry
     }
 
-    recvData.read_skip<uint32>();                          // for 0..uint8 (always 3) { uint8 (always 0) }
-
-    std::string comment;
-    recvData >> comment;
     sLog->outDebug(LOG_FILTER_LFG, "CMSG_LFG_JOIN %s roles: %u, Dungeons: %u, Comment: %s",
         GetPlayer()->GetGUID(), roles, uint8(newDungeons.size()), comment.c_str());
     sLFGMgr->JoinLfg(GetPlayer(), uint8(roles), newDungeons, comment);
@@ -133,8 +139,13 @@ void WorldSession::HandleLfgSetRolesOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleLfgSetCommentOpcode(WorldPacket&  recvData)
 {
+    uint32 commentSize;
     std::string comment;
-    recvData >> comment;
+
+    commentSize = recvData.ReadBits(9);
+    recvData.ReadBit();
+    recvData.read(comment, commentSize);
+
     uint64 guid = GetPlayer()->GetGUID();
     sLog->outDebug(LOG_FILTER_LFG, "CMSG_LFG_SET_COMMENT %s comment: %s",
         GetPlayer()->GetGUID(), comment.c_str());
@@ -144,8 +155,7 @@ void WorldSession::HandleLfgSetCommentOpcode(WorldPacket&  recvData)
 
 void WorldSession::HandleLfgSetBootVoteOpcode(WorldPacket& recvData)
 {
-    bool agree;                                            // Agree to kick player
-    recvData >> agree;
+    bool agree = recvData.ReadBit();
 
     uint64 guid = GetPlayer()->GetGUID();
     sLog->outDebug(LOG_FILTER_LFG, "CMSG_LFG_SET_BOOT_VOTE %s agree: %u",
@@ -155,8 +165,7 @@ void WorldSession::HandleLfgSetBootVoteOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleLfgTeleportOpcode(WorldPacket& recvData)
 {
-    bool out;
-    recvData >> out;
+    bool out = recvData.ReadBit();
 
     sLog->outDebug(LOG_FILTER_LFG, "CMSG_LFG_TELEPORT %s out: %u",
         GetPlayer()->GetGUID(), out ? 1 : 0);
