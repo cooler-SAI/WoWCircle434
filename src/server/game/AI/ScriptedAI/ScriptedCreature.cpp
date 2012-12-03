@@ -469,7 +469,7 @@ void BossAI::_Reset()
 
     me->ResetLootMode();
     events.Reset();
-    summons.DespawnAll();
+    summons.DespawnAll(2000);
     if (instance)
         instance->SetBossState(_bossId, NOT_STARTED);
 }
@@ -477,7 +477,7 @@ void BossAI::_Reset()
 void BossAI::_JustDied()
 {
     events.Reset();
-    summons.DespawnAll();
+    summons.DespawnAll(2000);
     if (instance)
     {
         instance->SetBossState(_bossId, DONE);

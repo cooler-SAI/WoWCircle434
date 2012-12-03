@@ -39,9 +39,6 @@ class instance_baradin_hold : public InstanceMapScript
             {
                 switch (pCreature->GetEntry())
                 {
-                    case NPC_OCCUTHAR:
-                        pCreature->SetVisible(false);
-                        break;
                     case NPC_ALIZABAL:
                         pCreature->SetVisible(false);
                         break;
