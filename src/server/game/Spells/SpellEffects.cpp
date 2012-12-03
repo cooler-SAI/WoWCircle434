@@ -523,6 +523,16 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             m_caster->ToPlayer()->AddSpellCooldown(86121, 0, time(NULL) + 10);
                     }
                 }
+                // Rain of Fire - Aftermath
+                else if (m_spellInfo->Id == 42223)
+                {
+                    if (AuraEffect * auraeff = m_caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_WARLOCK, 11, 0))
+                    {
+                        int32 chance = auraeff->GetAmount();
+                        if (roll_chance_i(chance))
+                            m_caster->CastSpell(unitTarget, 85387, true);
+                    }
+                }
                 break;
             }
             case SPELLFAMILY_PRIEST:
