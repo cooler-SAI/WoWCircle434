@@ -3006,6 +3006,9 @@ Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8
             if (effMask != foundAura->GetEffectMask())
                 return NULL;
 
+            if (foundAura->GetId() == 44614 && !caster->HasAura(61205))
+                return NULL;
+
             // update basepoints with new values - effect amount will be recalculated in ModStackAmount
             for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
             {

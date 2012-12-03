@@ -675,6 +675,9 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 float mwb = ((mwb_min + mwb_max) / 2 + (ap / 14) * mws) * 0.25f * 6.0f;
                 amount += int32(caster->ApplyEffectModifiers(m_spellInfo, m_effIndex, mwb) / GetTotalTicks());
             }
+            // Frostfire Bolt
+            else if (GetId() == 44614)
+                return m_baseAmount * GetBase()->GetStackAmount();
             break;
         case SPELL_AURA_PERIODIC_ENERGIZE:
             switch (m_spellInfo->Id)

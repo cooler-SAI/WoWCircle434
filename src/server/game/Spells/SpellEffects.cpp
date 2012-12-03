@@ -759,6 +759,18 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             damage = unitTarget->SpellDamageBonusTaken(m_originalCaster, m_spellInfo, (uint32)damage, SPELL_DIRECT_DAMAGE);
         }
 
+        // hack for use final damage
+        switch (m_spellInfo->Id)
+        {
+            // Glyph of Frostfire
+            case 44614:
+                if (m_caster->HasAura(61205))
+                    m_spellValue->EffectBasePoints[2] = damage * 0.03f;
+                break;
+            default:
+                break;
+        }
+
         m_damage += damage;
     }
 }
