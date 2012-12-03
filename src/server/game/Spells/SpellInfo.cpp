@@ -1999,7 +1999,7 @@ SpellSpecificType SpellInfo::GetSpellSpecific() const
                 return SPELL_SPECIFIC_STING;
 
             // only hunter aspects have this (but not all aspects in hunter family)
-            if (SpellFamilyFlags.HasFlag(0x00380000, 0x00440000, 0x00001010))
+            if (SpellFamilyFlags.HasFlag(0x00380000, 0x00400000, 0x00001010))
                 return SPELL_SPECIFIC_ASPECT;
 
             break;
