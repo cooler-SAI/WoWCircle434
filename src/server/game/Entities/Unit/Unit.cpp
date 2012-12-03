@@ -8656,7 +8656,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             float weaponDPS = weapon->DPS;
             float attackPower = GetTotalAttackPowerValue(BASE_ATTACK) / 14.0f;
             float weaponSpeed = float(weapon->Delay) / 1000.0f;
-            basepoints0 = int32((weaponDPS + attackPower) * weaponSpeed);
+            basepoints0 = int32((weaponDPS + attackPower) * weaponSpeed)/6;
             trigger_spell_id = 12721;
             break;
         }
