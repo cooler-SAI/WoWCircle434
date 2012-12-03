@@ -531,7 +531,7 @@ public:
     // helpers for breaking by damage spells
     bool IsBreakingCamouflage() const;
     bool IsBreakingCamouflageAfterHit() const;
-    bool IsBreakingStealth() const;
+    bool IsBreakingStealth(Unit* m_caster = NULL) const;
 
     bool IsShouldProcOnOwner() const;
     bool IsCanBeStolen() const;

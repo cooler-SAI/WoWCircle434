@@ -2224,7 +2224,15 @@ bool WorldObject::CanDetect(WorldObject const* obj, bool ignoreStealth) const
 
 bool WorldObject::CanDetectInvisibilityOf(WorldObject const* obj) const
 {
+    // pets are invisible if caster is invisible
+    if (obj->ToUnit() && obj->ToUnit()->GetOwner())
+        return this->CanDetectInvisibilityOf(obj->ToUnit()->GetOwner());
+
     uint32 mask = obj->m_invisibility.GetFlags() & m_invisibilityDetect.GetFlags();
+
+    // caster can see targets if has 335 aura
+    if (this->ToUnit() && this->ToUnit()->HasAuraType(SPELL_AURA_335) && !obj->m_invisibility.GetFlags())
+        return true;
 
     // Check for not detected types
     if (mask != obj->m_invisibility.GetFlags())

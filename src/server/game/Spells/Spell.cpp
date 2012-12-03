@@ -3172,9 +3172,15 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     {
         // stealth must be removed at cast starting (at show channel bar)
         // skip triggered spell (item equip spell casting and other not explicit character casts/item uses)
-        if (!(_triggeredCastFlags & TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && m_spellInfo->IsBreakingStealth() && (!m_caster->HasAuraType(SPELL_AURA_MOD_CAMOUFLAGE) || m_spellInfo->IsBreakingCamouflage()))
+        if (!(_triggeredCastFlags & TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS) && m_spellInfo->IsBreakingStealth(m_caster) && (!m_caster->HasAuraType(SPELL_AURA_MOD_CAMOUFLAGE) || m_spellInfo->IsBreakingCamouflage()))
         {
             m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
+
+            // test code, should break invisibility from mage when pet cast spells
+            if (m_caster->isPet())
+                if (Unit* owner = m_caster->GetOwner())
+                    owner->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
+
             for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                 if (m_spellInfo->Effects[i].GetUsedTargetObjectType() == TARGET_OBJECT_TYPE_UNIT)
                 {
@@ -3400,12 +3406,15 @@ void Spell::cast(bool skipCheck)
                     if (Unit* pOwner = m_caster->GetCharmerOrOwnerOrSelf())
                     {
                         if (AuraEffect const* improvedFreeze = pOwner->GetDummyAuraEffect(SPELLFAMILY_MAGE, 94, 0))
+                        {
                             if (roll_chance_i(improvedFreeze->GetAmount()))
                             {
                                 pOwner->CastSpell(pOwner, 44544, true);
                                 if (Aura* fingersOfFrost = pOwner->GetAura(44544))
                                     fingersOfFrost->SetStackAmount(2);
                             }
+                        }
+                        pOwner->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
                     }
                     break;
                 }

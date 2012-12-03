@@ -1904,6 +1904,9 @@ SpellSpecificType SpellInfo::GetSpellSpecific() const
                     }
                 }
 
+                if (SpellIconID == 358)
+                    food = true;
+
                 if (food && drink)
                     return SPELL_SPECIFIC_FOOD_AND_DRINK;
                 else if (food)
@@ -2898,9 +2901,25 @@ bool SpellInfo::IsShouldProcOnOwner() const
     return false;
 }
 
-bool SpellInfo::IsBreakingStealth() const
+
+
+bool SpellInfo::IsBreakingStealth(Unit* m_caster) const
 {
-    if (IsPositive())
+    switch (GetSpellSpecific())
+    {
+        case SPELL_SPECIFIC_FOOD:
+        case SPELL_SPECIFIC_FOOD_AND_DRINK:
+        case SPELL_SPECIFIC_WELL_FED:
+            return true;
+    }
+
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (Effects[i].ApplyAuraName == SPELL_AURA_MOUNTED)
+            return true;
+    }
+
+    if (((m_caster && !m_caster->HasAuraType(SPELL_AURA_335)) || !m_caster) && IsPositive())
         return false;
 
     switch(Id)
