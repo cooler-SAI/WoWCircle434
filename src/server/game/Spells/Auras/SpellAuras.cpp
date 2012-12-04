@@ -1326,6 +1326,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                 caster->CastSpell(caster, spellId, true);
                         }
                         break;
+                    case 64343: // Impact
+                        // Reset cooldown on Fire Blast
+                        caster->ToPlayer()->RemoveSpellCooldown(2136, true);
+                        break;
                     default:
                         break;
                 }

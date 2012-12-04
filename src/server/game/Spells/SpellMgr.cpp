@@ -4767,6 +4767,10 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].SetRadiusIndex(13);
                 spellInfo->Effects[1].SetRadiusIndex(13);
                 break;
+            // Impact
+            case 12355:
+                spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
+                break;
             default:
                 break;
         }

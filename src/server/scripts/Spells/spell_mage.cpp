@@ -591,6 +591,112 @@ public:
     }
 };
 
+class ImpactTargetCheck
+{
+    public:
+        ImpactTargetCheck(Unit* originalTarget) : _originalTarget(originalTarget) { }
+
+        bool operator() (Unit* unit)
+        {
+            return unit == _originalTarget || !unit->isAlive();
+        }
+
+    private:
+        Unit* _originalTarget;
+};
+
+class ImpactAuraCheck
+{
+    public:
+        ImpactAuraCheck(uint64 guid) : _guid(guid) { }
+
+        bool operator() (AuraEffect* effect)
+        {
+            if (!(effect->GetSpellInfo()->SchoolMask & SPELL_SCHOOL_MASK_FIRE))
+                return true;
+
+            return _guid != effect->GetCasterGUID();
+        }
+
+    private:
+        uint64 _guid;
+};
+
+// 12355 - Impact
+class spell_mage_impact : public SpellScriptLoader
+{
+public:
+    spell_mage_impact() : SpellScriptLoader("spell_mage_impact") { }
+
+    class spell_mage_impact_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_mage_impact_SpellScript);
+
+        void HandleScript(SpellEffIndex effIndex)
+        {
+            Unit* caster = GetCaster();
+            Unit* target = GetExplTargetUnit();
+            if (!caster || !target || !target->isAlive())
+                return;
+
+            // Build target list
+            const float range = 12.0f;
+            std::list<Unit*> targets;
+            {
+                Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(target, caster, range);
+                Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(target, targets, u_check);
+                target->VisitNearbyObject(range, searcher);
+
+                targets.remove_if(ImpactTargetCheck(target));
+            }
+
+            if (targets.empty())
+                return;
+
+            static const AuraType periodicDamageAuraTypes[] =
+            {
+                SPELL_AURA_PERIODIC_DAMAGE,
+                SPELL_AURA_PERIODIC_DAMAGE_PERCENT,
+                SPELL_AURA_NONE
+            };
+
+            std::list<AuraEffect*> aurasPeriodic;
+            for (AuraType const* auraType = &periodicDamageAuraTypes[0]; auraType && auraType[0] != SPELL_AURA_NONE; ++auraType)
+            {
+                aurasPeriodic = target->GetAuraEffectsByType(*auraType);
+                aurasPeriodic.remove_if(ImpactAuraCheck(caster->GetGUID()));
+                for (std::list<AuraEffect*>::const_iterator i = aurasPeriodic.begin(); i != aurasPeriodic.end(); ++i)
+                {
+                    int32 amount = (*i)->GetAmount();
+                    uint8 stack = (*i)->GetBase()->GetStackAmount();
+
+                    for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+                    {
+                        if (Aura* aura = caster->AddAura((*i)->GetSpellInfo(), (*i)->GetBase()->GetEffectMask(), (*iter)))
+                        {
+                            if (stack)
+                                aura->SetStackAmount(stack);
+
+                            if (AuraEffect* _effect = aura->GetEffect(uint8((*i)->GetEffIndex())))
+                                _effect->ChangeAmount(amount, false);
+                        }
+                    }
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnEffectHit += SpellEffectFn(spell_mage_impact_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_mage_impact_SpellScript();
+    }
+};
+
 void AddSC_mage_spell_scripts()
 {
     new spell_mage_blast_wave();
@@ -605,4 +711,5 @@ void AddSC_mage_spell_scripts()
     new spell_mage_cauterize();
     new spell_mage_cone_of_cold();
     new spell_mage_time_warp();
+    new spell_mage_impact();
 }
