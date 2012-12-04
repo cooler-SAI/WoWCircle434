@@ -8563,6 +8563,11 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Crimson Scourge
+        case 81141:
+            if (victim && victim->HasAura(55078, this->GetGUID()))
+                break;
+            return false;
         // Masochism
         case 88994:
         case 88995:
