@@ -2917,13 +2917,14 @@ bool SpellInfo::IsBreakingStealth(Unit* m_caster) const
             return true;
     }
 
-    if (((m_caster && !m_caster->HasAuraType(SPELL_AURA_335)) || !m_caster) && IsPositive())
+    if ((!m_caster || !m_caster->HasAuraType(SPELL_AURA_335)) && IsPositive())
         return false;
 
     switch(Id)
     {
-        // Earthbind Totem
-        case 3600:
+        case 3600:  // Earthbind Totem
+        case 99:    // Demoralizing Roar
+        case 50256:
             return false;
         default:
             break;
