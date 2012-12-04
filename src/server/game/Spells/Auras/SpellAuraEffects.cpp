@@ -648,20 +648,15 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_DRUID && m_spellInfo->SpellFamilyFlags[0] & 0x00800000)
             {
                 m_canBeRecalculated = false;
-                // 0.01*$AP*cp
+                //  ${($m1+$b1*1+0.0207*$AP)*8}
                 if (caster->GetTypeId() != TYPEID_PLAYER)
                     break;
 
                 uint8 cp = caster->ToPlayer()->GetComboPoints();
 
-                // Idol of Feral Shadows. Cant be handled as SpellMod in SpellAura:Dummy due its dependency from CPs
-                if (AuraEffect const* aurEff = caster->GetAuraEffect(34241, EFFECT_0))
-                    amount += cp * aurEff->GetAmount();
-                // Idol of Worship. Cant be handled as SpellMod in SpellAura:Dummy due its dependency from CPs
-                else if (AuraEffect const* aurEff = caster->GetAuraEffect(60774, EFFECT_0))
-                    amount += cp * aurEff->GetAmount();
-
-                amount += uint32(CalculatePct(caster->GetTotalAttackPowerValue(BASE_ATTACK), cp));
+                amount += int32(0.0207f * caster->GetTotalAttackPowerValue(BASE_ATTACK) * cp);
+                amount *= 8;
+                amount /= GetTotalTicks();
             }
             // Rend
             else if (GetId() == 94009)
