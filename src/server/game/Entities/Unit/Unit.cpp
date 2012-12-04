@@ -7989,6 +7989,9 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, uint32 absorb, Aura* trig
                     // Hot Streak
                     if (HasAura(44445))
                         *handled = true;
+                    // Brain Freeze
+                    if (GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_MAGE, 2938, 0))
+                        *handled = true;
                     break;
                 }
                 // Empowered Fire
