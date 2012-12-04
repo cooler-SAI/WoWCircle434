@@ -5124,6 +5124,9 @@ SpellCastResult Spell::CheckCast(bool strict)
         if (castResult != SPELL_CAST_OK)
             return castResult;
 
+        if (strict && IsMorePowerfulAura(target))
+            return IsTriggered() ? SPELL_FAILED_DONT_REPORT: SPELL_FAILED_AURA_BOUNCED;
+
         if (target != m_caster)
         {
             // Must be behind the target
@@ -6830,6 +6833,10 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                 caster = m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
             if (!caster)
                 caster = m_caster;
+            if (target->GetEntry() == 5925)
+                return true;
+            if (LOSAdditionalRules(target))
+                return true;
             if (target != m_caster && !target->IsWithinLOSInMap(caster))
                 return false;
             break;
@@ -7557,6 +7564,72 @@ bool Spell::IsDarkSimulacrum() const
         }
     }
 
+    return false;
+}
+
+bool Spell::LOSAdditionalRules(Unit const* target) const
+{
+    // Okay, custom rules for LoS
+    for (uint8 x = 0; x < MAX_SPELL_EFFECTS; ++x)
+    {
+        // like paladin auras
+        if (m_spellInfo->Effects[x].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID)
+            return true;
+
+        // like bloodlust / prayers
+        if (m_spellInfo->Effects[x].ApplyAuraName && (m_spellInfo->Effects[x].TargetB.GetTarget() == TARGET_UNIT_SRC_AREA_ALLY || 
+            m_spellInfo->Effects[x].TargetA.GetTarget() == TARGET_UNIT_CASTER_AREA_RAID))
+            return !IsMorePowerfulAura(target);
+
+        if (m_spellInfo->IsChanneled())
+            continue;
+
+        if (m_spellInfo->Effects[x].TargetA.GetTarget() == TARGET_UNIT_PET || m_spellInfo->Effects[x].TargetA.GetTarget() == TARGET_UNIT_MASTER)
+            return true;
+    }
+
+    return false;
+}
+
+bool Spell::IsMorePowerfulAura(Unit const* target) const
+{
+    if (m_spellInfo->GetDuration() >= 2 * MINUTE * IN_MILLISECONDS)
+    {
+        switch (m_spellInfo->Effects[0].ApplyAuraName)
+        {
+            case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
+            case SPELL_AURA_MOD_STAT:
+            case SPELL_AURA_MOD_RANGED_ATTACK_POWER:
+            {
+                Unit::VisibleAuraMap const *visibleAuras = const_cast<Unit*>(target)->GetVisibleAuras();
+                for (Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
+                    if (AuraEffect * auraeff = itr->second->GetBase()->GetEffect(0))
+                    {
+                        if (auraeff->GetBase()->GetDuration() <= 2*MINUTE*IN_MILLISECONDS)
+                            continue;
+
+                        if (auraeff->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_POTION)
+                            continue;
+
+                        if (auraeff->GetAuraType() == m_spellInfo->Effects[0].ApplyAuraName &&
+                            (m_spellInfo->Effects[0].ApplyAuraName == SPELL_AURA_MOD_RANGED_ATTACK_POWER || m_spellInfo->Effects[0].MiscValue == auraeff->GetMiscValue()))
+                        {
+                            uint32 dmg = abs(CalculateDamage(0, target));
+                            uint32 amount = abs(auraeff->GetAmount());
+                            if (amount < dmg)
+                                continue;
+
+                            else if (amount == dmg && m_spellInfo->GetDuration() > auraeff->GetBase()->GetDuration())
+                                continue;
+
+                            return true;
+                        }
+                    }
+            }
+            default:
+                break;
+        }
+    }
     return false;
 }
 
