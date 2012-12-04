@@ -1785,6 +1785,32 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
             }
             break;
+        case SPELLFAMILY_MAGE:
+            if (!caster)
+                break;
+
+            // Pyromaniac
+            if (GetSpellInfo()->Effects[0].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE)
+            {
+                if (AuraEffect const* Pyromaniac = caster->GetDummyAuraEffect(SPELLFAMILY_MAGE, 2128, 0))
+                {
+                    UnitList targets;
+                    Trinity::AnyUnitHavingAuraTypeInObjectRangeCheck u_check(caster, caster, 80, SPELL_AURA_PERIODIC_DAMAGE, false);
+                    Trinity::UnitListSearcher<Trinity::AnyUnitHavingAuraTypeInObjectRangeCheck> searcher(caster, targets, u_check);
+                    caster->VisitNearbyObject(80, searcher);
+                    if (apply)
+                        targets.push_back(target);
+                    if (targets.size() > 2)
+                    {
+                        int32 basepoints = Pyromaniac->GetAmount();
+                        caster->CastCustomSpell(caster, 83582, &basepoints, NULL, NULL, true);
+                    }
+                    else
+                        caster->RemoveAura(83582);
+                }
+                break;
+            }
+            break;
     }
 }
 

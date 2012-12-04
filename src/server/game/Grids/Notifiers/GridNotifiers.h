@@ -851,6 +851,46 @@ namespace Trinity
             float i_range;
     };
 
+    class AnyUnitHavingBuffInObjectRangeCheck
+    {
+        public:
+            AnyUnitHavingBuffInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range, uint32 spellid, bool isfriendly)
+                : i_obj(obj), i_funit(funit), i_range(range), i_spellid(spellid), i_friendly(isfriendly) {}
+            bool operator()(Unit* u)
+            {
+                if (u->isAlive() && i_obj->IsWithinDistInMap(u, i_range) && i_funit->IsFriendlyTo(u) == i_friendly && u->HasAura(i_spellid, i_obj->GetGUID()))
+                    return true;
+                else
+                    return false;
+            }
+        private:
+            WorldObject const* i_obj;
+            Unit const* i_funit;
+            float i_range;
+            bool i_friendly;
+            uint32 i_spellid;
+    };
+
+    class AnyUnitHavingAuraTypeInObjectRangeCheck
+    {
+        public:
+            AnyUnitHavingAuraTypeInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range, AuraType type, bool isfriendly)
+                : i_obj(obj), i_funit(funit), i_range(range), i_type(type), i_friendly(isfriendly) {}
+            bool operator()(Unit* u)
+            {
+                if (u->isAlive() && i_obj->IsWithinDistInMap(u, i_range) && i_funit->IsFriendlyTo(u) == i_friendly && u->HasAuraTypeWithCaster(i_type, i_obj->GetGUID()))
+                    return true;
+                else
+                    return false;
+            }
+        private:
+            WorldObject const* i_obj;
+            Unit const* i_funit;
+            float i_range;
+            bool i_friendly;
+            AuraType i_type;
+    };
+
     class AnyGroupedUnitInObjectRangeCheck
     {
         public:
