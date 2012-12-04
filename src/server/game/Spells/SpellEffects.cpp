@@ -5011,6 +5011,13 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                         m_caster->CastSpell(m_caster, 79462, true);
                 }
             }
+            // Cremation
+            else if (m_spellInfo->Id == 89603) 
+            {
+                if (Aura * aur = unitTarget->GetAura(348, m_caster->GetGUID()))
+                    aur->RefreshDuration();
+                break;
+            }
             break;
         }
     }
