@@ -22537,6 +22537,8 @@ void Player::SendInitialPacketsAfterAddToMap()
         ShowResearchSites();
         ShowResearchProjects();
     }
+
+    SendDeathRuneUpdate();
 }
 
 void Player::SendUpdateToOutOfRangeGroupMembers()
@@ -24200,6 +24202,23 @@ void Player::ResyncRunes(uint8 count)
         data << uint8(255 - (GetRuneCooldown(i) * 51));     // passed cooldown time (0-255)
     }
     GetSession()->SendPacket(&data);
+}
+
+void Player::SendDeathRuneUpdate()
+{
+    if (getClass() != CLASS_DEATH_KNIGHT)
+        return;
+
+    for (uint8 i = 0; i < MAX_RUNES; ++i)
+    {
+        if (m_runes->runes[i].CurrentRune != RUNE_DEATH)
+            continue;
+
+        WorldPacket data(SMSG_CONVERT_RUNE, 2);
+        data << uint8(i);
+        data << uint8(RUNE_DEATH);
+        GetSession()->SendPacket(&data);
+    }
 }
 
 void Player::AddRunePower(uint8 index)
