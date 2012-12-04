@@ -727,7 +727,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             return;
                         break;
                     case 82739: // Flame Orb
-                    case 86719:
                     case 95969: // Frostfire Orb R1
                     case 84721: // Frostfire Orb R2
                         if (Unit* owner = m_caster->GetOwner())
@@ -1132,6 +1131,14 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                         else
                             m_caster->CastSpell(m_caster, 84765, true); // Summon Flame Orb
                     }
+                    break;
+                }
+                case 86719: // Flame Orb damage
+                {
+                    if (!unitTarget)
+                        return;
+
+                    m_caster->CastSpell(unitTarget, 82739, true);
                     break;
                 }
                 case 43987: // Ritual of Refreshment
