@@ -2156,8 +2156,8 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /* 
         if (target->IsImmunedToSpellEffect(m_spellInfo, effIndex))
             effectMask &= ~(1 << effIndex);
 
-    if (m_spellInfo->Id == 44614)
-        if (!m_caster->HasAura(61205) && (effectIndex == 2))
+    if (m_spellInfo->Id == 44614 && effectIndex != 1)
+        if (m_caster->HasAura(61205) == (effectIndex == 0))
             return;
 
     uint64 targetGUID = target->GetGUID();
