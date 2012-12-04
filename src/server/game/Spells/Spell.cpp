@@ -2232,7 +2232,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /* 
     }
     else if ((m_caster->GetTypeId() == TYPEID_PLAYER || m_caster->ToCreature()->isPet()) && m_caster != target)
     {
-        if (m_spellInfo->_IsCrowdControl(0, false))
+        if (!IsTriggered() && m_spellInfo->_IsCrowdControl(0, false))
         {
             targetInfo.timeDelay = 200LL;
             m_delayMoment = 200LL;

@@ -2793,17 +2793,6 @@ void SpellMgr::LoadSpellCustomAttr()
 
         switch (spellInfo->Id)
         {
-            // Eclipse
-            case 48517:
-            case 48518:
-                spellInfo->Attributes |= SPELL_ATTR0_CANT_CANCEL;
-                break;
-            // Glyph of Totemic Recall
-            case 55438:
-                spellInfo->Effects[0].MiscValue= SPELLMOD_EFFECT1;
-                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_ADD_PCT_MODIFIER;
-                spellInfo->Effects[0].BasePoints = 200;
-                break;
             case 60256:
                 //Crashes client on pressing ESC (Maybe because of ReqSpellFocus and GameObject)
                 spellInfo->AttributesEx4 &= ~SPELL_ATTR4_TRIGGERED;
@@ -3018,6 +3007,21 @@ void SpellMgr::LoadDbcDataCorrections()
 
         switch (spellInfo->Id)
         {
+            // Chains Of Ice
+            case 45524:
+                spellInfo->Effects[1].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                break;
+            // Eclipse
+            case 48517:
+            case 48518:
+                spellInfo->Attributes |= SPELL_ATTR0_CANT_CANCEL;
+                break;
+            // Glyph of Totemic Recall
+            case 55438:
+                spellInfo->Effects[0].MiscValue= SPELLMOD_EFFECT1;
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_ADD_PCT_MODIFIER;
+                spellInfo->Effects[0].BasePoints = 200;
+                break;
             case 97463: // Rallying Cry
                 spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
                 break;
