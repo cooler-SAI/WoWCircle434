@@ -4775,6 +4775,20 @@ void SpellMgr::LoadDbcDataCorrections()
             case 12355:
                 spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
                 break;
+            // Mirror Image - Clone Me!
+            case 45204:
+                spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
+                spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+                break;
+            // Copy Weapon Spells
+            case 41055:
+            case 45206:
+            case 63416:
+            case 69891:
+            case 69892:
+                spellInfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;
+                spellInfo->Mechanic = 0;
+                break;
             default:
                 break;
         }

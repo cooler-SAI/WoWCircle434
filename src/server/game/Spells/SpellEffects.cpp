@@ -862,6 +862,35 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     }
                     break;
                 }
+                case 45206: // Copy Off-hand Weapon
+                case 69892:
+                    m_caster->CastSpell(unitTarget, damage, true);
+                    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+                        break;
+
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        if (Item* offItem = m_caster->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+                            unitTarget->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, offItem->GetEntry());
+                    }
+                    else
+                        unitTarget->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, m_caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1));
+                    break;
+                case 41055: // Copy Mainhand Weapon
+                case 63416:
+                case 69891:
+                    m_caster->CastSpell(unitTarget, damage, true);
+                    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+                        break;
+
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        if (Item* mainItem = m_caster->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+                            unitTarget->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, mainItem->GetEntry());
+                    }
+                    else
+                        unitTarget->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, m_caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID));
+                    break;
             }
             break;
         }
