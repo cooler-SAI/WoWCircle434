@@ -8729,6 +8729,9 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             if (GetTypeId() != TYPEID_PLAYER)
                 return false;
 
+            if (AuraEffect * eff = victim->GetAuraEffect(12721, 0))
+                basepoints0 = eff->GetAmount() * eff->GetBase()->GetDuration() / eff->GetBase()->GetMaxDuration();
+
             // now compute approximate weapon damage by formula from wowwiki.com
             Item* item = NULL;
             if (procFlags & PROC_FLAG_DONE_OFFHAND_ATTACK)
@@ -8745,7 +8748,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             float weaponDPS = weapon->DPS;
             float attackPower = GetTotalAttackPowerValue(BASE_ATTACK) / 14.0f;
             float weaponSpeed = float(weapon->Delay) / 1000.0f;
-            basepoints0 = int32((weaponDPS + attackPower) * weaponSpeed)/6;
+            basepoints0 += int32((weaponDPS + attackPower) * weaponSpeed)/6;
             trigger_spell_id = 12721;
             break;
         }
