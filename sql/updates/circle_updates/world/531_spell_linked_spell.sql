@@ -1,0 +1,2 @@
+REPLACE INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES (81021, 109881, 2, 'Druid - Stapmede Mark');
+REPLACE INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES (81022, 109881, 2, 'Druid - Stapmede Mark');

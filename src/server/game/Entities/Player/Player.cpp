@@ -25713,6 +25713,8 @@ void Player::ActivateSpec(uint8 spec)
     RemoveAurasDueToSpell(31665);
     RemoveAurasDueToSpell(58427);
 
+    RemoveAurasDueToSpell(588); // Inner Fire
+
     //RemoveAllAuras(GetGUID(), NULL, false, true); // removes too many auras
     //ExitVehicle(); // should be impossible to switch specs from inside a vehicle..
 

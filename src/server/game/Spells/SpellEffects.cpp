@@ -1350,6 +1350,22 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
         // special cases
         switch (triggered_spell_id)
         {
+            // Feral Charge (Bear)
+            case 45334:
+                // Stampede
+                if (m_caster->HasAura(78892))
+                    m_caster->CastSpell(m_caster, 81016, true);
+                else if (m_caster->HasAura(78893))
+                    m_caster->CastSpell(m_caster, 81017, true);
+                break;
+            // Feral Charge (Cat)
+            case 50259:
+                // Stampede
+                if (m_caster->HasAura(78892))
+                    m_caster->CastSpell(m_caster, 81021, true);
+                else if (m_caster->HasAura(78893))
+                    m_caster->CastSpell(m_caster, 81022, true);
+                break;
             // Vanish (not exist)
             case 18461:
             {
@@ -3933,6 +3949,15 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             {
                 if (AuraEffect const* rendAndTear = m_caster->GetDummyAuraEffect(SPELLFAMILY_DRUID, 2859, 0))
                     AddPct(totalDamagePercentMod, rendAndTear->GetAmount());
+            }
+            // Ravage
+            else if (m_spellInfo->SpellFamilyFlags[2] & 0x10000)
+            {
+                // Remove Stampede auras
+                if (m_caster->HasAura(81021))
+                    m_caster->RemoveAurasDueToSpell(81021);
+                else if (m_caster->HasAura(81022))
+                    m_caster->RemoveAurasDueToSpell(81022);
             }
             break;
         }

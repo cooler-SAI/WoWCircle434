@@ -4811,6 +4811,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 54785:
                 spellInfo->Effects[0].SetRadiusIndex(43);
                 break;
+            // Frenzied Regeneration
+            case 22842:
+                spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
+                break;
             default:
                 break;
         }

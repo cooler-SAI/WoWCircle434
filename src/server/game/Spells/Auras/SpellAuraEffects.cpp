@@ -5932,15 +5932,18 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                     // Should be manauser
                     if (target->getPowerType() != POWER_RAGE)
                         break;
-                    uint32 rage = target->GetPower(POWER_RAGE);
-                    // Nothing todo
+
+                    int32 rage = target->GetPower(POWER_RAGE);
                     if (rage == 0)
                         break;
-                    int32 mod = (rage < 100) ? rage : 100;
-                    int32 points = target->CalculateSpellDamage(target, GetSpellInfo(), 1);
-                    int32 regen = target->GetMaxHealth() * (mod * points / 10) / 1000;
+
+                    int32 mod = std::min(rage, 100);
+                    float points = float(target->CalculateSpellDamage(target, GetSpellInfo(), 1)) / 100.0f;
+                    
+                    int32 pctRegen = int32(points * (float(mod) / 10.0f));
+                    int32 regen = target->CountPctFromMaxHealth(pctRegen);
                     target->CastCustomSpell(target, 22845, &regen, 0, 0, true, 0, this);
-                    target->SetPower(POWER_RAGE, rage-mod);
+                    target->SetPower(POWER_RAGE, rage - mod);
                     break;
                 }
             }

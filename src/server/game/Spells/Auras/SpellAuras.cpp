@@ -1289,6 +1289,16 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         caster->CastCustomSpell(target, 64801, &heal, NULL, NULL, true, NULL, GetEffect(EFFECT_0));
                     }
                 }
+                // Frenzied Regeneration
+                else if (GetId() == 22842)
+                {
+                    if (caster->HealthAbovePct(30))
+                        break;
+
+                    uint32 pctHealth = caster->CountPctFromMaxHealth(30.0f);
+                    int32 bp0 = int32(pctHealth - caster->GetHealth());
+                    caster->CastCustomSpell(caster, 22845, &bp0, 0, 0, true);
+                }
                 break;
             case SPELLFAMILY_MAGE:
                 if (!caster)
