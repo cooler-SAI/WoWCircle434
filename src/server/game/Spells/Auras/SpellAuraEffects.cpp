@@ -6054,6 +6054,24 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
             if (GetId() == 82327)
                 caster->CastSpell(target, 86452, true);
             break;
+        case SPELLFAMILY_WARLOCK:
+            switch (GetId())
+            {
+                // Curse of Elements - Jinx
+                case 1490:
+                {
+                    Unit * caster = GetCaster();
+                    if (!caster)
+                        break;
+                    if (AuraEffect * aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, 5002, 0))
+                    {
+                        if (aurEff->GetId() == 85479)
+                            caster->CastSpell(target, 86105, true);
+                        else caster->CastSpell(target, 85547, true);
+                    }
+                    break;
+                }
+            }
         default:
             break;
     }

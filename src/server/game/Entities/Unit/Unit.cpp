@@ -5986,6 +5986,29 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             switch (dummySpell->Id)
             {
+                // Curse of Weakness - Jinx
+                case 85479:
+                case 18179:
+                {
+                    switch (target->getPowerType())
+                    {
+                        case POWER_RAGE:
+                            triggered_spell_id = 85539;
+                            break;
+                        case POWER_ENERGY:
+                            triggered_spell_id = 85540;
+                            break;
+                        case POWER_RUNIC_POWER:
+                            triggered_spell_id = 85541;
+                          break;
+                        case POWER_FOCUS:
+                            triggered_spell_id = 85542;
+                            break;
+                        default: return false;
+                    }
+                    basepoints0 = dummySpell->Effects[1].BasePoints;
+                    break;
+                }
                 // Improved Soul Fire
                 case 18119:
                 case 18120:
@@ -10935,11 +10958,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
         default:
             return false;
     }
-    // percent done
-    // only players use intelligence for critical chance computations
-    if (Player* modOwner = GetSpellModOwner())
-        modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_CRITICAL_CHANCE, crit_chance);
-
+    
     if (victim)
     {
         AuraEffectList const& critAuras = victim->GetAuraEffectsByType(SPELL_AURA_MOD_CRIT_CHANCE_FOR_CASTER);
@@ -10951,6 +10970,17 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
         if (spellProto->Id == 8092)
             victim->RemoveAurasDueToSpell(87178, GetGUID());
     }
+
+    // percent done
+    // only players use intelligence for critical chance computations
+    if (Player* modOwner = GetSpellModOwner())
+        modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_CRITICAL_CHANCE, crit_chance);
+
+    // Curse of Gul'dan
+    if (isPet())
+        if (Unit* owner = GetOwner())
+            if (Aura* aur = victim->GetAura(86000, owner->GetGUID()))
+                crit_chance += float(aur->GetEffect(0)->GetAmount());
 
     crit_chance = crit_chance > 0.0f ? crit_chance : 0.0f;
     if (roll_chance_f(crit_chance))

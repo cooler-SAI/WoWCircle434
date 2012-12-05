@@ -4789,6 +4789,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;
                 spellInfo->Mechanic = 0;
                 break;
+            // Jinx: Curse of Elements
+            case 86105:
+            case 86717:
+                spellInfo->Effects[0].SetRadiusIndex(23);
+                spellInfo->Effects[1].SetRadiusIndex(23);
+                break;
             default:
                 break;
         }
