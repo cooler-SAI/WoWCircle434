@@ -32,7 +32,6 @@ enum DruidSpells
     DRUID_NATURES_SPLENDOR              = 57865,
     DRUID_LIFEBLOOM_FINAL_HEAL          = 33778,
     DRUID_LIFEBLOOM_ENERGIZE            = 64372,
-    DRUID_SURVIVAL_INSTINCTS            = 50322,
     DRUID_SAVAGE_ROAR                   = 62071,
     SPELL_DRUID_ITEM_T8_BALANCE_RELIC   = 64950,
 };
@@ -615,71 +614,6 @@ class spell_dru_starfall_dummy : public SpellScriptLoader
         }
 };
 
-class spell_dru_survival_instincts : public SpellScriptLoader
-{
-    public:
-        spell_dru_survival_instincts() : SpellScriptLoader("spell_dru_survival_instincts") { }
-
-        class spell_dru_survival_instincts_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_dru_survival_instincts_SpellScript);
-
-            SpellCastResult CheckCast()
-            {
-                Unit* caster = GetCaster();
-                if (!caster->IsInFeralForm())
-                    return SPELL_FAILED_ONLY_SHAPESHIFT;
-
-                return SPELL_CAST_OK;
-            }
-
-            void Register()
-            {
-                OnCheckCast += SpellCheckCastFn(spell_dru_survival_instincts_SpellScript::CheckCast);
-            }
-        };
-
-        class spell_dru_survival_instincts_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_dru_survival_instincts_AuraScript);
-
-            bool Validate(SpellInfo const* /*spell*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(DRUID_SURVIVAL_INSTINCTS))
-                    return false;
-                return true;
-            }
-
-            void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-            {
-                Unit* target = GetTarget();
-                int32 bp0 = target->CountPctFromMaxHealth(aurEff->GetAmount());
-                target->CastCustomSpell(target, DRUID_SURVIVAL_INSTINCTS, &bp0, NULL, NULL, true);
-            }
-
-            void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                GetTarget()->RemoveAurasDueToSpell(DRUID_SURVIVAL_INSTINCTS);
-            }
-
-            void Register()
-            {
-                AfterEffectApply += AuraEffectApplyFn(spell_dru_survival_instincts_AuraScript::AfterApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK);
-                AfterEffectRemove += AuraEffectRemoveFn(spell_dru_survival_instincts_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_dru_survival_instincts_SpellScript();
-        }
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_dru_survival_instincts_AuraScript();
-        }
-};
-
 // 40121 - Swift Flight Form (Passive)
 class spell_dru_swift_flight_passive : public SpellScriptLoader
 {
@@ -833,7 +767,6 @@ void AddSC_druid_spell_scripts()
     new spell_dru_savage_roar();
     new spell_dru_starfall_aoe();
     new spell_dru_starfall_dummy();
-    new spell_dru_survival_instincts();
     new spell_dru_swift_flight_passive();
     new spell_dru_t10_restoration_4p_bonus();
     new spell_dru_eclipse_energize();

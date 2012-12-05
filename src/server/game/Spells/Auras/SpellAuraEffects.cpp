@@ -641,6 +641,24 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 amount = GetBase()->GetUnitOwner()->SpellHealingBonusTaken(caster, GetSpellInfo(), amount, SPELL_DIRECT_DAMAGE);
             }
             break;
+        case SPELL_AURA_DAMAGE_SHIELD:
+            if (!caster)
+                break;
+
+            // Thorns
+            if (GetId() == 467)
+            {
+                if (caster->GetTypeId() != TYPEID_PLAYER)
+                    break;
+
+                m_canBeRecalculated = false;
+
+                if (caster->ToPlayer()->GetPrimaryTalentTree(caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_DRUID_FERAL_COMBAT)
+                    amount += int32(0.168f * caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                else
+                    amount += int32(0.168f * caster->SpellBaseDamageBonusDone(SpellSchoolMask(GetSpellInfo()->SchoolMask)));
+                break;
+            }
         case SPELL_AURA_PERIODIC_DAMAGE:
             if (!caster)
                 break;
@@ -5368,8 +5386,23 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
         }
         case SPELLFAMILY_DRUID:
         {
-            //if (!(mode & AURA_EFFECT_HANDLE_REAL))
-                //break;
+            if (!(mode & AURA_EFFECT_HANDLE_REAL))
+                break;
+
+            switch (GetId())
+            {
+                // Survival Instincts
+                case 61336:
+                    if (apply)
+                    {
+                        if (target->IsInFeralForm())
+                            target->CastSpell(target, 50322, true);
+                    }
+                    else
+                        target->RemoveAurasDueToSpell(50322, true);
+                    break;
+            }
+
             break;
         }
         case SPELLFAMILY_SHAMAN:
