@@ -1251,6 +1251,10 @@ bool SpellInfo::CanPierceImmuneAura(SpellInfo const* aura) const
 
 bool SpellInfo::CanDispelAura(SpellInfo const* aura) const
 {
+    // Faerie Fire
+    if (aura->SpellIconID == 109)
+        return true;
+
     // These spells (like Mass Dispel) can dispell all auras
     if (Attributes & SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY)
         return true;
