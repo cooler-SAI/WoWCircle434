@@ -1727,19 +1727,31 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             }
             break;
         case SPELLFAMILY_ROGUE:
-            // Stealth
-            if (GetSpellInfo()->SpellFamilyFlags[0] & 0x00400000)
+            // Stealth / Vanish
+            if (GetSpellInfo()->SpellFamilyFlags[0] & 0x00400800)
             {
                 // Master of subtlety
-                if (AuraEffect const* aurEff = target->GetAuraEffect(31223, 0))
+                if (AuraEffect const * aurEff = target->GetAuraEffectOfRankedSpell(31223, 0))
                 {
-                    if (!apply)
-                        target->CastSpell(target, 31666, true);
-                    else
+                    if (apply)
                     {
                         int32 basepoints0 = aurEff->GetAmount();
-                        target->CastCustomSpell(target, 31665, &basepoints0, NULL, NULL, true);
+                        target->CastCustomSpell(target, 31665, &basepoints0, NULL, NULL , true);
                     }
+                    else if (!target->GetAuraEffect(SPELL_AURA_MOD_SHAPESHIFT, SPELLFAMILY_ROGUE, 0x400800, 0, 0))
+                        if (Aura* aur=target->GetAura(31665))
+                            aur->SetAuraTimer(6000);
+                }
+                // Overkill
+                if (target->HasAura(58426))
+                {
+                    if (apply)
+                    {
+                        target->CastSpell(target,58427,true);
+                    }
+                    else if (!target->GetAuraEffect(SPELL_AURA_MOD_SHAPESHIFT, SPELLFAMILY_ROGUE, 0x400800, 0, 0))
+                        if (Aura* aur=target->GetAura(58427))
+                            aur->SetAuraTimer(20000);
                 }
                 break;
             }

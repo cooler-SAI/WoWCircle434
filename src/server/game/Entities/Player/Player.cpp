@@ -25700,6 +25700,19 @@ void Player::ActivateSpec(uint8 spec)
     if (GetPet())
         GetPet()->RemoveAllAurasOnDeath();*/
 
+    // Hack: Remove DK Presences, to avoid some exploits
+    RemoveAurasDueToSpell(48263);
+    RemoveAurasDueToSpell(63611);
+    RemoveAurasDueToSpell(61261);
+    RemoveAurasDueToSpell(48265);
+    RemoveAurasDueToSpell(63622);
+    RemoveAurasDueToSpell(48266);
+    RemoveAurasDueToSpell(63621);
+
+    // Rogue: Overkill & Master of Subtlety
+    RemoveAurasDueToSpell(31665);
+    RemoveAurasDueToSpell(58427);
+
     //RemoveAllAuras(GetGUID(), NULL, false, true); // removes too many auras
     //ExitVehicle(); // should be impossible to switch specs from inside a vehicle..
 
