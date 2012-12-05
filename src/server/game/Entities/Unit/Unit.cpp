@@ -18675,9 +18675,6 @@ void Unit::SendMovementCanFlyChange()
     }
 
     SendMessageToSet(&data, false);
-
-
-#pragma warning "MSG_MOVE_UPDATE_CAN_FLY not found, replaced by SMSG_SPLINE_MOVE_SET_FLYING, SMSG_SPLINE_MOVE_UNSET_FLYING ???"
 }
 
 bool Unit::IsSplineEnabled() const

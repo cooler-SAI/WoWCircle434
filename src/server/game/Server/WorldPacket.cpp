@@ -16,7 +16,7 @@
  */
 
 
-#include <zlib.h>
+/*#include <zlib.h>
 #include "WorldPacket.h"
 #include "World.h"
 
@@ -105,4 +105,4 @@ void WorldPacket::Compress(void* dst, uint32 *dst_size, const void* src, int src
     }
 
     *dst_size -= _compressionStream->avail_out;
-}
+}*/

@@ -407,8 +407,6 @@ class WorldSession
         uint32 GetRecruiterId() const { return recruiterId; }
         bool IsARecruiter() const { return isRecruiter; }
 
-        z_stream_s* GetCompressionStream() { return _compressionStream; }
-
     public:                                                 // opcodes handlers
 
         void Handle_NULL(WorldPacket& recvPacket);          // not used
@@ -1061,7 +1059,6 @@ class WorldSession
         bool isRecruiter;
         ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> _recvQueue;
         time_t timeLastWhoCommand;
-        z_stream_s* _compressionStream;
 };
 #endif
 /// @}

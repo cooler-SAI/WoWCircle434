@@ -802,11 +802,7 @@ enum Opcodes
     SMSG_COMMENTATOR_SKIRMISH_QUEUE_RESULT2           = 0x6814,
     SMSG_COMMENTATOR_STATE_CHANGED                    = 0x0737,
     SMSG_COMPLAIN_RESULT                              = 0x6D24,
-    SMSG_COMPRESSED_ACHIEVEMENT_DATA                  = UNKNOWN_OPCODE,
-    SMSG_COMPRESSED_CHAR_ENUM                         = UNKNOWN_OPCODE,
-    SMSG_COMPRESSED_GUILD_ROSTER                      = UNKNOWN_OPCODE,
     SMSG_COMPRESSED_MOVES                             = 0x0517,
-    SMSG_COMPRESSED_UPDATE_OBJECT                     = UNKNOWN_OPCODE,
     SMSG_COMSAT_CONNECT_FAIL                          = 0x6317,
     SMSG_COMSAT_DISCONNECT                            = 0x0316,
     SMSG_COMSAT_RECONNECT_TRY                         = 0x4D35,
@@ -1475,11 +1471,7 @@ inline std::string GetOpcodeNameForLogging(Opcodes id)
     if (id < UNKNOWN_OPCODE)
     {
         if (OpcodeHandler const* handler = opcodeTable[uint32(id) & 0x7FFF])
-        {
             ss << handler->Name;
-            if (opcode & COMPRESSED_OPCODE_MASK)
-                ss << "_COMPRESSED";
-        }
         else
             ss << "UNKNOWN OPCODE";
     }
