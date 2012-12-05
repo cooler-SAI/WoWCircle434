@@ -4815,6 +4815,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 22842:
                 spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
                 break;
+            case 779:   // Swipe (Bear)
+            case 62078: // Swipe (Cat)
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                break;
             default:
                 break;
         }
