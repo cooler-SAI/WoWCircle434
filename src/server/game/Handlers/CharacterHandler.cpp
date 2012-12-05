@@ -222,40 +222,62 @@ bool LoginQueryHolder::Initialize()
 void WorldSession::HandleCharEnum(PreparedQueryResult result)
 {
     uint32 charCount = 0;
-    ByteBuffer bitBuffer;
-    ByteBuffer dataBuffer;
+    if (result)
+        charCount = uint32(result->GetRowCount());
 
-    bitBuffer.WriteBits<int>(0, 23);
-    bitBuffer.WriteBit(true);
+    WorldPacket data(SMSG_CHAR_ENUM, 6 + (3 * charCount) + (charCount * 248));
+    data
+        << WriteAsUnaligned<23>(0)
+        << WriteAsBit(true)
+        << WriteAsUnaligned<17>(charCount);
 
     if (result)
     {
         _allowedCharsToLogin.clear();
 
-        charCount = uint32(result->GetRowCount());
-        bitBuffer.reserve(24 * charCount / 8);
-        dataBuffer.reserve(charCount * 381);
-
-        bitBuffer << WriteAsUnaligned<17>(charCount);
+        ByteBuffer buffer;
 
         do
         {
             uint32 guidLow = (*result)[0].GetUInt32();
+            uint32 guildId = (*result)[13].GetUInt32();
+
+            std::string name = (*result)[1].GetString();
+            uint32 nameSize = uint32(name.size());
+
+            ObjectGuid guid = MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
+            ObjectGuid guildGuid = MAKE_NEW_GUID(guildId, 0, guildId ? uint32(HIGHGUID_GUILD) : 0);
+
+            data
+                .WriteByteMask(guid[3])
+                .WriteByteMask(guildGuid[1])
+                .WriteByteMask(guildGuid[7])
+                .WriteByteMask(guildGuid[2])
+                .WriteBits(nameSize, 7)
+                .WriteByteMask(guid[4])
+                .WriteByteMask(guid[7])
+                .WriteByteMask(guildGuid[3])
+                .WriteByteMask(guid[5])
+                .WriteByteMask(guildGuid[6])
+                .WriteByteMask(guid[1])
+                .WriteByteMask(guildGuid[5])
+                .WriteByteMask(guildGuid[4])
+                .WriteBit(((*result)[15].GetUInt16() & AT_LOGIN_FIRST))
+                .WriteByteMask(guid[0])
+                .WriteByteMask(guid[2])
+                .WriteByteMask(guid[6])
+                .WriteByteMask(guildGuid[0]);
+
+            Player::BuildEnumData(result, &buffer);
 
             sLog->outInfo(LOG_FILTER_NETWORKIO, "Loading char guid %u from account %u.", guidLow, GetAccountId());
 
-            Player::BuildEnumData(result, &dataBuffer, &bitBuffer);
-
             _allowedCharsToLogin.insert(guidLow);
-        } while (result->NextRow());
-    }
-    else
-        bitBuffer << WriteAsUnaligned<17>(0);
 
-    WorldPacket data(SMSG_CHAR_ENUM, 7 + bitBuffer.size() + dataBuffer.size());
-    data.append(bitBuffer);
-    if (charCount)
-        data.append(dataBuffer);
+        } while (result->NextRow());
+
+        data.append(buffer);
+    }
 
     SendPacket(&data);
 }
