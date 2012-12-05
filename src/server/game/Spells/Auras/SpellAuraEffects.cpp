@@ -788,6 +788,14 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                         amount += improvedFrostPresence->GetAmount();
                     break;
                 }
+                // Total Eclipse, Balance Druid Mastery
+                case 48517: // Eclipse (Solar)
+                case 48518: // Eclipse (Lunar)
+                {
+                    if (AuraEffect const* totalEclipse = caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 2856, 0))
+                        amount += totalEclipse->GetAmount();
+                    break;
+                }
                 default:
                     break;
             }
@@ -1446,7 +1454,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
             break;
         case FORM_MOONKIN:
             spellId = 24905;
-            spellId2 = 69366;
+            spellId2 = 24907;
             break;
         case FORM_FLIGHT:
             spellId = 33948;
