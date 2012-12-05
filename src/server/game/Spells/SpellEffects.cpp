@@ -4855,7 +4855,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         case SPELLFAMILY_DEATHKNIGHT:
         {
             // Pestilence
-            if (m_spellInfo->SpellFamilyFlags[1]&0x10000)
+            if (m_spellInfo->SpellFamilyFlags[1] & 0x10000)
             {
                 // Get diseases on target of spell
                 if (m_targets.GetUnitTarget() &&  // Glyph of Disease - cast on unit target too to refresh aura
@@ -4881,6 +4881,39 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                         m_caster->CastSpell(unitTarget, 65142, true);
                     }
                 }
+                return;
+            }
+            // Festering Strike
+            if (m_spellInfo->SpellFamilyFlags[2] & 0x200)
+            {
+                Unit::VisibleAuraMap const *visibleAuras = unitTarget->GetVisibleAuras();
+                for (Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
+                {
+                    AuraApplication * auraApp = itr->second;
+                    Aura * aura = auraApp->GetBase();
+                    SpellInfo const* spellInfo = aura->GetSpellInfo();
+
+                    // search our Blood Plague, Frost Fever, Ebon Plague and Chain of Ice on target
+                    if (spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && (spellInfo->SpellFamilyFlags[1] & 0xC000 ||
+                        spellInfo->SpellFamilyFlags[2] & 0x2 || spellInfo->SpellFamilyFlags[1] & 0x800) && aura->GetCasterGUID() == m_caster->GetGUID())
+                    {
+                        uint32 nowduration = aura->GetDuration();
+                        uint32 maxduration = spellInfo->GetMaxDuration();
+
+                        // talent Epidemic (without Chain of Ice)
+                        if (AuraEffect const* epidemic = m_caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 234, EFFECT_0))
+                            if (spellInfo->SpellIconID != 180)
+                                maxduration += epidemic->GetAmount();
+
+                        nowduration += 6000;
+
+                        if (nowduration < maxduration)
+                            aura->SetDuration(nowduration);
+                        else
+                            aura->SetDuration(maxduration);
+                    }
+                }
+                return;
             }
             break;
         }
