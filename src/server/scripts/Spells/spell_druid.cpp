@@ -35,36 +35,6 @@ enum DruidSpells
     DRUID_SURVIVAL_INSTINCTS            = 50322,
     DRUID_SAVAGE_ROAR                   = 62071,
     SPELL_DRUID_ITEM_T8_BALANCE_RELIC   = 64950,
-    SPELL_KING_OF_THE_JUNGLE            = 48492,
-    SPELL_TIGER_S_FURY_ENERGIZE         = 51178,
-    SPELL_ENRAGE_MOD_DAMAGE             = 51185,
-};
-
-class spell_dru_enrage : public SpellScriptLoader
-{
-    public:
-        spell_dru_enrage() : SpellScriptLoader("spell_dru_enrage") { }
-
-        class spell_dru_enrage_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_dru_enrage_SpellScript);
-
-            void OnHit()
-            {
-                if (AuraEffect const* aurEff = GetHitUnit()->GetAuraEffectOfRankedSpell(SPELL_KING_OF_THE_JUNGLE, EFFECT_0))
-                    GetHitUnit()->CastCustomSpell(SPELL_ENRAGE_MOD_DAMAGE, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetHitUnit(), true);
-            }
-
-            void Register()
-            {
-                AfterHit += SpellHitFn(spell_dru_enrage_SpellScript::OnHit);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_dru_enrage_SpellScript();
-        }
 };
 
 // 54846 Glyph of Starfire
@@ -744,33 +714,6 @@ class spell_dru_swift_flight_passive : public SpellScriptLoader
         }
 };
 
-class spell_dru_tiger_s_fury : public SpellScriptLoader
-{
-    public:
-        spell_dru_tiger_s_fury() : SpellScriptLoader("spell_dru_tiger_s_fury") { }
-
-        class spell_dru_tiger_s_fury_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_dru_tiger_s_fury_SpellScript);
-
-            void OnHit()
-            {
-                if (AuraEffect const* aurEff = GetHitUnit()->GetAuraEffectOfRankedSpell(SPELL_KING_OF_THE_JUNGLE, EFFECT_1))
-                    GetHitUnit()->CastCustomSpell(SPELL_TIGER_S_FURY_ENERGIZE, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetHitUnit(), true);
-            }
-
-            void Register()
-            {
-                AfterHit += SpellHitFn(spell_dru_tiger_s_fury_SpellScript::OnHit);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_dru_tiger_s_fury_SpellScript();
-        }
-};
-
 class spell_dru_t10_restoration_4p_bonus : public SpellScriptLoader
 {
     public:
@@ -880,7 +823,6 @@ class spell_dru_primal_madness : public SpellScriptLoader
 
 void AddSC_druid_spell_scripts()
 {
-    new spell_dru_enrage();
     new spell_dru_glyph_of_starfire();
     new spell_dru_insect_swarm();
     new spell_dru_lifebloom();
@@ -893,7 +835,6 @@ void AddSC_druid_spell_scripts()
     new spell_dru_starfall_dummy();
     new spell_dru_survival_instincts();
     new spell_dru_swift_flight_passive();
-    new spell_dru_tiger_s_fury();
     new spell_dru_t10_restoration_4p_bonus();
     new spell_dru_eclipse_energize();
     new spell_dru_primal_madness();
