@@ -5941,11 +5941,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // Remove aura (before cast for prevent infinite loop handlers)
                     RemoveAurasDueToSpell(triggeredByAura->GetId());
 
-                    uint32 spell = sSpellMgr->GetSpellWithRank(27285, dummySpell->GetRank());
-
                     // Cast finish spell (triggeredByAura already not exist!)
                     if (Unit* caster = GetUnit(*this, casterGuid))
-                        caster->CastSpell(this, spell, true, castItem);
+                        caster->CastSpell(this, 27285, true);
                     return true;                            // no hidden cooldown
                 }
 
@@ -7799,6 +7797,33 @@ bool Unit::HandleModifierAuraProc(Unit* victim, uint32 damage, AuraEffect* trigg
                 case 47221:
                     triggered_spell_id = 47283;
                     break;
+                // Soul Burn
+                case 74434:
+                {
+                    if (!procSpell)
+                        return false;
+                    
+                    switch (procSpell->Id)
+                    {
+                        // Healthstone
+                        case 6262:
+                            CastSpell(this, 79437, true);
+                            break;
+                        // Searing Pain
+                        case 5676:
+                            CastSpell(this, 79440, true);
+                            break;
+                        // Demonic Circle: Teleport
+                        case 48020:
+                            CastSpell(this, 79438, true);
+                            break;
+                        // Seed of Corruption
+                        case 27243:
+                            CastSpell(this, 86664, true);
+                            break;
+                    }
+                    return true;
+                }
                 default:
                     break;
             }

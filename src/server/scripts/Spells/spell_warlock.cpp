@@ -255,9 +255,23 @@ class spell_warl_seed_of_corruption : public SpellScriptLoader
                     targets.remove(GetExplTargetUnit());
             }
 
+            void HandleScript()
+            {
+                if (!GetCaster())
+                    return;
+
+                // Remove Soul Burn aura
+                if (GetCaster()->HasAura(86664))
+                {
+                    GetCaster()->EnergizeBySpell(GetCaster(), 86664, 1, POWER_SOUL_SHARDS);
+                    GetCaster()->RemoveAurasDueToSpell(86664);
+                }
+            }
+
             void Register()
             {
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_warl_seed_of_corruption_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+                AfterHit += SpellHitFn(spell_warl_seed_of_corruption_SpellScript::HandleScript);
             }
         };
 

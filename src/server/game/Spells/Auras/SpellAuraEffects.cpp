@@ -6471,6 +6471,12 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
                 damage += (damage+1)/2;           // +1 prevent 0.5 damage possible lost at 1..4 ticks
             // 5..8 ticks have normal tick damage
         }
+        // Drain Life
+        else if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_WARLOCK && GetSpellInfo()->SpellFamilyFlags[0] & 0x8)
+        {
+            GetCaster()->CastSpell(GetCaster(), 89653, true);
+        }
+
         if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_GENERIC)
         {
             switch (GetId())

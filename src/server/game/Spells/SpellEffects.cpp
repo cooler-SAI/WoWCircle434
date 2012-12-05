@@ -533,6 +533,13 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             m_caster->CastSpell(unitTarget, 85387, true);
                     }
                 }
+                // Seed of Corruption dmg
+                else if (m_spellInfo->Id == 27285)
+                {
+                    // Soul Burn
+                    if (m_caster->HasAura(86664))
+                        m_caster->AddAura(172, unitTarget);
+                }
                 break;
             }
             case SPELLFAMILY_PRIEST:
@@ -2175,6 +2182,15 @@ void Spell::EffectHealPct(SpellEffIndex /*effIndex*/)
     // Rune Tap - Party
     if (m_spellInfo->Id == 59754 && unitTarget == m_caster)
         return;
+
+    // Life Drain - Death's Embrace
+    if (m_spellInfo->Id == 89653)
+        if (AuraEffect * auraEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, 3223, 0))
+        {
+            int32 pct = 25; // SpellMgr::CalculateSpellEffectAmount(auraEff->GetSpellProto(), 2); -- that shit is broken
+            if (m_caster->GetHealthPct() < pct)
+                damage += auraEff->GetAmount();
+        }
 
     uint32 heal = m_originalCaster->SpellHealingBonusDone(unitTarget, m_spellInfo, unitTarget->CountPctFromMaxHealth(damage), HEAL);
     heal = unitTarget->SpellHealingBonusTaken(m_originalCaster, m_spellInfo, heal, HEAL);

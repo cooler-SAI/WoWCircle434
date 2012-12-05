@@ -3023,6 +3023,8 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].BasePoints = 200;
                 break;
             case 97463: // Rallying Cry
+            case 54443: // Demonic Empowerment
+            case 79437: // Soulburn - Healthstone
                 spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
                 break;
             case 69176:
@@ -4794,6 +4796,20 @@ void SpellMgr::LoadDbcDataCorrections()
             case 86717:
                 spellInfo->Effects[0].SetRadiusIndex(23);
                 spellInfo->Effects[1].SetRadiusIndex(23);
+                break;
+            // Soul Burn
+            case 74434:
+                spellInfo->ProcCharges = 1;
+                break;
+            // Soul Burn: Seed of Corruption
+            case 86664:
+                spellInfo->Effects[0].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_DUMMY;
+                spellInfo->SetDurationIndex(85);
+                break;
+            // Demonic Leap
+            case 54785:
+                spellInfo->Effects[0].SetRadiusIndex(43);
                 break;
             default:
                 break;
