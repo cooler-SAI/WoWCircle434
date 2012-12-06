@@ -1312,6 +1312,13 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 {
                     caster->ToPlayer()->RemoveSpellCooldown(78674, true);
                 }
+                // Lifebloom
+                else if (GetId() == 33763)
+                {
+                    // Revitalize
+                    if (AuraEffect* const aurEff = caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE, SPELLFAMILY_DRUID, 2862, 0))
+                        caster->CastSpell(caster, 57669, true);
+                }
                 break;
             case SPELLFAMILY_MAGE:
                 if (!caster)

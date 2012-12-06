@@ -586,6 +586,14 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     // 25 energy = 100% more damage
                     AddPct(damage, energy * 4);
                 }
+                // Starsurge
+                else if (m_spellInfo->Id == 78764)
+                {
+                    // Shooting Stars remove aura
+                    if (m_caster->HasAura(93400))
+                        m_caster->RemoveAurasDueToSpell(93400);
+
+                }
                 break;
             }
             case SPELLFAMILY_ROGUE:
