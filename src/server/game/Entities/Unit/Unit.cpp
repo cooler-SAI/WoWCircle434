@@ -5663,6 +5663,26 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         }
         case SPELLFAMILY_MAGE:
         {
+            // Nether Vortex
+            if (dummySpell->SpellIconID == 2294)
+            {
+                if (target == this)
+                    return false;
+
+                triggered_spell_id = 31589; // slow
+                AuraList & scAuras = GetSingleCastAuras();
+                for (AuraList::iterator iter = scAuras.begin(); iter != scAuras.end(); ++iter)
+                {
+                    if( (*iter)->GetId() == triggered_spell_id)
+                    {
+                        // can update current target slow
+                        if ((*iter)->GetOwner() == target)
+                            break;
+                        return false;
+                    }
+                }
+                break;
+            }
             // Magic Absorption
             if (dummySpell->SpellIconID == 459)             // only this spell has SpellIconID == 459 and dummy aura
             {
