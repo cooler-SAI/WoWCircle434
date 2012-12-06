@@ -1307,6 +1307,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         if (caster->IsInFeralForm())
                             SetStackAmount(aurEff->GetAmount());    
                 }
+                // Shooting Stars
+                else if (GetId() == 93400)
+                {
+                    caster->ToPlayer()->RemoveSpellCooldown(78674, true);
+                }
                 break;
             case SPELLFAMILY_MAGE:
                 if (!caster)

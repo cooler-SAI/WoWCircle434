@@ -5013,8 +5013,14 @@ bool Unit::HandleAuraProcOnPowerAmount(Unit* victim, uint32 /*damage*/, AuraEffe
                 {
                     case 0:
                     {
-                        // Do not proc if proc spell isnt starfire and starsurge
-                        if (procSpell->Id != 2912 && procSpell->Id != 78674)
+                        // Can proc if proc spell is starfire and starsurge
+                        if (procSpell->Id != 2912 && procSpell->Id != 78674 &&
+                            procSpell->Id != 8921 && procSpell->Id != 93402)
+                            return false;
+
+                        // Can proc if spell is moonfire or sunfire with lunar shower
+                        if ((procSpell->Id == 8921 || procSpell->Id == 93402) &&
+                            !(HasAura(81006) || HasAura(81191) || HasAura(81192)))
                             return false;
 
                         if (!HasAura(solarEclipseMarker))

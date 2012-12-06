@@ -254,6 +254,97 @@ public:
     }
 };
 
+enum LunarShowerSpells
+{
+    SPELL_DRUID_MOONFIRE    = 8921,
+    SPELL_DRUID_SUNFIRE     = 93402,
+};
+
+// Moonfire and Sunfire
+class spell_dru_lunar_shower_energize : public SpellScriptLoader
+{
+public:
+    spell_dru_lunar_shower_energize() : SpellScriptLoader("spell_dru_lunar_shower_energize") { }
+
+    class spell_dru_lunar_shower_energize_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dru_lunar_shower_energize_SpellScript);
+
+        bool Load()
+        {
+            if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                return false;
+
+            if (GetCaster()->ToPlayer()->getClass() != CLASS_DRUID)
+                return false;
+
+            if (!GetCaster()->HasAura(81006) &&
+                !GetCaster()->HasAura(81191) &&
+                !GetCaster()->HasAura(81192))
+                return false;
+
+            return true;
+        }
+
+        void HandleEnergize(SpellEffIndex effIndex)
+        {
+            Player* caster = GetCaster()->ToPlayer();
+
+            // No boomy, no deal.
+            if (caster->GetPrimaryTalentTree(caster->GetActiveSpec()) != TALENT_TREE_DRUID_BALANCE)
+                return;
+
+            switch(GetSpellInfo()->Id)
+            {
+                case SPELL_DRUID_SUNFIRE:
+                {
+                    int32 energizeAmount = -8;
+                    // If we are set to fill the lunar side or we've just logged in with 0 power..
+                    if ((!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
+                        || caster->GetPower(POWER_ECLIPSE) == 0)
+                    {
+                        caster->CastCustomSpell(caster,SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE,&energizeAmount,0,0,true);
+                        // If the energize was due to 0 power, cast the eclipse marker aura
+                        if (!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
+                            caster->CastSpell(caster,SPELL_DRUID_LUNAR_ECLIPSE_MARKER,true);
+                    }
+                    // The energizing effect brought us out of the solar eclipse, remove the aura
+                    if (caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE) && caster->GetPower(POWER_ECLIPSE) <= 0)
+                        caster->RemoveAurasDueToSpell(SPELL_DRUID_SOLAR_ECLIPSE);
+                    break;
+                }
+                case SPELL_DRUID_MOONFIRE:
+                {
+                    int32 energizeAmount = 8;
+                    // If we are set to fill the solar side or we've just logged in with 0 power..
+                    if ((!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
+                        || caster->GetPower(POWER_ECLIPSE) == 0)
+                    {
+                        caster->CastCustomSpell(caster,SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE,&energizeAmount,0,0,true);
+                        // If the energize was due to 0 power, cast the eclipse marker aura
+                        if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
+                            caster->CastSpell(caster,SPELL_DRUID_SOLAR_ECLIPSE_MARKER,true);
+                    }
+                    // The energizing effect brought us out of the lunar eclipse, remove the aura
+                    if (caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE) && caster->GetPower(POWER_ECLIPSE) >= 0)
+                        caster->RemoveAura(SPELL_DRUID_LUNAR_ECLIPSE);
+                    break;
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_dru_lunar_shower_energize_SpellScript::HandleEnergize, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dru_lunar_shower_energize_SpellScript;
+    }
+};
+
 class spell_dru_lifebloom : public SpellScriptLoader
 {
     public:
@@ -742,4 +833,5 @@ void AddSC_druid_spell_scripts()
     new spell_dru_t10_restoration_4p_bonus();
     new spell_dru_eclipse_energize();
     new spell_dru_primal_madness();
+    new spell_dru_lunar_shower_energize();
 }
