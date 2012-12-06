@@ -1135,9 +1135,9 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
     data->WriteByteMask(guidBytes[4]);
     data->WriteByteMask(guidBytes[2]);
     data->WriteByteMask(guidBytes[3]);
-    data->WriteBit(false);                                  // unk
+    data->WriteBit(true);                                   // unk
     data->WriteByteMask(guidBytes[5]);
-    data->WriteBit(false);                                  // unk
+    data->WriteBit(true);                                   // unk
 
     data->WriteByteSeq(guidBytes[6]);
     data->WriteByteSeq(guidBytes[1]);
