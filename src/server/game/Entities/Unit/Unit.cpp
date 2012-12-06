@@ -6790,6 +6790,30 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     basepoints0 = CalculatePct(GetMaxPower(POWER_FOCUS), triggerAmount);
                     break;
                 }
+                // Improved Steady Shot
+                case 3409:
+                {
+                    if (procSpell->Id != 56641) // not steady shot
+                    {
+                        triggeredByAura->GetBase()->SetCharges(0);
+                        return false;
+                    }
+
+                    // wtf bug
+                    if (this == target)
+                        return false;
+
+                    if (triggeredByAura->GetBase()->GetCharges() <= 1)
+                    {
+                        triggeredByAura->GetBase()->SetCharges(2);
+                        return true;
+                    }
+                    triggeredByAura->GetBase()->SetCharges(0);
+                    triggered_spell_id = 53220;
+                    basepoints0 = triggerAmount;
+                    target = this;
+                    break;
+                }
             }
 
             switch (dummySpell->Id)
