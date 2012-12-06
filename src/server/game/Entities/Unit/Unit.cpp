@@ -9024,15 +9024,6 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                 ToPlayer()->RemoveSpellCooldown(49576, true);
             return true;
         }
-        // Savage Defense
-        case 62606:
-        {
-            basepoints0 = CalculatePct(triggerAmount, GetTotalAttackPowerValue(BASE_ATTACK));
-            // Savage Defender (Druid Feral Combat Mastery)
-            if (AuraEffect const* savageDefender = GetDummyAuraEffect(SPELLFAMILY_HUNTER, 146, 0))
-                AddPct(basepoints0, savageDefender->GetAmount());
-            break;
-        }
         // Body and Soul
         case 64128:
         case 65081:

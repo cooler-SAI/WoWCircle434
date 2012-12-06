@@ -616,6 +616,19 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                         return amount;
                     }
                     break;
+                case SPELLFAMILY_DRUID:
+                    // Savage Defence
+                    if (GetSpellInfo()->Id == 62606)
+                    {
+                        int32 ap_mod = amount;
+
+                        // Savage Defender, Feral Druid Mastery
+                        if (AuraEffect const* aurEff = caster->GetAuraEffect(77494, 0))
+                            ap_mod += aurEff->GetAmount();
+
+                        amount = int32(CalculatePct(caster->GetTotalAttackPowerValue(BASE_ATTACK), ap_mod));
+                    }
+                    break;
                 default:
                     break;
             }
@@ -791,6 +804,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 }
                 break;
             }
+            break;
         }
         case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE:
         {
@@ -817,6 +831,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 default:
                     break;
             }
+            break;
         }
         default:
             break;
@@ -1585,9 +1600,9 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
                 for (Unit::AuraEffectList::const_iterator i = mModTotalStatPct.begin(); i != mModTotalStatPct.end(); ++i)
                 {
                     // Heart of the Wild
-                    if ((*i)->GetSpellInfo()->SpellIconID == 240 && (*i)->GetMiscValue() == 3)
+                    if (17003 <= (*i)->GetId() && (*i)->GetId() < 17006)
                     {
-                        int32 HotWMod = (*i)->GetAmount() / 2; // For each 2% Intelligence, you get 1% stamina and 1% attack power.
+                        int32 HotWMod = (*i)->GetSpellInfo()->Effects[(GetMiscValue() == FORM_CAT)? 1: 0].BasePoints;
 
                         target->CastCustomSpell(target, HotWSpellId, &HotWMod, NULL, NULL, true, NULL, this);
                         break;
@@ -2253,6 +2268,12 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
                 target->ToPlayer()->RemoveTemporarySpell(shapeInfo->stanceSpell[i]);
         }
     }
+
+    if (target->GetTypeId() == TYPEID_PLAYER && target->getClass() == CLASS_DRUID)
+        if (form == FORM_CAT || form == FORM_BEAR)
+            if (apply)
+                target->ToPlayer()->UpdateMastery();
+
 }
 
 void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, bool apply) const
