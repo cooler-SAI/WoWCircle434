@@ -1736,38 +1736,59 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             }
             break;
         case SPELLFAMILY_DRUID:
-            // Enrage
-            if (GetSpellInfo()->Id == 5229)
+            switch (GetSpellInfo()->Id)
             {
-                // Item - Druid T10 Feral 4P Bonus
-                if (caster->HasAura(70726)) 
-                    if (apply)
-                        caster->CastSpell(caster, 70725, true);
+                // Enrage
+                case 5229:
+                {
+                    // Item - Druid T10 Feral 4P Bonus
+                    if (caster->HasAura(70726)) 
+                        if (apply)
+                            caster->CastSpell(caster, 70725, true);
 
-                // King of the Jungle
-                if (apply)
-                {
-                    if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 2850, 0))
+                    // King of the Jungle
+                    if (apply)
                     {
-                        int32 bp = aurEff->GetAmount();
-                        caster->CastCustomSpell(caster, 51185, &bp, 0, 0, true);
+                        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 2850, 0))
+                        {
+                            int32 bp = aurEff->GetAmount();
+                            caster->CastCustomSpell(caster, 51185, &bp, 0, 0, true);
+                        }
                     }
+                    else
+                        if (caster->HasAura(51185))
+                            caster->RemoveAurasDueToSpell(51185);
+                    break;
                 }
-                else
-                    if (caster->HasAura(51185))
-                        caster->RemoveAurasDueToSpell(51185);
-                break;
-            }
-            // Tiger's Fury
-            else if (GetSpellInfo()->Id == 5217)
-            {
-                if (apply)
+                // Tiger's Fury
+                case 5217:
                 {
-                    if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 2850, 1))
+                    if (apply)
                     {
-                        int32 bp = aurEff->GetAmount();
-                        caster->CastCustomSpell(caster, 51178, &bp, 0, 0, true);
+                        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 2850, 1))
+                        {
+                            int32 bp = aurEff->GetAmount();
+                            caster->CastCustomSpell(caster, 51178, &bp, 0, 0, true);
+                        }
                     }
+                    break;
+                }
+                // Solar Eclipse
+                case 48517:
+                {
+                    if (apply)
+                    {
+                        // Sunfire apply
+                        if (caster->HasAura(93401))
+                            caster->CastSpell(caster, 94338, true);
+                    }
+                    else
+                    {
+                        // Sunfire remove
+                        if (caster->HasAura(94338))
+                            caster->RemoveAurasDueToSpell(94338);
+                    }
+                    break;
                 }
             }
             break;

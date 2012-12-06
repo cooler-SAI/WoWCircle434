@@ -4831,6 +4831,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 12873:
                 spellInfo->Effects[0].SpellClassMask[0] |= 0x00400000;
                 break;
+            // Sunfire
+            case 94338:
+                spellInfo->Effects[0].BasePoints = 93402;
+                break;
             default:
                 break;
         }
