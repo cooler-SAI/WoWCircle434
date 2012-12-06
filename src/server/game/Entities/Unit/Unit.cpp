@@ -9099,7 +9099,8 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit* victim, uint32 /*damage*/, Au
 
     switch (scriptId)
     {
-        case 4533:                                          // Dreamwalker Raiment 2 pieces bonus
+        // Dreamwalker Raiment 2 pieces bonus
+        case 4533:
         {
             // Chance 50%
             if (!roll_chance_i(50))
@@ -9115,8 +9116,18 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit* victim, uint32 /*damage*/, Au
             }
             break;
         }
-        case 4537:                                          // Dreamwalker Raiment 6 pieces bonus
-            triggered_spell_id = 28750;                     // Blessing of the Claw
+        // Dreamwalker Raiment 6 pieces bonus
+        // Blessing of the Claw
+        case 4537:
+            triggered_spell_id = 28750;
+            break;
+        // Ice Shards (Ranl 1)
+        case 836:
+            triggered_spell_id = 12484;
+            break;
+        // Ice Shards (Ranl 2)
+        case 988:
+            triggered_spell_id = 12485;
             break;
         default:
             break;
