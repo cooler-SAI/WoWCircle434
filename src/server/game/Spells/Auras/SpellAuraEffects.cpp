@@ -715,8 +715,21 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 amount = GetBase()->GetUnitOwner()->GetMaxPower(POWER_MANA) * 0.0025f;
                 break;
             case 29166: // Innervate
-                ApplyPct(amount, float(GetBase()->GetUnitOwner()->GetCreatePowers(POWER_MANA)) / GetTotalTicks());
+            {
+                int32 base_amount = 5;
+                if (caster == GetBase()->GetUnitOwner())
+                {
+                    base_amount += 15;
+
+                    // Dreamstate
+                    if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 2255, 0))
+                        base_amount += aurEff->GetAmount();
+                }
+
+                amount = int32(CalculatePct(caster->GetMaxPower(POWER_MANA), base_amount) / GetTotalTicks());
+
                 break;
+            }
             case 48391: // Owlkin Frenzy
                 ApplyPct(amount, GetBase()->GetUnitOwner()->GetCreatePowers(POWER_MANA));
                 break;
