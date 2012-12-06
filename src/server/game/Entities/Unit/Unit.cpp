@@ -8333,14 +8333,32 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                         Aura* charge = GetAura(50241);
                         if (charge->ModStackAmount(-1, AURA_REMOVE_BY_ENEMY_SPELL))
                             RemoveAurasDueToSpell(50240);
+                        break;
                     }
                     // Warrior - Vigilance, SPELLFAMILY_GENERIC
-                    if (auraSpellInfo->Id == 50720)
+                    case 50720:
                     {
                         target = triggeredByAura->GetCaster();
                         if (!target)
                             return false;
+
+                        break;
                     }
+                    // Reactive Barrier
+                    case 86303:
+                    case 86304:           
+                        if (GetTypeId() != TYPEID_PLAYER || ToPlayer()->HasSpellCooldown(11426))
+                            return false;
+
+                        if (GetHealthPct() > 50)
+                            return false;
+
+                        if (!roll_chance_i(auraSpellInfo->ProcChance))
+                            return false;
+
+                        CastSpell(this, 86347, true);
+                        CastSpell(this, 11426, TriggerCastFlags(0x72FFD));
+                        break;
                 }
                 break;
             case SPELLFAMILY_MAGE:
