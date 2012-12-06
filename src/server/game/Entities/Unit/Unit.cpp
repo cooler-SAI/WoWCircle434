@@ -11051,6 +11051,13 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
         {
             if (victim)
             {
+                // Careful Aim: Steady Shot, Cobra Shot and Aimed Shot
+                if (spellProto->SpellFamilyName == SPELLFAMILY_HUNTER && (spellProto->SpellFamilyFlags[1] & 0x00000001 ||
+                    spellProto->SpellFamilyFlags[2] & 0x00400000 || spellProto->SpellFamilyFlags[0] & 0x00020000))
+                    if (AuraEffect * aur = GetDummyAuraEffect(SPELLFAMILY_HUNTER, 2222, 0))
+                        if (victim->GetHealthPct() > 90)
+                            crit_chance += aur->GetAmount();
+
                 crit_chance += GetUnitCriticalChance(attackType, victim);
                 crit_chance += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL, schoolMask);
             }
