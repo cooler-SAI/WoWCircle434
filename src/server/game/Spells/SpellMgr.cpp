@@ -3007,6 +3007,12 @@ void SpellMgr::LoadDbcDataCorrections()
 
         switch (spellInfo->Id)
         {
+            // Master Marksman Aim Shot proc
+            case 82928:
+                spellInfo->CastTimeMax = 0;
+                spellInfo->CastTimeMin = 0;
+                spellInfo->Effects[1].BasePoints = 117;
+                break;
             // Chains Of Ice
             case 45524:
                 spellInfo->Effects[1].TargetA = TARGET_UNIT_TARGET_ENEMY;

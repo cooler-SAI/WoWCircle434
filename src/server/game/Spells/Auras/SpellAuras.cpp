@@ -1428,6 +1428,23 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (target->GetTypeId() == TYPEID_PLAYER)
                         target->ToPlayer()->RemoveSpellCooldown(20252, true);
                 break;
+            case SPELLFAMILY_HUNTER:
+                if (!caster)
+                    break;
+
+                switch(GetId())
+                {
+                    case 82925: // Master Marksman
+                    {
+                        if (target->GetTypeId() == TYPEID_PLAYER && GetStackAmount() == 5)
+                        {
+                            target->CastSpell(target, 82926, true);
+                            target->RemoveAura(82925);
+                        }
+                        break;
+                    }
+                }
+                break;
             case SPELLFAMILY_PALADIN:
                 // Avenging Wrath
                 if (m_spellInfo->Id == 31884)

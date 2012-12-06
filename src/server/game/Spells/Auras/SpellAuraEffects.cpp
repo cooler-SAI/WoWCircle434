@@ -5089,6 +5089,15 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                     if (caster && caster->GetMisdirectionTarget())
                         target->SetReducedThreatPercent(100, caster->GetMisdirectionTarget()->GetGUID());
                     break;
+                case 82925: // Ready, Set, Aim...(Master Marksman)
+                {
+                    if (GetBase()->GetStackAmount() == 5)
+                    {
+                        target->CastSpell(target, 82926, true);
+                        target->RemoveAurasDueToSpell(82925);
+                    }
+                    break;
+                }
             }
         }
         // AT REMOVE
