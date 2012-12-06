@@ -1157,18 +1157,17 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     break;
                 }
                 case 82731: // Flame Orb
-                {
-                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
-                    {
-                        if (m_caster->HasAura(84726) ||
-                            m_caster->HasAura(84727) ||
-                            m_caster->HasAura(84728))
-                            m_caster->CastSpell(m_caster, 84714, true); // Summon Frost Fire Orb
-                        else
-                            m_caster->CastSpell(m_caster, 84765, true); // Summon Flame Orb
-                    }
+                    if (!unitTarget)
+                        return;
+
+                    m_caster->CastSpell(m_caster, 84765, true);
                     break;
-                }
+                case 92283: // Frostfire Orb
+                    if (!unitTarget)
+                        return;
+
+                    m_caster->CastSpell(m_caster, 84714, true);
+                    break;
                 case 86719: // Flame Orb damage
                 {
                     if (!unitTarget)
