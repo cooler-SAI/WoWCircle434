@@ -1534,6 +1534,16 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             caster->AddAura(87515, target); // Immune Marker
                         }
                         break;
+                    case 1463: // Mana Shield
+                    {
+                        if (!caster)
+                            break;
+                        if (removeMode == AURA_REMOVE_BY_EXPIRE || removeMode == AURA_REMOVE_BY_CANCEL)
+                            break;
+                        if (caster->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 2941, EFFECT_0)) // Incanter's Absorption
+                            caster->CastSpell(caster, 86261, true);
+                        break;
+                    }
                     default:
                         break;
                 }

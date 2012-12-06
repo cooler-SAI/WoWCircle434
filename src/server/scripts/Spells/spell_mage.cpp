@@ -294,9 +294,9 @@ class spell_mage_incanters_absorbtion_base_AuraScript : public AuraScript
         {
             Unit* target = GetTarget();
 
-            if (AuraEffect* talentAurEff = target->GetAuraEffectOfRankedSpell(SPELL_MAGE_INCANTERS_ABSORBTION_R1, EFFECT_0))
+            if (AuraEffect const* incantersAbsorption = target->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 2941, EFFECT_0))
             {
-                int32 bp = CalculatePct(absorbAmount, talentAurEff->GetAmount());
+                int32 bp = CalculatePct(absorbAmount, incantersAbsorption->GetAmount());
                 target->CastCustomSpell(target, SPELL_MAGE_INCANTERS_ABSORBTION_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
             }
         }
