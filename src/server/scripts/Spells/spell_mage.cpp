@@ -110,7 +110,7 @@ class spell_mage_cold_snap : public SpellScriptLoader
                 caster->RemoveSpellCooldown(31687, true, true); // Summon Water Elemental
                 caster->RemoveSpellCooldown(44572, true, true); // Deep Freeze
                 caster->RemoveSpellCooldown(45438, true, true); // Ice Block
-
+                caster->RemoveSpellCooldown(82676, true, true); // Ring of Frost
                 caster->SendClearCooldownMap(caster);
             }
 
