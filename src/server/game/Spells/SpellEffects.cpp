@@ -4988,6 +4988,11 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             basepoints0 += termination->GetAmount();
 
                     m_caster->CastCustomSpell(m_caster, spellInfo->Id, &basepoints0, NULL, NULL, true);
+
+                    // Update Serpent Sting duration
+                    if (Aura * aur = unitTarget->GetAura(1978))
+                        aur->SetDuration((aur->GetDuration() + 6000), true);
+
                     break;
                 }
             }
