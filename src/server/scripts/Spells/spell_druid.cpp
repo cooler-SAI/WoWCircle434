@@ -127,6 +127,7 @@ enum EclipseSpells
     SPELL_DRUID_SOLAR_ECLIPSE_MARKER     = 67483, // Will make the yellow arrow on eclipse bar point to the yellow side (solar)
     SPELL_DRUID_SOLAR_ECLIPSE            = 48517,
     SPELL_DRUID_LUNAR_ECLIPSE            = 48518,
+    SPELL_DRUID_EUPHORIA_ENERGIZE        = 81069,  
 };
 
 // Wrath, Starfire, and Starsurge
@@ -171,6 +172,13 @@ public:
                     if ((!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
                         || caster->GetPower(POWER_ECLIPSE) == 0)
                     {
+                        // Euphoria
+                        // To do: which spell we have to use?
+                        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 4431, 0))
+                            if (roll_chance_i(aurEff->GetAmount()))
+                                //caster->CastCustomSpell(caster, SPELL_DRUID_EUPHORIA_ENERGIZE, &energizeAmount, 0, 0, true);
+                                energizeAmount *=2;
+
                         caster->CastCustomSpell(caster,SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE,&energizeAmount,0,0,true);
                         // If the energize was due to 0 power, cast the eclipse marker aura
                         if (!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
@@ -188,6 +196,13 @@ public:
                     if ((!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
                         || caster->GetPower(POWER_ECLIPSE) == 0)
                     {
+                        // Euphoria
+                        // To do: which spell we have to use?
+                        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 4431, 0))
+                            if (roll_chance_i(aurEff->GetAmount()))
+                                //caster->CastCustomSpell(caster, SPELL_DRUID_EUPHORIA_ENERGIZE, &energizeAmount, 0, 0, true);
+                                energizeAmount *=2;
+
                         caster->CastCustomSpell(caster,SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE,&energizeAmount,0,0,true);
                         // If the energize was due to 0 power, cast the eclipse marker aura
                         if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
