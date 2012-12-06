@@ -1198,10 +1198,26 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             // Skull Bash
             if  (m_spellInfo->SpellFamilyFlags[2] & 0x10000000)
             {
-                if (AuraEffect const * brutalimpact = m_caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 473, 0))
-                    if (unitTarget->IsNonMeleeSpellCasted(false, false, true, false, true))
-                        m_caster->CastSpell(unitTarget, m_spellInfo->Id == 80964 ? 82364 : 82365, true);
-                 
+                // Can interrupt spells if target is near
+                if (m_caster->HasUnitState(UNIT_STATE_ROOT) && m_caster->IsWithinDistInMap(unitTarget, 5.0f))
+                {
+                    m_caster->CastSpell(unitTarget, 93985, true);
+                }
+                // Charge and interrupt if caster is not rooted
+                else if (!m_caster->HasUnitState(UNIT_STATE_ROOT))
+                {
+                    m_caster->CastSpell(unitTarget, 93985, true);
+                    m_caster->CastSpell(unitTarget, 93983, true);
+                }
+                else
+                    return;
+
+                // Brutal Impact
+                if (m_caster->HasAura(16940))
+                    m_caster->CastSpell(unitTarget, 82364, true);
+                else if (m_caster->HasAura(16941))
+                    m_caster->CastSpell(unitTarget, 82365, true);
+
                 return;
             }
             switch(m_spellInfo->Id)

@@ -5335,6 +5335,9 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_NO_PET;
                     break;
                 }
+                // Skull Bash
+                else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DRUID && m_spellInfo->SpellFamilyFlags[2] & 0x10000000 && m_caster->HasUnitState(UNIT_STATE_ROOT) && !m_caster->IsWithinDistInMap(m_targets.GetUnitTarget(), 5))
+                    return SPELL_FAILED_ROOTED;
                 break;
             }
             case SPELL_EFFECT_LEARN_SPELL:
