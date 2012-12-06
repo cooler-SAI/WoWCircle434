@@ -5007,7 +5007,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     m_caster->CastCustomSpell(m_caster, spellInfo->Id, &basepoints0, NULL, NULL, true);
 
                     // Update Serpent Sting duration
-                    if (Aura * aur = unitTarget->GetAura(1978))
+                    if (Aura * aur = unitTarget->GetAura(1978, m_caster->GetGUID()))
                         aur->SetDuration((std::min(aur->GetDuration() + 6000, aur->GetMaxDuration())), true);
 
                     break;
