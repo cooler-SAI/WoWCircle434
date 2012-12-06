@@ -4819,6 +4819,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 62078: // Swipe (Cat)
                 spellInfo->Effects[0].SetRadiusIndex(14);
                 break;
+            // Critical Mass (proc from pyroblast)
+            case 11095:
+            case 12872:
+            case 12873:
+                spellInfo->Effects[0].SpellClassMask[0] |= 0x00400000;
+                break;
             default:
                 break;
         }
