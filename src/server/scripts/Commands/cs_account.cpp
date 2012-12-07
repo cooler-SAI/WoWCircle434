@@ -80,8 +80,7 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
-
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPANSION);
+        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_UPD_EXPANSION);
 
         stmt->setUInt8(0, uint8(expansion));
         stmt->setUInt32(1, accountId);
@@ -198,10 +197,9 @@ public:
     static bool HandleAccountOnlineListCommand(ChatHandler* handler, char const* /*args*/)
     {
         ///- Get the list of accounts ID logged to the realm
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_ONLINE);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<0>(CHAR_SEL_CHARACTER_ONLINE);
 
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
         if (!result)
         {
             handler->SendSysMessage(LANG_ACCOUNT_LIST_EMPTY);
@@ -222,7 +220,7 @@ public:
 
             ///- Get the username, last IP and GM level of each account
             // No SQL injection. account is uint32.
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_INFO);
+            stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_ACCOUNT_INFO);
             stmt->setUInt32(0, account);
             PreparedQueryResult resultLogin = LoginDatabase.Query(stmt);
 
@@ -256,7 +254,7 @@ public:
 
         if (!param.empty())
         {
-            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK);
+            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_UPD_ACCOUNT_LOCK);
 
             if (param == "on")
             {
@@ -393,7 +391,7 @@ public:
         if (expansion < 0 || uint8(expansion) > sWorld->getIntConfig(CONFIG_EXPANSION))
             return false;
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPANSION);
+        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_UPD_EXPANSION);
 
         stmt->setUInt8(0, expansion);
         stmt->setUInt32(1, accountId);
@@ -472,7 +470,7 @@ public:
         // Check and abort if the target gm has a higher rank on one of the realms and the new realm is -1
         if (gmRealmID == -1 && !AccountMgr::IsConsoleAccount(playerSecurity))
         {
-            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ACCESS_GMLEVEL_TEST);
+            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_SEL_ACCOUNT_ACCESS_GMLEVEL_TEST);
 
             stmt->setUInt32(0, targetAccountId);
             stmt->setUInt8(1, uint8(gm));
@@ -500,13 +498,13 @@ public:
 
         if (gmRealmID == -1)
         {
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS);
+            stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_DEL_ACCOUNT_ACCESS);
 
             stmt->setUInt32(0, targetAccountId);
         }
         else
         {
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS_BY_REALM);
+            stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_DEL_ACCOUNT_ACCESS_BY_REALM);
 
             stmt->setUInt32(0, targetAccountId);
             stmt->setUInt32(1, realmID);
@@ -516,7 +514,7 @@ public:
 
         if (gm != 0)
         {
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_ACCESS);
+            stmt = LoginDatabase.GetPreparedStatement<3>(LOGIN_INS_ACCOUNT_ACCESS);
 
             stmt->setUInt32(0, targetAccountId);
             stmt->setUInt8(1, uint8(gm));

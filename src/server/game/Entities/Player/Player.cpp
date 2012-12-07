@@ -1607,7 +1607,7 @@ void Player::Update(uint32 p_time)
     if (GetSession()->m_muteTime && GetSession()->m_muteTime < now)
     {
         GetSession()->m_muteTime = 0;
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
+        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_UPD_MUTE_TIME);
         stmt->setInt64(0, 0); // Set the mute time to 0
         stmt->setUInt32(1, GetSession()->GetAccountId());
         LoginDatabase.Execute(stmt);
@@ -3643,7 +3643,7 @@ bool Player::AddTalent(uint32 spellId, uint8 spec, bool learning)
         {
             sLog->outError(LOG_FILTER_SPELLS_AURAS, "Player::addSpell: Non-existed in SpellStore spell #%u request, deleting for all characters in `character_spell`.", spellId);
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_SPELL);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_INVALID_SPELL);
 
             stmt->setUInt32(0, spellId);
 
@@ -3662,7 +3662,7 @@ bool Player::AddTalent(uint32 spellId, uint8 spec, bool learning)
         {
             sLog->outError(LOG_FILTER_SPELLS_AURAS, "Player::addTalent: Broken spell #%u learning not allowed, deleting for all characters in `character_talent`.", spellId);
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_SPELL);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_INVALID_SPELL);
 
             stmt->setUInt32(0, spellId);
 
@@ -3716,7 +3716,7 @@ bool Player::addSpell(uint32 spellId, bool active, bool learning, bool dependent
         {
             sLog->outError(LOG_FILTER_SPELLS_AURAS, "Player::addSpell: Non-existed in SpellStore spell #%u request, deleting for all characters in `character_spell`.", spellId);
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_SPELL);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_INVALID_SPELL);
 
             stmt->setUInt32(0, spellId);
 
@@ -3735,7 +3735,7 @@ bool Player::addSpell(uint32 spellId, bool active, bool learning, bool dependent
         {
             sLog->outError(LOG_FILTER_SPELLS_AURAS, "Player::addSpell: Broken spell #%u learning not allowed, deleting for all characters in `character_spell`.", spellId);
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_SPELL);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_INVALID_SPELL);
 
             stmt->setUInt32(0, spellId);
 
@@ -4511,7 +4511,7 @@ void Player::_LoadSpellCooldowns(PreparedQueryResult result)
 
 void Player::_SaveSpellCooldowns(SQLTransaction& trans)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL_COOLDOWN);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_SPELL_COOLDOWN);
     stmt->setUInt32(0, GetGUIDLow());
     trans->Append(stmt);
 
@@ -4889,7 +4889,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
     LeaveAllArenaTeams(playerguid);
 
     // the player was uninvited already on logout so just remove from group
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GROUP_MEMBER);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_GROUP_MEMBER);
     stmt->setUInt32(0, guid);
     PreparedQueryResult resultGroup = CharacterDatabase.Query(stmt);
 
@@ -4907,7 +4907,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
         {
             SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_COD_ITEM_MAIL);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_COD_ITEM_MAIL);
             stmt->setUInt32(0, guid);
             PreparedQueryResult resultMail = CharacterDatabase.Query(stmt);
 
@@ -4928,7 +4928,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
 
                     // We can return mail now
                     // So firstly delete the old one
-                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
+                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_MAIL_BY_ID);
                     stmt->setUInt32(0, mail_id);
                     trans->Append(stmt);
 
@@ -4937,7 +4937,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                     {
                         if (has_items)
                         {
-                            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
+                            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_MAIL_ITEM_BY_ID);
                             stmt->setUInt32(0, mail_id);
                             trans->Append(stmt);
                         }
@@ -4951,7 +4951,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                     if (has_items)
                     {
                         // Data needs to be at first place for Item::LoadFromDB
-                        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEMS);
+                        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_MAILITEMS);
                         stmt->setUInt32(0, mail_id);
                         PreparedQueryResult resultItems = CharacterDatabase.Query(stmt);
                         if (resultItems)
@@ -4965,7 +4965,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                                 ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(item_template);
                                 if (!itemProto)
                                 {
-                                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
+                                    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_ITEM_INSTANCE);
                                     stmt->setUInt32(0, item_guidlow);
                                     trans->Append(stmt);
                                     continue;
@@ -4985,7 +4985,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                         }
                     }
 
-                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
+                    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_MAIL_ITEM_BY_ID);
                     stmt->setUInt32(0, mail_id);
                     trans->Append(stmt);
 
@@ -4998,7 +4998,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
 
             // Unsummon and delete for pets in world is not required: player deleted from CLI or character list with not loaded pet.
             // NOW we can finally clear other DB data related to character
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PETS);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_PETS);
             stmt->setUInt32(0, guid);
             PreparedQueryResult resultPets = CharacterDatabase.Query(stmt);
 
@@ -5012,7 +5012,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
             }
 
             // Delete char from social list of online chars
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_SOCIAL);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_SOCIAL);
             stmt->setUInt32(0, guid);
             PreparedQueryResult resultFriends = CharacterDatabase.Query(stmt);
 
@@ -5031,132 +5031,132 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                 } while (resultFriends->NextRow());
             }
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHARACTER);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_ACCOUNT_DATA);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PLAYER_ACCOUNT_DATA);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_DECLINED_NAME);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_DECLINED_NAME);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACTION);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_ACTION);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_AURA);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_GIFT);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_GIFT);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_HOMEBIND);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PLAYER_HOMEBIND);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_INSTANCE);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_INVENTORY);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_QUESTSTATUS);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_REWARDED);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_QUESTSTATUS_REWARDED);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_REPUTATION);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_REPUTATION);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_SPELL);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL_COOLDOWN);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_SPELL_COOLDOWN);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_GM_TICKETS);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PLAYER_GM_TICKETS);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_ITEM_INSTANCE);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SOCIAL_BY_FRIEND);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_SOCIAL_BY_FRIEND);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SOCIAL_BY_GUID);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_SOCIAL_BY_GUID);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_MAIL);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEMS);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_MAIL_ITEMS);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_OWNER);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_PET_BY_OWNER);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_DECLINEDNAME_BY_OWNER);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_PET_DECLINEDNAME_BY_OWNER);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACHIEVEMENTS);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_ACHIEVEMENTS);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACHIEVEMENT_PROGRESS);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_ACHIEVEMENT_PROGRESS);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_EQUIPMENTSETS);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_EQUIPMENTSETS);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_EVENTLOG_BY_PLAYER);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_GUILD_EVENTLOG_BY_PLAYER);
             stmt->setUInt32(0, guid);
             stmt->setUInt32(1, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_BANK_EVENTLOG_BY_PLAYER);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_GUILD_BANK_EVENTLOG_BY_PLAYER);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_BGDATA);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PLAYER_BGDATA);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_GLYPHS);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_GLYPHS);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_DAILY);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_QUESTSTATUS_DAILY);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_TALENT);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_TALENT);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SKILLS);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_SKILLS);
             stmt->setUInt32(0, guid);
             trans->Append(stmt);
 
@@ -5166,7 +5166,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
         // The character gets unlinked from the account, the name gets freed up and appears as deleted ingame
         case CHAR_DELETE_UNLINK:
         {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_DELETE_INFO);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_UPD_DELETE_INFO);
 
             stmt->setUInt32(0, guid);
 
@@ -5208,7 +5208,7 @@ void Player::DeleteOldCharacters(uint32 keepDays)
 {
     sLog->outInfo(LOG_FILTER_PLAYER, "Player::DeleteOldChars: Deleting all characters which have been deleted %u days before...", keepDays);
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_OLD_CHARS);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_OLD_CHARS);
     stmt->setUInt32(0, uint32(time(NULL) - time_t(keepDays * DAY)));
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -7461,7 +7461,7 @@ void Player::_SaveCurrency(SQLTransaction& trans)
         switch(itr->second.state)
         {
             case PLAYERCURRENCY_NEW:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_PLAYER_CURRENCY);
+                stmt = CharacterDatabase.GetPreparedStatement<5>(CHAR_REP_PLAYER_CURRENCY);
                 stmt->setUInt32(0, GetGUIDLow());
                 stmt->setUInt16(1, itr->first);
                 stmt->setUInt32(2, itr->second.weekCount);
@@ -7470,7 +7470,7 @@ void Player::_SaveCurrency(SQLTransaction& trans)
                 trans->Append(stmt);
                 break;
             case PLAYERCURRENCY_CHANGED:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PLAYER_CURRENCY);
+                stmt = CharacterDatabase.GetPreparedStatement<5>(CHAR_UPD_PLAYER_CURRENCY);
                 stmt->setUInt32(0, itr->second.weekCount);
                 stmt->setUInt32(1, itr->second.totalCount);
                 stmt->setUInt8(2, itr->second.flags);
@@ -7499,7 +7499,7 @@ void Player::SetInGuild(uint32 guildId)
 
 uint32 Player::GetGuildIdFromDB(uint64 guid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_MEMBER);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_GUILD_MEMBER);
     stmt->setUInt32(0, GUID_LOPART(guid));
     if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
         return result->Fetch()[0].GetUInt32();
@@ -7509,7 +7509,7 @@ uint32 Player::GetGuildIdFromDB(uint64 guid)
 
 uint8 Player::GetRankFromDB(uint64 guid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_MEMBER);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_GUILD_MEMBER);
     stmt->setUInt32(0, GUID_LOPART(guid));
     if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
         return result->Fetch()[1].GetUInt8();
@@ -7526,7 +7526,7 @@ void Player::SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 va
 
 uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ARENA_TEAM_ID_BY_PLAYER_GUID);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_SEL_ARENA_TEAM_ID_BY_PLAYER_GUID);
     stmt->setUInt32(0, GUID_LOPART(guid));
     stmt->setUInt8(1, type);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
@@ -7544,7 +7544,7 @@ uint32 Player::GetZoneIdFromDB(uint64 guid)
     PreparedQueryResult result = NULL;
 
     uint32 guidLow = GUID_LOPART(guid);
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_ZONE);
+    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_ZONE);
     stmt->setUInt32(0, guidLow);
     result = CharacterDatabase.Query(stmt);
 
@@ -7557,7 +7557,7 @@ uint32 Player::GetZoneIdFromDB(uint64 guid)
     if (!zone)
     {
         // stored zone is zero, use generic and slow zone detection
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_POSITION_XYZ);
+        stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_POSITION_XYZ);
         stmt->setUInt32(0, guidLow);
         result = CharacterDatabase.Query(stmt);
 
@@ -7574,7 +7574,7 @@ uint32 Player::GetZoneIdFromDB(uint64 guid)
 
         if (zone > 0)
         {
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ZONE);
+            stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_UPD_ZONE);
 
             stmt->setUInt16(0, uint16(zone));
             stmt->setUInt32(1, guidLow);
@@ -7588,7 +7588,7 @@ uint32 Player::GetZoneIdFromDB(uint64 guid)
 
 uint32 Player::GetLevelFromDB(uint64 guid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_LEVEL);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_LEVEL);
     stmt->setUInt32(0, GUID_LOPART(guid));
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -11866,7 +11866,7 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
             for (++itr; itr != allowedLooters.end(); ++itr)
                 ss << ' ' << *itr;
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ITEM_BOP_TRADE);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_INS_ITEM_BOP_TRADE);
             stmt->setUInt32(0, pItem->GetGUIDLow());
             stmt->setString(1, ss.str());
             CharacterDatabase.Execute(stmt);
@@ -12331,7 +12331,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
 
         if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED))
         {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_GIFT);
 
             stmt->setUInt32(0, pItem->GetGUIDLow());
 
@@ -16627,7 +16627,7 @@ void Player::_LoadBGData(PreparedQueryResult result)
 
 bool Player::LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, uint64 guid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_POSITION);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_POSITION);
     stmt->setUInt32(0, GUID_LOPART(guid));
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -16655,7 +16655,7 @@ void Player::SetHomebind(WorldLocation const& /*loc*/, uint32 /*area_id*/)
     m_homebindZ = GetPositionZ();
 
     // update sql homebind
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PLAYER_HOMEBIND);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<6>(CHAR_UPD_PLAYER_HOMEBIND);
     stmt->setUInt16(0, m_homebindMapId);
     stmt->setUInt16(1, m_homebindAreaId);
     stmt->setFloat (2, m_homebindX);
@@ -16730,7 +16730,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     if (ObjectMgr::CheckPlayerName(m_name) != CHAR_NAME_SUCCESS ||
         (AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()) && sObjectMgr->IsReservedName(m_name)))
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_UPD_ADD_AT_LOGIN_FLAG);
 
         stmt->setUInt16(0, uint16(AT_LOGIN_RENAME));
         stmt->setUInt32(1, guid);
@@ -17797,7 +17797,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                     sLog->outDebug(LOG_FILTER_PLAYER_LOADING, "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) with expired refund time (%u). Deleting refund data and removing refundable flag.",
                         GetGUIDLow(), GetName(), item->GetGUIDLow(), item->GetEntry(), item->GetPlayedTime());
 
-                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_REFUND_INSTANCE);
+                    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_ITEM_REFUND_INSTANCE);
                     stmt->setUInt32(0, item->GetGUIDLow());
                     trans->Append(stmt);
 
@@ -17805,7 +17805,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                 }
                 else
                 {
-                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ITEM_REFUNDS);
+                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_SEL_ITEM_REFUNDS);
                     stmt->setUInt32(0, item->GetGUIDLow());
                     stmt->setUInt32(1, GetGUIDLow());
                     if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
@@ -17825,7 +17825,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
             }
             else if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_BOP_TRADEABLE))
             {
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ITEM_BOP_TRADE);
+                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_ITEM_BOP_TRADE);
                 stmt->setUInt32(0, item->GetGUIDLow());
                 if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
                 {
@@ -17894,7 +17894,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
 void Player::_LoadMailedItems(Mail* mail)
 {
     // data needs to be at first place for Item::LoadFromDB
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEMS);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_MAILITEMS);
     stmt->setUInt32(0, mail->messageID);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
@@ -17915,11 +17915,11 @@ void Player::_LoadMailedItems(Mail* mail)
         {
             sLog->outError(LOG_FILTER_PLAYER, "Player %u has unknown item_template (ProtoType) in mailed items(GUID: %u template: %u) in mail (%u), deleted.", GetGUIDLow(), itemGuid, itemTemplate, mail->messageID);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_MAIL_ITEM);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_INVALID_MAIL_ITEM);
             stmt->setUInt32(0, itemGuid);
             CharacterDatabase.Execute(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_ITEM_INSTANCE);
             stmt->setUInt32(0, itemGuid);
             CharacterDatabase.Execute(stmt);
             continue;
@@ -17931,7 +17931,7 @@ void Player::_LoadMailedItems(Mail* mail)
         {
             sLog->outError(LOG_FILTER_PLAYER, "Player::_LoadMailedItems - Item in mail (%u) doesn't exist !!!! - item guid: %u, deleted from mail", mail->messageID, itemGuid);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_MAIL_ITEM);
             stmt->setUInt32(0, itemGuid);
             CharacterDatabase.Execute(stmt);
 
@@ -17964,7 +17964,7 @@ void Player::_LoadMail()
 {
     m_mail.clear();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_MAIL);
     stmt->setUInt32(0, GetGUIDLow());
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -18329,7 +18329,7 @@ void Player::_LoadBoundInstances(PreparedQueryResult result)
 
             if (deleteInstance)
             {
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
+                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
 
                 stmt->setUInt32(0, GetGUIDLow());
                 stmt->setUInt32(1, instanceId);
@@ -18385,7 +18385,7 @@ void Player::UnbindInstance(BoundInstancesMap::iterator &itr, Difficulty difficu
     {
         if (!unload)
         {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
 
             stmt->setUInt32(0, GetGUIDLow());
             stmt->setUInt32(1, itr->second.save->GetInstanceId());
@@ -18412,7 +18412,7 @@ InstancePlayerBind* Player::BindToInstance(InstanceSave* save, bool permanent, b
             if (permanent != bind.perm || save != bind.save)
                 if (!load)
                 {
-                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE);
+                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<4>(CHAR_UPD_CHAR_INSTANCE);
 
                     stmt->setUInt32(0, save->GetInstanceId());
                     stmt->setBool(1, permanent);
@@ -18425,7 +18425,7 @@ InstancePlayerBind* Player::BindToInstance(InstanceSave* save, bool permanent, b
         else
             if (!load)
             {
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_INSTANCE);
+                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_INS_CHAR_INSTANCE);
 
                 stmt->setUInt32(0, GetGUIDLow());
                 stmt->setUInt32(1, save->GetInstanceId());
@@ -18715,7 +18715,7 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
             ok = true;
         else
         {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_HOMEBIND);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PLAYER_HOMEBIND);
             stmt->setUInt32(0, GetGUIDLow());
             CharacterDatabase.Execute(stmt);
         }
@@ -18729,7 +18729,7 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
         m_homebindY = info->positionY;
         m_homebindZ = info->positionZ;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_HOMEBIND);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<6>(CHAR_INS_PLAYER_HOMEBIND);
         stmt->setUInt32(0, GetGUIDLow());
         stmt->setUInt16(1, m_homebindMapId);
         stmt->setUInt16(2, m_homebindAreaId);
@@ -18774,7 +18774,7 @@ void Player::SaveToDB(bool create /*=false*/)
     {
         //! Insert query
         //! TO DO: Filter out more redundant fields that can take their default value at player create
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER);
+        stmt = CharacterDatabase.GetPreparedStatement<61>(CHAR_INS_CHARACTER);
         stmt->setUInt32(index++, GetGUIDLow());
         stmt->setUInt32(index++, GetSession()->GetAccountId());
         stmt->setString(index++, GetName());
@@ -18882,7 +18882,7 @@ void Player::SaveToDB(bool create /*=false*/)
     else
     {
         // Update query
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER);
+        stmt = CharacterDatabase.GetPreparedStatement<61>(CHAR_UPD_CHARACTER);
         stmt->setString(index++, GetName());
         stmt->setUInt8(index++, getRace());
         stmt->setUInt8(index++, getClass());
@@ -19057,7 +19057,7 @@ void Player::SaveInventoryAndGoldToDB(SQLTransaction& trans)
 
 void Player::SaveGoldToDB(SQLTransaction& trans)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_MONEY);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_UDP_CHAR_MONEY);
     stmt->setUInt64(0, GetMoney());
     stmt->setUInt32(1, GetGUIDLow());
     trans->Append(stmt);
@@ -19072,7 +19072,7 @@ void Player::_SaveActions(SQLTransaction& trans)
         switch (itr->second.uState)
         {
             case ACTIONBUTTON_NEW:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACTION);
+                stmt = CharacterDatabase.GetPreparedStatement<5>(CHAR_INS_CHAR_ACTION);
                 stmt->setUInt32(0, GetGUIDLow());
                 stmt->setUInt8(1, GetActiveSpec());
                 stmt->setUInt8(2, itr->first);
@@ -19084,7 +19084,7 @@ void Player::_SaveActions(SQLTransaction& trans)
                 ++itr;
                 break;
             case ACTIONBUTTON_CHANGED:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_ACTION);
+                stmt = CharacterDatabase.GetPreparedStatement<5>(CHAR_UPD_CHAR_ACTION);
                 stmt->setUInt32(0, itr->second.GetAction());
                 stmt->setUInt8(1, uint8(itr->second.GetType()));
                 stmt->setUInt32(2,  GetGUIDLow());
@@ -19096,7 +19096,7 @@ void Player::_SaveActions(SQLTransaction& trans)
                 ++itr;
                 break;
             case ACTIONBUTTON_DELETED:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACTION_BY_BUTTON_SPEC);
+                stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_DEL_CHAR_ACTION_BY_BUTTON_SPEC);
                 stmt->setUInt32(0, GetGUIDLow());
                 stmt->setUInt8(1, itr->first);
                 stmt->setUInt8(2, GetActiveSpec());
@@ -19113,7 +19113,7 @@ void Player::_SaveActions(SQLTransaction& trans)
 
 void Player::_SaveAuras(SQLTransaction& trans)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_AURA);
     stmt->setUInt32(0, GetGUIDLow());
     trans->Append(stmt);
 
@@ -19146,7 +19146,7 @@ void Player::_SaveAuras(SQLTransaction& trans)
         }
 
         uint8 index = 0;
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_AURA);
+        stmt = CharacterDatabase.GetPreparedStatement<16>(CHAR_INS_AURA);
         stmt->setUInt32(index++, GetGUIDLow());
         stmt->setUInt64(index++, itr->second->GetCasterGUID());
         stmt->setUInt64(index++, itr->second->GetCastItemGUID());
@@ -19178,11 +19178,11 @@ void Player::_SaveInventory(SQLTransaction& trans)
         if (!item || item->GetState() == ITEM_NEW)
             continue;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
         stmt->setUInt32(0, item->GetGUIDLow());
         trans->Append(stmt);
 
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
+        stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_ITEM_INSTANCE);
         stmt->setUInt32(0, item->GetGUIDLow());
         trans->Append(stmt);
         m_items[i]->FSetState(ITEM_NEW);
@@ -19240,7 +19240,7 @@ void Player::_SaveInventory(SQLTransaction& trans)
                     bagTestGUID = test2->GetGUIDLow();
                 sLog->outError(LOG_FILTER_PLAYER, "Player(GUID: %u Name: %s)::_SaveInventory - the bag(%u) and slot(%u) values for the item with guid %u (state %d) are incorrect, the player doesn't have an item at that position!", lowGuid, GetName(), item->GetBagSlot(), item->GetSlot(), item->GetGUIDLow(), (int32)item->GetState());
                 // according to the test that was just performed nothing should be in this slot, delete
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_BAG_SLOT);
+                stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_DEL_CHAR_INVENTORY_BY_BAG_SLOT);
                 stmt->setUInt32(0, bagTestGUID);
                 stmt->setUInt8(1, item->GetSlot());
                 stmt->setUInt32(2, lowGuid);
@@ -19268,7 +19268,7 @@ void Player::_SaveInventory(SQLTransaction& trans)
         {
             case ITEM_NEW:
             case ITEM_CHANGED:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_INVENTORY_ITEM);
+                stmt = CharacterDatabase.GetPreparedStatement<4>(CHAR_REP_INVENTORY_ITEM);
                 stmt->setUInt32(0, lowGuid);
                 stmt->setUInt32(1, bag_guid);
                 stmt->setUInt8 (2, item->GetSlot());
@@ -19276,7 +19276,7 @@ void Player::_SaveInventory(SQLTransaction& trans)
                 trans->Append(stmt);
                 break;
             case ITEM_REMOVED:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
+                stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
                 stmt->setUInt32(0, item->GetGUIDLow());
                 trans->Append(stmt);
             case ITEM_UNCHANGED:
@@ -19298,14 +19298,14 @@ void Player::_SaveVoidStorage(SQLTransaction& trans)
         if (!_voidStorageItems[i]) // unused item
         {
             // DELETE FROM void_storage WHERE slot = ? AND playerGuid = ?
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_VOID_STORAGE_ITEM_BY_SLOT);
+            stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHAR_VOID_STORAGE_ITEM_BY_SLOT);
             stmt->setUInt8(0, i);
             stmt->setUInt32(1, lowGuid);
         }
         else
         {
             // REPLACE INTO character_inventory (itemId, playerGuid, itemEntry, slot, creatorGuid) VALUES (?, ?, ?, ?, ?)
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_VOID_STORAGE_ITEM);
+            stmt = CharacterDatabase.GetPreparedStatement<7>(CHAR_REP_CHAR_VOID_STORAGE_ITEM);
             stmt->setUInt64(0, _voidStorageItems[i]->ItemId);
             stmt->setUInt32(1, lowGuid);
             stmt->setUInt32(2, _voidStorageItems[i]->ItemEntry);
@@ -19330,14 +19330,14 @@ void Player::_SaveCUFProfiles(SQLTransaction& trans)
         if (!_CUFProfiles[i]) // unused profile
         {
             // DELETE FROM character_cuf_profiles WHERE guid = ? and id = ?
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_CUF_PROFILES);
+            stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHAR_CUF_PROFILES);
             stmt->setUInt32(0, lowGuid);
             stmt->setUInt8(1, i);
         }
         else
         {
             // REPLACE INTO character_cuf_profiles (guid, id, name, frameHeight, frameWidth, sortBy, healthText, boolOptions, unk146, unk147, unk148, unk150, unk152, unk154) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_CUF_PROFILES);
+            stmt = CharacterDatabase.GetPreparedStatement<14>(CHAR_REP_CHAR_CUF_PROFILES);
             stmt->setUInt32(0, lowGuid);
             stmt->setUInt8(1, i);
             stmt->setString(2, _CUFProfiles[i]->ProfileName);
@@ -19370,7 +19370,7 @@ void Player::_SaveMail(SQLTransaction& trans)
         Mail* m = (*itr);
         if (m->state == MAIL_STATE_CHANGED)
         {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<7>(CHAR_UPD_MAIL);
             stmt->setUInt8(0, uint8(m->HasItems() ? 1 : 0));
             stmt->setUInt32(1, uint32(m->expire_time));
             stmt->setUInt32(2, uint32(m->deliver_time));
@@ -19385,7 +19385,7 @@ void Player::_SaveMail(SQLTransaction& trans)
             {
                 for (std::vector<uint32>::iterator itr2 = m->removedItems.begin(); itr2 != m->removedItems.end(); ++itr2)
                 {
-                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM);
+                    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_MAIL_ITEM);
                     stmt->setUInt32(0, *itr2);
                     trans->Append(stmt);
                 }
@@ -19400,16 +19400,16 @@ void Player::_SaveMail(SQLTransaction& trans)
                 PreparedStatement* stmt = NULL;
                 for (MailItemInfoVec::iterator itr2 = m->items.begin(); itr2 != m->items.end(); ++itr2)
                 {
-                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
+                    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_ITEM_INSTANCE);
                     stmt->setUInt32(0, itr2->item_guid);
                     trans->Append(stmt);
                 }
             }
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_MAIL_BY_ID);
             stmt->setUInt32(0, m->messageID);
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_MAIL_ITEM_BY_ID);
             stmt->setUInt32(0, m->messageID);
             trans->Append(stmt);
         }
@@ -19452,7 +19452,7 @@ void Player::_SaveQuestStatus(SQLTransaction& trans)
             if (statusItr != m_QuestStatus.end() && (keepAbandoned || statusItr->second.Status != QUEST_STATUS_NONE))
             {
                 uint8 index = 0;
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_QUESTSTATUS);
+                stmt = CharacterDatabase.GetPreparedStatement<14>(CHAR_REP_CHAR_QUESTSTATUS);
 
                 stmt->setUInt32(index++, GetGUIDLow());
                 stmt->setUInt32(index++, statusItr->first);
@@ -19472,7 +19472,7 @@ void Player::_SaveQuestStatus(SQLTransaction& trans)
         }
         else
         {
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_BY_QUEST);
+            stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHAR_QUESTSTATUS_BY_QUEST);
             stmt->setUInt32(0, GetGUIDLow());
             stmt->setUInt32(1, saveItr->first);
             trans->Append(stmt);
@@ -19485,7 +19485,7 @@ void Player::_SaveQuestStatus(SQLTransaction& trans)
     {
         if (saveItr->second)
         {
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_QUESTSTATUS);
+            stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_INS_CHAR_QUESTSTATUS);
             stmt->setUInt32(0, GetGUIDLow());
             stmt->setUInt32(1, saveItr->first);
             trans->Append(stmt);
@@ -19493,7 +19493,7 @@ void Player::_SaveQuestStatus(SQLTransaction& trans)
         }
         else if (!keepAbandoned)
         {
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_REWARDED_BY_QUEST);
+            stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHAR_QUESTSTATUS_REWARDED_BY_QUEST);
             stmt->setUInt32(0, GetGUIDLow());
             stmt->setUInt32(1, saveItr->first);
             trans->Append(stmt);
@@ -19516,14 +19516,14 @@ void Player::_SaveDailyQuestStatus(SQLTransaction& trans)
     // save last daily quest time for all quests: we need only mostly reset time for reset check anyway
 
     // we don't need transactions here.
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_DAILY_CHAR);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_QUEST_STATUS_DAILY_CHAR);
     stmt->setUInt32(0, GetGUIDLow());
     trans->Append(stmt);
     for (uint32 quest_daily_idx = 0; quest_daily_idx < PLAYER_MAX_DAILY_QUESTS; ++quest_daily_idx)
     {
         if (GetUInt32Value(PLAYER_FIELD_DAILY_QUESTS_1+quest_daily_idx))
         {
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_DAILYQUESTSTATUS);
+            stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_INS_CHARACTER_DAILYQUESTSTATUS);
             stmt->setUInt32(0, GetGUIDLow());
             stmt->setUInt32(1, GetUInt32Value(PLAYER_FIELD_DAILY_QUESTS_1+quest_daily_idx));
             stmt->setUInt64(2, uint64(m_lastDailyQuestTime));
@@ -19535,7 +19535,7 @@ void Player::_SaveDailyQuestStatus(SQLTransaction& trans)
     {
         for (DFQuestsDoneList::iterator itr = m_DFQuests.begin(); itr != m_DFQuests.end(); ++itr)
         {
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_DAILYQUESTSTATUS);
+            stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_INS_CHARACTER_DAILYQUESTSTATUS);
             stmt->setUInt32(0, GetGUIDLow());
             stmt->setUInt32(1, (*itr));
             stmt->setUInt64(2, uint64(m_lastDailyQuestTime));
@@ -19550,7 +19550,7 @@ void Player::_SaveWeeklyQuestStatus(SQLTransaction& trans)
         return;
 
     // we don't need transactions here.
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_WEEKLY_CHAR);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_QUEST_STATUS_WEEKLY_CHAR);
     stmt->setUInt32(0, GetGUIDLow());
     trans->Append(stmt);
 
@@ -19558,7 +19558,7 @@ void Player::_SaveWeeklyQuestStatus(SQLTransaction& trans)
     {
         uint32 quest_id  = *iter;
 
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_WEEKLYQUESTSTATUS);
+        stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_INS_CHARACTER_WEEKLYQUESTSTATUS);
         stmt->setUInt32(0, GetGUIDLow());
         stmt->setUInt32(1, quest_id);
         trans->Append(stmt);
@@ -19573,7 +19573,7 @@ void Player::_SaveSeasonalQuestStatus(SQLTransaction& trans)
         return;
 
     // we don't need transactions here.
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_SEASONAL_CHAR);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_QUEST_STATUS_SEASONAL_CHAR);
     stmt->setUInt32(0, GetGUIDLow());
     trans->Append(stmt);
 
@@ -19584,7 +19584,7 @@ void Player::_SaveSeasonalQuestStatus(SQLTransaction& trans)
         {
             uint32 quest_id = (*itr);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_SEASONALQUESTSTATUS);
+            stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_INS_CHARACTER_SEASONALQUESTSTATUS);
             stmt->setUInt32(0, GetGUIDLow());
             stmt->setUInt32(1, quest_id);
             stmt->setUInt32(2, event_id);
@@ -19609,7 +19609,7 @@ void Player::_SaveSkills(SQLTransaction& trans)
 
         if (itr->second.uState == SKILL_DELETED)
         {
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SKILL_BY_SKILL);
+            stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHAR_SKILL_BY_SKILL);
             stmt->setUInt32(0, GetGUIDLow());
             stmt->setUInt32(1, itr->first);
             trans->Append(stmt);
@@ -19627,7 +19627,7 @@ void Player::_SaveSkills(SQLTransaction& trans)
         switch (itr->second.uState)
         {
             case SKILL_NEW:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_SKILLS);
+                stmt = CharacterDatabase.GetPreparedStatement<4>(CHAR_INS_CHAR_SKILLS);
                 stmt->setUInt32(0, GetGUIDLow());
                 stmt->setUInt16(1, uint16(itr->first));
                 stmt->setUInt16(2, value);
@@ -19635,7 +19635,7 @@ void Player::_SaveSkills(SQLTransaction& trans)
                 trans->Append(stmt);
                 break;
             case SKILL_CHANGED:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_SKILLS);
+                stmt = CharacterDatabase.GetPreparedStatement<4>(CHAR_UDP_CHAR_SKILLS);
                 stmt->setUInt16(0, value);
                 stmt->setUInt16(1, max);
                 stmt->setUInt32(2, GetGUIDLow());
@@ -19659,7 +19659,7 @@ void Player::_SaveSpells(SQLTransaction& trans)
     {
         if (itr->second->state == PLAYERSPELL_REMOVED || itr->second->state == PLAYERSPELL_CHANGED)
         {
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL_BY_SPELL);
+            stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHAR_SPELL_BY_SPELL);
             stmt->setUInt32(0, itr->first);
             stmt->setUInt32(1, GetGUIDLow());
             trans->Append(stmt);
@@ -19668,7 +19668,7 @@ void Player::_SaveSpells(SQLTransaction& trans)
         // add only changed/new not dependent spells
         if (!itr->second->dependent && (itr->second->state == PLAYERSPELL_NEW || itr->second->state == PLAYERSPELL_CHANGED))
         {
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_SPELL);
+            stmt = CharacterDatabase.GetPreparedStatement<4>(CHAR_INS_CHAR_SPELL);
             stmt->setUInt32(0, GetGUIDLow());
             stmt->setUInt32(1, itr->first);
             stmt->setBool(2, itr->second->active);
@@ -19699,13 +19699,13 @@ void Player::_SaveStats(SQLTransaction& trans)
 
     PreparedStatement* stmt = NULL;
 
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_STATS);
+    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_STATS);
     stmt->setUInt32(0, GetGUIDLow());
     trans->Append(stmt);
 
     uint8 index = 0;
 
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_STATS);
+    stmt = CharacterDatabase.GetPreparedStatement<29>(CHAR_INS_CHAR_STATS);
     stmt->setUInt32(index++, GetGUIDLow());
     stmt->setUInt32(index++, GetMaxHealth());
 
@@ -19802,7 +19802,7 @@ void Player::SendAttackSwingNotInRange()
 
 void Player::SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, uint64 guid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_POSITION);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<7>(CHAR_UPD_CHARACTER_POSITION);
 
     stmt->setFloat(0, x);
     stmt->setFloat(1, y);
@@ -19828,7 +19828,7 @@ void Player::SetUInt32ValueInArray(Tokenizer& Tokenizer, uint16 index, uint32 va
 
 void Player::Customize(uint64 guid, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PLAYERBYTES2);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_PLAYERBYTES2);
     stmt->setUInt32(0, GUID_LOPART(guid));
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -19841,7 +19841,7 @@ void Player::Customize(uint64 guid, uint8 gender, uint8 skin, uint8 face, uint8 
     playerBytes2 &= ~0xFF;
     playerBytes2 |= facialHair;
 
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GENDER_PLAYERBYTES);
+    stmt = CharacterDatabase.GetPreparedStatement<4>(CHAR_UPD_GENDER_PLAYERBYTES);
 
     stmt->setUInt8(0, gender);
     stmt->setUInt32(1, skin | (face << 8) | (hairStyle << 16) | (hairColor << 24));
@@ -20717,7 +20717,7 @@ void Player::SendProficiency(ItemClass itemClass, uint32 itemSubclassMask)
 
 void Player::RemovePetitionsAndSigns(uint64 guid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PETITION_SIG_BY_GUID);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_PETITION_SIG_BY_GUID);
     stmt->setUInt32(0, GUID_LOPART(guid));
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -20735,17 +20735,17 @@ void Player::RemovePetitionsAndSigns(uint64 guid)
                 owner->GetSession()->SendPetitionQueryOpcode(petitionguid);
         } while (result->NextRow());
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_SIGNATURE);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PETITION_SIGNATURE);
         stmt->setUInt32(0, GUID_LOPART(guid));
         CharacterDatabase.Execute(stmt);
     }
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_BY_OWNER);
+    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PETITION_BY_OWNER);
     stmt->setUInt32(0, GUID_LOPART(guid));
     trans->Append(stmt);
 
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_SIGNATURE_BY_OWNER);
+    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PETITION_SIGNATURE_BY_OWNER);
     stmt->setUInt32(0, GUID_LOPART(guid));
     trans->Append(stmt);
     CharacterDatabase.CommitTransaction(trans);
@@ -20753,7 +20753,7 @@ void Player::RemovePetitionsAndSigns(uint64 guid)
 
 void Player::LeaveAllArenaTeams(uint64 guid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PLAYER_ARENA_TEAMS);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_PLAYER_ARENA_TEAMS);
     stmt->setUInt32(0, GUID_LOPART(guid));
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -24455,7 +24455,7 @@ void Player::_LoadSkills(PreparedQueryResult result)
             {
                 sLog->outError(LOG_FILTER_PLAYER, "Character %u has skill %u with value 0. Will be deleted.", GetGUIDLow(), skill);
 
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_SKILL);
+                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHARACTER_SKILL);
 
                 stmt->setUInt32(0, GetGUIDLow());
                 stmt->setUInt16(1, skill);
@@ -25318,7 +25318,7 @@ void Player::_SaveEquipmentSets(SQLTransaction& trans)
                 ++itr;
                 break;                                      // nothing do
             case EQUIPMENT_SET_CHANGED:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_EQUIP_SET);
+                stmt = CharacterDatabase.GetPreparedStatement<25>(CHAR_UPD_EQUIP_SET);
                 stmt->setString(j++, eqset.Name.c_str());
                 stmt->setString(j++, eqset.IconName.c_str());
                 stmt->setUInt32(j++, eqset.IgnoreMask);
@@ -25332,7 +25332,7 @@ void Player::_SaveEquipmentSets(SQLTransaction& trans)
                 ++itr;
                 break;
             case EQUIPMENT_SET_NEW:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_EQUIP_SET);
+                stmt = CharacterDatabase.GetPreparedStatement<25>(CHAR_INS_EQUIP_SET);
                 stmt->setUInt32(j++, GetGUIDLow());
                 stmt->setUInt64(j++, eqset.Guid);
                 stmt->setUInt32(j++, index);
@@ -25346,7 +25346,7 @@ void Player::_SaveEquipmentSets(SQLTransaction& trans)
                 ++itr;
                 break;
             case EQUIPMENT_SET_DELETED:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_EQUIP_SET);
+                stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_EQUIP_SET);
                 stmt->setUInt64(0, eqset.Guid);
                 trans->Append(stmt);
                 m_EquipmentSets.erase(itr++);
@@ -25357,11 +25357,11 @@ void Player::_SaveEquipmentSets(SQLTransaction& trans)
 
 void Player::_SaveBGData(SQLTransaction& trans)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_BGDATA);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PLAYER_BGDATA);
     stmt->setUInt32(0, GetGUIDLow());
     trans->Append(stmt);
     /* guid, bgInstanceID, bgTeam, x, y, z, o, map, taxi[0], taxi[1], mountSpell */
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_BGDATA);
+    stmt = CharacterDatabase.GetPreparedStatement<11>(CHAR_INS_PLAYER_BGDATA);
     stmt->setUInt32(0, GetGUIDLow());
     stmt->setUInt32(1, m_bgData.bgInstanceID);
     stmt->setUInt16(2, m_bgData.bgTeam);
@@ -25397,7 +25397,7 @@ void Player::RemoveAtLoginFlag(AtLoginFlags flags, bool persist /*= false*/)
 
     if (persist)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_REM_AT_LOGIN_FLAG);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_UPD_REM_AT_LOGIN_FLAG);
 
         stmt->setUInt16(0, uint16(flags));
         stmt->setUInt32(1, GetGUIDLow());
@@ -25552,7 +25552,7 @@ void Player::_LoadGlyphs(PreparedQueryResult result)
 
 void Player::_SaveGlyphs(SQLTransaction& trans)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_GLYPHS);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_GLYPHS);
     stmt->setUInt32(0, GetGUIDLow());
     trans->Append(stmt);
 
@@ -25561,7 +25561,7 @@ void Player::_SaveGlyphs(SQLTransaction& trans)
     {
         uint8 index = 0;
 
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_GLYPHS);
+        stmt = CharacterDatabase.GetPreparedStatement<11>(CHAR_INS_CHAR_GLYPHS);
         stmt->setUInt32(index++, GetGUIDLow());
 
         stmt->setUInt8(index++, spec);
@@ -25594,7 +25594,7 @@ void Player::_SaveTalents(SQLTransaction& trans)
         {
             if (itr->second->state == PLAYERSPELL_REMOVED || itr->second->state == PLAYERSPELL_CHANGED)
             {
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_TALENT_BY_SPELL_SPEC);
+                stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_DEL_CHAR_TALENT_BY_SPELL_SPEC);
                 stmt->setUInt32(0, GetGUIDLow());
                 stmt->setUInt32(1, itr->first);
                 stmt->setUInt8(2, itr->second->spec);
@@ -25603,7 +25603,7 @@ void Player::_SaveTalents(SQLTransaction& trans)
 
             if (itr->second->state == PLAYERSPELL_NEW || itr->second->state == PLAYERSPELL_CHANGED)
             {
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_TALENT);
+                stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_INS_CHAR_TALENT);
                 stmt->setUInt32(0, GetGUIDLow());
                 stmt->setUInt32(1, itr->first);
                 stmt->setUInt8(2, itr->second->spec);
@@ -25642,7 +25642,7 @@ void Player::UpdateSpecCount(uint8 count)
         _SaveActions(trans); // make sure the button list is cleaned up
         for (ActionButtonList::iterator itr = m_actionButtons.begin(); itr != m_actionButtons.end(); ++itr)
         {
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACTION);
+            stmt = CharacterDatabase.GetPreparedStatement<5>(CHAR_INS_CHAR_ACTION);
             stmt->setUInt32(0, GetGUIDLow());
             stmt->setUInt8(1, 1);
             stmt->setUInt8(2, itr->first);
@@ -25656,7 +25656,7 @@ void Player::UpdateSpecCount(uint8 count)
     {
         _SaveActions(trans);
 
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACTION_EXCEPT_SPEC);
+        stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHAR_ACTION_EXCEPT_SPEC);
         stmt->setUInt8(0, GetActiveSpec());
         stmt->setUInt32(1, GetGUIDLow());
         trans->Append(stmt);
@@ -25873,7 +25873,7 @@ void Player::ActivateSpec(uint8 spec)
     InitTalentForLevel();
 
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_ACTIONS_SPEC);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_SEL_CHARACTER_ACTIONS_SPEC);
         stmt->setUInt32(0, GetGUIDLow());
         stmt->setUInt8(1, GetActiveSpec());
         if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
@@ -26182,7 +26182,7 @@ void Player::SetRandomWinner(bool isWinner)
     m_IsBGRandomWinner = isWinner;
     if (m_IsBGRandomWinner)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_BATTLEGROUND_RANDOM);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_INS_BATTLEGROUND_RANDOM);
 
         stmt->setUInt32(0, GetGUIDLow());
 
@@ -26235,13 +26235,13 @@ void Player::_SaveInstanceTimeRestrictions(SQLTransaction& trans)
     if (_instanceResetTimes.empty())
         return;
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ACCOUNT_INSTANCE_LOCK_TIMES);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_ACCOUNT_INSTANCE_LOCK_TIMES);
     stmt->setUInt32(0, GetSession()->GetAccountId());
     trans->Append(stmt);
 
     for (InstanceTimeMap::const_iterator itr = _instanceResetTimes.begin(); itr != _instanceResetTimes.end(); ++itr)
     {
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ACCOUNT_INSTANCE_LOCK_TIMES);
+        stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_INS_ACCOUNT_INSTANCE_LOCK_TIMES);
         stmt->setUInt32(0, GetSession()->GetAccountId());
         stmt->setUInt32(1, itr->first);
         stmt->setUInt64(2, itr->second);
@@ -26760,7 +26760,7 @@ void Player::SetMaxPersonalArenaRating(uint32 value)
     if (!IsHaveCap())
     {
         trans = CharacterDatabase.BeginTransaction();
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_CURRENCY_CAP);
+        stmt = CharacterDatabase.GetPreparedStatement<6>(CHAR_INS_PLAYER_CURRENCY_CAP);
         stmt->setUInt32(0, GetGUIDLow());
         stmt->setUInt16(1, _maxPersonalArenaRate);
         stmt->setUInt16(2, 0);
@@ -26776,7 +26776,7 @@ void Player::SetMaxPersonalArenaRating(uint32 value)
         m_currencyCap->highestArenaRating = _maxPersonalArenaRate;
         m_currencyCap->requireReset = 1;
         trans = CharacterDatabase.BeginTransaction();
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PLAYER_CURRENCY_CAP_RESET);
+        stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_UPD_PLAYER_CURRENCY_CAP_RESET);
         stmt->setUInt16(0, m_currencyCap->highestArenaRating);
         stmt->setUInt16(1, 0);
         stmt->setUInt32(2, GetGUIDLow());

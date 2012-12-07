@@ -557,6 +557,12 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
                 else
                     mi->RemoveServerMovementFlag(SERVERMOVEFLAG_SPLINE1);
                 break;
+            case MSEHasSpline2:
+                if (data.ReadBit())
+                    mi->AddServerMovementFlag(SERVERMOVEFLAG_SPLINE2);
+                else
+                    mi->RemoveServerMovementFlag(SERVERMOVEFLAG_SPLINE2);
+                break;
             case MSEMovementFlags:
                 if (hasMovementFlags)
                     mi->flags = data.ReadBits(30);
@@ -838,6 +844,9 @@ void WorldSession::WriteMovementInfo(WorldPacket &data, MovementInfo* mi)
                 break;
             case MSEHasSpline:
                 data.WriteBit(mi->HasServerMovementFlag(SERVERMOVEFLAG_SPLINE1));
+                break;
+            case MSEHasSpline2:
+                data.WriteBit(mi->HasServerMovementFlag(SERVERMOVEFLAG_SPLINE2));
                 break;
             case MSEMovementFlags:
                 if (mi->GetMovementFlags() != 0)

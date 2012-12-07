@@ -1177,7 +1177,7 @@ public:
                 std::string itemName = itemNameStr+1;
                 WorldDatabase.EscapeString(itemName);
 
-                PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ITEM_TEMPLATE_BY_NAME);
+                PreparedStatement* stmt = WorldDatabase.GetPreparedStatement<1>(WORLD_SEL_ITEM_TEMPLATE_BY_NAME);
                 stmt->setString(0, itemName);
                 PreparedQueryResult result = WorldDatabase.Query(stmt);
 
@@ -1513,7 +1513,7 @@ public:
             if (handler->HasLowerSecurity(NULL, targetGuid))
                 return false;
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PINFO);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_PINFO);
             stmt->setUInt32(0, GUID_LOPART(targetGuid));
             PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -1537,7 +1537,7 @@ public:
         uint32 security         = 0;
         std::string lastLogin   = handler->GetTrinityString(LANG_ERROR);
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO);
+        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_SEL_PINFO);
         stmt->setInt32(0, int32(realmID));
         stmt->setUInt32(1, accId);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
@@ -1563,7 +1563,7 @@ public:
                 EndianConvertReverse(ip);
 #endif
 
-                PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_IP2NATION_COUNTRY);
+                PreparedStatement* stmt = WorldDatabase.GetPreparedStatement<1>(WORLD_SEL_IP2NATION_COUNTRY);
 
                 stmt->setUInt32(0, ip);
 
@@ -1591,12 +1591,12 @@ public:
         std::string bannedby = "unknown";
         std::string banreason = "";
 
-        stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO_BANS);
+        stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_PINFO_BANS);
         stmt->setUInt32(0, accId);
         PreparedQueryResult result2 = LoginDatabase.Query(stmt);
         if (!result2)
         {
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_BANS);
+            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_PINFO_BANS);
             stmt->setUInt32(0, GUID_LOPART(targetGuid));
             result2 = CharacterDatabase.Query(stmt);
         }
@@ -1790,7 +1790,7 @@ public:
         if (handler->HasLowerSecurity (target, targetGuid, true))
             return false;
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
+        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_UPD_MUTE_TIME);
 
         if (target)
         {
@@ -1848,7 +1848,7 @@ public:
             target->GetSession()->m_muteTime = 0;
         }
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
+        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_UPD_MUTE_TIME);
         stmt->setInt64(0, 0);
         stmt->setUInt32(1, accountId);
         LoginDatabase.Execute(stmt);
@@ -2609,7 +2609,7 @@ public:
             if (targetName)
             {
                 // Check for offline players
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_GUID_BY_NAME);
+                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_GUID_BY_NAME);
                 stmt->setString(0, name);
                 PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -2623,7 +2623,7 @@ public:
                 Field* fields = result->Fetch();
                 uint32 lowGuid = fields[0].GetUInt32();
 
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA_FROZEN);
+                stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_AURA_FROZEN);
                 stmt->setUInt32(0, lowGuid);
                 CharacterDatabase.Execute(stmt);
 
@@ -2643,7 +2643,7 @@ public:
     static bool HandleListFreezeCommand(ChatHandler* handler, char const* /*args*/)
     {
         // Get names from DB
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_AURA_FROZEN);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<0>(CHAR_SEL_CHARACTER_AURA_FROZEN);
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
         if (!result)
         {

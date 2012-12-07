@@ -900,7 +900,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     }
 
     // Get the account information from the realmd database
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_INFO_BY_NAME);
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_ACCOUNT_INFO_BY_NAME);
 
     stmt->setString(0, account);
 
@@ -961,7 +961,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     {
         mutetime = time(NULL) + llabs(mutetime);
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
+        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_UPD_MUTE_TIME);
 
         stmt->setInt64(0, mutetime);
         stmt->setUInt32(1, id);
@@ -977,7 +977,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     std::string os = fields[10].GetString();
 
     // Checks gmlevel per Realm
-    stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_GMLEVEL_BY_REALMID);
+    stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_GET_GMLEVEL_BY_REALMID);
 
     stmt->setUInt32(0, id);
     stmt->setInt32(1, int32(realmID));
@@ -993,7 +993,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     }
 
     // Re-check account ban (same check as in realmd)
-    stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BANS);
+    stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_SEL_BANS);
 
     stmt->setUInt32(0, id);
     stmt->setString(1, GetRemoteAddress());
@@ -1069,7 +1069,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         address.c_str());
 
     // Check if this user is by any chance a recruiter
-    stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_RECRUITER);
+    stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_ACCOUNT_RECRUITER);
 
     stmt->setUInt32(0, id);
 
@@ -1081,7 +1081,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     // Update the last_ip in the database
 
-    stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LAST_IP);
+    stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_UPD_LAST_IP);
 
     stmt->setString(0, address);
     stmt->setString(1, account);

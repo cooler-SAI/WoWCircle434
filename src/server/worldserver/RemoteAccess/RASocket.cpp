@@ -180,7 +180,7 @@ int RASocket::check_access_level(const std::string& user)
 
 
 
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ACCESS);
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_ACCOUNT_ACCESS);
     stmt->setString(0, safeUser);
     PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -216,7 +216,7 @@ int RASocket::check_password(const std::string& user, const std::string& pass)
 
     std::string hash = AccountMgr::CalculateShaPassHash(safe_user, safe_pass);
 
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_CHECK_PASSWORD_BY_NAME);
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_SEL_CHECK_PASSWORD_BY_NAME);
 
     stmt->setString(0, safe_user);
     stmt->setString(1, hash);

@@ -474,7 +474,7 @@ void Unit::UpdateSplinePosition()
 void Unit::DisableSpline()
 {
     m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FORWARD);
-    m_movementInfo.RemoveServerMovementFlag(ServerMovementFlags(SERVERMOVEFLAG_SPLINE1));
+    m_movementInfo.RemoveServerMovementFlag(ServerMovementFlags(SERVERMOVEFLAG_SPLINE1 | SERVERMOVEFLAG_SPLINE2));
     movespline->_Interrupt();
 }
 

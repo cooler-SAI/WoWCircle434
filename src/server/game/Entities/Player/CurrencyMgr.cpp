@@ -501,7 +501,7 @@ void CurrencyMgr::setLastGuid(uint32 lowGuid, bool save)
     lastGuid = lowGuid;
     if (save)
     {
-        PreparedStatement *stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_CURRENCY_CAP_PROGRESS);
+        PreparedStatement *stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_INS_PLAYER_CURRENCY_CAP_PROGRESS);
         stmt->setUInt8(0, 1);
         stmt->setUInt32(1, lastGuid);
         CharacterDatabase.Execute(stmt);
@@ -510,7 +510,7 @@ void CurrencyMgr::setLastGuid(uint32 lowGuid, bool save)
 
 void CurrencyMgr::DeleteRestoreData()
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_CURRENCY_CAP_PROGRESS);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PLAYER_CURRENCY_CAP_PROGRESS);
     stmt->setUInt8(0, 1);
     CharacterDatabase.Execute(stmt);
 }

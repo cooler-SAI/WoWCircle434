@@ -69,7 +69,7 @@ bool PlayerSocial::AddToSocialList(uint32 friendGuid, bool ignore)
     PlayerSocialMap::const_iterator itr = m_playerSocialMap.find(friendGuid);
     if (itr != m_playerSocialMap.end())
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_CHARACTER_SOCIAL_FLAGS);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_UPD_ADD_CHARACTER_SOCIAL_FLAGS);
 
         stmt->setUInt8(0, flag);
         stmt->setUInt32(1, GetPlayerGUID());
@@ -81,7 +81,7 @@ bool PlayerSocial::AddToSocialList(uint32 friendGuid, bool ignore)
     }
     else
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_SOCIAL);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_INS_CHARACTER_SOCIAL);
 
         stmt->setUInt32(0, GetPlayerGUID());
         stmt->setUInt32(1, friendGuid);
@@ -109,7 +109,7 @@ void PlayerSocial::RemoveFromSocialList(uint32 friendGuid, bool ignore)
     itr->second.Flags &= ~flag;
     if (itr->second.Flags == 0)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_SOCIAL);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHARACTER_SOCIAL);
 
         stmt->setUInt32(0, GetPlayerGUID());
         stmt->setUInt32(1, friendGuid);
@@ -120,7 +120,7 @@ void PlayerSocial::RemoveFromSocialList(uint32 friendGuid, bool ignore)
     }
     else
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_REM_CHARACTER_SOCIAL_FLAGS);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_UPD_REM_CHARACTER_SOCIAL_FLAGS);
 
         stmt->setUInt8(0, flag);
         stmt->setUInt32(1, GetPlayerGUID());
@@ -138,7 +138,7 @@ void PlayerSocial::SetFriendNote(uint32 friendGuid, std::string note)
 
     utf8truncate(note, 48);                                  // DB and client size limitation
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_SOCIAL_NOTE);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_UPD_CHARACTER_SOCIAL_NOTE);
 
     stmt->setString(0, note);
     stmt->setUInt32(1, GetPlayerGUID());

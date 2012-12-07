@@ -284,7 +284,7 @@ void AuthSocket::_SetVSFields(const std::string& rI)
     v_hex = v.AsHexStr();
     s_hex = s.AsHexStr();
 
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_VS);
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<3>(LOGIN_UPD_VS);
     stmt->setString(0, v_hex);
     stmt->setString(1, s_hex);
     stmt->setString(2, _login);
@@ -356,10 +356,10 @@ bool AuthSocket::_HandleLogonChallenge()
     pkt << uint8(0x00);
 
     // Verify that this IP is not in the ip_banned table
-    LoginDatabase.Execute(LoginDatabase.GetPreparedStatement(LOGIN_DEL_EXPIRED_IP_BANS));
+    LoginDatabase.Execute(LoginDatabase.GetPreparedStatement<0>(LOGIN_DEL_EXPIRED_IP_BANS));
 
     std::string const& ip_address = socket().getRemoteAddress();
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_BANNED);
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_IP_BANNED);
     stmt->setString(0, ip_address);
     PreparedQueryResult result = LoginDatabase.Query(stmt);
     if (result)
@@ -371,7 +371,7 @@ bool AuthSocket::_HandleLogonChallenge()
     {
         // Get the account details from the account table
         // No SQL injection (prepared statement)
-        stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGONCHALLENGE);
+        stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_LOGONCHALLENGE);
         stmt->setString(0, _login);
 
         PreparedQueryResult res2 = LoginDatabase.Query(stmt);
@@ -401,11 +401,11 @@ bool AuthSocket::_HandleLogonChallenge()
             if (!locked)
             {
                 //set expired bans to inactive
-                LoginDatabase.Execute(LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPIRED_ACCOUNT_BANS));
-                LoginDatabase.Execute(LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_PREMIUM));
+                LoginDatabase.Execute(LoginDatabase.GetPreparedStatement<0>(LOGIN_UPD_EXPIRED_ACCOUNT_BANS));
+                LoginDatabase.Execute(LoginDatabase.GetPreparedStatement<0>(LOGIN_UPD_ACCOUNT_PREMIUM));
 
                 // If the account is banned, reject the logon attempt
-                stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
+                stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_ACCOUNT_BANNED);
                 stmt->setUInt32(0, fields[1].GetUInt32());
                 PreparedQueryResult banresult = LoginDatabase.Query(stmt);
                 if (banresult)
@@ -610,7 +610,7 @@ bool AuthSocket::_HandleLogonProof()
         // No SQL injection (escaped user name) and IP address as received by socket
         const char *K_hex = K.AsHexStr();
 
-        PreparedStatement *stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGONPROOF);
+        PreparedStatement *stmt = LoginDatabase.GetPreparedStatement<5>(LOGIN_UPD_LOGONPROOF);
         stmt->setString(0, K_hex);
         stmt->setString(1, socket().getRemoteAddress().c_str());
         stmt->setUInt32(2, GetLocaleByName(_localizationName));
@@ -659,11 +659,11 @@ bool AuthSocket::_HandleLogonProof()
         if (MaxWrongPassCount > 0)
         {
             //Increment number of failed logins by one and if it reaches the limit temporarily ban that account or IP
-            PreparedStatement *stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_FAILEDLOGINS);
+            PreparedStatement *stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_UPD_FAILEDLOGINS);
             stmt->setString(0, _login);
             LoginDatabase.Execute(stmt);
 
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_FAILEDLOGINS);
+            stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_FAILEDLOGINS);
             stmt->setString(0, _login);
 
             if (PreparedQueryResult loginfail = LoginDatabase.Query(stmt))
@@ -678,7 +678,7 @@ bool AuthSocket::_HandleLogonProof()
                     if (WrongPassBanType)
                     {
                         uint32 acc_id = (*loginfail)[0].GetUInt32();
-                        stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_AUTO_BANNED);
+                        stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_INS_ACCOUNT_AUTO_BANNED);
                         stmt->setUInt32(0, acc_id);
                         stmt->setUInt32(1, WrongPassBanTime);
                         LoginDatabase.Execute(stmt);
@@ -688,7 +688,7 @@ bool AuthSocket::_HandleLogonProof()
                     }
                     else
                     {
-                        stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_IP_AUTO_BANNED);
+                        stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_INS_IP_AUTO_BANNED);
                         stmt->setString(0, socket().getRemoteAddress());
                         stmt->setUInt32(1, WrongPassBanTime);
                         LoginDatabase.Execute(stmt);
@@ -739,7 +739,7 @@ bool AuthSocket::_HandleReconnectChallenge()
 
     _login = (const char*)ch->I;
 
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_SESSIONKEY);
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_SESSIONKEY);
     stmt->setString(0, _login);
     PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -830,7 +830,7 @@ bool AuthSocket::_HandleRealmList()
 
     // Get the user id (else close the connection)
     // No SQL injection (prepared statement)
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ID_BY_NAME);
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_ACCOUNT_ID_BY_NAME);
     stmt->setString(0, _login);
     PreparedQueryResult result = LoginDatabase.Query(stmt);
     if (!result)
@@ -880,7 +880,7 @@ bool AuthSocket::_HandleRealmList()
         uint8 lock = (i->second.allowedSecurityLevel > _accountSecurityLevel) ? 1 : 0;
 
         uint8 AmountOfCharacters = 0;
-        stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_NUM_CHARS_ON_REALM);
+        stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_SEL_NUM_CHARS_ON_REALM);
         stmt->setUInt32(0, i->second.m_ID);
         stmt->setUInt32(1, id);
         result = LoginDatabase.Query(stmt);

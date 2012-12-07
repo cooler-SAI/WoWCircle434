@@ -50,7 +50,6 @@ class DatabaseWorkerPool
         _queue(new ACE_Activation_Queue())
         {
             memset(_connectionCount, 0, sizeof(_connectionCount));
-            _connections.resize(IDX_SIZE);
 
             WPFatal (mysql_thread_safe(), "Used MySQL library isn't thread-safe.");
         }
@@ -426,9 +425,10 @@ class DatabaseWorkerPool
         //! Automanaged (internally) pointer to a prepared statement object for usage in upper level code.
         //! Pointer is deleted in this->Query(PreparedStatement*) or PreparedStatementTask::~PreparedStatementTask.
         //! This object is not tied to the prepared statement on the MySQL context yet until execution.
+        template<unsigned int fieldCount>
         PreparedStatement* GetPreparedStatement(uint32 index)
         {
-            return new PreparedStatement(index);
+            return new PreparedStatement(index, fieldCount);
         }
 
         //! Apply escape string'ing for current collation. (utf8)
@@ -511,8 +511,8 @@ class DatabaseWorkerPool
         };
 
         ACE_Activation_Queue*           _queue;             //! Queue shared by async worker threads.
-        std::vector< std::vector<T*> >  _connections;
-        uint32                          _connectionCount[2];       //! Counter of MySQL connections;
+        std::vector<T*>                 _connections[IDX_SIZE];
+        uint32                          _connectionCount[IDX_SIZE];       //! Counter of MySQL connections;
         MySQLConnectionInfo             _connectionInfo;
 };
 

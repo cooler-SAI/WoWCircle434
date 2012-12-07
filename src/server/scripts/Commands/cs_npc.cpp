@@ -134,7 +134,7 @@ public:
             uint32 tguid = chr->GetTransport()->AddNPCPassenger(0, id, chr->GetTransOffsetX(), chr->GetTransOffsetY(), chr->GetTransOffsetZ(), chr->GetTransOffsetO());
             if (tguid > 0)
             {
-                PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_CREATURE_TRANSPORT);
+                PreparedStatement* stmt = WorldDatabase.GetPreparedStatement<7>(WORLD_INS_CREATURE_TRANSPORT);
 
                 stmt->setInt32(0, int32(tguid));
                 stmt->setInt32(1, int32(id));
@@ -271,7 +271,7 @@ public:
             wait = 0;
 
         // Update movement type
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_MOVEMENT_TYPE);
+        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement<2>(WORLD_UPD_CREATURE_MOVEMENT_TYPE);
 
         stmt->setUInt8(0, uint8(WAYPOINT_MOTION_TYPE));
         stmt->setUInt32(1, lowGuid);
@@ -488,7 +488,7 @@ public:
         }
 
         // ..and DB
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_FACTION);
+        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement<3>(WORLD_UPD_CREATURE_FACTION);
 
         stmt->setUInt16(0, uint16(factionId));
         stmt->setUInt16(1, uint16(factionId));
@@ -518,7 +518,7 @@ public:
 
         creature->SetUInt32Value(UNIT_NPC_FLAGS, npcFlags);
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_NPCFLAG);
+        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement<2>(WORLD_UPD_CREATURE_NPCFLAG);
 
         stmt->setUInt32(0, npcFlags);
         stmt->setUInt32(1, creature->GetEntry());
@@ -702,7 +702,7 @@ public:
             }
         }
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_POSITION);
+        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement<5>(WORLD_UPD_CREATURE_POSITION);
 
         stmt->setFloat(0, x);
         stmt->setFloat(1, y);
@@ -731,7 +731,7 @@ public:
 
         if (target->GetTransport() && target->GetGUIDTransport())
         {
-            PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_TRANSPORT_EMOTE);
+            PreparedStatement* stmt = WorldDatabase.GetPreparedStatement<3>(WORLD_UPD_CREATURE_TRANSPORT_EMOTE);
 
             stmt->setInt32(0, int32(emote));
             stmt->setInt32(1, target->GetTransport()->GetEntry());
@@ -981,7 +981,7 @@ public:
             creature->Respawn();
         }
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_SPAWN_DISTANCE);
+        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement<3>(WORLD_UPD_CREATURE_SPAWN_DISTANCE);
 
         stmt->setFloat(0, option);
         stmt->setUInt8(1, uint8(mtype));
@@ -1021,7 +1021,7 @@ public:
         else
             return false;
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_SPAWN_TIME_SECS);
+        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement<2>(WORLD_UPD_CREATURE_SPAWN_TIME_SECS);
 
         stmt->setUInt32(0, uint32(spawnTime));
         stmt->setUInt32(1, guidLow);
@@ -1291,7 +1291,7 @@ public:
         sFormationMgr->CreatureGroupMap[lowguid] = group_member;
         creature->SearchFormation();
 
-        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_CREATURE_FORMATION);
+        PreparedStatement* stmt = WorldDatabase.GetPreparedStatement<5>(WORLD_INS_CREATURE_FORMATION);
 
         stmt->setUInt32(0, leaderGUID);
         stmt->setUInt32(1, lowguid);

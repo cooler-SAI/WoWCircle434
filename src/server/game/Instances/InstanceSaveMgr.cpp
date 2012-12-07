@@ -126,15 +126,15 @@ void InstanceSaveManager::DeleteInstanceFromDB(uint32 instanceid)
 {
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INSTANCE_BY_INSTANCE);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_INSTANCE_BY_INSTANCE);
     stmt->setUInt32(0, instanceid);
     trans->Append(stmt);
 
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE);
+    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE);
     stmt->setUInt32(0, instanceid);
     trans->Append(stmt);
 
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP_INSTANCE_BY_INSTANCE);
+    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_GROUP_INSTANCE_BY_INSTANCE);
     stmt->setUInt32(0, instanceid);
     trans->Append(stmt);
 
@@ -150,7 +150,7 @@ void InstanceSaveManager::RemoveInstanceSave(uint32 InstanceId)
         // save the resettime for normal instances only when they get unloaded
         if (time_t resettime = itr->second->GetResetTimeForDB())
         {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_INSTANCE_RESETTIME);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_UPD_INSTANCE_RESETTIME);
 
             stmt->setUInt32(0, uint32(resettime));
             stmt->setUInt32(1, InstanceId);
@@ -195,7 +195,7 @@ void InstanceSave::SaveToDB()
         }
     }
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_INSTANCE_SAVE);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<6>(CHAR_INS_INSTANCE_SAVE);
     stmt->setUInt32(0, m_instanceid);
     stmt->setUInt16(1, GetMapId());
     stmt->setUInt32(2, uint32(GetResetTimeForDB()));
@@ -327,7 +327,7 @@ void InstanceSaveManager::LoadResetTimes()
         while (result->NextRow());
 
         // update reset time for normal instances with the max creature respawn time + X hours
-        if (PreparedQueryResult result2 = CharacterDatabase.Query(CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAX_CREATURE_RESPAWNS)))
+        if (PreparedQueryResult result2 = CharacterDatabase.Query(CharacterDatabase.GetPreparedStatement<0>(CHAR_SEL_MAX_CREATURE_RESPAWNS)))
         {
             do
             {
@@ -584,17 +584,17 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
         // delete them from the DB, even if not loaded
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_MAP_DIFF);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHAR_INSTANCE_BY_MAP_DIFF);
         stmt->setUInt16(0, uint16(mapid));
         stmt->setUInt8(1, uint8(difficulty));
         trans->Append(stmt);
 
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP_INSTANCE_BY_MAP_DIFF);
+        stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_GROUP_INSTANCE_BY_MAP_DIFF);
         stmt->setUInt16(0, uint16(mapid));
         stmt->setUInt8(1, uint8(difficulty));
         trans->Append(stmt);
 
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INSTANCE_BY_MAP_DIFF);
+        stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_INSTANCE_BY_MAP_DIFF);
         stmt->setUInt16(0, uint16(mapid));
         stmt->setUInt8(1, uint8(difficulty));
         trans->Append(stmt);
@@ -614,7 +614,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
         ScheduleReset(true, time_t(next_reset-3600), InstResetEvent(1, mapid, difficulty, 0));
 
         // Update it in the DB
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GLOBAL_INSTANCE_RESETTIME);
+        stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_UPD_GLOBAL_INSTANCE_RESETTIME);
 
         stmt->setUInt32(0, next_reset);
         stmt->setUInt16(1, uint16(mapid));
