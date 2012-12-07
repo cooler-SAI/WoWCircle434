@@ -10862,6 +10862,21 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
     if ((spellProto->AttributesEx2 & SPELL_ATTR2_CANT_CRIT))
         return false;
 
+    float crit_chance = GetSpellCrit(victim, spellProto, schoolMask, attackType);
+
+    if (crit_chance == 0.0f)
+        return false;
+    else if (crit_chance >= 100.0f)
+        return true;
+
+    if (roll_chance_f(crit_chance))
+        return true;
+
+    return false;
+}
+
+float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType) const  
+{
     float crit_chance = 0.0f;
     switch (spellProto->DmgClass)
     {
@@ -10876,7 +10891,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                 case 71646: // Item - Bauble of True Blood 25m
                     break;
                 default:
-                    return false;
+                    return 0.0;
             }
         case SPELL_DAMAGE_CLASS_MAGIC:
         {
@@ -10974,7 +10989,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                         else if (spellProto->Category == 19)
                         {
                             if (victim->GetCreatureTypeMask() & CREATURE_TYPEMASK_DEMON_OR_UNDEAD)
-                                return true;
+                                return 100.0f;
                             break;
                         }
                         break;
@@ -10984,7 +10999,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                         {
                             if (victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_SHAMAN, 0x10000000, 0, 0, GetGUID()))
                                 if (victim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE) > -100)
-                                    return true;
+                                    return 100.0f;
                             break;
                         }
                         break;
@@ -11061,7 +11076,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
             break;
         }
         default:
-            return false;
+            return 0.0f;
     }
     
     if (victim)
@@ -11088,9 +11103,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
                 crit_chance += float(aur->GetEffect(0)->GetAmount());
 
     crit_chance = crit_chance > 0.0f ? crit_chance : 0.0f;
-    if (roll_chance_f(crit_chance))
-        return true;
-    return false;
+    return crit_chance;
 }
 
 uint32 Unit::SpellCriticalDamageBonus(SpellInfo const* spellProto, uint32 damage, Unit* /*victim*/)

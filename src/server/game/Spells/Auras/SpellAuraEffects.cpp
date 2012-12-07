@@ -436,6 +436,8 @@ m_baseAmount(baseAmount ? *baseAmount : m_spellInfo->Effects[effIndex].BasePoint
 m_spellmod(NULL), m_periodicTimer(0), m_tickNumber(0), m_effIndex(effIndex),
 m_canBeRecalculated(true), m_isPeriodic(false)
 {
+    m_fixed_periodic.Clear();
+
     CalculatePeriodic(caster, true, false);
 
     m_amount = CalculateAmount(caster);
@@ -678,7 +680,6 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             // Rip
             if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_DRUID && m_spellInfo->SpellFamilyFlags[0] & 0x00800000)
             {
-                m_canBeRecalculated = false;
                 //  ${($m1+$b1*1+0.0207*$AP)*8}
                 if (caster->GetTypeId() != TYPEID_PLAYER)
                     break;
@@ -692,7 +693,6 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             // Rend
             else if (GetId() == 94009)
             {
-                m_canBeRecalculated = false;
                 // ${0.2 * 6 * (($MWB + $mwb) / 2 + $AP / 14 * $MWS)}  bonus per tick
                 float ap = caster->GetTotalAttackPowerValue(BASE_ATTACK);
                 float mws = 0.001 * caster->GetAttackTime(BASE_ATTACK);
@@ -857,6 +857,25 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
 
     GetBase()->CallScriptEffectCalcAmountHandlers(const_cast<AuraEffect const*>(this), amount, m_canBeRecalculated);
     amount *= GetBase()->GetStackAmount();
+
+    // Fixate damage for periodic damage auras
+    // It's only for players now
+    if (caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE)
+        {
+            Unit* target = GetBase()->GetUnitOwner();
+            int32 temp_damage = amount;
+            float temp_crit = 0.0f;
+
+            temp_damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), temp_damage, DOT, GetBase()->GetStackAmount());
+            temp_crit = caster->GetSpellCrit(target, GetSpellInfo(), SpellSchoolMask(GetSpellInfo()->SchoolMask));
+            
+            m_fixed_periodic.SetFixedDamage(temp_damage);
+            m_fixed_periodic.SetCriticalChance(temp_crit);
+        }
+    }
+
     return amount;
 }
 
@@ -6527,7 +6546,11 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
 
     if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE)
     {
-        damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
+        if (m_fixed_periodic.HasDamage())
+            damage = m_fixed_periodic.GetFixedDamage();
+        else
+            damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
+
         damage = target->SpellDamageBonusTaken(caster, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
 
         // Calculate armor mitigation
@@ -6581,7 +6604,13 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     else
         damage = uint32(target->CountPctFromMaxHealth(damage));
 
-    bool crit = IsPeriodicTickCrit(target, caster);
+    bool crit = false;
+
+    if (m_fixed_periodic.HasCritChance())
+        crit = roll_chance_f(m_fixed_periodic.GetCriticalChance());
+    else
+        crit = IsPeriodicTickCrit(target, caster);
+
     if (crit)
         damage = caster->SpellCriticalDamageBonus(m_spellInfo, damage, target);
 
