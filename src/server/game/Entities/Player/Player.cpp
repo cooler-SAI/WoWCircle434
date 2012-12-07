@@ -2606,15 +2606,12 @@ void Player::RegenerateAll()
             uint8 runeToRegen = i;
             uint32 cd = GetRuneCooldown(i);
             uint32 secondRuneCd = GetRuneCooldown(i + 1);
+            float runeCdMod = GetFloatValue(PLAYER_RUNE_REGEN_1) * 10.0f;
             // Regenerate second rune of the same type only after first rune is off the cooldown
-            if (secondRuneCd && (cd > secondRuneCd || !cd))
-            {
-                runeToRegen = i + 1;
-                cd = secondRuneCd;
-            }
-
-            if (cd)
-                SetRuneCooldown(runeToRegen, (cd > m_regenTimer) ? cd - m_regenTimer : 0);
+            if (cd && (!secondRuneCd || cd <= secondRuneCd))
+                SetRuneCooldown(i, (cd > m_regenTimer * runeCdMod) ? cd - m_regenTimer * runeCdMod : 0);
+            else if (secondRuneCd)
+                SetRuneCooldown(i + 1, (secondRuneCd > m_regenTimer * runeCdMod) ? secondRuneCd - m_regenTimer * runeCdMod : 0);
         }
     }
 
@@ -24151,8 +24148,8 @@ uint32 Player::GetRuneTypeBaseCooldown(RuneType runeType) const
     float cooldown = RUNE_BASE_COOLDOWN;
     float hastePct = GetRatingBonusValue(CR_HASTE_MELEE);
 
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE);
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE) / 10.0f;
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE) / 10.0f;
 
     AuraEffectList const& regenAura = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
     for (AuraEffectList::const_iterator i = regenAura.begin();i != regenAura.end(); ++i)
