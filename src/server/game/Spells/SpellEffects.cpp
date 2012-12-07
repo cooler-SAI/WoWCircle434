@@ -5046,7 +5046,9 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     break;
             }
             break;
+        }
         case SPELLFAMILY_PRIEST:
+        {
             switch (m_spellInfo->Id)
             {
                 // Chakra: Serenity - renew update proc
@@ -5097,7 +5099,9 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     break;
             }
             break;
+        }
         case SPELLFAMILY_WARLOCK:
+        {
             // Fel Flame
             if (m_spellInfo->Id == 77799)
             {
@@ -5149,6 +5153,16 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                 if (Aura * aur = unitTarget->GetAura(348, m_caster->GetGUID()))
                     aur->RefreshDuration();
                 break;
+            }
+            break;
+        }
+        case SPELLFAMILY_DRUID:
+        {
+            // Empowered Touch
+            if (m_spellInfo->Id == 88433)
+            {
+                if (Aura* aura = unitTarget->GetAura(33763, m_caster->GetGUID()))
+                    aura->RefreshDuration();
             }
             break;
         }

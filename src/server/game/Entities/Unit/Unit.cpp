@@ -6456,6 +6456,14 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Empowered Touch
+                case 33879:
+                case 33880:
+                {
+                    triggered_spell_id = 88433;
+                    target = victim;
+                    break;
+                }
                 // Glyph of Innervate
                 case 54832:
                 {
@@ -17195,6 +17203,27 @@ float Unit::MeleeSpellMissChance(const Unit* victim, WeaponAttackType attType, u
 {
     //calculate miss chance
     float missChance = victim->GetUnitMissChance(attType);
+
+    // for example
+    // | caster | target | miss 
+    //    85        85      5
+    //    85        86     5.5
+    //    85        87      6
+    //    85        88      8
+    //    85        89      10
+
+    if (victim->getLevel() > getLevel())
+    {
+        uint8 level_diff = victim->getLevel() - getLevel();
+        if (level_diff <= 2)
+        {
+            missChance += 0.5f * level_diff;
+        }
+        else
+        {
+            missChance += ((0.5f + level_diff - 2) * 2);
+        }
+    }
 
     if (!spellId && haveOffhandWeapon())
         missChance += 19;

@@ -4608,10 +4608,7 @@ void Spell::TakePower()
                     if (ihit->targetGUID == targetGUID)
                     {
                         if (ihit->missCondition != SPELL_MISS_NONE)
-                        {
                             hit = false;
-                            m_powerCost -= CalculatePct(m_powerCost, 80); // Refund 80% of power on fail 4.x
-                        }
                         break;
                     }
                 }
@@ -4669,7 +4666,7 @@ void Spell::TakePower()
     if (hit)
         m_caster->ModifyPower(powerType, -m_powerCost);
     else
-        m_caster->ModifyPower(powerType, -irand(0, m_powerCost/4));
+        m_caster->ModifyPower(powerType, -CalculatePct(m_powerCost, 20)); // Refund 80% of power on fail 4.x
 }
 
 SpellCastResult Spell::CheckRuneCost(uint32 runeCostID)
