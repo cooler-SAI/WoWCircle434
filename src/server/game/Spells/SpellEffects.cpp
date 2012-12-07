@@ -2099,13 +2099,9 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
 
             // afterh 4.0 "Changed from selectable talent to a specilization perk. Heals for a fixed amount rather than based on the HoT it consumes"
             addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
-            addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL);
 
             if (!targetAura)
-            {
-                sLog->outError(LOG_FILTER_SPELLS_AURAS, "Target(GUID:" UI64FMTD ") has aurastate AURA_STATE_SWIFTMEND but no matching aura.", unitTarget->GetGUID());
                 return;
-            }
 
             // Glyph of Swiftmend
             if (!caster->HasAura(54824))

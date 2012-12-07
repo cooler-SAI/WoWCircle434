@@ -4831,6 +4831,13 @@ void SpellMgr::LoadDbcDataCorrections()
             case 53353: // Chimera Shot heal effect
                 spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
                 break;
+            // Gift of the Earthmother
+            case 51179:
+            case 51180:
+            case 51181:
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_ADD_PCT_MODIFIER;
+                spellInfo->Effects[0].MiscValue = SPELLMOD_DOT;
+                break;
             default:
                 break;
         }
