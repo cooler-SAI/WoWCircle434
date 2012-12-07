@@ -3400,13 +3400,6 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].TargetB = 0;
                 spellInfo->Effects[EFFECT_1].TargetB = 0;
                 break;
-            case 53241: // Marked for Death (Rank 1)
-            case 53243: // Marked for Death (Rank 2)
-            case 53244: // Marked for Death (Rank 3)
-            case 53245: // Marked for Death (Rank 4)
-            case 53246: // Marked for Death (Rank 5)
-                spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00067801, 0x10820001, 0x00000801);
-                break;
             case 5176:  // Wrath
             case 2912:  // Starfire
             case 78674: // Starsurge

@@ -6848,6 +6848,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     target = this;
                     break;
                 }
+                // Marked for Death
+                case 3524:
+                {
+                    triggered_spell_id = 88691;
+                    break;
+                }
             }
 
             switch (dummySpell->Id)
