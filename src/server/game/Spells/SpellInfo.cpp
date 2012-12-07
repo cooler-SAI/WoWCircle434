@@ -1270,7 +1270,7 @@ bool SpellInfo::CanDispelAura(SpellInfo const* aura) const
     return true;
 }
 
-bool SpellInfo::IsSingleTarget() const
+bool SpellInfo::IsSingleTarget(Unit* caster) const
 {
     // all other single target spells have if it has AttributesEx5
     if (AttributesEx5 & SPELL_ATTR5_SINGLE_TARGET_SPELL)
@@ -1283,6 +1283,10 @@ bool SpellInfo::IsSingleTarget() const
         default:
             break;
     }
+
+    // Life Bloom and Tree of Life
+    if (Id == 33763 && caster && !caster->HasAura(33891))
+        return true;
 
     return false;
 }

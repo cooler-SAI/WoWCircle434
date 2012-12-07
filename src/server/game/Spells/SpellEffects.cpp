@@ -2140,6 +2140,9 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
         // Seal of Insight
         else if (m_spellInfo->Id == 20167)
             addhealth = int32(0.15f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + 0.15f * m_caster->SpellBaseHealingBonusDone(SpellSchoolMask(m_spellInfo->ScalingClass)));
+        // Lifebloom final heal
+        else if (m_spellInfo->Id == 33778)
+            addhealth = m_caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL, m_spellValue->EffectBasePoints[1]);
         else
             addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
 

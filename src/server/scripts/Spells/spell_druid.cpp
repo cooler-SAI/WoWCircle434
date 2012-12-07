@@ -31,7 +31,6 @@ enum DruidSpells
     DRUID_INCREASED_MOONFIRE_DURATION   = 38414,
     DRUID_NATURES_SPLENDOR              = 57865,
     DRUID_LIFEBLOOM_FINAL_HEAL          = 33778,
-    DRUID_LIFEBLOOM_ENERGIZE            = 64372,
     DRUID_SAVAGE_ROAR                   = 62071,
     SPELL_DRUID_ITEM_T8_BALANCE_RELIC   = 64950,
 };
@@ -358,8 +357,6 @@ class spell_dru_lifebloom : public SpellScriptLoader
             {
                 if (!sSpellMgr->GetSpellInfo(DRUID_LIFEBLOOM_FINAL_HEAL))
                     return false;
-                if (!sSpellMgr->GetSpellInfo(DRUID_LIFEBLOOM_ENERGIZE))
-                    return false;
                 return true;
             }
 
@@ -374,14 +371,7 @@ class spell_dru_lifebloom : public SpellScriptLoader
                 int32 healAmount = aurEff->GetAmount();
                 if (Unit* caster = GetCaster())
                 {
-                    healAmount = caster->SpellHealingBonusDone(GetTarget(), GetSpellInfo(), healAmount, HEAL, stack);
-                    healAmount = GetTarget()->SpellHealingBonusTaken(caster, GetSpellInfo(), healAmount, HEAL, stack);
-
-                    GetTarget()->CastCustomSpell(GetTarget(), DRUID_LIFEBLOOM_FINAL_HEAL, &healAmount, NULL, NULL, true, NULL, aurEff, GetCasterGUID());
-
-                    // restore mana
-                    int32 returnMana = CalculatePct(caster->GetCreateMana(), GetSpellInfo()->ManaCostPercentage) * stack / 2;
-                    caster->CastCustomSpell(caster, DRUID_LIFEBLOOM_ENERGIZE, &returnMana, NULL, NULL, true, NULL, aurEff, GetCasterGUID());
+                    GetTarget()->CastCustomSpell(GetTarget(), DRUID_LIFEBLOOM_FINAL_HEAL, &healAmount, &stack, NULL, true, NULL, aurEff, GetCasterGUID());
                     return;
                 }
 
@@ -401,10 +391,6 @@ class spell_dru_lifebloom : public SpellScriptLoader
                             healAmount = caster->SpellHealingBonusDone(target, GetSpellInfo(), healAmount, HEAL, dispelInfo->GetRemovedCharges());
                             healAmount = target->SpellHealingBonusTaken(caster, GetSpellInfo(), healAmount, HEAL, dispelInfo->GetRemovedCharges());
                             target->CastCustomSpell(target, DRUID_LIFEBLOOM_FINAL_HEAL, &healAmount, NULL, NULL, true, NULL, NULL, GetCasterGUID());
-
-                            // restore mana
-                            int32 returnMana = CalculatePct(caster->GetCreateMana(), GetSpellInfo()->ManaCostPercentage) * dispelInfo->GetRemovedCharges() / 2;
-                            caster->CastCustomSpell(caster, DRUID_LIFEBLOOM_ENERGIZE, &returnMana, NULL, NULL, true, NULL, NULL, GetCasterGUID());
                             return;
                         }
 
