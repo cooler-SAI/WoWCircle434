@@ -6456,6 +6456,18 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Nature's Ward
+                case 33881:
+                case 33882:
+                {
+                    if (!HealthBelowPct(50) && !this->HealthBelowPctDamaged(50, damage))
+                        return false;
+
+                    target = this;
+                    triggered_spell_id = 774;
+
+                    break;
+                }
                 // Empowered Touch
                 case 33879:
                 case 33880:
