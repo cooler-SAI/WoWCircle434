@@ -5020,6 +5020,17 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
 
                     break;
                 }
+                // Chimera Shot
+                case 53209:
+                {
+                    // Update Serpent Sting Duration
+                    if (Aura * aur = unitTarget->GetAura(1978, m_caster->GetGUID()))
+                        aur->RefreshDuration();
+
+                    // Chimera Shot - Healing
+                    m_caster->CastSpell(m_caster, 53353, true);
+                    break;
+                }
             }
             break;
         }

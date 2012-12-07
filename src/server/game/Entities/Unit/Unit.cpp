@@ -10870,6 +10870,10 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
     if ((spellProto->AttributesEx2 & SPELL_ATTR2_CANT_CRIT))
         return false;
 
+    // Chimera Shot - Healing can crit, other spells - not
+    if (spellProto->Id != 53353 && spellProto->HasEffect(SPELL_EFFECT_HEAL_PCT))
+        return false;
+
     float crit_chance = GetSpellCrit(victim, spellProto, schoolMask, attackType);
 
     if (crit_chance == 0.0f)

@@ -4835,6 +4835,9 @@ void SpellMgr::LoadDbcDataCorrections()
             case 94338:
                 spellInfo->Effects[0].BasePoints = 93402;
                 break;
+            case 53353: // Chimera Shot heal effect
+                spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+                break;
             default:
                 break;
         }

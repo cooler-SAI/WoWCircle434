@@ -41,9 +41,6 @@ enum HunterSpells
     HUNTER_PET_SPELL_CARRION_FEEDER_TRIGGERED    = 54045,
     HUNTER_SPELL_INVIGORATION_TRIGGERED          = 53398,
     HUNTER_SPELL_MASTERS_CALL_TRIGGERED          = 62305,
-    HUNTER_SPELL_CHIMERA_SHOT_SERPENT            = 53353,
-    HUNTER_SPELL_CHIMERA_SHOT_VIPER              = 53358,
-    HUNTER_SPELL_CHIMERA_SHOT_SCORPID            = 53359,
     HUNTER_SPELL_ASPECT_OF_THE_BEAST_PET         = 61669,
 };
 
@@ -93,99 +90,6 @@ class spell_hun_aspect_of_the_beast : public SpellScriptLoader
         AuraScript* GetAuraScript() const
         {
             return new spell_hun_aspect_of_the_beast_AuraScript();
-        }
-};
-
-// 53209 Chimera Shot
-class spell_hun_chimera_shot : public SpellScriptLoader
-{
-    public:
-        spell_hun_chimera_shot() : SpellScriptLoader("spell_hun_chimera_shot") { }
-
-        class spell_hun_chimera_shot_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_hun_chimera_shot_SpellScript);
-
-            bool Validate(SpellInfo const* /*spellEntry*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(HUNTER_SPELL_CHIMERA_SHOT_SERPENT) || !sSpellMgr->GetSpellInfo(HUNTER_SPELL_CHIMERA_SHOT_VIPER) || !sSpellMgr->GetSpellInfo(HUNTER_SPELL_CHIMERA_SHOT_SCORPID))
-                    return false;
-                return true;
-            }
-
-            void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-            {
-                Unit* caster = GetCaster();
-                if (Unit* unitTarget = GetHitUnit())
-                {
-                    uint32 spellId = 0;
-                    int32 basePoint = 0;
-                    Unit::AuraApplicationMap& Auras = unitTarget->GetAppliedAuras();
-                    for (Unit::AuraApplicationMap::iterator i = Auras.begin(); i != Auras.end(); ++i)
-                    {
-                        Aura* aura = i->second->GetBase();
-                        if (aura->GetCasterGUID() != caster->GetGUID())
-                            continue;
-
-                        // Search only Serpent Sting, Viper Sting, Scorpid Sting auras
-                        flag96 familyFlag = aura->GetSpellInfo()->SpellFamilyFlags;
-                        if (!(familyFlag[1] & 0x00000080 || familyFlag[0] & 0x0000C000))
-                            continue;
-                        if (AuraEffect const* aurEff = aura->GetEffect(0))
-                        {
-                            // Serpent Sting - Instantly deals 40% of the damage done by your Serpent Sting.
-                            if (familyFlag[0] & 0x4000)
-                            {
-                                int32 TickCount = aurEff->GetTotalTicks();
-                                spellId = HUNTER_SPELL_CHIMERA_SHOT_SERPENT;
-                                basePoint = caster->SpellDamageBonusDone(unitTarget, aura->GetSpellInfo(), aurEff->GetAmount(), DOT, aura->GetStackAmount());
-                                ApplyPct(basePoint, TickCount * 40);
-                                basePoint = unitTarget->SpellDamageBonusTaken(caster, aura->GetSpellInfo(), basePoint, DOT, aura->GetStackAmount());
-                            }
-                            // Viper Sting - Instantly restores mana to you equal to 60% of the total amount drained by your Viper Sting.
-                            else if (familyFlag[1] & 0x00000080)
-                            {
-                                int32 TickCount = aura->GetEffect(0)->GetTotalTicks();
-                                spellId = HUNTER_SPELL_CHIMERA_SHOT_VIPER;
-
-                                // Amount of one aura tick
-                                basePoint = int32(CalculatePct(unitTarget->GetMaxPower(POWER_MANA), aurEff->GetAmount()));
-                                int32 casterBasePoint = aurEff->GetAmount() * unitTarget->GetMaxPower(POWER_MANA) / 50; // TODO: WTF? caster uses unitTarget?
-                                if (basePoint > casterBasePoint)
-                                    basePoint = casterBasePoint;
-                                ApplyPct(basePoint, TickCount * 60);
-                            }
-                            // Scorpid Sting - Attempts to Disarm the target for 10 sec. This effect cannot occur more than once per 1 minute.
-                            else if (familyFlag[0] & 0x00008000)
-                                spellId = HUNTER_SPELL_CHIMERA_SHOT_SCORPID;
-                            // ?? nothing say in spell desc (possibly need addition check)
-                            //if (familyFlag & 0x0000010000000000LL || // dot
-                            //    familyFlag & 0x0000100000000000LL)   // stun
-                            //{
-                            //    spellId = 53366; // 53366 Chimera Shot - Wyvern
-                            //}
-
-                            // Refresh aura duration
-                            aura->RefreshDuration();
-                        }
-                        break;
-                    }
-                    if (spellId)
-                        caster->CastCustomSpell(unitTarget, spellId, &basePoint, 0, 0, true);
-                    if (spellId == HUNTER_SPELL_CHIMERA_SHOT_SCORPID && caster->ToPlayer()) // Scorpid Sting - Add 1 minute cooldown
-                        caster->ToPlayer()->AddSpellCooldown(spellId, 0, uint32(time(NULL) + 60));
-                }
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_hun_chimera_shot_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_hun_chimera_shot_SpellScript();
         }
 };
 
@@ -710,7 +614,6 @@ class spell_hun_tame_beast : public SpellScriptLoader
 void AddSC_hunter_spell_scripts()
 {
     new spell_hun_aspect_of_the_beast();
-    new spell_hun_chimera_shot();
     new spell_hun_invigoration();
     new spell_hun_last_stand_pet();
     new spell_hun_masters_call();
