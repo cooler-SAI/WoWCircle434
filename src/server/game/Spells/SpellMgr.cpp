@@ -2966,6 +2966,33 @@ void SpellMgr::LoadSpellCustomAttr()
                 if (spellInfo->SpellFamilyFlags[0] & 0x8)
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
                 break;
+            // Efflorescence
+            case 81262:
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = 0;
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                spellInfo->Effects[EFFECT_0].Amplitude = 1000;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ALLY;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_DEST_AREA_ALLY;
+                break;
+            // Healing Rain
+            // Holy Word: Sanctuary
+            case 88685:
+            case 73920:
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = 0;
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                spellInfo->Effects[EFFECT_0].Amplitude = spellInfo->Id == 81262 ? 1000 : 2000;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ALLY;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_DEST_AREA_ALLY;
+                break;
+            // Healing Rain
+            // Holy Word: Sanctuary
+            case 73921:
+            case 88686:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ALLY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
             default:
                 break;
         }

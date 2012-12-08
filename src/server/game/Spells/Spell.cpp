@@ -637,7 +637,8 @@ void Spell::InitExplicitTargets(SpellCastTargets const& targets)
         if ((target->ToUnit() && !(neededTargets & (TARGET_FLAG_UNIT_MASK | TARGET_FLAG_CORPSE_MASK)))
             || (target->ToGameObject() && !(neededTargets & TARGET_FLAG_GAMEOBJECT_MASK))
             || (target->ToCorpse() && !(neededTargets & TARGET_FLAG_CORPSE_MASK)))
-            m_targets.RemoveObjectTarget();
+            if (!m_spellInfo->HasPersistenAura() || (m_spellInfo->HasPersistenAura() && !(m_targets.GetTargetMask() & TARGET_FLAG_UNIT_MASK))
+                m_targets.RemoveObjectTarget();
     }
     else
     {
@@ -1582,7 +1583,11 @@ void Spell::SelectImplicitCasterObjectTargets(SpellEffIndex effIndex, SpellImpli
 
 void Spell::SelectImplicitTargetObjectTargets(SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType)
 {
-    ASSERT((m_targets.GetObjectTarget() || m_targets.GetItemTarget()) && "Spell::SelectImplicitTargetObjectTargets - no explicit object or item target available!");
+    // Persistent auras should cast trigger spells when they is activated on target
+    if (m_spellInfo->HasPersistenAura())
+        return;
+
+    ASSERT((m_targets.GetObjectTarget() || m_targets.GetItemTarget() || m_targets.GetUnitTarget()) && "Spell::SelectImplicitTargetObjectTargets - no explicit object or item target available!");
 
     WorldObject* target = m_targets.GetObjectTarget();
 

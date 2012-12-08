@@ -6009,6 +6009,13 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
         {
             switch (GetSpellInfo()->Id)
             {
+                // Efflorescence
+                case 81262:
+                {
+                    int32 bp = GetAmount();
+                    caster->CastCustomSpell(target, 81269, &bp, 0, 0, true, 0, this);
+                    break;
+                }
                 // Frenzied Regeneration
                 case 22842:
                 {
@@ -6108,42 +6115,56 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
             break;
         }
         case SPELLFAMILY_SHAMAN:
-            if (GetId() == 52179) // Astral Shift
-            {
-                // Periodic need for remove visual on stun/fear/silence lost
-                if (!(target->GetUInt32Value(UNIT_FIELD_FLAGS)&(UNIT_FLAG_STUNNED|UNIT_FLAG_FLEEING|UNIT_FLAG_SILENCED)))
-                    target->RemoveAurasDueToSpell(52179);
+            if (!caster || !target)
                 break;
+
+            switch (GetId())
+            {
+                // Healing Rain
+                case 73920:
+                    if (target->HasAuraEffect(73920, 0, caster->GetGUID()))
+                        caster->CastSpell(target, 73921, true, 0, this);
+                    break;
+                // Astral Shift
+                case 52179:
+                    // Periodic need for remove visual on stun/fear/silence lost
+                    if (!(target->GetUInt32Value(UNIT_FIELD_FLAGS)&(UNIT_FLAG_STUNNED|UNIT_FLAG_FLEEING|UNIT_FLAG_SILENCED)))
+                        target->RemoveAurasDueToSpell(52179);
+                    break;
             }
             break;
         case SPELLFAMILY_DEATHKNIGHT:
+            if (!caster)
+                break;
+
             switch (GetId())
             {
-                case 49016: // Hysteria
+                // Hysteria
+                case 49016:
+                {
                     uint32 damage = uint32(target->CountPctFromMaxHealth(1));
                     target->DealDamage(target, damage, NULL, NODAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    break;
+                }
+                // Blood of the North
+                // Reaping
+                // Blood Rites
+                case 50034:
+                case 54637:
+                case 56835:
+                    if (target->GetTypeId() != TYPEID_PLAYER)
+                        break;
+                    if (target->ToPlayer()->getClass() != CLASS_DEATH_KNIGHT)
+                        break;
+
+                    // timer expired - remove death runes
+                    target->ToPlayer()->RemoveRunesBySpell(GetId());
                     break;
             }
             // Death and Decay
             if (GetSpellInfo()->SpellFamilyFlags[0] & 0x20)
-            {
-                if (caster)
-                    caster->CastCustomSpell(target, 52212, &m_amount, NULL, NULL, true, 0, this);
-                break;
-            }
-            // Blood of the North
-            // Reaping
-            // Blood Rites
-            if (GetId() == 54637 || GetId() == 56835 || GetId() == 50034)
-            {
-                if (target->GetTypeId() != TYPEID_PLAYER)
-                    return;
-                if (target->ToPlayer()->getClass() != CLASS_DEATH_KNIGHT)
-                    return;
-
-                 // timer expired - remove death runes
-                target->ToPlayer()->RemoveRunesBySpell(GetId());
-            }
+                caster->CastCustomSpell(target, 52212, &m_amount, NULL, NULL, true, 0, this);
+            break;
         case SPELLFAMILY_PALADIN:
             // Holy Radiance
             if (GetId() == 82327)
@@ -6167,6 +6188,18 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                     break;
                 }
             }
+            break;
+        case SPELLFAMILY_PRIEST:
+            switch (GetId())
+            {
+                // Holy Word: Sanctuary
+                case 88685:
+                    caster->CastSpell(target, 88686, true);
+                    break;
+                default:
+                    break;
+            }
+            break;
         default:
             break;
     }

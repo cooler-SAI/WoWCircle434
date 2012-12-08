@@ -365,6 +365,11 @@ bool SpellEffectInfo::IsAura() const
     return (IsUnitOwnedAuraEffect() || Effect == SPELL_EFFECT_PERSISTENT_AREA_AURA) && ApplyAuraName != 0;
 }
 
+bool SpellEffectInfo::IsPersistenAura() const
+{
+    return Effect == SPELL_EFFECT_PERSISTENT_AREA_AURA && ApplyAuraName != 0;
+}
+
 bool SpellEffectInfo::IsAura(AuraType aura) const
 {
     return IsAura() && AuraType(ApplyAuraName) == uint32(aura);
@@ -958,6 +963,14 @@ bool SpellInfo::HasAreaAuraEffect() const
     return false;
 }
 
+bool SpellInfo::HasPersistenAura() const
+{
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        if (Effects[i].IsPersistenAura())
+            return true;
+    return false;
+}
+
 bool SpellInfo::IsExplicitDiscovery() const
 {
     return ((Effects[0].Effect == SPELL_EFFECT_CREATE_RANDOM_ITEM
@@ -1334,6 +1347,7 @@ bool SpellInfo::IsAuraExclusiveBySpecificWith(SpellInfo const* spellInfo) const
         case SPELL_SPECIFIC_MAGE_ARCANE_BRILLANCE:
         case SPELL_SPECIFIC_PRIEST_DIVINE_SPIRIT:
         case SPELL_SPECIFIC_PRIEST_SANCTUM:
+        case SPELL_SPECIFIC_CHAKRA:
             return spellSpec1 == spellSpec2;
         case SPELL_SPECIFIC_FOOD:
             return spellSpec2 == SPELL_SPECIFIC_FOOD
@@ -1998,6 +2012,10 @@ SpellSpecificType SpellInfo::GetSpellSpecific() const
             // Priest (Inner Will | Inner Fire)
             if (Id == 588 || Id == 73413)
                 return SPELL_SPECIFIC_PRIEST_SANCTUM;
+
+            // Priest chakras
+            if (HasAttribute(SPELL_ATTR9_AFFECTED_BY_SPELLSWAP) || Id == 81209)
+                return SPELL_SPECIFIC_CHAKRA;
 
             break;
         }

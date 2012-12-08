@@ -624,7 +624,7 @@ enum SpellAttr9
     SPELL_ATTR9_UNK19                            = 0x00080000, // 19
     SPELL_ATTR9_UNK20                            = 0x00100000, // 20
     SPELL_ATTR9_UNK21                            = 0x00200000, // 21
-    SPELL_ATTR9_UNK22                            = 0x00400000, // 22
+    SPELL_ATTR9_AFFECTED_BY_SPELLSWAP            = 0x00400000, // 22 Can be swapped by 332 or 333 auras
     SPELL_ATTR9_UNK23                            = 0x00800000, // 23
     SPELL_ATTR9_UNK24                            = 0x01000000, // 24
     SPELL_ATTR9_UNK25                            = 0x02000000, // 25

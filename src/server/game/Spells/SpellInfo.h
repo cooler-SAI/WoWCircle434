@@ -169,7 +169,8 @@ enum SpellSpecificType
     SPELL_SPECIFIC_PRIEST_DIVINE_SPIRIT          = 27,
     SPELL_SPECIFIC_HAND                          = 28,
     SPELL_SPECIFIC_PHASE                         = 29,
-    SPELL_SPECIFIC_BANE                          = 30
+    SPELL_SPECIFIC_BANE                          = 30,
+    SPELL_SPECIFIC_CHAKRA                        = 31
 };
 
 enum SpellCustomAttributes
@@ -264,6 +265,7 @@ public:
     bool IsEffect() const;
     bool IsEffect(SpellEffects effectName) const;
     bool IsAura() const;
+    bool IsPersistenAura() const;
     bool IsAura(AuraType aura) const;
     bool IsTargetingArea() const;
     bool IsAreaAuraEffect() const;
@@ -424,6 +426,8 @@ public:
     bool HasEffect(SpellEffects effect) const;
     bool HasAura(AuraType aura) const;
     bool HasAreaAuraEffect() const;
+
+    bool HasPersistenAura() const;
 
     bool IsExplicitDiscovery() const;
     bool IsLootCrafting() const;
