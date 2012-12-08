@@ -423,11 +423,15 @@ public:
     SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effects);
     ~SpellInfo();
 
+    void LoadSpellTargetMask();
+
     bool HasEffect(SpellEffects effect) const;
     bool HasAura(AuraType aura) const;
     bool HasAreaAuraEffect() const;
 
     bool HasPersistenAura() const;
+
+    int32 GetUniqueChargeInfo(Unit* caster = NULL) const;
 
     bool IsExplicitDiscovery() const;
     bool IsLootCrafting() const;

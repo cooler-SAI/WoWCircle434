@@ -7805,6 +7805,23 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             break;
     }
 
+    // Vengeance tank mastery
+    if (dummySpell->SpellIconID == 3031 && victim->GetTypeId() != TYPEID_PLAYER)
+    {
+        triggered_spell_id = 76691;
+        int32 cap = (GetCreateHealth() + GetStat(STAT_STAMINA) * 14) / 10;
+        basepoints0 =  int32(damage*triggerAmount/100);
+
+        // There's aura modify amount
+        if (AuraEffect* vengeance = GetAuraEffect(triggered_spell_id, 0, GetGUID()))
+            basepoints0 += vengeance->GetAmount();
+
+        basepoints0 = std::min(cap, basepoints0);
+        int32 basepoints1 = basepoints0/5;
+        CastCustomSpell(this, triggered_spell_id, &basepoints0, &basepoints0, &basepoints1, true, castItem,triggeredByAura, originalCaster );
+        return true;
+    }
+
     // if not handled by custom case, get triggered spell from dummySpell proto
     if (!triggered_spell_id)
         triggered_spell_id = dummySpell->Effects[triggeredByAura->GetEffIndex()].TriggerSpell;
@@ -8859,6 +8876,16 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             float weaponSpeed = float(weapon->Delay) / 1000.0f;
             basepoints0 += int32((weaponDPS + attackPower) * weaponSpeed)/6;
             trigger_spell_id = 12721;
+            break;
+        }
+        // Efflorescence
+        case 34151:
+        case 81274:
+        case 81275:
+        {
+            basepoints0 = damage * triggerAmount / 100 / 8;
+            target = victim;
+            trigger_spell_id = 81262;
             break;
         }
         // Persistent Shield (Scarab Brooch trinket)

@@ -33,6 +33,14 @@ struct mod_pair
     AuraEffect* second_mod;
 };
 
+struct chargeStore
+{
+    int32 amount;
+    int32 duration;
+};
+
+typedef std::map<uint8, chargeStore> ChargeStoreMap;
+
 class AuraEffect
 {
     friend void Aura::_InitEffects(uint8 effMask, Unit* caster, int32 *baseAmount);
@@ -99,6 +107,7 @@ class AuraEffect
 
         void SendTickImmune(Unit* target, Unit* caster) const;
         void PeriodicTick(AuraApplication * aurApp, Unit* caster) const;
+        void UpdateChargeTick();
 
         void HandleProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
 
@@ -117,12 +126,21 @@ class AuraEffect
         SpellModifier* m_spellmod;
 
         int32 m_periodicTimer;
+        int32 m_chargePeriodicTimer;
         int32 m_amplitude;
         uint32 m_tickNumber;
+
+        bool m_haveStacks;
 
         // aura stack helpers
         void DoUniqueStackAura(AuraApplication const * aurApp, uint8 mode, bool apply) const;
         mod_pair GetUniqueVisibleAuraBuff(Unit* target, int8 x) const;
+
+        bool HaveChargeStore(uint8 chargeId) const
+        {
+            ChargeStoreMap::const_iterator itr = _chargeStoreMap.find(chargeId);
+            return itr != _chargeStoreMap.end();
+        }
 
         uint8 const m_effIndex;
         bool m_canBeRecalculated;
@@ -156,6 +174,7 @@ class AuraEffect
 
     private:
         bool IsPeriodicTickCrit(Unit* target, Unit const* caster) const;
+        ChargeStoreMap _chargeStoreMap;
 
     public:
         // aura effect apply/remove handlers

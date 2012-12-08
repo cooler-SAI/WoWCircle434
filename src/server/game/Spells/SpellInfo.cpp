@@ -143,6 +143,7 @@ uint32 SpellImplicitTargetInfo::GetExplicitTargetMask(bool& srcSet, bool& dstSet
                     break;
                 targetMask = TARGET_FLAG_DEST_LOCATION;
                 break;
+            case TARGET_REFERENCE_TYPE_CASTER:
             case TARGET_REFERENCE_TYPE_TARGET:
                 switch (GetObjectType())
                 {
@@ -930,13 +931,17 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effe
     for (uint8 i = 0; i < 2; ++i)
         Totem[i] = _totem ? _totem->Totem[i] : 0;
 
-    ExplicitTargetMask = _GetExplicitTargetMask();
     ChainEntry = NULL;
 }
 
 SpellInfo::~SpellInfo()
 {
     _UnloadImplicitTargetConditionLists();
+}
+
+void SpellInfo::LoadSpellTargetMask()
+{
+    ExplicitTargetMask = _GetExplicitTargetMask();
 }
 
 bool SpellInfo::HasEffect(SpellEffects effect) const
@@ -2895,6 +2900,20 @@ bool SpellInfo::IsCanBeStolen() const
     return true;
 }
 
+int32 SpellInfo::GetUniqueChargeInfo(Unit* caster /* = NULL */) const
+{
+    switch (Id)
+    {
+        case 12654: // Ignite
+        case 77489: // Echo of Light
+            return GetDuration();
+        default:
+            break;
+    }
+
+    return 0;
+}
+
 bool SpellInfo::IsRequireAdditionalTargetCheck() const
 {
     switch (Id)
@@ -2924,8 +2943,6 @@ bool SpellInfo::IsShouldProcOnOwner() const
 
     return false;
 }
-
-
 
 bool SpellInfo::IsBreakingStealth(Unit* m_caster) const
 {

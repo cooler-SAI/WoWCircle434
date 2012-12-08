@@ -433,8 +433,8 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32 *baseAmount, Unit* caster):
 m_base(base), m_spellInfo(base->GetSpellInfo()),
 m_baseAmount(baseAmount ? *baseAmount : m_spellInfo->Effects[effIndex].BasePoints),
-m_spellmod(NULL), m_periodicTimer(0), m_tickNumber(0), m_effIndex(effIndex),
-m_canBeRecalculated(true), m_isPeriodic(false)
+m_spellmod(NULL), m_periodicTimer(0), m_tickNumber(0), m_chargePeriodicTimer(0),
+m_effIndex(effIndex), m_canBeRecalculated(true), m_isPeriodic(false), m_haveStacks(false)
 {
     m_fixed_periodic.Clear();
 
@@ -448,6 +448,7 @@ m_canBeRecalculated(true), m_isPeriodic(false)
 AuraEffect::~AuraEffect()
 {
     delete m_spellmod;
+    _chargeStoreMap.clear();
 }
 
 void AuraEffect::GetTargetList(std::list<Unit*> & targetList) const
@@ -874,6 +875,20 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             m_fixed_periodic.SetFixedDamage(temp_damage);
             m_fixed_periodic.SetCriticalChance(temp_crit);
         }
+
+        // Some spells have unique duration for charges
+        if (GetBase()->GetStackAmount() > 1)
+        {
+            if (int32 duration = GetSpellInfo()->GetUniqueChargeInfo(GetCaster()))
+            {
+                chargeStore _chargeStore;
+                _chargeStore.amount = m_fixed_periodic.HasDamage() ? m_fixed_periodic.HasDamage() : GetAmount();
+                _chargeStore.duration = duration;
+                _chargeStoreMap[GetBase()->GetStackAmount()] = _chargeStore;
+
+                m_haveStacks = true;
+            }
+        }
     }
 
     return amount;
@@ -965,6 +980,11 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool resetPeriodicTimer /*= tru
                 }
         }
     }
+
+    if (GetSpellInfo()->GetUniqueChargeInfo())
+        m_chargePeriodicTimer = 500;
+    else
+        m_chargePeriodicTimer = 0;
 }
 
 void AuraEffect::CalculateSpellMod()
@@ -1204,6 +1224,14 @@ void AuraEffect::Update(uint32 diff, Unit* caster)
 {
     if (m_isPeriodic && (GetBase()->GetDuration() >=0 || GetBase()->IsPassive() || GetBase()->IsPermanent()))
     {
+        if (m_haveStacks)
+        {
+            if (m_chargePeriodicTimer > int32(diff))
+                m_chargePeriodicTimer -= diff;
+            else
+                UpdateChargeTick();
+        }
+
         if (m_periodicTimer > int32(diff))
             m_periodicTimer -= diff;
         else // tick also at m_periodicTimer == 0 to prevent lost last tick in case max m_duration == (max m_periodicTimer)*N
@@ -1316,6 +1344,27 @@ void AuraEffect::UpdatePeriodic(Unit* caster)
                         case 59911: // Tenacity (vehicle)
                            GetBase()->RefreshDuration();
                            break;
+                        case 76691: // Vengeance tank mastery - loss ap
+                            if (AuraEffect * aurEff = GetBase()->GetEffect(2))
+                            {
+                                if (GetCaster()->ToPlayer())
+                                {
+                                    switch (GetCaster()->ToPlayer()->GetActiveTalentTree())
+                                    {
+                                        case TALENT_TREE_WARRIOR_PROTECTION:
+                                        case TALENT_TREE_DEATH_KNIGHT_BLOOD:
+                                        case TALENT_TREE_DRUID_FERAL_COMBAT:
+                                        case TALENT_TREE_PALADIN_PROTECTION:
+                                            if (GetBase()->GetEffect(1)->GetAmount() >= 10)
+                                                aurEff->ChangeAmount(GetBase()->GetEffect(1)->GetAmount()/10);
+                                            break;
+                                        default:
+                                            GetCaster()->RemoveAurasDueToSpell(GetId());
+                                            break;
+                                    }
+                                }
+                                break;
+                            }
                         case 66823: case 67618: case 67619: case 67620: // Paralytic Toxin
                             // Get 0 effect aura
                             if (AuraEffect* slow = GetBase()->GetEffect(0))
@@ -1432,6 +1481,29 @@ void AuraEffect::PeriodicTick(AuraApplication * aurApp, Unit* caster) const
         default:
             break;
     }
+}
+
+void AuraEffect::UpdateChargeTick()
+{
+    if (GetBase()->IsRemoved() || GetBase()->IsExpired())
+        return;
+
+    for (ChargeStoreMap::iterator itr = _chargeStoreMap.begin(); itr != _chargeStoreMap.end(); ++itr)
+    {
+        itr->second.duration -= 500;
+        if (itr->second.duration <= 0)
+        {
+            GetBase()->ModStackAmount(-1);
+            if (GetBase() && !GetBase()->IsRemoved() && !GetBase()->IsExpired())
+            {
+                itr = _chargeStoreMap.erase(++itr);
+                break;
+            }
+            else
+                ++itr;
+        }
+    }
+    m_chargePeriodicTimer = 500;
 }
 
 void AuraEffect::HandleProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
@@ -2106,6 +2178,10 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
             case FORM_FLIGHT:
             case FORM_MOONKIN:
             {
+                // remove vengeance tank mastery for all form except bear
+                if (form != FORM_BEAR)
+                    target->RemoveAurasDueToSpell(76691);
+
                 // remove movement affects
                 target->RemoveMovementImpairingAuras();
 
@@ -5957,6 +6033,18 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
         case SPELLFAMILY_GENERIC:
             switch (GetId())
             {
+                case 76691: // Vengeance tank mastery
+                {
+                    int32 basepoints0 = GetBase()->GetEffect(0)->GetAmount() - GetAmount();
+                    if (basepoints0 < 0)
+                    {
+                        caster->RemoveAura(GetBase());
+                        return;
+                    }
+                    int32 basepoints1 = GetAmount();
+                    caster->CastCustomSpell(caster, 76691, &basepoints0, &basepoints0, &basepoints1, true);
+                    break;
+                }
                 case 41955: // No Man's Land
                 {
                     if (Player * plr = target->ToPlayer())
