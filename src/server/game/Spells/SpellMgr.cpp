@@ -4869,6 +4869,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 65139:
                 spellInfo->Effects[1].Effect = 0;
                 spellInfo->Effects[1].ApplyAuraName = 0;
+            // Blood in the Water rank 2
+            case 80319:
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL;
+                break;
             default:
                 break;
         }

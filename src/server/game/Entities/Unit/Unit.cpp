@@ -8706,6 +8706,12 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Blood in the Water
+        case 80318:
+        case 80319:
+            if (victim->GetHealthPct() > triggerAmount)
+                return false;
+            break;
         // Crimson Scourge
         case 81141:
             if (victim && victim->HasAura(55078, this->GetGUID()))
