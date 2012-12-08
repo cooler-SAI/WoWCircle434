@@ -1326,7 +1326,12 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
             case SPELLFAMILY_DRUID:
                 if (m_spellInfo->SpellFamilyFlags[1] == 0x04000000) // Wild Growth
                 {
-                    maxSize = m_caster->HasAura(62970) ? 6 : 5; // Glyph of Wild Growth
+                    maxSize = 5;
+                    if (m_caster->HasAura(62970)) // Glyph of Wild Growth
+                        maxSize++;
+                    if (m_caster->HasAura(33891)) // Tree of Life
+                        maxSize += 2;
+
                     power = POWER_HEALTH;
 
                     // Remove targets outside caster's raid

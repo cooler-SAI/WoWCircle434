@@ -4869,9 +4869,23 @@ void SpellMgr::LoadDbcDataCorrections()
             case 65139:
                 spellInfo->Effects[1].Effect = 0;
                 spellInfo->Effects[1].ApplyAuraName = 0;
+                break;
             // Blood in the Water rank 2
             case 80319:
                 spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL;
+                break;
+            // Solar Beam
+            case 78675:
+                spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
+                spellInfo->Effects[1].Amplitude = 500;
+                spellInfo->Effects[1].SetRadiusIndex(8);
+                spellInfo->Effects[2].ApplyAuraName = 0;
+                spellInfo->Effects[2].Effect = 0;
+                break;
+            // Wild Growth
+            case 48438:
+                spellInfo->Effects[0].SetRadiusIndex(10);
+                spellInfo->Effects[1].SetRadiusIndex(10);
                 break;
             default:
                 break;

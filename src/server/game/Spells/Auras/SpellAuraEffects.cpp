@@ -6009,6 +6009,12 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
         {
             switch (GetSpellInfo()->Id)
             {
+                // Solar beam
+                case 78675:
+                {
+                    caster->CastSpell(target, 81261, true);
+                    break;
+                }
                 // Efflorescence
                 case 81262:
                 {
