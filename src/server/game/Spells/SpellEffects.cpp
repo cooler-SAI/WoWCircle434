@@ -579,12 +579,25 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             case SPELLFAMILY_DRUID:
             {
                 // Ferocious Bite
-                if (m_caster->GetTypeId() == TYPEID_PLAYER && (m_spellInfo->SpellFamilyFlags[0] & 0x000800000) && m_spellInfo->SpellVisual[0] == 6587)
+                if (m_spellInfo->Id == 22568)
                 {
-                    // converts each extra point of energy ( up to 25 energy ) into additional damage
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                        break;
+
+                    float ap = 0.109f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                    uint8 cp = m_caster->ToPlayer()->GetComboPoints();
+
+                    damage += ap * cp;
+
                     int32 energy = -(m_caster->ModifyPower(POWER_ENERGY, -25));
-                    // 25 energy = 100% more damage
-                    AddPct(damage, energy * 4);
+                    damage *= 1.0f + (energy / 25.0f);
+
+                    // Glyph of Ferocious Bite
+                    if (m_caster->HasAura(67598))
+                    {
+                        int32 heal = CalculatePct(m_caster->GetMaxHealth(), 0.1f * (25 + energy));
+                        m_caster->CastCustomSpell(m_caster, 101024, &heal, 0, 0, true);
+                    }
                 }
                 // Starsurge
                 else if (m_spellInfo->Id == 78764)
