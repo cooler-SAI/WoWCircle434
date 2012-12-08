@@ -4838,6 +4838,10 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_ADD_PCT_MODIFIER;
                 spellInfo->Effects[0].MiscValue = SPELLMOD_DOT;
                 break;
+            // Tree of Life
+            case 65139:
+                spellInfo->Effects[1].Effect = 0;
+                spellInfo->Effects[1].ApplyAuraName = 0;
             default:
                 break;
         }

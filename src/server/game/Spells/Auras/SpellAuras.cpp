@@ -1758,6 +1758,23 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
         case SPELLFAMILY_DRUID:
             switch (GetSpellInfo()->Id)
             {
+                // Tree of Life
+                case 33891:
+                {
+                    if (apply)
+                    {
+                        caster->CastSpell(caster, 5420, true);
+                        caster->CastSpell(caster, 81097, true);
+                        caster->CastSpell(caster, 81098, true);
+                    }
+                    else
+                    {
+                        caster->RemoveAurasDueToSpell(5420);
+                        caster->RemoveAurasDueToSpell(81097);
+                        caster->RemoveAurasDueToSpell(81098);
+                    }
+                    break;
+                }
                 // Enrage
                 case 5229:
                 {
