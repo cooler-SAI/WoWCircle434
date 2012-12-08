@@ -1279,24 +1279,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_DRUID:
                 if (!caster)
                     break;
-                // Rejuvenation
-                if (GetId() == 774)
-                {
-                    // Druid T8 Restoration 4P Bonus
-                    if (caster->HasAura(64760))
-                    {
-                        int32 heal = GetEffect(EFFECT_0)->GetAmount();
-                        caster->CastCustomSpell(target, 64801, &heal, NULL, NULL, true, NULL, GetEffect(EFFECT_0));
-                    }
-
-                    // Gift of the Earthmother
-                    if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 3186, 1))
-                    {
-                        int32 bp0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * caster->SpellHealingBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), DOT) / 100; 
-                        caster->CastCustomSpell(target, 64801, &bp0, 0, 0, true);
-                    }
-
-                }
                 // Frenzied Regeneration
                 else if (GetId() == 22842)
                 {
@@ -1758,6 +1740,45 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
         case SPELLFAMILY_DRUID:
             switch (GetSpellInfo()->Id)
             {
+                // Rejuvenation
+                case 774:
+                {
+                    if (!caster)
+                        break;
+                    
+                    if (apply)
+                    {
+                        // Druid T8 Restoration 4P Bonus
+                        if (caster->HasAura(64760))
+                        {
+                            int32 heal = GetEffect(EFFECT_0)->GetAmount();
+                            caster->CastCustomSpell(target, 64801, &heal, NULL, NULL, true, NULL, GetEffect(EFFECT_0));
+                        }
+
+                        // Gift of the Earthmother
+                        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 3186, 1))
+                        {
+                            int32 bp0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * caster->SpellHealingBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), DOT) / 100; 
+                            caster->CastCustomSpell(target, 64801, &bp0, 0, 0, true);
+                        }
+                    }
+
+                    // Nature's Bounty
+                    if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 197, 0))
+                    {
+                        UnitList targets;
+                        Trinity::AnyUnitHavingBuffInObjectRangeCheck u_check(caster, caster, 80, 774, true);
+                        Trinity::UnitListSearcher<Trinity::AnyUnitHavingBuffInObjectRangeCheck> searcher(caster, targets, u_check);
+                        caster->VisitNearbyObject(80, searcher);
+                        if (targets.size() > 2)
+                        {
+                            int32 bp0 = -(aurEff->GetAmount() / 2);
+                            caster->CastCustomSpell(caster, 96206, &bp0, 0, 0, true);
+                        }
+                        else
+                            caster->RemoveAurasDueToSpell(96206);
+                    }
+                }
                 // Tree of Life
                 case 33891:
                 {
