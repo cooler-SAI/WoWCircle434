@@ -747,13 +747,31 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
         case SPELL_AURA_PERIODIC_HEAL:
             if (!caster)
                 break;
-            // Lightwell Renew
-            if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_PRIEST && m_spellInfo->SpellFamilyFlags[2] & 0x4000)
+            
+            switch (GetSpellInfo()->Id)
             {
-                if (caster->GetTypeId() == TYPEID_PLAYER)
-                // Bonus from Glyph of Lightwell
-                if (AuraEffect* modHealing = caster->GetAuraEffect(55673, 0))
-                    AddPct(amount, modHealing->GetAmount());
+                // Lightwell Renew
+                case 7001:
+                {
+                    if (caster->GetTypeId() == TYPEID_PLAYER)
+                    // Bonus from Glyph of Lightwell
+                    if (AuraEffect* modHealing = caster->GetAuraEffect(55673, 0))
+                        AddPct(amount, modHealing->GetAmount());
+                    break;
+                }
+                // Recuperate
+                case 73651:
+                {
+                    int32 heal_pct = amount * 1000;
+
+                    // Improved Recuperate
+                    if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_ROGUE, 4819, 0))
+                        heal_pct += aurEff->GetAmount();
+                    
+                    amount = CalculatePct(caster->GetMaxHealth(), 0.001 * heal_pct);
+
+                    break;
+                }
             }
             break;
         case SPELL_AURA_MOD_THREAT:
@@ -5572,6 +5590,32 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
         {
             //if (!(mode & AURA_EFFECT_HANDLE_REAL))
             //    break;
+            break;
+        }
+        case SPELLFAMILY_ROGUE:
+        {
+            if (!(mode & AURA_EFFECT_HANDLE_REAL))
+                break;
+
+            switch (GetId())
+            {
+                // Smoke Bomb
+                case 76577:
+                {
+                    if (apply)
+                    {
+                        if (Aura* aur = caster->AddAura(88611, target))
+                        {
+                            aur->SetMaxDuration(GetBase()->GetDuration());
+                            aur->SetDuration(GetBase()->GetDuration());
+                        }
+                    }
+                    else
+                        target->RemoveAura(88611);
+                    break;
+                }
+            }
+
             break;
         }
     }

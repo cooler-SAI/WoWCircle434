@@ -4888,6 +4888,21 @@ void SpellMgr::LoadDbcDataCorrections()
             case 81269:
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ALLY;
                 break;
+            // Relentless Strikes
+            case 14179:
+            case 58422:
+            case 58423:
+                spellInfo->Effects[0].SpellClassMask[1] |= 0x00000008;
+                break;
+            // Relentless Strikes effect
+            case 14181:
+                spellInfo->Effects[0].Effect = SPELL_EFFECT_ENERGIZE;
+                spellInfo->Effects[0].MiscValue = 3;
+                break;
+            // Smoke Bomb
+            case 76577:
+                spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_DUMMY;
+                break;
             default:
                 break;
         }
