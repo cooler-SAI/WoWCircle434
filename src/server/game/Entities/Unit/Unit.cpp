@@ -10686,7 +10686,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
             break;
         case SPELLFAMILY_HUNTER:
             // Serpent Sting Damage
-            if (spellProto->SpellFamilyFlags[0] & 0x4000)
+            if (spellProto->SpellFamilyFlags[0] & 0x4000 && damagetype == DOT)
             {
                 AlreadyCalculated = true;
                 switch (spellProto->Id)

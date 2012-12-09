@@ -1436,6 +1436,17 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
 
                 switch(GetId())
                 {
+                    case 1978:  // Improved Serpent Sting
+                    {
+                        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_HUNTER, 536, EFFECT_0))
+                        {
+                            // haste doesn't affect serpent sting so we can use static value for ticks
+                            int32 basepoints0 = caster->SpellDamageBonusDone(target, GetSpellInfo(), this->GetEffect(0)->GetAmount(), DOT);
+                            basepoints0 *= 5 * aurEff->GetAmount() / 100.0f;
+                            caster->CastCustomSpell(target, 83077, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
+                        }
+                        break;
+                    }
                     case 82925: // Master Marksman
                     {
                         if (target->GetTypeId() == TYPEID_PLAYER && GetStackAmount() == 5)
