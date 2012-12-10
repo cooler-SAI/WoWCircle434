@@ -189,7 +189,7 @@ class spell_warl_create_healthstone : public SpellScriptLoader
                 return true;
             }
 
-            void HandleScriptEffect(SpellEffIndex effIndex)
+            void HandleScriptEffect(SpellEffIndex /*effIndex*/)
             {
                 if (Unit* unitTarget = GetHitUnit())
                     unitTarget->CastSpell(unitTarget, WARLOCK_HEALTHSTONE_CREATE, false);
@@ -680,7 +680,7 @@ public:
     {
         PrepareSpellScript(spell_warlock_dark_intent_SpellScript)
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
+        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
         {
             Unit* caster = GetCaster();
             Unit* target = GetHitUnit();

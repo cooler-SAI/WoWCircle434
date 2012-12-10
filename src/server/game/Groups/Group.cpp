@@ -388,6 +388,9 @@ bool Group::AddMember(Player* player)
             return false;
     }
 
+    if (!player)
+        return false;
+
     MemberSlot member;
     member.guid      = player->GetGUID();
     member.name      = player->GetName();

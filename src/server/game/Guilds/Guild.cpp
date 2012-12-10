@@ -2148,10 +2148,7 @@ void Guild::SendBankList(WorldSession* session, uint8 tabId, bool withContent, b
             data.WriteBits(m_bankTabs[i]->GetIcon().length(), 9);
             data.WriteBits(m_bankTabs[i]->GetName().length(), 7);
         }
-    }
 
-    if (withTabInfo)
-    {
         for (uint8 i = 0; i < _GetPurchasedTabsSize(); ++i)
         {
             data
@@ -3468,7 +3465,7 @@ void Guild::GuildNewsLog::BuildNewsData(WorldPacket& data)
     data.Initialize(SMSG_GUILD_NEWS_UPDATE, (21 + _newsLog.size() * (26 + 8)) / 8 + (8 + 6 * 4) * _newsLog.size());
     data.WriteBits(_newsLog.size(), 21);
 
-    for (GuildNewsLogMap::const_iterator it = _newsLog.begin(); it != _newsLog.end(); it++)
+    for (GuildNewsLogMap::const_iterator it = _newsLog.begin(); it != _newsLog.end(); ++it)
     {
         data.WriteBits(0, 26); // Not yet implemented used for guild achievements
         ObjectGuid guid = it->second.PlayerGuid;
@@ -3483,7 +3480,7 @@ void Guild::GuildNewsLog::BuildNewsData(WorldPacket& data)
         data.WriteByteMask(guid[2]);
     }
 
-    for (GuildNewsLogMap::const_iterator it = _newsLog.begin(); it != _newsLog.end(); it++)
+    for (GuildNewsLogMap::const_iterator it = _newsLog.begin(); it != _newsLog.end(); ++it)
     {
         ObjectGuid guid = it->second.PlayerGuid;
         data.WriteByteSeq(guid[5]);

@@ -2463,7 +2463,7 @@ void WorldObject::MonsterYellToZone(int32 textId, uint32 language, uint64 Target
 
 void WorldObject::MonsterTextEmote(const char* text, uint64 TargetGuid, bool IsBossEmote)
 {
-    WorldPacket data(SMSG_MESSAGECHAT, 200);
+    WorldPacket data;
     BuildMonsterChat(&data, IsBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, text, LANG_UNIVERSAL, GetName(), TargetGuid);
     SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true);
 }
@@ -2490,7 +2490,7 @@ void WorldObject::MonsterWhisper(const char* text, uint64 receiver, bool IsBossW
 
     LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
 
-    WorldPacket data(SMSG_MESSAGECHAT, 200);
+    WorldPacket data;
     BuildMonsterChat(&data, IsBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, text, LANG_UNIVERSAL, GetNameForLocaleIdx(loc_idx), receiver);
 
     player->GetSession()->SendPacket(&data);
@@ -2505,29 +2505,38 @@ void WorldObject::MonsterWhisper(int32 textId, uint64 receiver, bool IsBossWhisp
     LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
     char const* text = sObjectMgr->GetTrinityString(textId, loc_idx);
 
-    WorldPacket data(SMSG_MESSAGECHAT, 200);
+    WorldPacket data;
     BuildMonsterChat(&data, IsBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, text, LANG_UNIVERSAL, GetNameForLocaleIdx(loc_idx), receiver);
 
     player->GetSession()->SendPacket(&data);
 }
 
+/*Packet size:  21 + nlen + 8 + (isNoPlayerGuid ? 5 : 0) + 4 + len + 1*/
 void WorldObject::BuildMonsterChat(WorldPacket* data, uint8 msgtype, char const* text, uint32 language, char const* name, uint64 targetGuid) const
 {
-    *data << (uint8)msgtype;
-    *data << (uint32)language;
-    *data << (uint64)GetGUID();
-    *data << (uint32)0;                                     // 2.1.0
-    *data << (uint32)(strlen(name)+1);
-    *data << name;
-    *data << (uint64)targetGuid;                            // Unit Target
-    if (targetGuid && !IS_PLAYER_GUID(targetGuid))
+    bool isNoPlayerGuid = targetGuid && !IS_PLAYER_GUID(targetGuid);
+    unsigned int len = (unsigned int)strlen(text)+1;
+    unsigned int nlen = (unsigned int)strlen(name)+1;
     {
-        *data << (uint32)1;                                 // target name length
-        *data << (uint8)0;                                  // target name
+        size_t newSize = size_t(21 + nlen + 8 + (isNoPlayerGuid ? 5 : 0) + 4 + len + 1);
+        data->Initialize(SMSG_MESSAGECHAT, newSize);
     }
-    *data << (uint32)(strlen(text)+1);
+
+    *data << uint8(msgtype);
+    *data << uint32(language);
+    *data << uint64(GetGUID());
+    *data << uint32(0);                                     // 2.1.0
+    *data << nlen;
+    *data << name;
+    *data << uint64(targetGuid);                            // Unit Target
+    if (isNoPlayerGuid)
+    {
+        *data << uint32(1);                                 // target name length
+        *data << uint8(0);                                  // target name
+    }
+    *data << len;
     *data << text;
-    *data << (uint8)0;                                      // ChatTag
+    *data << uint8(0);                                      // ChatTag
 }
 
 void WorldObject::SendMessageToSet(WorldPacket* data, bool self)

@@ -936,7 +936,11 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
         mask |= (GROUP_UPDATE_FLAG_PET_CUR_POWER | GROUP_UPDATE_FLAG_PET_MAX_POWER);
 
     data->Initialize(SMSG_PARTY_MEMBER_STATS, 80);          // average value
-    data->append(player->GetPackGUID());
+    if (player)
+        data->append(player->GetPackGUID());
+    else
+        *data << uint8(0);
+
     *data << uint32(mask);
 
     if (mask & GROUP_UPDATE_FLAG_STATUS)

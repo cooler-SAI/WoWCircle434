@@ -63,6 +63,7 @@ int VehicleAI::Permissible(const Creature* /*creature*/)
 
 void CombatAI::InitializeAI()
 {
+#pragma error "Replace by array of 8"
     for (uint32 i = 0; i < CREATURE_MAX_SPELLS; ++i)
         if (me->m_spells[i] && sSpellMgr->GetSpellInfo(me->m_spells[i]))
             spells.push_back(me->m_spells[i]);

@@ -36,7 +36,7 @@ void WorldSession::SendBfInvitePlayerToWar(uint64 guid, uint32 zoneId, uint32 pT
 {
     ObjectGuid guidBytes = guid;
 
-    WorldPacket data(SMSG_BATTLEFIELD_MGR_ENTRY_INVITE, 16);
+    WorldPacket data(SMSG_BATTLEFIELD_MGR_ENTRY_INVITE, 17);
 
     data
         .WriteByteMask(guidBytes[5])
@@ -72,7 +72,7 @@ void WorldSession::SendBfInvitePlayerToQueue(uint64 guid)
 {
     ObjectGuid guidBytes = guid;
 
-    WorldPacket data(SMSG_BATTLEFIELD_MGR_QUEUE_INVITE, 5);
+    WorldPacket data(SMSG_BATTLEFIELD_MGR_QUEUE_INVITE, 11);
 
     data
         .WriteBit(true)               // unk

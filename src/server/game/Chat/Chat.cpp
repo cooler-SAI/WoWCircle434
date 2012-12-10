@@ -626,7 +626,25 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
 {
     uint32 messageLength = (message ? strlen(message) : 0) + 1;
 
-    data->Initialize(SMSG_MESSAGECHAT, 100);                // guess size
+    bool extra = (type >= CHAT_MSG_MONSTER_SAY && type <= CHAT_MSG_MONSTER_EMOTE) || type == CHAT_MSG_RAID_BOSS_WHISPER || type == CHAT_MSG_RAID_BOSS_EMOTE || type == CHAT_MSG_BATTLENET;
+    bool isRaidBoss = type == CHAT_MSG_RAID_BOSS_WHISPER || type == CHAT_MSG_RAID_BOSS_EMOTE;
+
+    int size = 0;
+    if (extra)
+        size = 42 + messageLength + (isRaidBoss ? 5 : 0);
+    else
+    {
+        size = 16 + messageLength;
+        if (type == CHAT_MSG_CHANNEL)
+            size += 21;
+        else if (type == uint8(CHAT_MSG_ADDON))
+            size += 13;
+        else
+            size += 8;
+    }
+
+    data->Initialize(SMSG_MESSAGECHAT, 5 + size);
+
     *data << uint8(type);
     if ((type != CHAT_MSG_CHANNEL && type != CHAT_MSG_WHISPER) || language == LANG_ADDON)
         *data << uint32(language);

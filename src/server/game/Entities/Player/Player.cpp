@@ -1316,7 +1316,7 @@ uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
 
     DealDamageMods(this, damage, &absorb);
 
-    WorldPacket data(SMSG_ENVIRONMENTALDAMAGELOG, (21));
+    WorldPacket data(SMSG_ENVIRONMENTALDAMAGELOG, 21);
     data << uint64(GetGUID());
     data << uint8(type != DAMAGE_FALL_TO_VOID ? type : DAMAGE_FALL);
     data << uint32(damage);
@@ -7797,7 +7797,7 @@ void Player::DuelComplete(DuelCompleteType type)
 
     sLog->outDebug(LOG_FILTER_UNITS, "Duel Complete %s %s", GetName(), duel->opponent->GetName());
 
-    WorldPacket data(SMSG_DUEL_COMPLETE, (1));
+    WorldPacket data(SMSG_DUEL_COMPLETE, 1);
     data << (uint8)((type != DUEL_INTERRUPTED) ? 1 : 0);
     GetSession()->SendPacket(&data);
 
@@ -12060,7 +12060,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
                     GetGlobalCooldownMgr().AddGlobalCooldown(spellProto, m_weaponChangeTimer);
 
-                    WorldPacket data(SMSG_SPELL_COOLDOWN, 8+1+4);
+                    WorldPacket data(SMSG_SPELL_COOLDOWN, 8+1+4+4);
                     data << uint64(GetGUID());
                     data << uint8(1);
                     data << uint32(cooldownSpell);
@@ -16388,7 +16388,7 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP, Object* questGiver)
         moneyReward = uint32(quest->GetRewOrReqMoney() + int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY)));
     }
 
-    WorldPacket data(SMSG_QUESTGIVER_QUEST_COMPLETE, (4+4+4+4+4));
+    WorldPacket data(SMSG_QUESTGIVER_QUEST_COMPLETE, (4+4+4+4+4+4+1));
 
     data 
         << uint32(quest->GetBonusTalents())              // bonus talents (not verified for 4.x)
@@ -18516,8 +18516,6 @@ void Player::SendRaidInfo()
 void Player::SendSavedInstances()
 {
     bool hasBeenSaved = false;
-    WorldPacket data;
-
     for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
     {
         for (BoundInstancesMap::iterator itr = m_boundInstances[i].begin(); itr != m_boundInstances[i].end(); ++itr)
@@ -18531,7 +18529,7 @@ void Player::SendSavedInstances()
     }
 
     //Send opcode SMSG_UPDATE_INSTANCE_OWNERSHIP. true or false means, whether you have current raid/heroic instances
-    data.Initialize(SMSG_UPDATE_INSTANCE_OWNERSHIP, 4);
+    WorldPacket data(SMSG_UPDATE_INSTANCE_OWNERSHIP, 4);
     data << uint32(hasBeenSaved);
     GetSession()->SendPacket(&data);
 

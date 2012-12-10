@@ -287,7 +287,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     // TODO: pets should be summoned from real cast instead of just faking it?
     if (summon_spell_id)
     {
-        WorldPacket data(SMSG_SPELL_GO, (8+8+4+4+2));
+        WorldPacket data(SMSG_SPELL_GO, (8+8+1+4+4+4));
         data.append(owner->GetPackGUID());
         data.append(owner->GetPackGUID());
         data << uint8(0);
@@ -1327,11 +1327,10 @@ void Pet::_SaveAuras(SQLTransaction& trans)
 
     for (AuraMap::const_iterator itr = m_ownedAuras.begin(); itr != m_ownedAuras.end(); ++itr)
     {
-        // check if the aura has to be saved
-        if (!itr->second->CanBeSaved() || IsPetAura(itr->second))
-            continue;
-
         Aura* aura = itr->second;
+        // check if the aura has to be saved
+        if (!aura->CanBeSaved() || IsPetAura(aura))
+            continue;
 
         int32 damage[MAX_SPELL_EFFECTS];
         int32 baseDamage[MAX_SPELL_EFFECTS];
@@ -1339,12 +1338,12 @@ void Pet::_SaveAuras(SQLTransaction& trans)
         uint8 recalculateMask = 0;
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
-            if (aura->GetEffect(i))
+            if (AuraEffect* effect = aura->GetEffect(i))
             {
-                baseDamage[i] = aura->GetEffect(i)->GetBaseAmount();
-                damage[i] = aura->GetEffect(i)->GetAmount();
+                baseDamage[i] = effect->GetBaseAmount();
+                damage[i] = effect->GetAmount();
                 effMask |= (1<<i);
-                if (aura->GetEffect(i)->CanBeRecalculated())
+                if (effect->CanBeRecalculated())
                     recalculateMask |= (1<<i);
             }
             else
@@ -1355,26 +1354,26 @@ void Pet::_SaveAuras(SQLTransaction& trans)
         }
 
         // don't save guid of caster in case we are caster of the spell - guid for pet is generated every pet load, so it won't match saved guid anyways
-        uint64 casterGUID = (itr->second->GetCasterGUID() == GetGUID()) ? 0 : itr->second->GetCasterGUID();
+        uint64 casterGUID = (aura->GetCasterGUID() == GetGUID()) ? 0 : aura->GetCasterGUID();
 
         uint8 index = 0;
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<15>(CHAR_INS_PET_AURA);
         stmt->setUInt32(index++, m_charmInfo->GetPetNumber());
         stmt->setUInt64(index++, casterGUID);
-        stmt->setUInt32(index++, itr->second->GetId());
+        stmt->setUInt32(index++, aura->GetId());
         stmt->setUInt8(index++, effMask);
         stmt->setUInt8(index++, recalculateMask);
-        stmt->setUInt8(index++, itr->second->GetStackAmount());
+        stmt->setUInt8(index++, aura->GetStackAmount());
         stmt->setInt32(index++, damage[0]);
         stmt->setInt32(index++, damage[1]);
         stmt->setInt32(index++, damage[2]);
         stmt->setInt32(index++, baseDamage[0]);
         stmt->setInt32(index++, baseDamage[1]);
         stmt->setInt32(index++, baseDamage[2]);
-        stmt->setInt32(index++, itr->second->GetMaxDuration());
-        stmt->setInt32(index++, itr->second->GetDuration());
-        stmt->setUInt8(index++, itr->second->GetCharges());
+        stmt->setInt32(index++, aura->GetMaxDuration());
+        stmt->setInt32(index++, aura->GetDuration());
+        stmt->setUInt8(index++, aura->GetCharges());
 
         trans->Append(stmt);
     }

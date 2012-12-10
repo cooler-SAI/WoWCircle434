@@ -398,7 +398,7 @@ public:
 
         PrepareSpellScript(spell_mage_frostbolt_SpellScript);
 
-        bool Validate(const SpellInfo *spell)
+        bool Validate(const SpellInfo* /*spell*/)
         {
             return true;
         }
@@ -464,7 +464,7 @@ public:
             return GetUnitOwner()->ToPlayer();
         }
 
-        void CalculateAmount(AuraEffect const* /*auraEffect*/, int32& amount, bool& canBeRecalculated)
+        void CalculateAmount(AuraEffect const* /*auraEffect*/, int32& amount, bool& /*canBeRecalculated*/)
         {
             amount = -1;
         }
@@ -521,7 +521,7 @@ public:
     {
         PrepareSpellScript(spell_mage_cone_of_cold_SpellScript);
 
-        void HandleConeOfColdScript(SpellEffIndex effIndex)
+        void HandleConeOfColdScript(SpellEffIndex /*effIndex*/)
         {
             Unit* caster = GetCaster();
             if (Unit* unitTarget = GetHitUnit())
@@ -632,7 +632,7 @@ public:
     {
         PrepareSpellScript(spell_mage_impact_SpellScript);
 
-        void HandleScript(SpellEffIndex effIndex)
+        void HandleScript(SpellEffIndex /*effIndex*/)
         {
             Unit* caster = GetCaster();
             Unit* target = GetExplTargetUnit();

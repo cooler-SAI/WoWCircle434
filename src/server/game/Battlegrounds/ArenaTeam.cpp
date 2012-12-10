@@ -366,7 +366,7 @@ void ArenaTeam::Roster(WorldSession* session)
 
     uint8 unk308 = 0;
 
-    WorldPacket data(SMSG_ARENA_TEAM_ROSTER, 100);
+    WorldPacket data(SMSG_ARENA_TEAM_ROSTER, 13 + int(Members.size()) * (13 + 8 + 1 + 4 + 1 + 1 + 20 + (unk308 ? 8 : 0)));
     data << uint32(GetId());                                // team id
     data << uint8(unk308);                                  // 308 unknown value but affect packet structure
     data << uint32(GetMembersSize());                       // members count

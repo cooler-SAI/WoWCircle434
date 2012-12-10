@@ -684,7 +684,6 @@ void Battleground::PlaySoundToAll(uint32 SoundID)
 
 void Battleground::PlaySoundToTeam(uint32 SoundID, uint32 TeamID)
 {
-    WorldPacket data;
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
         if (Player* player = _GetPlayerForTeam(TeamID, itr, "PlaySoundToTeam"))
@@ -711,7 +710,7 @@ void Battleground::YellToAll(Creature* creature, char const* text, uint32 langua
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
         if (Player* player = _GetPlayer(itr, "YellToAll"))
         {
-            WorldPacket data(SMSG_MESSAGECHAT, 200);
+            WorldPacket data;
             creature->BuildMonsterChat(&data, CHAT_MSG_MONSTER_YELL, text, language, creature->GetName(), itr->first);
             player->GetSession()->SendPacket(&data);
         }
@@ -1225,8 +1224,7 @@ void Battleground::AddPlayer(Player* player)
             SendCountdownTimer();
         }
 
-        WorldPacket teammate;
-        teammate.Initialize(SMSG_ARENA_OPPONENT_UPDATE, 8);
+        WorldPacket teammate(SMSG_ARENA_OPPONENT_UPDATE, 8);
         teammate << uint64(player->GetGUID());
         SendPacketToTeam(team, &teammate, player, false);
     }
@@ -1766,7 +1764,7 @@ void Battleground::SendWarningToAll(int32 entry, ...)
     va_end(ap);
     std::string msg(str);
 
-    WorldPacket data(SMSG_MESSAGECHAT, 200);
+    WorldPacket data(SMSG_MESSAGECHAT, 35 + msg.length() + 1);
 
     data << (uint8)CHAT_MSG_RAID_BOSS_EMOTE;
     data << (uint32)LANG_UNIVERSAL;

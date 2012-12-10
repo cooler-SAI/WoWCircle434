@@ -645,7 +645,8 @@ void AchievementMgr<Guild>::SaveToDB(SQLTransaction& trans)
     std::ostringstream guidstr;
     for (CompletedAchievementMap::const_iterator itr = m_completedAchievements.begin(); itr != m_completedAchievements.end(); ++itr)
     {
-        if (!itr->second.changed)
+        CompletedAchievementData second = itr->second;
+        if (!second.changed)
             continue;
 
         stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_GUILD_ACHIEVEMENT);
@@ -656,8 +657,8 @@ void AchievementMgr<Guild>::SaveToDB(SQLTransaction& trans)
         stmt = CharacterDatabase.GetPreparedStatement<4>(CHAR_INS_GUILD_ACHIEVEMENT);
         stmt->setUInt32(0, GetOwner()->GetId());
         stmt->setUInt16(1, itr->first);
-        stmt->setUInt32(2, itr->second.date);
-        for (std::set<uint64>::const_iterator gItr = itr->second.guids.begin(); gItr != itr->second.guids.end(); ++gItr)
+        stmt->setUInt32(2, second.date);
+        for (std::set<uint64>::const_iterator gItr = second.guids.begin(); gItr != second.guids.end(); ++gItr)
             guidstr << GUID_LOPART(*gItr) << ',';
 
         stmt->setString(3, guidstr.str());
@@ -2294,8 +2295,9 @@ void AchievementMgr<Guild>::SendAchievementInfo(Player* receiver, uint32 achieve
         if (progress == m_criteriaProgress.end())
             continue;
 
-        counter = progress->second.counter;
-        guid = progress->second.CompletedGUID;
+        CriteriaProgress second = progress->second;
+        counter = second.counter;
+        guid = second.CompletedGUID;
 
         criteriaBits.WriteByteMask(counter[4]);
         criteriaBits.WriteByteMask(counter[1]);
@@ -2315,10 +2317,10 @@ void AchievementMgr<Guild>::SendAchievementInfo(Player* receiver, uint32 achieve
         criteriaBits.WriteByteMask(guid[4]);
 
         criteriaData.WriteByteSeq(guid[5]);
-        criteriaData << uint32(progress->second.date);      // unknown date
+        criteriaData << uint32(second.date);      // unknown date
         criteriaData.WriteByteSeq(counter[3]);
         criteriaData.WriteByteSeq(counter[7]);
-        criteriaData << uint32(progress->second.date);      // unknown date
+        criteriaData << uint32(second.date);      // unknown date
         criteriaData.WriteByteSeq(counter[6]);
         criteriaData.WriteByteSeq(guid[4]);
         criteriaData.WriteByteSeq(guid[1]);
@@ -2328,7 +2330,7 @@ void AchievementMgr<Guild>::SendAchievementInfo(Player* receiver, uint32 achieve
         criteriaData.WriteByteSeq(guid[2]);
         criteriaData.WriteByteSeq(counter[1]);
         criteriaData.WriteByteSeq(guid[6]);
-        criteriaData << uint32(progress->second.date);      // last update time (not packed!)
+        criteriaData << uint32(second.date);      // last update time (not packed!)
         criteriaData << uint32(criteriaId);
         criteriaData.WriteByteSeq(counter[5]);
         criteriaData << uint32(0);

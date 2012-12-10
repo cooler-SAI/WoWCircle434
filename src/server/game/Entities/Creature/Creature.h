@@ -521,7 +521,7 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
         bool AIM_Initialize(CreatureAI* ai = NULL);
         void Motion_Initialize();
 
-        bool isCanGiveSpell(Unit* caster)
+        bool isCanGiveSpell(Unit* /*caster*/)
         {
             if (IsPetGuardianStuff())
                 return true;

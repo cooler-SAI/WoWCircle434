@@ -1217,12 +1217,13 @@ void LFGMgr::RemoveProposal(LfgProposalContainer::iterator itProposal, LfgUpdate
     LfgGuidSet toRemove;
     for (LfgProposalPlayerContainer::iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
     {
-        if (it->second.accept == LFG_ANSWER_AGREE)
+        LfgProposalPlayer second = it->second;
+        if (second.accept == LFG_ANSWER_AGREE)
             continue;
 
-        uint64 guid = it->second.group ? it->second.group : it->first;
+        uint64 guid = second.group ? second.group : it->first;
         // Player didn't accept or still pending when no secs left
-        if (it->second.accept == LFG_ANSWER_DENY || type == LFG_UPDATETYPE_PROPOSAL_FAILED)
+        if (second.accept == LFG_ANSWER_DENY || type == LFG_UPDATETYPE_PROPOSAL_FAILED)
         {
             it->second.accept = LFG_ANSWER_DENY;
             toRemove.insert(guid);

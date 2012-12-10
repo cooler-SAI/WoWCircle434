@@ -109,7 +109,7 @@ inline bool PhaseMgr::CheckDefinition(PhaseDefinition const* phaseDefinition)
     return sConditionMgr->IsObjectMeetToConditions(player, sConditionMgr->GetConditionsForPhaseDefinition(phaseDefinition->zoneId, phaseDefinition->entry));
 }
 
-bool PhaseMgr::NeedsPhaseUpdateWithData(PhaseUpdateData const updateData) const
+bool PhaseMgr::NeedsPhaseUpdateWithData(PhaseUpdateData const& updateData) const
 {
     PhaseDefinitionStore::const_iterator itr = _PhaseDefinitionStore->find(player->GetZoneId());
     if (itr != _PhaseDefinitionStore->end())

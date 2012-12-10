@@ -431,17 +431,18 @@ void PetAI::HandleReturnMovement()
 {
     // Handles moving the pet back to stay or owner
 
-    if (me->GetCharmInfo()->HasCommandState(COMMAND_STAY))
+    CharmInfo* charm = me->GetCharmInfo();
+    if (charm->HasCommandState(COMMAND_STAY))
     {
-        if (!me->GetCharmInfo()->IsAtStay() && !me->GetCharmInfo()->IsReturning())
+        if (!charm->IsAtStay() && !charm->IsReturning())
         {
             // Return to previous position where stay was clicked
-            if (!me->GetCharmInfo()->IsCommandAttack())
+            if (!charm->IsCommandAttack())
             {
                 float x, y, z;
 
-                me->GetCharmInfo()->GetStayPosition(x, y, z);
-                me->GetCharmInfo()->SetIsReturning(true);
+                charm->GetStayPosition(x, y, z);
+                charm->SetIsReturning(true);
                 me->GetMotionMaster()->Clear();
                 me->GetMotionMaster()->MovePoint(me->GetGUIDLow(), x, y, z);
             }
@@ -449,11 +450,11 @@ void PetAI::HandleReturnMovement()
     }
     else // COMMAND_FOLLOW
     {
-        if (!me->GetCharmInfo()->IsFollowing() && !me->GetCharmInfo()->IsReturning())
+        if (!charm->IsFollowing() && !charm->IsReturning())
         {
-            if (!me->GetCharmInfo()->IsCommandAttack())
+            if (!charm->IsCommandAttack())
             {
-                me->GetCharmInfo()->SetIsReturning(true);
+                charm->SetIsReturning(true);
                 me->GetMotionMaster()->Clear();
                 me->GetMotionMaster()->MoveFollow(me->GetCharmerOrOwner(), PET_FOLLOW_DIST, me->GetFollowAngle());
             }
@@ -472,28 +473,31 @@ void PetAI::DoAttack(Unit* target, bool chase)
     // (Follow && (Aggressive || Defensive))
     // ((Stay || Follow) && (Passive && player clicked attack))
 
+    CharmInfo* charm = me->GetCharmInfo();
     if (chase)
     {
         if (me->Attack(target, true))
         {
-            me->GetCharmInfo()->SetIsAtStay(false);
-            me->GetCharmInfo()->SetIsFollowing(false);
-            me->GetCharmInfo()->SetIsReturning(false);
+            charm->SetIsAtStay(false);
+            charm->SetIsFollowing(false);
+            charm->SetIsReturning(false);
             me->GetMotionMaster()->Clear();
             me->GetMotionMaster()->MoveChase(target);
         }
     }
     else // (Stay && ((Aggressive || Defensive) && In Melee Range)))
     {
-        me->GetCharmInfo()->SetIsAtStay(true);
-        me->GetCharmInfo()->SetIsFollowing(false);
-        me->GetCharmInfo()->SetIsReturning(false);
+        charm->SetIsAtStay(true);
+        charm->SetIsFollowing(false);
+        charm->SetIsReturning(false);
         me->Attack(target, true);
     }
 }
 
 void PetAI::MovementInform(uint32 moveType, uint32 data)
 {
+    CharmInfo* charm = me->GetCharmInfo();
+
     // Receives notification when pet reaches stay or follow owner
     switch (moveType)
     {
@@ -501,12 +505,12 @@ void PetAI::MovementInform(uint32 moveType, uint32 data)
         {
             // Pet is returning to where stay was clicked. data should be
             // pet's GUIDLow since we set that as the waypoint ID
-            if (data == me->GetGUIDLow() && me->GetCharmInfo()->IsReturning())
+            if (data == me->GetGUIDLow() && charm->IsReturning())
             {
-                me->GetCharmInfo()->SetIsAtStay(true);
-                me->GetCharmInfo()->SetIsReturning(false);
-                me->GetCharmInfo()->SetIsFollowing(false);
-                me->GetCharmInfo()->SetIsCommandAttack(false);
+                charm->SetIsAtStay(true);
+                charm->SetIsReturning(false);
+                charm->SetIsFollowing(false);
+                charm->SetIsCommandAttack(false);
                 me->GetMotionMaster()->Clear();
                 me->GetMotionMaster()->MoveIdle();
             }
@@ -516,12 +520,12 @@ void PetAI::MovementInform(uint32 moveType, uint32 data)
         {
             // If data is owner's GUIDLow then we've reached follow point,
             // otherwise we're probably chasing a creature
-            if (me->GetCharmerOrOwner() && me->GetCharmInfo() && data == me->GetCharmerOrOwner()->GetGUIDLow() && me->GetCharmInfo()->IsReturning())
+            if (me->GetCharmerOrOwner() && charm && data == me->GetCharmerOrOwner()->GetGUIDLow() && charm->IsReturning())
             {
-                me->GetCharmInfo()->SetIsAtStay(false);
-                me->GetCharmInfo()->SetIsReturning(false);
-                me->GetCharmInfo()->SetIsFollowing(true);
-                me->GetCharmInfo()->SetIsCommandAttack(false);
+                charm->SetIsAtStay(false);
+                charm->SetIsReturning(false);
+                charm->SetIsFollowing(true);
+                charm->SetIsCommandAttack(false);
             }
             break;
         }
@@ -539,27 +543,28 @@ bool PetAI::CanAttack(Unit* target)
     if (!target->isAlive())
         return false;
 
+    CharmInfo* charm = me->GetCharmInfo();
     // Returning - check first since pets returning ignore attacks
-    if (me->GetCharmInfo()->IsReturning())
+    if (charm->IsReturning())
         return false;
 
     // Passive - check now so we don't have to worry about passive in later checks
     if (me->HasReactState(REACT_PASSIVE))
-        return me->GetCharmInfo()->IsCommandAttack();
+        return charm->IsCommandAttack();
 
     // Follow
-    if (me->GetCharmInfo()->HasCommandState(COMMAND_FOLLOW))
+    if (charm->HasCommandState(COMMAND_FOLLOW))
         return true;
 
     // From this point on, pet will always be either aggressive or defensive
 
     // Stay - can attack if target is within range or commanded to
-    if (me->GetCharmInfo()->HasCommandState(COMMAND_STAY))
-        return (me->IsWithinMeleeRange(target) || me->GetCharmInfo()->IsCommandAttack());
+    if (charm->HasCommandState(COMMAND_STAY))
+        return (me->IsWithinMeleeRange(target) || charm->IsCommandAttack());
 
     //  Pets commanded to attack should not stop their approach if attacked by another creature
     if (me->getVictim() && (me->getVictim() != target))
-        return !me->GetCharmInfo()->IsCommandAttack();
+        return !charm->IsCommandAttack();
 
     // default, though we shouldn't ever get here
     return false;

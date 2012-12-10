@@ -213,7 +213,7 @@ public:
                                     {
                                         if (Player* player = i->getSource())
                                         {
-                                            WorldPacket packet(SMSG_MESSAGECHAT, 200);
+                                            WorldPacket packet;
                                             unit->BuildMonsterChat(&packet, CHAT_MSG_MONSTER_YELL, YELL_EFFORTS, 0, YELL_EFFORTS_NAME, player->GetGUID());
                                             player->GetSession()->SendPacket(&packet);
 

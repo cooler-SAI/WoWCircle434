@@ -878,7 +878,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
         default:
             break;
     }
-    if (DoneActualBenefit != 0.0f)
+    if (caster && DoneActualBenefit != 0.0f)
     {
         DoneActualBenefit *= caster->CalculateLevelPenalty(GetSpellInfo());
         amount += (int32)DoneActualBenefit;

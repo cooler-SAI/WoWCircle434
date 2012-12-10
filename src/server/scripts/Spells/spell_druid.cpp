@@ -285,7 +285,7 @@ public:
             return true;
         }
 
-        void HandleEnergize(SpellEffIndex effIndex)
+        void HandleEnergize(SpellEffIndex /*effIndex*/)
         {
             Player* caster = GetCaster()->ToPlayer();
 

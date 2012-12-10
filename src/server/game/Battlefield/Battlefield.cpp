@@ -445,7 +445,7 @@ void Battlefield::BroadcastPacketToWar(WorldPacket& data) const
 
 WorldPacket Battlefield::BuildWarningAnnPacket(std::string msg)
 {
-    WorldPacket data(SMSG_MESSAGECHAT, 200);
+    WorldPacket data(SMSG_MESSAGECHAT, 35 + msg.length() + 1);
 
     data << uint8(CHAT_MSG_RAID_BOSS_EMOTE);
     data << uint32(LANG_UNIVERSAL);

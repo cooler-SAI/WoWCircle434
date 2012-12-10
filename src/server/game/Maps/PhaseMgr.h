@@ -159,7 +159,7 @@ private:
 
     inline bool CheckDefinition(PhaseDefinition const* phaseDefinition);
 
-    bool NeedsPhaseUpdateWithData(PhaseUpdateData const updateData) const;
+    bool NeedsPhaseUpdateWithData(PhaseUpdateData const& updateData) const;
 
     inline bool IsUpdateInProgress() const { return (_UpdateFlags & PHASE_UPDATE_FLAG_ZONE_UPDATE) || (_UpdateFlags & PHASE_UPDATE_FLAG_AREA_UPDATE); }
 

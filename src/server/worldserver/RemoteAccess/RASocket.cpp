@@ -32,7 +32,7 @@
 
 RASocket::RASocket()
 {
-    _minLevel = ConfigMgr::GetIntDefault("RA.MinLevel", 3);
+    _minLevel = uint8(ConfigMgr::GetIntDefault("RA.MinLevel", 3));
 }
 
 RASocket::~RASocket()

@@ -4025,7 +4025,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             // Blood Strike
             if (m_spellInfo->SpellFamilyFlags[0] & 0x400000)
             {
-                float bonusPct = m_spellInfo->Effects[EFFECT_2].CalcValue(m_caster) * unitTarget->GetDiseasesByCaster(m_caster->GetGUID()) / 2.0f;
+                float bonusPct = m_spellInfo->Effects[EFFECT_2].CalcValue(m_caster) * float(unitTarget->GetDiseasesByCaster(m_caster->GetGUID())) / 2.0f;
                 // Death Knight T8 Melee 4P Bonus
                 if (AuraEffect const* aurEff = m_caster->GetAuraEffect(64736, EFFECT_0))
                     AddPct(bonusPct, aurEff->GetAmount());
@@ -4045,7 +4045,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             // Obliterate (12.5% more damage per disease)
             if (m_spellInfo->SpellFamilyFlags[1] & 0x20000)
             {
-                float bonusPct = m_spellInfo->Effects[EFFECT_2].CalcValue(m_caster) * unitTarget->GetDiseasesByCaster(m_caster->GetGUID(), false) / 2.0f;
+                float bonusPct = m_spellInfo->Effects[EFFECT_2].CalcValue(m_caster) * float(unitTarget->GetDiseasesByCaster(m_caster->GetGUID(), false)) / 2.0f;
                 // Death Knight T8 Melee 4P Bonus
                 if (AuraEffect const* aurEff = m_caster->GetAuraEffect(64736, EFFECT_0))
                     AddPct(bonusPct, aurEff->GetAmount());
@@ -4061,7 +4061,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             // Heart Strike
             if (m_spellInfo->SpellFamilyFlags[0] & 0x1000000)
             {
-                float bonusPct = m_spellInfo->Effects[EFFECT_2].CalcValue(m_caster) * unitTarget->GetDiseasesByCaster(m_caster->GetGUID());
+                float bonusPct = m_spellInfo->Effects[EFFECT_2].CalcValue(m_caster) * float(unitTarget->GetDiseasesByCaster(m_caster->GetGUID()));
                 // Death Knight T8 Melee 4P Bonus
                 if (AuraEffect const* aurEff = m_caster->GetAuraEffect(64736, EFFECT_0))
                     AddPct(bonusPct, aurEff->GetAmount());
@@ -5873,7 +5873,7 @@ void Spell::EffectReputation(SpellEffIndex effIndex)
     }
 
     // Bonus from spells that increase reputation gain
-    float bonus = rep_change * player->GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN) / 100.0f; // 10%
+    float bonus = rep_change * float(player->GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN)) / 100.0f; // 10%
     rep_change += (int32)bonus;
 
     player->GetReputationMgr().ModifyReputation(factionEntry, rep_change);

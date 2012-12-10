@@ -177,18 +177,19 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
         if (m_leader) // avoid crash if leader was killed and reset.
             sLog->outDebug(LOG_FILTER_UNITS, "GROUP ATTACK: group instance id %u calls member instid %u", m_leader->GetInstanceId(), member->GetInstanceId());
 
+        Creature* first = itr->first;
         //Skip one check
-        if (itr->first == member)
+        if (first == member)
             continue;
 
-        if (!itr->first->isAlive())
+        if (!first->isAlive())
             continue;
 
-        if (itr->first->getVictim())
+        if (first->getVictim())
             continue;
 
-        if (itr->first->IsValidAttackTarget(target) && itr->first->AI())
-            itr->first->AI()->AttackStart(target);
+        if (first->IsValidAttackTarget(target) && first->AI())
+            first->AI()->AttackStart(target);
     }
 }
 

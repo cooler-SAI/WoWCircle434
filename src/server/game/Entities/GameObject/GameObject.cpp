@@ -1810,22 +1810,23 @@ void GameObject::UpdateRotationFields(float rotation2 /*=0.0f*/, float rotation3
 
 void GameObject::ModifyHealth(int32 change, Unit* attackerOrHealer /*= NULL*/, uint32 spellId /*= 0*/)
 {
-    if (!GetGOValue()->Building.MaxHealth || !change)
+    GameObjectValue* value = GetGOValue();
+    if (!value->Building.MaxHealth || !change)
         return;
 
     // prevent double destructions of the same object
-    if (change < 0 && !GetGOValue()->Building.Health)
+    if (change < 0 && !value->Building.Health)
         return;
 
-    if (int32(GetGOValue()->Building.Health) + change <= 0)
-        GetGOValue()->Building.Health = 0;
-    else if (int32(GetGOValue()->Building.Health) + change >= int32(GetGOValue()->Building.MaxHealth))
-        GetGOValue()->Building.Health = GetGOValue()->Building.MaxHealth;
+    if (int32(value->Building.Health) + change <= 0)
+        value->Building.Health = 0;
+    else if (int32(value->Building.Health) + change >= int32(value->Building.MaxHealth))
+        value->Building.Health = value->Building.MaxHealth;
     else
-        GetGOValue()->Building.Health += change;
+        value->Building.Health += change;
 
     // Set the health bar, value = 255 * healthPct;
-    SetGoAnimProgress(GetGOValue()->Building.Health * 255 / GetGOValue()->Building.MaxHealth);
+    SetGoAnimProgress(value->Building.Health * 255 / value->Building.MaxHealth);
 
     Player* player = attackerOrHealer->GetCharmerOrOwnerPlayerOrPlayerItself();
 
@@ -1844,11 +1845,11 @@ void GameObject::ModifyHealth(int32 change, Unit* attackerOrHealer /*= NULL*/, u
 
     GameObjectDestructibleState newState = GetDestructibleState();
 
-    if (!GetGOValue()->Building.Health)
+    if (!value->Building.Health)
         newState = GO_DESTRUCTIBLE_DESTROYED;
-    else if (GetGOValue()->Building.Health <= GetGOInfo()->building.damagedNumHits)
+    else if (value->Building.Health <= GetGOInfo()->building.damagedNumHits)
         newState = GO_DESTRUCTIBLE_DAMAGED;
-    else if (GetGOValue()->Building.Health == GetGOValue()->Building.MaxHealth)
+    else if (value->Building.Health == value->Building.MaxHealth)
         newState = GO_DESTRUCTIBLE_INTACT;
 
     if (newState == GetDestructibleState())

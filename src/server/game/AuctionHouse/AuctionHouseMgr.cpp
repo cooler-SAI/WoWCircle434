@@ -611,6 +611,7 @@ bool AuctionEntry::BuildAuctionInfo(WorldPacket& data) const
         sLog->outError(LOG_FILTER_GENERAL, "AuctionEntry::BuildAuctionInfo: Auction %u has a non-existent item: %u", Id, itemGUIDLow);
         return false;
     }
+
     data << uint32(Id);
     data << uint32(item->GetEntry());
 

@@ -248,7 +248,7 @@ class ByteBuffer
 
                 uint8 writtenThisCycle = 8 - _bitpos;
                 if (writtenThisCycle > bits)
-                    writtenThisCycle = bits;
+                    writtenThisCycle = uint8(bits);
 
                 bits -= writtenThisCycle;
                 _bitpos += writtenThisCycle;
@@ -282,7 +282,7 @@ class ByteBuffer
 
                 uint8 readThisCycle = 8 - _bitpos;
                 if (readThisCycle > bits)
-                    readThisCycle = bits;
+                    readThisCycle = uint8(bits);
 
                 bits -= readThisCycle;
                 _bitpos += readThisCycle;

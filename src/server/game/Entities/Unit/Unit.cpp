@@ -592,7 +592,7 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
     if (IsAIEnabled)
         GetAI()->DamageDealt(victim, damage, damagetype);
 
-    if (victim->GetTypeId() == TYPEID_PLAYER)
+    if (victim && victim->GetTypeId() == TYPEID_PLAYER)
     {
         if (victim->ToPlayer()->GetCommandStatus(CHEAT_GOD))
             return 0;
@@ -1614,8 +1614,10 @@ void Unit::CalcAbsorbResist(Unit* victim, SpellSchoolMask schoolMask, DamageEffe
     for (AuraEffectList::iterator itr = vSchoolAbsorbCopy.begin(); (itr != vSchoolAbsorbCopy.end()) && (dmgInfo.GetDamage() > 0); ++itr)
     {
         AuraEffect* absorbAurEff = *itr;
+        Aura* aura = absorbAurEff->GetBase();
+
         // Check if aura was removed during iteration - we don't need to work on such auras
-        AuraApplication const* aurApp = absorbAurEff->GetBase()->GetApplicationOfTarget(victim->GetGUID());
+        AuraApplication const* aurApp = aura->GetApplicationOfTarget(victim->GetGUID());
         if (!aurApp)
             continue;
         if (!(absorbAurEff->GetMiscValue() & schoolMask))
@@ -1631,7 +1633,7 @@ void Unit::CalcAbsorbResist(Unit* victim, SpellSchoolMask schoolMask, DamageEffe
 
         bool defaultPrevented = false;
 
-        absorbAurEff->GetBase()->CallScriptEffectAbsorbHandlers(absorbAurEff, aurApp, dmgInfo, tempAbsorb, defaultPrevented);
+        aura->CallScriptEffectAbsorbHandlers(absorbAurEff, aurApp, dmgInfo, tempAbsorb, defaultPrevented);
         currentAbsorb = tempAbsorb;
 
         if (defaultPrevented)
@@ -1646,7 +1648,7 @@ void Unit::CalcAbsorbResist(Unit* victim, SpellSchoolMask schoolMask, DamageEffe
         dmgInfo.AbsorbDamage(currentAbsorb);
 
         tempAbsorb = currentAbsorb;
-        absorbAurEff->GetBase()->CallScriptEffectAfterAbsorbHandlers(absorbAurEff, aurApp, dmgInfo, tempAbsorb);
+        aura->CallScriptEffectAfterAbsorbHandlers(absorbAurEff, aurApp, dmgInfo, tempAbsorb);
 
         // Check if our aura is using amount to count damage
         if (absorbAurEff->GetAmount() >= 0)
@@ -1655,7 +1657,7 @@ void Unit::CalcAbsorbResist(Unit* victim, SpellSchoolMask schoolMask, DamageEffe
             absorbAurEff->SetAmount(absorbAurEff->GetAmount() - currentAbsorb);
             // Aura cannot absorb anything more - remove it
             if (absorbAurEff->GetAmount() <= 0)
-                absorbAurEff->GetBase()->Remove(AURA_REMOVE_BY_ENEMY_SPELL);
+                aura->Remove(AURA_REMOVE_BY_ENEMY_SPELL);
         }
     }
 
@@ -1664,8 +1666,10 @@ void Unit::CalcAbsorbResist(Unit* victim, SpellSchoolMask schoolMask, DamageEffe
     for (AuraEffectList::const_iterator itr = vManaShieldCopy.begin(); (itr != vManaShieldCopy.end()) && (dmgInfo.GetDamage() > 0); ++itr)
     {
         AuraEffect* absorbAurEff = *itr;
+        Aura* aura = absorbAurEff->GetBase();
+
         // Check if aura was removed during iteration - we don't need to work on such auras
-        AuraApplication const* aurApp = absorbAurEff->GetBase()->GetApplicationOfTarget(victim->GetGUID());
+        AuraApplication const* aurApp = aura->GetApplicationOfTarget(victim->GetGUID());
         if (!aurApp)
             continue;
         // check damage school mask
@@ -1682,7 +1686,7 @@ void Unit::CalcAbsorbResist(Unit* victim, SpellSchoolMask schoolMask, DamageEffe
 
         bool defaultPrevented = false;
 
-        absorbAurEff->GetBase()->CallScriptEffectManaShieldHandlers(absorbAurEff, aurApp, dmgInfo, tempAbsorb, defaultPrevented);
+        aura->CallScriptEffectManaShieldHandlers(absorbAurEff, aurApp, dmgInfo, tempAbsorb, defaultPrevented);
         currentAbsorb = tempAbsorb;
 
         if (defaultPrevented)
@@ -1707,14 +1711,14 @@ void Unit::CalcAbsorbResist(Unit* victim, SpellSchoolMask schoolMask, DamageEffe
         dmgInfo.AbsorbDamage(currentAbsorb);
 
         tempAbsorb = currentAbsorb;
-        absorbAurEff->GetBase()->CallScriptEffectAfterManaShieldHandlers(absorbAurEff, aurApp, dmgInfo, tempAbsorb);
+        aura->CallScriptEffectAfterManaShieldHandlers(absorbAurEff, aurApp, dmgInfo, tempAbsorb);
 
         // Check if our aura is using amount to count damage
         if (absorbAurEff->GetAmount() >= 0)
         {
             absorbAurEff->SetAmount(absorbAurEff->GetAmount() - currentAbsorb);
             if ((absorbAurEff->GetAmount() <= 0))
-                absorbAurEff->GetBase()->Remove(AURA_REMOVE_BY_ENEMY_SPELL);
+                aura->Remove(AURA_REMOVE_BY_ENEMY_SPELL);
         }
     }
 
@@ -1724,7 +1728,7 @@ void Unit::CalcAbsorbResist(Unit* victim, SpellSchoolMask schoolMask, DamageEffe
         // We're going to call functions which can modify content of the list during iteration over it's elements
         // Let's copy the list so we can prevent iterator invalidation
         AuraEffectList vSplitDamagePctCopy(victim->GetAuraEffectsByType(SPELL_AURA_SPLIT_DAMAGE_PCT));
-        for (AuraEffectList::iterator itr = vSplitDamagePctCopy.begin(), next; (itr != vSplitDamagePctCopy.end()) &&  (dmgInfo.GetDamage() > 0); ++itr)
+        for (AuraEffectList::iterator itr = vSplitDamagePctCopy.begin(); (itr != vSplitDamagePctCopy.end()) &&  (dmgInfo.GetDamage() > 0); ++itr)
         {
             // Check if aura was removed during iteration - we don't need to work on such auras
             AuraApplication const* aurApp = (*itr)->GetBase()->GetApplicationOfTarget(victim->GetGUID());
@@ -5522,6 +5526,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (GetTypeId() != TYPEID_PLAYER)
                         return false;
 
+                    #pragma error "Replace by array of 3"
                     std::vector<uint32> RandomSpells;
                     switch (getClass())
                     {
@@ -5568,6 +5573,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (GetTypeId() != TYPEID_PLAYER)
                         return false;
 
+                    #pragma error "Replace by array of 3"
                     std::vector<uint32> RandomSpells;
                     switch (getClass())
                     {
@@ -5803,7 +5809,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 // Glyph of Icy Veins
                 case 56374:
                 {
-                    RemoveAurasByType(SPELL_AURA_HASTE_SPELLS, 0, 0, true, false);
+                    RemoveAurasByType(SPELL_AURA_HASTE_SPELLS, 0, 0, 0, true, false);
                     RemoveAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
                     return true;
                 }
@@ -6546,8 +6552,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // try to find spell Rip on the target
                     if (AuraEffect const* AurEff = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x00800000, 0x0, 0x0, GetGUID()))
                     {
+                        Aura* aura = AurEff->GetBase();
                         // Rip's max duration, note: spells which modifies Rip's duration also counted
-                        uint32 CountMin = AurEff->GetBase()->GetMaxDuration();
+                        uint32 CountMin = aura->GetMaxDuration();
 
                         // just Rip's max duration without other spells
                         uint32 CountMax = AurEff->GetSpellInfo()->GetMaxDuration();
@@ -6560,8 +6567,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         // so set Rip's duration and max duration
                         if (CountMin < CountMax)
                         {
-                            AurEff->GetBase()->SetDuration(AurEff->GetBase()->GetDuration() + triggerAmount * IN_MILLISECONDS);
-                            AurEff->GetBase()->SetMaxDuration(CountMin + triggerAmount * IN_MILLISECONDS);
+                            aura->SetDuration(aura->GetDuration() + triggerAmount * IN_MILLISECONDS);
+                            aura->SetMaxDuration(CountMin + triggerAmount * IN_MILLISECONDS);
                             return true;
                         }
                     }
@@ -6858,7 +6865,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 14172:
                 {
                      float chance = triggerAmount * ToPlayer()->GetComboPoints();
-                     if (roll_chance_i(chance))
+                     if (roll_chance_f(chance))
                      {
                          if (Aura* Rupture = victim->GetAura(1943, GetGUID()))
                              Rupture->RefreshDuration();
@@ -7071,7 +7078,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 if (Unit* beaconTarget = triggeredByAura->GetBase()->GetCaster())
                 {
                     // do not proc when target of beacon of light is healed
-                    if (beaconTarget->GetGUID() == GetGUID())
+                    if (!victim || beaconTarget->GetGUID() == GetGUID())
                         return false;
 
                     float healing = 1.0f;
@@ -7706,14 +7713,14 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                     std::set<uint8> runes;
                     for (uint8 i = 0; i < MAX_RUNES; i++)
-                        if (this->ToPlayer()->GetRuneCooldown(i) == this->ToPlayer()->GetRuneBaseCooldown(i))
+                        if (this->ToPlayer()->GetRuneCooldown(i) == ToPlayer()->GetRuneBaseCooldown(i))
                             runes.insert(i);
                     if (runes.size())
                     {
                         std::set<uint8>::iterator itr = runes.begin();
                         std::advance(itr, urand(0, runes.size()-1));
-                        this->ToPlayer()->SetRuneCooldown((*itr), 0);
-                        this->ToPlayer()->ResyncRunes(MAX_RUNES);
+                        ToPlayer()->SetRuneCooldown((*itr), 0);
+                        ToPlayer()->ResyncRunes(MAX_RUNES);
                     }
                     return true;
                 }
@@ -10509,11 +10516,12 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
 
             if ((*i)->GetMiscValue() & spellProto->GetSchoolMask())
             {
-                if ((*i)->GetSpellInfo()->EquippedItemClass == -1)
+                const SpellInfo* _info = (*i)->GetSpellInfo();
+                if (_info->EquippedItemClass == -1)
                     AddPct(DoneTotalMod, (*i)->GetAmount());
-                else if (!(*i)->GetSpellInfo()->HasAttribute(SPELL_ATTR5_SPECIAL_ITEM_CLASS_CHECK) && ((*i)->GetSpellInfo()->EquippedItemSubClassMask == 0))
+                else if (!_info->HasAttribute(SPELL_ATTR5_SPECIAL_ITEM_CLASS_CHECK) && (_info->EquippedItemSubClassMask == 0))
                     AddPct(DoneTotalMod, (*i)->GetAmount());
-                else if (ToPlayer() && ToPlayer()->HasItemFitToSpellRequirements((*i)->GetSpellInfo()))
+                else if (ToPlayer() && ToPlayer()->HasItemFitToSpellRequirements(_info))
                     AddPct(DoneTotalMod, (*i)->GetAmount());
             }
         }
@@ -11395,7 +11403,7 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
             case   21: // Test of Faith
             case 6935:
             case 6918:
-                if (victim->HealthBelowPct(50))
+                if (victim && victim->HealthBelowPct(50))
                     AddPct(DoneTotalMod, (*i)->GetAmount());
                 break;
             default:
@@ -15069,13 +15077,17 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         // Do not allow auras to proc from effect triggered by itself
         if (procAura && procAura->Id == itr->first)
             continue;
-        ProcTriggeredData triggerData(itr->second->GetBase());
+
+        AuraApplication* second = itr->second;
+        Aura* aura = second->GetBase();
+
+        ProcTriggeredData triggerData(second->GetBase());
         // Defensive procs are active on absorbs (so absorption effects are not a hindrance)
         bool active = damage || (procExtra & PROC_EX_BLOCK && isVictim);
         if (isVictim)
             procExtra &= ~PROC_EX_INTERNAL_REQ_FAMILY;
 
-        SpellInfo const* spellProto = itr->second->GetBase()->GetSpellInfo();
+        SpellInfo const* spellProto = aura->GetSpellInfo();
 
         // fix for not gain enchant buffs for pets
         if (caster != this && (spellProto->SpellFamilyName == SPELLFAMILY_GENERIC || spellProto->SpellFamilyName == SPELLFAMILY_POTION))
@@ -15095,9 +15107,9 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
 
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
-            if (itr->second->HasEffect(i))
+            if (second->HasEffect(i))
             {
-                AuraEffect* aurEff = itr->second->GetBase()->GetEffect(i);
+                AuraEffect* aurEff = aura->GetEffect(i);
                 // Skip this auras
                 if (isNonTriggerAura[aurEff->GetAuraType()])
                     continue;
@@ -15124,18 +15136,19 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
     // Handle effects proceed this time
     for (ProcTriggeredList::const_iterator i = procTriggered.begin(); i != procTriggered.end(); ++i)
     {
+        Aura* aura = i->aura;
         // look for aura in auras list, it may be removed while proc event processing
-        if (i->aura->IsRemoved())
+        if (aura->IsRemoved())
             continue;
 
-        bool useCharges  = i->aura->IsUsingCharges();
+        bool useCharges = aura->IsUsingCharges();
         // no more charges to use, prevent proc
-        if (useCharges && !i->aura->GetCharges())
+        if (useCharges && !aura->GetCharges())
             continue;
 
         bool takeCharges = false;
-        SpellInfo const* spellInfo = i->aura->GetSpellInfo();
-        uint32 Id = i->aura->GetId();
+        SpellInfo const* spellInfo = aura->GetSpellInfo();
+        uint32 Id = aura->GetId();
 
         // For players set spell cooldown if need
         uint32 cooldown = 0;
@@ -15161,7 +15174,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                 if (!(i->effMask & (1<<effIndex)))
                     continue;
 
-                AuraEffect* triggeredByAura = i->aura->GetEffect(effIndex);
+                AuraEffect* triggeredByAura = aura->GetEffect(effIndex);
                 ASSERT(triggeredByAura);
 
                 switch(triggeredByAura->GetId())
@@ -15341,7 +15354,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                             break;
 
                         // Sanguinary Vein and Gouge
-                        if (spellInfo->Id == 1776 && target && (procFlag & PROC_FLAG_TAKEN_PERIODIC) && (procSpell->GetAllEffectsMechanicMask() & (1<<MECHANIC_BLEED)))
+                        if (spellInfo->Id == 1776 && target && (procFlag & PROC_FLAG_TAKEN_PERIODIC) && (procSpell && (procSpell->GetAllEffectsMechanicMask() & (1<<MECHANIC_BLEED))))
                             if (AuraEffect * aur = target->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 4821, 1))
                                 if (roll_chance_i(aur->GetAmount()))
                                     break;
@@ -19022,6 +19035,8 @@ bool Unit::IsVisionObscured(Unit* victim) const
     Unit* victimCaster = NULL;
     Unit* myCaster = NULL;
 
+    #pragma warning "Replace for loop by vAuras.front()"
+
     AuraEffectList const& vAuras = victim->GetAuraEffectsByType(SPELL_AURA_INTERFERE_TARGETTING);
     for (AuraEffectList::const_iterator i = vAuras.begin(); i != vAuras.end(); ++i)
     {
@@ -19029,6 +19044,8 @@ bool Unit::IsVisionObscured(Unit* victim) const
         victimCaster = victimAura->GetCaster();
         break;
     }
+    #pragma warning "Replace for loop by myAuras.front()"
+
     AuraEffectList const& myAuras = GetAuraEffectsByType(SPELL_AURA_INTERFERE_TARGETTING);
     for (AuraEffectList::const_iterator i = myAuras.begin(); i != myAuras.end(); ++i)
     {
@@ -19071,9 +19088,6 @@ uint32 Unit::GetHealingDoneInPastSecs(uint32 secs)
     for (uint32 i = 0; i < secs; i++)
         heal += m_heal_done[i];
 
-    if (heal < 0)
-        return 0;
-
     return heal;
 };
 
@@ -19087,9 +19101,6 @@ uint32 Unit::GetDamageDoneInPastSecs(uint32 secs)
     for (uint32 i = 0; i < secs; i++)
         damage += m_damage_done[i];
 
-    if (damage < 0)
-        return 0;
-
     return damage;
 };
 
@@ -19102,9 +19113,6 @@ uint32 Unit::GetDamageTakenInPastSecs(uint32 secs)
 
     for (uint32 i = 0; i < secs; i++)
         tdamage += m_damage_taken[i];
-
-    if (tdamage < 0)
-        return 0;
 
     return tdamage;
 };
