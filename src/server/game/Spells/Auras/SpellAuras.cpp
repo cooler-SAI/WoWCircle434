@@ -1289,14 +1289,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     int32 bp0 = int32(pctHealth - caster->GetHealth());
                     caster->CastCustomSpell(caster, 22845, &bp0, 0, 0, true);
                 }
-                // Fierie Fire
-                else if (GetId() == 91565)
-                {
-                    // Feral Aggression
-                    if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 960, 0))
-                        if (caster->IsInFeralForm())
-                            SetStackAmount(aurEff->GetAmount());    
-                }
                 // Shooting Stars
                 else if (GetId() == 93400)
                 {
