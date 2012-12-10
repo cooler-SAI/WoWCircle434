@@ -600,7 +600,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     }
                 }
                 // Starsurge
-                else if (m_spellInfo->Id == 78764)
+                else if (m_spellInfo->Id == 78674)
                 {
                     // Shooting Stars remove aura
                     if (m_caster->HasAura(93400))
@@ -660,14 +660,14 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     }
                 }
                 // Eviscerate
-                else if (m_spellInfo->SpellFamilyFlags[0] & 0x00020000)
+                else if (m_spellInfo->Id == 2098)
                 {
                     if (m_caster->GetTypeId() == TYPEID_PLAYER)
                     {
                         if (uint32 combo = ((Player*)m_caster)->GetComboPoints())
                         {
                             float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
-                            damage += irand(int32(ap * combo * 0.03f), int32(ap * combo * 0.07f));
+                            damage += int32(ap * combo * 0.09f);
 
                             // Eviscerate and Envenom Bonus Damage (item set effect)
                             if (m_caster->HasAura(37169))

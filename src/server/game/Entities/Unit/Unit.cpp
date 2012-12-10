@@ -10897,22 +10897,13 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
     TakenTotalMod *= GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, spellProto->GetSchoolMask());
 
     //.. taken pct: dummy auras
-    AuraEffectList const& mDummyAuras = GetAuraEffectsByType(SPELL_AURA_DUMMY);
+    /*AuraEffectList const& mDummyAuras = GetAuraEffectsByType(SPELL_AURA_DUMMY);
     for (AuraEffectList::const_iterator i = mDummyAuras.begin(); i != mDummyAuras.end(); ++i)
     {
         switch ((*i)->GetSpellInfo()->SpellIconID)
         {
-            // Cheat Death
-            case 2109:
-                if ((*i)->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL)
-                {
-                    if (GetTypeId() != TYPEID_PLAYER)
-                        continue;
-                    AddPct(TakenTotalMod, (*i)->GetAmount());
-                }
-                break;
         }
-    }
+    }*/
 
     // From caster spells
     AuraEffectList const& mOwnerTaken = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_FROM_CASTER);
@@ -11994,23 +11985,13 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
     }
 
     // .. taken pct: dummy auras
-    AuraEffectList const& mDummyAuras = GetAuraEffectsByType(SPELL_AURA_DUMMY);
+    /*AuraEffectList const& mDummyAuras = GetAuraEffectsByType(SPELL_AURA_DUMMY);
     for (AuraEffectList::const_iterator i = mDummyAuras.begin(); i != mDummyAuras.end(); ++i)
     {
         switch ((*i)->GetSpellInfo()->SpellIconID)
         {
-            // Cheat Death
-            case 2109:
-                if ((*i)->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL)
-                {
-                    if (GetTypeId() != TYPEID_PLAYER)
-                        continue;
-                    float mod = ToPlayer()->GetRatingBonusValue(CR_CRIT_TAKEN_MELEE) * (-8.0f);
-                    AddPct(TakenTotalMod, std::max(mod, float((*i)->GetAmount())));
-                }
-                break;
         }
-    }
+    }*/
 
     // .. taken pct: class scripts
     //*AuraEffectList const& mclassScritAuras = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);

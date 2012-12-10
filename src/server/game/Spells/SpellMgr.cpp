@@ -4919,6 +4919,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 77764: // Cat
                 spellInfo->Effects[0].SetRadiusIndex(13);
                 break;
+            // Cheat Death
+            case 45182:
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
+                break;
             default:
                 break;
         }
