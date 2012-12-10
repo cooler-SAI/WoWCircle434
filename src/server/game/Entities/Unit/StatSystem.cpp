@@ -72,7 +72,6 @@ bool Player::UpdateStats(Stats stat)
     switch (stat)
     {
         case STAT_AGILITY:
-            UpdateArmor();
             UpdateAllCritPercentages();
             UpdateDodgePercentage();
             break;
