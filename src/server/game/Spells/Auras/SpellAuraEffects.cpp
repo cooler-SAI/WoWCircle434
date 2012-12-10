@@ -2173,6 +2173,8 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         case FORM_SHADOW:                                   // 0x1C
         case FORM_FLIGHT:                                   // 0x1D
         case FORM_STEALTH:                                  // 0x1E
+            if (GetSpellInfo()->Id != 11327) // for Vanish
+                break;
         case FORM_MOONKIN:                                  // 0x1F
         case FORM_SPIRITOFREDEMPTION:                       // 0x20
             break;

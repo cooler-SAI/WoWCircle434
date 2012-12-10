@@ -1682,9 +1682,26 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 break;
             case SPELLFAMILY_ROGUE:
-                // Remove Vanish on stealth remove
-                if (GetId() == 1784)
-                    target->RemoveAurasWithFamily(SPELLFAMILY_ROGUE, 0x0000800, 0, 0, target->GetGUID());
+                // Apply stealth at remove Vanish
+                if (GetId() == 11327 && removeMode == AURA_REMOVE_BY_EXPIRE)
+                {
+                    if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+                        break;
+
+                    if (caster->ToPlayer()->HasSpellCooldown(1784))
+                        caster->ToPlayer()->RemoveSpellCooldown(1784);
+
+                    caster->CastSpell(caster, 1784, true);
+                }
+                // Sap
+                else if (GetId() == 6770)
+                {
+                    // Blackjack
+                    if (caster && caster->HasAura(79125)) // rank 2
+                        caster->CastSpell(target, 79126, true);
+                    else if (caster && caster->HasAura(79123)) // rank 1
+                        caster->CastSpell(target, 79124, true);
+                }
                 break;
             case SPELLFAMILY_PALADIN:
                 // Avenging Wrath

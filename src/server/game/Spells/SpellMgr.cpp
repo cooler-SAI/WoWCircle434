@@ -4906,6 +4906,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 76577:
                 spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_DUMMY;
                 break;
+            // Fan of Knives
+            case 51723:
+                spellInfo->Effects[0].SetRadiusIndex(14);
+                break;
             default:
                 break;
         }

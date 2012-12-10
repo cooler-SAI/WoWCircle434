@@ -1402,26 +1402,11 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                 else if (m_caster->HasAura(78893))
                     m_caster->CastSpell(m_caster, 81022, true);
                 break;
-            // Vanish (not exist)
-            case 18461:
+            // Vanish
+            case 11327:
             {
                 unitTarget->RemoveMovementImpairingAuras();
-                unitTarget->RemoveAurasByType(SPELL_AURA_MOD_STALKED);
-
-                // If this spell is given to an NPC, it must handle the rest using its own AI
-                if (unitTarget->GetTypeId() != TYPEID_PLAYER)
-                    return;
-
-                // See if we already are stealthed. If so, we're done.
-                if (unitTarget->HasAura(1784))
-                    return;
-
-                // Reset cooldown on stealth if needed
-                if (unitTarget->ToPlayer()->HasSpellCooldown(1784))
-                    unitTarget->ToPlayer()->RemoveSpellCooldown(1784);
-
-                unitTarget->CastSpell(unitTarget, 1784, true);
-                return;
+                break;
             }
             // Demonic Empowerment -- succubus
             case 54437:
@@ -3970,6 +3955,28 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                     if (Item* item = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
                         if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
                             totalDamagePercentMod *= 1.5f;
+            }
+            // Backstab
+            else if (m_spellInfo->Id == 53)
+            {
+                // Murderous Intent
+                if (unitTarget->HealthAbovePct(35) || effIndex != 0)
+                    break;
+
+                if (AuraEffect const* aurEff = m_caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_ROGUE, 134, 0))
+                {
+                    int32 bp0 = aurEff->GetAmount();
+                    m_caster->CastCustomSpell(m_caster, 79132, &bp0, 0, 0, true);
+                }
+            }
+            // Fan of Knives
+            else if (m_spellInfo->Id == 51723)
+            {
+                if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                    break;
+
+                if (m_caster->ToPlayer()->GetComboTarget() == unitTarget->GetGUID())
+                    m_caster->ToPlayer()->AddComboPoints(unitTarget, 1);
             }
             break;
         }
