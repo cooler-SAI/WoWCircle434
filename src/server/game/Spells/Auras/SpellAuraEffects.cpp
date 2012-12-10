@@ -865,6 +865,16 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             }
             break;
         }
+        case SPELL_AURA_MOD_MELEE_HASTE_3:
+            // Slice and Dice
+            if (GetSpellInfo()->Id == 5171)
+            {
+                // Executioner, Subtlety Rogue Mastery
+                if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_ROGUE, 1474, 0))
+                    amount += aurEff->GetAmount();
+                break;
+            }
+            break;
         default:
             break;
     }
