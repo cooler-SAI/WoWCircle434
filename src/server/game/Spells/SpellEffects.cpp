@@ -595,8 +595,8 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     // Glyph of Ferocious Bite
                     if (m_caster->HasAura(67598))
                     {
-                        int32 heal = CalculatePct(m_caster->GetMaxHealth(), 0.1f * (25 + energy));
-                        m_caster->CastCustomSpell(m_caster, 101024, &heal, 0, 0, true);
+                        int32 heal_pct = int32((25 + energy) / 10);
+                        m_caster->CastCustomSpell(m_caster, 101024, &heal_pct, 0, 0, true);
                     }
                 }
                 // Starsurge

@@ -4914,6 +4914,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 51698:
                 spellInfo->SpellFamilyName = SPELLFAMILY_ROGUE;
                 break;
+            // Stampeding Roar
+            case 77761: // Bear
+            case 77764: // Cat
+                spellInfo->Effects[0].SetRadiusIndex(13);
+                break;
             default:
                 break;
         }
