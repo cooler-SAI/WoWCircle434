@@ -3434,11 +3434,11 @@ public:
                     }
                     if (me->GetEntry() == 44214)
                         DoCast(target, SPELL_FLAME_ORB_DAMAGE);
-                    else
+                    else if (Unit* owner = me->GetOwner())
                     {
-                        if (me->GetOwner()->HasAura(84726))
+                        if (owner->HasAura(84726))
                             DoCast(target, SPELL_FROSTFIRE_ORB_DAMAGE);
-                        else if (me->GetOwner()->HasAura(84727))
+                        else if (owner->HasAura(84727))
                             DoCast(target, SPELL_FROSTFIRE_ORB_DAMAGE_RANK2);
                     }
                 }
