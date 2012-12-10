@@ -8664,8 +8664,8 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
 
                         trigger_spell_id = 96172;
                         basepoints0 = int32(damage / 100.0f * triggeredByAura->GetAmount());
-                        if (AuraEffect* aurEff = GetAuraEffect(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, SPELLFAMILY_PALADIN, 5155, 0))
-                            AddPct(basepoints0, aurEff->GetAmount());
+                        if (HasAura(84963))
+                            AddPct(basepoints0, 30);
                         target = victim;
                         break;
                     }
@@ -10423,6 +10423,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
         case 70890: // Scourge Strike shadow part
         case 83853: // Combustion
         case 22482: // Blade Flurry
+        case 96172: // Hand of Light
             return pdamage;
         default:
             break;
@@ -10815,6 +10816,7 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
         case 70890: // Scourge Strike shadow part
         case 83853: // Combustion
         case 22482: // Blade Flurry
+        case 96172: // Hand of Light
             return pdamage;
         default:
             break;
@@ -11309,6 +11311,7 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
         case 64801: // Gift of the Earthmother
         case 81751: // Atonement
         case 91394: // Permafrost
+        case 63544: // Divine Touch
             return healamount;
         case 6262: // Warlock Healthstone
             healamount = uint32(0.45f * GetCreateHealth());
@@ -11444,7 +11447,8 @@ uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, u
         case 64801: // Gift of the Earthmother
         case 81751: // Atonement
         case 91394: // Permafrost
-        case 6262: // Warlock Healthstone
+        case 6262:  // Warlock Healthstone
+        case 63544: // Divine Touch
             return healamount;
             break;
         default:
