@@ -883,15 +883,18 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
     {
         if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE)
         {
-            Unit* target = GetBase()->GetUnitOwner();
-            int32 temp_damage = amount;
-            float temp_crit = 0.0f;
+            if (GetBase()->GetType() == UNIT_AURA_TYPE)
+            {
+                Unit* target = GetBase()->GetUnitOwner();
+                int32 temp_damage = amount;
+                float temp_crit = 0.0f;
 
-            temp_damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), temp_damage, DOT, GetBase()->GetStackAmount());
-            temp_crit = caster->GetSpellCrit(target, GetSpellInfo(), SpellSchoolMask(GetSpellInfo()->SchoolMask));
-            
-            m_fixed_periodic.SetFixedDamage(temp_damage);
-            m_fixed_periodic.SetCriticalChance(temp_crit);
+                temp_damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), temp_damage, DOT, GetBase()->GetStackAmount());
+                temp_crit = caster->GetSpellCrit(target, GetSpellInfo(), SpellSchoolMask(GetSpellInfo()->SchoolMask));
+                
+                m_fixed_periodic.SetFixedDamage(temp_damage);
+                m_fixed_periodic.SetCriticalChance(temp_crit);
+            }
         }
 
         // Some spells have unique duration for charges
