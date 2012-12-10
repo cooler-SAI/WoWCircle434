@@ -6699,6 +6699,25 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Deadly Brew
+                case 51625:
+                case 51626:
+                    triggered_spell_id =3409;
+                    break;
+                // Venomous Wounds
+                case 79134:
+                case 79133:
+                {
+                    if (effIndex != 0)
+                        return false;
+
+                    int32 energy = triggeredByAura->GetBase()->GetEffect(1)->GetAmount();
+                    CastCustomSpell(this, 51637, &energy, 0, 0, true);
+
+                    triggered_spell_id = 79136;
+
+                    break;
+                }
                 // Revealing Strike
                 case 84617:
                     return triggeredByAura->GetCaster() == victim;
@@ -6843,11 +6862,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         return true;
                     }
                     return false;
-                }
-                case 2963: // Deadly Brew
-                {
-                    triggered_spell_id = 3409;
-                    break;
                 }
             }
             break;
