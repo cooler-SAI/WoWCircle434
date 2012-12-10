@@ -5271,7 +5271,28 @@ void Spell::EffectAddComboPoints(SpellEffIndex /*effIndex*/)
     {
         // Rogue: Redirect
         if (GetSpellInfo()->Id == 73981 && player->GetComboPoints() > 0 && player->GetComboTarget())
-            player->AddComboPoints(unitTarget, player->GetComboPoints(), this);
+        {
+            
+            if (unitTarget->GetGUID() != player->GetComboTarget())
+                player->AddComboPoints(unitTarget, player->GetComboPoints(), this);
+
+            // Copy Bandit's Vile
+            Unit* _target = NULL;
+            Trinity::AnyUnitHavingBuffInObjectRangeCheck u_check(player, player, 100, 84748, false);
+            Trinity::UnitLastSearcher<Trinity::AnyUnitHavingBuffInObjectRangeCheck> searcher(player, _target, u_check);
+            player->VisitNearbyObject(100, searcher);
+                        
+            if (_target)
+            {
+                if (Aura* aur = _target->GetAura(84748, player->GetGUID()))
+                {
+                    int32 bp0 = aur->GetEffect(0)->GetAmount();
+                    int32 bp1 = aur->GetEffect(1)->GetAmount();
+                    _target->RemoveAurasDueToSpell(84748);
+                    player->CastCustomSpell(unitTarget, 84748, &bp0, &bp1, 0, true);
+                }
+            }
+        }
 
         // Rogue: Sinister Strike Enabler
         if (!player->HasAura(79327) && player->getLevel() >= 3)

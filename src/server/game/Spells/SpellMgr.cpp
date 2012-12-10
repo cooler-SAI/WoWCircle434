@@ -4838,8 +4838,8 @@ void SpellMgr::LoadDbcDataCorrections()
             case 51179:
             case 51180:
             case 51181:
-                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_ADD_PCT_MODIFIER;
-                spellInfo->Effects[0].MiscValue = SPELLMOD_DOT;
+                spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_ADD_PCT_MODIFIER;
+                spellInfo->Effects[1].MiscValue = SPELLMOD_DOT;
                 break;
             // Tree of Life
             case 65139:
@@ -4909,6 +4909,10 @@ void SpellMgr::LoadDbcDataCorrections()
             // Fan of Knives
             case 51723:
                 spellInfo->Effects[0].SetRadiusIndex(14);
+                break;
+            // Honor Among Thieves rank 1
+            case 51698:
+                spellInfo->SpellFamilyName = SPELLFAMILY_ROGUE;
                 break;
             default:
                 break;

@@ -6699,6 +6699,42 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Honor Amoung Thieves
+                case 51698:
+                case 51700:
+                case 51701:
+                {
+                    if (!ToPlayer())
+                        return false;
+
+                    if (Unit* caster = triggeredByAura->GetCaster())
+                    {
+                        if (caster->GetTypeId() != TYPEID_PLAYER)
+                            return false;
+
+                        if (caster->ToPlayer()->HasSpellCooldown(51699))
+                            return false;
+
+                        target = NULL;
+                        if (Unit* target2 = caster->ToPlayer()->GetSelectedUnit())
+                        {
+                            if (target2->IsHostileTo(caster))
+                                target = target2;
+                        }
+                        if (!target)
+                            if (Unit* target3 = ObjectAccessor::GetUnit(*caster, caster->ToPlayer()->GetComboTarget()))
+                                target = target3;
+
+                        caster->CastSpell(target? target: victim, 51699, true);
+
+                        cooldown = 4;
+                        if (AuraEffect const* auraEff = caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_ROGUE, 2903, 2))
+                            cooldown += auraEff->GetAmount() / 1000;
+                        caster->ToPlayer()->AddSpellCooldown(51699, 0, time(NULL) + cooldown);
+                    }
+
+                    break;
+                }
                 // Deadly Brew
                 case 51625:
                 case 51626:
@@ -13429,7 +13465,6 @@ void Unit::setDeathState(DeathState s)
         CombatStop();
         DeleteThreatList();
         getHostileRefManager().deleteReferences();
-        ClearComboPointHolders();                           // any combo points pointed to unit lost at it death
 
         if (IsNonMeleeSpellCasted(false))
             InterruptNonMeleeSpells(false);
