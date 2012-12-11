@@ -4309,6 +4309,13 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                // Blood in the Water
+                case 80863:
+                {
+                    if (Aura* aura = unitTarget->GetAura(1079, m_caster->GetGUID()))
+                        aura->RefreshDuration();
+                    break;
+                }
                 // Feral Swiftness Movement Imparing Removal
                 case 97985:
                 {
@@ -5211,11 +5218,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                 // Empowered Touch
                 case 88433:
                     if (Aura* aura = unitTarget->GetAura(33763, m_caster->GetGUID()))
-                        aura->RefreshDuration();
-                    break;
-                // Blood in the Water
-                case 80863:
-                    if (Aura* aura = unitTarget->GetAura(1079, m_caster->GetGUID()))
                         aura->RefreshDuration();
                     break;
             }

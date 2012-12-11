@@ -656,24 +656,6 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 amount = GetBase()->GetUnitOwner()->SpellHealingBonusTaken(caster, GetSpellInfo(), amount, SPELL_DIRECT_DAMAGE);
             }
             break;
-        case SPELL_AURA_DAMAGE_SHIELD:
-            if (!caster)
-                break;
-
-            // Thorns
-            if (GetId() == 467)
-            {
-                if (caster->GetTypeId() != TYPEID_PLAYER)
-                    break;
-
-                m_canBeRecalculated = false;
-
-                if (caster->ToPlayer()->GetPrimaryTalentTree(caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_DRUID_FERAL_COMBAT)
-                    amount += int32(0.168f * caster->GetTotalAttackPowerValue(BASE_ATTACK));
-                else
-                    amount += int32(0.168f * caster->SpellBaseDamageBonusDone(SpellSchoolMask(GetSpellInfo()->SchoolMask)));
-                break;
-            }
         case SPELL_AURA_PERIODIC_DAMAGE:
             if (!caster)
                 break;

@@ -1399,6 +1399,18 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
 
             if (Unit* caster = (*dmgShieldItr)->GetCaster())
             {
+                // Thorns, calculate damage
+                if ((*dmgShieldItr)->GetSpellInfo()->Id == 467)
+                {
+                    if (caster->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        if (caster->ToPlayer()->GetPrimaryTalentTree(caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_DRUID_FERAL_COMBAT)
+                            damage += int32(0.168f * caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                        else
+                            damage += int32(0.168f * caster->SpellBaseDamageBonusDone(SpellSchoolMask((*dmgShieldItr)->GetSpellInfo()->SchoolMask)));
+                    }
+                }
+
                 damage = caster->SpellDamageBonusDone(this, i_spellProto, damage, SPELL_DIRECT_DAMAGE);
                 damage = this->SpellDamageBonusTaken(caster, i_spellProto, damage, SPELL_DIRECT_DAMAGE);
             }
