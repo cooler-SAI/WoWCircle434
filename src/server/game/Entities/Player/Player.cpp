@@ -13558,6 +13558,11 @@ void Player::ApplyReforgeEnchantment(Item* item, bool apply)
 
     switch (reforge->FinalStat)
     {
+        case ITEM_MOD_CRIT_RATING:
+            ApplyRatingMod(CR_CRIT_MELEE, addValue, apply);
+            ApplyRatingMod(CR_CRIT_RANGED, addValue, apply);
+            ApplyRatingMod(CR_CRIT_SPELL, addValue, apply);
+            break;
         case ITEM_MOD_MANA:
             HandleStatModifier(UNIT_MOD_MANA, BASE_VALUE, addValue, apply);
             break;
