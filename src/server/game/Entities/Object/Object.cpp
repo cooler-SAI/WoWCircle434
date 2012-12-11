@@ -2297,7 +2297,12 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj) const
                 return true;
 
         // Starting points
-        int32 detectionValue = 30;
+        int32 detectionValue = 15;
+
+        if ((ToPlayer() && ToPlayer()->getClass() == CLASS_ROGUE) || 
+            (ToPlayer() && ToPlayer()->getClass() == CLASS_DRUID &&
+            ToPlayer()->GetPrimaryTalentTree(ToPlayer()->GetActiveSpec()) == TALENT_TREE_DRUID_FERAL_COMBAT))
+            detectionValue = 50;
 
         // Level difference: 5 point / level, starting from level 1.
         // There may be spells for this and the starting points too, but
@@ -2313,7 +2318,7 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj) const
         detectionValue -= obj->m_stealth.GetValue(StealthType(i));
 
         // Calculate max distance
-        float visibilityRange = float(detectionValue) * 0.3f + combatReach;
+        float visibilityRange = float(detectionValue) * 0.2f + combatReach;
 
         if (visibilityRange > MAX_PLAYER_STEALTH_DETECT_RANGE)
             visibilityRange = MAX_PLAYER_STEALTH_DETECT_RANGE;
