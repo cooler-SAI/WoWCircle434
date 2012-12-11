@@ -4024,10 +4024,43 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
         }
         case SPELLFAMILY_HUNTER:
         {
-            // Kill Shot - bonus damage from Ranged Attack Power
-            if (m_spellInfo->SpellFamilyFlags[1] & 0x800000)
-                spell_bonus += int32(0.45f * m_caster->GetTotalAttackPowerValue(RANGED_ATTACK));
-            break;
+            float shotMod = 0;
+            switch(m_spellInfo->Id)
+            {
+                case 53351: // Kill Shot
+                {
+                    // "You attempt to finish the wounded target off, firing a long range attack dealing % weapon damage plus RAP*0.30+543."
+                    shotMod = 0.45f;
+                    break;
+                }
+                case 19434: // Aimed Shot
+                case 82928: // Aimed Shot with Master Marksman
+                {
+                    // "A powerful aimed shot that deals % ranged weapon damage plus (RAP * 0.724)+776."
+                    shotMod = 0.724f;
+                    break;
+                }
+                case 56641: // Steady Shot
+                {
+                    // "A steady shot that causes % weapon damage plus RAP*0.021+280. Generates 9 Focus."
+                    // focus effect done in dummy
+                    shotMod = 0.021f;
+                    break;
+                }
+                case 53209: // Chimera Shot
+                {
+                    shotMod = 0.732f;
+                    break;
+                }
+                case 3044: // Arcane Shot
+                {
+                    shotMod = 0.0483f;
+                    break;
+                }
+
+                default: break;
+            }
+            spell_bonus += int32((shotMod*m_caster->GetTotalAttackPowerValue(RANGED_ATTACK)));
         }
         case SPELLFAMILY_DEATHKNIGHT:
         {
