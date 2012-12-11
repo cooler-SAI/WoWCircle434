@@ -2255,7 +2255,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         ExitVehicle();
 
     // reset movement flags at teleport, because player will continue move with these flags after teleport
-    SetUnitMovementFlags(0);
+    m_movementInfo.flags = m_movementInfo.flags_s = 0;
+    //SetUnitMovementFlags(0);
     DisableSpline();
 
     if (m_transport)

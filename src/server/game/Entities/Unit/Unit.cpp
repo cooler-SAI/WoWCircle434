@@ -5534,46 +5534,45 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (GetTypeId() != TYPEID_PLAYER)
                         return false;
 
-                    #pragma error "Replace by array of 3"
-                    std::vector<uint32> RandomSpells;
+                    uint32 *RandomSpells = new uint32[3];
                     switch (getClass())
                     {
                         case CLASS_WARRIOR:
                         case CLASS_PALADIN:
                         case CLASS_DEATH_KNIGHT:
-                            RandomSpells.push_back(71484);
-                            RandomSpells.push_back(71491);
-                            RandomSpells.push_back(71492);
+                            RandomSpells[0] = 71484;
+                            RandomSpells[1] = 71491;
+                            RandomSpells[2] = 71492;
                             break;
                         case CLASS_SHAMAN:
                         case CLASS_ROGUE:
-                            RandomSpells.push_back(71486);
-                            RandomSpells.push_back(71485);
-                            RandomSpells.push_back(71492);
+                            RandomSpells[0] = 71486;
+                            RandomSpells[1] = 71485;
+                            RandomSpells[2] = 71492;
                             break;
                         case CLASS_DRUID:
-                            RandomSpells.push_back(71484);
-                            RandomSpells.push_back(71485);
-                            RandomSpells.push_back(71492);
+                            RandomSpells[0] = 71484;
+                            RandomSpells[1] = 71485;
+                            RandomSpells[2] = 71492;
                             break;
                         case CLASS_HUNTER:
-                            RandomSpells.push_back(71486);
-                            RandomSpells.push_back(71491);
-                            RandomSpells.push_back(71485);
+                            RandomSpells[0] = 71486;
+                            RandomSpells[1] = 71491;
+                            RandomSpells[2] = 71485;
                             break;
                         default:
+                            delete []&RandomSpells;
                             return false;
                     }
-                    if (RandomSpells.empty()) // shouldn't happen
-                        return false;
-
-                    uint8 rand_spell = irand(0, (RandomSpells.size() - 1));
+                    uint8 rand_spell = irand(0, 2);
                     CastSpell(target, RandomSpells[rand_spell], true, castItem, triggeredByAura, originalCaster);
-                    for (std::vector<uint32>::iterator itr = RandomSpells.begin(); itr != RandomSpells.end(); ++itr)
+                    for (uint8 i = 0; i < 3; ++i)
                     {
-                        if (!ToPlayer()->HasSpellCooldown(*itr))
-                            ToPlayer()->AddSpellCooldown(*itr, 0, time(NULL) + cooldown);
+                        uint32 spell = RandomSpells[i];
+                        if (!ToPlayer()->HasSpellCooldown(spell))
+                            ToPlayer()->AddSpellCooldown(spell, 0, time(NULL) + cooldown);
                     }
+                    delete []&RandomSpells;
                     break;
                 }
                 case 71562: // Deathbringer's Will Heroic
@@ -5581,46 +5580,46 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (GetTypeId() != TYPEID_PLAYER)
                         return false;
 
-                    #pragma error "Replace by array of 3"
-                    std::vector<uint32> RandomSpells;
+                    uint32 *RandomSpells = new uint32[3];
                     switch (getClass())
                     {
                         case CLASS_WARRIOR:
                         case CLASS_PALADIN:
                         case CLASS_DEATH_KNIGHT:
-                            RandomSpells.push_back(71561);
-                            RandomSpells.push_back(71559);
-                            RandomSpells.push_back(71560);
+                            RandomSpells[0] = 71561;
+                            RandomSpells[1] = 71559;
+                            RandomSpells[2] = 71560;
                             break;
                         case CLASS_SHAMAN:
                         case CLASS_ROGUE:
-                            RandomSpells.push_back(71558);
-                            RandomSpells.push_back(71556);
-                            RandomSpells.push_back(71560);
+                            RandomSpells[0] = 71558;
+                            RandomSpells[1] = 71556;
+                            RandomSpells[2] = 71560;
                             break;
                         case CLASS_DRUID:
-                            RandomSpells.push_back(71561);
-                            RandomSpells.push_back(71556);
-                            RandomSpells.push_back(71560);
+                            RandomSpells[0] = 71561;
+                            RandomSpells[1] = 71556;
+                            RandomSpells[2] = 71560;
                             break;
                         case CLASS_HUNTER:
-                            RandomSpells.push_back(71558);
-                            RandomSpells.push_back(71559);
-                            RandomSpells.push_back(71556);
+                            RandomSpells[0] = 71558;
+                            RandomSpells[1] = 71559;
+                            RandomSpells[2] = 71556;
                             break;
                         default:
+                            delete []&RandomSpells;
                             return false;
                     }
-                    if (RandomSpells.empty()) // shouldn't happen
-                        return false;
 
-                    uint8 rand_spell = irand(0, (RandomSpells.size() - 1));
+                    uint8 rand_spell = irand(0, 2);
                     CastSpell(target, RandomSpells[rand_spell], true, castItem, triggeredByAura, originalCaster);
-                    for (std::vector<uint32>::iterator itr = RandomSpells.begin(); itr != RandomSpells.end(); ++itr)
+                    for (uint8 i = 0; i < 3; ++i)
                     {
-                        if (!ToPlayer()->HasSpellCooldown(*itr))
-                            ToPlayer()->AddSpellCooldown(*itr, 0, time(NULL) + cooldown);
+                        uint32 spell = RandomSpells[i];
+                        if (!ToPlayer()->HasSpellCooldown(spell))
+                            ToPlayer()->AddSpellCooldown(spell, 0, time(NULL) + cooldown);
                     }
+                    delete []&RandomSpells;
                     break;
                 }
                 case 71875: // Item - Black Bruise: Necrotic Touch Proc
@@ -19036,12 +19035,11 @@ void Unit::ReleaseFocus(Spell const* focusSpell)
 bool Unit::IsVisionObscured(Unit* victim) const
 {
     Aura* victimAura = NULL;
-    Aura* myAura = NULL;
     Unit* victimCaster = NULL;
+    Aura* myAura = NULL;
     Unit* myCaster = NULL;
 
     #pragma warning "Replace for loop by vAuras.front()"
-
     AuraEffectList const& vAuras = victim->GetAuraEffectsByType(SPELL_AURA_INTERFERE_TARGETTING);
     for (AuraEffectList::const_iterator i = vAuras.begin(); i != vAuras.end(); ++i)
     {
@@ -19049,8 +19047,8 @@ bool Unit::IsVisionObscured(Unit* victim) const
         victimCaster = victimAura->GetCaster();
         break;
     }
-    #pragma warning "Replace for loop by myAuras.front()"
 
+    #pragma warning "Replace for loop by myAuras.front()"
     AuraEffectList const& myAuras = GetAuraEffectsByType(SPELL_AURA_INTERFERE_TARGETTING);
     for (AuraEffectList::const_iterator i = myAuras.begin(); i != myAuras.end(); ++i)
     {

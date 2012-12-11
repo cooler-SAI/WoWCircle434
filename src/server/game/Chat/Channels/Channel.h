@@ -161,7 +161,7 @@ class Channel
 
     private:
         // initial packet data (notify type and channel name)
-        void MakeNotifyPacket(WorldPacket* data, uint8 notify_type);
+        void MakeNotifyPacket(WorldPacket* data, uint8 notify_type, uint8 dopSize = 0);
         // type specific packet data
         void MakeJoined(WorldPacket* data, uint64 guid);                        //+ 0x00
         void MakeLeft(WorldPacket* data, uint64 guid);                          //+ 0x01
