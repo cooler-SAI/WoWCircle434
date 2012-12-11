@@ -434,7 +434,7 @@ AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32 *baseAmount, Unit* cast
 m_base(base), m_spellInfo(base->GetSpellInfo()),
 m_baseAmount(baseAmount ? *baseAmount : m_spellInfo->Effects[effIndex].BasePoints),
 m_spellmod(NULL), m_periodicTimer(0), m_tickNumber(0), m_chargePeriodicTimer(0),
-m_effIndex(effIndex), m_canBeRecalculated(true), m_isPeriodic(false), m_haveStacks(false)
+m_effIndex(effIndex), m_canBeRecalculated(true), m_isPeriodic(false)
 {
     m_fixed_periodic.Clear();
 
@@ -448,7 +448,6 @@ m_effIndex(effIndex), m_canBeRecalculated(true), m_isPeriodic(false), m_haveStac
 AuraEffect::~AuraEffect()
 {
     delete m_spellmod;
-    _chargeStoreMap.clear();
 }
 
 void AuraEffect::GetTargetList(std::list<Unit*> & targetList) const
@@ -906,20 +905,6 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 m_fixed_periodic.SetCriticalChance(temp_crit);
             }
         }
-
-        // Some spells have unique duration for charges
-        if (GetBase()->GetStackAmount() > 1)
-        {
-            if (int32 duration = GetSpellInfo()->GetUniqueChargeInfo(GetCaster()))
-            {
-                chargeStore _chargeStore;
-                _chargeStore.amount = m_fixed_periodic.HasDamage() ? m_fixed_periodic.HasDamage() : GetAmount();
-                _chargeStore.duration = duration;
-                _chargeStoreMap[GetBase()->GetStackAmount()] = _chargeStore;
-
-                m_haveStacks = true;
-            }
-        }
     }
 
     return amount;
@@ -1255,11 +1240,10 @@ void AuraEffect::Update(uint32 diff, Unit* caster)
 {
     if (m_isPeriodic && (GetBase()->GetDuration() >=0 || GetBase()->IsPassive() || GetBase()->IsPermanent()))
     {
-        if (m_haveStacks)
+        if (GetBase()->m_haveStacks)
         {
-            if (m_chargePeriodicTimer > int32(diff))
-                m_chargePeriodicTimer -= diff;
-            else
+            m_chargePeriodicTimer -= diff;
+            if (m_chargePeriodicTimer < 0)
                 UpdateChargeTick();
         }
 
@@ -1519,22 +1503,9 @@ void AuraEffect::UpdateChargeTick()
     if (GetBase()->IsRemoved() || GetBase()->IsExpired())
         return;
 
-    for (ChargeStoreMap::iterator itr = _chargeStoreMap.begin(); itr != _chargeStoreMap.end(); ++itr)
-    {
-        itr->second.duration -= 500;
-        if (itr->second.duration <= 0)
-        {
-            GetBase()->ModStackAmount(-1);
-            if (GetBase() && !GetBase()->IsRemoved() && !GetBase()->IsExpired())
-            {
-                itr = _chargeStoreMap.erase(++itr);
-                break;
-            }
-            else
-                ++itr;
-        }
-    }
-    m_chargePeriodicTimer = 500;
+    GetBase()->UpdateChargesStore();
+
+    m_chargePeriodicTimer += 500;
 }
 
 void AuraEffect::HandleProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)

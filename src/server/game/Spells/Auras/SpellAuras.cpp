@@ -424,6 +424,7 @@ Aura::~Aura()
 
     ASSERT(m_applications.empty());
     _DeleteRemovedApplications();
+    _chargeStoreList.clear();
 }
 
 Unit* Aura::GetCaster() const
@@ -925,6 +926,8 @@ bool Aura::ModStackAmount(int32 num, AuraRemoveMode removeMode)
 
     if (refresh)
     {
+        CreateChargesStore();
+
         RefreshSpellMods();
         RefreshTimers();
 
@@ -2878,4 +2881,38 @@ bool Aura::IsUniqueVisibleAuraBuff() const
         }
     }
     return false;
+}
+
+void Aura::CreateChargesStore()
+{
+    // Some spells have unique duration for charges
+    if (GetSpellInfo()->StackAmount > 1)
+    {
+        if (int32 duration = GetSpellInfo()->GetUniqueChargeInfo(GetCaster()))
+        {
+            _chargeStoreList.push_back(duration);
+
+            m_haveStacks = true;
+        }
+    }
+}
+
+void Aura::UpdateChargesStore()
+{
+    if (!_chargeStoreList.size())
+        return;
+
+    for (ChargeStoreList::iterator itr = _chargeStoreList.begin(); itr != _chargeStoreList.end();)
+    {
+        (*itr) -= 500;
+        if ((*itr) <= 0)
+        {
+            itr = _chargeStoreList.erase(itr);
+            ModStackAmount(-1);
+        }
+        else
+        {
+            ++itr;
+        }
+    }
 }

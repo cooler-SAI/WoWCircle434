@@ -4866,6 +4866,7 @@ void SpellMgr::LoadDbcDataCorrections()
             // Echo of Light
             case 77489:
                 spellInfo->StackAmount = 100; // should be inf
+                spellInfo->AttributesEx8 |= SPELL_ATTR8_DONT_RESET_PERIODIC_TIMER;
                 break;
             // Efflorescence
             // Healing Rain

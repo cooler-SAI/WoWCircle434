@@ -3155,6 +3155,7 @@ void Unit::_ApplyAura(AuraApplication * aurApp, uint8 effMask)
         return;
 
     aura->HandleAuraSpecificMods(aurApp, caster, true, false);
+    aura->CreateChargesStore();
 
     // apply effects of the aura
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
