@@ -48,7 +48,7 @@ _flags(AFLAG_NONE), _effectsToApply(effMask), _needClientUpdate(false)
         // Try find slot for aura
         uint8 slot = MAX_AURAS;
         // Lookup for auras already applied from spell
-        if (AuraApplication * foundAura = GetTarget()->GetAuraApplication(GetBase()->GetId(), GetBase()->GetCasterGUID(), GetBase()->GetCastItemGUID()))
+        if (AuraApplication* foundAura = GetTarget()->GetAuraApplication(GetBase()->GetId(), GetBase()->GetCasterGUID(), GetBase()->GetCastItemGUID()))
         {
             // allow use single slot only by auras from same caster
             slot = foundAura->GetSlot();
@@ -2011,6 +2011,110 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         caster->RemoveAura(83582);
                 }
                 break;
+            }
+            break;
+        case SPELLFAMILY_DEATHKNIGHT:
+            if (!caster)
+                break;
+
+            if (GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_PRESENCE)
+            {
+                target->SetPower(POWER_RUNIC_POWER, 0);
+                Aura *bloodPresenceAura=0;  // healing by damage done
+                AuraEffect *frostPresenceAura=0;  // increased health
+                AuraEffect *unholyPresenceAura=0; // increased movement speed, faster rune recovery
+
+                // Improved Presences
+                Unit::AuraEffectList const& vDummyAuras = target->GetAuraEffectsByType(SPELL_AURA_DUMMY);
+                for (Unit::AuraEffectList::const_iterator itr = vDummyAuras.begin(); itr != vDummyAuras.end(); ++itr)
+                {
+                    switch((*itr)->GetId())
+                    {
+                        // Improved Blood Presence
+                        case 50365:
+                        case 50371:
+                        {
+                            bloodPresenceAura = (*itr)->GetBase();
+                            break;
+                        }
+                        // Improved Frost Presence
+                        case 50384:
+                        case 50385:
+                        {
+                            frostPresenceAura = (*itr);
+                            break;
+                        }
+                        // Improved Unholy Presence
+                        case 50391:
+                        case 50392:
+                        {
+                            unholyPresenceAura = (*itr);
+                            break;
+                        }
+                    }
+                }
+
+                uint32 presence = GetId();
+                if (apply)
+                {
+                    // Blood Presence bonus
+                    if (presence == PRESENCE_BLOOD)
+                    {
+                        target->ModifyAuraState(AURA_STATE_DEFENSE, true);
+                        // Improved Blood Presence
+                        if (bloodPresenceAura)
+                        {
+                            // -crit bonus
+                            int32 bp2 = bloodPresenceAura->GetEffect(1)->GetAmount();
+                            target->CastCustomSpell(target, 61261, 0, &bp2, 0, true);
+
+                            // rune recovery bonus
+                            int32 bp1 = bloodPresenceAura->GetEffect(2)->GetAmount();
+                            bp2 = bp1;
+                            target->CastCustomSpell(target, 63611, &bp1, &bp2, 0, true);
+                        }
+                        else target->CastSpell(target, 61261, true);
+                    }
+                    else if (bloodPresenceAura)
+                    {
+                        int32 basePoints1=bloodPresenceAura->GetEffect(0)->GetAmount();
+                        target->CastCustomSpell(target, 61261, NULL, &basePoints1, NULL, true, 0, bloodPresenceAura->GetEffect(0));
+                    }
+                    // Frost Presence bonus
+                    if (presence == PRESENCE_FROST)
+                    {
+                        // there are nothing to do with it, rly
+                    }
+                    else if (frostPresenceAura)
+                    {
+                        int32 basePoints0=frostPresenceAura->GetAmount();
+                        target->CastCustomSpell(target, 63621, &basePoints0, NULL, NULL, true, 0, frostPresenceAura);
+                    }
+                    // Unholy Presence bonus
+                    if (presence == PRESENCE_UNHOLY)
+                    {
+                    }
+                    else if (unholyPresenceAura)
+                    {
+                        int32 basePoints0=unholyPresenceAura->GetAmount();
+                        target->CastCustomSpell(target, 63622, &basePoints0 , NULL, NULL, true, 0, unholyPresenceAura);
+                    }
+                }
+                else
+                {
+                    // Remove passive auras
+                    if (presence == PRESENCE_BLOOD || bloodPresenceAura)
+                    {
+                        if (presence == PRESENCE_BLOOD)
+                            target->ModifyAuraState(AURA_STATE_DEFENSE, false);
+                        target->RemoveAurasDueToSpell(63611);
+                        target->RemoveAurasDueToSpell(61261);
+                    }
+                    if (frostPresenceAura)
+                        target->RemoveAurasDueToSpell(63621);
+                    if (unholyPresenceAura)
+                        target->RemoveAurasDueToSpell(63622);
+                }
             }
             break;
     }

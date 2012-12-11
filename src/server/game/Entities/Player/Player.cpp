@@ -24146,13 +24146,13 @@ uint32 Player::GetRuneTypeBaseCooldown(RuneType runeType) const
     float cooldown = RUNE_BASE_COOLDOWN;
     float hastePct = GetRatingBonusValue(CR_HASTE_MELEE);
 
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE) / 10.0f;
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE) / 10.0f;
-
     AuraEffectList const& regenAura = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
     for (AuraEffectList::const_iterator i = regenAura.begin();i != regenAura.end(); ++i)
-        if ((*i)->GetMiscValue() == POWER_RUNES && (*i)->GetMiscValueB() == runeType)
+        if ((*i)->GetMiscValue() == POWER_RUNES)
             cooldown *= 1.0f - (*i)->GetAmount() / 100.0f;
+
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE) / 10.0f;
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE) / 10.0f;
 
     cooldown *=  1.0f - (hastePct / 100.0f);
     return cooldown;

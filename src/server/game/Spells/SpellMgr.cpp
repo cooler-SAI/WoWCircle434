@@ -4896,20 +4896,20 @@ void SpellMgr::LoadDbcDataCorrections()
             case 14179:
             case 58422:
             case 58423:
-                spellInfo->Effects[0].SpellClassMask[1] |= 0x00000008;
+                spellInfo->Effects[EFFECT_0].SpellClassMask[1] |= 0x00000008;
                 break;
             // Relentless Strikes effect
             case 14181:
-                spellInfo->Effects[0].Effect = SPELL_EFFECT_ENERGIZE;
-                spellInfo->Effects[0].MiscValue = 3;
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_ENERGIZE;
+                spellInfo->Effects[EFFECT_0].MiscValue = 3;
                 break;
             // Smoke Bomb
             case 76577:
-                spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_DUMMY;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
                 break;
             // Fan of Knives
             case 51723:
-                spellInfo->Effects[0].SetRadiusIndex(14);
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(14);
                 break;
             // Honor Among Thieves rank 1
             case 51698:
@@ -4918,11 +4918,18 @@ void SpellMgr::LoadDbcDataCorrections()
             // Stampeding Roar
             case 77761: // Bear
             case 77764: // Cat
-                spellInfo->Effects[0].SetRadiusIndex(13);
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(13);
                 break;
             // Cheat Death
             case 45182:
-                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
+                break;
+            // Improved Blood Presence
+            case 63611:
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_POWER_REGEN_PERCENT;
+                spellInfo->Effects[EFFECT_0].MiscValue = 5;
+                spellInfo->Effects[EFFECT_0].MiscValueB = NUM_RUNE_TYPES;
                 break;
             default:
                 break;

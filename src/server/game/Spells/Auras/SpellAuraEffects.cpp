@@ -4337,7 +4337,12 @@ void AuraEffect::HandleModPowerRegen(AuraApplication const* aurApp, uint8 mode, 
     if (GetMiscValue() == POWER_MANA)
         target->ToPlayer()->UpdateManaRegen();
     else if (GetMiscValue() == POWER_RUNES)
-        target->ToPlayer()->UpdateRuneRegen(RuneType(GetMiscValueB()));
+    {
+        if (GetMiscValueB() >= NUM_RUNE_TYPES)
+            target->ToPlayer()->UpdateAllRunesRegen();
+        else
+            target->ToPlayer()->UpdateRuneRegen(RuneType(GetMiscValueB()));
+    }
     // other powers are not immediate effects - implemented in Player::Regenerate, Creature::Regenerate
 }
 
@@ -5338,6 +5343,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
         {
             if (!(mode & AURA_EFFECT_HANDLE_REAL))
                 break;
+
             switch (GetId())
             {
                 // Recently Bandaged
@@ -5569,8 +5575,35 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
         }
         case SPELLFAMILY_DEATHKNIGHT:
         {
-            //if (!(mode & AURA_EFFECT_HANDLE_REAL))
-            //    break;
+            if (!(mode & AURA_EFFECT_HANDLE_REAL))
+                break;
+
+            // Improved Unholy Presence
+            if (m_spellInfo->SpellIconID == 2633)
+            {
+                if (apply)
+                {
+                    if (target->HasAura(48265) && !target->HasAura(63622))
+                    {
+                        // Not listed as any effect, only base points set
+                        int32 basePoints0 = m_spellInfo->Effects[m_effIndex].CalcValue(caster, &m_spellInfo->Effects[m_effIndex].BasePoints, GetBase()->GetOwner()->ToUnit());
+                        target->CastCustomSpell(target, 63622, &basePoints0 , &basePoints0, &basePoints0, true, 0, this);
+                    }
+                }
+                else
+                    target->RemoveAurasDueToSpell(63622);
+            }
+            // Improved Blood Presence
+            else if (m_spellInfo->SpellIconID == 2636)
+            {
+                if (apply)
+                {
+                    if (!target->HasAura(48263) && !target->HasAura(63611))
+                        target->CastSpell(target, 63611, true, NULL, this);
+                }
+                else
+                    target->RemoveAurasDueToSpell(63611);
+            }
             break;
         }
         case SPELLFAMILY_ROGUE:

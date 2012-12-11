@@ -137,6 +137,13 @@ enum SpellValueMod
     SPELLVALUE_AURA_STACK
 };
 
+enum PRESENCES
+{
+    PRESENCE_BLOOD  =   48263,
+    PRESENCE_FROST  =   48266,
+    PRESENCE_UNHOLY =   48265
+};
+
 typedef std::pair<SpellValueMod, int32>     CustomSpellValueMod;
 class CustomSpellValues : public std::vector<CustomSpellValueMod>
 {
