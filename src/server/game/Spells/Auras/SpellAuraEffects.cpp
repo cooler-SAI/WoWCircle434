@@ -1936,15 +1936,28 @@ void AuraEffect::HandleModStealth(AuraApplication const* aurApp, uint8 mode, boo
     if (apply)
     {
         target->m_stealth.AddFlag(type);
-        target->m_stealth.AddValue(type, GetAmount());
+        target->m_stealth.SetValue(type, GetAmount());
 
         target->SetStandFlags(UNIT_STAND_FLAGS_CREEP);
         if (target->GetTypeId() == TYPEID_PLAYER)
             target->SetByteFlag(PLAYER_FIELD_BYTES2, 3, PLAYER_FIELD_BYTE2_STEALTH);
+
+        WorldPacket data(SMSG_CLEAR_TARGET, 8);
+        data << uint64(target->GetGUID());
+        target->SendMessageToSet(&data, true);
+
+        Unit::AttackerSet const& attackers = target->getAttackers();
+        for (Unit::AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end();)
+        {
+            if (!(*itr)->canSeeOrDetect(target))
+                (*(itr++))->AttackStop();
+            else
+                ++itr;
+        }
     }
     else
     {
-        target->m_stealth.AddValue(type, -GetAmount());
+        target->m_stealth.SetValue(type, target->GetTotalAuraModifier(SPELL_AURA_MOD_STEALTH));
 
         if (!target->HasAuraType(SPELL_AURA_MOD_STEALTH)) // if last SPELL_AURA_MOD_STEALTH
         {

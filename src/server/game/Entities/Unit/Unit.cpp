@@ -10635,6 +10635,14 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     // Custom scripted damage
     switch (spellProto->SpellFamilyName)
     {
+        case SPELLFAMILY_ROGUE:
+        {
+            // Revealing Strike for direct damage abilities
+            if (spellProto->AttributesEx & SPELL_ATTR1_REQ_COMBO_POINTS1 && damagetype != DOT)
+                if (AuraEffect* aurEff = victim->GetAuraEffect(84617, 2, GetGUID()))
+                    DoneTotalMod *= (100.0f + aurEff->GetAmount()) / 100.0f;
+            break;
+        }
         case SPELLFAMILY_MAGE:
             // Ice Lance
             if (spellProto->SpellIconID == 186)
@@ -13831,7 +13839,7 @@ int32 Unit::CalculateSpellDamage(Unit const* target, SpellInfo const* spellProto
     return spellProto->Effects[effect_index].CalcValue(this, basePoints, target);
 }
 
-int32 Unit::CalcSpellDuration(SpellInfo const* spellProto)
+int32 Unit::CalcSpellDuration(SpellInfo const* spellProto, Unit* target)
 {
     uint8 comboPoints = m_movedPlayer ? m_movedPlayer->GetComboPoints() : 0;
 
@@ -13841,7 +13849,15 @@ int32 Unit::CalcSpellDuration(SpellInfo const* spellProto)
     int32 duration;
 
     if (comboPoints && minduration != -1 && minduration != maxduration)
+    {
         duration = minduration + int32((maxduration - minduration) * comboPoints / 5);
+        if (target)
+            if (AuraEffect* aurEff = target->GetAuraEffect(84617, 2, GetGUID()))
+            {
+                if (!(spellProto->SpellFamilyFlags[0] & 0x00100000))
+                    duration *= (100.0f + aurEff->GetAmount()) / 100.0f;
+            }
+    }
     else
         duration = minduration;
 

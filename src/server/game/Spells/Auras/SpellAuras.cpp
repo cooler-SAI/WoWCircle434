@@ -761,7 +761,7 @@ int32 Aura::CalcMaxDuration(Unit* caster) const
     if (caster)
     {
         modOwner = caster->GetSpellModOwner();
-        maxDuration = caster->CalcSpellDuration(m_spellInfo);
+        maxDuration = caster->CalcSpellDuration(m_spellInfo, (GetType() == UNIT_AURA_TYPE)? GetUnitOwner(): NULL);
     }
     else
         maxDuration = m_spellInfo->GetDuration();
@@ -1704,6 +1704,9 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Sap
                 else if (GetId() == 6770)
                 {
+                    // Remove stealth from target
+                    target->RemoveAurasByType(SPELL_AURA_MOD_STEALTH, 0, 0, 11327);
+
                     // Blackjack
                     if (caster && caster->HasAura(79125)) // rank 2
                         caster->CastSpell(target, 79126, true);
@@ -1814,6 +1817,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         else
                             caster->RemoveAurasDueToSpell(96206);
                     }
+                    break;
                 }
                 // Tree of Life
                 case 33891:

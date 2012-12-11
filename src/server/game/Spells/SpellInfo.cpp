@@ -2868,6 +2868,8 @@ bool SpellInfo::IsIgnoringCombat() const
         case 83676:
         // Living Bomb Explode
         case 44461:
+        // Vendeta
+        case 79140:
             return true;
         default: return false;
     }
@@ -2991,8 +2993,8 @@ bool SpellInfo::IsBreakingStealth(Unit* m_caster) const
             return true;
     }
 
-    if ((!m_caster || !m_caster->HasAuraType(SPELL_AURA_335)) && IsPositive())
-        return false;
+    //if ((!m_caster || !m_caster->HasAuraType(SPELL_AURA_335)) && IsPositive())
+    //    return false;
 
     switch(Id)
     {
