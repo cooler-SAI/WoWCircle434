@@ -983,8 +983,8 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool resetPeriodicTimer /*= tru
         {
             m_periodicTimer = 0;
             // Start periodic on next tick or at aura apply
-            if (m_amplitude && !m_spellInfo->HasAttribute(SPELL_ATTR5_START_PERIODIC_AT_APPLY))
-                if (m_spellInfo->IsPassive() || GetId() == 32409)
+            if (m_amplitude && (!m_spellInfo->HasAttribute(SPELL_ATTR5_START_PERIODIC_AT_APPLY) ||
+                m_spellInfo->IsPassive() || GetId() == 32409))
                     m_periodicTimer += m_amplitude;
                 else
                 {

@@ -411,6 +411,32 @@ bool SpellEffectInfo::IsUnitOwnedAuraEffect() const
     return IsAreaAuraEffect() || Effect == SPELL_EFFECT_APPLY_AURA;
 }
 
+bool SpellEffectInfo::IsPeriodicEffect() const
+{
+    if (!ApplyAuraName)
+        return false;
+
+    switch (ApplyAuraName)
+    {
+        case SPELL_AURA_PERIODIC_DUMMY:
+        case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
+        case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
+        case SPELL_AURA_PERIODIC_DAMAGE:
+        case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+        case SPELL_AURA_PERIODIC_LEECH:
+        case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
+        case SPELL_AURA_PERIODIC_HEAL:
+        case SPELL_AURA_OBS_MOD_HEALTH:
+        case SPELL_AURA_PERIODIC_MANA_LEECH:
+        case SPELL_AURA_OBS_MOD_POWER:
+        case SPELL_AURA_PERIODIC_ENERGIZE:
+        case SPELL_AURA_POWER_BURN:
+            return true;
+    }
+
+    return false;
+}
+
 int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const* target) const
 {
     float basePointsPerLevel = RealPointsPerLevel;
@@ -1227,6 +1253,12 @@ bool SpellInfo::IsRangedWeaponSpell() const
 bool SpellInfo::IsAutoRepeatRangedSpell() const
 {
     return AttributesEx2 & SPELL_ATTR2_AUTOREPEAT_FLAG;
+}
+
+bool SpellInfo::IsPeriodic() const
+{
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        return Effects[i].IsPeriodicEffect();
 }
 
 bool SpellInfo::IsAffectedBySpellMods() const

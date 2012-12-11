@@ -2662,6 +2662,7 @@ void Unit::_UpdateSpells(uint32 time)
     {
         Aura* i_aura = m_auraUpdateIterator->second;
         ++m_auraUpdateIterator;                            // need shift to next for allow update if need into aura update
+
         i_aura->UpdateOwner(time, this);
     }
 
@@ -3048,7 +3049,10 @@ Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8
 void Unit::_AddAura(UnitAura* aura, Unit* caster)
 {
     ASSERT(!m_cleanupDone);
-    m_ownedAuras.insert(AuraMap::value_type(aura->GetId(), aura));
+
+    // temporary hack: dynamic auras should be updated from dynobject::update
+    if (!aura->GetSpellInfo()->HasPersistenAura())
+        m_ownedAuras.insert(AuraMap::value_type(aura->GetId(), aura));
 
     _RemoveNoStackAurasDueToAura(aura);
 
@@ -3339,6 +3343,9 @@ void Unit::RemoveOwnedAura(Aura* aura, AuraRemoveMode removeMode)
     ASSERT(aura->GetOwner() == this);
 
     uint32 spellId = aura->GetId();
+    if (aura->GetSpellInfo()->HasPersistenAura())
+        return;
+
     for (AuraMap::iterator itr = m_ownedAuras.lower_bound(spellId); itr != m_ownedAuras.upper_bound(spellId); ++itr)
         if (itr->second == aura)
         {
