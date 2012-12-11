@@ -32,7 +32,8 @@ enum DruidSpells
     DRUID_NATURES_SPLENDOR              = 57865,
     DRUID_LIFEBLOOM_FINAL_HEAL          = 33778,
     DRUID_SAVAGE_ROAR                   = 62071,
-    SPELL_DRUID_ITEM_T8_BALANCE_RELIC   = 64950,
+    DRUID_ITEM_T8_BALANCE_RELIC         = 64950,
+    DRUID_FAERIE_FIRE                   = 91565,
 };
 
 // 54846 Glyph of Starfire
@@ -99,7 +100,7 @@ class spell_dru_insect_swarm : public SpellScriptLoader
             void CalculateAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 if (Unit* caster = GetCaster())
-                    if (AuraEffect const* relicAurEff = caster->GetAuraEffect(SPELL_DRUID_ITEM_T8_BALANCE_RELIC, EFFECT_0))
+                    if (AuraEffect const* relicAurEff = caster->GetAuraEffect(DRUID_ITEM_T8_BALANCE_RELIC, EFFECT_0))
                         amount += relicAurEff->GetAmount() / aurEff->GetTotalTicks();
             }
 
@@ -803,6 +804,44 @@ class spell_dru_primal_madness : public SpellScriptLoader
         }
 };
 
+// Feral Agression - Faerie Fire
+class spell_dru_faerie_fire : public SpellScriptLoader
+{
+public:
+    spell_dru_faerie_fire() : SpellScriptLoader("spell_dru_faerie_fire") {}
+
+    class spell_dru_faerie_fire_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dru_faerie_fire_SpellScript);
+
+        bool Load()
+        {
+            return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        }
+
+        void ChangeStackAmount()
+        {
+            if (AuraEffect const* aurEff = GetCaster()->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 960, 0))
+            {
+                if (GetHitUnit() && GetCaster()->IsInFeralForm())
+                {
+                    if (Aura* faerieFire = GetHitUnit()->GetAura(DRUID_FAERIE_FIRE, GetCaster()->GetGUID()))
+                        faerieFire->SetStackAmount(aurEff->GetAmount());
+                }
+            }
+        }
+
+        void Register()
+        {
+            AfterHit += SpellHitFn(spell_dru_faerie_fire_SpellScript::ChangeStackAmount);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dru_faerie_fire_SpellScript();
+    }
+};
 
 void AddSC_druid_spell_scripts()
 {
@@ -820,4 +859,5 @@ void AddSC_druid_spell_scripts()
     new spell_dru_eclipse_energize();
     new spell_dru_primal_madness();
     new spell_dru_lunar_shower_energize();
+    new spell_dru_faerie_fire();
 }

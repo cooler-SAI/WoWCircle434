@@ -401,6 +401,8 @@ class SpellScript : public _SpellScript
         // Returns SpellInfo from the spell that triggered the current one
         SpellInfo const* GetTriggeringSpell();
 
+        bool IsTriggeredSpell();
+
         // finishes spellcast prematurely with selected error message
         void FinishCast(SpellCastResult result);
 

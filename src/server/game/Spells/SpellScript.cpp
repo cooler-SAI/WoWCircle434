@@ -588,6 +588,11 @@ SpellInfo const* SpellScript::GetTriggeringSpell()
     return m_spell->m_triggeredByAuraSpell;
 }
 
+bool SpellScript::IsTriggeredSpell()
+{
+    return m_spell->IsTriggered();
+}
+
 void SpellScript::FinishCast(SpellCastResult result)
 {
     m_spell->SendCastResult(result);
