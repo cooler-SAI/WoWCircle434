@@ -54,6 +54,9 @@ enum ShamanSpells
     SPELL_HEALING_STREAM_TOTEM_HEAL        = 52042,
 
     SHAMAN_SPELL_UNLEASH_ELEMENTS          = 73680,
+
+    SHAMAN_SPELL_SPIRIT_LINK               = 98020,
+    SHAMAN_SPELL_SPIRIT_LINK_DAMAGE        = 98021,
 };
 
 // 1535 Fire Nova
@@ -684,6 +687,80 @@ public:
     }
 };
 
+// 98020 Spirit Link
+class spell_sha_spirit_link : public SpellScriptLoader
+{
+    public:
+        spell_sha_spirit_link() : SpellScriptLoader("spell_sha_spirit_link") { }
+
+        class spell_sha_spirit_link_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_sha_spirit_link_SpellScript)
+            bool Validate(SpellEntry const * spellEntry)
+            {
+                if (!sSpellStore.LookupEntry(SHAMAN_SPELL_SPIRIT_LINK))
+                    return false;
+
+                if (!sSpellStore.LookupEntry(SHAMAN_SPELL_SPIRIT_LINK_DAMAGE))
+                    return false;
+
+                m_healthPct = 100.0f;
+
+                return true;
+            }
+
+            void CheckTargets(std::list<WorldObject*>& targets)
+            {
+                float healthPct = 0;
+
+                if (targets.size() == 0)
+                    return;
+                
+                for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
+                    healthPct += (*itr)->ToUnit()->GetHealthPct();
+
+                if (healthPct > 0.0f)
+                    m_healthPct = healthPct / targets.size();
+            }
+            
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                if (!GetCaster() || !GetHitUnit())
+                    return;
+
+                int32 dmg = 0;
+
+                float curPct = GetHitUnit()->GetHealthPct();
+
+                if (curPct < m_healthPct)
+                {
+                    dmg = CalculatePct(GetHitUnit()->GetMaxHealth(), m_healthPct) - GetHitUnit()->GetHealth(); 
+                    GetCaster()->CastCustomSpell(GetHitUnit(), SHAMAN_SPELL_SPIRIT_LINK_DAMAGE, 0, &dmg, 0, true);
+                }
+                else if (curPct > m_healthPct)
+                {
+                    dmg = GetHitUnit()->GetHealth() - CalculatePct(GetHitUnit()->GetMaxHealth(), m_healthPct);
+                    GetCaster()->CastCustomSpell(GetHitUnit(), SHAMAN_SPELL_SPIRIT_LINK_DAMAGE, &dmg, 0, 0, true);
+                }
+            }
+
+            void Register()
+            {
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sha_spirit_link_SpellScript::CheckTargets, EFFECT_0, TARGET_UNIT_CASTER_AREA_RAID);
+                OnEffectHitTarget += SpellEffectFn(spell_sha_spirit_link_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+
+        private:
+            float m_healthPct;
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_sha_spirit_link_SpellScript();
+        }
+};
+
 void AddSC_shaman_spell_scripts()
 {
     new spell_sha_fire_nova();
@@ -699,4 +776,5 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_flame_shock();
     new spell_sha_unleash_elements();
     new spell_shaman_ancestral_resolve();
+    new spell_sha_spirit_link();
 }
