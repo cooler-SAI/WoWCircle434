@@ -842,6 +842,18 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             }
             break;
         }
+        case SPELL_AURA_MOD_STAT:
+            if (!caster)
+                break;
+
+            // Mana Tide
+            if (GetSpellInfo()->Id == 16191)
+            {
+                if (Unit* owner = GetCaster()->GetOwner())
+                    amount = CalculatePct(owner->GetStat(STAT_SPIRIT), amount);
+            }
+
+            break;
         default:
             break;
     }

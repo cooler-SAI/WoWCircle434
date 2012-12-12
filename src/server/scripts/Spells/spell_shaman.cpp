@@ -95,37 +95,6 @@ class spell_sha_fire_nova : public SpellScriptLoader
         }
 };
 
-// 16191 Mana Tide
-/// Updated 4.3.4
-class spell_sha_mana_tide : public SpellScriptLoader
-{
-    public:
-        spell_sha_mana_tide() : SpellScriptLoader("spell_sha_mana_tide") { }
-
-        class spell_sha_mana_tide_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_sha_mana_tide_AuraScript);
-
-            void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
-            {
-                ///@TODO: Exclude the "short term" buffs from the stat value
-                if (Unit* caster = GetCaster())
-                    if (Unit* owner = caster->GetOwner())
-                        amount = CalculatePct(owner->GetStat(STAT_SPIRIT), aurEff->GetAmount());
-            }
-
-            void Register()
-            {
-                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_mana_tide_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_STAT);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_sha_mana_tide_AuraScript();
-        }
-};
-
 // 6474 - Earthbind Totem - Fix Talent:Earthen Power, Earth's Grasp
 /// Updated 4.3.4
 class spell_sha_earthbind_totem : public SpellScriptLoader
@@ -764,7 +733,6 @@ class spell_sha_spirit_link : public SpellScriptLoader
 void AddSC_shaman_spell_scripts()
 {
     new spell_sha_fire_nova();
-    new spell_sha_mana_tide();
     new spell_sha_earthbind_totem();
     new spell_sha_earthen_power();
     new spell_sha_bloodlust();
