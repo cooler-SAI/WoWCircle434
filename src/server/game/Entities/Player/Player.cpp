@@ -26062,7 +26062,8 @@ void Player::SendItemRefundResult(Item* item, ItemExtendedCostEntry const* iece,
     {
         for (uint8 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
         {
-            data << uint32(iece->RequiredCurrencyCount[i]);
+            CurrencyTypesEntry const* _currencyEntry = sCurrencyTypesStore.LookupEntry(iece->RequiredCurrency[i]);
+            data << uint32(iece->RequiredCurrencyCount[i] / _currencyEntry->GetPrecision());
             data << uint32(iece->RequiredCurrency[i]);
         }
 
@@ -26156,7 +26157,7 @@ void Player::RefundItem(Item* item)
     DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
 
     // Grant back extendedcost items
-    for (uint8 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
+    for (uint8 i = 0; i < MAX_ITEM_EXT_COST_ITEMS; ++i)
     {
         uint32 count = iece->RequiredItemCount[i];
         uint32 itemid = iece->RequiredItem[i];
@@ -26167,6 +26168,17 @@ void Player::RefundItem(Item* item)
             ASSERT(msg == EQUIP_ERR_OK) /// Already checked before
             Item* it = StoreNewItem(dest, itemid, true);
             SendNewItem(it, count, true, false, true);
+        }
+    }
+
+    // and currencies
+    for (uint8 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
+    {
+        uint32 currency = iece->RequiredCurrency[i];
+        uint32 count = iece->RequiredCurrencyCount[i];
+        if (currency && count)
+        {
+            ModifyCurrency(currency, count, false, true);
         }
     }
 

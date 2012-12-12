@@ -941,7 +941,7 @@ struct CurrencyTypesEntry
 
     bool HasPrecision() const   { return Flags & CURRENCY_FLAG_HIGH_PRECISION; }
     bool HasSeasonCount() const { return Flags & CURRENCY_FLAG_HAS_SEASON_COUNT; }
-    float GetPrecision() const  { return HasPrecision() ? CURRENCY_PRECISION : 1.0f; }
+    float GetPrecision() const  { return HasPrecision() ? 100.0f : 1.0f; }
 };
 
 struct DestructibleModelDataEntry

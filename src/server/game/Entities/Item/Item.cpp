@@ -1069,7 +1069,7 @@ void Item::SaveRefundDataToDB()
 {
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<4>(CHAR_DEL_ITEM_REFUND_INSTANCE);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_ITEM_REFUND_INSTANCE);
     stmt->setUInt32(0, GetGUIDLow());
     trans->Append(stmt);
 

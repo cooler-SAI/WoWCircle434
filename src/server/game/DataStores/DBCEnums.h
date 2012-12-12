@@ -44,8 +44,6 @@ enum BattlegroundBracketId                                  // bracketId for lev
 // must be max value in PvPDificulty slot+1
 #define MAX_BATTLEGROUND_BRACKETS  16
 
-#define CURRENCY_PRECISION 100.0f
-
 enum CurrencyCategory
 {
     // ...
