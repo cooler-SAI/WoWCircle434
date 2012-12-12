@@ -3453,6 +3453,35 @@ void Spell::cast(bool skipCheck)
             }
             break;
         }
+        case SPELLFAMILY_DEATHKNIGHT:
+        {
+            // Death strike should heal regardless of hit result
+            if (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_DK_DEATH_STRIKE && !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_REQ_OFFHAND))
+            {
+                int32 healthPct = 7;
+
+                // Glyph of Dark Succor
+                if (AuraEffect const* aurEff = m_caster->GetAuraEffect(96279, EFFECT_0))
+                {
+                    if (m_caster->HasAura(48265) || m_caster->HasAura(48266)) // Work only in frost / unholy presence
+                        healthPct = aurEff->GetAmount();
+                }
+
+                int32 minimumHp = int32(m_caster->CountPctFromMaxHealth(healthPct));
+                int32 takenDamage = int32(m_caster->GetDamageTakenInPastSecs(5) * 0.2f);
+
+                int32 bp = std::max(takenDamage, minimumHp);
+
+                // Improved Death Strike
+                if (AuraEffect const * aurEff = m_caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 2751, 0))
+                    AddPct(bp, m_caster->CalculateSpellDamage(m_caster, aurEff->GetSpellInfo(), EFFECT_2));
+
+                if (!m_triggeredByAuraSpell)
+                    m_caster->CastCustomSpell(m_caster, 45470, &bp, NULL, NULL, false);
+                break;
+            }
+            break;
+        }
     }
 
     CallScriptOnCastHandlers();
