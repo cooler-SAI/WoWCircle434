@@ -2866,11 +2866,15 @@ void World::ResetDailyQuests()
 
 void World::ResetCurrencyWeekCap()
 {
-    CharacterDatabase.Execute("UPDATE `character_currency` SET `week_count` = 0");
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_UPD_CURRENCY_RESET_WEEK_CAP);
+    stmt->setUInt32(0, 0);
+    CharacterDatabase.Query(stmt);
 
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
-        if (itr->second->GetPlayer())
-            itr->second->GetPlayer()->ResetCurrencyWeekCap();
+    {
+        if (Player* player = itr->second->GetPlayer())
+            player->ResetCurrencyWeekCap();
+    }
 
     m_NextCurrencyReset = time_t(m_NextCurrencyReset + DAY * getIntConfig(CONFIG_CURRENCY_RESET_INTERVAL));
     sWorld->setWorldState(WS_CURRENCY_RESET_TIME, uint64(m_NextCurrencyReset));

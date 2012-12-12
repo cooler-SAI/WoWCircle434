@@ -154,7 +154,7 @@ class AuraEffect
         void DoUniqueStackAura(AuraApplication const * aurApp, uint8 mode, bool apply) const;
         mod_pair GetUniqueVisibleAuraBuff(Unit* target, int8 x) const;
 
-        bool HaveChargeStore(uint8 chargeId) const
+        bool HaveChargeStore(uint8 /*chargeId*/) const
         {
 //            ChargeStoreMap::const_iterator itr = _chargeStoreMap.find(chargeId);
 //            return itr != _chargeStoreMap.end();

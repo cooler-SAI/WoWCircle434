@@ -3184,7 +3184,7 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                 if (!unit || unit->GetHealthPct() >= reqValue)
                     return false;
                 break;
-            case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_MIN_ACHIEVEMENT_POINTS:
+            case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_MIN_ACHIEVEMENT_POINTS: // 56
                 if (referencePlayer->GetAchievementMgr().GetAchievementPoints() < reqValue)
                     return false;
                 break;

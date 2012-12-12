@@ -602,4 +602,10 @@ void CharacterDatabaseConnection::DoPrepareStatements()
 
     // Archaeology
     PREPARE_STATEMENT(CHAR_SEL_CHAR_ARCHAEOLOGY, "SELECT sites, counts, projects, completed FROM character_archaeology WHERE guid = ?", CONNECTION_ASYNC);
+
+    // Currency
+    PREPARE_STATEMENT(CHAR_UPD_CURRENCY_WEEK_CAP, "UPDATE character_currency_cap SET currentArenaCap = ?, currentRBgCap = ?, requireReset = ?, highestArenaRating = ?, highestRBgRating = ? where guid = '?'", CONNECTION_ASYNC);
+    PREPARE_STATEMENT(CHAR_SEL_CURRENCY_CAP, "SELECT guid, highestArenaRating, highestRBgRating, currentArenaCap, currentRBgCap, requireReset FROM character_currency_cap ORDER BY guid", CONNECTION_SYNCH);
+    PREPARE_STATEMENT(CHAR_SEL_CURRENCY_RESTORE_DATA, "SELECT lastguid FROM currency_reset_save WHERE id = ?", CONNECTION_SYNCH);
+    PREPARE_STATEMENT(CHAR_UPD_CURRENCY_RESET_WEEK_CAP, "UPDATE `character_currency` SET `week_count` = ?", CONNECTION_ASYNC);
 }

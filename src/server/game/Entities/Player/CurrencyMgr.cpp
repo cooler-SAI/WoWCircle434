@@ -356,15 +356,21 @@ void Player::ResetCurrencyWeekCap(SQLTransaction* trans /* = NULL */)
     // we need it after rated bg implementation
     //sCurrencyMgr->CalculatingCurrencyCap(m_currencyCap->currentRBgCap, true);
 
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<6>(CHAR_UPD_CURRENCY_WEEK_CAP);
+    stmt->setUInt16(0, m_currencyCap->currentArenaCap); // currentArenaCap
+    stmt->setUInt16(1, 0);                              // currentRBgCap
+    stmt->setUInt8(2, 0);                               // requireReset
+    stmt->setUInt16(3, 0);                              // highestArenaRating
+    stmt->setUInt16(4, 0);                              // highestRBgRating
+    stmt->setUInt32(5, GetGUIDLow());                   // guid
+
     if (trans && !trans->null())
-        (*trans)->PAppend("UPDATE character_currency_cap SET currentArenaCap = %u, currentRBgCap = %u,"
-        " requireReset = 0, highestArenaRating = 0, highestRBgRating = 0 where guid = '%u'",
-        m_currencyCap->currentArenaCap, 0, GetGUIDLow());
+        (*trans)->Append(stmt);
 }
 
 void Player::SendPvpRewards()
 {
-    WorldPacket packet(SMSG_REQUEST_PVP_REWARDS_RESPONSE, 24);
+    WorldPacket packet(SMSG_REQUEST_PVP_REWARDS_RESPONSE, 28);
     packet << GetBattlegroundCap();
     packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_POINTS, true);
     packet << GetArenaCap();
@@ -387,17 +393,13 @@ void CurrencyMgr::AddCurrencyCapData(uint32 lowGuid, uint16 arenaRating /* = 0 *
 
 void CurrencyMgr::LoadPlayersCurrencyCap()
 {
-    QueryResult result = CharacterDatabase.Query(
-        "SELECT guid, highestArenaRating, highestRBgRating, currentArenaCap, currentRBgCap, requireReset"
-        " FROM character_currency_cap ORDER BY guid");
-
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<0>(CHAR_SEL_CURRENCY_CAP);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
     {
         sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 players who have any currency cap data. DB table `character_currency_cap` is empty!");
         return;
     }
-
-    uint32 count = 0;
 
     do 
     {
@@ -424,8 +426,9 @@ void CurrencyMgr::LoadPlayersCurrencyCap()
 
 bool CurrencyMgr::CheckIfNeedRestore()
 {
-    QueryResult result = CharacterDatabase.Query(
-        "SELECT lastguid FROM currency_reset_save WHERE id = 1");
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CURRENCY_RESTORE_DATA);
+    stmt->setUInt8(0, 0);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
     if (!result)
         return false;
@@ -451,26 +454,32 @@ void CurrencyMgr::RestoreResettingCap()
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
     for (; itr != sCurrencyMgr->getCapEnd(); ++itr)
-    {        
-        if (!itr->second.requireReset)
+    {
+        CurrencyCap second = itr->second;
+        if (!second.requireReset)
             continue;
 
-        sCurrencyMgr->CalculatingCurrencyCap(itr->second.highestArenaRating);
-        trans->PAppend("UPDATE character_currency_cap SET currentArenaCap = %u, currentRBgCap = %u,"
-            " requireReset = 0, highestArenaRating = 0, highestRBgRating = 0 where guid = '%u'",
-            itr->second.highestArenaRating, 0, itr->first);
+        sCurrencyMgr->CalculatingCurrencyCap(second.highestArenaRating);
+
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<6>(CHAR_UPD_CURRENCY_WEEK_CAP);
+        stmt->setUInt16(0, second.highestArenaRating); // currentArenaCap
+        stmt->setUInt16(1, 0);                         // currentRBgCap
+        stmt->setUInt8(2, 0);                          // requireReset
+        stmt->setUInt16(3, 0);                         // highestArenaRating
+        stmt->setUInt16(4, 0);                         // highestRBgRating
+        stmt->setUInt32(5, itr->first);                // guid
+
+        trans->Append(stmt);
     }
+
     CharacterDatabase.CommitTransaction(trans);
     DeleteRestoreData();
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Server crashed on resetting arena cap but cap restore now!");
 }
 
-void CurrencyMgr::CalculatingCurrencyCap(uint32 &rating, bool ratedBattleground /* = false */)
+void CurrencyMgr::CalculatingCurrencyCap(uint16 &rating, bool ratedBattleground /* = false */)
 {
-    if (!ratedBattleground)
-        Trinity::Currency::ConquestRatingCalculator(rating);
-    else
-        Trinity::Currency::BgConquestRatingCalculator(rating);
+    Trinity::Currency::ConquestRatingCalculator(rating, ratedBattleground);
 }
 
 CurrencyCap* CurrencyMgr::getCurrencyCapData(uint32 lowGuid)
@@ -515,7 +524,6 @@ void CurrencyMgr::DeleteRestoreData()
     CharacterDatabase.Execute(stmt);
 }
 
-
 void CurrencyMgr::UpdateEvents(uint32 diff)
 {
     m_events.Update(diff);
@@ -538,20 +546,28 @@ bool CapResetEvent::Execute(uint64 e_time, uint32 p_time)
     for (; itr != sCurrencyMgr->getCapEnd(); ++itr)
     {
         ++count;
-        if (!itr->second.requireReset)
+
+        CurrencyCap second = itr->second;
+        if (!second.requireReset)
             continue;
 
         if (Player* player = HashMapHolder<Player>::Find(itr->first))
             player->ResetCurrencyWeekCap(&trans);
         else
         {
-            sCurrencyMgr->CalculatingCurrencyCap(itr->second.highestArenaRating);
+            sCurrencyMgr->CalculatingCurrencyCap(second.highestArenaRating);
             // We need it after rated bg implementation
             //sCurrencyMgr->CalculatingCurrencyCap(itr->second.highestRBgRating, true);
 
-            trans->PAppend("UPDATE character_currency_cap SET currentArenaCap = %u, currentRBgCap = %u,"
-                " requireReset = 0, highestArenaRating = 0, highestRBgRating = 0 where guid = '%u'",
-                itr->second.highestArenaRating, 0, itr->first);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<6>(CHAR_UPD_CURRENCY_WEEK_CAP);
+            stmt->setUInt16(0, second.highestArenaRating); // currentArenaCap
+            stmt->setUInt16(1, 0);                         // currentRBgCap
+            stmt->setUInt8(2, 0);                          // requireReset
+            stmt->setUInt16(3, 0);                         // highestArenaRating
+            stmt->setUInt16(4, 0);                         // highestRBgRating
+            stmt->setUInt32(5, itr->first);                // guid
+
+            trans->Append(stmt);
         }
 
         if (count > numberInPart)
