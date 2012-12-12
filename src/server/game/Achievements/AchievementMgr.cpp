@@ -3184,6 +3184,10 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                 if (!unit || unit->GetHealthPct() >= reqValue)
                     return false;
                 break;
+            case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_MIN_ACHIEVEMENT_POINTS:
+                if (referencePlayer->GetAchievementMgr().GetAchievementPoints() < reqValue)
+                    return false;
+                break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_REQUIRES_GUILD_GROUP: // 61
             {
                 Group* pGroup = referencePlayer->GetGroup();
@@ -3236,7 +3240,6 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                     return false;
                 break;
             }
-                
             default:
                 break;
         }
