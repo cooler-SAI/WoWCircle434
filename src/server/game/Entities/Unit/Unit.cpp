@@ -8869,6 +8869,22 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Will Of The Necropolis Ranks 1-3
+        case 52284:
+        case 81163:
+        case 81164:
+        {
+            if (GetTypeId() != TYPEID_PLAYER)
+                return false;
+
+            if (HealthBelowPct(29) || (!HealthBelowPctDamaged(30, damage)) || this->ToPlayer()->HasSpellCooldown(trigger_spell_id))
+                return false;
+
+            this->ToPlayer()->RemoveSpellCooldown(48982,true); // Remove cooldown of rune tap
+            CastSpell(this, 96171, true); // next rune tap wont cost runes
+            cooldown = 45; // Can only happen once in 45 seconds
+            break;
+        }
         // Blood in the Water
         case 80318:
         case 80319:
