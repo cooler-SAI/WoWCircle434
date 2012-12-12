@@ -7345,6 +7345,16 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Tidal Waves
+                case 51562:
+                case 51563:
+                case 51564:
+                {
+                    int32 bp0 = -triggerAmount;
+                    int32 bp1 = triggerAmount;
+                    CastCustomSpell(this, 53390, &bp0, &bp1, 0, true);
+                    break;
+                }
                 // Totemic Power (The Earthshatterer set)
                 case 28823:
                 {
@@ -7609,107 +7619,111 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // if not found Flame Shock
                     return false;
                 }
-                break;
-            }
-            // Frozen Power
-            if (dummySpell->SpellIconID == 3780)
-            {
-                if (!target)
-                    return false;
-                if (GetDistance(target) < 15.0f)
-                    return false;
-                float chance = (float)triggerAmount;
-                if (!roll_chance_f(chance))
-                    return false;
-
-                triggered_spell_id = 63685;
-                break;
-            }
-            // Ancestral Awakening
-            if (dummySpell->SpellIconID == 3065)
-            {
-                triggered_spell_id = 52759;
-                basepoints0 = CalculatePct(int32(damage), triggerAmount);
-                target = this;
-                break;
-            }
-            // Earth Shield
-            if (dummySpell->Id == 974)
-            {
-                // 3.0.8: Now correctly uses the Shaman's own spell critical strike chance to determine the chance of a critical heal.
-                originalCaster = triggeredByAura->GetCasterGUID();
-                target = this;
-                basepoints0 = triggerAmount;
-
-                // Glyph of Earth Shield
-                if (AuraEffect* aur = GetAuraEffect(63279, 0))
-                    AddPct(basepoints0, aur->GetAmount());
-                triggered_spell_id = 379;
-                break;
-            }
-            // Flametongue Weapon (Passive)
-            if (dummySpell->SpellFamilyFlags[0] & 0x200000)
-            {
-                if (GetTypeId() != TYPEID_PLAYER  || !victim || !victim->isAlive() || !castItem || !castItem->IsEquipped())
-                    return false;
-
-                WeaponAttackType attType = WeaponAttackType(Player::GetAttackBySlot(castItem->GetSlot()));
-                if ((attType != BASE_ATTACK && attType != OFF_ATTACK)
-                    || (attType == BASE_ATTACK && procFlag & PROC_FLAG_DONE_OFFHAND_ATTACK)
-                    || (attType == OFF_ATTACK && procFlag & PROC_FLAG_DONE_MAINHAND_ATTACK))
-                    return false;
-
-                float fire_onhit = float(CalculatePct(dummySpell->Effects[EFFECT_0]. CalcValue(), 1.0f));
-
-                float add_spellpower = (float)(SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE)
-                                     + victim->SpellBaseDamageBonusTaken(SPELL_SCHOOL_MASK_FIRE));
-
-                // 1.3speed = 5%, 2.6speed = 10%, 4.0 speed = 15%, so, 1.0speed = 3.84%
-                ApplyPct(add_spellpower, 3.84f);
-
-                // Enchant on Off-Hand and ready?
-                if (castItem->GetSlot() == EQUIPMENT_SLOT_OFFHAND && procFlag & PROC_FLAG_DONE_OFFHAND_ATTACK)
+                // Frozen Power
+                case 63373:
+                case 63374:
                 {
-                    float BaseWeaponSpeed = GetAttackTime(OFF_ATTACK) / 1000.0f;
+                    if (!target)
+                        return false;
+                    if (GetDistance(target) < 15.0f)
+                        return false;
+                    float chance = (float)triggerAmount;
+                    if (!roll_chance_f(chance))
+                        return false;
 
-                    // Value1: add the tooltip damage by swingspeed + Value2: add spelldmg by swingspeed
-                    basepoints0 = int32((fire_onhit * BaseWeaponSpeed) + (add_spellpower * BaseWeaponSpeed));
-                    triggered_spell_id = 10444;
+                    triggered_spell_id = 63685;
+                    break;
                 }
-
-                // Enchant on Main-Hand and ready?
-                else if (castItem->GetSlot() == EQUIPMENT_SLOT_MAINHAND && procFlag & PROC_FLAG_DONE_MAINHAND_ATTACK)
+                // Ancestral Awakening
+                case 51556:
+                case 51557:
+                case 51558:
                 {
-                    float BaseWeaponSpeed = GetAttackTime(BASE_ATTACK) / 1000.0f;
-
-                    // Value1: add the tooltip damage by swingspeed +  Value2: add spelldmg by swingspeed
-                    basepoints0 = int32((fire_onhit * BaseWeaponSpeed) + (add_spellpower * BaseWeaponSpeed));
-                    triggered_spell_id = 10444;
+                    triggered_spell_id = 52759;
+                    basepoints0 = CalculatePct(int32(damage), triggerAmount);
+                    target = this;
+                    break;
                 }
-
-                // If not ready, we should  return, shouldn't we?!
-                else
-                    return false;
-
-                CastCustomSpell(victim, triggered_spell_id, &basepoints0, NULL, NULL, true, castItem, triggeredByAura);
-                return true;
-            }
-            // Static Shock
-            if (dummySpell->SpellIconID == 3059)
-            {
-                // Lightning Shield
-                if (GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_SHAMAN, 0x400, 0, 0))
+                // Earth Shield
+                case 974:
                 {
-                    uint32 spell = 26364;
+                    // 3.0.8: Now correctly uses the Shaman's own spell critical strike chance to determine the chance of a critical heal.
+                    originalCaster = triggeredByAura->GetCasterGUID();
+                    target = this;
+                    basepoints0 = triggerAmount;
 
-                    // custom cooldown processing case
-                    if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->HasSpellCooldown(spell))
-                        ToPlayer()->RemoveSpellCooldown(spell);
+                    // Glyph of Earth Shield
+                    if (AuraEffect* aur = GetAuraEffect(63279, 0))
+                        AddPct(basepoints0, aur->GetAmount());
+                    triggered_spell_id = 379;
+                    break;
+                }
+                // Flametongue Weapon (Passive)
+                case 10400:
+                {
+                    if (GetTypeId() != TYPEID_PLAYER  || !victim || !victim->isAlive() || !castItem || !castItem->IsEquipped())
+                        return false;
 
-                    CastSpell(target, spell, true, castItem, triggeredByAura);
+                    WeaponAttackType attType = WeaponAttackType(Player::GetAttackBySlot(castItem->GetSlot()));
+                    if ((attType != BASE_ATTACK && attType != OFF_ATTACK)
+                        || (attType == BASE_ATTACK && procFlag & PROC_FLAG_DONE_OFFHAND_ATTACK)
+                        || (attType == OFF_ATTACK && procFlag & PROC_FLAG_DONE_MAINHAND_ATTACK))
+                        return false;
+
+                    float fire_onhit = float(CalculatePct(dummySpell->Effects[EFFECT_0]. CalcValue(), 1.0f));
+
+                    float add_spellpower = (float)(SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE)
+                                         + victim->SpellBaseDamageBonusTaken(SPELL_SCHOOL_MASK_FIRE));
+
+                    // 1.3speed = 5%, 2.6speed = 10%, 4.0 speed = 15%, so, 1.0speed = 3.84%
+                    ApplyPct(add_spellpower, 3.84f);
+
+                    // Enchant on Off-Hand and ready?
+                    if (castItem->GetSlot() == EQUIPMENT_SLOT_OFFHAND && procFlag & PROC_FLAG_DONE_OFFHAND_ATTACK)
+                    {
+                        float BaseWeaponSpeed = GetAttackTime(OFF_ATTACK) / 1000.0f;
+
+                        // Value1: add the tooltip damage by swingspeed + Value2: add spelldmg by swingspeed
+                        basepoints0 = int32((fire_onhit * BaseWeaponSpeed) + (add_spellpower * BaseWeaponSpeed));
+                        triggered_spell_id = 10444;
+                    }
+
+                    // Enchant on Main-Hand and ready?
+                    else if (castItem->GetSlot() == EQUIPMENT_SLOT_MAINHAND && procFlag & PROC_FLAG_DONE_MAINHAND_ATTACK)
+                    {
+                        float BaseWeaponSpeed = GetAttackTime(BASE_ATTACK) / 1000.0f;
+
+                        // Value1: add the tooltip damage by swingspeed +  Value2: add spelldmg by swingspeed
+                        basepoints0 = int32((fire_onhit * BaseWeaponSpeed) + (add_spellpower * BaseWeaponSpeed));
+                        triggered_spell_id = 10444;
+                    }
+
+                    // If not ready, we should  return, shouldn't we?!
+                    else
+                        return false;
+
+                    CastCustomSpell(victim, triggered_spell_id, &basepoints0, NULL, NULL, true, castItem, triggeredByAura);
                     return true;
                 }
-                return false;
+                // Static Shock
+                case 51525:
+                case 51526:
+                case 51527:
+                {
+                    // Lightning Shield
+                    if (GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_SHAMAN, 0x400, 0, 0))
+                    {
+                        uint32 spell = 26364;
+
+                        // custom cooldown processing case
+                        if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->HasSpellCooldown(spell))
+                            ToPlayer()->RemoveSpellCooldown(spell);
+
+                        CastSpell(target, spell, true, castItem, triggeredByAura);
+                        return true;
+                    }
+                    return false;
+                }
             }
             break;
         }
@@ -8783,7 +8797,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                     case 30883: // Nature's Guardian Rank 2
                     case 30884: // Nature's Guardian Rank 3
                     {
-                        if (!HealthBelowPctDamaged(30, damage))
+                        if (HealthBelowPct(30) || HealthBelowPctDamaged(30, damage))
                         {
                             basepoints0 = int32(CountPctFromMaxHealth(triggerAmount));
                             target = this;
