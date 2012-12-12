@@ -10495,18 +10495,6 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     if (!spellProto || !victim || damagetype == DIRECT_DAMAGE)
         return pdamage;
 
-    switch (spellProto->Id)
-    {
-        case 12721: // Deep Wounds
-        case 70890: // Scourge Strike shadow part
-        case 83853: // Combustion
-        case 22482: // Blade Flurry
-        case 96172: // Hand of Light
-            return pdamage;
-        default:
-            break;
-    }
-
     // Some spells don't benefit from done mods
     if (spellProto->HasAttribute(SPELL_ATTR3_NO_DONE_BONUS) || spellProto->HasAttribute(SPELL_ATTR6_NO_DONE_PCT_DAMAGE_MODS))
         return pdamage;
