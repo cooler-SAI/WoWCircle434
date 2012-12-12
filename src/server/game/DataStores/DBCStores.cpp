@@ -819,14 +819,18 @@ void LoadDBCStores(const std::string& dataPath)
     
     for (uint32 i = 1; i < sSpellStore.GetNumRows(); ++i)
     {
-        SpellCategoriesEntry const* spell = sSpellCategoriesStore.LookupEntry(i);
-        if (!spell || !spell->Category)
+        SpellEntry const* spell = sSpellStore.LookupEntry(i);
+        if (!spell)
             continue;
 
-        if (!sSpellStore.LookupEntry(i))
+        if (!spell->SpellCategoriesId)
             continue;
 
-        sSpellCategoryStore[spell->Category].insert(i);
+        SpellCategoriesEntry const* spellCat = sSpellCategoriesStore.LookupEntry(spell->SpellCategoriesId);
+        if (!spellCat)
+            continue;
+
+        sSpellCategoryStore[spellCat->Category].insert(i);
     }
 
     for (uint32 i = 0; i < sSpellDifficultyStore.GetNumRows(); ++i)
