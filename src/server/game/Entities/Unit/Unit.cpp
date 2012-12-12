@@ -849,7 +849,7 @@ void Unit::CastStop(uint32 except_spellid)
             InterruptSpell(CurrentSpellTypes(i), false);
 }
 
-void Unit::CastSpell(SpellCastTargets const& targets, SpellInfo const* spellInfo, CustomSpellValues const* value, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster)
+void Unit::CastSpell(SpellCastTargets const& targets, SpellInfo const* spellInfo, CustomSpellValues const* value, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster, float periodicDamageModifier /* = 0.0f*/)
 {
     if (!spellInfo)
     {
@@ -868,15 +868,16 @@ void Unit::CastSpell(SpellCastTargets const& targets, SpellInfo const* spellInfo
             spell->SetSpellValue(itr->first, itr->second);
 
     spell->m_CastItem = castItem;
+    spell->SetPeriodicDamageModifier(periodicDamageModifier);
     spell->prepare(&targets, triggeredByAura);
 }
 
-void Unit::CastSpell(Unit* victim, uint32 spellId, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster)
+void Unit::CastSpell(Unit* victim, uint32 spellId, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster, float periodicDamageModifier)
 {
-    CastSpell(victim, spellId, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
+    CastSpell(victim, spellId, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster, periodicDamageModifier);
 }
 
-void Unit::CastSpell(Unit* victim, uint32 spellId, TriggerCastFlags triggerFlags /*= TRIGGER_NONE*/, Item* castItem /*= NULL*/, AuraEffect const* triggeredByAura /*= NULL*/, uint64 originalCaster /*= 0*/)
+void Unit::CastSpell(Unit* victim, uint32 spellId, TriggerCastFlags triggerFlags /*= TRIGGER_NONE*/, Item* castItem /*= NULL*/, AuraEffect const* triggeredByAura /*= NULL*/, uint64 originalCaster /*= 0*/, float periodicDamageModifier /* = 0.0f */)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
@@ -885,7 +886,7 @@ void Unit::CastSpell(Unit* victim, uint32 spellId, TriggerCastFlags triggerFlags
         return;
     }
 
-    CastSpell(victim, spellInfo, triggerFlags, castItem, triggeredByAura, originalCaster);
+    CastSpell(victim, spellInfo, triggerFlags, castItem, triggeredByAura, originalCaster, periodicDamageModifier);
 }
 
 void Unit::CastSpell(Unit* victim, SpellInfo const* spellInfo, bool triggered, Item* castItem/*= NULL*/, AuraEffect const* triggeredByAura /*= NULL*/, uint64 originalCaster /*= 0*/)
@@ -893,11 +894,11 @@ void Unit::CastSpell(Unit* victim, SpellInfo const* spellInfo, bool triggered, I
     CastSpell(victim, spellInfo, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
 }
 
-void Unit::CastSpell(Unit* victim, SpellInfo const* spellInfo, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster)
+void Unit::CastSpell(Unit* victim, SpellInfo const* spellInfo, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster, float periodicDamageModifier /* = 0.0f */)
 {
     SpellCastTargets targets;
     targets.SetUnitTarget(victim);
-    CastSpell(targets, spellInfo, NULL, triggerFlags, castItem, triggeredByAura, originalCaster);
+    CastSpell(targets, spellInfo, NULL, triggerFlags, castItem, triggeredByAura, originalCaster, periodicDamageModifier);
 }
 
 void Unit::CastCustomSpell(Unit* target, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster)
@@ -10898,18 +10899,6 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
 {
     if (!spellProto || damagetype == DIRECT_DAMAGE)
         return pdamage;
-
-    switch (spellProto->Id)
-    {
-        case 12721: // Deep Wounds
-        case 70890: // Scourge Strike shadow part
-        case 83853: // Combustion
-        case 22482: // Blade Flurry
-        case 96172: // Hand of Light
-            return pdamage;
-        default:
-            break;
-    }
 
     int32 TakenTotal = 0;
     float TakenTotalMod = 1.0f;

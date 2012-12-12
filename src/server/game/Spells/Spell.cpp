@@ -578,6 +578,7 @@ m_caster((info->AttributesEx6 & SPELL_ATTR6_CAST_BY_CHARMER && caster->GetCharme
     m_powerCost = 0;                                        // setup to correct value in Spell::prepare, must not be used before.
     m_casttime = 0;                                         // setup to correct value in Spell::prepare, must not be used before.
     m_timer = 0;                                            // will set to castime in prepare
+    m_periodicDamageModifier = 0.0f;
 
     m_channelTargetEffectMask = 0;
 
@@ -2805,6 +2806,14 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                         m_spellAura->SetStackAmount(m_spellValue->AuraStackAmount);
                     else
                         m_spellAura->ModStackAmount(m_spellValue->AuraStackAmount);
+                }
+
+                if (float damageModifier = m_periodicDamageModifier)
+                {
+                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                        if (m_spellAura->GetEffect(i) && m_spellAura->GetEffect(i)->HasFixedDamageInfo())
+                            if (int32 fixedDamage = m_spellAura->GetEffect(i)->GetFixedDamageInfo().GetFixedDamage())
+                                m_spellAura->GetEffect(i)->GetFixedDamageInfo().SetFixedDamage(int32(fixedDamage * damageModifier));
                 }
 
                 // Now Reduce spell duration using data received at spell hit

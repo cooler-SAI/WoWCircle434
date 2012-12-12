@@ -107,6 +107,34 @@ class AuraEffect
 
         // add/remove SPELL_AURA_MOD_SHAPESHIFT (36) linked auras
         void HandleShapeshiftBoosts(Unit* target, bool apply) const;
+
+        struct FixedPeriodic
+        {
+            float fx_crit_chance;
+            int32 fx_fixed_damage;
+            bool bCrit;
+            bool bDamage;
+
+            void Clear()
+            {
+                fx_crit_chance = 0.0f;
+                fx_fixed_damage = 0;
+                bCrit = false;
+                bDamage = false;
+            }
+
+            void SetCriticalChance(float value) { bCrit = true; fx_crit_chance = value; }
+            float GetCriticalChance() const { return fx_crit_chance; }
+            bool HasCritChance() const { return bCrit; }
+
+            void SetFixedDamage(int32 value) { bDamage = true; fx_fixed_damage = value; }
+            int32 GetFixedDamage() const { return fx_fixed_damage; }
+            bool HasDamage() const { return bDamage; }
+        };
+
+        bool HasFixedDamageInfo() { return hasFixedPeriodic; }
+        FixedPeriodic& GetFixedDamageInfo() { return m_fixed_periodic; }
+
     private:
         Aura* const m_base;
 
@@ -137,31 +165,8 @@ class AuraEffect
         bool m_canBeRecalculated;
         bool m_isPeriodic;
 
-        struct FixedPeriodic
-        {
-            float fx_crit_chance;
-            int32 fx_fixed_damage;
-            bool bCrit;
-            bool bDamage;
-
-            void Clear()
-            {
-                fx_crit_chance = 0.0f;
-                fx_fixed_damage = 0;
-                bCrit = false;
-                bDamage = false;
-            }
-
-            void SetCriticalChance(float value) { bCrit = true; fx_crit_chance = value; }
-            float GetCriticalChance() const { return fx_crit_chance; }
-            bool HasCritChance() const { return bCrit; }
-
-            void SetFixedDamage(int32 value) { bDamage = true; fx_fixed_damage = value; }
-            int32 GetFixedDamage() const { return fx_fixed_damage; }
-            bool HasDamage() const { return bDamage; }
-        };
-
         FixedPeriodic m_fixed_periodic;
+        bool hasFixedPeriodic;
 
     private:
         bool IsPeriodicTickCrit(Unit* target, Unit const* caster) const;

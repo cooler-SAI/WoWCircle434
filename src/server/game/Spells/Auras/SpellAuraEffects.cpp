@@ -434,7 +434,7 @@ AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32 *baseAmount, Unit* cast
 m_base(base), m_spellInfo(base->GetSpellInfo()),
 m_baseAmount(baseAmount ? *baseAmount : m_spellInfo->Effects[effIndex].BasePoints),
 m_spellmod(NULL), m_periodicTimer(0), m_tickNumber(0), m_chargePeriodicTimer(0),
-m_effIndex(effIndex), m_canBeRecalculated(true), m_isPeriodic(false)
+m_effIndex(effIndex), m_canBeRecalculated(true), m_isPeriodic(false), hasFixedPeriodic(false)
 {
     m_fixed_periodic.Clear();
 
@@ -885,6 +885,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 
                 m_fixed_periodic.SetFixedDamage(temp_damage);
                 m_fixed_periodic.SetCriticalChance(temp_crit);
+                hasFixedPeriodic = true;
             }
         }
     }

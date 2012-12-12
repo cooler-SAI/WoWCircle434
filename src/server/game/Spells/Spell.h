@@ -490,6 +490,9 @@ class Spell
         void SetSpellValue(SpellValueMod mod, int32 value);
 
         bool isearlyfrostaffected;
+
+        void SetPeriodicDamageModifier(float newModifier) { m_periodicDamageModifier = newModifier; }
+
     protected:
         bool HasGlobalCooldown() const;
         void TriggerGlobalCooldown();
@@ -540,6 +543,7 @@ class Spell
         bool m_needComboPoints;
         uint8 m_applyMultiplierMask;
         float m_damageMultipliers[3];
+        float m_periodicDamageModifier;
 
         // Current targets, to be used in SpellEffects (MUST BE USED ONLY IN SPELL EFFECTS)
         Unit* unitTarget;

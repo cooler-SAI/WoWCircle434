@@ -4975,27 +4975,27 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
             if (m_spellInfo->SpellFamilyFlags[1] & 0x10000)
             {
                 // Get diseases on target of spell
-                if (m_targets.GetUnitTarget() &&  // Glyph of Disease - cast on unit target too to refresh aura
-                    (m_targets.GetUnitTarget() != unitTarget || m_caster->GetAura(63334)))
+                if (m_targets.GetUnitTarget() && m_targets.GetUnitTarget() != unitTarget)
                 {
+                    uint8 pestilcenceModifier = m_spellInfo->Effects[EFFECT_1].CalcValue(m_caster);
                     // And spread them on target
                     // Blood Plague
                     if (m_targets.GetUnitTarget()->GetAura(55078))
                     {
                         m_caster->CastSpell(unitTarget, 91939, true);
-                        m_caster->CastSpell(unitTarget, 55078, true);
+                        m_caster->CastSpell(unitTarget, 55078, true, NULL, NULL, 0, float(pestilcenceModifier / 100.0f));
                     }
                     // Frost Fever
                     if (m_targets.GetUnitTarget()->GetAura(55095))
                     {
                         m_caster->CastSpell(unitTarget, 91939, true);
-                        m_caster->CastSpell(unitTarget, 55095, true);
+                        m_caster->CastSpell(unitTarget, 55095, true, NULL, NULL, 0, float(pestilcenceModifier / 100.0f));
                     }
                     // Ebon Plague
                     if (m_targets.GetUnitTarget()->GetAura(65142))
                     {
                         m_caster->CastSpell(unitTarget, 91939, true);
-                        m_caster->CastSpell(unitTarget, 65142, true);
+                        m_caster->CastSpell(unitTarget, 65142, true, NULL, NULL, 0, float(pestilcenceModifier / 100.0f));
                     }
                 }
                 return;
