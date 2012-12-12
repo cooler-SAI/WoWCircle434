@@ -21444,9 +21444,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
                 return false;
             }
 
-            uint32 precision = (entry->Flags & CURRENCY_FLAG_HIGH_PRECISION) ? 100 : 1;
-
-            if (!HasCurrency(iece->RequiredCurrency[i], (iece->RequiredCurrencyCount[i] * count) / precision))
+            if (!HasCurrency(iece->RequiredCurrency[i], (iece->RequiredCurrencyCount[i] * count) / entry->GetPrecision()))
             {
                 SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL);
                 return false;
@@ -26062,8 +26060,10 @@ void Player::SendItemRefundResult(Item* item, ItemExtendedCostEntry const* iece,
     {
         for (uint8 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
         {
-            CurrencyTypesEntry const* _currencyEntry = sCurrencyTypesStore.LookupEntry(iece->RequiredCurrency[i]);
-            data << uint32(iece->RequiredCurrencyCount[i] / _currencyEntry->GetPrecision());
+            float prc = 1.0f;
+            if (CurrencyTypesEntry const* _currencyEntry = sCurrencyTypesStore.LookupEntry(iece->RequiredCurrency[i]))
+                prc = _currencyEntry->GetPrecision();
+            data << uint32(iece->RequiredCurrencyCount[i] / prc);
             data << uint32(iece->RequiredCurrency[i]);
         }
 
