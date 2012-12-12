@@ -2953,6 +2953,9 @@ void SpellMgr::LoadSpellCustomAttr()
             case 22482: // Blade Flurry dmg
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
+            case 48707: // Anti-Magic Shell
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_SEND_BASE_AMOUNT;
+                break;
             default:
                 break;
         }

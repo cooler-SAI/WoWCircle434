@@ -248,7 +248,14 @@ void AuraApplication::BuildUpdatePacket(ByteBuffer& data, bool remove) const
             if (flags & (1 << i))
             {
                 if (AuraEffect const* eff = aura->GetEffect(i)) // NULL if effect flag not set
-                    data << int32(eff->GetAmount());
+                {
+                    // test fix
+                    // think this attribute should look like spell_attribute_send_DBC_amount
+                    if (eff->GetSpellInfo()->HasCustomAttribute(SPELL_ATTR0_CU_SEND_BASE_AMOUNT))
+                        data << int32(eff->GetBaseAmount());
+                    else
+                        data << int32(eff->GetAmount());
+                }
                 else
                     data << int32(0);
             }
