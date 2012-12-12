@@ -3435,6 +3435,24 @@ void Spell::cast(bool skipCheck)
             }
             break;
         }
+        case SPELLFAMILY_HUNTER:
+        {
+            switch (m_spellInfo->Id)
+            {
+                // Posthaste
+                case 781:
+                {
+                    if (AuraEffect * eff = m_caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_HUNTER, 5094, 1))
+                    {
+                        int32 basepoints = eff->GetAmount();
+                        m_caster->CastCustomSpell(m_caster, 83559, &basepoints, 0, 0, true);
+                    }
+                    break;
+                }
+                default: break;
+            }
+            break;
+        }
     }
 
     CallScriptOnCastHandlers();
