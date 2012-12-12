@@ -4924,6 +4924,8 @@ void SpellMgr::LoadDbcDataCorrections()
             case 45182:
                 spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
                 break;
+            // Runic Corruption
+            case 51460:
             // Improved Blood Presence
             case 63611:
                 spellInfo->Effects[EFFECT_1].Effect = 0;
