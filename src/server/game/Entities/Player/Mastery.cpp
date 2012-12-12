@@ -99,7 +99,7 @@ void Player::UpdateMastery()
                     if (AuraEffect* eff = aura->GetEffect(j))
                     {
                         eff->SetCanBeRecalculated(true);
-                        eff->ChangeAmount(amount, false);
+                        eff->ChangeAmount(amount, false, true);
                     }
                 }
 

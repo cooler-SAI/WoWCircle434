@@ -646,16 +646,6 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 DoneActualBenefit += caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()) * 0.807f;
             }
             break;
-        case SPELL_AURA_DUMMY:
-            if (!caster)
-                break;
-            // Earth Shield
-            if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_SHAMAN && m_spellInfo->SpellFamilyFlags[1] & 0x400)
-            {
-                amount = caster->SpellHealingBonusDone(GetBase()->GetUnitOwner(), GetSpellInfo(), amount, SPELL_DIRECT_DAMAGE);
-                amount = GetBase()->GetUnitOwner()->SpellHealingBonusTaken(caster, GetSpellInfo(), amount, SPELL_DIRECT_DAMAGE);
-            }
-            break;
         case SPELL_AURA_PERIODIC_DAMAGE:
             if (!caster)
                 break;
@@ -671,6 +661,22 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 amount += int32(0.0207f * caster->GetTotalAttackPowerValue(BASE_ATTACK) * cp);
                 amount *= 8;
                 amount /= GetTotalTicks();
+            }
+            // Rupture
+            else if (GetId() == 1943)
+            {
+                if (caster->GetTypeId() != TYPEID_PLAYER)
+                    break;
+
+                //1 point : ${($m1+$b1*1+0.015*$AP)*4} damage over 8 secs
+                //2 points: ${($m1+$b1*2+0.024*$AP)*5} damage over 10 secs
+                //3 points: ${($m1+$b1*3+0.03*$AP)*6} damage over 12 secs
+                //4 points: ${($m1+$b1*4+0.03428571*$AP)*7} damage over 14 secs
+                //5 points: ${($m1+$b1*5+0.0375*$AP)*8} damage over 16 secs
+                float AP_per_combo[6] = {0.0f, 0.015f, 0.024f, 0.03f, 0.03428571f, 0.0375f};
+                uint8 cp = caster->ToPlayer()->GetComboPoints();
+                if (cp > 5) cp = 5;
+                amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * AP_per_combo[cp]);
             }
             // Rend
             else if (GetId() == 94009)
@@ -833,29 +839,9 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                         amount += improvedFrostPresence->GetAmount();
                     break;
                 }
-                // Total Eclipse, Balance Druid Mastery
-                case 48517: // Eclipse (Solar)
-                case 48518: // Eclipse (Lunar)
-                {
-                    if (AuraEffect const* totalEclipse = caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 2856, 0))
-                        amount += totalEclipse->GetAmount();
-                    break;
-                }
-                default:
-                    break;
             }
             break;
         }
-        case SPELL_AURA_MOD_MELEE_HASTE_3:
-            // Slice and Dice
-            if (GetSpellInfo()->Id == 5171)
-            {
-                // Executioner, Subtlety Rogue Mastery
-                if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_ROGUE, 1474, 0))
-                    amount += aurEff->GetAmount();
-                break;
-            }
-            break;
         default:
             break;
     }
