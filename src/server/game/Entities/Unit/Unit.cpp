@@ -6725,6 +6725,18 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Improved Expose Armor
+                case 14168:
+                case 14169:
+                {
+                    if (GetTypeId() != TYPEID_PLAYER)
+                        break;
+
+                    target = victim;
+                    triggered_spell_id = 79128;
+                    basepoints0 = ToPlayer()->GetComboPoints();
+                    break;
+                }
                 // Honor Amoung Thieves
                 case 51698:
                 case 51700:

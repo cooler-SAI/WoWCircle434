@@ -1352,63 +1352,71 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_PRIEST:
                 if (!caster)
                     break;
-                // Inner Focus
-                if (GetSpellInfo()->Id == 89485)
+                switch (GetSpellInfo()->Id)
                 {
-                    // Strength of Soul
-                    if (caster->HasAura(89488))
-                        caster->CastSpell(caster, 96266, true);
-                    else if (caster->HasAura(89489))
-                        caster->CastSpell(caster, 96267, true);
-                }
-                // Inner Fire
-                else if (GetSpellInfo()->Id == 588)
-                {
-                    // Inner Sanctum
-                    if (AuraEffect * aur = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 51, 0))
+                    // Inner Focus
+                    case 89485:
                     {
-                        int32 basepoints = -aur->GetAmount();
-                        caster->CastCustomSpell(caster, 91724, &basepoints, 0, 0, true);
+                        // Strength of Soul
+                        if (caster->HasAura(89488))
+                            caster->CastSpell(caster, 96266, true);
+                        else if (caster->HasAura(89489))
+                            caster->CastSpell(caster, 96267, true);
+                        break;
                     }
-                }
-                // Devouring Plague
-                else if (GetSpellInfo()->SpellFamilyFlags[0] & 0x02000000 && GetEffect(0))
-                {
-                    // Improved Devouring Plague
-                    if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3790, 0))
+                    // Inner Fire
+                    case 588:
                     {
-                        uint32 damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), DOT);
-                        damage = target->SpellDamageBonusTaken(caster, GetSpellInfo(), damage, DOT);
-                        int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * int32(damage) / 100;
-                        int32 heal = int32(CalculatePct(basepoints0, 15));
+                        // Inner Sanctum
+                        if (AuraEffect * aur = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 51, 0))
+                        {
+                            int32 basepoints = -aur->GetAmount();
+                            caster->CastCustomSpell(caster, 91724, &basepoints, 0, 0, true);
+                        }
+                        break;
+                    }
+                    // Devouring Plague
+                    case 2944:
+                    {
+                        // Improved Devouring Plague
+                        if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3790, 0))
+                        {
+                            uint32 damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), DOT);
+                            damage = target->SpellDamageBonusTaken(caster, GetSpellInfo(), damage, DOT);
+                            int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * int32(damage) / 100;
+                            int32 heal = int32(CalculatePct(basepoints0, 15));
 
-                        caster->CastCustomSpell(target, 63675, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
-                        caster->CastCustomSpell(caster, 75999, &heal, NULL, NULL, true, NULL, GetEffect(0));
+                            caster->CastCustomSpell(target, 63675, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
+                            caster->CastCustomSpell(caster, 75999, &heal, NULL, NULL, true, NULL, GetEffect(0));
+                        }
+                        break;
                     }
-                }
-                // Power Word: Shield
-                else if (m_spellInfo->SpellFamilyFlags[0] & 0x1 && GetEffect(0))
-                {
-                    // Weakened Soul
-                    if (!target->HasAura(6788))
-                        caster->CastSpell(target, 6788, true);
+                    // Power Word: Shield
+                    case 17:
+                    {
+                        // Weakened Soul
+                        if (!target->HasAura(6788))
+                            caster->CastSpell(target, 6788, true);
 
-                    // Glyph of Power Word: Shield
-                    if (AuraEffect* glyph = caster->GetAuraEffect(55672, 0))
-                    {
-                        // instantly heal m_amount% of the absorb-value
-                        int32 heal = glyph->GetAmount() * GetEffect(0)->GetAmount()/100;
-                        caster->CastCustomSpell(GetUnitOwner(), 56160, &heal, NULL, NULL, true, 0, GetEffect(0));
+                        // Glyph of Power Word: Shield
+                        if (AuraEffect* glyph = caster->GetAuraEffect(55672, 0))
+                        {
+                            // instantly heal m_amount% of the absorb-value
+                            int32 heal = glyph->GetAmount() * GetEffect(0)->GetAmount()/100;
+                            caster->CastCustomSpell(GetUnitOwner(), 56160, &heal, NULL, NULL, true, 0, GetEffect(0));
+                        }
+                        break;
                     }
-                }
-                // Renew
-                else if (GetSpellInfo()->SpellFamilyFlags[0] & 0x00000040 && GetEffect(0))
-                {
-                    // Divine Touch
-                    if (AuraEffect const * aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3021, 0))
+                    // Renew
+                    case 139:
                     {
-                        int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * caster->SpellHealingBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), HEAL) / 100;
-                        caster->CastCustomSpell(target, 63544, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
+                        // Divine Touch
+                        if (AuraEffect const * aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3021, 0))
+                        {
+                            int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * caster->SpellHealingBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), HEAL) / 100;
+                            caster->CastCustomSpell(target, 63544, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
+                        }
+                        break;
                     }
                 }
                 break;
@@ -1430,6 +1438,20 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
                         target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
                     }
+                }
+                // Sap
+                else if (GetId() == 6770)
+                {
+                    // Remove stealth from target
+                    target->RemoveAurasByType(SPELL_AURA_MOD_STEALTH, 0, 0, 11327);
+                }
+                // Deadly Momentum
+                else if (GetId() == 84590)
+                {
+                    if (Aura* snd = target->GetAura(5171))
+                        snd->RefreshDuration();
+                    if (Aura* rec = target->GetAura(73651))
+                        rec->RefreshDuration();
                 }
                 break;
             case SPELLFAMILY_WARRIOR:
@@ -1704,9 +1726,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Sap
                 else if (GetId() == 6770)
                 {
-                    // Remove stealth from target
-                    target->RemoveAurasByType(SPELL_AURA_MOD_STEALTH, 0, 0, 11327);
-
                     // Blackjack
                     if (caster && caster->HasAura(79125)) // rank 2
                         caster->CastSpell(target, 79126, true);
