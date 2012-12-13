@@ -8938,6 +8938,15 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             }
             break;
         }
+        // Shadow Infusion
+        case 48965:
+        case 49571:
+        case 49572:
+        {
+            if (!damage)
+                return false;
+            break;
+        }
         // Will Of The Necropolis Ranks 1-3
         case 52284:
         case 81163:
