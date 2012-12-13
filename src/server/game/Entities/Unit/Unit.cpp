@@ -8893,6 +8893,32 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Rolling Thunder
+        case 88756:
+        case 88764:
+        {
+            if (!procSpell)
+                return false;
+
+            // Some spells has bad spellflags
+            // So check spell id here
+            if (procSpell->Id != 403 && procSpell->Id != 421 &&
+                procSpell->Id != 45284 && procSpell->Id != 45297)
+                return false;
+
+            if (Aura* lightningShield = GetAura(324))
+            {
+                uint8 lsCharges = lightningShield->GetCharges();
+                if (lsCharges < 9)
+                {
+                    lightningShield->SetCharges(lsCharges + 1);
+                    lightningShield->RefreshDuration();
+                }
+                if (lsCharges > 7 && (HasAura(88766)))
+                    CastSpell(this, 95774, true);
+            }
+            break;
+        }
         // Will Of The Necropolis Ranks 1-3
         case 52284:
         case 81163:
@@ -9343,6 +9369,13 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
 
     if (cooldown && GetTypeId() == TYPEID_PLAYER)
         ToPlayer()->AddSpellCooldown(trigger_spell_id, 0, time(NULL) + cooldown);
+
+    // Glyph of Lightning Shield
+    if (trigger_spell_id == 26364)
+    {
+        if (HasAura(55448) && triggeredByAura->GetBase()->GetCharges() <= 3)
+            return false;
+    }
 
     return true;
 }
@@ -11248,7 +11281,7 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
                         break;
                     case SPELLFAMILY_SHAMAN:
                         // Lava Burst
-                        if (spellProto->SpellFamilyFlags[1] & 0x00001000)
+                        if (spellProto->Id == 51505 || spellProto->Id == 77451)
                         {
                             if (victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_SHAMAN, 0x10000000, 0, 0, GetGUID()))
                                 if (victim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE) > -100)

@@ -57,6 +57,12 @@ enum ShamanSpells
 
     SHAMAN_SPELL_SPIRIT_LINK               = 98020,
     SHAMAN_SPELL_SPIRIT_LINK_DAMAGE        = 98021,
+
+    SHAMAN_SPELL_EARTH_SHOCK               = 8042,
+    SHAMAN_SPELL_FULMINATION               = 88766,
+    SHAMAN_SPELL_FULMINATION_TRIGGERED     = 88767,
+    SHAMAN_SPELL_FULMINATION_INFO          = 95774,
+    SHAMAN_SPELL_LIGHTNING_SHIELD_PROC     = 26364,
 };
 
 // 1535 Fire Nova
@@ -730,6 +736,79 @@ class spell_sha_spirit_link : public SpellScriptLoader
         }
 };
 
+// 88766 Fulmination handled in 8042 Earth Shock
+class spell_sha_fulmination : public SpellScriptLoader
+{
+    public:
+        spell_sha_fulmination() : SpellScriptLoader("spell_sha_fulmination") { }
+
+        class spell_sha_fulmination_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_sha_fulmination_SpellScript)
+
+            bool Validate(SpellEntry const * /*spellEntry*/)
+            {
+                if (!sSpellStore.LookupEntry(SHAMAN_SPELL_FULMINATION))
+                    return false;
+
+                if (!sSpellStore.LookupEntry(SHAMAN_SPELL_FULMINATION_TRIGGERED))
+                    return false;
+
+                if (!sSpellStore.LookupEntry(SHAMAN_SPELL_FULMINATION_INFO))
+                    return false;
+
+                return true;
+            }
+
+            void HandleFulmination(SpellEffIndex effIndex)
+            {
+                // make caster cast a spell on a unit target of effect
+
+                Unit *target = GetHitUnit();
+
+                Unit *caster = GetCaster();
+
+                if(!target || !caster)
+                    return;
+
+                AuraEffect *fulminationAura = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 2010, 0);
+
+                if (!fulminationAura)
+                    return;
+
+                Aura * lightningShield = caster->GetAura(324);
+
+                if(!lightningShield)
+                    return;
+
+                uint8 lsCharges = lightningShield->GetCharges();
+
+                if(lsCharges <= 3)
+                    return;
+                uint8 usedCharges = lsCharges - 3;
+
+                caster->RemoveAurasDueToSpell(95774); // remove visual effect
+
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SHAMAN_SPELL_LIGHTNING_SHIELD_PROC);
+                int32 basePoints = caster->CalculateSpellDamage(target, spellInfo, 0);
+                uint32 damage = usedCharges * caster->SpellDamageBonusDone(target, spellInfo, basePoints, SPELL_DIRECT_DAMAGE);
+                caster->CastCustomSpell(SHAMAN_SPELL_FULMINATION_TRIGGERED, SPELLVALUE_BASE_POINT0, damage, target, true, NULL, fulminationAura);
+                lightningShield->SetCharges(lsCharges - usedCharges);
+            }
+
+            // register functions used in spell script - names of these functions do not matter
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_sha_fulmination_SpellScript::HandleFulmination, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript *GetSpellScript() const
+        {
+            return new spell_sha_fulmination_SpellScript();
+        }
+};
+
 void AddSC_shaman_spell_scripts()
 {
     new spell_sha_fire_nova();
@@ -745,4 +824,5 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_unleash_elements();
     new spell_shaman_ancestral_resolve();
     new spell_sha_spirit_link();
+    new spell_sha_fulmination();
 }

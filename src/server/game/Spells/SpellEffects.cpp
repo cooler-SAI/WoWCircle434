@@ -3228,14 +3228,39 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
     if (success_list.empty())
         return;
 
-    // Glyph of Dispel Magic
-    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && m_spellInfo->SpellFamilyFlags[1] & 1)
-        if (AuraEffect* aurEff = m_caster->GetAuraEffect(55677, 0))
-            if (m_caster->IsFriendlyTo(unitTarget))
+    // Custom effects
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        // Glyph of Dispel Magic
+        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && m_spellInfo->SpellFamilyFlags[1] & 1)
+            if (AuraEffect* aurEff = m_caster->GetAuraEffect(55677, 0))
+                if (m_caster->IsFriendlyTo(unitTarget))
+                {
+                    int32 bp = int32(unitTarget->CountPctFromMaxHealth(aurEff->GetAmount()));
+                    m_caster->CastCustomSpell(unitTarget, 56131, &bp, 0, 0, true); 
+                }
+
+        // Cleansing Waters
+        if (m_spellInfo->Id == 51886)
+        {
+            if (m_caster->HasAura(86959)) // Rank 1
             {
-                int32 bp = int32(unitTarget->CountPctFromMaxHealth(aurEff->GetAmount()));
-                m_caster->CastCustomSpell(unitTarget, 56131, &bp, 0, 0, true); 
+                if (!m_caster->ToPlayer()->HasSpellCooldown(86961))
+                {
+                    m_caster->CastSpell(unitTarget, 86961, true);
+                    m_caster->ToPlayer()->AddSpellCooldown(86961, 0, time(NULL) + 6);
+                }
             }
+            else if (m_caster->HasAura(86962)) // Rank 2
+            {
+                if (!m_caster->ToPlayer()->HasSpellCooldown(86958))
+                {
+                    m_caster->CastSpell(unitTarget, 86958, true);
+                    m_caster->ToPlayer()->AddSpellCooldown(86958, 0, time(NULL) + 6);
+                }
+            }
+        }
+    }
 
 
     WorldPacket dataSuccess(SMSG_SPELLDISPELLOG, 8+8+4+1+4+success_list.size()*5);

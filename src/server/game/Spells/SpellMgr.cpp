@@ -4940,6 +4940,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 1535:
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
                 break;
+            // Fulmination damage
+            case 88767:
+                spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_DONE_PCT_DAMAGE_MODS;
+                break;
             default:
                 break;
         }
