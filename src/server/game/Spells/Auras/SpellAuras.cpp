@@ -1485,33 +1485,66 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 break;
             case SPELLFAMILY_PALADIN:
-                // Avenging Wrath
-                if (m_spellInfo->Id == 31884)
-                {
-                    if (!caster)
-                        return;
+                if (!caster)
+                    break;
 
-                    if (AuraEffect const* auraEff = caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_PALADIN, 3029, 0))
-                        caster->CastSpell(caster, 57318, true);
-                }
-                // Speed of Light
-                else if (m_spellInfo->Id == 498)
+                switch (m_spellInfo->Id)
                 {
-                    if (AuraEffect const* auraEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 5062, 1))
-                    {
-                        int32 bp0 = auraEff->GetAmount();
-                        caster->CastCustomSpell(caster, 85497, &bp0, 0, 0, true);
-                    }
+                    // Avenging Wrath
+                    case 31884:
+                        if (AuraEffect const* auraEff = caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_PALADIN, 3029, 0))
+                            caster->CastSpell(caster, 57318, true);
+                        break;
+                    // Speed of Light
+                    case 498:
+                        if (AuraEffect const* auraEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 5062, 1))
+                        {
+                            int32 bp0 = auraEff->GetAmount();
+                            caster->CastCustomSpell(caster, 85497, &bp0, 0, 0, true);
+                        }
+                        break;
+                    // Grand Crusader
+                    case 85416:
+                        caster->ToPlayer()->RemoveSpellCooldown(31935, true);
+                        break;
+                    default:
+                        break;
                 }
-                // Communion
-                else if (m_spellInfo->SpellFamilyFlags[2] & 0x20)
+                if (m_spellInfo->SpellFamilyFlags[2] & 0x20)
                     caster->CastSpell(caster, 63531, true);
-                // Grand Crusader
-                else if (m_spellInfo->Id == 85416)
+                break;
+            case SPELLFAMILY_DEATHKNIGHT:
+                if (!caster)
+                    break;
+
+                switch (m_spellInfo->Id)
                 {
-                    if (!caster)
-                        return;
-                    caster->ToPlayer()->RemoveSpellCooldown(31935, true);
+                    // Shadow Infusion
+                    case 91342:
+                        if (GetStackAmount() == 5 && !caster->HasAura(93426))
+                            caster->CastSpell(caster, 93426, true);
+                        break;
+                    // Dark Transformation
+                    case 63560:
+                        target->RemoveAurasDueToSpell(91342);
+                        caster->RemoveAurasDueToSpell(93426);
+                        break;
+                    // Summon Gargoyle debuff, need to find target
+                    case 49206:
+                        if (caster->ToPlayer() && caster->getClass() == CLASS_DEATH_KNIGHT)
+                        {
+                            for (Unit::ControlList::iterator itr = caster->m_Controlled.begin(); itr != caster->m_Controlled.end(); ++itr)
+                            {
+                                if ((*itr)->GetEntry() == 27829)
+                                {
+                                    (*itr)->GetAI()->AttackStart(aurApp->GetTarget());
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    default:
+                        break;
                 }
                 break;
         }

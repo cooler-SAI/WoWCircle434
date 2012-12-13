@@ -928,6 +928,46 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     else
                         unitTarget->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, m_caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID));
                     break;
+                // Ghoul: Claw
+                case 47468:
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // Dark Transformation - Replace spell
+                    if (m_caster->HasAura(63560))
+                        m_caster->CastSpell(unitTarget, 91778, true); // Sweeping Claws
+                    else
+                        m_caster->CastSpell(unitTarget, 91776, true); // Claw
+
+                    break;
+                }
+                // Ghoul: Huddle
+                case 47484:
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // Dark Transformation - Replace spell
+                    if (m_caster->HasAura(63560))
+                        m_caster->CastSpell(unitTarget, 91837, true); // Putrid Bulwark
+                    else
+                        m_caster->CastSpell(unitTarget, 91838, true); // Huddle
+                    break;
+                }
+                // Ghoul: Leap
+                case 47482:
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // Dark Transformation - Replace spell
+                    if (m_caster->HasAura(63560))
+                        m_caster->CastSpell(unitTarget, 91802, true); // Shambling Rush
+                    else
+                        m_caster->CastSpell(unitTarget, 91809, true); // Leap
+                    break;
+                }
             }
             break;
         }
@@ -1084,7 +1124,8 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             }
             switch (m_spellInfo->Id)
             {
-                case 46584: // Raise Dead
+                // Raise Dead
+                case 46584:
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
@@ -1097,6 +1138,19 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     // Remove cooldown - summon spellls have category
                     m_caster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
                     break;
+                // Ghoul: Gnaw
+                case 47481:
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // Dark Transformation - Replace spell
+                    if (m_caster->HasAura(63560))
+                        m_caster->CastSpell(unitTarget, 91797, true); // Monstrous Blow
+                    else
+                        m_caster->CastSpell(unitTarget, 91800, true); // Gnaw
+                    break;
+                }
             }
             break;
         case SPELLFAMILY_HUNTER:
