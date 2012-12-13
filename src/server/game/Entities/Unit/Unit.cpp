@@ -7019,6 +7019,13 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         return false;
                     triggered_spell_id = 35079; // 4 sec buff on self
                     target = this;
+
+                    // Glyph of Misdirection
+                    if (GetPetGUID() == GetMisdirectionTargetGuid() && HasAura(56829))
+                    {
+                        ToPlayer()->RemoveSpellCooldown(34477, true);
+                    }
+
                     break;
                 }
                 // Wild Quiver (Mastery Marksmanship Hunter)

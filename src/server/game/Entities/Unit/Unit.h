@@ -2170,6 +2170,7 @@ class Unit : public WorldObject
         }
         uint32 GetReducedThreatPercent() { return m_reducedThreatPercent; }
         Unit* GetMisdirectionTarget() { return m_misdirectionTargetGUID ? GetUnit(*this, m_misdirectionTargetGUID) : NULL; }
+        uint64 GetMisdirectionTargetGuid() { return m_misdirectionTargetGUID; }
 
         bool IsAIEnabled, NeedChangeAI;
         bool CreateVehicleKit(uint32 id, uint32 creatureEntry);
