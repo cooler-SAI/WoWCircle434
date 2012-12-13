@@ -1136,7 +1136,8 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                         spell_id = 46585; // or guardian
 
                     // Remove cooldown - summon spellls have category
-                    m_caster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+                    m_caster->ToPlayer()->RemoveSpellCooldown(52150, true);
+                    m_caster->ToPlayer()->RemoveSpellCooldown(46585, true);
                     break;
                 // Ghoul: Gnaw
                 case 47481:
