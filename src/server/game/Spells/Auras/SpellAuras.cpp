@@ -1371,17 +1371,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             caster->CastSpell(caster, 96267, true);
                         break;
                     }
-                    // Inner Fire
-                    case 588:
-                    {
-                        // Inner Sanctum
-                        if (AuraEffect * aur = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 51, 0))
-                        {
-                            int32 basepoints = -aur->GetAmount();
-                            caster->CastCustomSpell(caster, 91724, &basepoints, 0, 0, true);
-                        }
-                        break;
-                    }
                     // Devouring Plague
                     case 2944:
                     {
@@ -1802,6 +1791,32 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     break;
             }
             break;
+        case SPELLFAMILY_PRIEST:
+            switch(GetSpellInfo()->Id)
+            {
+                // Inner Fire
+                case 588:
+                {
+                    if (!caster)
+                        break;
+
+                    // Inner Sanctum
+                    if (apply)
+                    {
+                        if (AuraEffect * aur = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 51, 0))
+                        {
+                            int32 basepoints = -aur->GetAmount();
+                            caster->CastCustomSpell(caster, 91724, &basepoints, 0, 0, true);
+                        }
+                    }
+                    else
+                    {
+                        caster->RemoveAurasDueToSpell(91724);
+                    }
+                    break;
+                }
+            }
+
         case SPELLFAMILY_DRUID:
             switch (GetSpellInfo()->Id)
             {
