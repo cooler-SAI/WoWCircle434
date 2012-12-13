@@ -7346,6 +7346,23 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Focused Insight
+                case 77794:
+                case 77795:
+                case 77796:
+                {
+                    if (Aura* aura = triggeredByAura->GetBase())
+                    {
+                        if (!procSpell)
+                            break;
+
+                        uint32 cost = CalculatePct(GetCreateMana(), procSpell->ManaCostPercentage);
+                        int32 bp0 = int32(CalculatePct(cost, aura->GetEffect(EFFECT_0)->GetAmount()) * -1);
+                        int32 bp1 = aura->GetEffect(EFFECT_1)->GetAmount();
+                        CastCustomSpell(this, 77800, &bp0, &bp1, &bp1, true);
+                    }
+                    break;
+                }
                 // Tidal Waves
                 case 51562:
                 case 51563:

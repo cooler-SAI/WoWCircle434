@@ -4936,6 +4936,10 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].MiscValue = 5;
                 spellInfo->Effects[EFFECT_0].MiscValueB = NUM_RUNE_TYPES;
                 break;
+            // Fire Nova
+            case 1535:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                break;
             default:
                 break;
         }
