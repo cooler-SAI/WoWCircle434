@@ -2971,6 +2971,7 @@ bool SpellInfo::IsShouldProcOnOwner() const
         case 83381: // Kill Command! -> Improved Kill Command
         case 95969: // Frostfire Orb -> Fingers of Frost
         case 84721:
+        case 3606: // Searing Arrow -> Searing Flames
             return true;
     }
 

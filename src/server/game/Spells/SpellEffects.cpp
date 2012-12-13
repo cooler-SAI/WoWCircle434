@@ -3995,6 +3995,30 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             // Stormstrike
             if (AuraEffect* aurEff = m_caster->IsScriptOverriden(m_spellInfo, 5634))
                 m_caster->CastSpell(m_caster, 38430, true, NULL, aurEff);
+
+            // Lava Lash
+            if (m_spellInfo->Id == 60103)
+            {
+                if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                    break;
+
+                if (Item* offItem = m_caster->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+                {
+                    // Flametongue
+                    if (offItem->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) == 5) 
+                        AddPct(totalDamagePercentMod, 40);
+                }
+                
+                if (AuraEffect* aurEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 4780, 1))
+                {
+                    // Searing Flames
+                    if (Aura* aur = unitTarget->GetAura(77661, m_caster->GetGUID()))
+                    {
+                        AddPct(totalDamagePercentMod, aurEff->GetAmount() * aur->GetStackAmount());
+                        unitTarget->RemoveAura(77661, m_caster->GetGUID());
+                    }
+                }
+            }
             break;
         }
         case SPELLFAMILY_DRUID:

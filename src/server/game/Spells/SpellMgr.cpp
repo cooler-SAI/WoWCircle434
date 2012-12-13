@@ -4944,6 +4944,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 88767:
                 spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_DONE_PCT_DAMAGE_MODS;
                 break;
+            // Searing Flame
+            case 77661:
+                spellInfo->Effects[EFFECT_0].ScalingMultiplier = 0.0f;
+                spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_DONE_PCT_DAMAGE_MODS;
             default:
                 break;
         }

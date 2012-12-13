@@ -375,50 +375,6 @@ class spell_sha_healing_stream_totem : public SpellScriptLoader
         }
 };
 
-/// Updated 4.3.4
-class spell_sha_lava_lash : public SpellScriptLoader
-{
-    public:
-        spell_sha_lava_lash() : SpellScriptLoader("spell_sha_lava_lash") { }
-
-        class spell_sha_lava_lash_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_sha_lava_lash_SpellScript)
-
-            bool Load()
-            {
-                return GetCaster()->GetTypeId() == TYPEID_PLAYER;
-            }
-
-            void HandleDummy(SpellEffIndex /* effIndex */)
-            {
-                if (Player* caster = GetCaster()->ToPlayer())
-                {
-                    int32 damage = GetEffectValue();
-                    int32 hitDamage = GetHitDamage();
-                    if (caster->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
-                    {
-                        // Damage is increased by 25% if your off-hand weapon is enchanted with Flametongue.
-                        if (caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_SHAMAN, 0x200000, 0, 0))
-                            AddPct(hitDamage, damage);
-                        SetHitDamage(hitDamage);
-                    }
-                }
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_sha_lava_lash_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
-            }
-
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_sha_lava_lash_SpellScript();
-        }
-};
-
 // 1064 Chain Heal
 /// Updated 4.3.4
 class spell_sha_chain_heal : public SpellScriptLoader
@@ -818,7 +774,6 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_heroism();
     new spell_sha_ancestral_awakening_proc();
     new spell_sha_healing_stream_totem();
-    new spell_sha_lava_lash();
     new spell_sha_chain_heal();
     new spell_sha_flame_shock();
     new spell_sha_unleash_elements();

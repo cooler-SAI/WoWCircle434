@@ -7353,6 +7353,16 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Searing Flame
+                case 77655:
+                case 77656:
+                case 77657:
+                {
+                    target = victim;
+                    triggered_spell_id = 77661;
+                    basepoints0 = damage / 5;
+                    break;
+                }
                 // Focused Insight
                 case 77794:
                 case 77795:
