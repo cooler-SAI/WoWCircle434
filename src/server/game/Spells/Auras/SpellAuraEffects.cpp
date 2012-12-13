@@ -662,6 +662,15 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 amount *= 8;
                 amount /= GetTotalTicks();
             }
+            // Exorcism 
+            else if (GetId() == 879)
+            {
+                float attackPower = caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                int32 spellPower = caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->ScalingClass));
+                uint32 maxdmg = attackPower > spellPower ? (attackPower * 0.344f) : (spellPower * 0.344f);
+                amount = int32(maxdmg / 5.0f);
+                amount /= GetTotalTicks();
+            }
             // Rupture
             else if (GetId() == 1943)
             {

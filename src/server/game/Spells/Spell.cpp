@@ -2262,7 +2262,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /* 
                     targetInfo.timeDelay = 200LL;
                     m_delayMoment = 200LL;
                 }
-                default: 
+                default:
                     break;
             }
             // Shadowstep
@@ -2770,6 +2770,12 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         if (effectMask & (1 << i) && m_spellInfo->Effects[i].IsUnitOwnedAuraEffect())
             aura_effmask |= 1 << i;
+
+    if (m_spellInfo->Id == 879) // Exorcism
+    {
+        if (!m_caster->HasAura(54934)) // Glyph of Exorcism
+            aura_effmask &= ~(1 << EFFECT_1);
+    }
 
     if (aura_effmask)
     {
@@ -3535,7 +3541,7 @@ void Spell::cast(bool skipCheck)
     SendSpellGo();
 
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
-    if (((m_spellInfo->Speed > 0.0f || (m_delayMoment && (m_caster->GetTypeId() == TYPEID_PLAYER || m_caster->ToCreature()->isPet()))) 
+    if (((m_spellInfo->Speed > 0.0f || (m_delayMoment && (m_caster->GetTypeId() == TYPEID_PLAYER || m_caster->ToCreature()->isPet())))
         && !m_spellInfo->IsChanneled()) || m_spellInfo->_IsNeedDelay())
     {
         // Remove used for cast item if need (it can be already NULL after TakeReagents call
@@ -3752,7 +3758,7 @@ void Spell::_handle_finish_phase()
         // Real add combo points from effects
         if (m_comboPointGain)
             m_caster->m_movedPlayer->GainSpellComboPoints(m_comboPointGain);
-        
+
         if (m_spellInfo->PowerType == POWER_HOLY_POWER && m_caster->m_movedPlayer->getClass() == CLASS_PALADIN)
            HandleHolyPower(m_caster->m_movedPlayer);
     }
@@ -4687,10 +4693,10 @@ void Spell::TakePower()
         TakeRunePower(hit);
         return;
     }
-    
+
     // In Spell::HandleHolyPower
     if (m_spellInfo->PowerType == POWER_HOLY_POWER)
-    { 
+    {
         if (m_caster->HasAura(90174))
         {
             m_powerCost = 3;
@@ -4711,8 +4717,8 @@ void Spell::TakePower()
             m_caster->ModifyPower(POWER_HOLY_POWER, -m_powerCost);
 
         return;
-    }       
-       
+    }
+
     if (!m_powerCost)
         return;
 
@@ -5332,7 +5338,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     }
                 }
                 break;
-            } 
+            }
             case SPELL_EFFECT_SCHOOL_DAMAGE:
             {
                 // Soul Swap
@@ -5363,14 +5369,14 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_SPELL_UNAVAILABLE;
                 }
                 // Awaken Peon
-                else if (m_spellInfo->Id == 19938)          
+                else if (m_spellInfo->Id == 19938)
                 {
                     Unit* unit = m_targets.GetUnitTarget();
                     if (!unit || !unit->HasAura(17743))
                         return SPELL_FAILED_BAD_TARGETS;
                 }
                 // Righteous Defense
-                else if (m_spellInfo->Id == 31789)          
+                else if (m_spellInfo->Id == 31789)
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return SPELL_FAILED_DONT_REPORT;
@@ -5381,7 +5387,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                 }
                 // Kill Command
-                else if (m_spellInfo->Id == 34026) 
+                else if (m_spellInfo->Id == 34026)
                 {
                     if (Unit* pet = m_caster->GetGuardianPet())
                     {
@@ -7644,7 +7650,7 @@ bool Spell::LOSAdditionalRules(Unit const* target) const
             return true;
 
         // like bloodlust / prayers
-        if (m_spellInfo->Effects[x].ApplyAuraName && (m_spellInfo->Effects[x].TargetB.GetTarget() == TARGET_UNIT_SRC_AREA_ALLY || 
+        if (m_spellInfo->Effects[x].ApplyAuraName && (m_spellInfo->Effects[x].TargetB.GetTarget() == TARGET_UNIT_SRC_AREA_ALLY ||
             m_spellInfo->Effects[x].TargetA.GetTarget() == TARGET_UNIT_CASTER_AREA_RAID))
             return !IsMorePowerfulAura(target);
 

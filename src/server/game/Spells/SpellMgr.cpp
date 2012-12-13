@@ -3088,7 +3088,6 @@ void SpellMgr::LoadDbcDataCorrections()
             case 34026:
                 spellInfo->SetRangeIndex(2);
                 break;
-            case 879:   // Exorcism
             case 85673: // Word of Glory
             case 89023: // Blessed life (spell, not talent)
             case 85222: // Light of Dawn
