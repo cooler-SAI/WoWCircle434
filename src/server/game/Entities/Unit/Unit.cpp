@@ -9250,6 +9250,22 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // dummy basepoints or other customs
     switch (trigger_spell_id)
     {
+        case 91342: // Shadow Infusion
+        {
+            if (GetTypeId() != TYPEID_PLAYER)
+                return false;
+
+            if (Pet* pet = ToPlayer()->GetPet())
+            {
+                uint8 stackAmount = 0;
+                if (Aura* aura = pet->GetAura(trigger_spell_id))
+                    stackAmount = aura->GetStackAmount();
+
+                if (stackAmount >= 4) // Apply Dark Transformation
+                    CastSpell(this, 93426, true);
+            }
+            break;
+        }
         // Power Word: Barrier
         case 81782:
         case 90785:
