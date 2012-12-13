@@ -26,6 +26,7 @@
 #include "Unit.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
+#include "TotemAI.h"
 
 enum ShamanSpells
 {
@@ -63,6 +64,9 @@ enum ShamanSpells
     SHAMAN_SPELL_FULMINATION_TRIGGERED     = 88767,
     SHAMAN_SPELL_FULMINATION_INFO          = 95774,
     SHAMAN_SPELL_LIGHTNING_SHIELD_PROC     = 26364,
+
+    SHAMAN_TOTEM_SPELL_TOTEMIC_WRATH       = 77746,
+    SHAMAN_TOTEM_SPELL_TOTEMIC_WRATH_AURA  = 77747,
 };
 
 // 1535 Fire Nova
@@ -477,6 +481,40 @@ class spell_sha_flame_shock : public SpellScriptLoader
         {
             return new spell_sha_flame_shock_AuraScript();
         }
+
+        class spell_sha_flame_shock_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_sha_flame_shock_SpellScript)
+            bool Validate(SpellEntry const * spellEntry)
+            {
+                if (!sSpellStore.LookupEntry(SHAMAN_SPELL_FLAME_SHOCK))
+                    return false;
+
+                return true;
+            }
+
+            void HandleDamage(SpellEffIndex /*effIndex*/)
+            {
+                if (!GetCaster() || !GetHitUnit())
+                    return;
+
+                if (Unit* minion = ObjectAccessor::GetUnit(*GetCaster(), GetCaster()->m_SummonSlot[SUMMON_SLOT_TOTEM]))
+                    if (minion->isTotem() && minion->GetEntry() == 2523) // Searing Totem
+                    {
+                        static_cast<TotemAI*>(minion->GetAI())->SetVictim(GetHitUnit()->GetGUID());
+                    }
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_sha_flame_shock_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_sha_flame_shock_SpellScript();
+        }
 };
 
 // 73680 Unleash Elements
@@ -765,6 +803,52 @@ class spell_sha_fulmination : public SpellScriptLoader
         }
 };
 
+// 77746 - Totemic Wrath
+class spell_sha_totemic_wrath : public SpellScriptLoader
+{
+    public:
+        spell_sha_totemic_wrath() : SpellScriptLoader("spell_sha_totemic_wrath") { }
+
+        class spell_sha_totemic_wrath_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_sha_totemic_wrath_AuraScript);
+
+            bool Validate(SpellEntry const * /*spellEntry*/)
+            {
+                if (!sSpellStore.LookupEntry(SHAMAN_TOTEM_SPELL_TOTEMIC_WRATH))
+                    return false;
+
+                if (!sSpellStore.LookupEntry(SHAMAN_TOTEM_SPELL_TOTEMIC_WRATH_AURA))
+                    return false;
+
+                return true;
+            }
+
+            void HandleEffectApply(AuraEffect const * aurEff, AuraEffectHandleModes /*mode*/)
+            {
+                Unit* target = GetTarget();
+
+                if(target->ToPlayer())
+                    return; // just apply as dummy
+
+                // applied by a totem - cast the real aura if owner has the talent
+                if (Unit *caster = aurEff->GetBase()->GetCaster())
+                    if (caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_GENERIC, 2019, 0))
+                        target->CastSpell(target, SHAMAN_TOTEM_SPELL_TOTEMIC_WRATH_AURA, true, NULL, aurEff);
+            }
+
+            void Register()
+            {
+                OnEffectApply += AuraEffectApplyFn(spell_sha_totemic_wrath_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript *GetAuraScript() const
+        {
+            return new spell_sha_totemic_wrath_AuraScript();
+        }
+};
+
 void AddSC_shaman_spell_scripts()
 {
     new spell_sha_fire_nova();
@@ -780,4 +864,5 @@ void AddSC_shaman_spell_scripts()
     new spell_shaman_ancestral_resolve();
     new spell_sha_spirit_link();
     new spell_sha_fulmination();
+    new spell_sha_totemic_wrath();
 }

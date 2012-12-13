@@ -7353,6 +7353,15 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Telluric Currents
+                case 82984:
+                case 82988:
+                {
+                    basepoints0 = CalculatePct(damage, triggerAmount);
+                    target = this;
+                    triggered_spell_id = 82987;
+                    break;
+                }
                 // Searing Flame
                 case 77655:
                 case 77656:
@@ -9277,12 +9286,11 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
         // Maelstrom Weapon
         case 53817:
         {
-            // has rank dependant proc chance, ignore too often cases
-            // PPM = 2.5 * (rank of talent),
-            uint32 rank = auraSpellInfo->GetRank();
-            // 5 rank -> 100% 4 rank -> 80% and etc from full rate
-            if (!roll_chance_i(20*rank))
-                return false;
+            // Visual
+            if (Aura* aur = GetAura(53817))
+                if (aur->GetStackAmount()  >= 4)
+                    CastSpell(this, 60349, true);
+
             // Item - Shaman T10 Enhancement 4P Bonus
             if (AuraEffect const* aurEff = GetAuraEffect(70832, 0))
                 if (Aura const* maelstrom = GetAura(53817))

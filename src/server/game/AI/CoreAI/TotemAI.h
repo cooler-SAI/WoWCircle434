@@ -34,6 +34,7 @@ class TotemAI : public CreatureAI
         void MoveInLineOfSight(Unit* who);
         void AttackStart(Unit* victim);
         void EnterEvadeMode();
+        void SetVictim(uint64 victim) { i_victimGuid = victim; }
 
         void UpdateAI(uint32 const diff);
         static int Permissible(Creature const* creature);

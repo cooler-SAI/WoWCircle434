@@ -89,6 +89,11 @@ void Totem::InitSummon()
 {
     if (m_type == TOTEM_PASSIVE && GetSpell())
     {
+        // Hack for Flametongue Totem and Totemic Wrath
+        if (GetEntry() == 5950)
+            if (GetOwner() && GetOwner()->HasAura(77746))
+                return;
+
         CastSpell(this, GetSpell(), true);
     }
 
