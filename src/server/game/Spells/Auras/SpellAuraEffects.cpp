@@ -7145,7 +7145,15 @@ void AuraEffect::HandleObsModPowerAuraTick(Unit* target, Unit* caster) const
         return;
 
     // ignore negative values (can be result apply spellmods to aura damage
-    uint32 amount = std::max(m_amount, 0) * target->GetMaxPower(powerType) /100;
+    uint32 amount = std::max(m_amount, 0) * target->GetMaxPower(powerType) / 100;
+
+    // Glyph of Mage Armor
+    if (GetSpellInfo()->Id == 6117)
+    {
+        if (AuraEffect * eff = GetCaster()->GetAuraEffect(56383, 0))
+            AddPct(amount, eff->GetAmount());
+    }
+
     sLog->outInfo(LOG_FILTER_SPELLS_AURAS, "PeriodicTick: %u (TypeId: %u) energize %u (TypeId: %u) for %u dmg inflicted by %u",
         GUID_LOPART(GetCasterGUID()), GuidHigh2TypeId(GUID_HIPART(GetCasterGUID())), target->GetGUIDLow(), target->GetTypeId(), amount, GetId());
 
