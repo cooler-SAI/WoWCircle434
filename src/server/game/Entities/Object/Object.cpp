@@ -1597,13 +1597,8 @@ bool MovementInfo::AcceptClientChanges(Player* player, MovementInfo& client, Opc
     {
         plMover->UpdateFallInformationIfNeed(client);
 
-        float valueZ = -500.0f;
-        // Check for Vajsh'ir zones
-        if (plMover->GetMapId() == 0 && (plMover->GetZoneId() == 5144 || plMover->GetZoneId() == 5145 ||
-            plMover->GetZoneId() == 5146 || plMover->GetZoneId() == 4815 || plMover->GetZoneId() == 4816))
-            valueZ = -3000.0f;
-
-        if (client.pos.GetPositionZ() < valueZ)
+        AreaTableEntry const* zone = GetAreaEntryByAreaID(plMover->GetAreaId());
+        if (client.pos.GetPositionZ() < (zone ? zone->MaxDepth : -500.0f))
         {
             if (!(plMover->InBattleground()
                 && plMover->GetBattleground()
