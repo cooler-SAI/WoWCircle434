@@ -7353,6 +7353,28 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Lava Surge
+                case 77755:
+                case 77756:
+                {
+                    triggered_spell_id = 77762;
+                    target = this;
+                    break;
+                }
+                // Feedback
+                case 86183:
+                case 86184:
+                case 86185:
+                {
+                    if (GetTypeId() != TYPEID_PLAYER)
+                        break;
+
+                    int32 bp = -triggerAmount;
+
+                    ToPlayer()->ReduceSpellCooldown(16166, bp);
+
+                    break;
+                }
                 // Telluric Currents
                 case 82984:
                 case 82988:

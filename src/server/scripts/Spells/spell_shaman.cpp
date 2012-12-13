@@ -462,9 +462,6 @@ class spell_sha_flame_shock : public SpellScriptLoader
                     // Lava Flows
                     if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, ICON_ID_SHAMAN_LAVA_FLOW, EFFECT_0))
                     {
-                        if (sSpellMgr->GetFirstSpellInChain(SHAMAN_LAVA_FLOWS_R1) != sSpellMgr->GetFirstSpellInChain(aurEff->GetId()))
-                            return;
-
                         int32 basepoints = aurEff->GetAmount();
                         caster->CastCustomSpell(caster, SHAMAN_LAVA_FLOWS_TRIGGERED_R1, &basepoints, NULL, NULL, true);
                     }

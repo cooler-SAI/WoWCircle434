@@ -862,6 +862,15 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                // Lava Surge
+                case 77762:
+                {
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    m_caster->ToPlayer()->RemoveSpellCooldown(51505, true);
+                    return;
+                }
                 case 82626: // Grounded Plasma Shield
                 {
                     if (m_caster && m_caster->GetTypeId() == TYPEID_PLAYER)
