@@ -26,11 +26,9 @@
 #include "LootMgr.h"
 #include "DatabaseEnv.h"
 #include "Cell.h"
-
 #include <list>
 
 class SpellInfo;
-
 class CreatureAI;
 class Quest;
 class Player;
@@ -70,6 +68,20 @@ enum CreatureFlagsExtra
 #else
 #pragma pack(push, 1)
 #endif
+
+// Creature Pet entries
+#define ENTRY_INFERNAL          89
+#define ENTRY_IMP               416
+#define ENTRY_VOIDWALKER        1860
+#define ENTRY_SUCCUBUS          1863
+#define ENTRY_FELHUNTER         417
+#define ENTRY_FELGUARD          17252
+#define ENTRY_WATER_ELEMENTAL   510
+#define ENTRY_TREANT            1964
+#define ENTRY_FIRE_ELEMENTAL    15438
+#define ENTRY_GHOUL             26125
+#define ENTRY_BLOODWORM         28017
+#define ENTRY_GARGOYLE          27829
 
 #define MAX_KILL_CREDIT 2
 #define CREATURE_REGEN_INTERVAL 2 * IN_MILLISECONDS

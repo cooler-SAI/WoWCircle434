@@ -2779,6 +2779,9 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
                 ++itr;
         }
 
+        if (pet->IsPetGhoul())
+            pet->setPowerType(POWER_ENERGY);
+
         if (duration > 0)
             pet->SetDuration(duration);
 

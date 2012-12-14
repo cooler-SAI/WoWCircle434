@@ -212,10 +212,12 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     {
         case SUMMON_PET:
             petlevel = owner->getLevel();
-
             SetUInt32Value(UNIT_FIELD_BYTES_0, 0x800); // class = mage
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
-                                                            // this enables popup window (pet dismiss, cancel)
+                                   
+            if (IsPetGhoul())
+                SetUInt32Value(UNIT_FIELD_BYTES_0, 1024);
+
             break;
         case HUNTER_PET:
             SetUInt32Value(UNIT_FIELD_BYTES_0, 0x02020100); // class = warrior, gender = none, power = focus
@@ -227,8 +229,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
             setPowerType(POWER_FOCUS);
             break;
         default:
-            if (!IsPetGhoul())
-                sLog->outError(LOG_FILTER_PETS, "Pet have incorrect type (%u) for pet loading.", getPetType());
+            sLog->outError(LOG_FILTER_PETS, "Pet have incorrect type (%u) for pet loading.", getPetType());
             break;
     }
 
@@ -584,20 +585,31 @@ void Pet::Update(uint32 diff)
                         case POWER_FOCUS:
                             Regenerate(POWER_FOCUS);
                             m_regenTimer += PET_FOCUS_REGEN_INTERVAL - diff;
-                            if (!m_regenTimer) ++m_regenTimer;
+                            if (!m_regenTimer)
+                                ++m_regenTimer;
 
                             // Reset if large diff (lag) causes focus to get 'stuck'
                             if (m_regenTimer > PET_FOCUS_REGEN_INTERVAL)
                                 m_regenTimer = PET_FOCUS_REGEN_INTERVAL;
-
                             break;
+                        case POWER_ENERGY:
+                            {
+                                m_regenTimer -= diff;
+                                float haste = 1.0f;
+                                if (GetOwner() && GetOwner()->GetTypeId() == TYPEID_PLAYER)
+                                    haste = (2.0f - GetOwner()->GetFloatValue(PLAYER_FIELD_MOD_HASTE));
 
-                        // in creature::update
-                        //case POWER_ENERGY:
-                        //    Regenerate(POWER_ENERGY);
-                        //    m_regenTimer += CREATURE_REGEN_INTERVAL - diff;
-                        //    if (!m_regenTimer) ++m_regenTimer;
-                        //    break;
+                                // Negative values should't change regeneration
+                                if (haste < 1.0f)
+                                    haste = 1.0f;
+
+                                while (m_regenTimer <= 0)
+                                {
+                                    Regenerate(POWER_ENERGY);
+                                    m_regenTimer += uint32(PET_ENERGY_REGEN_INTERVAL / haste);
+                                }
+                                break;
+                            }
                         default:
                             m_regenTimer = 0;
                             break;
@@ -633,7 +645,7 @@ void Creature::Regenerate(Powers power)
         case POWER_ENERGY:
         {
             // For deathknight's ghoul.
-            addvalue = 20;
+            addvalue = 1;
             break;
         }
         default:
@@ -1494,8 +1506,15 @@ bool Pet::addSpell(uint32 spellId, ActiveStates active /*= ACT_DECIDE*/, PetSpel
 
     if (spellInfo->IsPassive() && (!spellInfo->CasterAuraState || HasAuraState(AuraStateType(spellInfo->CasterAuraState))))
         CastSpell(this, spellId, true);
-    else
+    else if (!IsPetGhoul())
         m_charmInfo->AddSpellToActionBar(spellInfo);
+
+    if (IsPetGhoul())
+    {
+        for (uint32 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+            if (spellInfo->Id == ToCreature()->m_spells[i])
+                m_charmInfo->AddSpellToActionBar(spellInfo);
+    }
 
     if (newspell.active == ACT_ENABLED)
         ToggleAutocast(spellInfo, true);

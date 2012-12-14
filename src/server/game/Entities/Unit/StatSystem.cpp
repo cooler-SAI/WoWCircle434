@@ -985,17 +985,6 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
 ########                         ########
 #######################################*/
 
-#define ENTRY_IMP               416
-#define ENTRY_VOIDWALKER        1860
-#define ENTRY_SUCCUBUS          1863
-#define ENTRY_FELHUNTER         417
-#define ENTRY_FELGUARD          17252
-#define ENTRY_WATER_ELEMENTAL   510
-#define ENTRY_TREANT            1964
-#define ENTRY_FIRE_ELEMENTAL    15438
-#define ENTRY_GHOUL             26125
-#define ENTRY_BLOODWORM         28017
-
 bool Guardian::UpdateStats(Stats stat)
 {
     if (stat >= MAX_STATS)
@@ -1013,7 +1002,7 @@ bool Guardian::UpdateStats(Stats stat)
     {
         switch (stat)
         {
-            case STAT_STAMINA:  mod = 0.3f; break;                // Default Owner's Stamina scale
+            case STAT_STAMINA:  mod = 0.45f; break;               // Default Owner's Stamina scale
             case STAT_STRENGTH: mod = 0.7f; break;                // Default Owner's Strength scale
             default: break;
         }
@@ -1138,13 +1127,16 @@ void Guardian::UpdateMaxHealth()
     float multiplicator;
     switch (GetEntry())
     {
-        case ENTRY_IMP:         multiplicator = 8.4f;   break;
-        case ENTRY_VOIDWALKER:  multiplicator = 11.0f;  break;
-        case ENTRY_SUCCUBUS:    multiplicator = 9.1f;   break;
-        case ENTRY_FELHUNTER:   multiplicator = 9.5f;   break;
-        case ENTRY_FELGUARD:    multiplicator = 11.0f;  break;
-        case ENTRY_BLOODWORM:   multiplicator = 1.0f;   break;
-        default:                multiplicator = 10.0f;  break;
+        case ENTRY_IMP:                 multiplicator = 8.4f;   break;
+        case ENTRY_VOIDWALKER:          multiplicator = 11.0f;  break;
+        case ENTRY_SUCCUBUS:            multiplicator = 9.1f;   break;
+        case ENTRY_FELHUNTER:           multiplicator = 9.5f;   break;
+        case ENTRY_FELGUARD:            multiplicator = 11.0f;  break;
+        case ENTRY_BLOODWORM:           multiplicator = 1.0f;   break;
+        case ENTRY_GHOUL:               multiplicator = 15.0f;  break;
+        case ENTRY_GARGOYLE:            multiplicator = 15.0f;  break;
+        case ENTRY_WATER_ELEMENTAL:     multiplicator = 10.0f;  break;
+        default:                        multiplicator = 14.0f;  break;
     }
 
     float value = GetModifierValue(unitMod, BASE_VALUE) + GetCreateHealth();
