@@ -638,6 +638,14 @@ void AddSC_boss_forgemaster_throngus();
 void AddSC_boss_drahga_shadowburner();
 void AddSC_boss_erudax();
 
+void AddSC_instance_bastion_of_twilight(); // Bastion of Twilight
+void AddSC_bastion_of_twilight();
+void AddSC_boss_halfus_wyrmbreaker();
+void AddSC_boss_theralion_and_valiona();
+void AddSC_boss_ascendant_council();
+void AddSC_boss_chogall();
+void AddSC_boss_sinestra();
+
 // battlegrounds
 
 // outdoor pvp
@@ -1311,6 +1319,15 @@ void AddNorthrendScripts()
     AddSC_boss_forgemaster_throngus();
     AddSC_boss_drahga_shadowburner();
     AddSC_boss_erudax();
+
+    AddSC_instance_bastion_of_twilight(); // Bastion of Twilight
+    AddSC_bastion_of_twilight();
+    AddSC_boss_halfus_wyrmbreaker();
+    AddSC_boss_theralion_and_valiona();
+    AddSC_boss_ascendant_council();
+    AddSC_boss_chogall();
+    AddSC_boss_sinestra();
+
 
 #endif
 }
