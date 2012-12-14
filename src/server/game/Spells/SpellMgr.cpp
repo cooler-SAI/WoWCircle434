@@ -4947,6 +4947,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 77661:
                 spellInfo->Effects[EFFECT_0].ScalingMultiplier = 0.0f;
                 spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_DONE_PCT_DAMAGE_MODS;
+                break;
+            // Summon Gargoyle
+            case 49206:
+                spellInfo->SetDurationIndex(587);
+                spellInfo->AttributesEx5 |= SPELL_ATTR5_SINGLE_TARGET_SPELL;
+                break;
             default:
                 break;
         }

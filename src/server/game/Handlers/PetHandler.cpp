@@ -213,6 +213,22 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint32 spellid
                         if (pet->getVictim())
                             pet->AttackStop();
 
+                        // Summon gargoyle should attack the same target as ghoul
+                        if (Unit* owner = pet->GetOwner())
+                        {
+                            if (owner->getClass() == CLASS_DEATH_KNIGHT)
+                            {
+                                for (Unit::ControlList::iterator itr = owner->m_Controlled.begin(); itr != owner->m_Controlled.end(); ++itr)
+                                {
+                                    if ((*itr)->GetEntry() == 27829 && !(*itr)->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                                    {
+                                        owner->AddAura(49206, TargetUnit);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
                         if (pet->GetTypeId() != TYPEID_PLAYER && pet->ToCreature()->IsAIEnabled)
                         {
                             charmInfo->SetIsCommandAttack(true);

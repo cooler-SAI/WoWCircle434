@@ -216,7 +216,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
                                    
             if (IsPetGhoul())
-                SetUInt32Value(UNIT_FIELD_BYTES_0, 1024);
+                SetUInt32Value(UNIT_FIELD_BYTES_0, CLASS_ROGUE << 8);
 
             break;
         case HUNTER_PET:

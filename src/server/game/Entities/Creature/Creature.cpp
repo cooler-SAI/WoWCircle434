@@ -347,6 +347,9 @@ bool Creature::InitEntry(uint32 Entry, uint32 /*team*/, const CreatureData* data
     for (uint8 i=0; i < CREATURE_MAX_SPELLS; ++i)
         m_spells[i] = GetCreatureTemplate()->spells[i];
 
+    if (GetEntry() == 27829)
+        SetUInt32Value(UNIT_FIELD_BYTES_0, CLASS_MAGE << 8);
+
     return true;
 }
 

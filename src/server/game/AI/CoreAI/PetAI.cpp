@@ -97,7 +97,7 @@ void PetAI::UpdateAI(const uint32 diff)
     if (me->getVictim() && me->getVictim()->isAlive())
     {
         // is only necessary to stop casting, the pet must not exit combat
-        if (me->getVictim()->HasBreakableByDamageCrowdControlAura(me))
+        if (me->getVictim()->HasCrowdControlAura(me))
         {
             me->InterruptNonMeleeSpells(false);
             return;
@@ -396,7 +396,7 @@ Unit* PetAI::SelectNextTarget()
 
     // Check pet attackers first so we don't drag a bunch of targets to the owner
     if (Unit* myAttacker = me->getAttackerForHelper())
-        if (!myAttacker->HasBreakableByDamageCrowdControlAura())
+        if (!myAttacker->HasCrowdControlAura())
             return myAttacker;
 
     // Not sure why we wouldn't have an owner but just in case...
@@ -405,13 +405,13 @@ Unit* PetAI::SelectNextTarget()
 
     // Check owner attackers
     if (Unit* ownerAttacker = me->GetCharmerOrOwner()->getAttackerForHelper())
-        if (!ownerAttacker->HasBreakableByDamageCrowdControlAura())
+        if (!ownerAttacker->HasCrowdControlAura())
             return ownerAttacker;
 
     // Check owner victim
     // 3.0.2 - Pets now start attacking their owners victim in defensive mode as soon as the hunter does
     if (Unit* ownerVictim = me->GetCharmerOrOwner()->getVictim())
-        if (!ownerVictim->HasBreakableByDamageCrowdControlAura())
+        if (!ownerVictim->HasCrowdControlAura())
             return ownerVictim;
 
     // Neither pet or owner had a target and aggressive pets can pick any target
@@ -419,7 +419,7 @@ Unit* PetAI::SelectNextTarget()
     // We also want to lock this to LOS so pet doesn't go running through walls and stuff
     if (me->HasReactState(REACT_AGGRESSIVE))
         if (Unit* nearTarget = me->ToCreature()->SelectNearestTarget())
-            if (nearTarget->IsHostileTo(me) && !nearTarget->HasBreakableByDamageCrowdControlAura())
+            if (nearTarget->IsHostileTo(me) && !nearTarget->HasCrowdControlAura())
                 if (nearTarget->IsWithinLOS(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()))
                     return nearTarget;
 

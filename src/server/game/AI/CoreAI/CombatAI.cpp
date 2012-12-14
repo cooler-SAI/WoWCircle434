@@ -101,6 +101,12 @@ void CombatAI::UpdateAI(const uint32 diff)
 
     events.Update(diff);
 
+    if (me->getVictim()->HasCrowdControlAura(me))
+    {
+        me->InterruptNonMeleeSpells(false);
+        return;
+    }
+
     if (me->HasUnitState(UNIT_STATE_CASTING))
         return;
 
@@ -165,7 +171,7 @@ void CasterAI::UpdateAI(const uint32 diff)
 
     events.Update(diff);
 
-    if (me->getVictim()->HasBreakableByDamageCrowdControlAura(me))
+    if (me->getVictim()->HasCrowdControlAura(me))
     {
         me->InterruptNonMeleeSpells(false);
         return;
@@ -176,6 +182,22 @@ void CasterAI::UpdateAI(const uint32 diff)
 
     if (uint32 spellId = events.ExecuteEvent())
     {
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        if (!spellInfo)
+            return;
+
+        float maxRange = spellInfo->GetMaxRange();
+        float normalRange = maxRange / 1.2f;
+
+        if (Unit* victim = me->getVictim())
+        {
+            if (maxRange && !me->IsWithinDistInMap(victim, maxRange))
+                me->GetMotionMaster()->MoveChase(victim, normalRange);
+
+            if (maxRange && !me->IsWithinLOSInMap(victim))
+                me->GetMotionMaster()->MoveChase(victim, MELEE_RANGE);
+        }
+
         DoCast(spellId);
         uint32 casttime = me->GetCurrentSpellCastTime(spellId);
         events.ScheduleEvent(spellId, (casttime ? casttime : 500) + GetAISpellInfo(spellId)->realCooldown);

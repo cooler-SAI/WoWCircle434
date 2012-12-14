@@ -1700,7 +1700,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->getVictim()->HasBreakableByDamageCrowdControlAura(me))
+            if (me->getVictim()->HasCrowdControlAura(me))
             {
                 me->InterruptNonMeleeSpells(false);
                 return;
@@ -1908,15 +1908,28 @@ public:
                 return;
             // Not needed to be despawned now
             despawnTimer = 0;
+        }
+
+        void DoSearchTarget()
+        {
+            Unit* owner = me->GetOwner();
+            if (!owner)
+                return;
+
             // Find victim of Summon Gargoyle spell
             std::list<Unit*> targets;
             Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30);
             Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
             me->VisitNearbyObject(30, searcher);
             for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
-                if ((*iter)->GetAura(49206, ownerGuid))
+                if ((*iter)->GetAura(49206, owner->GetGUID()))
                 {
                     me->Attack((*iter), false);
+                    break;
+                }
+                else
+                {
+                    owner->AddAura(49206, (*iter));
                     break;
                 }
         }
@@ -1926,6 +1939,17 @@ public:
             // Stop Feeding Gargoyle when it dies
             if (Unit* owner = me->GetOwner())
                 owner->RemoveAurasDueToSpell(50514);
+        }
+
+        void AttackStart(Unit *target)
+        {
+            if (target && !target->HasAura(49206))
+            {
+                DoSearchTarget();
+                return;
+            }
+
+            AttackStartCaster(target, 30.0f);
         }
 
         // Fly away when dismissed
