@@ -3473,6 +3473,9 @@ void Spell::cast(bool skipCheck)
             // Death strike should heal regardless of hit result
             if (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_DK_DEATH_STRIKE && !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_REQ_OFFHAND))
             {
+                if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                    return;
+
                 int32 healthPct = 7;
 
                 // Glyph of Dark Succor
@@ -3483,7 +3486,7 @@ void Spell::cast(bool skipCheck)
                 }
 
                 int32 minimumHp = int32(m_caster->CountPctFromMaxHealth(healthPct));
-                int32 takenDamage = int32(m_caster->GetDamageTakenInPastSecs(5) * 0.2f);
+                int32 takenDamage = int32(m_caster->ToPlayer()->GetDamageInPastSecs<true>(5) * 0.2f);
 
                 int32 bp = std::max(takenDamage, minimumHp);
 

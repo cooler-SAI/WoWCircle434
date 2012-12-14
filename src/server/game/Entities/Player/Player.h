@@ -1308,6 +1308,8 @@ private:
     PlayerTalentInfo(PlayerTalentInfo const&);
 };
 
+#define SAVE_FOR_SECONDS 120
+
 class Player : public Unit, public GridObject<Player>
 {
     friend class WorldSession;
@@ -2962,6 +2964,62 @@ class Player : public Unit, public GridObject<Player>
         VoidStorageItem* GetVoidStorageItem(uint8 slot) const;
         VoidStorageItem* GetVoidStorageItem(uint64 id, uint8& slot) const;
 
+        void SetHealingDoneForSecond(uint32 value)
+        {
+            _heal_done[CurrentSecond] += value;
+        }
+
+        template<bool taken>
+        void SetDamageForSecond(uint32 value)
+        {
+            (taken ? _damage_taken : _damage_done)[CurrentSecond] += value;
+        }
+
+        uint32 GetHealingDoneInPastSecs(uint8 seconds)
+        {
+            ASSERT(seconds <= SAVE_FOR_SECONDS);
+
+            uint32 value = 0;
+            for (uint8 i = 0; i < seconds; ++i)
+            {
+                 value += _heal_done[i];
+            }
+
+            return value;
+        }
+
+        template<bool taken>
+        uint32 GetDamageInPastSecs(uint8 seconds)
+        {
+            ASSERT(seconds <= SAVE_FOR_SECONDS);
+
+            uint32 value = 0;
+            for (uint8 i = 0; i < seconds; ++i)
+            {
+                 value += (taken ? _damage_taken : _damage_done)[i];
+            }
+            return value;
+        }
+
+        template<bool taken>
+        void ResetDamageInPastSecs(uint8 seconds)
+        {
+            ASSERT(seconds <= SAVE_FOR_SECONDS);
+            for (uint8 i = 0; i < seconds; ++i)
+            {
+                 (taken ? _damage_taken : _damage_done)[i] = 0;
+            }
+        }
+
+        void ResetHealingDoneInPastSecs(uint8 seconds)
+        {
+            ASSERT(seconds <= SAVE_FOR_SECONDS);
+            for (uint8 i = 0; i < seconds; ++i)
+            {
+                 _heal_done[i] = 0;
+            }
+        }
+
     protected:
         // Gamemaster whisper whitelist
         WhisperListContainer WhisperList;
@@ -3309,6 +3367,13 @@ class Player : public Unit, public GridObject<Player>
         uint32 _ConquestCurrencytotalWeekCap;
 
         PhaseMgr phaseMgr;
+
+        uint32 _heal_done[SAVE_FOR_SECONDS];
+        uint32 _damage_done[SAVE_FOR_SECONDS];
+        uint32 _damage_taken[SAVE_FOR_SECONDS];
+
+        int32 DmgandHealDoneTimer;
+        uint8 CurrentSecond;
 };
 
 void AddItemsSetItem(Player*player, Item* item);

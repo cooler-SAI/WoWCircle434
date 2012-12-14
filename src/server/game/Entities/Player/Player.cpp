@@ -900,6 +900,13 @@ Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_rep
 
     memset(_voidStorageItems, 0, VOID_STORAGE_MAX_SLOT * sizeof(VoidStorageItem*));
     memset(_CUFProfiles, 0, MAX_CUF_PROFILES * sizeof(CUFProfile*));
+
+    CurrentSecond = 0;
+    DmgandHealDoneTimer = 0;
+
+    memset(_heal_done, 0, SAVE_FOR_SECONDS * sizeof(uint32));
+    memset(_damage_done, 0, SAVE_FOR_SECONDS * sizeof(uint32));
+    memset(_damage_taken, 0, SAVE_FOR_SECONDS * sizeof(uint32));
 }
 
 Player::~Player()
@@ -1551,6 +1558,23 @@ void Player::Update(uint32 p_time)
 {
     if (!IsInWorld())
         return;
+
+    // This is required for GetHealingDoneInPastSecs(), GetDamageDoneInPastSecs() and GetDamageTakenInPastSecs()!
+    DmgandHealDoneTimer -= p_time;
+
+    if (DmgandHealDoneTimer <= 0)
+    {
+        if (CurrentSecond++ == (SAVE_FOR_SECONDS-1))
+        {
+            CurrentSecond = 0;
+
+            ResetDamageInPastSecs<true>(SAVE_FOR_SECONDS);
+            ResetDamageInPastSecs<false>(SAVE_FOR_SECONDS);
+            ResetHealingDoneInPastSecs(SAVE_FOR_SECONDS);
+        }
+
+        DmgandHealDoneTimer = 1000;
+    }
 
     // undelivered mail
     if (m_nextMailDelivereTime && m_nextMailDelivereTime <= time(NULL))

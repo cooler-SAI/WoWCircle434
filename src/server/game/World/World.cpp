@@ -2868,7 +2868,7 @@ void World::ResetCurrencyWeekCap()
 {
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_UPD_CURRENCY_RESET_WEEK_CAP);
     stmt->setUInt32(0, 0);
-    CharacterDatabase.Query(stmt);
+    CharacterDatabase.Execute(stmt);
 
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
     {

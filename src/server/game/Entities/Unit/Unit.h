@@ -2262,19 +2262,8 @@ class Unit : public WorldObject
 
         Unit *m_SoulSwapTarget;
         std::list<uint32> m_BufferAuras; // for soul swap
-
-        uint32 m_heal_done[120];
-        uint32 m_damage_done[120];
-        uint32 m_damage_taken[120];
-        int32 DmgandHealDoneTimer;
-        uint32 GetHealingDoneInPastSecs(uint32 secs);
-        uint32 GetDamageDoneInPastSecs(uint32 secs);
-        uint32 GetDamageTakenInPastSecs(uint32 secs);
-        void ResetDamageDoneInPastSecs(uint32 secs);
-        void ResetHealingDoneInPastSecs(uint32 secs);
         
         void DoBuffPartyOrSingle(uint32 single_buff, uint32 party_buff, Unit * target);
-
 
         // helper for dark simulacrum spell
         Unit* getSimulacrumTarget() { return simulacrumTarget && simulacrumTarget->IsInWorld() ? simulacrumTarget : NULL; }
