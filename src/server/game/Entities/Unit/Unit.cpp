@@ -2714,10 +2714,18 @@ void Unit::_UpdateAutoRepeatSpell()
     if (isAttackReady(RANGED_ATTACK))
     {
         // Check if able to cast
-        if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->CheckCast(true) != SPELL_CAST_OK)
+        for (uint8 i = 0; i < CURRENT_MAX_SPELL; ++i)
         {
-            InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
-            return;
+            if (Spell* currentSpell = m_currentSpells[i])
+            {
+                if (i == CURRENT_AUTOREPEAT_SPELL && currentSpell->CheckCast(true) != SPELL_CAST_OK)
+                {
+                    InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+                    return;
+                }
+                else if (currentSpell->m_spellInfo->Id == 19434)
+                    return;
+            }
         }
 
         // we want to shoot
