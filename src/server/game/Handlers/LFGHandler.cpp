@@ -476,24 +476,26 @@ void WorldSession::SendLfgUpdateParty(const LfgUpdateData& updateData)
 
     sLog->outDebug(LOG_FILTER_LFG, "SMSG_LFG_UPDATE_PARTY %s updatetype: %u",
         GetPlayer()->GetGUID(), updateData.updateType);
-    WorldPacket data(SMSG_LFG_UPDATE_PARTY, 1 + 1 + (size > 0 ? 1 : 0) * (1 + 1 + 1 + 1 + 1 + size * 4 + updateData.comment.length()));
-    data << uint8(updateData.updateType);                  // Lfg Update type
-    data << uint8(size > 0);                               // Extra info
-    if (size)
-    {
-        data << uint8(join);                               // LFG Join
-        data << uint8(queued);                             // Join the queue
-        data << uint8(0);                                  // unk - Always 0
-        data << uint8(0);                                  // unk - Always 0
-        for (uint8 i = 0; i < 3; ++i)
-            data << uint8(0);                              // unk - Always 0
 
-        data << uint8(size);
-        for (LfgDungeonSet::const_iterator it = updateData.dungeons.begin(); it != updateData.dungeons.end(); ++it)
-            data << uint32(*it);
-        data << updateData.comment;
-    }
-    SendPacket(&data);
+    // Calls trace at every login that hits server performance hard
+//    WorldPacket data(SMSG_LFG_UPDATE_PARTY, 1 + 1 + (size > 0 ? 1 : 0) * (1 + 1 + 1 + 1 + 1 + size * 4 + updateData.comment.length()));
+//    data << uint8(updateData.updateType);                  // Lfg Update type
+//    data << uint8(size > 0);                               // Extra info
+//    if (size)
+//    {
+//        data << uint8(join);                               // LFG Join
+//        data << uint8(queued);                             // Join the queue
+//        data << uint8(0);                                  // unk - Always 0
+//        data << uint8(0);                                  // unk - Always 0
+//        for (uint8 i = 0; i < 3; ++i)
+//            data << uint8(0);                              // unk - Always 0
+
+//        data << uint8(size);
+//        for (LfgDungeonSet::const_iterator it = updateData.dungeons.begin(); it != updateData.dungeons.end(); ++it)
+//            data << uint32(*it);
+//        data << updateData.comment;
+//    }
+//    SendPacket(&data);
 }
 
 void WorldSession::SendLfgRoleChosen(uint64 guid, uint8 roles)
