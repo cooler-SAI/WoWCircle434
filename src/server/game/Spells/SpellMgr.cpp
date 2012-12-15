@@ -4866,7 +4866,16 @@ void SpellMgr::LoadDbcDataCorrections()
             case 44132: // Drain Power
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
                 break;
-
+            case 43095: // Creeping Paralysis
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                break;
+            case 97682: // Pillar of Flame dmg
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(7);
+                break;
+            case 43121: // Feather Storm
+            case 97645:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(7);
+                break;
             // ENDOF ZUL'AMAN SPELLS
             //
             // Camouflage

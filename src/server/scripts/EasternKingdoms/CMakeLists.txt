@@ -174,7 +174,7 @@ set(scripts_STAT_SRCS
   EasternKingdoms/stormwind_city.cpp
   EasternKingdoms/ZulAman/boss_halazzi.cpp
   EasternKingdoms/ZulAman/boss_hexlord.cpp
-  EasternKingdoms/ZulAman/boss_zuljin.cpp
+  EasternKingdoms/ZulAman/boss_daakara.cpp
   EasternKingdoms/ZulAman/boss_akilzon.cpp
   EasternKingdoms/ZulAman/instance_zulaman.cpp
   EasternKingdoms/ZulAman/boss_janalai.cpp

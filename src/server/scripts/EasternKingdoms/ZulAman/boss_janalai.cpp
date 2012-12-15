@@ -6,7 +6,7 @@ enum ScriptTexts
     SAY_AGGRO       = 0,
     SAY_FIRE_BOMB   = 1,
     SAY_HATCHER     = 2,
-    SAY_20          = 3,
+    SAY_35          = 3,
     SAY_KILL        = 4,
     SAY_DEATH       = 5,
 };
@@ -217,10 +217,10 @@ class boss_janalai : public CreatureScript
 
                 EnterEvadeIfOutOfCombatArea(diff);
                 
-                if (me->HealthBelowPct(20) && !bEnraged)
+                if (me->HealthBelowPct(35) && !bEnraged)
                 {
                     bEnraged = true;
-                    Talk(SAY_20);
+                    Talk(SAY_35);
                     DoCast(me, SPELL_FRENZY, true);
                     events.CancelEvent(EVENT_SUMMON_HATCHERS);
                     DoCast(me, SPELL_HATCH_ALL);
