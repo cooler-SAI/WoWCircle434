@@ -123,6 +123,7 @@ public:
         }
     };
 
+
     bool OnGossipHello(Player* player, Creature* creature)
     {
         if (creature->isQuestGiver())
@@ -627,10 +628,17 @@ class npc_adventurous_dwarf : public CreatureScript
 public:
     npc_adventurous_dwarf() : CreatureScript("npc_adventurous_dwarf") { }
 
+    struct npc_adventurous_dwarfAI : public ScriptedAI
+    {
+        npc_adventurous_dwarfAI(Creature* creature) : ScriptedAI(creature)
+        {
+            Talk(SAY_DWARF_OUCH);
+        }	
+    };
+
     CreatureAI* GetAI(Creature* creature) const
     {
-        DoScriptText(SAY_DWARF_OUCH, creature);
-        return NULL;
+        return new npc_adventurous_dwarfAI(creature);
     }
 
     bool OnGossipHello(Player* player, Creature* creature)

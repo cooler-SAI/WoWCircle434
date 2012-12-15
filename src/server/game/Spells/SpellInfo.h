@@ -250,6 +250,7 @@ public:
     SpellImplicitTargetInfo TargetA;
     SpellImplicitTargetInfo TargetB;
     SpellRadiusEntry const* RadiusEntry;
+    SpellRadiusEntry const* MaxRadiusEntry;
     uint32    ChainTarget;
     uint32    ItemType;
     uint32    TriggerSpell;
@@ -281,6 +282,7 @@ public:
     float CalcDamageMultiplier(Unit* caster, Spell* spell = NULL) const;
 
     bool HasRadius() const;
+    bool HasMaxRadius() const;
     float CalcRadius(Unit* caster, Spell* spell, bool positive) const;
 
     uint32 GetProvidedTargetMask() const;
