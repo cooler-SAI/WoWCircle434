@@ -3181,5 +3181,3 @@ void SpellInfo::_UnloadImplicitTargetConditionLists()
         delete cur;
     }
 }
-
-
