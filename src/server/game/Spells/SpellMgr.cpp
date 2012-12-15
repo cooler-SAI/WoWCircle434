@@ -4170,6 +4170,292 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // ENDOF GRIM BATOL SPELLS
             //
+            // BLACKWING DESCENT SPELLS
+            //
+            // Trash
+            case 79604: // Thunderclap
+            case 91905:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(13);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(13);
+                break;
+            case 80035: // Vengeful Rage
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(12);
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(12);
+                break;
+            case 79589: // Constricting Chains
+            case 91911:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(27);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(27);
+                break;
+            case 80336: // Frost Burn
+            case 91896:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(9);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(9);
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(9);
+                break;
+            case 80878: // Bestowal of Angerforge
+            case 80871: // Bestowal of Thaurissan
+            case 80875: // Bestowal of Ironstar
+            case 80872: // Bestowal of Burningeye
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                break;
+            case 80638: // Stormbolt
+            case 91890:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(8);
+                break;
+            case 80646: // Chain Lightning
+            case 91891:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                break;
+            case 91849: // Grip of Death
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_SRC_CASTER; 
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 92048: // Shadow Infusion
+                spellInfo->TargetAuraSpell = 0;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                break;
+            case 92051: // Shadow Conductor
+            case 92135:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                break;
+            case 92023: // Encasing Shadows
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                spellInfo->TargetAuraSpell = 0;
+                break;
+            case 92153: // Blazing Inferno missile
+                spellInfo->Speed = 6;
+                break;
+            case 92154: // Blazing Inferno dmg
+            case 92190:
+            case 92191:
+            case 92192:
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(8);
+                break;
+            case 92173: // Shadow Breath
+            case 92193:
+            case 92194:
+            case 92195:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                break;
+            case 89798: // Master Adventurer Award
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                break;
+            // Magmaw
+            case 89773: // Mangle
+            case 91912:
+            case 94616:
+            case 94617:
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                break;
+            case 78359: // Magma Split 1
+            case 91916:
+            case 91925:
+            case 91926:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 78068: // Magma Split 2
+            case 91917:
+            case 91927:
+            case 91928:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            // Omnotron Defence System
+            case 91540: // Arcane Annihilator
+            case 91542:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                spellInfo->MaxAffectedTargets = 3;
+                break;
+            case 79629: // Power Generator aoe
+            case 91555:
+            case 91556:
+            case 91557:
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(8);
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_SRC_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENTRY;
+                break;
+            case 91858: // Overcharged Power Generator aoe
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(8);
+                break;
+            case 91879: // Arcane Blowback
+            case 91880:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(13);
+                break;
+            case 79912: // Static Shock dmg
+            case 91456:
+            case 91457:
+            case 91458:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                break;
+            case 79035: // Inseneration Security Missure
+            case 91523:
+            case 91524:
+            case 91525:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                break;
+            case 79504: // Flamethrower
+            case 91535:
+            case 91536:
+            case 91537:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CONE_ENEMY_24;
+                break;
+            case 79617: // Backdraft
+            case 91528:
+            case 91529:
+            case 91530:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                break;
+            case 80092: // Poison Bomb
+            case 91498:
+            case 91499:
+            case 91500:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(13);
+                break;
+            case 80164: // Chemical Cloud aoe a
+            case 91478:
+            case 91479:
+            case 91480:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(18);
+                break;
+            case 80161: // Chemocal Cloud aoe b
+            case 91471:
+            case 91472:
+            case 91473:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(18);
+                break;
+            case 80097: // Poison Pubble aoe
+            case 91488:
+            case 91489:
+            case 91490:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(13);
+                break;
+            // Maloriak
+            case 77699: // Flash Freeze dmg
+            case 92978:
+            case 92979:
+            case 92980:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(8);
+                break;
+            case 77763: // Biting Chill dmg
+            case 92975:
+            case 92976:
+            case 92977:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(29);
+                break;
+            case 77615: // Debilitating Slime
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(12);
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(12);
+                break;
+            case 77908: // Arcane Storm dmg
+            case 92961:
+            case 92962:
+            case 92963:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                break;
+            case 78095: // Magma Jets dmg
+            case 93014:
+            case 93015:
+            case 93016:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(15);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(15);
+                break;
+            case 78225: // Acid Nova
+            case 93011:
+            case 93012:
+            case 93013:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                break;
+            case 77987: // Grown Catalyst
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(13);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(13);
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(13);
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 78208: // Absolute Zero
+            case 93041:
+            case 93042:
+            case 93043:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(8);
+                break;
+            case 77715: // Shatter
+            case 95655:
+            case 95656:
+            case 95657:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(8);
+                break;
+            // Chimaeron
+            case 82705: // Finkle's Mixture
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                break;
+            case 82848: // Massacre
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                break;
+            // Atramedes
+            case 77612: // Modulation
+            case 92451:
+            case 92452:
+            case 92453:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                break;
+            case 77675: // Sonar Pulse dmg
+            case 92417:
+            case 92418:
+            case 92419:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                break;
+            case 77982: // Searing Flame dmg
+            case 92421:
+            case 92422:
+            case 92423:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(28);
+                break;
+            case 78115: // Sonar Fireball
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                break;
+            case 92553: // Sonar Bomb dmg
+            case 92554:
+            case 92555:
+            case 92556:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(8);
+                break;
+            case 77966: // Searing Flame Missile
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(23);
+                break;
+            case 78353: // Roaring Flame dmg
+            case 92445:
+            case 92446:
+            case 92447:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(8);
+                break;
+            case 78023: // Roaring Flame aura dmg
+            case 92483:
+            case 92484:
+            case 92485:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(8);
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(8);
+                break;
+            case 78875: // Devastation
+                spellInfo->TargetAuraSpell = 0;
+                break;
+            case 78868: // Devastation dmg
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                break;
+
+            // ENDOF BLACKWING DESCENT SPELLS
+            //
             // BASTION OF TWILIGHT SPELLS
             //
             // Trash

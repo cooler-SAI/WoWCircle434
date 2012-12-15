@@ -646,6 +646,14 @@ void AddSC_boss_ascendant_council();
 void AddSC_boss_chogall();
 void AddSC_boss_sinestra();
 
+void AddSC_instance_blackwing_descent(); // Blackwing Descent
+void AddSC_blackwing_descent();
+void AddSC_boss_magmaw();
+void AddSC_boss_omnotron_defence_system();
+void AddSC_boss_maloriak();
+void AddSC_boss_chimaeron();
+void AddSC_boss_atramedes();
+
 // battlegrounds
 
 // outdoor pvp
@@ -1328,6 +1336,13 @@ void AddNorthrendScripts()
     AddSC_boss_chogall();
     AddSC_boss_sinestra();
 
+    AddSC_instance_blackwing_descent(); // Blackwing Descent
+    AddSC_blackwing_descent();
+    AddSC_boss_magmaw();
+    AddSC_boss_omnotron_defence_system();
+    AddSC_boss_maloriak();
+    AddSC_boss_chimaeron();
+    AddSC_boss_atramedes();
 
 #endif
 }
