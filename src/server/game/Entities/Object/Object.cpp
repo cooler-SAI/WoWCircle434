@@ -328,6 +328,16 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         unit ? (const WorldObject*)unit : (
         go ? (const WorldObject*)go : dob ? (const WorldObject*)dob : (const WorldObject*)ToCorpse()));
 
+    uint32 transportPause = 0;
+    if (go)
+    {
+        if (GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(go->GetEntry()))
+        {
+            if (goinfo->type == GAMEOBJECT_TYPE_TRANSPORT && goinfo->transport.pause)
+                transportPause = goinfo->transport.pause;
+        }
+    }
+
     bool hasOrientation = false;
     bool hasPitch = false;
     uint32 movementFlags = 0;
@@ -345,8 +355,6 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         hasOrientation = !G3D::fuzzyEq(unit->GetOrientation(), 0.0f);
     }
 
-    uint32 unkLoopCounter = 0;
-
     data->WriteBit(false);
     data->WriteBit(false);
     data->WriteBit((flags & UPDATEFLAG_ROTATION) && go);
@@ -355,7 +363,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     data->WriteBit(flags & UPDATEFLAG_SELF);
     data->WriteBit((flags & UPDATEFLAG_VEHICLE) && unit);
     data->WriteBit((flags & UPDATEFLAG_LIVING) && unit);
-    data->WriteBits(unkLoopCounter, 24); // transport pause
+    data->WriteBits(transportPause ? 1 : 0, 24);
     data->WriteBit(false);
     data->WriteBit((flags & UPDATEFLAG_GO_TRANSPORT_POSITION) && wo);
     data->WriteBit((flags & UPDATEFLAG_STATIONARY_POSITION) && wo);
@@ -435,7 +443,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 
     if ((flags & UPDATEFLAG_HAS_TARGET) && unit && unit->getVictim())
     {
-        ObjectGuid victimGuid = unit->getVictim()->GetGUID();   // checked in BuildCreateUpdateBlockForPlayer
+        ObjectGuid victimGuid = unit->getVictim()->GetGUID();
         data->WriteByteMask(victimGuid[2]);
         data->WriteByteMask(victimGuid[7]);
         data->WriteByteMask(victimGuid[0]);
@@ -453,9 +461,8 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         data->WriteBit(true);                                                      // Missing AnimKit3
     }
 
-    // Data
-    for (uint32 i = 0; i < unkLoopCounter; ++i)
-        *data << uint32(0);
+    if (transportPause)
+        *data << uint32(transportPause);
 
     if ((flags & UPDATEFLAG_LIVING) && unit)
     {
@@ -608,7 +615,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 
     if ((flags & UPDATEFLAG_HAS_TARGET) && unit && unit->getVictim())
     {
-        ObjectGuid victimGuid = unit->getVictim()->GetGUID();   // checked in BuildCreateUpdateBlockForPlayer
+        ObjectGuid victimGuid = unit->getVictim()->GetGUID();
         data->WriteByteSeq(victimGuid[4]);
         data->WriteByteSeq(victimGuid[0]);
         data->WriteByteSeq(victimGuid[3]);
