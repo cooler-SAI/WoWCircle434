@@ -7378,7 +7378,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 77795:
                 case 77796:
                 {
-                    if (Aura* aura = triggeredByAura->GetBase())
+                    if (Aura* aura = GetAura(dummySpell->Id))
                     {
                         if (!procSpell)
                             break;

@@ -9,6 +9,7 @@ build/
 .git/
 bin/
 *.kdev*
+tc/
 
 # use regexp syntax.
 syntax: regexp
