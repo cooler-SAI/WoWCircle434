@@ -862,6 +862,12 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                case 25952: // Reindeer Dust Effect
+                {
+                    if (m_caster->GetTypeId() == TYPEID_UNIT)
+                        m_caster->ToCreature()->DisappearAndDie();
+                    return;
+                }
                 // Lava Surge
                 case 77762:
                 {
@@ -6155,6 +6161,16 @@ void Spell::EffectChargeDest(SpellEffIndex /*effIndex*/)
         float angle = m_caster->GetRelativeAngle(pos.GetPositionX(), pos.GetPositionY());
         float dist = m_caster->GetDistance(pos);
         m_caster->GetFirstCollisionPosition(pos, dist, angle);
+
+        // Racer Slam Hit Destination
+        if (m_spellInfo->Id == 49302)
+        {
+            if (urand(0, 100) < 20)
+            {
+                m_caster->CastSpell(m_caster, 49336, false);
+                m_caster->CastSpell((Unit*)NULL, 49444, false); // achievement counter
+            }
+        }
 
         m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
     }

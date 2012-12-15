@@ -92,6 +92,7 @@ void AddSC_npc_professions();
 void AddSC_npc_innkeeper();
 void AddSC_npcs_special();
 void AddSC_npc_taxi();
+void AddSC_npc_companions();
 void AddSC_achievement_scripts();
 
 //eastern kingdoms
@@ -764,6 +765,7 @@ void AddWorldScripts()
     AddSC_npc_innkeeper();
     AddSC_npcs_special();
     AddSC_npc_taxi();
+    AddSC_npc_companions();
     AddSC_achievement_scripts();
     AddSC_chat_log();
 #endif

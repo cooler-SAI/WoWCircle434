@@ -1557,6 +1557,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_GENERIC:
                 switch (GetId())
                 {
+                    case 49440: // Racer Slam, Slamming
+                        if (Creature* racerBunny = target->FindNearestCreature(27674, 25.0f))
+                            target->CastSpell(racerBunny, 49302, false);
+                        break;
                     case 61987: // Avenging Wrath
                         // Remove the immunity shield marker on Avenging Wrath removal if Forbearance is not present
                         if (target->HasAura(61988) && !target->HasAura(25771))

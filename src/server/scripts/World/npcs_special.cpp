@@ -3558,6 +3558,53 @@ public:
     }
 };
 
+// Winter Weil - Metzen
+enum GossipMenuMetzen
+{
+    SPELL_REINDEER_DUST_EFFECT  = 25952,
+    GOSSIP_METZEN               = 15664
+};
+
+class npc_metzen : public CreatureScript
+{
+    public:
+        npc_metzen() : CreatureScript("npc_metzen") { }
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        uint32 questid_metz;
+        
+        if (player->getRaceMask() & RACEMASK_ALLIANCE)
+            questid_metz = 8762;
+        else
+            questid_metz = 8746;
+
+        if (player->GetQuestStatus(questid_metz) == QUEST_STATUS_INCOMPLETE && !creature->HasUnitState(UNIT_STATE_CASTING))
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Sprinkle the fairy dust", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+        player->PlayerTalkClass->SendGossipMenu(GOSSIP_METZEN, creature->GetGUID());
+        return true;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+    {
+        player->PlayerTalkClass->ClearMenus();
+
+        switch (uiAction)
+        {
+            case GOSSIP_ACTION_INFO_DEF + 1:
+            {
+                player->KilledMonsterCredit(creature->GetEntry(), creature->GetGUID());
+                creature->CastSpell(creature, SPELL_REINDEER_DUST_EFFECT, false);
+            }
+            break;
+        }
+
+        player->PlayerTalkClass->SendCloseGossip();
+        return true;
+    }
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3599,4 +3646,5 @@ void AddSC_npcs_special()
     new npc_flame_orb();
     new npc_power_word_barrier();
     new npc_wild_mushroom();
+    new npc_metzen();
 }

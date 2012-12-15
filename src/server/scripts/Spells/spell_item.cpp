@@ -2124,6 +2124,63 @@ class spell_item_flask_of_battle : public SpellScriptLoader
         }
 };
 
+// Crazy Alchemist's Potion
+enum CrazyAlchemistsPotion
+{
+    SPELL_SPEED             = 53908,
+    SPELL_WILD_MAGIC_POTION = 53909,
+    SPELL_INDESTRUCTIBLE    = 53762,
+    SPELL_RESTORE_MANA      = 43186,
+    SPELL_HEALING_POTION    = 43185,
+    SPELL_FIRE_PROTECTION   = 53911,
+};
+
+class spell_item_crazy_alchemists_potion : public SpellScriptLoader
+{
+    public:
+        spell_item_crazy_alchemists_potion() : SpellScriptLoader("spell_item_crazy_alchemists_potion") { }
+
+        class spell_item_crazy_alchemists_potion_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_item_crazy_alchemists_potion_SpellScript);
+
+            void HandleHeal(SpellEffIndex /*effIndex*/)
+            {
+                if (Unit* caster = GetOriginalCaster())
+                {
+                    uint32 spellId = 0;
+                    uint32 roll = urand(0, 9);
+                    if (roll > 5)
+                        return;
+
+                    switch (roll)
+                    {
+                        case 0: spellId = SPELL_SPEED; break;
+                        case 1: spellId = SPELL_WILD_MAGIC_POTION; break;
+                        case 2: spellId = SPELL_INDESTRUCTIBLE; break;
+                        case 3: spellId = SPELL_RESTORE_MANA; break;
+                        case 4: spellId = SPELL_HEALING_POTION; break;
+                        case 5: spellId = SPELL_FIRE_PROTECTION; break;
+                        default: break;
+                    }
+
+                    if (spellId)
+                        caster->AddAura(spellId, caster);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_item_crazy_alchemists_potion_SpellScript::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+            }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_item_crazy_alchemists_potion_SpellScript();
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     // 23074 Arcanite Dragonling
@@ -2179,4 +2236,5 @@ void AddSC_item_spell_scripts()
     new spell_item_cauldron_of_battle();
     new spell_item_big_cauldron_of_battle();
     new spell_item_flask_of_battle();
+    new spell_item_crazy_alchemists_potion();
 }

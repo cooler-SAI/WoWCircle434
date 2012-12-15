@@ -21,6 +21,7 @@ set(scripts_STAT_SRCS
   World/npc_innkeeper.cpp
   World/npc_professions.cpp
   World/npc_taxi.cpp
+  World/npc_companions.cpp
   World/npcs_special.cpp
 )
 

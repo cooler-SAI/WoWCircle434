@@ -11350,6 +11350,10 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
                             return EQUIP_ERR_NOT_DURING_ARENA_MATCH;
                 }
 
+                // prevent equip item in process logout
+                if (GetSession()->isLogingOut())
+                    return EQUIP_ERR_GENERIC_STUNNED;
+
                 if (isInCombat() && (pProto->Class == ITEM_CLASS_WEAPON || (pProto->InventoryType == INVTYPE_RELIC && pProto->SubClass != ITEM_SUBCLASS_ARMOR_LIBRAM)) 
                     && m_weaponChangeTimer != 0)
                     return EQUIP_ERR_CLIENT_LOCKED_OUT;         // maybe exist better err
@@ -11476,6 +11480,10 @@ InventoryResult Player::CanUnequipItem(uint16 pos, bool swap) const
             if (bg->isArena() && bg->GetStatus() == STATUS_IN_PROGRESS)
                 return EQUIP_ERR_NOT_DURING_ARENA_MATCH;
     }
+
+    // prevent unequip item in process logout
+    if (GetSession()->isLogingOut())
+        return EQUIP_ERR_GENERIC_STUNNED;
 
     if (!swap && pItem->IsNotEmptyBag())
         return EQUIP_ERR_DESTROY_NONEMPTY_BAG;
