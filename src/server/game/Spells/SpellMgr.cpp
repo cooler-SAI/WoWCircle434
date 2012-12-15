@@ -4862,6 +4862,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 97505: // Refreshing Stream heal
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
                 break;
+            // Hex Lord Malacrass
+            case 44132: // Drain Power
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
 
             // ENDOF ZUL'AMAN SPELLS
             //
