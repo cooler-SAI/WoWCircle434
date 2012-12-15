@@ -328,19 +328,20 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         unit ? (const WorldObject*)unit : (
         go ? (const WorldObject*)go : dob ? (const WorldObject*)dob : (const WorldObject*)ToCorpse()));
 
-    if (unit)
-        const_cast<Unit*>(unit)->m_movementInfo.Normalize();
-
     bool hasOrientation = false;
+    bool hasPitch = false;
     uint32 movementFlags = 0;
     uint16 movementFlagsExtra = 0;
     if (unit)
     {
+        const_cast<Unit*>(unit)->m_movementInfo.Normalize();
+
         movementFlags = unit->m_movementInfo.GetMovementFlags();
         movementFlagsExtra = unit->m_movementInfo.GetExtraMovementFlags();
         if (GetTypeId() == TYPEID_UNIT)
             movementFlags &= MOVEMENTFLAG_MASK_CREATURE_ALLOWED;
 
+        hasPitch = !G3D::fuzzyEq(unit->m_movementInfo.pitch, 0.0f);
         hasOrientation = !G3D::fuzzyEq(unit->GetOrientation(), 0.0f);
     }
 
@@ -376,8 +377,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
             data->WriteBits(movementFlags, 30);
 
         data->WriteBit(false);
-        data->WriteBit(!((movementFlags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) ||
-            (movementFlagsExtra & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING)));       // Has pitch
+        data->WriteBit(!hasPitch);
         data->WriteBit(unit->IsSplineEnabled());                                // Has spline data
         data->WriteBit(unit->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA));
         data->WriteBit(!(movementFlags & MOVEMENTFLAG_SPLINE_ELEVATION));       // Has spline elevation
@@ -534,8 +534,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
             *data << float(unit->GetOrientation());
 
         *data << unit->GetSpeed(MOVE_RUN);
-        if ((movementFlags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) ||
-            (movementFlagsExtra & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
+        if (hasPitch)
             *data << float(unit->m_movementInfo.pitch);
 
         *data << unit->GetSpeed(MOVE_FLIGHT);
@@ -2294,11 +2293,13 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj) const
 
         // Starting points
         int32 detectionValue = 15;
-
-        if ((ToPlayer() && ToPlayer()->getClass() == CLASS_ROGUE) || 
-            (ToPlayer() && ToPlayer()->getClass() == CLASS_DRUID &&
-            ToPlayer()->GetPrimaryTalentTree(ToPlayer()->GetActiveSpec()) == TALENT_TREE_DRUID_FERAL_COMBAT))
-            detectionValue = 50;
+        if (isType(TYPEMASK_PLAYER) && ToPlayer())
+        {
+            Player const* _plr = ToPlayer();
+            uint8 _class = _plr->getClass();
+            if (_class == CLASS_ROGUE || (_class == CLASS_DRUID && _plr->GetPrimaryTalentTreeForCurrentSpec() == TALENT_TREE_DRUID_FERAL_COMBAT))
+                detectionValue = 50;
+        }
 
         // Level difference: 5 point / level, starting from level 1.
         // There may be spells for this and the starting points too, but

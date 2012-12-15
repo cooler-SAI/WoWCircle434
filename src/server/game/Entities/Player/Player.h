@@ -1936,6 +1936,7 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetTalentResetTime() const { return _talentMgr->ResetTalentsTime; }
         void SetTalentResetTime(time_t time_)  { _talentMgr->ResetTalentsTime = time_; }
         uint32 GetPrimaryTalentTree(uint8 spec) const { return _talentMgr->SpecInfo[spec].TalentTree; }
+        uint32 GetPrimaryTalentTreeForCurrentSpec() const { return _talentMgr->SpecInfo[_talentMgr->ActiveSpec].TalentTree; }
         void SetPrimaryTalentTree(uint8 spec, uint32 tree) { _talentMgr->SpecInfo[spec].TalentTree = tree; }
         uint8 GetActiveSpec() const { return _talentMgr->ActiveSpec; }
         void SetActiveSpec(uint8 spec){ _talentMgr->ActiveSpec = spec; }
