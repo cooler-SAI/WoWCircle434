@@ -1488,12 +1488,7 @@ bool MovementInfo::Check(Player* target, Opcodes opcode)
         return false;
     }
 
-    /* Somehow always for these opcodes (CMSG_FORCE_MOVE_ROOT_ACK and CMSG_FORCE_MOVE_UNROOT_ACK) guid = old_mover_guid
-     * For these opcode - CMSG_MOVE_NOT_ACTIVE_MOVER guid = old_mover_guid
-     * Maybe need to store old_mover_guid in movement_info for future check
-     */
-    bool guidOk = mover->GetGUID() == guid || (opcode == CMSG_FORCE_MOVE_ROOT_ACK || opcode == CMSG_FORCE_MOVE_UNROOT_ACK || opcode == CMSG_MOVE_NOT_ACTIVE_MOVER);
-    if (!guidOk)
+    if (mover->GetGUID() != guid)
     {
         sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Opcode %u Session %u Invalid mover guid: client's " I64FMT " vs server's " I64FMT,
             uint32(opcode), target->GetSession()->GetAccountId(),
