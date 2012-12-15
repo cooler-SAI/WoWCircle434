@@ -4843,6 +4843,28 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // ENDOF BASTION OF TWILIGHT SPELLS
             //
+            // ZUL'AMAN SPELLS
+            //
+            // Akil'zon
+            //
+            case 43648: // Electrical Storm
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_STUN;
+                break;
+            // Janalai
+           case 42471: // Hatch Eggs
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(10);
+                spellInfo->MaxAffectedTargets = 3;
+                break;
+            case 42630: // Fire Bomb dmg
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(15);
+                break;
+            // Halazzi
+            case 97505: // Refreshing Stream heal
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                break;
+
+            // ENDOF ZUL'AMAN SPELLS
+            //
             // Camouflage
             case 80325:
                 spellInfo->Effects[EFFECT_1].Effect = 0;
