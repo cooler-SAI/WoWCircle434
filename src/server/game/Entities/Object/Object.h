@@ -594,6 +594,10 @@ struct MovementInfo
         t_seat = -1;
     }
 
+    bool HasPitch() const { return !G3D::fuzzyEq(pitch, 0.0f); }
+    bool HasOrientation() const { return !G3D::fuzzyEq(pos.m_orientation, 0.0f); }
+    bool HasSplineElevation() const { return !G3D::fuzzyEq(splineElevation, 0.0f); }
+
     uint32 GetMovementFlags() const { return flags; }
     void SetMovementFlags(uint32 flag) { flags = flag; }
     void AddMovementFlag(uint32 flag) { flags |= flag; }

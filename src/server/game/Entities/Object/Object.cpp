@@ -338,8 +338,6 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         }
     }
 
-    bool hasOrientation = false;
-    bool hasPitch = false;
     uint32 movementFlags = 0;
     uint16 movementFlagsExtra = 0;
     if (unit)
@@ -350,9 +348,6 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         movementFlagsExtra = unit->m_movementInfo.GetExtraMovementFlags();
         if (GetTypeId() == TYPEID_UNIT)
             movementFlags &= MOVEMENTFLAG_MASK_CREATURE_ALLOWED;
-
-        hasPitch = !G3D::fuzzyEq(unit->m_movementInfo.pitch, 0.0f);
-        hasOrientation = !G3D::fuzzyEq(unit->GetOrientation(), 0.0f);
     }
 
     data->WriteBit(false);
@@ -376,7 +371,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         ObjectGuid guid = GetGUID();
 
         data->WriteBit(!movementFlags);
-        data->WriteBit(!hasOrientation);
+        data->WriteBit(!unit->m_movementInfo.HasOrientation());
         data->WriteByteMask(guid[7]);
         data->WriteByteMask(guid[3]);
         data->WriteByteMask(guid[2]);
@@ -385,10 +380,10 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
             data->WriteBits(movementFlags, 30);
 
         data->WriteBit(false);
-        data->WriteBit(!hasPitch);
-        data->WriteBit(unit->IsSplineEnabled());                                // Has spline data
+        data->WriteBit(!unit->m_movementInfo.HasPitch());
+        data->WriteBit(unit->IsSplineEnabled());
         data->WriteBit(unit->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA));
-        data->WriteBit(!(movementFlags & MOVEMENTFLAG_SPLINE_ELEVATION));       // Has spline elevation
+        data->WriteBit(!unit->m_movementInfo.HasSplineElevation());
         data->WriteByteMask(guid[5]);
         data->WriteBit(unit->m_movementInfo.HasTransportData());
         data->WriteBit(!unit->m_movementInfo.time);
@@ -484,7 +479,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         }
 
         *data << unit->GetSpeed(MOVE_SWIM_BACK);
-        if (movementFlags & MOVEMENTFLAG_SPLINE_ELEVATION)
+        if (unit->m_movementInfo.HasSplineElevation())
             *data << float(unit->m_movementInfo.splineElevation);
 
         if (unit->IsSplineEnabled())
@@ -537,11 +532,11 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         *data << unit->GetSpeed(MOVE_FLIGHT_BACK);
         data->WriteByteSeq(guid[6]);
         *data << unit->GetSpeed(MOVE_TURN_RATE);
-        if (hasOrientation)
+        if (unit->m_movementInfo.HasOrientation())
             *data << float(unit->GetOrientation());
 
         *data << unit->GetSpeed(MOVE_RUN);
-        if (hasPitch)
+        if (unit->m_movementInfo.HasPitch())
             *data << float(unit->m_movementInfo.pitch);
 
         *data << unit->GetSpeed(MOVE_FLIGHT);
