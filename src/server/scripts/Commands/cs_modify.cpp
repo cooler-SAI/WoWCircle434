@@ -1359,6 +1359,8 @@ public:
         if (!amount)
             return false;
 
+        amount *= currencyType->GetPrecision();
+
         target->ModifyCurrency(currencyId, amount, true, true);
         return true;
     }
