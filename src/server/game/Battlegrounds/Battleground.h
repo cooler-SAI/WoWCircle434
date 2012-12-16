@@ -602,6 +602,7 @@ class Battleground
         virtual void SetDroppedFlagGUID(uint64 /*guid*/, int32 /*team*/ = -1) {}
         uint32 GetTeamScore(uint32 TeamID) const;
 
+        virtual uint32 GetPrematureWinner();
     protected:
         // this method is called, when BG cannot spawn its own spirit guide, or something is wrong, It correctly ends Battleground
         void EndNow();

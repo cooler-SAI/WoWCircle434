@@ -19,7 +19,7 @@
 #ifndef __BATTLEGROUNDAV_H
 #define __BATTLEGROUNDAV_H
 
-#include "Battleground.h"
+class Battleground;
 
 #define LANG_BG_AV_A_CAPTAIN_BUFF       "Begone. Uncouth scum! The Alliance shall prevail in Alterac Valley!"
 #define LANG_BG_AV_H_CAPTAIN_BUFF       "Now is the time to attack! For the Horde!"
@@ -95,7 +95,8 @@ horde:
     AV_SOUND_BOTH_TOWER_DEFEND              = 8192,
 
     AV_SOUND_ALLIANCE_CAPTAIN               = 8232, //gets called when someone attacks them and at the beginning after 3min+rand(x)*10sec (maybe buff)
-    AV_SOUND_HORDE_CAPTAIN                  = 8333
+    AV_SOUND_HORDE_CAPTAIN                  = 8333,
+
 };
 
 enum BG_AV_OTHER_VALUES
@@ -355,9 +356,7 @@ enum BG_AV_OBJECTS
 
     AV_OPLACE_MAX                         = 149
 };
-
-const float BG_AV_ObjectPos[AV_OPLACE_MAX][4] =
-{
+const float BG_AV_ObjectPos[AV_OPLACE_MAX][4] = {
     {638.592f, -32.422f, 46.0608f, -1.62316f }, //firstaid station
     {669.007f, -294.078f, 30.2909f, 2.77507f }, //stormpike
     {77.8013f, -404.7f, 46.7549f, -0.872665f }, //stone grave
@@ -528,8 +527,7 @@ const float BG_AV_ObjectPos[AV_OPLACE_MAX][4] =
     {-951.394f, -193.695f, 67.634f, 0.802851f}
 };
 
-const float BG_AV_DoorPositons[2][4] =
-{
+const float BG_AV_DoorPositons[2][4] = {
     {780.487f, -493.024f, 99.9553f, 3.0976f},   //alliance
     {-1375.193f, -538.981f, 55.2824f, 0.72178f} //horde
 };
@@ -625,8 +623,7 @@ enum BG_AV_CreaturePlace
 };
 
 //x, y, z, o
-const float BG_AV_CreaturePos[AV_CPLACE_MAX][4] =
-{
+const float BG_AV_CreaturePos[AV_CPLACE_MAX][4] = {
     //spiritguides
     {643.000000f, 44.000000f, 69.740196f, -0.001854f},
     {676.000000f, -374.000000f, 30.000000f, -0.001854f},
@@ -985,6 +982,7 @@ const float BG_AV_CreaturePos[AV_CPLACE_MAX][4] =
 
 enum BG_AV_CreatureIds
 {
+
     AV_NPC_A_TOWERDEFENSE  = 0,     // stormpike bowman
     AV_NPC_A_GRAVEDEFENSE0 = 1,     // stormpike Defender
     AV_NPC_A_GRAVEDEFENSE1 = 2,     // seasoned defender
@@ -1036,12 +1034,12 @@ enum BG_AV_CreatureIds
     AV_NPC_S_MINE_H_4      = 46,
     AV_NPC_HERALD          = 47,
     AV_NPC_INFO_MAX        = 48
+
 };
 
 //entry, team, minlevel, maxlevel
 //TODO this array should be removed, the only needed things are the entrys (for spawning(?) and handlekillunit)
-const uint32 BG_AV_CreatureInfo[AV_NPC_INFO_MAX][4] =
-{
+const uint32 BG_AV_CreatureInfo[AV_NPC_INFO_MAX][4] = {
     { 12050, 1216, 58, 58 }, //Stormpike Defender
     { 13326, 1216, 59, 59 }, //Seasoned Defender
     { 13331, 1216, 60, 60 }, //Veteran Defender
@@ -1097,12 +1095,11 @@ const uint32 BG_AV_CreatureInfo[AV_NPC_INFO_MAX][4] =
     {13089, 67, 54, 55}, //guard
     {13088, 67, 58, 58},
     {14848, 67, 58, 58} //Herald
+
 };
 
 //x, y, z, o, static_creature_info-id
-const float BG_AV_StaticCreaturePos[AV_STATICCPLACE_MAX][5] =
-{
-    //static creatures
+const float BG_AV_StaticCreaturePos[AV_STATICCPLACE_MAX][5] = { //static creatures
     {-1235.31f, -340.777f, 60.5088f, 3.31613f, 0 }, //2225 - Zora Guthrek
     {-1244.02f, -323.795f, 61.0485f, 5.21853f, 1 }, //3343 - Grelkor
     {-1235.16f, -332.302f, 60.2985f, 2.96706f, 2 }, //3625 - Rarck
@@ -1226,10 +1223,10 @@ const float BG_AV_StaticCreaturePos[AV_STATICCPLACE_MAX][5] =
     {773.651f, -497.482f, 99.0408f, 2.11185f, 46 }, //14284 - Stormpike Battleguard
     {949.1f, -506.913f, 95.4237f, 3.31613f, 46 }, //14284 - Stormpike Battleguard
     {-1370.9f, -219.793f, 98.4258f, 5.04381f, 47}, //drek thar
+
 };
 
-const uint32 BG_AV_StaticCreatureInfo[51][4] =
-{
+const uint32 BG_AV_StaticCreatureInfo[51][4] = {
     { 2225, 1215, 55, 55 }, //Zora Guthrek
     { 3343, 1215, 55, 55 }, //Grelkor
     { 3625, 1215, 55, 55 }, //Rarck
@@ -1296,17 +1293,16 @@ enum BG_AV_Graveyards
     AV_GRAVE_MAIN_HORDE        = 610
 };
 
-const uint32 BG_AV_GraveyardIds[9]=
-{
-    AV_GRAVE_STORM_AID,
-    AV_GRAVE_STORM_GRAVE,
-    AV_GRAVE_STONE_GRAVE,
-    AV_GRAVE_SNOWFALL,
-    AV_GRAVE_ICE_GRAVE,
-    AV_GRAVE_FROSTWOLF,
-    AV_GRAVE_FROST_HUT,
-    AV_GRAVE_MAIN_ALLIANCE,
-    AV_GRAVE_MAIN_HORDE
+const uint32 BG_AV_GraveyardIds[9]= {
+  AV_GRAVE_STORM_AID,
+  AV_GRAVE_STORM_GRAVE,
+  AV_GRAVE_STONE_GRAVE,
+  AV_GRAVE_SNOWFALL,
+  AV_GRAVE_ICE_GRAVE,
+  AV_GRAVE_FROSTWOLF,
+  AV_GRAVE_FROST_HUT,
+  AV_GRAVE_MAIN_ALLIANCE,
+  AV_GRAVE_MAIN_HORDE
 };
 
 enum BG_AV_BUFF
@@ -1354,7 +1350,7 @@ enum BG_AV_WorldStates
     //Neutral
     //Snowfall Grave
 */
-    AV_SNOWFALL_N                   = 1966 //over aa
+    AV_SNOWFALL_N                   = 1966, //over aa
 /*
     AV_SNOWFALL_A_C                 = 1341, //over hc
     AV_SNOWFALL_A_A                 = 1343, //over ha
@@ -1434,18 +1430,17 @@ enum BG_AV_WorldStates
     AV_FROSTWOLFE_UNUSED            = 1393,
     AV_FROSTWOLFW_UNUSED            = 1392
 */
+
 };
 
 //alliance_control neutral_control horde_control
-const uint32 BG_AV_MineWorldStates[2][3] =
-{
+const uint32 BG_AV_MineWorldStates[2][3] = {
     {1358, 1360, 1359},
     {1355, 1357, 1356}
 };
 
 //alliance_control alliance_assault h_control h_assault
-const uint32 BG_AV_NodeWorldStates[16][4] =
-{
+const uint32 BG_AV_NodeWorldStates[16][4] = {
     //Stormpike first aid station
     {1325, 1326, 1327, 1328},
     //Stormpike Graveyard
@@ -1514,28 +1509,29 @@ enum BG_AV_Objectives
 
 struct BG_AV_NodeInfo
 {
-    BG_AV_States State;
-    BG_AV_States PrevState;
-    uint32       Timer;
     uint16       TotalOwner;
     uint16       Owner;
     uint16       PrevOwner;
+    BG_AV_States State;
+    BG_AV_States PrevState;
+    uint32       Timer;
     bool         Tower;
 };
 
 inline BG_AV_Nodes &operator++(BG_AV_Nodes &i){ return i = BG_AV_Nodes(i + 1); }
 
-struct BattlegroundAVScore : public BattlegroundScore
+class BattlegroundAVScore : public BattlegroundScore
 {
-    BattlegroundAVScore() : GraveyardsAssaulted(0), GraveyardsDefended(0), TowersAssaulted(0), TowersDefended(0), MinesCaptured(0), LeadersKilled(0), SecondaryObjectives(0) { }
-    ~BattlegroundAVScore() { }
-    uint32 GraveyardsAssaulted;
-    uint32 GraveyardsDefended;
-    uint32 TowersAssaulted;
-    uint32 TowersDefended;
-    uint32 MinesCaptured;
-    uint32 LeadersKilled;
-    uint32 SecondaryObjectives;
+    public:
+        BattlegroundAVScore() : GraveyardsAssaulted(0), GraveyardsDefended(0), TowersAssaulted(0), TowersDefended(0), MinesCaptured(0), LeadersKilled(0), SecondaryObjectives(0) {};
+        virtual ~BattlegroundAVScore() {};
+        uint32 GraveyardsAssaulted;
+        uint32 GraveyardsDefended;
+        uint32 TowersAssaulted;
+        uint32 TowersDefended;
+        uint32 MinesCaptured;
+        uint32 LeadersKilled;
+        uint32 SecondaryObjectives;
 };
 
 class BattlegroundAV : public Battleground
@@ -1545,21 +1541,21 @@ class BattlegroundAV : public Battleground
         ~BattlegroundAV();
 
         /* inherited from BattlegroundClass */
-        void AddPlayer(Player* player);
-        void StartingEventCloseDoors();
-        void StartingEventOpenDoors();
+        virtual void AddPlayer(Player* player);
+        virtual void StartingEventCloseDoors();
+        virtual void StartingEventOpenDoors();
 
         void RemovePlayer(Player* player, uint64 guid, uint32 team);
         void HandleAreaTrigger(Player* Source, uint32 Trigger);
         bool SetupBattleground();
-        void ResetBGSubclass();
+        virtual void ResetBGSubclass();
 
         /*general stuff*/
         void UpdateScore(uint16 team, int16 points);
-       void UpdatePlayerScore(Player* Source, uint32 type, uint32 value, bool doAddHonor = true);
+        void UpdatePlayerScore(Player* Source, uint32 type, uint32 value, bool doAddHonor = true);
 
         /*handlestuff*/ //these are functions which get called from extern
-        void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj);
+        virtual void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj);
         void HandleKillPlayer(Player* player, Player* killer);
         void HandleKillUnit(Creature* unit, Player* killer);
         void HandleQuestComplete(uint32 questid, Player* player);
@@ -1567,14 +1563,16 @@ class BattlegroundAV : public Battleground
 
         void EndBattleground(uint32 winner);
 
-        WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
+        virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
 
         /* achievement req. */
         bool IsBothMinesControlledByTeam(uint32 team) const;
         bool IsAllTowersControlledAndCaptainAlive(uint32 team) const;
 
+        uint32 GetPrematureWinner();
+
     private:
-        void PostUpdateImpl(uint32 diff);
+        virtual void PostUpdateImpl(uint32 diff);
 
         /* Nodes occupying */
         void EventPlayerAssaultsPoint(Player* player, uint32 object);
@@ -1591,7 +1589,7 @@ class BattlegroundAV : public Battleground
 
         BG_AV_Nodes GetNodeThroughObject(uint32 object);
         uint32 GetObjectThroughNode(BG_AV_Nodes node);
-        char const* GetNodeName(BG_AV_Nodes node);
+        const char* GetNodeName(BG_AV_Nodes node);
         bool IsTower(BG_AV_Nodes node) { return m_Nodes[node].Tower; }
 
         /*mine*/
@@ -1622,6 +1620,7 @@ class BattlegroundAV : public Battleground
 
         uint8 m_MaxLevel; //TODO remove this when battleground-getmaxlevel() returns something usefull
         bool m_IsInformedNearVictory[2];
+
 };
 
 #endif
