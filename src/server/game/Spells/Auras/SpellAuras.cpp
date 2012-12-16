@@ -1795,7 +1795,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Glyph of Freezing Trap
                 if (GetSpellInfo()->SpellFamilyFlags[0] & 0x00000008)
                     if (caster && caster->HasAura(56845))
-                        target->CastSpell(target, 61394, true);
+                        caster->CastSpell(target, 61394, true);
 
                 break;
             case SPELLFAMILY_SHAMAN:
