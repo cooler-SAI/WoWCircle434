@@ -2190,7 +2190,11 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
                     target->RemoveAurasDueToSpell(76691);
 
                 // remove movement affects
-                target->RemoveMovementImpairingAuras();
+                uint32 mechanicMask = (1 << MECHANIC_SNARE);
+                if (target->HasAura(96429))
+                    mechanicMask |= (1 << MECHANIC_ROOT);
+
+                target->RemoveAurasWithMechanic(mechanicMask);
 
                 // and polymorphic affects
                 if (target->IsPolymorphed())
@@ -2271,7 +2275,11 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
             {
                 target->setPowerType(POWER_MANA);
                 // Remove movement impairing effects also when shifting out
-                target->RemoveMovementImpairingAuras();
+                uint32 mechanicMask = (1 << MECHANIC_SNARE);
+                if (target->HasAura(96429))
+                    mechanicMask |= (1 << MECHANIC_ROOT);
+
+                target->RemoveAurasWithMechanic(mechanicMask);
             }
         }
         else if (target->HasAura(51713))
