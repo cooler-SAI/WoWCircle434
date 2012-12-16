@@ -753,11 +753,6 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
 
 void WorldSession::WriteMovementInfo(WorldPacket &data, MovementInfo* mi)
 {
-    bool hasOrientation = !G3D::fuzzyEq(mi->pos.GetOrientation(), 0.0f);
-    bool hasTransportData = mi->HasTransportData();
-    bool hasPitch = mi->HasMovementFlag(MovementFlags(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || mi->HasExtraMovementFlag(MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING);
-    bool hasSplineElevation = mi->HasMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
-
     MovementStatusElements* sequence = GetMovementStatusElementsSequence(data.GetOpcode());
     if (!sequence)
     {
@@ -769,6 +764,11 @@ void WorldSession::WriteMovementInfo(WorldPacket &data, MovementInfo* mi)
 
     ObjectGuid guid = mi->guid;
     ObjectGuid tguid = mi->t_guid;
+
+    bool hasOrientation = mi->HasOrientation();
+    bool hasTransportData = mi->HasTransportData();
+    bool hasPitch = mi->HasPitch();
+    bool hasSplineElevation = mi->HasSplineElevation();
 
     for(uint32 i = 0; i < MSE_COUNT; ++i)
     {
