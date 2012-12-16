@@ -37,7 +37,13 @@ enum CreatureIds
 
 enum GameObjectIds
 {
-    GO_VENOXIS_EXIT = 208844,
+    GO_VENOXIS_EXIT     = 208844,
+    GO_MANDOKIR_EXIT1   = 208845,
+    GO_MANDOKIR_EXIT2   = 208846,
+    GO_MANDOKIR_EXIT3   = 208847,
+    GO_MANDOKIR_EXIT4   = 208848,
+    GO_MANDOKIR_EXIT5   = 208849,
+    GO_ZANZIL_EXIT      = 208850,
 };
 
 #endif
