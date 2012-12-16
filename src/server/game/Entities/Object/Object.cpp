@@ -338,17 +338,8 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         }
     }
 
-    uint32 movementFlags = 0;
-    uint16 movementFlagsExtra = 0;
     if (unit)
-    {
-        const_cast<Unit*>(unit)->m_movementInfo.Normalize();
-
-        movementFlags = unit->m_movementInfo.GetMovementFlags();
-        movementFlagsExtra = unit->m_movementInfo.GetExtraMovementFlags();
-        if (GetTypeId() == TYPEID_UNIT)
-            movementFlags &= MOVEMENTFLAG_MASK_CREATURE_ALLOWED;
-    }
+        const_cast<Unit*>(unit)->m_movementInfo.Normalize(GetTypeId() == TYPEID_UNIT);
 
     data->WriteBit(false);
     data->WriteBit(false);
@@ -364,20 +355,20 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     data->WriteBit((flags & UPDATEFLAG_STATIONARY_POSITION) && wo);
     data->WriteBit(flags & UPDATEFLAG_UNK5);
     data->WriteBit(false);
-    data->WriteBit(flags & UPDATEFLAG_TRANSPORT);
+    data->WriteBit((flags & UPDATEFLAG_TRANSPORT) && wo);
 
     if ((flags & UPDATEFLAG_LIVING) && unit)
     {
         ObjectGuid guid = GetGUID();
 
-        data->WriteBit(!movementFlags);
+        data->WriteBit(!unit->m_movementInfo.flags);
         data->WriteBit(!unit->m_movementInfo.HasOrientation());
         data->WriteByteMask(guid[7]);
         data->WriteByteMask(guid[3]);
         data->WriteByteMask(guid[2]);
 
-        if (movementFlags)
-            data->WriteBits(movementFlags, 30);
+        if (unit->m_movementInfo.flags)
+            data->WriteBits(unit->m_movementInfo.flags, 30);
 
         data->WriteBit(false);
         data->WriteBit(!unit->m_movementInfo.HasPitch());
@@ -414,10 +405,10 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         data->WriteByteMask(guid[0]);
         data->WriteByteMask(guid[1]);
         data->WriteBit(false);
-        data->WriteBit(!movementFlagsExtra);
+        data->WriteBit(!unit->m_movementInfo.flags2);
 
-        if (movementFlagsExtra)
-            data->WriteBits(movementFlagsExtra, 12);
+        if (unit->m_movementInfo.flags2)
+            data->WriteBits(unit->m_movementInfo.flags2, 12);
     }
 
     if ((flags & UPDATEFLAG_GO_TRANSPORT_POSITION) && wo)
@@ -631,8 +622,8 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     //        *data << uint16(animKit3);
     //}
 
-    if (flags & UPDATEFLAG_TRANSPORT)
-        *data << uint32(getMSTime());                       // Unknown - getMSTime is wrong.
+    if ((flags & UPDATEFLAG_TRANSPORT) && wo)
+        *data << uint32(wo->m_movementInfo.t_time);
 }
 
 void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* updateMask, Player* target) const
@@ -1619,7 +1610,7 @@ bool MovementInfo::AcceptClientChanges(Player* player, MovementInfo& client, Opc
     return true;
 }
 
-void MovementInfo::Normalize()
+void MovementInfo::Normalize(bool update)
 {
     // move orientation to range [0, 2*PI)
     pos.m_orientation = Position::NormalizeOrientation(pos.m_orientation);
@@ -1630,6 +1621,9 @@ void MovementInfo::Normalize()
 
     if (HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T3) && !t_time3)
         RemoveServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T3);
+
+    if (update)
+        flags &= MOVEMENTFLAG_MASK_CREATURE_ALLOWED;
 }
 
 WorldObject::WorldObject(bool isWorldObject): WorldLocation(),

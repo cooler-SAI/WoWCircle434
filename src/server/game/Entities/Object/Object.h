@@ -617,7 +617,7 @@ struct MovementInfo
 
     void OutDebug();
 
-    void Normalize();
+    void Normalize(bool update = false);
     bool Check(Player* target, Opcodes opcode);
     bool AcceptClientChanges(Player* player, MovementInfo& client, Opcodes opcode);
     bool HasTransportData() const { return t_guid != 0LL; }
