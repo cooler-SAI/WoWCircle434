@@ -7393,7 +7393,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                         uint32 cost = CalculatePct(GetCreateMana(), procSpell->ManaCostPercentage);
                         int32 bp0 = int32(CalculatePct(cost, aura->GetEffect(EFFECT_0)->GetAmount()) * -1);
-                        int32 bp1 = aura->GetEffect(EFFECT_1)->GetAmount();
+                        int32 bp1 = 30;
                         CastCustomSpell(this, 77800, &bp0, &bp1, &bp1, true);
                     }
                     break;

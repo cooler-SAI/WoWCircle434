@@ -27,7 +27,7 @@ void WorldSession::SendAuthResponse(uint8 code, bool queued, uint32 queuePos)
     if (queued)
         packet.WriteBit(false);
 
-    packet.WriteBit(true);                                    // has account info
+    packet.WriteBit(true);                                 // has account info
 
     // account info
     packet << uint32(0);                                   // BillingTimeRemaining
