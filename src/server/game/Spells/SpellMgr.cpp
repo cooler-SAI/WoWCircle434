@@ -4843,10 +4843,39 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // ENDOF BASTION OF TWILIGHT SPELLS
             //
+            // ZUL'GURUB SPELLS
+            //
+            // Venoxis
+            case 96489: // Toxic Explosion
+            case 97093:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(14);
+                break;
+            case 96560: // Word of Hethiss
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(13);
+                break;
+            case 96842: // Bloodvenom
+                spellInfo->MaxAffectedTargets = 3;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(41);
+                break;
+            case 96638: // Bloodvenom dmg
+            case 97104:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(26);
+                break;
+            case 96685: // Venomous Infusion dmg
+            case 97338:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(7);
+                break;
+            case 96475: // Toxic Link
+                spellInfo->MaxAffectedTargets = 2;
+                break;
+            case 96476: // Toxic Link dummy
+                spellInfo->MaxAffectedTargets = 1;
+                spellInfo->TargetAuraSpell = 96477;
+                break;
+            // ENDOF ZUL'GURUB SPELLS
             // ZUL'AMAN SPELLS
             //
             // Akil'zon
-            //
             case 43648: // Electrical Storm
                 spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_STUN;
                 break;

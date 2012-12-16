@@ -1,35 +1,28 @@
-/*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
+#include "ScriptPCH.h"
 #include "zulgurub.h"
+
+static const DoorData doordata[] = 
+{
+    {GO_VENOXIS_EXIT,           DATA_VENOXIS,            DOOR_TYPE_ROOM,     BOUNDARY_NONE},
+    {0,                         0,                       DOOR_TYPE_ROOM,     BOUNDARY_NONE},
+};
 
 class instance_zulgurub : public InstanceMapScript
 {
     public:
-        instance_zulgurub() : InstanceMapScript(ZGScriptName, 859) { }
+        instance_zulgurub() : InstanceMapScript("instance_zulgurub", 859) { }
+        
+        InstanceScript* GetInstanceScript(InstanceMap* map) const
+        {
+            return new instance_zulgurub_InstanceMapScript(map);
+        }
 
         struct instance_zulgurub_InstanceMapScript : public InstanceScript
         {
             instance_zulgurub_InstanceMapScript(Map* map) : InstanceScript(map)
             {
                 SetBossNumber(EncounterCount);
+                LoadDoorData(doordata);
                 venoxisGUID     = 0;
                 mandokirGUID    = 0;
                 kilnaraGUID     = 0;
@@ -40,7 +33,7 @@ class instance_zulgurub : public InstanceMapScript
                 wushoolayGUID   = 0;
                 grilekGUID      = 0;
             }
-
+    
             void OnCreatureCreate(Creature* creature)
             {
                 switch (creature->GetEntry())
@@ -74,6 +67,16 @@ class instance_zulgurub : public InstanceMapScript
                       break;
                    default:
                       break;
+                }
+            }
+            
+            void OnGameObjectCreate(GameObject* pGo)
+            {
+                switch (pGo->GetEntry())
+                {
+                    case GO_VENOXIS_EXIT:
+                        AddDoor(pGo, true);
+                        break;
                 }
             }
 
@@ -204,11 +207,6 @@ class instance_zulgurub : public InstanceMapScript
              uint64 wushoolayGUID;
              uint64 grilekGUID;
         };
-
-        InstanceScript* GetInstanceScript(InstanceMap* map) const
-        {
-            return new instance_zulgurub_InstanceMapScript(map);
-        }
 };
 
 void AddSC_instance_zulgurub()

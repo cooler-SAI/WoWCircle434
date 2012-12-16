@@ -1431,6 +1431,11 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
         // special cases
         switch (triggered_spell_id)
         {
+            // Venomous Effusion
+            case 96680:
+                if (m_caster->FindNearestCreature(52288, 2.0f))
+                    return;
+                break;
             // Feral Charge (Bear)
             case 45334:
                 // Stampede
