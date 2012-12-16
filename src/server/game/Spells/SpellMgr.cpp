@@ -5303,6 +5303,13 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->SetDurationIndex(587);
                 spellInfo->AttributesEx5 |= SPELL_ATTR5_SINGLE_TARGET_SPELL;
                 break;
+            // Focused Insight
+            case 77794: // rank 1
+            case 77795: // rank 2
+                spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+                break;
             default:
                 break;
         }

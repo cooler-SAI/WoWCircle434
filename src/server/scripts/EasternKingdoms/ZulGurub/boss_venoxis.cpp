@@ -194,8 +194,8 @@ class boss_venoxis : public CreatureScript
                             events.ScheduleEvent(EVENT_TOXIC_LINK, urand(15000, 19000));
                             break;
                         case EVENT_WHISPER_OF_HETHISS:
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                                DoCast(pTarget, SPELL_WHISPER_OF_HETHISS);
+                            //if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                                //DoCast(pTarget, SPELL_WHISPER_OF_HETHISS);
                             events.ScheduleEvent(EVENT_WHISPER_OF_HETHISS, 10000);
                             break;
                         case EVENT_TRANSFORM:
@@ -576,7 +576,7 @@ class spell_venoxis_pool_of_acid_tears_dmg : public SpellScriptLoader
 
             void CorrectRange(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(ExactDistanceCheck(GetCaster(), 3.0f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X)));
+                targets.remove_if(ExactDistanceCheck(GetCaster(), 2.0f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X)));
             }
 
             void Register()
