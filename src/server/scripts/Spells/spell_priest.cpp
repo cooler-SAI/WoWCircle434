@@ -34,7 +34,7 @@ enum PriestSpells
     PRIEST_SPELL_PENANCE_R1_HEAL                = 47757,
     PRIEST_SPELL_REFLECTIVE_SHIELD_TRIGGERED    = 33619,
     PRIEST_SPELL_REFLECTIVE_SHIELD_R1           = 33201,
-    PRIEST_SPELL_VAMPIRIC_TOUCH_DISPEL          = 64085,
+    PRIEST_SPELL_VAMPIRIC_TOUCH_DISPEL          = 87204,
     PRIEST_SPELL_EMPOWERED_RENEW                = 63544,
     PRIEST_ICON_ID_EMPOWERED_RENEW_TALENT       = 3021,
     PRIEST_ICON_ID_PAIN_AND_SUFFERING           = 2874,
@@ -356,14 +356,13 @@ class spell_pri_vampiric_touch : public SpellScriptLoader
 
             void HandleDispel(DispelInfo* /*dispelInfo*/)
             {
-                if (Unit* caster = GetCaster())
-                    if (Unit* target = GetUnitOwner())
-                        if (AuraEffect const* aurEff = GetEffect(EFFECT_1))
-                        {
-                            int32 damage = aurEff->GetAmount() * 8;
-                            // backfire damage
-                            caster->CastCustomSpell(target, PRIEST_SPELL_VAMPIRIC_TOUCH_DISPEL, &damage, NULL, NULL, true, NULL, aurEff);
-                        }
+                if (!GetCaster() || !GetUnitOwner())
+                    return;
+
+                if (AuraEffect const* aurEff = GetCaster()->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PRIEST, 1869, EFFECT_1))
+                    if (roll_chance_i(aurEff->GetSpellInfo()->Effects[EFFECT_0].BasePoints))
+                        GetUnitOwner()->CastSpell(GetUnitOwner(), PRIEST_SPELL_VAMPIRIC_TOUCH_DISPEL, true);
+
             }
 
             void Register()

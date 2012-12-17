@@ -5336,6 +5336,13 @@ void SpellMgr::LoadDbcDataCorrections()
             case 2643: 
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_TARGET_ENEMY;
                 spellInfo->Effects[EFFECT_1].SetRadiusIndex(14);
+                break;
+            // Paralysis
+            case 87193:
+            case 87194:
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_ROOT;
+                spellInfo->Effects[EFFECT_0].BasePoints = 0;
+                break;
             default:
                 break;
         }

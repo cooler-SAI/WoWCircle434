@@ -6470,7 +6470,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         int32 chance = aur->GetEffect(0)->GetAmount();
                         if (isMoving())
                             chance *= 5;
-                        if (effIndex !=0 || !procSpell || procSpell->Id != 589 || !roll_chance_i(chance))
+                        if (effIndex !=0 || !procSpell || !roll_chance_i(chance))
                             return false;
 
                         std::list<Creature*> summons;
