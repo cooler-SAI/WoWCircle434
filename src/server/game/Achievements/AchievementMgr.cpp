@@ -3028,19 +3028,19 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                 break;
             }
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_CREATURE_ENTRY: // 4
-                if (!unit || unit->GetEntry() != reqValue)
+                if (!unit || !unit->IsInWorld() || unit->GetEntry() != reqValue)
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_MUST_BE_PLAYER: // 5
-                if (!unit || unit->GetTypeId() != TYPEID_PLAYER)
+                if (!unit || !unit->IsInWorld() || unit->GetTypeId() != TYPEID_PLAYER)
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_MUST_BE_DEAD: // 6
-                if (!unit || unit->isAlive())
+                if (!unit || !unit->IsInWorld() || unit->isAlive())
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_MUST_BE_ENEMY: // 7
-                if (!unit || !referencePlayer->IsHostileTo(unit))
+                if (!unit || !unit->IsInWorld() || !referencePlayer->IsHostileTo(unit))
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_SOURCE_HAS_AURA: // 8
@@ -3048,10 +3048,10 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_HAS_AURA: // 10
-                if (!unit || !unit->HasAura(reqValue))
+                if (!unit || !unit->IsInWorld() || !unit->HasAura(reqValue))
                     return false;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_HAS_AURA_TYPE: // 11
-                if (!unit || !unit->HasAuraType(AuraType(reqValue)))
+                if (!unit || !unit->IsInWorld() || !unit->HasAuraType(AuraType(reqValue)))
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_ITEM_QUALITY_MIN: // 14
@@ -3114,11 +3114,11 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_RACE: // 27
-                if (!unit || unit->GetTypeId() != TYPEID_PLAYER || unit->getRace() != reqValue)
+                if (!unit || !unit->IsInWorld() || unit->GetTypeId() != TYPEID_PLAYER || unit->getRace() != reqValue)
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_CLASS: // 28
-                if (!unit || unit->GetTypeId() != TYPEID_PLAYER || unit->getClass() != reqValue)
+                if (!unit || !unit->IsInWorld() || unit->GetTypeId() != TYPEID_PLAYER || unit->getClass() != reqValue)
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_MAX_GROUP_MEMBERS: // 29
@@ -3174,14 +3174,14 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_LEVEL: // 40
-                if (!unit || unit->getLevel() != reqValue)
+                if (!unit || !unit->IsInWorld() || unit->getLevel() != reqValue)
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_ZONE: // 41
-                if (!unit || unit->GetZoneId() != reqValue)
+                if (!unit || !unit->IsInWorld() || unit->GetZoneId() != reqValue)
                     return false;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_HEALTH_PERCENT_BELOW: // 46
-                if (!unit || unit->GetHealthPct() >= reqValue)
+                if (!unit || !unit->IsInWorld() || unit->GetHealthPct() >= reqValue)
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_MIN_ACHIEVEMENT_POINTS: // 56
