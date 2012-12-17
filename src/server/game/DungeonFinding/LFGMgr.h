@@ -89,7 +89,7 @@ enum LfgTeleportError
 enum LfgJoinResult
 {
     // 3 = No client reaction | 18 = "Rolecheck failed"
-    LFG_JOIN_OK                                  = 0,      // Joined (no client msg)
+    LFG_JOIN_OK                                  = 31,      // Joined (no client msg)
     LFG_JOIN_FAILED                              = 1,      // RoleCheck Failed
     LFG_JOIN_GROUPFULL                           = 2,      // Your group is full
     LFG_JOIN_INTERNAL_ERROR                      = 4,      // Internal LFG Error
@@ -170,12 +170,13 @@ struct LfgUpdateData
 // Data needed by SMSG_LFG_QUEUE_STATUS
 struct LfgQueueStatusData
 {
-    LfgQueueStatusData(uint32 _dungeonId = 0, int32 _waitTime = -1, int32 _waitTimeAvg = -1, int32 _waitTimeTank = -1, int32 _waitTimeHealer = -1,
+    LfgQueueStatusData(uint32 _dungeonId = 0, int32 _joinTime = -1, int32 _waitTime = -1, int32 _waitTimeAvg = -1, int32 _waitTimeTank = -1, int32 _waitTimeHealer = -1,
         int32 _waitTimeDps = -1, uint32 _queuedTime = 0, uint8 _tanks = 0, uint8 _healers = 0, uint8 _dps = 0) :
-        dungeonId(_dungeonId), waitTime(_waitTime), waitTimeAvg(_waitTimeAvg), waitTimeTank(_waitTimeTank), waitTimeHealer(_waitTimeHealer),
+        dungeonId(_dungeonId), joinTime(_joinTime), waitTime(_waitTime), waitTimeAvg(_waitTimeAvg), waitTimeTank(_waitTimeTank), waitTimeHealer(_waitTimeHealer),
         waitTimeDps(_waitTimeDps), queuedTime(_queuedTime), tanks(_tanks), healers(_healers), dps(_dps) {}
 
     uint32 dungeonId;
+    int32 joinTime;
     int32 waitTime;
     int32 waitTimeAvg;
     int32 waitTimeTank;

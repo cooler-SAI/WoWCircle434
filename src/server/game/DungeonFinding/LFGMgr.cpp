@@ -553,8 +553,8 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
     {
         LfgDungeonSet const& playerDungeons = GetSelectedDungeons(guid);
         if (playerDungeons == dungeons)                     // Joining the same dungeons -- Send OK
-         {
-            player->GetSession()->SendLfgJoinResult(joinData); // Default value of joinData.result = LFG_JOIN_OK
+        {
+            player->GetSession()->SendLfgJoinResult(player->GetGUID(), 0, joinData); // Default value of joinData.result = LFG_JOIN_OK
             if (grp)
             {
                 LfgUpdateData updateData = LfgUpdateData(LFG_UPDATETYPE_ADDED_TO_QUEUE, dungeons, comment);
@@ -664,7 +664,7 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
         sLog->outDebug(LOG_FILTER_LFG, "LFGMgr::Join: [" UI64FMTD "] joining with %u members. result: %u", guid, grp ? grp->GetMembersCount() : 1, joinData.result);
         if (!dungeons.empty())                             // Only should show lockmap when have no dungeons available
             joinData.lockmap.clear();
-        player->GetSession()->SendLfgJoinResult(joinData);
+        player->GetSession()->SendLfgJoinResult(player->GetGUID(), 0, joinData);
         return;
     }
 
@@ -731,7 +731,7 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
             SetSelectedDungeons(guid, dungeons);
         }
         // Send update to player
-        player->GetSession()->SendLfgJoinResult(joinData);
+        player->GetSession()->SendLfgJoinResult(player->GetGUID(), 0, joinData);
         player->GetSession()->SendLfgUpdatePlayer(LfgUpdateData(LFG_UPDATETYPE_JOIN_QUEUE, dungeons, comment));
         SetState(gguid, LFG_STATE_QUEUED);
         SetRoles(guid, roles);
@@ -1910,7 +1910,7 @@ void LFGMgr::SendLfgUpdateParty(uint64 guid, LfgUpdateData const& data)
 void LFGMgr::SendLfgJoinResult(uint64 guid, LfgJoinResultData const& data)
 {
     if (Player* player = ObjectAccessor::FindPlayer(guid))
-        player->GetSession()->SendLfgJoinResult(data);
+        player->GetSession()->SendLfgJoinResult(guid, 0, data);
 }
 
 void LFGMgr::SendLfgBootProposalUpdate(uint64 guid, LfgPlayerBoot const& boot)

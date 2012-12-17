@@ -576,7 +576,7 @@ void LFGQueue::UpdateQueueTimers(time_t currTime)
         if (queueinfo.bestCompatible.empty())
             FindBestCompatibleInQueue(itQueue);
 
-        LfgQueueStatusData queueData(dungeonId, waitTime, wtAvg, wtTank, wtHealer, wtDps, queuedTime, queueinfo.tanks, queueinfo.healers, queueinfo.dps);
+        LfgQueueStatusData queueData(dungeonId, queueinfo.joinTime, waitTime, wtAvg, wtTank, wtHealer, wtDps, queuedTime, queueinfo.tanks, queueinfo.healers, queueinfo.dps);
         for (LfgRolesMap::const_iterator itPlayer = queueinfo.roles.begin(); itPlayer != queueinfo.roles.end(); ++itPlayer)
         {
             uint64 pguid = itPlayer->first;

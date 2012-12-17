@@ -852,7 +852,7 @@ class WorldSession
         void SendLfgRoleChosen(uint64 guid, uint8 roles);
         void SendLfgRoleCheckUpdate(const LfgRoleCheck& pRoleCheck);
         void SendLfgLfrList(bool update);
-        void SendLfgJoinResult(const LfgJoinResultData& joinData);
+        void SendLfgJoinResult(uint64 jguid, uint32 queueID, const LfgJoinResultData& joinData);
         void SendLfgQueueStatus(const LfgQueueStatusData& queueData);
         void SendLfgPlayerReward(uint32 rdungeonEntry, uint32 sdungeonEntry, uint8 done, const LfgReward* reward, const Quest *qRew);
         void SendLfgBootProposalUpdate(const LfgPlayerBoot& boot);
