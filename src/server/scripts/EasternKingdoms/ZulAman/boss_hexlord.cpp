@@ -234,6 +234,7 @@ class boss_hex_lord_malacrass : public CreatureScript
                 events.ScheduleEvent(EVENT_SPIRIT_BOLTS, 10000);
                 events.ScheduleEvent(EVENT_DRAIN_POWER, 6000);
                 Talk(SAY_AGGRO);
+                DoZoneInCombat();
                 instance->SetBossState(DATA_HEX_LORD_MALACRASS, IN_PROGRESS);
             }
 

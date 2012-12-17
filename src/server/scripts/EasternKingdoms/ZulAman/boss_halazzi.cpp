@@ -116,6 +116,7 @@ class boss_halazzi : public CreatureScript
                 health = me->GetHealth();
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
                 events.ScheduleEvent(EVENT_WATER_TOTEM, urand(5000, 15000));
+                DoZoneInCombat();
                 instance->SetBossState(DATA_HALAZZI, IN_PROGRESS);
             }
 

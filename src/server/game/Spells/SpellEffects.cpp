@@ -1438,7 +1438,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
         // special cases
         switch (triggered_spell_id)
         {
-            // Venomous Effusion
+            // Venomous Effusion, Venoxis
             case 96680:
                 if (m_caster->FindNearestCreature(52288, 2.0f))
                     return;

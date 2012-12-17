@@ -69,6 +69,7 @@ class boss_nalorakk : public CreatureScript
                 Talk(SAY_AGGRO);
                 events.ScheduleEvent(EVENT_BEARFORM, 30000);
                 events.ScheduleEvent(EVENT_BRUTAL_STRIKE, 6000);
+                DoZoneInCombat();
                 instance->SetBossState(DATA_NALORAKK, IN_PROGRESS);
             }
 

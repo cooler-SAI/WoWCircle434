@@ -143,6 +143,7 @@ class boss_venoxis : public CreatureScript
                 events.ScheduleEvent(EVENT_WHISPER_OF_HETHISS, 6000);
                 events.ScheduleEvent(EVENT_TRANSFORM, 35000);
                 DoCastAOE(SPELL_WORD_OF_HETHISS);
+                DoZoneInCombat();
                 instance->SetBossState(DATA_VENOXIS, IN_PROGRESS);
             }
 

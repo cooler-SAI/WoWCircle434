@@ -46,5 +46,11 @@ enum GameObjectIds
     GO_ZANZIL_EXIT      = 208850,
 };
 
+enum OtherSpells
+{
+    SPELL_FROSTBURN_FORMULA = 96331,
+    SPELL_HYPPOTHERMIA      = 96332,
+};
+
 #endif
 

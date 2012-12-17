@@ -185,6 +185,7 @@ class boss_janalai : public CreatureScript
                 events.ScheduleEvent(EVENT_FLAME_BREATH, 7000);
                 events.ScheduleEvent(EVENT_SUMMON_HATCHERS, 13000);
                 events.ScheduleEvent(EVENT_TELEPORT, 55000);
+                DoZoneInCombat();
                 instance->SetBossState(DATA_JANALAI, IN_PROGRESS);
             }
 

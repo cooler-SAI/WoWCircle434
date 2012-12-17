@@ -114,8 +114,6 @@ class boss_mandokir : public CreatureScript
                 if (Creature* spirit = me->FindNearestCreature(NPC_CHAINED_SPIRIT, 200.0f))
                 {
                     spirit->AI()->SetGUID(victim->GetGUID(), DATA_RES);
-                    //spirit->CastSpell(victim, SPELL_RESSURECT);
-                    //spirit->DespawnOrUnsummon(2000);
                 }
             }
 
@@ -125,6 +123,7 @@ class boss_mandokir : public CreatureScript
                 events.ScheduleEvent(EVENT_DECAPITATE, 7000);
                 events.ScheduleEvent(EVENT_BLOODLETTING, 10000);
                 events.ScheduleEvent(EVENT_DISMOUNT, 15000);
+                DoZoneInCombat();
                 instance->SetBossState(DATA_MANDOKIR, IN_PROGRESS);
             }
 
@@ -165,7 +164,7 @@ class boss_mandokir : public CreatureScript
                                 DoCast(pTarget, SPELL_DECAPITATE);
                                 events.ScheduleEvent(EVENT_LEVEL_UP, 5000);
                             }
-                            events.ScheduleEvent(EVENT_DECAPITATE, 30000);
+                            events.ScheduleEvent(EVENT_DECAPITATE, 45000);
                             break;
                         }
                         case EVENT_LEVEL_UP:

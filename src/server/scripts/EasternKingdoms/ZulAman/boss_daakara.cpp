@@ -144,6 +144,7 @@ class boss_daakara : public CreatureScript
                 events.ScheduleEvent(EVENT_BERSERK, 660000);
                 events.ScheduleEvent(EVENT_GRIEVOUS_THROW, urand(3000, 8000));
                 events.ScheduleEvent(EVENT_WHIRLWIND, urand(6000, 8000));
+                DoZoneInCombat();
                 instance->SetBossState(DATA_DAAKARA, IN_PROGRESS);
             }
 

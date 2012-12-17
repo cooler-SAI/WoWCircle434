@@ -4872,6 +4872,24 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->MaxAffectedTargets = 1;
                 spellInfo->TargetAuraSpell = 96477;
                 break;
+            // Zanzil
+            case 96319:
+            case 96316:
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = 0;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                break;
+            case 96342: // Pursuit
+                spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_CASTER;
+                break;
+            case 96914: // Zanzil Fire
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_STUN;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
             // ENDOF ZUL'GURUB SPELLS
             // ZUL'AMAN SPELLS
             //

@@ -92,6 +92,7 @@ class boss_akilzon : public CreatureScript
                 events.ScheduleEvent(EVENT_CALL_LIGHTNING, urand(3000, 5000));
                 events.ScheduleEvent(EVENT_SUMMON_EAGLE, 10000);
                 Talk(SAY_AGGRO);
+                DoZoneInCombat();
                 instance->SetBossState(DATA_AKILZON, IN_PROGRESS);
             }
 

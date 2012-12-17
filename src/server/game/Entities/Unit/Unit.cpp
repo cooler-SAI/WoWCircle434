@@ -8945,6 +8945,11 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Frostburn Formula
+        case 96325:
+            if (victim->getLevel() > 85)
+                return true;
+            break;
         // Rolling Thunder
         case 88756:
         case 88764:
