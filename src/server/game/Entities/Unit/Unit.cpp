@@ -8720,6 +8720,21 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             }
             case SPELLFAMILY_HUNTER:
             {
+                if (auraSpellInfo->SpellIconID == 2225)     // Serpent Spread 1, 2
+                {
+                    switch (auraSpellInfo->Id)
+                    {
+                        case 87934:
+                            trigger_spell_id = 88453;
+                            break;
+                        case 87935:
+                            trigger_spell_id = 88466;
+                            break;
+                        default:
+                            return false;
+                    }
+                    break;
+                }
                 if (auraSpellInfo->SpellIconID == 3247)     // Piercing Shots
                 {
                     switch (auraSpellInfo->Id)

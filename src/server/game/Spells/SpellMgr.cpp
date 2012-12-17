@@ -3013,6 +3013,15 @@ void SpellMgr::LoadDbcDataCorrections()
 
         switch (spellInfo->Id)
         {
+            case 87934: // Serpent Spread
+            case 87935:
+                spellInfo->Effects[0].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL;
+                break;
+            case 88466:
+            case 88453:
+                spellInfo->Speed = 0;
+                break;
             // Master Marksman Aim Shot proc
             case 82928:
                 spellInfo->CastTimeMax = 0;
