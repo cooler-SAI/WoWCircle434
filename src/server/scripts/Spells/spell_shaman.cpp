@@ -67,6 +67,8 @@ enum ShamanSpells
 
     SHAMAN_TOTEM_SPELL_TOTEMIC_WRATH       = 77746,
     SHAMAN_TOTEM_SPELL_TOTEMIC_WRATH_AURA  = 77747,
+
+    SHAMAN_SPELL_THUNDERSTORM_SLOW         = 100955,
 };
 
 // 1535 Fire Nova
@@ -88,7 +90,6 @@ class spell_sha_fire_nova : public SpellScriptLoader
                     if (target->HasAura(SHAMAN_SPELL_FLAME_SHOCK))
                     {
                         caster->CastSpell(target, SHAMAN_SPELL_FIRE_NOVA_TRIGGERED_R1, true);
-                        target->RemoveAurasDueToSpell(SHAMAN_SPELL_FLAME_SHOCK);
                     }
                 }
             }
@@ -846,6 +847,35 @@ class spell_sha_totemic_wrath : public SpellScriptLoader
         }
 };
 
+class spell_sha_thunderstorm : public SpellScriptLoader
+{
+    public:
+        spell_sha_thunderstorm() : SpellScriptLoader("spell_sha_thunderstorm") { }
+
+        class spell_sha_thunderstorm_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_sha_thunderstorm_SpellScript);
+
+            void HandleScript(SpellEffIndex /*effIndex*/)
+            {
+                if (!GetCaster() || !GetHitUnit())
+                    return;
+
+                GetCaster()->CastSpell(GetHitUnit(), SHAMAN_SPELL_THUNDERSTORM_SLOW, true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_sha_thunderstorm_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_sha_thunderstorm_SpellScript();
+        }
+};
+
 void AddSC_shaman_spell_scripts()
 {
     new spell_sha_fire_nova();
@@ -862,4 +892,5 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_spirit_link();
     new spell_sha_fulmination();
     new spell_sha_totemic_wrath();
+    new spell_sha_thunderstorm();
 }
