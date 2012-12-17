@@ -374,8 +374,9 @@ void WorldSession::HandlePVPLogDataOpcode(WorldPacket & /*recvData*/)
         return;
 
     WorldPacket data;
-    sBattlegroundMgr->BuildPvpLogDataPacket(&data, bg);
-    SendPacket(&data);
+    ByteBuffer buff;
+    sBattlegroundMgr->BuildPvpLogDataPacket(&data, bg, &buff);
+    sBattlegroundMgr->FinishPvpLogDataPacket(&data, bg, &buff, GetPlayer());
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_PVP_LOG_DATA Message");
 }

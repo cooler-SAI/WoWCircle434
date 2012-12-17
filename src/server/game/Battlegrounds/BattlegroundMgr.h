@@ -78,7 +78,8 @@ class BattlegroundMgr
         void BuildBattlegroundListPacket(WorldPacket* data, uint64 guid, Player* player, BattlegroundTypeId bgTypeId);
         void BuildStatusFailedPacket(WorldPacket* data, Battleground* bg, Player* player, uint8 QueueSlot, GroupJoinBattlegroundResult result);
         void BuildUpdateWorldStatePacket(WorldPacket* data, uint32 field, uint32 value);
-        void BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg);
+        void BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg, ByteBuffer* buff);
+        void FinishPvpLogDataPacket(WorldPacket* data, Battleground* bg, ByteBuffer* buff, Player* player);
         void BuildBattlegroundStatusPacket(WorldPacket* data, Battleground* bg, Player* player, uint8 queueSlot, uint8 statusId, uint32 time1, uint32 time2, uint8 arenaType, uint8 uiFrame = 0);
         void SendAreaSpiritHealerQueryOpcode(Player* player, Battleground* bg, uint64 guid);
 

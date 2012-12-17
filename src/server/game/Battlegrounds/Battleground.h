@@ -29,6 +29,7 @@ class Group;
 class Player;
 class WorldPacket;
 class BattlegroundMap;
+class ArenaTeam;
 
 struct PvPDifficultyEntry;
 struct WorldSafeLocsEntry;
@@ -292,6 +293,8 @@ enum GroupJoinBattlegroundResult
     ERR_BATTLEGROUND_DUPE_QUEUE                     = 43
 };
 
+typedef std::map<uint64, int32> MatchMakingRatingChangeStore;
+
 struct BattlegroundScore
 {
     BattlegroundScore() : KillingBlows(0), Deaths(0), HonorableKills(0), BonusHonor(0),
@@ -524,15 +527,23 @@ class Battleground
         void SetArenaTeamIdForTeam(uint32 Team, uint32 ArenaTeamId) { m_ArenaTeamIds[GetTeamIndexByTeamId(Team)] = ArenaTeamId; }
         uint32 GetArenaTeamIdForTeam(uint32 Team) const             { return m_ArenaTeamIds[GetTeamIndexByTeamId(Team)]; }
         uint32 GetArenaTeamIdByIndex(uint32 index) const { return m_ArenaTeamIds[index]; }
-        void SetArenaTeamRatingChangeForTeam(uint32 Team, int32 RatingChange) { m_ArenaTeamRatingChanges[GetTeamIndexByTeamId(Team)] = RatingChange; }
-        int32 GetArenaTeamRatingChangeForTeam(uint32 Team) const    { return m_ArenaTeamRatingChanges[GetTeamIndexByTeamId(Team)]; }
-        int32 GetArenaTeamRatingChangeByIndex(uint32 index) const   { return m_ArenaTeamRatingChanges[index]; }
         void SetArenaMatchmakerRating(uint32 Team, uint32 MMR){ m_ArenaTeamMMR[GetTeamIndexByTeamId(Team)] = MMR; }
         uint32 GetArenaMatchmakerRating(uint32 Team) const          { return m_ArenaTeamMMR[GetTeamIndexByTeamId(Team)]; }
         uint32 GetArenaMatchmakerRatingByIndex(uint32 index) const  { return m_ArenaTeamMMR[index]; }
+        int32 GetMatchMakingRatingChange(uint64 playerGuid) const
+        {
+            MatchMakingRatingChangeStore::const_iterator itr = m_matchMakingRatingChange.find(playerGuid);
+            if (itr != m_matchMakingRatingChange.end())
+                return itr->second;
+
+            return 0;
+        }
+        void SetMatchMakingRatingChange(uint64 playerGuid, int32 matchmakingChange) { m_matchMakingRatingChange[playerGuid] = matchmakingChange; }
+
         void CheckArenaAfterTimerConditions();
         void CheckArenaWinConditions();
         void UpdateArenaWorldState();
+        void CalculatingMatchmakingRating(ArenaTeam* winnerTeam, ArenaTeam* loserTeam, uint32 winnerMatchmaking, uint32 loserMatchmaking, uint32 winner);
 
         // Triggers handle
         // must be implemented in BG subclass
@@ -720,8 +731,8 @@ class Battleground
         // Arena team ids by team
         uint32 m_ArenaTeamIds[BG_TEAMS_COUNT];
 
-        int32 m_ArenaTeamRatingChanges[BG_TEAMS_COUNT];
         uint32 m_ArenaTeamMMR[BG_TEAMS_COUNT];
+        MatchMakingRatingChangeStore m_matchMakingRatingChange;
 
         // Limits
         uint32 m_LevelMin;

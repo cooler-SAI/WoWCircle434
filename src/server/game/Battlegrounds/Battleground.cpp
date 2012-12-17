@@ -192,9 +192,6 @@ Battleground::Battleground()
     m_ArenaTeamIds[TEAM_ALLIANCE]   = 0;
     m_ArenaTeamIds[TEAM_HORDE]      = 0;
 
-    m_ArenaTeamRatingChanges[TEAM_ALLIANCE]   = 0;
-    m_ArenaTeamRatingChanges[TEAM_HORDE]      = 0;
-
     m_BgRaids[TEAM_ALLIANCE]         = NULL;
     m_BgRaids[TEAM_HORDE]            = NULL;
 
@@ -819,8 +816,6 @@ void Battleground::EndBattleground(uint32 winner)
                     winnerMatchmakerChange, loserTeamRating, loserChange, loserMatchmakerRating, loserMatchmakerChange);
                 SetArenaMatchmakerRating(winner, winnerMatchmakerRating + winnerMatchmakerChange);
                 SetArenaMatchmakerRating(GetOtherTeam(winner), loserMatchmakerRating + loserMatchmakerChange);
-                SetArenaTeamRatingChangeForTeam(winner, winnerChange);
-                SetArenaTeamRatingChangeForTeam(GetOtherTeam(winner), loserChange);
                 sLog->outDebug(LOG_FILTER_ARENAS, "Arena match Type: %u for Team1Id: %u - Team2Id: %u ended. WinnerTeamId: %u. Winner rating: +%d, Loser rating: %d", m_ArenaType, m_ArenaTeamIds[TEAM_ALLIANCE], m_ArenaTeamIds[TEAM_HORDE], winnerArenaTeam->GetId(), winnerChange, loserChange);
                 if (sWorld->getBoolConfig(CONFIG_ARENA_LOG_EXTENDED_INFO))
                     for (Battleground::BattlegroundScoreMap::const_iterator itr = GetPlayerScoresBegin(); itr != GetPlayerScoresEnd(); ++itr)
@@ -843,9 +838,13 @@ void Battleground::EndBattleground(uint32 winner)
         }
     }
 
+    if (isArena() && isRated() && winnerArenaTeam && loserArenaTeam && winnerArenaTeam != loserArenaTeam)
+        CalculatingMatchmakingRating(winnerArenaTeam, loserArenaTeam, winnerMatchmakerChange, loserMatchmakerChange, winner);
+
     bool guildAwarded = false;
     WorldPacket pvpLogData;
-    sBattlegroundMgr->BuildPvpLogDataPacket(&pvpLogData, this);
+    ByteBuffer buff;
+    sBattlegroundMgr->BuildPvpLogDataPacket(&pvpLogData, this, &buff);
 
     BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType());
 
@@ -853,20 +852,6 @@ void Battleground::EndBattleground(uint32 winner)
     for (BattlegroundPlayerMap::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
         uint32 team = itr->second.Team;
-
-        if (itr->second.OfflineRemoveTime)
-        {
-            //if rated arena match - make member lost!
-            if (isArena() && isRated() && winnerArenaTeam && loserArenaTeam && winnerArenaTeam != loserArenaTeam)
-            {
-                if (team == winner)
-                    winnerArenaTeam->OfflineMemberLost(itr->first, loserMatchmakerRating, winnerMatchmakerChange);
-                else
-                    loserArenaTeam->OfflineMemberLost(itr->first, winnerMatchmakerRating, loserMatchmakerChange);
-            }
-            continue;
-        }
-
         Player* player = _GetPlayer(itr, "EndBattleground");
         if (!player)
             continue;
@@ -889,28 +874,6 @@ void Battleground::EndBattleground(uint32 winner)
             //needed cause else in av some creatures will kill the players at the end
             player->CombatStop();
             player->getHostileRefManager().deleteReferences();
-        }
-
-        // per player calculation
-        if (isArena() && isRated() && winnerArenaTeam && loserArenaTeam && winnerArenaTeam != loserArenaTeam)
-        {
-            if (team == winner)
-            {
-                // update achievement BEFORE personal rating update
-                uint32 rating = player->GetArenaPersonalRating(winnerArenaTeam->GetSlot());
-                player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA, rating ? rating : 1);
-                player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA, GetMapId());
-
-                winnerArenaTeam->MemberWon(player, loserMatchmakerRating, winnerMatchmakerChange);
-                player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_ARENA, sWorld->getIntConfig(CONFIG_CURRENCY_CONQUEST_POINTS_ARENA_REWARD));
-            }
-            else
-            {
-                loserArenaTeam->MemberLost(player, winnerMatchmakerRating, loserMatchmakerChange);
-
-                // Arena lost => reset the win_rated_arena having the "no_lose" condition
-                player->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA, ACHIEVEMENT_CRITERIA_CONDITION_NO_LOSE);
-            }
         }
 
         uint32 winner_kills = player->GetRandomWinner() ? BG_REWARD_WINNER_HONOR_LAST : BG_REWARD_WINNER_HONOR_FIRST;
@@ -960,10 +923,10 @@ void Battleground::EndBattleground(uint32 winner)
 
         BlockMovement(player);
 
-        player->GetSession()->SendPacket(&pvpLogData);
+        sBattlegroundMgr->FinishPvpLogDataPacket(&pvpLogData, this, &buff, player);
 
         WorldPacket data;
-        sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player, player->GetBattlegroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, player->GetBattlegroundQueueJoinTime(GetTypeID()), GetElapsedTime(), GetArenaType());
+        sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player, player->GetBattlegroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, player->GetBattlegroundQueueJoinTime(GetTypeID()), 0, GetArenaType());
         player->GetSession()->SendPacket(&data);
 
         player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND, 1);
@@ -1050,7 +1013,7 @@ void Battleground::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
             // if arena, remove the specific arena auras
             if (isArena())
             {
-                bgTypeId=BATTLEGROUND_AA;                   // set the bg type to all arenas (it will be used for queue refreshing)
+                bgTypeId = BATTLEGROUND_AA;                   // set the bg type to all arenas (it will be used for queue refreshing)
 
                 // unsummon current and summon old pet if there was one and there isn't a current pet
                 player->RemovePet(NULL, PET_SAVE_NOT_IN_SLOT);
@@ -1931,12 +1894,13 @@ void Battleground::PlayerAddedToBGCheckIfBGIsRunning(Player* player)
         return;
 
     WorldPacket data;
+    ByteBuffer buff;
     BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(GetTypeID(), GetArenaType());
 
     BlockMovement(player);
 
-    sBattlegroundMgr->BuildPvpLogDataPacket(&data, this);
-    player->GetSession()->SendPacket(&data);
+    sBattlegroundMgr->BuildPvpLogDataPacket(&data, this, &buff);
+    sBattlegroundMgr->FinishPvpLogDataPacket(&data, this, &buff, player);
 
     sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player, player->GetBattlegroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, player->GetBattlegroundQueueJoinTime(GetTypeID()), GetElapsedTime(), GetArenaType());
     player->GetSession()->SendPacket(&data);
@@ -2042,4 +2006,50 @@ void Battleground::HandleAreaTrigger(Player* player, uint32 trigger)
 {
     sLog->outDebug(LOG_FILTER_BATTLEGROUND, "Unhandled AreaTrigger %u in Battleground %u. Player coords (x: %f, y: %f, z: %f)",
                    trigger, player->GetMapId(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+}
+
+void Battleground::CalculatingMatchmakingRating(ArenaTeam* winnerTeam, ArenaTeam* loserTeam, uint32 winnerMatchmaking, uint32 loserMatchmaking, uint32 winner)
+{
+    for (BattlegroundPlayerMap::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    {
+        uint32 team = itr->second.Team;
+        if (itr->second.OfflineRemoveTime)
+        {
+            if (team == winner)
+            {
+                winnerTeam->OfflineMemberLost(itr->first, loserMatchmaking, winnerMatchmaking);
+                SetMatchMakingRatingChange(itr->first, winnerMatchmaking);
+            }
+            else
+            {
+                loserTeam->OfflineMemberLost(itr->first, winnerMatchmaking, loserMatchmaking);
+                SetMatchMakingRatingChange(itr->first, loserMatchmaking);
+            }
+            continue;
+        }
+
+        Player* player = _GetPlayer(itr, "EndBattleground");
+        if (!player)
+            continue;
+
+        if (team == winner)
+        {
+            // update achievement BEFORE personal rating update
+            uint32 rating = player->GetArenaPersonalRating(winnerTeam->GetSlot());
+            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA, rating ? rating : 1);
+            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA, GetMapId());
+
+            winnerTeam->MemberWon(player, loserMatchmaking, winnerMatchmaking);
+            SetMatchMakingRatingChange(player->GetGUID(), winnerMatchmaking);
+            player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_ARENA, sWorld->getIntConfig(CONFIG_CURRENCY_CONQUEST_POINTS_ARENA_REWARD));
+        }
+        else
+        {
+            loserTeam->MemberLost(player, winnerMatchmaking, loserMatchmaking);
+            SetMatchMakingRatingChange(player->GetGUID(), loserMatchmaking);
+
+            // Arena lost => reset the win_rated_arena having the "no_lose" condition
+            player->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA, ACHIEVEMENT_CRITERIA_CONDITION_NO_LOSE);
+        }
+    }
 }

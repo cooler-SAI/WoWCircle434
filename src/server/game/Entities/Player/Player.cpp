@@ -23522,6 +23522,10 @@ void Player::SetClientControl(Unit* target, uint8 allowMove)
     data.append(target->GetPackGUID());
     data << uint8(allowMove);
     GetSession()->SendPacket(&data);
+
+    if (Player* player = target->ToPlayer())
+        player->SetRooted(true);
+
     if (target == this)
         SetMover(this);
 }
