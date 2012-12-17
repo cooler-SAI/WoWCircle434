@@ -2974,6 +2974,24 @@ bool SpellInfo::IsRequireAdditionalTargetCheck() const
     return true;
 }
 
+bool SpellInfo::IsNeedToCheckSchoolImmune() const
+{
+    // there are a problem with some of spells that does holypower or break cc kinda pvp trinket
+    // so we need hack-handle for em
+
+    switch (Id)
+    {
+        case 42292: // Pvp Trinket
+        case 59752: // Every Man for Himself (racical)
+        case 25912: // Holy Shock damage
+        case 35395: // Crusader Strike
+            return false;
+        default:
+            break;
+    }
+    return true;
+}
+
 bool SpellInfo::IsShouldProcOnOwner() const
 {
     switch (Id)

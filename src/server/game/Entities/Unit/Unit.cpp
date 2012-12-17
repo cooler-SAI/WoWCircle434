@@ -11895,7 +11895,7 @@ bool Unit::IsImmunedToDamage(SpellInfo const* spellInfo)
         return false;
 
     uint32 shoolMask = spellInfo->GetSchoolMask();
-    if (spellInfo->Id != 42292 && spellInfo->Id != 59752)
+    if (spellInfo->IsNeedToCheckSchoolImmune())
     {
         // If m_immuneToSchool type contain this school type, IMMUNE damage.
         SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
@@ -11961,7 +11961,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo)
     if (immuneToAllEffects) //Return immune only if the target is immune to all spell effects.
         return true;
 
-    if (spellInfo->Id != 42292 && spellInfo->Id != 59752)
+    if (spellInfo->IsNeedToCheckSchoolImmune())
     {
         SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
         for (SpellImmuneList::const_iterator itr = schoolList.begin(); itr != schoolList.end(); ++itr)
@@ -12011,6 +12011,17 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) cons
             if (spellInfo->Dispel == DISPEL_MAGIC &&                                      // Magic debuff
                 ((*iter)->GetMiscValue() & spellInfo->GetSchoolMask()) &&  // Check school
                 !spellInfo->IsPositiveEffect(index))                                  // Harmful
+                return true;
+    }
+
+    if (spellInfo->IsNeedToCheckSchoolImmune() && !spellInfo->IsPositiveEffect(index))
+    {
+        uint32 shoolMask = spellInfo->GetSchoolMask();
+
+        // If m_immuneToSchool type contain this school type, IMMUNE damage.
+        SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
+        for (SpellImmuneList::const_iterator itr = schoolList.begin(); itr != schoolList.end(); ++itr)
+            if (itr->type & shoolMask && !spellInfo->CanPierceImmuneAura(sSpellMgr->GetSpellInfo(itr->spellId)))
                 return true;
     }
 

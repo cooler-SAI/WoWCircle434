@@ -540,6 +540,7 @@ public:
 
     bool IsIgnoringCombat() const;
     bool IsRequireAdditionalTargetCheck() const;
+    bool IsNeedToCheckSchoolImmune() const;
 
     // helpers for breaking by damage spells
     bool IsBreakingCamouflage() const;
