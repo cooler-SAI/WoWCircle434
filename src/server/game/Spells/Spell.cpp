@@ -3200,9 +3200,10 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
             m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
 
             // test code, should break invisibility from mage when pet cast spells
-            /*if (m_caster->isPet())
+            if (m_caster->isPet())
                 if (Unit* owner = m_caster->GetOwner())
-                    owner->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);*/
+                    if (owner->getClass() == CLASS_MAGE && owner->HasAuraType(SPELL_AURA_MOD_INVISIBILITY))
+                        owner->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
 
             for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                 if (m_spellInfo->Effects[i].GetUsedTargetObjectType() == TARGET_OBJECT_TYPE_UNIT)
