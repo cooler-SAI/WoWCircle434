@@ -1548,6 +1548,14 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_GENERIC:
                 switch (GetId())
                 {
+                    case 91296: // Egg Shell, Corrupted Egg Shell
+                        if (caster)
+                            caster->CastSpell(caster, 91305, true);
+                        break;
+                    case 91308: // Egg Shell, Corrupted Egg Shell (H)
+                        if (caster)
+                            caster->CastSpell(caster, 91310, true);
+                        break;
                     case 49440: // Racer Slam, Slamming
                         if (Creature* racerBunny = target->FindNearestCreature(27674, 25.0f))
                             target->CastSpell(racerBunny, 49302, false);

@@ -357,6 +357,11 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                 switch (m_spellInfo->Id)                     // better way to check unknown
                 {
+                    // Detonate Mana, Tyrande's Favorite Doll
+                    case 92601:
+                        if (AuraEffect const* aurEff = m_caster->GetAuraEffect(92596, EFFECT_0))
+                            damage = aurEff->GetAmount();
+                        break;
                     // Consumption
                     case 28865:
                         damage = (((InstanceMap*)m_caster->GetMap())->GetDifficulty() == REGULAR_DIFFICULTY ? 2750 : 4250);
@@ -2614,6 +2619,13 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
                     AddPct(damage, 25);
             break;
         }
+        case 92601: // Detonate Mana, Tyrande's Favorite Doll
+            if (AuraEffect const* aurEff = m_caster->GetAuraEffect(92596, EFFECT_0))
+            {
+                damage = aurEff->GetAmount();
+                m_caster->RemoveAurasDueToSpell(92596);
+            }
+            break;
         default:
             break;
     }

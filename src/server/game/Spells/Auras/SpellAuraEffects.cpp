@@ -6102,6 +6102,12 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
         case SPELLFAMILY_GENERIC:
             switch (GetId())
             {
+                case 91296: // Egg Shell, Corrupted Egg Shell
+                    GetCaster()->CastSpell(GetCaster(), 91306, true);
+                    break;
+                case 91308: // Egg Shell, Corrupted Egg Shell (H)
+                    GetCaster()->CastSpell(GetCaster(), 91311, true);
+                    break;
                 case 76691: // Vengeance tank mastery
                 {
                     int32 basepoints0 = GetBase()->GetEffect(0)->GetAmount() - GetAmount();

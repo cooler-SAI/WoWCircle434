@@ -7139,6 +7139,30 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             switch (dummySpell->Id)
             {
+                // Item - Collecting Mana, Tyrande's Favirite Doll
+                case 92272:
+                {
+                    if (procSpell && procSpell->ManaCostPercentage)
+                    {
+                        uint32 maxmana = 4200;
+                        uint32 mana = int32(0.2f * CalculatePct(GetCreateMana(), procSpell->ManaCostPercentage));
+                        if (AuraEffect* aurEff = GetAuraEffect(92596, EFFECT_0))
+                        {
+                            int32 oldamount = aurEff->GetAmount();
+                            if (oldamount < maxmana)
+                            {
+                                int32 newamount = std::min(maxmana, (oldamount + mana));
+                                aurEff->ChangeAmount(newamount);
+                            }
+                        }
+                        else
+                        {
+                            int32 bp = std::min(mana, maxmana);
+                            CastCustomSpell(this, 92596, &bp, 0, 0, true);
+                        }
+                    }
+                    break;
+                }
                 // Guarded by the Light
                 case 85646:
                 {
@@ -8960,6 +8984,16 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        case 90998: // Song of Sorrow, Sorrowsong
+        case 91003: // Song of Sorrow, Sorrowsong (H)
+        case 92180: // Item - Proc Armor, Leaden Despair
+        case 92185: // Item - Proc Armor, Leaden Despair (H)
+        case 92236: // Item - Proc Mastery Below 35%, Symbiotic Worm
+        case 92356: // Item - Proc Mastery Below 35%, Symbiotic Worm (H)
+        case 92234: // Item - Proc Dodge Below 35%, Bedrock Talisman
+            if (!HealthBelowPct(35) && !HealthBelowPctDamaged(35, damage))
+                return false;
+            break;
         // Frostburn Formula
         case 96325:
             if (victim->getLevel() > 85)

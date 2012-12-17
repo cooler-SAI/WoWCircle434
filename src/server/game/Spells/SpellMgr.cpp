@@ -5352,6 +5352,10 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_ROOT;
                 spellInfo->Effects[EFFECT_0].BasePoints = 0;
                 break;
+            // Detonate Mana, Tyrande's Favorite Doll
+            case 92601:
+                spellInfo->CasterAuraSpell = 92596;
+                break;
             default:
                 break;
         }
