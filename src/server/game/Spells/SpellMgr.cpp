@@ -5310,6 +5310,14 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
                 spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
                 break;
+            // Detterence
+            case 19263:
+                spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_MOD_PACIFY;
+                break;
+            // Multishot
+            case 2643: 
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(14);
             default:
                 break;
         }

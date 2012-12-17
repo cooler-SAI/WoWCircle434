@@ -6957,7 +6957,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 3560: // Rapid Recuperation
                 {
                     // This effect only from Rapid Killing (focus regen)
-                    if (!(procSpell->SpellFamilyFlags[1] & 0x01000000))
+                    if (!(procSpell->Id == 35098 || procSpell->Id == 35099))
                         return false;
 
                     target = this;
@@ -7030,6 +7030,20 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                     triggered_spell_id = 76663;
                     basepoints0 = 0;
+                }
+                // Sic 'Em! (Rank 1)
+                case 83340:
+                {
+                    triggered_spell_id = 83359;
+                    target = this;
+                    break;
+                }
+                // Sic 'Em! (Rank 2)
+                case 83356:
+                {
+                    triggered_spell_id = 89388;
+                    target = this;
+                    break;
                 }
             }
             break;
