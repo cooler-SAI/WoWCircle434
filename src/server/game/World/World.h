@@ -264,6 +264,8 @@ enum WorldIntConfigs
     CONFIG_GROUP_VISIBILITY,
     CONFIG_MAIL_DELIVERY_DELAY,
     CONFIG_UPTIME_UPDATE,
+    CONFIG_EXTERNAL_MAIL,
+    CONFIG_EXTERNAL_MAIL_INTERVAL,
     CONFIG_SKILL_CHANCE_ORANGE,
     CONFIG_SKILL_CHANCE_YELLOW,
     CONFIG_SKILL_CHANCE_GREEN,
@@ -837,6 +839,7 @@ class World
         time_t m_startTime;
         time_t m_gameTime;
         IntervalTimer m_timers[WUPDATE_COUNT];
+        IntervalTimer extmail_timer;
         time_t mail_timer;
         time_t mail_timer_expires;
         uint32 m_updateTime, m_updateTimeSum;
