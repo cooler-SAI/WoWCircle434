@@ -285,7 +285,7 @@ void WorldSession::SendExternalMails()
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
-    QueryResult result = CharacterDatabase.Query("SELECT id,receiver,subject,message,money FROM mail_external WHERE sent=0");
+    QueryResult result = CharacterDatabase.Query("SELECT id, receiver, subject, message, money FROM mail_external WHERE sent = 0");
     if (!result)
     {
         sLog->outInfo(LOG_FILTER_WORLDSERVER, "EXTERNAL MAIL> No mails in queue...");
@@ -294,12 +294,11 @@ void WorldSession::SendExternalMails()
     }
     else
     {
-        uint32 last_id = 0;
         MailDraft* draft = NULL;
         do
         {
             Field *fields = result->Fetch();
-            uint32 id = fields[0].GetUInt32();
+            uint64 id = fields[0].GetUInt64();
             uint64 receiver_guid = fields[1].GetUInt64();
             std::string subject = fields[2].GetString();
             std::string body = fields[3].GetString();
@@ -309,30 +308,30 @@ void WorldSession::SendExternalMails()
             {
                 sLog->outInfo(LOG_FILTER_WORLDSERVER, "EXTERNAL MAIL> Send Mail %u to Player %u...", id, receiver_guid);
                 subject = !subject.empty() ? subject : "Support Message";
-                draft = new MailDraft( subject, body );
-                QueryResult result2 = CharacterDatabase.PQuery("SELECT item,count FROM mail_external_items WHERE mail_id = '%u'", id);
+                draft = new MailDraft(subject, body);
+                QueryResult result2 = CharacterDatabase.PQuery("SELECT item, count FROM mail_external_items WHERE mail_id = '%u'", id);
                 if (result2)
                 {
                     do
                     {
                         Field *itemfields = result2->Fetch();
-                        uint32 ItemID = itemfields[0].GetUInt32();
-                        uint32 ItemCount = itemfields[1].GetUInt32();
+                        uint64 ItemID = itemfields[0].GetUInt64();
+                        uint64 ItemCount = itemfields[1].GetUInt64();
                         Item* ToMailItem = ItemID ? Item::CreateItem(ItemID, ItemCount, receiver) : NULL;
                         if (ToMailItem)
                         {
                             ToMailItem->SaveToDB(trans);
                             draft->AddItem(ToMailItem);
                         }
-                    }while(result2->NextRow());
+                    } while(result2->NextRow());
                 }
                 if (money)
                     draft->AddMoney(money);
 
-                draft->SendMailTo(trans,MailReceiver(receiver), MailSender(MAIL_NORMAL, 0, MAIL_STATIONERY_GM),      MAIL_CHECK_MASK_RETURNED);
+                draft->SendMailTo(trans, MailReceiver(receiver), MailSender(MAIL_NORMAL, 0, MAIL_STATIONERY_GM),      MAIL_CHECK_MASK_RETURNED);
                 //SendMailTo(trans,MailReceiver(receiver,receiver_guid), MailSender(MAIL_NORMAL, sender_guid), MAIL_CHECK_MASK_RETURNED, deliver_delay);
 
-                CharacterDatabase.PExecute("UPDATE mail_external SET sent=1 WHERE id='%u'", id);
+                CharacterDatabase.PExecute("UPDATE mail_external SET sent = 1 WHERE id = '%u'", id);
                 //delete result2;
             }
 
