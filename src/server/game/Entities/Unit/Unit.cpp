@@ -11070,8 +11070,20 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
     // From caster spells
     AuraEffectList const& mOwnerTaken = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_FROM_CASTER);
     for (AuraEffectList::const_iterator i = mOwnerTaken.begin(); i != mOwnerTaken.end(); ++i)
-        if ((*i)->GetCasterGUID() == caster->GetGUID() && (*i)->IsAffectingSpell(spellProto))
-            AddPct(TakenTotalMod, (*i)->GetAmount());
+        if ((*i)->GetCasterGUID() == caster->GetGUID())
+        {
+            switch ((*i)->GetId())
+            {
+                // Vendetta, should affect to all damage
+                case 79140:
+                    AddPct(TakenTotalMod, (*i)->GetAmount());
+                    break;
+                default:
+                    if ((*i)->IsAffectingSpell(spellProto))
+                        AddPct(TakenTotalMod, (*i)->GetAmount());
+                    break;
+            }
+        }
 
     // Mod damage from spell mechanic
     if (uint32 mechanicMask = spellProto->GetAllEffectsMechanicMask())
@@ -12127,8 +12139,20 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
         // From caster spells
         AuraEffectList const& mOwnerTaken = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_FROM_CASTER);
         for (AuraEffectList::const_iterator i = mOwnerTaken.begin(); i != mOwnerTaken.end(); ++i)
-            if ((*i)->GetCasterGUID() == attacker->GetGUID() && (*i)->IsAffectingSpell(spellProto))
-                AddPct(TakenTotalMod, (*i)->GetAmount());
+            if ((*i)->GetCasterGUID() == attacker->GetGUID())
+            {
+                switch ((*i)->GetId())
+                {
+                    // Vendetta, should affect to all damage
+                    case 79140:
+                        AddPct(TakenTotalMod, (*i)->GetAmount());
+                        break;
+                    default:
+                        if ((*i)->IsAffectingSpell(spellProto))
+                            AddPct(TakenTotalMod, (*i)->GetAmount());
+                        break;
+                }
+            }
 
         // Mod damage from spell mechanic
         uint32 mechanicMask = spellProto->GetAllEffectsMechanicMask();

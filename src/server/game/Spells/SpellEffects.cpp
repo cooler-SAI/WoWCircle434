@@ -4054,7 +4054,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             else if (m_spellInfo->Id == 53)
             {
                 // Murderous Intent
-                if (unitTarget->HealthAbovePct(35) || effIndex != 0)
+                if (unitTarget->HealthAbovePct(35) || effIndex != EFFECT_1)
                     break;
 
                 if (AuraEffect const* aurEff = m_caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_ROGUE, 134, 0))
