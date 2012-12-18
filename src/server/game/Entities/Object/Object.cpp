@@ -622,8 +622,8 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     //        *data << uint16(animKit3);
     //}
 
-    if ((flags & UPDATEFLAG_TRANSPORT) && wo)
-        *data << uint32(wo->m_movementInfo.t_time);
+    if (flags & UPDATEFLAG_TRANSPORT)
+        *data << uint32(getMSTime());
 }
 
 void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* updateMask, Player* target) const
