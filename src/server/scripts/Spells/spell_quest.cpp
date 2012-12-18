@@ -1485,6 +1485,38 @@ class spell_q11010_q11102_q11023_q11008_check_fly_mount : public SpellScriptLoad
         }
 };
 
+/*
+Many quest those require spell cast on trainng dummies: 
+*/
+class spell_quests_spell_hit : public SpellScriptLoader
+{
+    public:
+        spell_quests_spell_hit() : SpellScriptLoader("spell_quests_spell_hit") { }
+
+        class spell_quests_spell_hit_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_quests_spell_hit_SpellScript)
+
+            void HandleDummy()
+            {
+                if (GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER)
+                {
+                    GetCaster()->ToPlayer()->KilledMonsterCredit(44175, 0);
+                }
+            }
+
+            void Register()
+            {
+                OnCast += SpellCastFn(spell_quests_spell_hit_SpellScript::HandleDummy);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_quests_spell_hit_SpellScript();
+        }
+};
+
 void AddSC_quest_spell_scripts()
 {
     new spell_q55_sacred_cleansing();
@@ -1521,4 +1553,5 @@ void AddSC_quest_spell_scripts()
     new spell_q11010_q11102_q11023_aggro_burst();
     new spell_q11010_q11102_q11023_choose_loc();
     new spell_q11010_q11102_q11023_q11008_check_fly_mount();
+    new spell_quests_spell_hit();
 }
