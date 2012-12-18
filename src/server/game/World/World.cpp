@@ -517,6 +517,7 @@ void World::LoadConfigSettings(bool reload)
         sLog->outError(LOG_FILTER_SERVER_LOADING, "Rate.Talent (%f) must be > 0. Using 1 instead.", rate_values[RATE_TALENT]);
         rate_values[RATE_TALENT] = 1.0f;
     }
+    rate_values[RATE_ONLINE] = ConfigMgr::GetFloatDefault("Rate.Online", 1.47f);
     rate_values[RATE_MOVESPEED] = ConfigMgr::GetFloatDefault("Rate.MoveSpeed", 1.0f);
     if (rate_values[RATE_MOVESPEED] < 0)
     {
@@ -2390,30 +2391,30 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, std::string dura
     ///- Update the database with ban information
     switch (mode)
     {
-        case BAN_IP:
+         case BAN_IP:
             // No SQL injection with prepared statements
-            stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_ACCOUNT_BY_IP);
+           stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_ACCOUNT_BY_IP);
             stmt->setString(0, nameOrIP);
             resultAccounts = LoginDatabase.Query(stmt);
             stmt = LoginDatabase.GetPreparedStatement<4>(LOGIN_INS_IP_BANNED);
             stmt->setString(0, nameOrIP);
             stmt->setUInt32(1, duration_secs);
-            stmt->setString(2, author);
+           stmt->setString(2, author);
             stmt->setString(3, reason);
             LoginDatabase.Execute(stmt);
-            break;
-        case BAN_ACCOUNT:
+             break;
+         case BAN_ACCOUNT:
             // No SQL injection with prepared statements
             stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_ACCOUNT_ID_BY_NAME);
             stmt->setString(0, nameOrIP);
             resultAccounts = LoginDatabase.Query(stmt);
-            break;
-        case BAN_CHARACTER:
+             break;
+         case BAN_CHARACTER:
             // No SQL injection with prepared statements
             stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_ACCOUNT_BY_NAME);
             stmt->setString(0, nameOrIP);
             resultAccounts = CharacterDatabase.Query(stmt);
-            break;
+             break;
         default:
             return BAN_SYNTAX_ERROR;
     }
@@ -2897,11 +2898,8 @@ void World::ResetCurrencyWeekCap()
 
 void World::LoadDBAllowedSecurityLevel()
 {
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_REALMLIST_SECURITY_LEVEL);
-    stmt->setInt32(0, int32(realmID));
-    PreparedQueryResult result = LoginDatabase.Query(stmt);
-
-    if (result)
+     QueryResult result = LoginDatabase.PQuery("SELECT allowedSecurityLevel from realmlist WHERE id = '%d'", realmID);
+     if (result)
         SetPlayerSecurityLimit(AccountTypes(result->Fetch()->GetUInt8()));
 }
 

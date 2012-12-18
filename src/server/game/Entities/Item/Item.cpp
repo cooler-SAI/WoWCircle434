@@ -1014,7 +1014,9 @@ Item* Item::CreateItem(uint32 item, uint32 count, Player const* player)
             delete pItem;
     }
     else
-        ASSERT(false);
+    {
+	 sLog->outError(LOG_FILTER_SQL, "Item::CreateItem Unknown prototype for item %u", item);
+    }
     return NULL;
 }
 
