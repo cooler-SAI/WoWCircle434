@@ -18602,9 +18602,12 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     if (!m_vehicle)
         return;
 
+    bool playerOnTransport = false;
     m_vehicle->RemovePassenger(this);
 
     Player* player = ToPlayer();
+    if (player && player->GetTransport())
+        playerOnTransport = true;
 
     // If player is on mouted duel and exits the mount should immediatly lose the duel
     if (player && player->duel && player->duel->isMounted)
@@ -18650,11 +18653,16 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         SendMessageToSet(&data, false);
     }
 
-    Movement::MoveSplineInit init(*this);
-    init.MoveTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
-    init.SetFacing(GetOrientation());
-    init.SetTransportExit();
-    init.Launch();
+    if (!playerOnTransport)
+    {
+        Movement::MoveSplineInit init(*this);
+        init.MoveTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
+        init.SetFacing(GetOrientation());
+        init.SetTransportExit();
+        init.Launch();
+    }
+    else
+        player->Relocate(pos);
 
     //GetMotionMaster()->MoveFall();            // Enable this once passenger positions are calculater properly (see above)
 
