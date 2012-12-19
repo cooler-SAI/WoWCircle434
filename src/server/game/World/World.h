@@ -704,7 +704,7 @@ class World
         static bool IsStopped() { return m_stopEvent.value(); }
         static bool IsVisualStudioAttached()
         {
-            #if defined(_WI32) || defined(_WIN64)
+            #if defined(_WIN32) || defined(_WIN64)
             if (IsDebuggerPresent())
                 return true;
             #endif
