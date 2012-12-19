@@ -220,7 +220,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
 
             break;
         case HUNTER_PET:
-            SetUInt32Value(UNIT_FIELD_BYTES_0, 0x02020100); // class = warrior, gender = none, power = focus
+            SetUInt32Value(UNIT_FIELD_BYTES_0, CLASS_HUNTER << 8); // class = hunter, gender = none
             SetSheath(SHEATH_STATE_MELEE);
             SetByteFlag(UNIT_FIELD_BYTES_2, 2, fields[9].GetBool() ? UNIT_CAN_BE_ABANDONED : UNIT_CAN_BE_RENAMED | UNIT_CAN_BE_ABANDONED);
 
@@ -576,8 +576,8 @@ void Pet::Update(uint32 diff)
             //regenerate focus for hunter pets or energy for deathknight's ghoul
             if (m_regenTimer)
             {
-                if (m_regenTimer > diff)
-                    m_regenTimer -= diff;
+                if (m_regenTimer > int32(diff))
+                    m_regenTimer -= int32(diff);
                 else
                 {
                     switch (getPowerType())
