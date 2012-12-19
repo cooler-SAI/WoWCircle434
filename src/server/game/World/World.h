@@ -702,6 +702,15 @@ class World
         static uint8 GetExitCode() { return m_ExitCode; }
         static void StopNow(uint8 exitcode) { m_stopEvent = true; m_ExitCode = exitcode; }
         static bool IsStopped() { return m_stopEvent.value(); }
+        static bool IsVisualStudioAttached()
+        {
+            #if defined(_WI32) || defined(_WIN64)
+            if (IsDebuggerPresent())
+                return true;
+            #endif
+
+            return false;
+        }
 
         void Update(uint32 diff);
 

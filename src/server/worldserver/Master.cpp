@@ -89,7 +89,8 @@ public:
         w_loops = 0;
         m_lastchange = 0;
         w_lastchange = 0;
-        while (!World::IsStopped())
+
+        while (!World::IsStopped() && !World::IsVisualStudioAttached())
         {
             ACE_Based::Thread::Sleep(1000);
             uint32 curtime = getMSTime();

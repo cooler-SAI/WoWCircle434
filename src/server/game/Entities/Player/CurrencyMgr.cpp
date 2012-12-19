@@ -139,7 +139,7 @@ void Player::ModifyCurrencyFlag(uint32 id, uint8 flag)
         _currencyStorage[id].state = PLAYERCURRENCY_CHANGED;
 }
 
-void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bool ignoreMultipliers/* = false*/)
+void Player::ModifyCurrency(uint32 id, int32 count, bool printLog /* = true */, bool ignoreMultipliers /* = false */, bool ignoreLimit /* = false */)
 {
     if (!count)
         return;
@@ -171,33 +171,41 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
 
     // count can't be more then weekCap if used (weekCap > 0)
     uint32 weekCap = _GetCurrencyWeekCap(currency);
-    if (weekCap && count > int32(weekCap))
+    if (!ignoreLimit && weekCap && count > int32(weekCap))
         count = weekCap;
 
     int32 newTotalCount = int32(oldTotalCount) + count;
-    if (newTotalCount < 0)
-        newTotalCount = 0;
+    int32 newWeekCount = 0;
 
-    int32 newWeekCount = int32(oldWeekCount) + (count > 0 ? count : 0);
-    if (newWeekCount < 0)
-        newWeekCount = 0;
+    if ( !ignoreLimit && count > 0 )
+        newWeekCount = int32(oldWeekCount) + count;
+    else
+        newWeekCount = int32(oldWeekCount);
 
     //ASSERT(weekCap >= oldWeekCount);
-
-    // if we get more then weekCap just set to limit
-    if (weekCap && int32(weekCap) < newWeekCount)
+    
+    if ( !ignoreLimit )
     {
-        newWeekCount = int32(weekCap);
-        // weekCap - oldWeekCount alwayt >= 0 as we set limit before!
-        newTotalCount = oldTotalCount + (weekCap - oldWeekCount);
+        // if we get more then weekCap just set to limit
+        if (weekCap && int32(weekCap) < newWeekCount)
+        {
+            newWeekCount = int32(weekCap);
+            // weekCap - oldWeekCount alwayt >= 0 as we set limit before!
+            newTotalCount = oldTotalCount + (weekCap - oldWeekCount);
+        }
+
+        // if we get more then totalCap set to maximum;
+        if (currency->TotalCap && int32(currency->TotalCap) < newTotalCount)
+        {
+            newTotalCount = int32(currency->TotalCap);
+            newWeekCount = weekCap;
+        }
     }
 
-    // if we get more then totalCap set to maximum;
-    if (currency->TotalCap && int32(currency->TotalCap) < newTotalCount)
-    {
-        newTotalCount = int32(currency->TotalCap);
-        newWeekCount = weekCap;
-    }
+    if (newWeekCount < 0)
+        newWeekCount = 0;
+    if (newTotalCount < 0)
+        newTotalCount = 0;
 
     if (uint32(newTotalCount) != oldTotalCount)
     {
@@ -210,7 +218,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
         // probably excessive checks
         if (IsInWorld() && !GetSession()->PlayerLoading())
         {
-            if (count > 0)
+            if (!ignoreLimit && count > 0)
                 UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CURRENCY, id, count);
 
             if (currency->Category == CURRENCY_CATEGORY_META_CONQUEST)
@@ -224,7 +232,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog/* = true*/, bo
             }
 
             // on new case just set init.
-            if(itr->second.state == PLAYERCURRENCY_NEW)
+            if (itr->second.state == PLAYERCURRENCY_NEW)
             {
                 SendNewCurrency(id);
                 return;

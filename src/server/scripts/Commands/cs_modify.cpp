@@ -532,6 +532,9 @@ public:
 
         Player* target = handler->getSelectedPlayer();
         if (!target)
+            target = handler->GetSession()->GetPlayer();
+
+        if (!target)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
             handler->SetSentErrorMessage(true);
@@ -1160,10 +1163,11 @@ public:
             return false;
 
         int32 amount = (uint32)atoi(args);
+        amount *= 100;
+        target->ModifyCurrency(CURRENCY_TYPE_HONOR_POINTS, amount, true, true, true);
 
-        target->ModifyCurrency(CURRENCY_TYPE_HONOR_POINTS, amount, true, true);
-
-        handler->PSendSysMessage(LANG_COMMAND_MODIFY_HONOR, handler->GetNameLink(target).c_str(), target->GetCurrency(CURRENCY_TYPE_HONOR_POINTS, false));
+        uint32 totalCurrency = target->GetCurrency(CURRENCY_TYPE_HONOR_POINTS, false) / 100;
+        handler->PSendSysMessage(LANG_COMMAND_MODIFY_HONOR, handler->GetNameLink(target).c_str(), totalCurrency);
 
         return true;
     }
