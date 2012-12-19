@@ -4089,29 +4089,26 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 {
                     if (roll_chance_i(aur->GetAmount()))
                     {
-                        for (uint8 i = EQUIPMENT_SLOT_MAINHAND; i < EQUIPMENT_SLOT_RANGED; ++i)
+                        Item * item = m_caster->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+                        if (!item)
+                            break;
+
+                        uint32 enchant_id = item->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT);
+                        SpellItemEnchantmentEntry const *pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+                        if (!pEnchant)
+                            break;
+
+                        // seek for needed enchantment
+                        for (uint8 s = 0; s < MAX_ITEM_ENCHANTMENT_EFFECTS; ++s)
                         {
-                            Item * item = m_caster->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-                            if (!item)
+                            if (pEnchant->type[s] != ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
                                 continue;
 
-                            uint32 enchant_id = item->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT);
-                            SpellItemEnchantmentEntry const *pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
-                            if (!pEnchant)
+                            if (!sSpellStore.LookupEntry(pEnchant->spellid[s]))
                                 continue;
 
-                            // seek for needed enchantment
-                            for (uint8 s = 0; s < MAX_ITEM_ENCHANTMENT_EFFECTS; ++s)
-                            {
-                                if (pEnchant->type[s] != ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
-                                    continue;
-
-                                if (!sSpellStore.LookupEntry(pEnchant->spellid[s]))
-                                    continue;
-
-                                m_caster->CastSpell(unitTarget, pEnchant->spellid[s], true, item, aur, m_caster->GetGUID());
-                                break;
-                            }
+                            m_caster->CastSpell(unitTarget, pEnchant->spellid[s], true, item, aur, m_caster->GetGUID());
+                            break;
                         }
                     }
                 }
