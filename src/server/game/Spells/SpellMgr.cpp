@@ -5356,6 +5356,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 92601:
                 spellInfo->CasterAuraSpell = 92596;
                 break;
+            // Eye for an Eye
+            case 25988:
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
+                break;
             default:
                 break;
         }
