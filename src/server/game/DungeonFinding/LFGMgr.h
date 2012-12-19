@@ -88,24 +88,24 @@ enum LfgTeleportError
 /// Queue join results
 enum LfgJoinResult
 {
-    // 3 = No client reaction | 18 = "Rolecheck failed"
-    LFG_JOIN_OK                                  = 31,      // Joined (no client msg)
-    LFG_JOIN_FAILED                              = 1,      // RoleCheck Failed
-    LFG_JOIN_GROUPFULL                           = 2,      // Your group is full
-    LFG_JOIN_INTERNAL_ERROR                      = 4,      // Internal LFG Error
-    LFG_JOIN_NOT_MEET_REQS                       = 5,      // You do not meet the requirements for the chosen dungeons
-    LFG_JOIN_PARTY_NOT_MEET_REQS                 = 6,      // One or more party members do not meet the requirements for the chosen dungeons
-    LFG_JOIN_MIXED_RAID_DUNGEON                  = 7,      // You cannot mix dungeons, raids, and random when picking dungeons
-    LFG_JOIN_MULTI_REALM                         = 8,      // The dungeon you chose does not support players from multiple realms
-    LFG_JOIN_DISCONNECTED                        = 9,      // One or more party members are pending invites or disconnected
-    LFG_JOIN_PARTY_INFO_FAILED                   = 10,     // Could not retrieve information about some party members
-    LFG_JOIN_DUNGEON_INVALID                     = 11,     // One or more dungeons was not valid
-    LFG_JOIN_DESERTER                            = 12,     // You can not queue for dungeons until your deserter debuff wears off
-    LFG_JOIN_PARTY_DESERTER                      = 13,     // One or more party members has a deserter debuff
-    LFG_JOIN_RANDOM_COOLDOWN                     = 14,     // You can not queue for random dungeons while on random dungeon cooldown
-    LFG_JOIN_PARTY_RANDOM_COOLDOWN               = 15,     // One or more party members are on random dungeon cooldown
-    LFG_JOIN_TOO_MUCH_MEMBERS                    = 16,     // You can not enter dungeons with more that 5 party members
-    LFG_JOIN_USING_BG_SYSTEM                     = 17      // You can not use the dungeon system while in BG or arenas
+    // 29 = No client reaction | 43 = "Rolecheck failed"
+    LFG_JOIN_OK                                  = 26,     // Joined (no client msg)
+    LFG_JOIN_FAILED                              = 27,     // RoleCheck Failed
+    LFG_JOIN_GROUPFULL                           = 28,     // Your group is full
+    LFG_JOIN_INTERNAL_ERROR                      = 30,     // Internal LFG Error
+    LFG_JOIN_NOT_MEET_REQS                       = 31,     // You do not meet the requirements for the chosen dungeons
+    LFG_JOIN_PARTY_NOT_MEET_REQS                 = 6,      // One or more party members do not meet the requirements for the chosen dungeons --- Unknown new value in 4.3.4 - deprecated?
+    LFG_JOIN_MIXED_RAID_DUNGEON                  = 32,     // You cannot mix dungeons, raids, and random when picking dungeons
+    LFG_JOIN_MULTI_REALM                         = 33,     // The dungeon you chose does not support players from multiple realms
+    LFG_JOIN_DISCONNECTED                        = 34,     // One or more party members are pending invites or disconnected
+    LFG_JOIN_PARTY_INFO_FAILED                   = 35,     // Could not retrieve information about some party members
+    LFG_JOIN_DUNGEON_INVALID                     = 36,     // One or more dungeons was not valid
+    LFG_JOIN_DESERTER                            = 37,     // You can not queue for dungeons until your deserter debuff wears off
+    LFG_JOIN_PARTY_DESERTER                      = 38,     // One or more party members has a deserter debuff
+    LFG_JOIN_RANDOM_COOLDOWN                     = 39,     // You can not queue for random dungeons while on random dungeon cooldown
+    LFG_JOIN_PARTY_RANDOM_COOLDOWN               = 40,     // One or more party members are on random dungeon cooldown
+    LFG_JOIN_TOO_MUCH_MEMBERS                    = 41,     // You can not enter dungeons with more that 5 party members
+    LFG_JOIN_USING_BG_SYSTEM                     = 42,     // You can not use the dungeon system while in BG or arenas
 };
 
 /// Role check states

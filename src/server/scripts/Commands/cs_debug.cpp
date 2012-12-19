@@ -32,6 +32,7 @@ EndScriptData */
 #include "GridNotifiersImpl.h"
 #include "GossipDef.h"
 #include "CurrencyMgr.h"
+#include "LFGMgr.h"
 
 #include <fstream>
 
@@ -66,6 +67,8 @@ public:
             { "catCooldown",    SEC_ADMINISTRATOR,  false, &HandleDebugSendCategoryCooldownCommand,      "", NULL },
             { "mountresult",    SEC_ADMINISTRATOR,  false, &HandleDebugSendMountResultCommand,    "", NULL },
             { "messagebox",     SEC_ADMINISTRATOR,  false, &HandleDebugSendMessageBoxCommand,     "", NULL },
+            { "joinresult",     SEC_ADMINISTRATOR,  false, &HandleDebugSendLfgJoinResultCommand,  "", NULL },
+            { "rolecheckstate", SEC_ADMINISTRATOR,  false, &HandleDebugSendLfgRoleCheckStateCommand, "", NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                                  "", NULL }
         };
 
@@ -267,6 +270,34 @@ public:
 
         MountResult error = MountResult(atoi(result));
         handler->GetSession()->GetPlayer()->SendMountResult(error);
+        return true;
+    }
+
+    static bool HandleDebugSendLfgJoinResultCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* result = strtok((char*)args, " ");
+        if (!result)
+            return false;
+
+        LfgJoinResult error = LfgJoinResult(atoi(result));
+        handler->GetSession()->SendLfgJoinResult(handler->GetSession()->GetPlayer()->GetGUID(), 0, LfgJoinResultData(error));
+        return true;
+    }
+
+    static bool HandleDebugSendLfgRoleCheckStateCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* result = strtok((char*)args, " ");
+        if (!result)
+            return false;
+
+        LfgRoleCheckState error = LfgRoleCheckState(atoi(result));
+        handler->GetSession()->SendLfgJoinResult(handler->GetSession()->GetPlayer()->GetGUID(), 0, LfgJoinResultData(LFG_JOIN_OK, error));
         return true;
     }
 
