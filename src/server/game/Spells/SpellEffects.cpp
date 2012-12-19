@@ -1211,6 +1211,10 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     }
                     break;
                 }
+                // Scatter Shot
+                case 37506:
+                    m_caster->SendMeleeAttackStop(unitTarget);
+                    break;
             }
             break;
         case SPELLFAMILY_MAGE:
