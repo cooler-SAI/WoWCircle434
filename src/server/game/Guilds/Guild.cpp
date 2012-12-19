@@ -1320,10 +1320,10 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
     {
         Member* member = itr->second;
         Player* player = member->FindPlayer();
-        size_t pubNoteLength = member->GetPublicNote().length();
-        size_t offNoteLength = member->GetOfficerNote().length();
-
+        uint32 pubNoteLength = uint32(member->GetPublicNote().length());
+        uint32 offNoteLength = uint32(member->GetOfficerNote().length());
         uint32 nameSize = uint32(member->GetName().length());
+
         ObjectGuid guid = member->GetGUID();
         data.WriteByteMask(guid[3]);
         data.WriteByteMask(guid[4]);
@@ -1366,7 +1366,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         memberData.WriteByteSeq(guid[7]);
         memberData << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP) - member->GetWeeklyReputation());// Remaining guild week Rep
 
-        memberData << WriteBuffer(member->GetPublicNote().c_str(), uint32(pubNoteLength));
+        memberData << WriteBuffer(member->GetPublicNote().c_str(), pubNoteLength);
 
         memberData.WriteByteSeq(guid[3]);
         memberData << uint8(player ? player->getLevel() : member->GetLevel());
@@ -1377,17 +1377,17 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         memberData.WriteByteSeq(guid[1]);
         memberData << float(player ? 0.0f : float(::time(NULL) - member->GetLogoutTime()) / DAY);
 
-        memberData << WriteBuffer(member->GetOfficerNote().c_str(), uint32(offNoteLength));
+        memberData << WriteBuffer(member->GetOfficerNote().c_str(), offNoteLength);
         memberData.WriteByteSeq(guid[6]);
         memberData << WriteBuffer(member->GetName().c_str(), nameSize);
     }
 
-    size_t infoLength = m_info.length();
+    uint32 infoLength = uint32(m_info.length());
     data.WriteBits(infoLength, 12);
 
     data.append(memberData);
 
-    data << WriteBuffer(m_info.c_str(), uint32(infoLength));
+    data << WriteBuffer(m_info.c_str(), infoLength);
     data << WriteBuffer(m_motd.c_str(), motdSize);
     data << uint32(m_accountsNumber);
     data << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP));
@@ -1460,9 +1460,8 @@ void Guild::HandleGuildRanks(WorldSession* session) const
 
         uint32 nameSize = uint32(rankInfo->GetName().length());
 
-        rankData
-                << WriteAsUnaligned<7>(nameSize)
-                << uint32(i);
+        data << WriteAsUnaligned<7>(nameSize);
+        rankData << uint32(i);
 
         for (uint8 j = 0; j < GUILD_BANK_MAX_TABS; ++j)
         {
@@ -1697,7 +1696,7 @@ void Guild::HandleInviteMember(WorldSession* session, const std::string& name)
 
     uint32 guildNameSize = uint32(pInvitee->GetGuildName().length());
     uint32 m_nameSize = uint32(m_name.length());
-    uint32 playerNameSize = uint32(strlen(player->GetName()));
+    uint32 playerNameSize = uint32(name.length());
     
     data.WriteByteMask(newGuildGuid[3]);
     data.WriteByteMask(newGuildGuid[2]);
@@ -1731,7 +1730,7 @@ void Guild::HandleInviteMember(WorldSession* session, const std::string& name)
     data.WriteByteSeq(newGuildGuid[7]);
     data.WriteByteSeq(newGuildGuid[2]);
 
-    data << WriteBuffer(player->GetName(), playerNameSize);
+    data << WriteBuffer(name.c_str(), playerNameSize);
 
     data.WriteByteSeq(oldGuildGuid[7]);
     data.WriteByteSeq(oldGuildGuid[6]);
