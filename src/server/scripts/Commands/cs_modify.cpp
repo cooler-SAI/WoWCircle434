@@ -1164,7 +1164,7 @@ public:
 
         int32 amount = (uint32)atoi(args);
         amount *= 100;
-        target->ModifyCurrency(CURRENCY_TYPE_HONOR_POINTS, amount, true, true, true);
+        target->ModifyCurrency(CURRENCY_TYPE_HONOR_POINTS, amount, true, true, false);
 
         uint32 totalCurrency = target->GetCurrency(CURRENCY_TYPE_HONOR_POINTS, false) / 100;
         handler->PSendSysMessage(LANG_COMMAND_MODIFY_HONOR, handler->GetNameLink(target).c_str(), totalCurrency);

@@ -7459,7 +7459,8 @@ void Player::_LoadCurrency(PreparedQueryResult result)
         cur.state = PLAYERCURRENCY_UNCHANGED;
         cur.weekCount = fields[1].GetUInt32();
         cur.totalCount = fields[2].GetUInt32();
-        cur.flags = fields[3].GetUInt8();
+        cur.seasonCount = fields[3].GetUInt32();
+        cur.flags = fields[4].GetUInt8();
 
         _currencyStorage.insert(PlayerCurrenciesMap::value_type(currencyID, cur));
 
@@ -7486,21 +7487,23 @@ void Player::_SaveCurrency(SQLTransaction& trans)
         switch(itr->second.state)
         {
             case PLAYERCURRENCY_NEW:
-                stmt = CharacterDatabase.GetPreparedStatement<5>(CHAR_REP_PLAYER_CURRENCY);
+                stmt = CharacterDatabase.GetPreparedStatement<6>(CHAR_REP_PLAYER_CURRENCY);
                 stmt->setUInt32(0, GetGUIDLow());
                 stmt->setUInt16(1, itr->first);
                 stmt->setUInt32(2, itr->second.weekCount);
                 stmt->setUInt32(3, itr->second.totalCount);
-                stmt->setUInt8(4, itr->second.flags);
+                stmt->setUInt32(4, itr->second.seasonCount);
+                stmt->setUInt8(5, itr->second.flags);
                 trans->Append(stmt);
                 break;
             case PLAYERCURRENCY_CHANGED:
-                stmt = CharacterDatabase.GetPreparedStatement<5>(CHAR_UPD_PLAYER_CURRENCY);
+                stmt = CharacterDatabase.GetPreparedStatement<6>(CHAR_UPD_PLAYER_CURRENCY);
                 stmt->setUInt32(0, itr->second.weekCount);
                 stmt->setUInt32(1, itr->second.totalCount);
-                stmt->setUInt8(2, itr->second.flags);
-                stmt->setUInt32(3, GetGUIDLow());
-                stmt->setUInt16(4, itr->first);
+                stmt->setUInt32(2, itr->second.seasonCount);
+                stmt->setUInt8(3, itr->second.flags);
+                stmt->setUInt32(4, GetGUIDLow());
+                stmt->setUInt16(5, itr->first);
                 trans->Append(stmt);
                 break;
             default:
@@ -26232,7 +26235,7 @@ void Player::RefundItem(Item* item)
         uint32 count = iece->RequiredCurrencyCount[i];
         if (currency && count)
         {
-            ModifyCurrency(currency, count, false, true);
+            ModifyCurrency(currency, count, false, true, true);
         }
     }
 

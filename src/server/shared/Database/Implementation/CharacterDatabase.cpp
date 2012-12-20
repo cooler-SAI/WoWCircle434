@@ -266,11 +266,10 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC)
 
     // Currency
-    PREPARE_STATEMENT(CHAR_SEL_PLAYER_CURRENCY, "SELECT currency, week_count, total_count, flags FROM character_currency WHERE guid = ?", CONNECTION_ASYNC);
-    PREPARE_STATEMENT(CHAR_UPD_PLAYER_CURRENCY, "UPDATE character_currency SET week_count = ?, total_count = ?, flags = ? WHERE guid = ? AND currency = ?", CONNECTION_ASYNC);
-    PREPARE_STATEMENT(CHAR_REP_PLAYER_CURRENCY, "REPLACE INTO character_currency (guid, currency, week_count, total_count, flags) VALUES (?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PREPARE_STATEMENT(CHAR_SEL_PLAYER_CURRENCY, "SELECT currency, week_count, total_count, season_count, flags FROM character_currency WHERE guid = ?", CONNECTION_ASYNC);
+    PREPARE_STATEMENT(CHAR_UPD_PLAYER_CURRENCY, "UPDATE character_currency SET week_count = ?, total_count = ?, season_count = ?, flags = ? WHERE guid = ? AND currency = ?", CONNECTION_ASYNC);
+    PREPARE_STATEMENT(CHAR_REP_PLAYER_CURRENCY, "REPLACE INTO character_currency (guid, currency, week_count, total_count, season_count, flags) VALUES (?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     
-
     // Currency Cap
     PREPARE_STATEMENT(CHAR_INS_PLAYER_CURRENCY_CAP, "INSERT INTO character_currency_cap (guid, highestArenaRating, highestRBgRating, currentArenaCap, currentRBgCap, requireReset) VALUES (?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC)
     PREPARE_STATEMENT(CHAR_REP_PLAYER_CURRENCY_CAP, "REPLACE INTO character_currency_cap (guid, highestArenaRating, highestRBgRating, currentArenaCap, currentRBgCap, requireReset) VALUES (?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
