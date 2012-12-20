@@ -63,16 +63,21 @@ void Player::SendCurrencies() const
         CurrencyTypesEntry const* entry = sCurrencyTypesStore.LookupEntry(itr->first);
         ASSERT(entry && "What the fack?");
 
+        uint32 Id = entry->ID;
+
         float precision = entry->GetPrecision();
 
         uint32 weekCount = itr->second.weekCount;
         uint32 weekCap = _GetCurrencyWeekCap(entry);
 
-        if (!sCurrencyMgr->IsPrecisionAreConsidered(entry->ID))
+        if (!sCurrencyMgr->IsPrecisionAreConsidered(Id))
         {
             weekCount /= 100;
             weekCap /= 100;
         }
+
+        if (Id == CURRENCY_TYPE_HONOR_POINTS)
+            weekCount = itr->second.totalCount / precision;
 
         packet
             .WriteBit(weekCount)
@@ -186,7 +191,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog /* = true */, 
     int32 newTotalCount = int32(oldTotalCount) + count;
     int32 newWeekCount = 0;
 
-    if (!ignoreLimit && (count > 0 || (id == CURRENCY_TYPE_HONOR_POINTS && !ignoreLimit)))
+    if (!ignoreLimit && count > 0)
         newWeekCount = int32(oldWeekCount) + count;
     else
         newWeekCount = int32(oldWeekCount);
@@ -215,6 +220,9 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog /* = true */, 
         newWeekCount = 0;
     if (newTotalCount < 0)
         newTotalCount = 0;
+
+    if (id == CURRENCY_TYPE_HONOR_POINTS)
+        newWeekCount = newTotalCount;
 
     if (uint32(newTotalCount) != oldTotalCount)
     {
@@ -394,7 +402,7 @@ void Player::SendPvpRewards()
     packet << GetBattlegroundCap();
     packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_ARENA, false);;
     packet << GetArenaCap();
-    packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_BG, false);
+    packet << uint32(0); // Rated battleground current cap, still don't need
     packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_ARENA, false);
     packet << GetMaximumCap();
     packet << GetMaximumCap();
