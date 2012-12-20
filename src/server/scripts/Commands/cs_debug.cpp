@@ -76,6 +76,7 @@ public:
         {
             { "reset",          SEC_ADMINISTRATOR,  false, &HandleDebugCapResetCommand,        "", NULL },
             { "updaterating",   SEC_ADMINISTRATOR,  false, &HandleDebugCapRatingCommand,       "", NULL },
+            { "pretendfinish",  SEC_ADMINISTRATOR,  false, &HandleDebugCapFinishCommand,       "", NULL }
         };
 
         static ChatCommand debugCommandTable[] =
@@ -1606,6 +1607,13 @@ public:
         player->ApplyRatingMod(CR_HIT_MELEE, Value, true);
         player->ApplyRatingMod(CR_HIT_RANGED, Value, true);
         player->ApplyRatingMod(CR_HIT_SPELL, Value, true);
+        return true;
+    }
+
+    static bool HandleDebugCapFinishCommand(ChatHandler* handler, const char* args)
+    {
+        handler->GetSession()->GetPlayer()->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_ARENA, sWorld->getIntConfig(CONFIG_CURRENCY_CONQUEST_POINTS_ARENA_REWARD));
+        handler->PSendSysMessage("Arena conquest points was modified...");
         return true;
     }
 };

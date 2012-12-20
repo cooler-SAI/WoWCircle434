@@ -877,7 +877,7 @@ void Battleground::EndBattleground(uint32 winner)
         player->RemoveAura(SPELL_HONORABLE_DEFENDER_60Y);
 
         // Reward winner team
-        if (team == winner)
+        if (!isArena() && team == winner)
         {
             if (IsRandom() || BattlegroundMgr::IsBGWeekend(GetTypeID()))
             {
@@ -916,7 +916,7 @@ void Battleground::EndBattleground(uint32 winner)
 
         BlockMovement(player);
 
-        sBattlegroundMgr->FinishPvpLogDataPacket(&pvpLogData, this, &buff, player);
+        sBattlegroundMgr->FinishAndSendPvpLogDataPacket(&pvpLogData, this, &buff, player);
 
         WorldPacket data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player, player->GetBattlegroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, player->GetBattlegroundQueueJoinTime(GetTypeID()), 0, GetArenaType());
@@ -1893,7 +1893,7 @@ void Battleground::PlayerAddedToBGCheckIfBGIsRunning(Player* player)
     BlockMovement(player);
 
     sBattlegroundMgr->BuildPvpLogDataPacket(&data, this, &buff);
-    sBattlegroundMgr->FinishPvpLogDataPacket(&data, this, &buff, player);
+    sBattlegroundMgr->FinishAndSendPvpLogDataPacket(&data, this, &buff, player);
 
     sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player, player->GetBattlegroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, player->GetBattlegroundQueueJoinTime(GetTypeID()), GetElapsedTime(), GetArenaType());
     player->GetSession()->SendPacket(&data);

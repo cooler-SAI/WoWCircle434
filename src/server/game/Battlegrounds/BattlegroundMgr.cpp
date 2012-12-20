@@ -549,7 +549,7 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg,
     data->WriteBit(bg->GetStatus() == STATUS_WAIT_LEAVE);    // If Ended
 }
 
-void BattlegroundMgr::FinishPvpLogDataPacket(WorldPacket* data, Battleground* bg, ByteBuffer* buff, Player* player)
+void BattlegroundMgr::FinishAndSendPvpLogDataPacket(WorldPacket* data, Battleground* bg, ByteBuffer* buff, Player* player)
 {
     ByteBuffer finishbuff = *buff;
     WorldPacket finishData = *data;
@@ -561,7 +561,7 @@ void BattlegroundMgr::FinishPvpLogDataPacket(WorldPacket* data, Battleground* bg
         finishData << uint32(matchmakingValue_first);    // Matchmaking Value 1
         finishData << uint32(0);                         // Think this field is not used (old field - mmr change, has been deleted after 4.3~)
         finishData << uint32(0);                         // Think this field is not used (old field - mmr change, has been deleted after 4.3~)
-        finishData << uint32(matchmakingValue_second);   // Matchmaking Value 1
+        finishData << uint32(matchmakingValue_second);   // Matchmaking Value 2
         finishData << uint32(0);                         // Think this field is not used (old field - mmr change, has been deleted after 4.3~)
         finishData << uint32(0);                         // Think this field is not used (old field - mmr change, has been deleted after 4.3~)
         sLog->outDebug(LOG_FILTER_BATTLEGROUND, "matchmaking rating values first team [ %d ], second team [ %d ]", matchmakingValue_first, matchmakingValue_second);

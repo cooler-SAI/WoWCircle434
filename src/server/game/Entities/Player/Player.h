@@ -2861,8 +2861,8 @@ class Player : public Unit, public GridObject<Player>
         void SetCurrency(uint32 id, uint32 count, bool printLog = true);
 
         uint32 GetCurrencyWeekCap(uint32 id, bool usePrecision) const;
-        uint32 GetArenaCap() { return m_currencyCap ? m_currencyCap->currentArenaCap : DEFAULT_ARENA_CAP; }
-        uint32 GetBattlegroundCap() { return m_currencyCap ? m_currencyCap->currentRBgCap : DEFAULT_ARENA_CAP; }
+        uint32 GetArenaCap() { return m_currencyCap && m_currencyCap->currentArenaCap? m_currencyCap->currentArenaCap : DEFAULT_ARENA_CAP; }
+        uint32 GetBattlegroundCap() { return m_currencyCap && m_currencyCap->currentRBgCap ? m_currencyCap->currentRBgCap : DEFAULT_ARENA_CAP; }
         uint32 GetMaximumCap() { return GetArenaCap() > GetBattlegroundCap() ? GetArenaCap() : GetBattlegroundCap(); }
 
         uint32 GetMaxPersonalArenaRating() { return _maxPersonalArenaRate; }

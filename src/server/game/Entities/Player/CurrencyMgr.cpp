@@ -65,8 +65,14 @@ void Player::SendCurrencies() const
 
         float precision = entry->GetPrecision();
 
-        uint32 weekCount = itr->second.weekCount / precision;
-        uint32 weekCap = _GetCurrencyWeekCap(entry) / precision;
+        uint32 weekCount = itr->second.weekCount;
+        uint32 weekCap = _GetCurrencyWeekCap(entry);
+
+        if (!sCurrencyMgr->IsPrecisionAreConsidered(entry->ID))
+        {
+            weekCount /= 100;
+            weekCap /= 100;
+        }
 
         packet
             .WriteBit(weekCount)
@@ -150,6 +156,9 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog /* = true */, 
     if (!ignoreMultipliers)
         count *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_CURRENCY_GAIN, id);
 
+    if (sCurrencyMgr->IsPrecisionAreConsidered(id))
+        count /= currency->GetPrecision();
+
     uint32 oldTotalCount = 0;
     uint32 oldWeekCount = 0;
     PlayerCurrenciesMap::iterator itr = _currencyStorage.find(id);
@@ -177,7 +186,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog /* = true */, 
     int32 newTotalCount = int32(oldTotalCount) + count;
     int32 newWeekCount = 0;
 
-    if ( !ignoreLimit && count > 0 )
+    if (!ignoreLimit && (count > 0 || (id == CURRENCY_TYPE_HONOR_POINTS && !ignoreLimit)))
         newWeekCount = int32(oldWeekCount) + count;
     else
         newWeekCount = int32(oldWeekCount);
@@ -290,7 +299,7 @@ uint32 Player::_GetCurrencyWeekCap(const CurrencyTypesEntry* currency) const
 
     switch (currency->ID)
     {
-       // original conquest not have week cap
+        // original conquest not have week cap
         case CURRENCY_TYPE_CONQUEST_POINTS:
             return _ConquestCurrencytotalWeekCap;
         case CURRENCY_TYPE_CONQUEST_META_ARENA:
@@ -330,8 +339,11 @@ void Player::SendCurrencyWeekCap(const CurrencyTypesEntry* currency) const
     if (!cap)
         return;
 
+    if (!sCurrencyMgr->IsPrecisionAreConsidered(currency->ID))
+        cap /= currency->GetPrecision();
+
     WorldPacket packet(SMSG_UPDATE_CURRENCY_WEEK_LIMIT, 8);
-    packet << uint32(floor(cap / currency->GetPrecision()));
+    packet << uint32(floor(cap));
     packet << uint32(currency->ID);
     GetSession()->SendPacket(&packet);
 }
@@ -380,12 +392,12 @@ void Player::SendPvpRewards()
 {
     WorldPacket packet(SMSG_REQUEST_PVP_REWARDS_RESPONSE, 28);
     packet << GetBattlegroundCap();
-    packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_POINTS, true);
+    packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_ARENA, false);;
     packet << GetArenaCap();
-    packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_ARENA, true);
-    packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_BG, true);
+    packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_BG, false);
+    packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_ARENA, false);
     packet << GetMaximumCap();
-    packet << GetBattlegroundCap();
+    packet << GetMaximumCap();
     GetSession()->SendPacket(&packet);
 }
 
@@ -536,6 +548,19 @@ void CurrencyMgr::UpdateEvents(uint32 diff)
 {
     m_events.Update(diff);
 }
+
+bool CurrencyMgr::IsPrecisionAreConsidered(uint32 currencyId) const
+{
+    switch (currencyId)
+    {
+        case CURRENCY_TYPE_CONQUEST_POINTS:
+        case CURRENCY_TYPE_CONQUEST_META_ARENA:
+            return true;
+    }
+
+    return false;
+}
+
 
 bool CapResetEvent::Execute(uint64 e_time, uint32 p_time)
 {

@@ -61,6 +61,8 @@ public:
     void setLastGuid(uint32 lowGuid, bool save = false);
     void DeleteRestoreData();
 
+    bool IsPrecisionAreConsidered(uint32 currencyId) const;
+
 protected:
     PlayerCurrencyCapMap _capValuesStorage; 
 
