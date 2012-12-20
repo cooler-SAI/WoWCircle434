@@ -242,7 +242,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog /* = true */, 
     if (newTotalCount < 0)
         newTotalCount = 0;
 
-    if (id == CURRENCY_TYPE_HONOR_POINTS)
+    if (id == CURRENCY_TYPE_HONOR_POINTS || id == CURRENCY_TYPE_JUSTICE_POINTS)
     {
         newWeekCount = newTotalCount;
         weekCap = 0;
