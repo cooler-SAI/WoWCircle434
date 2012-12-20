@@ -5360,6 +5360,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 25988:
                 spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
                 break;
+            // Hercular's Rod
+            case 89821:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
             default:
                 break;
         }
