@@ -72,8 +72,8 @@ void Player::SendCurrencies() const
 
         if (!sCurrencyMgr->IsPrecisionAreConsidered(Id))
         {
-            weekCount /= 100;
-            weekCap /= 100;
+            weekCount /= precision;
+            weekCap /= precision;
         }
 
         if (Id == CURRENCY_TYPE_HONOR_POINTS)
