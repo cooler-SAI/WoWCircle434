@@ -343,7 +343,7 @@ void Player::SendCurrencyWeekCap(const CurrencyTypesEntry* currency) const
         cap /= currency->GetPrecision();
 
     WorldPacket packet(SMSG_UPDATE_CURRENCY_WEEK_LIMIT, 8);
-    packet << uint32(floor(cap));
+    packet << uint32(floor(float(cap)));
     packet << uint32(currency->ID);
     GetSession()->SendPacket(&packet);
 }

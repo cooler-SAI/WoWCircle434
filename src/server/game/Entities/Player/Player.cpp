@@ -15182,6 +15182,15 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
         InitTalentForLevel();
     }
 
+    // currencies reward
+    for (uint32 i = 0; i < QUEST_REWARD_CURRENCY_COUNT; i++)
+    {
+        uint32 currId = quest->RewardCurrencyId[i];
+        uint32 currCount = quest->RewardCurrencyCount[i];
+        if (currId && currCount)
+            ModifyCurrency(currId, currCount);
+    }
+
     // Send reward mail
     if (uint32 mail_template_id = quest->GetRewMailTemplateId())
     {
