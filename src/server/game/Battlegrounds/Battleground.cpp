@@ -877,22 +877,24 @@ void Battleground::EndBattleground(uint32 winner)
         player->RemoveAura(SPELL_HONORABLE_DEFENDER_60Y);
 
         // Reward winner team
-        if (!isArena() && team == winner)
+        if (team == winner)
         {
-            if (IsRandom() || BattlegroundMgr::IsBGWeekend(GetTypeID()))
+            if (!isArena())
             {
-                UpdatePlayerScore(player, SCORE_BONUS_HONOR, GetBonusHonorFromKill(winner_kills));
-                if (!player->GetRandomWinner())
+                if (IsRandom() || BattlegroundMgr::IsBGWeekend(GetTypeID()))
                 {
-                    // 100cp awarded for the first rated battleground won each day 
-                    player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_BG, BG_REWARD_WINNER_CONQUEST_FIRST);
-                    player->SetRandomWinner(true);
+                    UpdatePlayerScore(player, SCORE_BONUS_HONOR, GetBonusHonorFromKill(winner_kills));
+                    if (!player->GetRandomWinner())
+                    {
+                        // 100cp awarded for the first rated battleground won each day 
+                        player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_BG, BG_REWARD_WINNER_CONQUEST_FIRST);
+                        player->SetRandomWinner(true);
+                    }
                 }
+                else // 50cp awarded for each non-rated battleground won 
+                    player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_BG, BG_REWARD_WINNER_CONQUEST_LAST);
             }
-            else // 50cp awarded for each non-rated battleground won 
-                player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_BG, BG_REWARD_WINNER_CONQUEST_LAST);
 
-            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, 1);
             if (!guildAwarded)
             {
                 guildAwarded = true;
@@ -904,6 +906,8 @@ void Battleground::EndBattleground(uint32 winner)
                             guild->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA, std::max<uint32>(winnerArenaTeam->GetRating(), 1), 0, 0, NULL, player);
                     }
             }
+
+            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, 1);
         }
         else
         {
