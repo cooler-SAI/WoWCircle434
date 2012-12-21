@@ -1419,6 +1419,7 @@ bool SpellInfo::IsAuraExclusiveBySpecificPerCasterWith(SpellInfo const* spellInf
     SpellSpecificType spellSpec = GetSpellSpecific();
     switch (spellSpec)
     {
+        case SPELL_SPECIFIC_BLESSING:
         case SPELL_SPECIFIC_SEAL:
         case SPELL_SPECIFIC_HAND:
         case SPELL_SPECIFIC_AURA:
@@ -2084,6 +2085,9 @@ SpellSpecificType SpellInfo::GetSpellSpecific() const
         }
         case SPELLFAMILY_PALADIN:
         {
+            if (SpellFamilyFlags[0] & 0x01000002)
+                return SPELL_SPECIFIC_BLESSING;
+
             // Collection of all the seal family flags. No other paladin spell has any of those.
             if (SpellFamilyFlags[1] & 0x80000000 // Seal of Justice
                 || SpellFamilyFlags[1] & 0x20000000 // Seal of Righteoussness

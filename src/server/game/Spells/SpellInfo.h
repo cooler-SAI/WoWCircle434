@@ -145,6 +145,7 @@ enum SpellSpecificType
 {
     SPELL_SPECIFIC_NORMAL                        = 0,
     SPELL_SPECIFIC_SEAL                          = 1,
+    SPELL_SPECIFIC_BLESSING                      = 2,
     SPELL_SPECIFIC_AURA                          = 3,
     SPELL_SPECIFIC_STING                         = 4,
     SPELL_SPECIFIC_CURSE                         = 5,
