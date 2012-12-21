@@ -24438,6 +24438,8 @@ uint32 Player::CalculateTalentsPoints() const
 
 bool Player::IsKnowHowFlyIn(uint32 mapid, uint32 zone, uint32 spellId) const
 {
+    if (isGameMaster())
+        return true;
     // Eye of the Storm is always allowed in Throne of the Four Winds
     if (zone == 5638 && spellId == 82724)
         return true;
