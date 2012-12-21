@@ -26,9 +26,7 @@ void Player::SendNewCurrency(uint32 id) const
     WorldPacket packet(SMSG_INIT_CURRENCY, 4 + (5*4 + 1));
     packet.WriteBits(1, 23);
 
-    float precision = entry->GetPrecision();
-    if (sCurrencyMgr->IsPrecisionAreConsidered(id))
-        precision = 1;
+    float precision = sCurrencyMgr->GetPrecision(entry);
 
     uint32 weekCount = itr->second.weekCount / precision;
     uint32 weekCap = _GetCurrencyWeekCap(entry) / precision;
@@ -68,18 +66,15 @@ void Player::SendCurrencies() const
 
         uint32 Id = entry->ID;
 
-        float precision = entry->GetPrecision();
+        float precision = sCurrencyMgr->GetPrecision(entry);
 
         uint32 weekCount = itr->second.weekCount;
         uint32 weekCap = _GetCurrencyWeekCap(entry);
         uint32 seasonCount = itr->second.seasonCount;
 
-        if (!sCurrencyMgr->IsPrecisionAreConsidered(Id))
-        {
-            weekCount /= precision;
-            weekCap /= precision;
-            seasonCount /= precision;
-        }
+        weekCount /= precision;
+        weekCap /= precision;
+        seasonCount /= precision;
 
         if (Id == CURRENCY_TYPE_HONOR_POINTS)
         {
@@ -376,8 +371,7 @@ void Player::SendCurrencyWeekCap(const CurrencyTypesEntry* currency) const
     if (!cap)
         return;
 
-    if (!sCurrencyMgr->IsPrecisionAreConsidered(currency->ID))
-        cap /= currency->GetPrecision();
+    cap /= sCurrencyMgr->GetPrecision(currency);
 
     WorldPacket packet(SMSG_UPDATE_CURRENCY_WEEK_LIMIT, 8);
     packet << uint32(floor(float(cap)));
@@ -436,6 +430,16 @@ void Player::SendPvpRewards()
     packet << GetMaximumCap();
     packet << GetMaximumCap();
     GetSession()->SendPacket(&packet);
+}
+
+float CurrencyMgr::GetPrecision(CurrencyTypesEntry const* currency) const
+{
+    float precision = currency->GetPrecision();
+
+    if (IsPrecisionAreConsidered(currency->ID))
+        precision = 1.0f;
+
+    return precision;
 }
 
 void CurrencyMgr::AddCurrencyCapData(uint32 lowGuid, uint16 arenaRating /* = 0 */, uint16 RBgRating /* = 0 */, uint16 cap /* = 1350 */, uint16 rbgCap /* = 0 */, uint8 reset /* = 0 */)
