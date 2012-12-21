@@ -4138,7 +4138,8 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                     if (offItem->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) == 5) 
                         AddPct(totalDamagePercentMod, 40);
                 }
-                
+
+                // Improved Lava Lash
                 if (AuraEffect* aurEff = m_caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 4780, 1))
                 {
                     // Searing Flames
@@ -4147,6 +4148,9 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                         AddPct(totalDamagePercentMod, aurEff->GetAmount() * aur->GetStackAmount());
                         unitTarget->RemoveAura(77661, m_caster->GetGUID());
                     }
+
+                    if (unitTarget->HasAura(8050, m_caster->GetGUID()))
+                        m_caster->SpreadAura(8050, 12, false, 4);
                 }
             }
             break;

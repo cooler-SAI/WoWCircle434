@@ -19419,3 +19419,54 @@ void Unit::DoBuffPartyOrSingle(uint32 single_buff, uint32 party_buff, Unit *targ
     else
         CastSpell(target, single_buff, true);
 }
+
+void Unit::SpreadAura(uint32 spellId, float radius, bool positive, int8 count)
+{
+    UnitList targets;
+    Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck u_check(this, radius);
+    Trinity::UnitListSearcher<Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck> searcher(this, targets, u_check);
+    this->VisitNearbyObject(radius, searcher);
+
+    UnitList targets_limited; // list of targets that hasn't aura
+    if (count == -1)
+    {
+        targets_limited = targets;
+    }
+    else
+    {
+        for (UnitList::iterator itr = targets.begin(); itr != targets.end(); )
+        {
+            if (!(*itr)->HasAura(spellId))
+            {
+                targets_limited.push_back(*itr);
+                itr = targets.erase(itr);
+
+                // break if we have full needed list
+                if (--count == 0)
+                    break;
+
+                continue;
+            }
+
+            itr++;
+        }
+    }
+
+
+    // apply aura
+    for (UnitList::iterator itr = targets_limited.begin(); itr != targets_limited.end(); ++itr)
+    {
+        AddAura(spellId, *itr);
+    }
+
+    if (count > 0)
+    {
+        for (UnitList::iterator itr = targets.begin(); itr != targets.end(); ++itr)
+        {
+            AddAura(spellId, *itr);
+
+            if (--count == 0)
+                break;
+        }
+    }
+}
