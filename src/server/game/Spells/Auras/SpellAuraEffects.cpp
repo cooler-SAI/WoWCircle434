@@ -3332,6 +3332,9 @@ void AuraEffect::HandleAuraModRoot(AuraApplication const* aurApp, uint8 mode, bo
     if (!(mode & AURA_EFFECT_HANDLE_REAL))
         return;
 
+    if (GetBase()->GetSpellInfo()->HasAura(SPELL_AURA_MOD_FEAR))
+        return;
+
     Unit* target = aurApp->GetTarget();
 
     target->SetControlled(apply, UNIT_STATE_ROOT);
