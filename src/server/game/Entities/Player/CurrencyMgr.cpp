@@ -298,7 +298,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog /* = true */, 
     }
 }
 
-void Player::SetCurrency(uint32 id, uint32 count, bool printLog /*= true*/)
+void Player::SetCurrency(uint32 id, uint32 count)
 {
    PlayerCurrenciesMap::iterator itr = _currencyStorage.find(id);
    if (itr == _currencyStorage.end())

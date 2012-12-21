@@ -566,12 +566,12 @@ enum CombatRating
     CR_CRIT_MELEE               = 8,
     CR_CRIT_RANGED              = 9,
     CR_CRIT_SPELL               = 10,
-    CR_HIT_TAKEN_MELEE          = 11,
-    CR_HIT_TAKEN_RANGED         = 12,
-    CR_HIT_TAKEN_SPELL          = 13,
-    CR_CRIT_TAKEN_MELEE         = 14,
+    CR_HIT_TAKEN_MELEE          = 11, // Deprecated since Cataclysm
+    CR_HIT_TAKEN_RANGED         = 12, // Deprecated since Cataclysm
+    CR_HIT_TAKEN_SPELL          = 13, // Deprecated since Cataclysm
+    CR_CRIT_TAKEN_MELEE         = 14, // Deprecated since Cataclysm
     CR_RESILIENCE_TAKEN_ALL     = 15,
-    CR_CRIT_TAKEN_SPELL         = 16,
+    CR_CRIT_TAKEN_SPELL         = 16, // Deprecated since Cataclysm
     CR_HASTE_MELEE              = 17,
     CR_HASTE_RANGED             = 18,
     CR_HASTE_SPELL              = 19,

@@ -2859,7 +2859,7 @@ class Player : public Unit, public GridObject<Player>
         /// return presence related currency
         bool HasCurrency(uint32 id, uint32 count) const;
         /// initialize currency count for custom initialization at create character
-        void SetCurrency(uint32 id, uint32 count, bool printLog = true);
+        void SetCurrency(uint32 id, uint32 count);
 
         uint32 GetCurrencyWeekCap(uint32 id, bool usePrecision) const;
         uint32 GetArenaCap() { return m_currencyCap && m_currencyCap->currentArenaCap? m_currencyCap->currentArenaCap : DEFAULT_ARENA_CAP; }

@@ -2142,7 +2142,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (presence == PRESENCE_BLOOD)
                     {
                         target->ModifyAuraState(AURA_STATE_DEFENSE, true);
-                        // Improved Blood Presence
+                        // Improved Blood Presenceenum PRESENCES
                         if (bloodPresenceAura)
                         {
                             // -crit bonus

@@ -9995,19 +9995,26 @@ void Unit::ModifyAuraState(AuraStateType flag, bool apply)
 {
     if (apply)
     {
-        if (!HasFlag(UNIT_FIELD_AURASTATE, 1<<(flag-1)))
+        if (!HasFlag(UNIT_FIELD_AURASTATE, 1 << (flag-1)))
         {
-            SetFlag(UNIT_FIELD_AURASTATE, 1<<(flag-1));
+            SetFlag(UNIT_FIELD_AURASTATE, 1 << (flag-1));
             if (GetTypeId() == TYPEID_PLAYER)
             {
+                if (getClass() == CLASS_DEATH_KNIGHT && flag == AURA_STATE_DEFENSE)
+                {
+                    if (!HasAura(PRESENCE_BLOOD))
+                        CastSpell(this, 56817, true);
+                }
                 PlayerSpellMap const& sp_list = ToPlayer()->GetSpellMap();
                 for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
                 {
                     if (itr->second->state == PLAYERSPELL_REMOVED || itr->second->disabled)
                         continue;
+
                     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
                     if (!spellInfo || !spellInfo->IsPassive())
                         continue;
+
                     if (spellInfo->CasterAuraState == uint32(flag))
                         CastSpell(this, itr->first, true, NULL);
                 }
@@ -10018,9 +10025,11 @@ void Unit::ModifyAuraState(AuraStateType flag, bool apply)
                 {
                     if (itr->second.state == PETSPELL_REMOVED)
                         continue;
+
                     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
                     if (!spellInfo || !spellInfo->IsPassive())
                         continue;
+
                     if (spellInfo->CasterAuraState == uint32(flag))
                         CastSpell(this, itr->first, true, NULL);
                 }
@@ -10029,9 +10038,9 @@ void Unit::ModifyAuraState(AuraStateType flag, bool apply)
     }
     else
     {
-        if (HasFlag(UNIT_FIELD_AURASTATE, 1<<(flag-1)))
+        if (HasFlag(UNIT_FIELD_AURASTATE, 1 << (flag-1)))
         {
-            RemoveFlag(UNIT_FIELD_AURASTATE, 1<<(flag-1));
+            RemoveFlag(UNIT_FIELD_AURASTATE, 1 << (flag-1));
 
             if (flag != AURA_STATE_ENRAGE)                  // enrage aura state triggering continues auras
             {
@@ -15959,7 +15968,13 @@ void Unit::UpdateReactives(uint32 p_time)
             {
                 case REACTIVE_DEFENSE:
                     if (HasAuraState(AURA_STATE_DEFENSE))
+                    {
+                        if (getClass() == CLASS_DEATH_KNIGHT && HasAura(PRESENCE_BLOOD))
+                            break;
+
+                        RemoveAura(56817);
                         ModifyAuraState(AURA_STATE_DEFENSE, false);
+                    }
                     break;
                 case REACTIVE_HUNTER_PARRY:
                     if (getClass() == CLASS_HUNTER && HasAuraState(AURA_STATE_HUNTER_PARRY))
