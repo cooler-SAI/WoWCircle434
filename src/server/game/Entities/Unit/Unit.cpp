@@ -6122,6 +6122,16 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     caster->CastCustomSpell(target, triggered_spell_id, &basepoints0, NULL, NULL, true);
                     return true;
                 }
+                // Glyph of Shadowburn
+                case 56229:
+                {
+                    if (procSpell->ProcFlags & PROC_FLAG_KILL || ToPlayer()->HasSpellCooldown(dummySpell->Id))
+                        return false;
+
+                    ToPlayer()->RemoveSpellCooldown(17877, true);
+                    ToPlayer()->AddSpellCooldown(dummySpell->Id, 0, time(NULL)+6);
+                    return true;
+                }
                 // Nether Protection
                 case 30299:
                 case 30301:
