@@ -1276,6 +1276,7 @@ bool SpellInfo::IsPeriodic() const
        if (Effects[i].IsPeriodicEffect())
            return true;
     }
+    return false;
 }
 
 bool SpellInfo::IsAffectedBySpellMods() const
