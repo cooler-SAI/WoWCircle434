@@ -6114,16 +6114,16 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                 case 76691: // Vengeance tank mastery
                 {
                     if (!GetCaster())
-                        return;
+                        break;
 
                     int32 basepoints0 = GetBase()->GetEffect(0)->GetAmount() - GetAmount();
                     if (basepoints0 < 0)
                     {
                         caster->RemoveAura(GetBase());
-                        return;
+                        break;
                     }
                     else if (GetCaster()->isInCombat() && basepoints0 < int32((GetAmount() * 5 * 33) / 100))
-                        return;
+                        break;
 
                     int32 basepoints1 = GetAmount();
                     caster->CastCustomSpell(caster, 76691, &basepoints0, &basepoints0, &basepoints1, true);

@@ -97,9 +97,15 @@ class spell_dk_anti_magic_shell_self : public SpellScriptLoader
             PrepareAuraScript(spell_dk_anti_magic_shell_self_AuraScript);
 
             uint32 absorbPct, hpPct;
+            uint8 magicSuppressionRank;
             bool Load()
             {
                 absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue(GetCaster());
+                magicSuppressionRank = 0;
+
+                if (AuraEffect const* absorbBonus = GetCaster()->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, 99, 0))
+                    magicSuppressionRank = sSpellMgr->GetSpellRank(absorbBonus->GetId());
+
                 hpPct = GetSpellInfo()->Effects[EFFECT_1].CalcValue(GetCaster());
                 return true;
             }
@@ -111,9 +117,10 @@ class spell_dk_anti_magic_shell_self : public SpellScriptLoader
                 return true;
             }
 
-            void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 amount = GetCaster()->CountPctFromMaxHealth(hpPct);
+                const_cast<AuraEffect*>(aurEff)->SetBaseAmount(int32(absorbPct));
             }
 
             void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
@@ -124,10 +131,15 @@ class spell_dk_anti_magic_shell_self : public SpellScriptLoader
             void Trigger(AuraEffect* aurEff, DamageInfo & /*dmgInfo*/, uint32 & absorbAmount)
             {
                 Unit* target = GetTarget();
-                // damage absorbed by Anti-Magic Shell energizes the DK with additional runic power.
-                // This, if I'm not mistaken, shows that we get back ~20% of the absorbed damage as runic power.
-                int32 bp = absorbAmount * 2 / 10;
-                target->CastCustomSpell(target, DK_SPELL_RUNIC_POWER_ENERGIZE, &bp, NULL, NULL, true, NULL, aurEff);
+
+                // Magic Suppression - produces energy from damage
+                if (magicSuppressionRank)
+                {
+                    // damage absorbed by Anti-Magic Shell energizes the DK with additional runic power.
+                    // This, if I'm not mistaken, shows that we get back ~20% of the absorbed damage as runic power.
+                    int32 bp = std::max(uint32(1), absorbAmount * magicSuppressionRank / 227 / 3) * 10;
+                    target->CastCustomSpell(target, DK_SPELL_RUNIC_POWER_ENERGIZE, &bp, NULL, NULL, true, NULL, aurEff);
+                }
             }
 
             void Register()

@@ -53,6 +53,7 @@ class AuraEffect
         uint32 GetId() const { return m_spellInfo->Id; }
         uint32 GetEffIndex() const { return m_effIndex; }
         int32 GetBaseAmount() const { return m_baseAmount; }
+        void SetBaseAmount(int32 _newValue) { m_baseAmount = _newValue; }
         int32 GetAmplitude() const { return m_amplitude; }
 
         int32 GetMiscValueB() const { return m_spellInfo->Effects[m_effIndex].MiscValueB; }
@@ -139,7 +140,7 @@ class AuraEffect
         Aura* const m_base;
 
         SpellInfo const* const m_spellInfo;
-        int32 const m_baseAmount;
+        int32 m_baseAmount;
 
         int32 m_amount;
 

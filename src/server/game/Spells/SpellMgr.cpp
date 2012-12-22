@@ -5364,6 +5364,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 89821:
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
+            // Magic Suppression
+            case 49224:
+            case 49610:
+            case 49611:
+                spellInfo->ProcCharges = 0;
+                break;
             default:
                 break;
         }
