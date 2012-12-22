@@ -136,9 +136,6 @@ uint32 Player::GetCurrencyOnWeek(uint32 id, bool precision) const
 
 bool Player::HasCurrency(uint32 id, uint32 count) const
 {
-    // hack for cooking currency
-    if (id == 402) id = 81;
-
     PlayerCurrenciesMap::const_iterator itr = _currencyStorage.find(id);
     return itr != _currencyStorage.end() && itr->second.totalCount >= count;
 }
@@ -160,9 +157,6 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog /* = true */, 
 {
     if (!count)
         return;
-
-    // hack for cooking currency
-    if (id == 402) id = 81;
 
     CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
     ASSERT(currency);
