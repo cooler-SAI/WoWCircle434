@@ -940,10 +940,10 @@ void _WriteUnitAuras(Unit* unit, WorldPacket* data, uint64 mask)
         if (itr != auras->end())
         {
             AuraApplication* aura = itr->second;
-            uint8 flags = aura->GetFlags();
+            uint16 flags = uint16(aura->GetFlags());
 
             *data << uint32(aura->GetBase()->GetId());
-            *data << uint8(flags);
+            *data << uint16(flags);
 
             if (flags & AFLAG_ANY_EFFECT_AMOUNT_SENT)
             {
@@ -959,7 +959,7 @@ void _WriteUnitAuras(Unit* unit, WorldPacket* data, uint64 mask)
         else
         {
             *data << uint32(0);
-            *data << uint8(0);
+            *data << uint16(0);
         }
     }
 
