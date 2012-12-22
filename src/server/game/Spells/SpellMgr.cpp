@@ -5370,6 +5370,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 49611:
                 spellInfo->ProcCharges = 0;
                 break;
+            // Weakening, Flameseer's Staff
+            case 75192:
+                spellInfo->StackAmount = 20;
+                break;
             default:
                 break;
         }

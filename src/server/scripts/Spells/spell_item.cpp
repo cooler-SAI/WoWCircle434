@@ -2181,6 +2181,40 @@ class spell_item_crazy_alchemists_potion : public SpellScriptLoader
     }
 };
 
+class spell_item_flameseers_staff_weakening : public SpellScriptLoader
+{
+    public:
+        spell_item_flameseers_staff_weakening() : SpellScriptLoader("spell_item_flameseers_staff_weakening") { }
+
+        class spell_item_flameseers_staff_weakening_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_item_flameseers_staff_weakening_AuraScript);
+
+            void HandlePeriodic(AuraEffect const* aurEff)
+            {
+                if (aurEff->GetBase()->GetOwner()->GetEntry() == 40147)
+                    if (GetCaster()->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        uint8 stacks = GetAura()->GetStackAmount();
+                        GetAura()->SetStackAmount(stacks + 1);
+                        if (stacks >= 19)
+                            GetCaster()->ToPlayer()->KilledMonsterCredit(40334, 0);                            
+                    }
+            }
+
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_item_flameseers_staff_weakening_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_item_flameseers_staff_weakening_AuraScript();
+        }
+};
+
 void AddSC_item_spell_scripts()
 {
     // 23074 Arcanite Dragonling
@@ -2237,4 +2271,5 @@ void AddSC_item_spell_scripts()
     new spell_item_big_cauldron_of_battle();
     new spell_item_flask_of_battle();
     new spell_item_crazy_alchemists_potion();
+    new spell_item_flameseers_staff_weakening();
 }
