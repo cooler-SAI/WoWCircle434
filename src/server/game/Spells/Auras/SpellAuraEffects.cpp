@@ -1350,7 +1350,7 @@ void AuraEffect::UpdatePeriodic(Unit* caster)
                            GetBase()->RefreshDuration();
                            break;
                         case 76691: // Vengeance tank mastery - loss ap
-                            if (AuraEffect * aurEff = GetBase()->GetEffect(2))
+                            if (AuraEffect* aurEff = GetBase()->GetEffect(2))
                             {
                                 if (GetCaster()->ToPlayer())
                                 {
@@ -1361,7 +1361,7 @@ void AuraEffect::UpdatePeriodic(Unit* caster)
                                         case TALENT_TREE_DRUID_FERAL_COMBAT:
                                         case TALENT_TREE_PALADIN_PROTECTION:
                                             if (GetBase()->GetEffect(1)->GetAmount() >= 10)
-                                                aurEff->ChangeAmount(GetBase()->GetEffect(1)->GetAmount()/10);
+                                                aurEff->ChangeAmount(GetBase()->GetEffect(1)->GetAmount() / 10);
                                             break;
                                         default:
                                             GetCaster()->RemoveAurasDueToSpell(GetId());
@@ -6113,12 +6113,18 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                     break;
                 case 76691: // Vengeance tank mastery
                 {
+                    if (!GetCaster())
+                        return;
+
                     int32 basepoints0 = GetBase()->GetEffect(0)->GetAmount() - GetAmount();
                     if (basepoints0 < 0)
                     {
                         caster->RemoveAura(GetBase());
                         return;
                     }
+                    else if (GetCaster()->isInCombat() && basepoints0 < int32((GetAmount() * 5 * 33) / 100))
+                        return;
+
                     int32 basepoints1 = GetAmount();
                     caster->CastCustomSpell(caster, 76691, &basepoints0, &basepoints0, &basepoints1, true);
                     break;

@@ -8045,16 +8045,22 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
     // Vengeance tank mastery
     if (dummySpell->SpellIconID == 3031 && victim->GetTypeId() != TYPEID_PLAYER)
     {
-        triggered_spell_id = 76691;
-        int32 cap = (GetCreateHealth() + GetStat(STAT_STAMINA) * 14) / 10;
-        basepoints0 =  int32(damage*triggerAmount/100);
-
+        int32 aviableBasepoints = 0;
         // There's aura modify amount
         if (AuraEffect* vengeance = GetAuraEffect(triggered_spell_id, 0, GetGUID()))
-            basepoints0 += vengeance->GetAmount();
+            aviableBasepoints += vengeance->GetAmount();
 
+        // The first melee attack taken by the tank generates Vengeance equal to 33% of the damage taken by that attack.
+        if (!aviableBasepoints)
+            triggerAmount = 33;
+
+        triggered_spell_id = 76691;
+        int32 cap = (GetCreateHealth() + GetStat(STAT_STAMINA) * 14) / 10;
+        basepoints0 = int32(damage * triggerAmount / 100);
+        basepoints0 += aviableBasepoints;
         basepoints0 = std::min(cap, basepoints0);
-        int32 basepoints1 = basepoints0/5;
+
+        int32 basepoints1 = basepoints0 / 5;
         CastCustomSpell(this, triggered_spell_id, &basepoints0, &basepoints0, &basepoints1, true, castItem,triggeredByAura, originalCaster );
         return true;
     }
