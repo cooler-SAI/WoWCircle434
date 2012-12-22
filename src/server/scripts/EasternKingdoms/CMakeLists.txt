@@ -219,7 +219,12 @@ set(scripts_STAT_SRCS
   EasternKingdoms/BaradinHold/boss_alizabal.cpp
   EasternKingdoms/BaradinHold/instance_baradin_hold.cpp
   EasternKingdoms/BaradinHold/baradin_hold.h
+  EasternKingdoms/Firelands/boss_shannox.cpp
+  EasternKingdoms/Firelands/boss_lord_rhyolith.cpp
+  EasternKingdoms/Firelands/boss_bethtilac.cpp
+  EasternKingdoms/Firelands/boss_alysrazor.cpp
   EasternKingdoms/Firelands/instance_firelands.cpp
+  EasternKingdoms/Firelands/firelands.cpp
   EasternKingdoms/Firelands/firelands.h
   EasternKingdoms/TheStonecore/boss_corborus.cpp
   EasternKingdoms/TheStonecore/boss_slabhide.cpp

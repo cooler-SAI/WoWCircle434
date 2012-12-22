@@ -1,10 +1,16 @@
 #include "ScriptPCH.h"
 #include "firelands.h"
+// areatrigger
+// 6929 - quest1
+// 6861 - near miniboss 1
 
 #define MAX_ENCOUNTER 6
 
 static const DoorData doordata[] = 
 {
+    {GO_BRIDGE_OF_RHYOLITH, DATA_RHYOLITH,  DOOR_TYPE_ROOM, BOUNDARY_NONE},
+    {GO_FIRE_WALL_BALEROC,  DATA_BALEROC,   DOOR_TYPE_ROOM, BOUNDARY_NONE},
+    {GO_STICKY_WEB,         DATA_BETHTILAC, DOOR_TYPE_ROOM, BOUNDARY_NONE},
     {0, 0, DOOR_TYPE_ROOM, BOUNDARY_NONE},
 };
 
