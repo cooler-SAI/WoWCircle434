@@ -8051,7 +8051,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             aviableBasepoints += vengeance->GetAmount();
 
         // The first melee attack taken by the tank generates Vengeance equal to 33% of the damage taken by that attack.
-        if (!aviableBasepoints)
+        if (!aviableBasepoints && (procFlag & (PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK)))
             triggerAmount = 33;
 
         triggered_spell_id = 76691;
