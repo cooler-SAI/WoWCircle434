@@ -377,7 +377,7 @@ class WorldSession
         void SendNotInArenaTeamPacket(uint8 type);
         void SendPetitionShowList(uint64 guid);
 
-        void BuildPartyMemberStatsChangedPacket(Player* player, WorldPacket* data);
+        void BuildPartyMemberStatsChangedPacket(Player* player, WorldPacket* data, GroupUpdateFlags mask, uint64 guid, bool full = false);
 
         void DoLootRelease(uint64 lguid);
 

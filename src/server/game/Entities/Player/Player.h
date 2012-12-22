@@ -2773,8 +2773,8 @@ class Player : public Unit, public GridObject<Player>
         GroupReference& GetGroupRef() { return m_group; }
         void SetGroup(Group* group, int8 subgroup = -1);
         uint8 GetSubGroup() const { return m_group.getSubGroup(); }
-        uint32 GetGroupUpdateFlag() const { return m_groupUpdateMask; }
-        void SetGroupUpdateFlag(uint32 flag) { m_groupUpdateMask |= flag; }
+        GroupUpdateFlags GetGroupUpdateFlag() const { return m_groupUpdateMask; }
+        void SetGroupUpdateFlag(GroupUpdateFlags flag) { m_groupUpdateMask |= flag; }
         uint64 GetAuraUpdateMaskForRaid() const { return m_auraRaidUpdateMask; }
         void SetAuraUpdateMaskForRaid(uint8 slot) { m_auraRaidUpdateMask |= (uint64(1) << slot); }
         Player* GetNextRandomRaidMember(float radius);
@@ -3260,7 +3260,7 @@ class Player : public Unit, public GridObject<Player>
         GroupReference m_group;
         GroupReference m_originalGroup;
         Group* m_groupInvite;
-        uint32 m_groupUpdateMask;
+        GroupUpdateFlags m_groupUpdateMask;
         uint64 m_auraRaidUpdateMask;
         bool m_bPassOnGroupLoot;
 

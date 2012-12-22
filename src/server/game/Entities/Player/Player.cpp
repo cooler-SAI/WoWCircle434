@@ -737,7 +737,7 @@ Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_rep
 
     // group is initialized in the reference constructor
     SetGroupInvite(NULL);
-    m_groupUpdateMask = 0;
+    m_groupUpdateMask = GROUP_UPDATE_FLAG_NONE;
     m_auraRaidUpdateMask = 0;
     m_bPassOnGroupLoot = false;
 

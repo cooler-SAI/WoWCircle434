@@ -87,6 +87,36 @@ typedef ACE_UINT32 uint32;
 typedef ACE_UINT16 uint16;
 typedef ACE_UINT8 uint8;
 
+#define DEFINE_ENUM_BIT_OPS(NAME, BASE)                 \
+    inline NAME operator~(NAME v)                       \
+    {                                                   \
+        return static_cast<NAME>(~static_cast<BASE>(v));\
+    };                                                  \
+    inline NAME operator|(NAME one, NAME two)           \
+    {                                                   \
+        return static_cast<NAME>(                       \
+            static_cast<BASE>(one)                      \
+            | static_cast<BASE>(two)                    \
+            );                                          \
+    };                                                  \
+    inline NAME operator&(NAME one, NAME two)           \
+    {                                                   \
+        return static_cast<NAME>(                       \
+            static_cast<BASE>(one)                      \
+            & static_cast<BASE>(two)                    \
+            );                                          \
+    };                                                  \
+    inline NAME& operator|=(NAME& one, NAME two)        \
+    {                                                   \
+        one = one | two;                                \
+        return one;                                     \
+    };                                                  \
+    inline NAME& operator&=(NAME& one, NAME two)        \
+    {                                                   \
+        one = one & two;                                \
+        return one;                                     \
+    };
+
 enum DBCFormer
 {
     FT_NA='x',                                              //not used or unknown, 4 byte size

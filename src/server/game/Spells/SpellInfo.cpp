@@ -1272,7 +1272,10 @@ bool SpellInfo::IsAutoRepeatRangedSpell() const
 bool SpellInfo::IsPeriodic() const
 {
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-        return Effects[i].IsPeriodicEffect();
+    {
+       if (Effects[i].IsPeriodicEffect())
+           return true;
+    }
 }
 
 bool SpellInfo::IsAffectedBySpellMods() const

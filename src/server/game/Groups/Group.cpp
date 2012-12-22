@@ -1580,7 +1580,7 @@ void Group::UpdatePlayerOutOfRange(Player* player)
         return;
 
     WorldPacket data;
-    player->GetSession()->BuildPartyMemberStatsChangedPacket(player, &data);
+    player->GetSession()->BuildPartyMemberStatsChangedPacket(player, &data, player->GetGroupUpdateFlag(), player->GetGUID());
 
     Player* member;
     for (GroupReference* itr = GetFirstMember(); itr != NULL; itr = itr->next())
