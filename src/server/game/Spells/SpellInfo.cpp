@@ -1747,7 +1747,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
     if (unitTarget->HasUnitState(UNIT_STATE_IN_FLIGHT))
         return SPELL_FAILED_BAD_TARGETS;
 
-    if (!(Targets & TARGET_UNIT_MASTER) && !caster->IsVehicle())
+    if (!caster->IsVehicle() && !(caster->GetCharmerOrOwner() == target))
     {
         if (TargetAuraState && !unitTarget->HasAuraState(AuraStateType(TargetAuraState), this, caster))
             return SPELL_FAILED_TARGET_AURASTATE;
