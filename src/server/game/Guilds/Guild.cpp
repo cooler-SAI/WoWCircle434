@@ -2113,12 +2113,11 @@ void Guild::SendBankList(WorldSession* session, uint8 tabId, bool withContent, b
                     data.WriteBit(false);
 
                     uint32 enchants = 0;
-                    for (uint32 ench = 0; ench < MAX_ENCHANTMENT_SLOT; ++ench)
+                    for (uint32 i = 0; i < MAX_GEM_SOCKETS; ++i)
                     {
-                        if (uint32 enchantId = tabItem->GetEnchantmentId(EnchantmentSlot(ench)))
+                        if (uint32 enchantId = tabItem->GetEnchantmentId(EnchantmentSlot(SOCK_ENCHANTMENT_SLOT + i)))
                         {
-                            tabData << uint32(enchantId);
-                            tabData << uint32(ench);
+                            tabData << uint32(enchantId) << uint32(i);
                             ++enchants;
                         }
                     }
