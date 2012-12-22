@@ -6664,10 +6664,10 @@ void ObjectMgr::LoadCurrencyOnKill()
 
         uint32 creature_id = fields[0].GetUInt32();
 
-		CurrencyOnKillEntry currOnKill;
-        currOnKill.currencyid1          = fields[1].GetUInt32();
-        currOnKill.currencyid2          = fields[2].GetUInt32();
-        currOnKill.currencyid3          = fields[3].GetUInt32();
+        CurrencyOnKillEntry currOnKill;
+        currOnKill.currencyid1          = fields[1].GetUInt16();
+        currOnKill.currencyid2          = fields[2].GetUInt16();
+        currOnKill.currencyid3          = fields[3].GetUInt16();
         currOnKill.currencycount1       = fields[4].GetInt32();
         currOnKill.currencycount2       = fields[5].GetInt32();
         currOnKill.currencycount3       = fields[6].GetInt32();
