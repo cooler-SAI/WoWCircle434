@@ -49,8 +49,9 @@ void Guild::SendCommandResult(WorldSession* session, GuildCommandType type, Guil
 {
     WorldPacket data(SMSG_GUILD_COMMAND_RESULT, 8 + param.size() + 1);
     data << uint32(type);
-    data << param;
     data << uint32(errCode);
+    data << uint8(param.size());
+    data.append(param.c_str(), param.size());
     session->SendPacket(&data);
 
     sLog->outDebug(LOG_FILTER_GUILD, "WORLD: Sent (SMSG_GUILD_COMMAND_RESULT)");
