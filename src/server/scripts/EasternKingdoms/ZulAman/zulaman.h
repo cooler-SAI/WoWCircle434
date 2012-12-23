@@ -11,6 +11,8 @@ enum Data
     DATA_DAAKARA            = 5,
     DATA_MAIN_GATE          = 6,
     DATA_TEMPEST            = 7,
+    DATA_VENDOR_1           = 8,
+    DATA_VENDOR_2           = 9,
 };
 
 enum CreaturesIds
@@ -21,6 +23,18 @@ enum CreaturesIds
     NPC_HALAZZI             = 23577,
     NPC_HEX_LORD_MALACRASS  = 24239,
     NPC_DAAKARA             = 23863,
+
+    NPC_FOREST_FROG         = 24396,
+    NPC_HARALD              = 52915, // Vendor 1
+    NPC_EULINDA             = 52914, // Vendor 2
+    NPC_ARINOTH             = 52919, // Money Bag
+    NPC_LENZO               = 52917, // Money Bag
+    NPC_MELISSA             = 52947, // Amani Charm Box
+    NPC_MAWAGO              = 52920, // Amani Charm Box
+    NPC_MELASONG            = 52916, // Amani Charm Box
+    NPC_ROSA                = 52905, // Amani Charm Box
+    NPC_RELISSA             = 52912, // Amani Charm Box
+    NPC_TYLLAN              = 52909, // Amani Charm Box
 
     NPC_AMANISHI_TEMPEST    = 24549,
     NPC_AMANISHI_WARRIOR    = 24225,

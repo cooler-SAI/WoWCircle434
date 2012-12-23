@@ -1,26 +1,24 @@
 #include "ScriptPCH.h"
 #include "zulaman.h"
 
-/*######
-## npc_forest_frog
-######*/
-
-#define SPELL_REMOVE_AMANI_CURSE    43732
-#define SPELL_PUSH_MOJO             43923
-#define ENTRY_FOREST_FROG           24396
-
 enum Spells
 {
+    SPELL_REMOVE_AMANI_CURSE        = 43732,
+    SPELL_PUSH_MOJO                 = 43923,
+    SPELL_SUMMON_MONEY_BAG          = 43774,
+    SPELL_SUMMON_AMANI_CHARM_CHEST1 = 43835,
+    SPELL_SUMMON_AMANI_CHARM_CHEST2 = 43756,
+
     // Amani'shi Tempest
-    SPELL_THUNDERCLAP       = 44033,
-    SPELL_CHAIN_LIGHTNING   = 97496,
+    SPELL_THUNDERCLAP               = 44033,
+    SPELL_CHAIN_LIGHTNING           = 97496,
 
     // Amani Eagle
-    SPELL_TALON             = 43517,
+    SPELL_TALON                     = 43517,
 
     // Amani'shi Warrior
-    SPELL_CHARGE            = 43519,
-    SPELL_KICK              = 43518,
+    SPELL_CHARGE                    = 43519,
+    SPELL_KICK                      = 43518,
 };
 
 enum Events
@@ -52,7 +50,93 @@ enum Actions
 
 const Position posTurnPoint = {232.83f, 1367.78f, 48.58f, 1.79f};
 const Position posDownPoint = {227.75f, 1460.83f, 25.98f, 4.75f};
-const Position posUpPoint   = {280.12f, 1380.63f, 49.35f, 3.46f}; 
+const Position posUpPoint   = {280.12f, 1380.63f, 49.35f, 3.46f};
+
+class npc_zulaman_forest_frog : public CreatureScript
+{
+    public:
+        
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_zulaman_forest_frogAI(pCreature);
+        }
+
+        npc_zulaman_forest_frog() : CreatureScript("npc_zulaman_forest_frog") { }
+
+        struct npc_zulaman_forest_frogAI : public ScriptedAI
+        {
+            npc_zulaman_forest_frogAI(Creature* pCreature) : ScriptedAI(pCreature)
+            {
+                pInstance = pCreature->GetInstanceScript();
+                reward = 0;
+            }
+
+            InstanceScript *pInstance;
+            uint8 reward;
+
+            void DoSpawnRandom()
+            {
+                if (pInstance)
+                {
+                    uint32 cEntry = 0;
+                    switch(urand(0, 9))
+                    {
+                        case 0: cEntry = NPC_HARALD; break;
+                        case 1: cEntry = NPC_EULINDA; break;
+                        case 2: cEntry = NPC_ARINOTH; reward = 1; break;
+                        case 3: cEntry = NPC_LENZO; reward = 1; break;
+                        case 4: cEntry = NPC_MELISSA; reward = 2; break;
+                        case 5: cEntry = NPC_MAWAGO; reward = 2; break;
+                        case 6: cEntry = NPC_MELASONG; reward = 2; break;
+                        case 7: cEntry = NPC_ROSA; reward = 2; break;
+                        case 8: cEntry = NPC_RELISSA; reward = 2; break;
+                        case 9: cEntry = NPC_TYLLAN; reward = 2; break;
+                    }
+
+                    if (cEntry == NPC_HARALD && pInstance->GetData(DATA_VENDOR_1))
+                        cEntry = NPC_TYLLAN;
+                    if (cEntry == NPC_EULINDA && pInstance->GetData(DATA_VENDOR_2))
+                        cEntry = NPC_ARINOTH;
+
+                    if (cEntry) me->UpdateEntry(cEntry);
+                    
+                    // There must nbe only one vendor per instance
+                    if (cEntry == NPC_HARALD)
+                        pInstance->SetData(DATA_VENDOR_1, DONE);
+                    else if (cEntry == NPC_EULINDA)
+                        pInstance->SetData(DATA_VENDOR_2, DONE);
+                    else
+                    {
+                        if (reward == 1)
+                            me->CastSpell(me, SPELL_SUMMON_MONEY_BAG, true);
+                        else if (reward == 2)
+                            me->CastSpell(me, urand(0, 1)? SPELL_SUMMON_AMANI_CHARM_CHEST1: SPELL_SUMMON_AMANI_CHARM_CHEST2, true);
+
+                        me->DespawnOrUnsummon(5000);
+                    }
+                }
+            }
+
+            void SpellHit(Unit *caster, const SpellInfo* spell)
+            {
+                if (spell->Id == SPELL_REMOVE_AMANI_CURSE && caster->GetTypeId() == TYPEID_PLAYER && me->GetEntry() == NPC_FOREST_FROG)
+                {
+                    if (roll_chance_i(6))
+                    {
+                        if (!caster->ToPlayer()->HasItemCount(33993) && !caster->HasSpell(43918))
+                        {
+                            DoCast(caster, SPELL_PUSH_MOJO, true);
+                            me->DespawnOrUnsummon();
+                        }
+                        else
+                            DoSpawnRandom();
+                    }
+                    else
+                        DoSpawnRandom();
+                }
+            }
+        };
+};
 
 #define GOSSIP_HOSTAGE1        "I am glad to help you."
 
@@ -214,6 +298,7 @@ class npc_amanishi_tempest : public CreatureScript
 
 void AddSC_zulaman()
 {
+    new npc_zulaman_forest_frog();
     new npc_zulaman_hostage();
     new go_strange_gong();
     new npc_amanishi_tempest();

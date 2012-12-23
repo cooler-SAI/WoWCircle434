@@ -56,6 +56,8 @@ class instance_zulaman : public InstanceMapScript
                 QuestTimer = 0;
                 QuestMinute = 21;
                 uiMainGate = 0;
+                uiVendor1 = 0;
+                uiVendor2 = 0;
             }
 
             uint64 HarkorsSatchelGUID;
@@ -69,6 +71,8 @@ class instance_zulaman : public InstanceMapScript
             uint64 AmanishiTempestGUID;
 
             uint32 uiMainGate;
+            uint32 uiVendor1;
+            uint32 uiVendor2;
             uint32 QuestTimer;
             uint16 QuestMinute;
             
@@ -171,6 +175,8 @@ class instance_zulaman : public InstanceMapScript
                     SetData(DATA_MAIN_GATE, uiMainGate);
                     loadStream >> QuestMinute;
                     DoUpdateWorldState(3104, QuestMinute);
+                    loadStream >> uiVendor1;
+                    loadStream >> uiVendor2;
 
                 } else OUT_LOAD_INST_DATA_FAIL;
 
@@ -270,6 +276,14 @@ class instance_zulaman : public InstanceMapScript
                             SaveToDB();
                         }
                         break;
+                    case DATA_VENDOR_1:
+                        uiVendor1 = data;
+                        SaveToDB();
+                        break;
+                    case DATA_VENDOR_2:
+                        uiVendor2 = data;
+                        SaveToDB();
+                        break;
                     default:
                         break;
                 }
@@ -283,6 +297,10 @@ class instance_zulaman : public InstanceMapScript
                         return MainGateGUID;
                     case DATA_TEMPEST:
                         return AmanishiTempestGUID;
+                    case DATA_VENDOR_1:
+                        return uiVendor1;
+                    case DATA_VENDOR_2:
+                        return uiVendor2;
                     default: 
                         return 0;
                 }
