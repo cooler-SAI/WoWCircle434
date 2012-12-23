@@ -9012,7 +9012,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             break;
         // Frostburn Formula
         case 96325:
-            if (victim->getLevel() > 85)
+            if (victim && victim->getLevel() > 85)
                 return true;
             break;
         // Rolling Thunder
