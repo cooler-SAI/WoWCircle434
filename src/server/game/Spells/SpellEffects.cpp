@@ -4014,6 +4014,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     float totalDamagePercentMod  = 1.0f;                    // applied to final bonus+weapon damage
     int32 fixed_bonus = 0;
     int32 spell_bonus = 0;                                  // bonus specific for spell
+    float final_bonus = 0;
 
     switch (m_spellInfo->SpellFamilyName)
     {
@@ -4219,6 +4220,8 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 {
                     // "You attempt to finish the wounded target off, firing a long range attack dealing % weapon damage plus RAP*0.30+543."
                     shotMod = 0.45f;
+                    // Kill Shot - (100% weapon dmg + 45% RAP + 543) * 150% - EJ
+                    final_bonus = 1.5f;
                     break;
                 }
                 case 19434: // Aimed Shot
@@ -4226,6 +4229,8 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 {
                     // "A powerful aimed shot that deals % ranged weapon damage plus (RAP * 0.724)+776."
                     shotMod = 0.724f;
+                    // Aimed Shot - (100% weapon dmg + 72.4% RAP + 776) * 160% + 100 - EJ
+                    final_bonus = 1.6f;
                     break;
                 }
                 case 56641: // Steady Shot
@@ -4370,6 +4375,9 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
 
     if (spell_bonus)
         weaponDamage += spell_bonus;
+
+    if (final_bonus)
+        weaponDamage *= final_bonus;
 
     if (totalDamagePercentMod != 1.0f)
         weaponDamage = int32(weaponDamage* totalDamagePercentMod);
