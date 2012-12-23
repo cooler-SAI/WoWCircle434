@@ -576,6 +576,9 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                     {
                         // +87% from sp bonus
                         DoneActualBenefit += caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()) * 0.87f;
+                        // Glyph of Ice Barrier
+                        if (AuraEffect const* glyph = caster->GetDummyAuraEffect(SPELLFAMILY_MAGE, 32, 0))
+                            amount *= (glyph->GetAmount() + 100.0f) / 100.0f;
                     }
                     // Mage Ward
                     else if (GetSpellInfo()->SpellFamilyFlags[0] & 0x8 && GetSpellInfo()->SpellFamilyFlags[2] & 0x8)
