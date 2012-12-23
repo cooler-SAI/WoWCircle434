@@ -204,7 +204,10 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog /* = true */, 
         newSeasonCount = oldSeasonCount + count;
     }
     else
+    {
+        newSeasonCount = oldSeasonCount;
         newWeekCount = int32(oldWeekCount);
+    }
 
     //ASSERT(weekCap >= oldWeekCount);
     
