@@ -3501,6 +3501,13 @@ void Spell::cast(bool skipCheck)
         }
     }
 
+    if (m_caster->getClass() == CLASS_DEATH_KNIGHT)
+        if (IsDarkSimulacrum())
+        {
+            m_caster->RemoveAurasDueToSpell(77616);
+            m_caster->RemoveAurasDueToSpell(94984);
+        }
+
     CallScriptOnCastHandlers();
 
     // traded items have trade slot instead of guid in m_itemTargetGUID
