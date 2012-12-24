@@ -4465,6 +4465,28 @@ void SpellMgr::LoadDbcDataCorrections()
 
             // ENDOF BLACKWING DESCENT SPELLS
             //
+            // FIRELANDS SPELLS
+            //
+            // Trash
+            case 99692: // Terrifying Roar
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(33);
+                break;
+            case 97552: // Lava Shower dmg
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(26);
+                break;
+            case 99993: // Fiery Blood
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(18);
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(18);
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 100273: // Shell Spin dmg
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(8);
+                break;
+            case 100799: // Fire Torment dmg
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                break;
+            // ENDOF FIRELANDS
             // BASTION OF TWILIGHT SPELLS
             //
             // Trash

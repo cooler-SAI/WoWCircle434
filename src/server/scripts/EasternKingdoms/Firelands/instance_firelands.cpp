@@ -4,7 +4,7 @@
 // 6929 - quest1
 // 6861 - near miniboss 1
 
-#define MAX_ENCOUNTER 6
+#define MAX_ENCOUNTER 7
 
 static const DoorData doordata[] = 
 {
@@ -16,110 +16,110 @@ static const DoorData doordata[] =
 
 class instance_firelands : public InstanceMapScript
 {
-public:
-    instance_firelands() : InstanceMapScript("instance_firelands", 720) { }
+    public:
+        instance_firelands() : InstanceMapScript("instance_firelands", 720) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
-    {
-        return new instance_firelands_InstanceMapScript(map);
-    }
-
-    struct instance_firelands_InstanceMapScript : public InstanceScript
-    {
-        instance_firelands_InstanceMapScript(Map* map) : InstanceScript(map)
+        InstanceScript* GetInstanceScript(InstanceMap* map) const
         {
-            SetBossNumber(MAX_ENCOUNTER);
-            LoadDoorData(doordata);
+            return new instance_firelands_InstanceMapScript(map);
         }
 
-        void OnPlayerEnter(Player* pPlayer)
+        struct instance_firelands_InstanceMapScript : public InstanceScript
         {
-            if (!uiTeamInInstance)
-				uiTeamInInstance = pPlayer->GetTeam();
-        }
-
-        void OnCreatureCreate(Creature* pCreature)
-        {
-		}
-
-        void OnGameObjectCreate(GameObject* pGo)
-        {
-		}
-
-        void OnGameObjectRemove(GameObject* pGo)
-		{
-		}
-
-        void SetData(uint32 type, uint32 data)
-        {
-		}
-
-        uint32 GetData(uint32 type)
-        {
-			return 0;
-        }
-
-        uint64 GetData64(uint32 type)
-        {
-            return 0;
-        }
-
-        bool SetBossState(uint32 type, EncounterState state)
-        {
-			if (!InstanceScript::SetBossState(type, state))
-				return false;
-
-			return true;
-        }
-
-        std::string GetSaveData()
-        {
-            OUT_SAVE_INST_DATA;
-
-            std::string str_data;
-
-            std::ostringstream saveStream;
-            saveStream << "F L " << GetBossSaveData();
-
-            str_data = saveStream.str();
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return str_data;
-        }
-
-        void Load(const char* in)
-        {
-            if (!in)
+            instance_firelands_InstanceMapScript(Map* map) : InstanceScript(map)
             {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
+                SetBossNumber(MAX_ENCOUNTER);
+                LoadDoorData(doordata);
             }
 
-            OUT_LOAD_INST_DATA(in);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'F' && dataHead2 == 'L')
+            void OnPlayerEnter(Player* pPlayer)
             {
-                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-				{
-					uint32 tmpState;
-					loadStream >> tmpState;
-					if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-						tmpState = NOT_STARTED;
-					SetBossState(i, EncounterState(tmpState));
-				}} else OUT_LOAD_INST_DATA_FAIL;
+                if (!uiTeamInInstance)
+				    uiTeamInInstance = pPlayer->GetTeam();
+            }
 
-            OUT_LOAD_INST_DATA_COMPLETE;
-        }
+            void OnCreatureCreate(Creature* pCreature)
+            {
+		    }
 
-        private:
-            uint32 uiTeamInInstance;
-           
-    };
+            void OnGameObjectCreate(GameObject* pGo)
+            {
+		    }
+
+            void OnGameObjectRemove(GameObject* pGo)
+		    {
+		    }
+
+            void SetData(uint32 type, uint32 data)
+            {
+		    }
+
+            uint32 GetData(uint32 type)
+            {
+			    return 0;
+            }
+
+            uint64 GetData64(uint32 type)
+            {
+                return 0;
+            }
+
+            bool SetBossState(uint32 type, EncounterState state)
+            {
+			    if (!InstanceScript::SetBossState(type, state))
+				    return false;
+
+			    return true;
+            }
+
+            std::string GetSaveData()
+            {
+                OUT_SAVE_INST_DATA;
+
+                std::string str_data;
+
+                std::ostringstream saveStream;
+                saveStream << "F L " << GetBossSaveData();
+
+                str_data = saveStream.str();
+
+                OUT_SAVE_INST_DATA_COMPLETE;
+                return str_data;
+            }
+
+            void Load(const char* in)
+            {
+                if (!in)
+                {
+                    OUT_LOAD_INST_DATA_FAIL;
+                    return;
+                }
+
+                OUT_LOAD_INST_DATA(in);
+
+                char dataHead1, dataHead2;
+
+                std::istringstream loadStream(in);
+                loadStream >> dataHead1 >> dataHead2;
+
+                if (dataHead1 == 'F' && dataHead2 == 'L')
+                {
+                    for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+				    {
+					    uint32 tmpState;
+					    loadStream >> tmpState;
+					    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+						    tmpState = NOT_STARTED;
+					    SetBossState(i, EncounterState(tmpState));
+				    }} else OUT_LOAD_INST_DATA_FAIL;
+
+                OUT_LOAD_INST_DATA_COMPLETE;
+            }
+
+            private:
+                uint32 uiTeamInInstance;
+               
+        };
 };
 
 void AddSC_instance_firelands()

@@ -8595,6 +8595,11 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             case SPELLFAMILY_GENERIC:
                 switch (auraSpellInfo->Id)
                 {
+
+                    case 99984: // Slightly Warm Pincers
+                        trigger_spell_id = 99987;
+                        target = victim;
+                        break;
                     case 23780:             // Aegis of Preservation (Aegis of Preservation trinket)
                         trigger_spell_id = 23781;
                         break;

@@ -140,7 +140,7 @@ class instance_zulaman : public InstanceMapScript
                 OUT_SAVE_INST_DATA;
 
                 std::ostringstream ss;
-                ss << "ZA " << GetBossSaveData() << uiMainGate << " " << QuestMinute << " ";
+                ss << "ZA " << GetBossSaveData() << uiMainGate << " " << QuestMinute << " " << uiVendor1 << " " << uiVendor2 << " ";
 
                 OUT_SAVE_INST_DATA_COMPLETE;
                 return ss.str();

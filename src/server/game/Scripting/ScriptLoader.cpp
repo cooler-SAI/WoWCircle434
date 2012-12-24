@@ -655,6 +655,9 @@ void AddSC_boss_maloriak();
 void AddSC_boss_chimaeron();
 void AddSC_boss_atramedes();
 
+void AddSC_instance_firelands(); // Firelands
+void AddSC_firelands();
+
 // battlegrounds
 
 // outdoor pvp
@@ -1345,6 +1348,9 @@ void AddNorthrendScripts()
     AddSC_boss_maloriak();
     AddSC_boss_chimaeron();
     AddSC_boss_atramedes();
+
+    AddSC_instance_firelands(); // Firelands
+    AddSC_firelands();
 
 #endif
 }
