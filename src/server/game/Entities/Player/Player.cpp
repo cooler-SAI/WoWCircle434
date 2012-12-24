@@ -2711,9 +2711,6 @@ void Player::Regenerate(Powers power)
         case POWER_FOCUS:
         {
             addvalue += m_regenTimer * 0.001f * (GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) + 5); // 5 for cleint correct tooltip
-            std::ostringstream oss;
-            oss << GetPower(POWER_FOCUS) + addvalue;
-            this->Say(oss.str(), LANG_UNIVERSAL);
             break;
         }
         case POWER_ENERGY:                                              // Regenerate energy (rogue)
