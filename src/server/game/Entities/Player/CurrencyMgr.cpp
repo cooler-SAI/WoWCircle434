@@ -31,17 +31,18 @@ void Player::SendNewCurrency(uint32 id) const
     uint32 weekCount = itr->second.weekCount / precision;
     uint32 weekCap = _GetCurrencyWeekCap(entry) / precision;
     uint32 seasonCount = itr->second.seasonCount / precision;
+    bool sendSeason = seasonCount > 0 && entry->HasSeasonCount();
 
     packet.WriteBit(weekCount);
     packet.WriteBits(itr->second.flags, 4);
     packet.WriteBit(weekCap);
-    packet.WriteBit(seasonCount > 0);     // season total earned
+    packet.WriteBit(sendSeason);     // season total earned
 
     currencyData << uint32(itr->second.totalCount / precision);
     if (weekCap)
         currencyData << uint32(weekCap);
 
-    if (seasonCount)
+    if (sendSeason)
         currencyData << uint32(seasonCount);
 
     currencyData << uint32(entry->ID);
@@ -71,6 +72,7 @@ void Player::SendCurrencies() const
         uint32 weekCount = itr->second.weekCount;
         uint32 weekCap = _GetCurrencyWeekCap(entry);
         uint32 seasonCount = itr->second.seasonCount;
+        bool sendSeason = seasonCount > 0 && entry->HasSeasonCount();
 
         weekCount /= precision;
         weekCap /= precision;
@@ -86,13 +88,13 @@ void Player::SendCurrencies() const
             .WriteBit(weekCount)
             .WriteBits(itr->second.flags, 4)
             .WriteBit(weekCap)
-            .WriteBit(seasonCount > 0);     // seasonTotal
+            .WriteBit(sendSeason);     // seasonTotal
 
         currencyData << uint32(itr->second.totalCount / precision);
         if (weekCap)
             currencyData << uint32(weekCap);
 
-        if (seasonCount)
+        if (sendSeason)
             currencyData << uint32(seasonCount);
 
         currencyData << uint32(entry->ID);
@@ -172,9 +174,6 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog /* = true */, 
 
     if (!ignoreMultipliers)
         count *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_CURRENCY_GAIN, id);
-
-    if (sCurrencyMgr->IsPrecisionAreConsidered(id))
-        count /= currency->GetPrecision();
 
     uint32 oldTotalCount = 0;
     uint32 oldWeekCount = 0;
@@ -258,6 +257,11 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog /* = true */, 
         itr->second.weekCount = newWeekCount;
         itr->second.seasonCount = newSeasonCount;
 
+        newSeasonCount /= sCurrencyMgr->GetPrecision(currency);
+        newWeekCount /= sCurrencyMgr->GetPrecision(currency);
+        newTotalCount /= sCurrencyMgr->GetPrecision(currency);
+        bool sendSeason = itr->second.seasonCount > 0 && currency->HasSeasonCount();
+
         // probably excessive checks
         if (IsInWorld() && !GetSession()->PlayerLoading())
         {
@@ -285,19 +289,16 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog /* = true */, 
 
             packet
                 .WriteBit(weekCap != 0)
-                .WriteBit(newSeasonCount > 0) // hasSeasonCount
+                .WriteBit(sendSeason) // hasSeasonCount
                 .WriteBit(printLog? 0: 1); // print in log
 
-            if (!sCurrencyMgr->IsPrecisionAreConsidered(id))
-                newSeasonCount /= currency->GetPrecision();
-
-            if (newSeasonCount)
+            if (sendSeason)
                 packet << uint32(newSeasonCount);
 
-            packet << uint32(newTotalCount / currency->GetPrecision());
+            packet << uint32(newTotalCount);
             packet << uint32(id);
             if (weekCap)
-                packet << uint32(newWeekCount / currency->GetPrecision());
+                packet << uint32(newWeekCount);
 
             GetSession()->SendPacket(&packet);
         }

@@ -26229,6 +26229,28 @@ void Player::RefundItem(Item* item)
         return;
     }
 
+    // check total cap
+    for (uint8 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
+    {
+        // Second field in dbc is season count except one row
+        if (i == 1 && iece->ID != 2999)
+            continue;
+
+        uint32 currencyId = iece->RequiredCurrency[i];
+        CurrencyTypesEntry const* cte = sCurrencyTypesStore.LookupEntry(currencyId);
+        if (!cte)
+            continue;
+
+        uint32 count = iece->RequiredCurrencyCount[i] / cte->GetPrecision();
+        uint32 plrCount = GetCurrency(currencyId, cte->HasPrecision());
+
+        if (cte->TotalCap && (plrCount + count > (cte->TotalCap / sCurrencyMgr->GetPrecision(cte))))
+        {
+            SendItemRefundResult(item, iece, 10);
+            return;
+        }
+    }
+
     SendItemRefundResult(item, iece, 0);
 
     uint32 moneyRefund = item->GetPaidMoney();  // item-> will be invalidated in DestroyItem
