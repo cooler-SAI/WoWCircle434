@@ -715,6 +715,11 @@ void Player::ApplyHealthRegenBonus(int32 amount, bool apply)
 
 void Player::UpdateManaRegen()
 {
+    if (getClass() == CLASS_HUNTER)
+    {
+        return;
+    }
+
     // Mana regen from spirit
     float spirit_regen = OCTRegenMPPerSpirit();
     // Apply PCT bonus from SPELL_AURA_MOD_POWER_REGEN_PERCENT aura on spirit base regen
@@ -753,6 +758,13 @@ void Player::UpdateRuneRegen(RuneType rune)
 
     float regen = float(1 * IN_MILLISECONDS) / float(cooldown);
     SetFloatValue(PLAYER_RUNE_REGEN_1 + uint8(rune), regen);
+}
+
+void Player::UpdateFocusRegen(float mod)
+{
+    float val = 6.0f*(2.0f-mod); // 6 for default regeneration
+    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER,
+                      val*sWorld->getRate(RATE_POWER_FOCUS) - 5); // client has +5 on it, kinda bug
 }
 
 void Player::UpdateAllRunesRegen()
@@ -810,6 +822,7 @@ void Player::UpdateRangeHastMod()
 {
     float mod = CalculateRangeHastMod();
     SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, mod);
+    UpdateFocusRegen(mod);
 }
 
 void Player::_ApplyAllStatBonuses()
