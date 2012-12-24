@@ -4273,7 +4273,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 // Glyph of Death Strike
                 // 2% more damage per 5 runic power, up to a maximum of 40%
                 if (AuraEffect const* aurEff = m_caster->GetAuraEffect(59336, EFFECT_0))
-                    if (uint32 runic = std::min<uint32>(uint32(m_caster->GetPower(POWER_RUNIC_POWER) / 2.5f), aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue(m_caster)))
+                    if (uint32 runic = std::min<uint32>(uint32(m_caster->GetPower(POWER_RUNIC_POWER) / 10 / 2.5f), aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue(m_caster)))
                         AddPct(totalDamagePercentMod, runic);
                 break;
             }

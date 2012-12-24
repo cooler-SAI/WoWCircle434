@@ -3470,7 +3470,7 @@ void Spell::cast(bool skipCheck)
         case SPELLFAMILY_DEATHKNIGHT:
         {
             // Death strike should heal regardless of hit result
-            if (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_DK_DEATH_STRIKE && !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_REQ_OFFHAND))
+            if (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_DK_DEATH_STRIKE && !m_spellInfo->HasAttribute(SPELL_ATTR3_REQ_OFFHAND))
             {
                 if (m_caster->GetTypeId() != TYPEID_PLAYER)
                     return;
