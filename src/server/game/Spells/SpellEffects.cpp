@@ -7225,6 +7225,8 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
         case 49028: // Dancing Rune Weapon
             if (AuraEffect *aurEff = m_originalCaster->GetAuraEffect(63330, 0)) // glyph of Dancing Rune Weapon
                 duration += aurEff->GetAmount();
+            // 20% parry
+            m_originalCaster->CastSpell(m_originalCaster, 81256, true);
             break;
         case 48739: // Winterfin First Responder
             numGuardians = 1;
