@@ -5716,6 +5716,20 @@ void Spell::EffectApplyGlyph(SpellEffIndex effIndex)
 
     Player* player = (Player*)m_caster;
 
+    if (GlyphPropertiesEntry const *gp = sGlyphPropertiesStore.LookupEntry(m_spellInfo->Effects[effIndex].MiscValue))
+    {
+        for (uint8 i = 0; i < MAX_GLYPH_SLOT_INDEX; ++i)
+        {
+            if (player->GetGlyph(player->GetActiveSpec(), i) == gp->Id)
+            {
+                sLog->outError(LOG_FILTER_PLAYER, "Possible hacking attempt: Player %s [guid: %u] tried to stack applied [SpellId %u GlyphId %u] glyph!",
+                    player->GetName(), player->GetGUIDLow(), m_spellInfo->Id, gp->Id);
+                SendCastResult(SPELL_FAILED_UNIQUE_GLYPH);
+                return;
+            }
+        }
+    }
+
     // glyph sockets level requirement
     uint8 minLevel = 0;
     switch (m_glyphIndex)

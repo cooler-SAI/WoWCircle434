@@ -2385,7 +2385,7 @@ bool Aura::CanStackWith(Aura const* existingAura) const
     if (m_spellInfo->Id == 16191) // mana tide buff
         return true;
 
-    if (m_spellInfo->SpellFamilyName != SPELLFAMILY_POTION && existingSpellInfo->SpellFamilyName != SPELLFAMILY_POTION)
+    if (!IsPassive() && !existingSpellInfo->IsPassive() && m_spellInfo->SpellFamilyName != SPELLFAMILY_POTION && existingSpellInfo->SpellFamilyName != SPELLFAMILY_POTION)
         for (int i = 0; i < 3; ++i)
         {
             if ((m_spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA || m_spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID) &&

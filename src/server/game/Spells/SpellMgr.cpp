@@ -5374,6 +5374,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 75192:
                 spellInfo->StackAmount = 20;
                 break;
+            // Improved Blood Presence
+            case 61261:
+                spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
+                break;
             default:
                 break;
         }
