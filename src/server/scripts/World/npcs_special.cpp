@@ -3355,7 +3355,7 @@ public:
                 me->SetHealth(0.20 * me->GetOwner()->GetHealth());
             }
             
-            DoCast(me, 50453);
+            DoCast(me, 50453, true);
             
             uiBurstTimer = 19000;
         }
