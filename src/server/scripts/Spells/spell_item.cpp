@@ -2215,6 +2215,54 @@ class spell_item_flameseers_staff_weakening : public SpellScriptLoader
         }
 };
 
+class spell_item_stay_of_execution : public SpellScriptLoader
+{
+    public:
+        spell_item_stay_of_execution() : SpellScriptLoader("spell_item_stay_of_execution") { }
+
+        class spell_item_stay_of_execution_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_item_stay_of_execution_AuraScript);
+
+            uint32 absorbPct, healPct;
+
+            bool Load()
+            {
+                withdrawn = 0;
+                return GetUnitOwner()->GetTypeId() == TYPEID_PLAYER;
+            }
+
+            void Absorb(AuraEffect* aurEff, DamageInfo & dmgInfo, uint32 & absorbAmount)
+            {
+                absorbAmount = CalculatePct(dmgInfo.GetDamage(), 20);
+                withdrawn += absorbAmount;
+            }
+
+            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            { 
+                if (!GetCaster())
+                    return;
+
+                int32 bp0 = int32(0.08f * withdrawn);
+                GetCaster()->CastCustomSpell(GetCaster(), 96993, &bp0, 0, 0, true);
+            }
+
+            void Register()
+            {
+                 OnEffectAbsorb += AuraEffectAbsorbFn(spell_item_stay_of_execution_AuraScript::Absorb, EFFECT_0);
+                 OnEffectRemove += AuraEffectRemoveFn(spell_item_stay_of_execution_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
+            }
+
+        private:
+            int32 withdrawn;
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_item_stay_of_execution_AuraScript();
+        }
+};
+
 void AddSC_item_spell_scripts()
 {
     // 23074 Arcanite Dragonling
@@ -2272,4 +2320,5 @@ void AddSC_item_spell_scripts()
     new spell_item_flask_of_battle();
     new spell_item_crazy_alchemists_potion();
     new spell_item_flameseers_staff_weakening();
+    new spell_item_stay_of_execution();
 }
