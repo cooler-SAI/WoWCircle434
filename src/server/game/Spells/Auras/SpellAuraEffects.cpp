@@ -638,6 +638,27 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                     break;
             }
             break;
+        case SPELL_AURA_SCHOOL_HEAL_ABSORB:
+            if (!caster)
+                break;
+            // Necrotic Strike
+            if (GetId() == 73975)
+            {
+                Unit* target = GetBase()->GetUnitOwner();
+                if (!target)
+                    break;
+
+                int32 damage = int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.75f);
+                caster->ApplyResilience(target, &damage);
+                if (AuraEffect const* pAurEff = target->GetAuraEffect(73975, 0))
+                {
+                    int32 oldamount = pAurEff->GetAmount();
+                    amount += oldamount + damage;
+                }
+                else
+                    amount += damage;
+            }
+            break;
         case SPELL_AURA_MANA_SHIELD:
             m_canBeRecalculated = false;
             if (!caster)
