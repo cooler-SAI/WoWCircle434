@@ -1486,6 +1486,9 @@ void World::SetInitialWorldSettings()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Creature Reputation OnKill Data...");
     sObjectMgr->LoadReputationOnKill();
 
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Creature Currency OnKill Data...");
+    sObjectMgr->LoadCurrencyOnKill();
+
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Reputation Spillover Data...");
     sObjectMgr->LoadReputationSpilloverTemplate();
 
