@@ -2858,6 +2858,8 @@ class Player : public Unit, public GridObject<Player>
         void SendCurrencies() const;
         /// return count of currency witch has plr
         uint32 GetCurrency(uint32 id, bool precision) const;
+        /// return count of currency player has obtained in current season
+        uint32 GetSeasonCount(uint32 id) const;
         /// return presence related currency
         bool HasCurrency(uint32 id, uint32 count) const;
         /// initialize currency count for custom initialization at create character

@@ -119,6 +119,15 @@ uint32 Player::GetCurrency(uint32 id, bool precision) const
     return itr->second.totalCount / currency->GetPrecision();
 }
 
+uint32 Player::GetSeasonCount(uint32 id) const
+{
+    PlayerCurrenciesMap::const_iterator itr = _currencyStorage.find(id);
+    if (itr != _currencyStorage.end())
+        return itr->second.seasonCount;
+    
+    return 0;
+}
+
 uint32 Player::GetCurrencyOnWeek(uint32 id, bool precision) const
 {
     PlayerCurrenciesMap::const_iterator itr = _currencyStorage.find(id);
@@ -277,7 +286,7 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog /* = true */, 
             packet
                 .WriteBit(weekCap != 0)
                 .WriteBit(newSeasonCount > 0) // hasSeasonCount
-                .WriteBit(printLog); // print in log
+                .WriteBit(printLog? 0: 1); // print in log
 
             if (!sCurrencyMgr->IsPrecisionAreConsidered(id))
                 newSeasonCount /= currency->GetPrecision();

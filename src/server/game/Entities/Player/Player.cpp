@@ -21242,6 +21242,10 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
 
         for (int i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
         {
+            // Second field in dbc is season count except one row
+            if (i == 1 && iece->ID != 2999)
+                continue;
+
             if (iece->RequiredCurrency[i])
                 ModifyCurrency(iece->RequiredCurrency[i], -int32(iece->RequiredCurrencyCount[i]), true, true);
         }
@@ -21483,8 +21487,17 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
                 SendBuyError(BUY_ERR_CANT_FIND_ITEM, vendorguid, item);
                 return false;
             }
-
-            if (!HasCurrency(iece->RequiredCurrency[i], (iece->RequiredCurrencyCount[i] * count)))
+            
+            // Second field in dbc is season count except two strange rows
+            if (i == 1 && iece->ID != 2999)
+            {
+                if (iece->RequiredCurrencyCount[i] > GetSeasonCount(iece->RequiredCurrency[i]))
+                {
+                    SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL);
+                    return false;
+                }
+            }
+            else if (!HasCurrency(iece->RequiredCurrency[i], (iece->RequiredCurrencyCount[i] * count)))
             {
                 SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL);
                 return false;
@@ -26058,8 +26071,17 @@ void Player::SendRefundInfo(Item* item)
 
     for (uint8 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)                       // currency cost data
     {
-        data << uint32(iece->RequiredCurrencyCount[i]);
-        data << uint32(iece->RequiredCurrency[i]);
+        CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(iece->RequiredCurrency[i]);
+        if (!currency || (i == 1 && iece->ID != 2999))
+        {
+            data << uint32(0);
+            data << uint32(0);
+        }
+        else
+        {
+            data << uint32(iece->RequiredCurrencyCount[i] / currency->GetPrecision());
+            data << uint32(iece->RequiredCurrency[i]);
+        }
     }
 
     data
@@ -26115,11 +26137,20 @@ void Player::SendItemRefundResult(Item* item, ItemExtendedCostEntry const* iece,
     {
         for (uint8 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
         {
-            float prc = 1.0f;
-            if (CurrencyTypesEntry const* _currencyEntry = sCurrencyTypesStore.LookupEntry(iece->RequiredCurrency[i]))
-                prc = _currencyEntry->GetPrecision();
-            data << uint32(iece->RequiredCurrencyCount[i] / prc);
-            data << uint32(iece->RequiredCurrency[i]);
+            if (i == 1 && iece->ID != 2999)
+            {
+                data << uint32(0);
+                data << uint32(0);
+            }
+            else
+            {
+                float prc = 1.0f;
+                if (CurrencyTypesEntry const* _currencyEntry = sCurrencyTypesStore.LookupEntry(iece->RequiredCurrency[i]))
+                    prc = _currencyEntry->GetPrecision();
+
+                data << uint32(iece->RequiredCurrencyCount[i] / prc);
+                data << uint32(iece->RequiredCurrency[i]);
+            }
         }
 
         data << uint32(item->GetPaidMoney());               // money cost
@@ -26229,6 +26260,10 @@ void Player::RefundItem(Item* item)
     // and currencies
     for (uint8 i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
     {
+        // Second field in dbc is season count except one row
+        if (i == 1 && iece->ID != 2999)
+            continue;
+
         uint32 currency = iece->RequiredCurrency[i];
         uint32 count = iece->RequiredCurrencyCount[i];
         if (currency && count)
