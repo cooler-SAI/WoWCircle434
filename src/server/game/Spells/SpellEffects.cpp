@@ -5766,6 +5766,19 @@ void Spell::EffectApplyGlyph(SpellEffIndex effIndex)
             player->SendTalentsInfoData(false);
         }
     }
+    else if (!m_spellInfo->Effects[effIndex].MiscValue)
+    {
+        // remove old glyph
+        if (uint32 glyph = player->GetGlyph(player->GetActiveSpec(), m_glyphIndex))
+        {
+            if (GlyphPropertiesEntry const* gp = sGlyphPropertiesStore.LookupEntry(glyph))
+            {
+                player->RemoveAurasDueToSpell(gp->SpellId);
+                player->SetGlyph(m_glyphIndex, 0);
+                player->SendTalentsInfoData(false);
+            }
+        }
+    }
 }
 
 void Spell::EffectEnchantHeldItem(SpellEffIndex effIndex)
