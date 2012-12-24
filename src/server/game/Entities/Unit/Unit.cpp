@@ -5993,6 +5993,13 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 target = this;
                 break;
             }
+            // Blood and Thunder
+            if (dummySpell->SpellIconID == 5057)
+            {
+                if (victim && victim->HasAura(94009, GetGUID()))
+                    SpreadAura(94009, 8, false);
+                return true;
+            }
             // Glyph of Sunder Armor
             if (dummySpell->Id == 58387)
             {
