@@ -1374,7 +1374,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         memberData << int32(0);                                     // unk
         memberData.WriteByteSeq(guid[5]);
         memberData.WriteByteSeq(guid[4]);
-        memberData << uint8(0);                                     // unk
+        memberData << uint8(player ? player->getGender() : 0);
         memberData.WriteByteSeq(guid[1]);
         memberData << float(player ? 0.0f : float(::time(NULL) - member->GetLogoutTime()) / DAY);
 
@@ -1697,7 +1697,7 @@ void Guild::HandleInviteMember(WorldSession* session, const std::string& name)
 
     uint32 guildNameSize = uint32(pInvitee->GetGuildName().length());
     uint32 m_nameSize = uint32(m_name.length());
-    uint32 playerNameSize = uint32(name.length());
+    uint32 playerNameSize = uint32(player->GetNameLength());
     
     data.WriteByteMask(newGuildGuid[3]);
     data.WriteByteMask(newGuildGuid[2]);
@@ -1731,7 +1731,7 @@ void Guild::HandleInviteMember(WorldSession* session, const std::string& name)
     data.WriteByteSeq(newGuildGuid[7]);
     data.WriteByteSeq(newGuildGuid[2]);
 
-    data << WriteBuffer(name.c_str(), playerNameSize);
+    data << WriteBuffer(player->GetName(), playerNameSize);
 
     data.WriteByteSeq(oldGuildGuid[7]);
     data.WriteByteSeq(oldGuildGuid[6]);

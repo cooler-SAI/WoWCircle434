@@ -764,6 +764,7 @@ class WorldObject : public Object, public WorldLocation
         InstanceScript* GetInstanceScript();
 
         const char* GetName() const { return m_name.c_str(); }
+        size_t GetNameLength() const { return m_name.length(); }
         void SetName(const std::string& newname) { m_name=newname; }
 
         virtual const char* GetNameForLocaleIdx(LocaleConstant /*locale_idx*/) const { return GetName(); }
