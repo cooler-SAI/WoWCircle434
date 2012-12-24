@@ -1,15 +1,15 @@
-DELETE FROM `creature` WHERE `map WHERE `guid`=337570 AND `id`=53167;
-DELETE FROM `creature_addon` WHERE `map WHERE `guid`=337570;
-DELETE FROM `creature` WHERE `map WHERE `guid`=341062 AND `id`=53141;
-DELETE FROM `creature_addon` WHERE `map WHERE `guid`=341062;
-DELETE FROM `creature` WHERE `map WHERE `guid`=337537 AND `id`=53141;
-DELETE FROM `creature_addon` WHERE `map WHERE `guid`=337537;
-DELETE FROM `creature` WHERE `map WHERE `guid`=337565 AND `id`=53141;
-DELETE FROM `creature_addon` WHERE `map WHERE `guid`=337565;
-DELETE FROM `creature` WHERE `map WHERE `guid`=341471 AND `id`=53167;
-DELETE FROM `creature_addon` WHERE `map WHERE `guid`=341471;
-DELETE FROM `creature` WHERE `map WHERE `guid`=341104 AND `id`=54161;
-DELETE FROM `creature_addon` WHERE `map WHERE `guid`=341104;
+DELETE FROM `creature` WHERE `map`=720 AND `guid`=337570 AND `id`=53167;
+DELETE FROM `creature_addon` WHERE `guid`=337570;
+DELETE FROM `creature` WHERE `map`=720 AND `guid`=341062 AND `id`=53141;
+DELETE FROM `creature_addon` WHERE `guid`=341062;
+DELETE FROM `creature` WHERE `map`=720 AND `guid`=337537 AND `id`=53141;
+DELETE FROM `creature_addon` WHERE `guid`=337537;
+DELETE FROM `creature` WHERE `map`=720 AND `guid`=337565 AND `id`=53141;
+DELETE FROM `creature_addon` WHERE `guid`=337565;
+DELETE FROM `creature` WHERE `map`=720 AND `guid`=341471 AND `id`=53167;
+DELETE FROM `creature_addon` WHERE `guid`=341471;
+DELETE FROM `creature` WHERE `map`=720 AND `guid`=341104 AND `id`=54161;
+DELETE FROM `creature_addon` WHERE `guid`=341104;
 
 UPDATE creature_template SET unit_flags=unit_flags & ~33554688 where entry in (
 35592,
@@ -118,11 +118,6 @@ UPDATE creature_template SET unit_flags=unit_flags & ~33554688 where entry in (
 54401,
 54402,
 54563) and unit_flags & 33554688;
-
-INSERT INTO `creature` 53901 -6.056 48.424 53.98 2.87
-
-53187 -89.521 -63.438 55.76 4.39
-53187 -72.325 -88.005 56.83 3.06
 
 UPDATE `creature_template` SET `mechanic_immune_mask`=617299967 WHERE `entry` IN 
 (52053, 52054, 53134, 53691, 52142, 53979, 54079, 54080, 52393, 52155, 52151, 52059, 52053, 52148,
