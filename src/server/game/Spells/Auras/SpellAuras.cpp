@@ -1828,6 +1828,9 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     else
                         target->SetReducedThreatPercent(0, 0);
                     break;
+                case 91838: // Huddle
+                    target->SetControlled(apply, UNIT_STATE_STUNNED);
+                    break;
             }
             break;
         case SPELLFAMILY_PRIEST:
