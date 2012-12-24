@@ -1005,8 +1005,6 @@ enum Opcodes
     SMSG_LFG_SLOT_INVALID                             = 0x54B5,
     SMSG_LFG_TELEPORT_DENIED                          = 0x0E14,
     SMSG_LFG_UPDATE_LIST                              = UNKNOWN_OPCODE,
-    SMSG_LFG_UPDATE_PARTY                             = UNKNOWN_OPCODE,
-    SMSG_LFG_UPDATE_PLAYER                            = UNKNOWN_OPCODE,
     SMSG_LFG_UPDATE_SEARCH                            = 0x54A1,
     SMSG_LFG_UPDATE_STATUS                            = 0x31A4,
     SMSG_LFG_UPDATE_STATUS_NONE                       = 0x7CA1,

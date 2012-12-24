@@ -69,6 +69,7 @@ public:
             { "messagebox",     SEC_ADMINISTRATOR,  false, &HandleDebugSendMessageBoxCommand,     "", NULL },
             { "joinresult",     SEC_ADMINISTRATOR,  false, &HandleDebugSendLfgJoinResultCommand,  "", NULL },
             { "rolecheckstate", SEC_ADMINISTRATOR,  false, &HandleDebugSendLfgRoleCheckStateCommand, "", NULL },
+            { "lfgupdate",      SEC_ADMINISTRATOR,  false, &HandleDebugSendLfgUpdateStatusCommand,"", NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                                  "", NULL }
         };
 
@@ -299,6 +300,20 @@ public:
 
         LfgRoleCheckState error = LfgRoleCheckState(atoi(result));
         handler->GetSession()->SendLfgJoinResult(handler->GetSession()->GetPlayer()->GetGUID(), 0, LfgJoinResultData(LFG_JOIN_OK, error));
+        return true;
+    }
+
+    static bool HandleDebugSendLfgUpdateStatusCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* result = strtok((char*)args, " ");
+        if (!result)
+            return false;
+
+        LfgUpdateType error = LfgUpdateType(atoi(result));
+        handler->GetSession()->SendLfgUpdatePlayer(LfgUpdateData(error));
         return true;
     }
 
