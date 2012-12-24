@@ -5759,6 +5759,10 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (bg->GetStatus() == STATUS_IN_PROGRESS)
                             return SPELL_FAILED_NOT_IN_BATTLEGROUND;
                 break;
+            case SPELL_EFFECT_RESURRECT:
+                if (m_spellInfo->HasAttribute(SPELL_ATTR8_BATTLE_RESURRECTION) && m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->HasAura(97821))
+                    return SPELL_FAILED_TARGET_CANNOT_BE_RESURRECTED;
+                break;
             default:
                 break;
         }

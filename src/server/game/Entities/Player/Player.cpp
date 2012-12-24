@@ -2517,6 +2517,9 @@ void Player::ProcessDelayedOperations()
         SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
         SetPower(POWER_ECLIPSE, 0);
 
+        if (m_resurrectDebuff)
+            AddAura(m_resurrectDebuff, this);
+
         SpawnCorpseBones();
     }
 

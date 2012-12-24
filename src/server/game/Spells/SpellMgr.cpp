@@ -5378,6 +5378,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 61261:
                 spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
                 break;
+            // Raise Ally
+            case 61999:
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                break;
             default:
                 break;
         }

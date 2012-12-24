@@ -2029,7 +2029,7 @@ class Player : public Unit, public GridObject<Player>
         void SetLastPotionId(uint32 item_id) { m_lastPotionId = item_id; }
         void UpdatePotionCooldown(Spell* spell = NULL);
 
-        void setResurrectRequestData(uint64 guid, uint32 mapId, float X, float Y, float Z, uint32 health, uint32 mana)
+        void setResurrectRequestData(uint64 guid, uint32 mapId, float X, float Y, float Z, uint32 health, uint32 mana, uint32 resurrectDebuff = 0)
         {
             m_resurrectGUID = guid;
             m_resurrectMap = mapId;
@@ -2038,6 +2038,7 @@ class Player : public Unit, public GridObject<Player>
             m_resurrectZ = Z;
             m_resurrectHealth = health;
             m_resurrectMana = mana;
+            m_resurrectDebuff = resurrectDebuff;
         }
         void clearResurrectRequestData() { setResurrectRequestData(0, 0, 0.0f, 0.0f, 0.0f, 0, 0); }
         bool isRessurectRequestedBy(uint64 guid) const { return m_resurrectGUID == guid; }
@@ -3206,7 +3207,7 @@ class Player : public Unit, public GridObject<Player>
         void SendTimeSync();
 
         uint64 m_resurrectGUID;
-        uint32 m_resurrectMap;
+        uint32 m_resurrectMap, m_resurrectDebuff;
         float m_resurrectX, m_resurrectY, m_resurrectZ;
         uint32 m_resurrectHealth, m_resurrectMana;
 

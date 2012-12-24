@@ -6012,15 +6012,13 @@ void Spell::EffectResurrect(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
-    if (!unitTarget)
-        return;
-    if (unitTarget->GetTypeId() != TYPEID_PLAYER)
+    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    if (unitTarget->isAlive())
+    if (unitTarget->isAlive() || !unitTarget->IsInWorld())
         return;
-    if (!unitTarget->IsInWorld())
-        return;
+
+    uint32 resurrectDebuffId = 0;
 
     switch (m_spellInfo->Id)
     {
@@ -6047,6 +6045,10 @@ void Spell::EffectResurrect(SpellEffIndex effIndex)
                 return;
             }
             break;
+        // Raise Ally should apply a debuff
+        case 61999:
+            resurrectDebuffId = 97821;
+            break;
         default:
             break;
     }
@@ -6061,7 +6063,7 @@ void Spell::EffectResurrect(SpellEffIndex effIndex)
 
     ExecuteLogEffectResurrect(effIndex, target);
 
-    target->setResurrectRequestData(m_caster->GetGUID(), m_caster->GetMapId(), m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), health, mana);
+    target->setResurrectRequestData(m_caster->GetGUID(), m_caster->GetMapId(), m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), health, mana, resurrectDebuffId);
     SendResurrectRequest(target);
 }
 
