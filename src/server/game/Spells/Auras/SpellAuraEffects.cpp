@@ -6374,6 +6374,9 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                 caster->CastCustomSpell(target, 52212, &m_amount, NULL, NULL, true, 0, this);
             break;
         case SPELLFAMILY_PALADIN:
+            if (!caster || !target)
+                break;
+
             // Holy Radiance
             if (GetId() == 82327)
                 caster->CastSpell(target, 86452, true);
