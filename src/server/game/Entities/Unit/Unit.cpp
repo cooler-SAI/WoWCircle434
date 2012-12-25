@@ -6982,6 +6982,28 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     basepoints0 = CalculatePct(GetMaxPower(POWER_FOCUS), triggerAmount);
                     break;
                 }
+                // Crouching Tiger, Hidden Chimera
+                case 4752:
+                {
+                    // custom cooldown processing case
+                    if (!ToPlayer() || (cooldown && ToPlayer()->HasSpellCooldown(dummySpell->Id)))
+                        return false;
+
+                    // Reduct Disengage cooldown
+                    if (procFlag & (PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK | PROC_FLAG_TAKEN_SPELL_MELEE_DMG_CLASS))
+                    {
+                        if (AuraEffect const* aurEff = this->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_HUNTER, 4752, 0))
+                            ToPlayer()->SpellCooldownReduction(781, aurEff->GetAmount());
+                    }
+                    // Reduct Deterrence cooldown
+                    else if (procFlag & (PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK | PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG))
+                    {
+                        if (AuraEffect const* aurEff = this->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_HUNTER, 4752, 1))
+                            ToPlayer()->SpellCooldownReduction(19263, aurEff->GetAmount());
+                    }
+                    ToPlayer()->AddSpellCooldown(dummySpell->Id, 0, time(NULL) + cooldown);
+                    return true;
+                }
                 // Improved Steady Shot
                 case 3409:
                 {
