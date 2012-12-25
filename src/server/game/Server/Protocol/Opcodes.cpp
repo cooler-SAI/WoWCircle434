@@ -302,9 +302,9 @@ void OpcodeTable::Initialize()
     DEFINE_OPCODE_HANDLER(CMSG_LFG_LEAVE,                               STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleLfgLeaveOpcode            );
     DEFINE_OPCODE_HANDLER(CMSG_LFG_LFR_JOIN,                            STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
     DEFINE_OPCODE_HANDLER(CMSG_LFG_LFR_LEAVE,                           STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
-    DEFINE_OPCODE_HANDLER(CMSG_LFG_PROPOSAL_RESULT,                     STATUS_UNHANDLED, PROCESS_THREADUNSAFE, &WorldSession::HandleLfgProposalResultOpcode   );
+    DEFINE_OPCODE_HANDLER(CMSG_LFG_PROPOSAL_RESULT,                     STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleLfgProposalResultOpcode   );
     DEFINE_OPCODE_HANDLER(CMSG_LFG_SET_BOOT_VOTE,                       STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleLfgSetBootVoteOpcode      );
-    DEFINE_OPCODE_HANDLER(CMSG_LFG_SET_COMMENT,                         STATUS_LOGGEDIN,  PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
+    DEFINE_OPCODE_HANDLER(CMSG_LFG_SET_COMMENT,                         STATUS_LOGGEDIN,  PROCESS_INPLACE,      &WorldSession::HandleLfgSetCommentOpcode       );
     DEFINE_OPCODE_HANDLER(CMSG_LFG_SET_ROLES,                           STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleLfgSetRolesOpcode         );
     DEFINE_OPCODE_HANDLER(CMSG_LFG_TELEPORT,                            STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleLfgTeleportOpcode         );
     DEFINE_OPCODE_HANDLER(CMSG_LF_GUILD_ADD_RECRUIT,                    STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleGuildFinderAddRecruit     );
@@ -876,7 +876,7 @@ void OpcodeTable::Initialize()
     DEFINE_OPCODE_HANDLER(SMSG_LFG_ROLE_CHOSEN,                         STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     DEFINE_OPCODE_HANDLER(SMSG_LFG_SLOT_INVALID,                        STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     DEFINE_OPCODE_HANDLER(SMSG_LFG_TELEPORT_DENIED,                     STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
-    DEFINE_OPCODE_HANDLER(SMSG_LFG_UPDATE_SEARCH,                       STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
+    DEFINE_OPCODE_HANDLER(SMSG_LFG_UPDATE_SEARCH,                       STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     DEFINE_OPCODE_HANDLER(SMSG_LFG_UPDATE_STATUS,                       STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     DEFINE_OPCODE_HANDLER(SMSG_LFG_UPDATE_STATUS_NONE,                  STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     DEFINE_OPCODE_HANDLER(SMSG_LF_GUILD_APPLICANT_LIST_UPDATED,         STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
@@ -1507,7 +1507,6 @@ void OpcodeTable::Initialize()
   //DEFINE_OPCODE_HANDLER(CMSG_SET_GLYPH,                               STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
   //DEFINE_OPCODE_HANDLER(CMSG_SET_GLYPH_SLOT,                          STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
   //DEFINE_OPCODE_HANDLER(CMSG_SET_GRANTABLE_LEVELS,                    STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
-  //DEFINE_OPCODE_HANDLER(CMSG_SET_LFG_COMMENT,                         STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleLfgSetCommentOpcode       );
   //DEFINE_OPCODE_HANDLER(CMSG_SET_PAID_SERVICE_CHEAT,                  STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
   //DEFINE_OPCODE_HANDLER(CMSG_SET_PVP_RANK_CHEAT,                      STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
   //DEFINE_OPCODE_HANDLER(CMSG_SET_PVP_TITLE,                           STATUS_NEVER,     PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );

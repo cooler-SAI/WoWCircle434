@@ -506,7 +506,6 @@ enum Opcodes
     CMSG_SET_FACTION_CHEAT                            = UNKNOWN_OPCODE,
     CMSG_SET_FACTION_INACTIVE                         = 0x0E37,
     CMSG_SET_GUILD_BANK_TEXT                          = 0x3023,
-    CMSG_SET_LFG_COMMENT                              = UNKNOWN_OPCODE,
     CMSG_SET_PET_SLOT                                 = 0x3A04,
     CMSG_SET_PLAYER_DECLINED_NAMES                    = 0x6316,
     CMSG_SET_PREFERED_CEMETERY                        = 0x311E,

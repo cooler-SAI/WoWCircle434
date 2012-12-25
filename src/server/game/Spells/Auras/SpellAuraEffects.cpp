@@ -6405,7 +6405,8 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
             {
                 // Holy Word: Sanctuary
                 case 88685:
-                    caster->CastSpell(target, 88686, true);
+                    if (caster)
+                        caster->CastSpell(target, 88686, true);
                     break;
                 default:
                     break;

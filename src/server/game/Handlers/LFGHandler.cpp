@@ -65,7 +65,7 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
 
     recvData >> roles;
 
-    for (int i = 0; i < 3; ++i)
+    for (uint8 i = 0; i < 3; ++i)
     {
         recvData.read_skip<uint32>();
     }
@@ -112,20 +112,72 @@ void WorldSession::HandleLfgLeaveOpcode(WorldPacket&  recvData)
 
 void WorldSession::HandleLfgProposalResultOpcode(WorldPacket& recvData)
 {
-    uint32 lfgGroupID;                                      // Internal lfgGroupID
-    bool accept;                                           // Accept to join?
-    recvData >> lfgGroupID;
-    recvData >> accept;
+    uint32 lfgGroupID;                   // Internal lfgGroupID
+    uint32 time;
+    uint32 roles;
+    uint32 unk;
+    bool accept;                         // Accept to join?
+
+    ObjectGuid playerGuid;
+    ObjectGuid instanceGuid;
+
+    recvData 
+        >> lfgGroupID // dword28
+        >> time // f0[16]
+        >> roles // f0[12]
+        >> unk; // f0[8]
+
+    recvData
+        .ReadByteMask(playerGuid[4])
+        .ReadByteMask(playerGuid[5])
+        .ReadByteMask(playerGuid[0])
+        .ReadByteMask(playerGuid[6])
+        .ReadByteMask(playerGuid[2])
+        .ReadByteMask(playerGuid[7])
+        .ReadByteMask(playerGuid[1])
+        .ReadByteMask(playerGuid[3])
+
+        .ReadByteSeq(playerGuid[7])
+        .ReadByteSeq(playerGuid[4])
+        .ReadByteSeq(playerGuid[3])
+        .ReadByteSeq(playerGuid[2])
+        .ReadByteSeq(playerGuid[6])
+        .ReadByteSeq(playerGuid[0])
+        .ReadByteSeq(playerGuid[1])
+        .ReadByteSeq(playerGuid[5]);
+
+    recvData.ReadByteMask(instanceGuid[7]);
+
+    accept = recvData.ReadBit();
+
+    recvData
+        .ReadByteMask(instanceGuid[1])
+        .ReadByteMask(instanceGuid[3])
+        .ReadByteMask(instanceGuid[0])
+        .ReadByteMask(instanceGuid[5])
+        .ReadByteMask(instanceGuid[4])
+        .ReadByteMask(instanceGuid[6])
+        .ReadByteMask(instanceGuid[2])
+
+        .ReadByteSeq(instanceGuid[7])
+        .ReadByteSeq(instanceGuid[1])
+        .ReadByteSeq(instanceGuid[5])
+        .ReadByteSeq(instanceGuid[6])
+        .ReadByteSeq(instanceGuid[3])
+        .ReadByteSeq(instanceGuid[4])
+        .ReadByteSeq(instanceGuid[0])
+        .ReadByteSeq(instanceGuid[2]);
 
     sLog->outDebug(LOG_FILTER_LFG, "CMSG_LFG_PROPOSAL_RESULT %s proposal: %u accept: %u",
         GetPlayer()->GetGUID(), lfgGroupID, accept ? 1 : 0);
-    sLFGMgr->UpdateProposal(lfgGroupID, GetPlayer()->GetGUID(), accept);
+    sLFGMgr->UpdateProposal(lfgGroupID, playerGuid, accept);
 }
 
 void WorldSession::HandleLfgSetRolesOpcode(WorldPacket& recvData)
 {
-    uint8 roles;
+    uint32 roles;
     recvData >> roles;                                     // Player Group Roles
+    
     uint64 guid = GetPlayer()->GetGUID();
     Group* grp = GetPlayer()->GetGroup();
     if (!grp)
@@ -146,7 +198,6 @@ void WorldSession::HandleLfgSetCommentOpcode(WorldPacket&  recvData)
     std::string comment;
 
     commentSize = recvData.ReadBits(9);
-    recvData.ReadBit();
     recvData.read(comment, commentSize);
 
     uint64 guid = GetPlayer()->GetGUID();
@@ -436,8 +487,6 @@ void WorldSession::HandleLfgGetStatus(WorldPacket& /*recvData*/)
 
 void WorldSession::SendLfgUpdatePlayer(const LfgUpdateData& updateData)
 {
-#pragma warning "Found opcode"
-
     bool queued = false;
     bool join = false;
     uint8 size = uint8(updateData.dungeons.size());
@@ -903,7 +952,7 @@ void WorldSession::SendLfgUpdateProposal(uint32 proposalId, LfgProposal const& p
     if (LFGDungeonData const* dungeon = sLFGMgr->GetLFGDungeon(dungeonEntry))
         dungeonEntry = dungeon->Entry();
 
-    data << uint32(0);                                     // Date
+    data << uint32(getMSTime());                           // Date
     data << uint32(proposal.encounters);                   // Bosses killed mask - encounters done?
     data << uint32(3);                                     // Unk1
     data << uint32(0);                                     // Unk2
