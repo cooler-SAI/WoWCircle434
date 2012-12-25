@@ -2424,14 +2424,9 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             {
                 // send transfer packets
                 WorldPacket data(SMSG_TRANSFER_PENDING, 4 + 4 + 4);
-                data.WriteBit(false);       // unknown
+                data.WriteBit(false).WriteBit(m_transport != NULL);       // unknown
                 if (m_transport)
-                {
-                    data.WriteBit(true);   // has transport
                     data << GetMapId() << m_transport->GetEntry();
-                }
-                else
-                    data.WriteBit(false);   // has transport
 
                 data << uint32(mapid);
                 GetSession()->SendPacket(&data);
@@ -2469,9 +2464,9 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 WorldPacket data(SMSG_NEW_WORLD, 4 + 4 + 4 + 4 + 4);
                 data << float(m_teleport_dest.GetPositionX());
                 data << float(m_teleport_dest.GetOrientation());
-                data << float(m_teleport_dest.GetPositionZ());
-                data << uint32(mapid);
                 data << float(m_teleport_dest.GetPositionY());
+                data << uint32(mapid);
+                data << float(m_teleport_dest.GetPositionZ());
 
                 GetSession()->SendPacket(&data);
                 SendSavedInstances();
