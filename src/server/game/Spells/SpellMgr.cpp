@@ -5404,6 +5404,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 61999:
                 spellInfo->Effects[EFFECT_1].Effect = 0;
                 break;
+            // Snowball
+            case 25677:
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
             default:
                 break;
         }
