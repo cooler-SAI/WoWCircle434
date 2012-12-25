@@ -808,7 +808,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     {
                         float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
                         int32 spd = m_caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->SchoolMask));
-                        damage += int32(0.15f * spd + 0.50f * ap);
+                        damage += int32(0.117f * spd + 0.39f * ap);
                         break;
                     }
                     // Exorcism 
