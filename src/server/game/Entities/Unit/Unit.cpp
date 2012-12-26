@@ -8425,6 +8425,10 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, uint32 absorb, Aura* trig
                     // Brain Freeze
                     if (GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_MAGE, 0, 0, 0x00008000, GetGUID()))
                         *handled = true;
+
+                    // roll basepoints
+                    if (!roll_chance_i(triggeredByAura->GetEffect(0)->GetAmount()))
+                        *handled = true;
                     break;
                 }
                 // Empowered Fire
