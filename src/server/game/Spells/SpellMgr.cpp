@@ -4024,6 +4024,166 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // ENDOF STONECORE SPELLS
             //
+            // LOST CITY OF THE TOL'VIR
+            case 83644: // Mystic Trap N
+                spellInfo->MaxAffectedTargets = 3;
+                break;
+            case 91252: // Mystic Trap H
+                spellInfo->MaxAffectedTargets = 5;
+                break;
+            case 83112: // Land Mine Player Search Effect
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(7);
+                spellInfo->AttributesEx3 = SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+                break;
+            case 91263: // Detonate Traps
+                spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
+                break;
+            case 84799: // Paralytic Blow Dart N
+            case 89989: // Paralytic Blow Dart H
+                spellInfo->Attributes = 0;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                spellInfo->Effects[EFFECT_2].TargetB = 0;
+                spellInfo->Targets = TARGET_FLAG_UNIT;
+                break;
+            case 83131: // Summon Shockwave Target N
+            case 83132: // Summon Shockwave Target S
+            case 83133: // Summon Shockwave Target W
+            case 83134: // Summon Shockwave Target E
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(15);
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Targets = TARGET_FLAG_DEST_LOCATION;
+                break;
+            case 83454: // Shockwave N
+            case 90029: // Shockwave H
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(15);
+                break;
+            case 81690: // Scent of Blood N
+            case 89998: // Scent of Blood H
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 82263: // Merged Souls
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                spellInfo->Effects[EFFECT_2].TargetB = 0;
+                spellInfo->Targets = TARGET_FLAG_UNIT;
+                break;
+            case 82430: // Repentance
+                spellInfo->Effects[EFFECT_0].MiscValue = 250;
+                break;
+            case 91196: // Blaze of the Heavens
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(7);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(7);
+                break;
+            case 88814: // Hallowed Ground N
+            case 90010: // Hallowed Ground H
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(32);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(32);
+                break;
+            case 81942: // Heaven's Fury N
+            case 90040: // Heaven's Fury H
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(15);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(15);
+                break;
+            case 82622: // Plague of Ages N
+            case 89997: // Plague of Ages H
+                spellInfo->MaxAffectedTargets = 1;
+                spellInfo->AttributesEx = SPELL_ATTR1_CANT_TARGET_SELF;
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS | SPELL_ATTR3_IGNORE_HIT_RESULT;
+                break;
+            case 82637: // Plague of Ages N
+                spellInfo->ExcludeTargetAuraSpell = 82622;
+                spellInfo->MaxAffectedTargets = 1;
+                spellInfo->Attributes &= ~SPELL_ATTR0_NEGATIVE_1;
+                spellInfo->AttributesEx = SPELL_ATTR1_CANT_TARGET_SELF;
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS | SPELL_ATTR3_IGNORE_HIT_RESULT;
+                break;
+            case 89996: // Plague of Ages H
+                spellInfo->ExcludeTargetAuraSpell = 89997;
+                spellInfo->MaxAffectedTargets = 1;
+                spellInfo->Attributes &= ~SPELL_ATTR0_NEGATIVE_1;
+                spellInfo->AttributesEx = SPELL_ATTR1_CANT_TARGET_SELF;
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS | SPELL_ATTR3_IGNORE_HIT_RESULT;
+                break;
+            case 82640: // Plague of Ages N
+                spellInfo->ExcludeTargetAuraSpell = 82622;
+                spellInfo->MaxAffectedTargets = 1;
+                spellInfo->Attributes &= ~SPELL_ATTR0_NEGATIVE_1;
+                spellInfo->AttributesEx = SPELL_ATTR1_CANT_TARGET_SELF;
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS | SPELL_ATTR3_IGNORE_HIT_RESULT;
+                break;
+            case 89995: // Plague of Ages H
+                spellInfo->ExcludeTargetAuraSpell = 89997;
+                spellInfo->MaxAffectedTargets = 1;
+                spellInfo->Attributes &= ~SPELL_ATTR0_NEGATIVE_1;
+                spellInfo->AttributesEx = SPELL_ATTR1_CANT_TARGET_SELF;
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS | SPELL_ATTR3_IGNORE_HIT_RESULT;
+                break;
+            case 82139: // Repentance
+                spellInfo->AttributesEx3 &= ~SPELL_ATTR3_DEATH_PERSISTENT;
+                break;
+            case 82425: // Wail of Darkness N
+            case 90039: // Wail of Darkness H
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(32);
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_SRC_CASTER;
+                spellInfo->Effects[EFFECT_1].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 84546: // Static Shock
+            case 84555: // Static Shock
+            case 84556: // Static Shock
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Targets = TARGET_FLAG_DEST_LOCATION;
+                break;
+            case 84956: // Call of Sky
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                spellInfo->Targets = TARGET_FLAG_DEST_LOCATION;
+                break;
+            case 83455: // Chain Lightning N
+            case 90027: // Chain Lightning H
+                spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
+                break;
+            case 83790: // Cloud Burst
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_DEST_DEST_RANDOM;
+                spellInfo->Targets = TARGET_FLAG_DEST_LOCATION;
+                break;
+            case 83051: // Cloud Burst
+            case 90032: // Cloud Burst
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(7);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(7);
+                break;
+            case 83566: // Wailing Winds
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                spellInfo->Effects[EFFECT_2].TargetB = 0;
+                break;
+            case 83094: // Wailing Winds N
+            case 90031: // Wailing Winds H
+                spellInfo->AttributesEx4 |= SPELL_ATTR4_TRIGGERED;
+                break;
+            case 83151: // Absorb Storms
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_NEARBY_ENTRY;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_CASTER;
+                break;
+            case 84126: // Call Scorpid
+            case 82791: // Call Crocolisk
+                spellInfo->Attributes = 0;
+                break;
+            // ENDOF LOST CITY OF THE TOL'VIR
             // GRIM BATOL SPELLS
             //
             // Trash
@@ -5408,6 +5568,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 25677:
                 spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
             default:
                 break;
