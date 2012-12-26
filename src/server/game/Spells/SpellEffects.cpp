@@ -2153,91 +2153,126 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
 
         int32 addhealth = damage;
 
-        // Vessel of the Naaru (Vial of the Sunwell trinket)
-        if (m_spellInfo->Id == 45064)
+        switch (m_spellInfo->Id)
         {
-            // Amount of heal - depends from stacked Holy Energy
-            int damageAmount = 0;
-            if (AuraEffect const* aurEff = m_caster->GetAuraEffect(45062, 0))
+            // Tipping of the Scales, Scales of Life
+            case 96880:
             {
-                damageAmount+= aurEff->GetAmount();
-                m_caster->RemoveAurasDueToSpell(45062);
-            }
-
-            addhealth += damageAmount;
-        }
-        // Charged Crystal Focus
-        else if (m_spellInfo->Id == 41237)
-        {
-            addhealth = 2000;
-        }
-        // Runic Healing Injector (heal increased by 25% for engineers - 3.2.0 patch change)
-        else if (m_spellInfo->Id == 67489)
-        {
-            if (Player* player = m_caster->ToPlayer())
-                if (player->HasSkill(SKILL_ENGINEERING))
-                    AddPct(addhealth, 25);
-        }
-        // Swiftmend - consumes Regrowth or Rejuvenation
-        else if (m_spellInfo->TargetAuraState == AURA_STATE_SWIFTMEND && unitTarget->HasAuraState(AURA_STATE_SWIFTMEND, m_spellInfo, m_caster))
-        {
-            Unit::AuraEffectList const& RejorRegr = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_HEAL);
-            // find most short by duration
-            AuraEffect* targetAura = NULL;
-            for (Unit::AuraEffectList::const_iterator i = RejorRegr.begin(); i != RejorRegr.end(); ++i)
-            {
-                if ((*i)->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_DRUID
-                    && (*i)->GetSpellInfo()->SpellFamilyFlags[0] & 0x50)
+                if (AuraEffect const* aurEff = m_caster->GetAuraEffect(96881, EFFECT_0))
                 {
-                    if (!targetAura || (*i)->GetBase()->GetDuration() < targetAura->GetBase()->GetDuration())
-                        targetAura = *i;
+                    addhealth = aurEff->GetAmount();
+                    m_caster->RemoveAurasDueToSpell(96881);
                 }
+                else
+                    return;
+                break;
             }
-
-            // afterh 4.0 "Changed from selectable talent to a specilization perk. Heals for a fixed amount rather than based on the HoT it consumes"
-            addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
-
-            if (!targetAura)
-                return;
-
-            // Glyph of Swiftmend
-            if (!caster->HasAura(54824))
-                unitTarget->RemoveAura(targetAura->GetId(), targetAura->GetCasterGUID()); 
-        }
-        // Death Pact - return pct of max health to caster
-        else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && m_spellInfo->SpellFamilyFlags[0] & 0x00080000)
-            addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, int32(caster->CountPctFromMaxHealth(damage)), HEAL);
-        // Word of Glory
-        else if (m_spellInfo->Id == 85673)
-        {
-            addhealth += int32(0.209f * m_caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->SchoolMask)) + 0.198f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
-
-            // Divine Purpose
-            addhealth *= GetPowerCost();
-
-            // Selfless Healer
-            if (m_caster != unitTarget)
+            // Vessel of the Naaru (Vial of the Sunwell trinket)
+            case 45064:
             {
-                if (AuraEffect const * aurEff = m_caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 3924, 0))
-                    AddPct(addhealth, aurEff->GetAmount());
+                // Amount of heal - depends from stacked Holy Energy
+                int damageAmount = 0;
+                if (AuraEffect const* aurEff = m_caster->GetAuraEffect(45062, 0))
+                {
+                    damageAmount+= aurEff->GetAmount();
+                    m_caster->RemoveAurasDueToSpell(45062);
+                }
+
+                addhealth += damageAmount;
+                break;
             }
+            // Charged Crystal Focus
+            case 1237:
+            {
+                addhealth = 2000;
+                break;
+            }
+            // Runic Healing Injector (heal increased by 25% for engineers - 3.2.0 patch change)
+            case 67489:
+            {
+                if (Player* player = m_caster->ToPlayer())
+                    if (player->HasSkill(SKILL_ENGINEERING))
+                        AddPct(addhealth, 25);
+                break;
+            }
+            // Swiftmend - consumes Regrowth or Rejuvenation
+            case 18562: 
+            {
+                if (!unitTarget->HasAuraState(AURA_STATE_SWIFTMEND, m_spellInfo, m_caster))
+                    break;
 
-            // Guarded by the Light
-            AuraEffect* aur = NULL;
-            if ((aur = m_caster->GetAuraEffect(85646, 0)) || (aur = m_caster->GetAuraEffect(85639, 0)))            
-                if (unitTarget == m_caster)
-                    AddPct(addhealth, aur->GetAmount());
+                Unit::AuraEffectList const& RejorRegr = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_HEAL);
+                // find most short by duration
+                AuraEffect* targetAura = NULL;
+                for (Unit::AuraEffectList::const_iterator i = RejorRegr.begin(); i != RejorRegr.end(); ++i)
+                {
+                    if ((*i)->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_DRUID
+                        && (*i)->GetSpellInfo()->SpellFamilyFlags[0] & 0x50)
+                    {
+                        if (!targetAura || (*i)->GetBase()->GetDuration() < targetAura->GetBase()->GetDuration())
+                            targetAura = *i;
+                    }
+                }
 
-            addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
+                // afterh 4.0 "Changed from selectable talent to a specilization perk. Heals for a fixed amount rather than based on the HoT it consumes"
+                addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
+
+                if (!targetAura)
+                    return;
+
+                // Glyph of Swiftmend
+                if (!caster->HasAura(54824))
+                    unitTarget->RemoveAura(targetAura->GetId(), targetAura->GetCasterGUID());
+                
+                break;
+            }
+            // Death Pact - return pct of max health to caster
+            case 48743:
+            {
+                addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, int32(caster->CountPctFromMaxHealth(damage)), HEAL);
+                break;
+            }
+            // Word of Glory
+            case 85673:
+            {
+                addhealth += int32(0.209f * m_caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->SchoolMask)) + 0.198f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
+
+                // Divine Purpose
+                addhealth *= GetPowerCost();
+
+                // Selfless Healer
+                if (m_caster != unitTarget)
+                {
+                    if (AuraEffect const * aurEff = m_caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 3924, 0))
+                        AddPct(addhealth, aurEff->GetAmount());
+                }
+
+                // Guarded by the Light
+                AuraEffect* aur = NULL;
+                if ((aur = m_caster->GetAuraEffect(85646, 0)) || (aur = m_caster->GetAuraEffect(85639, 0)))            
+                    if (unitTarget == m_caster)
+                        AddPct(addhealth, aur->GetAmount());
+
+                addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
+                break;
+            }
+            // Seal of Insight
+            case 20167:
+            {
+                addhealth = int32(0.15f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + 0.15f * m_caster->SpellBaseHealingBonusDone(SpellSchoolMask(m_spellInfo->ScalingClass)));
+                break;
+            }
+            // Lifebloom final heal
+            case 33778:
+            {
+                addhealth = m_caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL, m_spellValue->EffectBasePoints[1]);
+                break;
+            }
+            default:
+                addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
+                break;
         }
-        // Seal of Insight
-        else if (m_spellInfo->Id == 20167)
-            addhealth = int32(0.15f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + 0.15f * m_caster->SpellBaseHealingBonusDone(SpellSchoolMask(m_spellInfo->ScalingClass)));
-        // Lifebloom final heal
-        else if (m_spellInfo->Id == 33778)
-            addhealth = m_caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL, m_spellValue->EffectBasePoints[1]);
-        else
-            addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
+        
         // Mastery Priest
         if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST)
         {

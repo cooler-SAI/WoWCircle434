@@ -5148,6 +5148,29 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Weight of Feather, Scales of Life
+                case 96879:
+                case 97117:
+                {
+                    if (!victim)
+                        return false;
+
+                    int32 max_amount = triggeredByAura->GetAmount();
+                    int32 add_heal = damage - (victim->GetMaxHealth() - victim->GetHealth());
+                    if (add_heal <= 0)
+                        return false;
+
+                    int32 old_amount = 0;
+
+                    if (AuraEffect* aurEff = victim->GetAuraEffect(96881, EFFECT_0))
+                        old_amount = aurEff->GetAmount();
+
+                    int32 new_amount = old_amount + add_heal;
+
+                    int32 bp0 = std::min(new_amount, max_amount);
+                    CastCustomSpell(victim, 96881, &bp0, 0, 0, true); 
+                    return true;
+                }
                 // Pursuit of Justice
                 case 26022:
                 case 26023:
