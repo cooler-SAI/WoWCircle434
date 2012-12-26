@@ -3113,13 +3113,6 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     }
     LoadScripts();
 
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        m_caster->ToPlayer()->SetSpellModTakingSpell(this, true);
-    // Fill cost data (not use power for item casts
-    m_powerCost = m_CastItem ? 0 : m_spellInfo->CalcPowerCost(m_caster, m_spellSchoolMask);
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        m_caster->ToPlayer()->SetSpellModTakingSpell(this, false);
-
     // Set combo point requirement
     if ((_triggeredCastFlags & TRIGGERED_IGNORE_COMBO_POINTS) || m_CastItem || !m_caster->m_movedPlayer)
         m_needComboPoints = false;
@@ -3127,7 +3120,29 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     if (IsDarkSimulacrum())
         isStolen = true;
 
-    SpellCastResult result = CheckCast(true);
+    SpellCastResult result = SPELL_CAST_OK;
+    if (!m_caster->isPet())
+    {
+        result = CheckCast(true);
+        if (result == SPELL_CAST_OK)
+        {
+            if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                m_caster->ToPlayer()->SetSpellModTakingSpell(this, true);
+            // Fill cost data (not use power for item casts
+            m_powerCost = m_CastItem ? 0 : m_spellInfo->CalcPowerCost(m_caster, m_spellSchoolMask);
+
+            if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                m_caster->ToPlayer()->SetSpellModTakingSpell(this, false);
+
+            if (!(_triggeredCastFlags & TRIGGERED_IGNORE_POWER_AND_REAGENT_COST))
+            {
+                result = CheckPower();
+                if (result == SPELL_CAST_OK)
+                    result = CheckCasterAuras();
+            }
+        }
+    }
+
     if (result != SPELL_CAST_OK && !IsAutoRepeat())          //always cast autorepeat dummy for triggering
     {
         // Periodic auras should be interrupted when aura triggers a spell which can't be cast
