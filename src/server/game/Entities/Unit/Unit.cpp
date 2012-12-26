@@ -9142,7 +9142,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
         case 11213:
         case 12574:
         case 12575:
-            if (!damage || !absorb)
+            if (!damage && !absorb)
                 return false;
             break;
         // Seal of Insight
