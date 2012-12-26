@@ -73,17 +73,24 @@ public:
 
     static bool HandleLearnCommand(ChatHandler* handler, char const* args)
     {
-        Player* targetPlayer = handler->getSelectedPlayer();
+        Player* target;
+        uint64 targetGuid;
+        std::string targetName;
+        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
+            return false;
 
-        if (!targetPlayer)
+        if (!target)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
+        char const* spellId = strtok(NULL, "");
+        if (!spellId)
+            return false;
+
         // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
-        uint32 spell = handler->extractSpellIdFromLink((char*)args);
+        uint32 spell = handler->extractSpellIdFromLink((char*)spellId);
         if (!spell || !sSpellMgr->GetSpellInfo(spell))
             return false;
 
@@ -98,24 +105,24 @@ public:
             return false;
         }
 
-        if (!allRanks && targetPlayer->HasSpell(spell))
+        if (!allRanks && target->HasSpell(spell))
         {
-            if (targetPlayer == handler->GetSession()->GetPlayer())
+            if (target == handler->GetSession()->GetPlayer())
                 handler->SendSysMessage(LANG_YOU_KNOWN_SPELL);
             else
-                handler->PSendSysMessage(LANG_TARGET_KNOWN_SPELL, handler->GetNameLink(targetPlayer).c_str());
+                handler->PSendSysMessage(LANG_TARGET_KNOWN_SPELL, handler->GetNameLink(target).c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (allRanks)
-            targetPlayer->learnSpellHighRank(spell);
+            target->learnSpellHighRank(spell);
         else
-            targetPlayer->learnSpell(spell, false);
+            target->learnSpell(spell, false);
 
         uint32 firstSpell = sSpellMgr->GetFirstSpellInChain(spell);
         if (GetTalentSpellCost(firstSpell))
-            targetPlayer->SendTalentsInfoData(false);
+            target->SendTalentsInfoData(false);
 
         return true;
     }
@@ -451,24 +458,29 @@ public:
 
     static bool HandleUnLearnCommand(ChatHandler* handler, char const* args)
     {
-        if (!*args)
+        Player* target;
+        uint64 targetGuid;
+        std::string targetName;
+        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
             return false;
 
-        // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r
-        uint32 spellId = handler->extractSpellIdFromLink((char*)args);
-        if (!spellId)
+        if (!target)
+        {
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        char const* spell = strtok(NULL, "");
+        if (!spell)
+            return false;
+
+        // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
+        uint32 spellId = handler->extractSpellIdFromLink((char*)spell);
+        if (!spellId || !sSpellMgr->GetSpellInfo(spellId))
             return false;
 
         char const* allStr = strtok(NULL, " ");
         bool allRanks = allStr ? (strncmp(allStr, "all", strlen(allStr)) == 0) : false;
-
-        Player* target = handler->getSelectedPlayer();
-        if (!target)
-        {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
 
         if (allRanks)
             spellId = sSpellMgr->GetFirstSpellInChain (spellId);

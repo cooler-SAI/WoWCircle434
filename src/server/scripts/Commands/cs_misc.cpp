@@ -1384,25 +1384,49 @@ public:
     }
 
 
-    static bool HandleMaxSkillCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleMaxSkillCommand(ChatHandler* handler, char const* args)
     {
-        Player* SelectedPlayer = handler->getSelectedPlayer();
-        if (!SelectedPlayer)
+        Player* target;
+        uint64 targetGuid;
+        std::string targetName;
+        handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName);
+
+        if (!target)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
-            return false;
+            target = handler->getSelectedPlayer();
+            if (!target)
+            {
+                handler->PSendSysMessage("No char selected or typed");
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
         }
 
         // each skills that have max skill value dependent from level seted to current level max skill value
-        SelectedPlayer->UpdateSkillsToMaxSkillsForLevel();
+        target->UpdateSkillsToMaxSkillsForLevel();
         return true;
     }
 
     static bool HandleSetSkillCommand(ChatHandler* handler, char const* args)
     {
+        Player* target;
+        uint64 targetGuid;
+        std::string targetName;
+        if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
+            return false;
+
+        if (!target)
+        {
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        char const* skillchar = strtok(NULL, "");
+        if (!skillchar)
+            return false;
+
         // number or [name] Shift-click form |color|Hskill:skill_id|h[name]|h|r
-        char const* skillStr = handler->extractKeyFromLink((char*)args, "Hskill");
+        char const* skillStr = handler->extractKeyFromLink((char*)skillchar, "Hskill");
         if (!skillStr)
             return false;
 
@@ -1421,14 +1445,6 @@ public:
         }
 
         int32 level = uint32(atol(levelStr));
-
-        Player* target = handler->getSelectedPlayer();
-        if (!target)
-        {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
 
         SkillLineEntry const* skillLine = sSkillLineStore.LookupEntry(skill);
         if (!skillLine)
