@@ -602,7 +602,6 @@ bool CurrencyMgr::IsPrecisionAreConsidered(uint32 currencyId) const
 {
     switch (currencyId)
     {
-        case CURRENCY_TYPE_CONQUEST_POINTS:
         case CURRENCY_TYPE_CONQUEST_META_ARENA:
             return true;
     }
