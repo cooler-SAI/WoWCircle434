@@ -3731,12 +3731,7 @@ bool Player::addSpell(uint32 spellId, bool active, bool learning, bool dependent
         if (!IsInWorld() && !learning)                       // spell load case
         {
             sLog->outError(LOG_FILTER_SPELLS_AURAS, "Player::addSpell: Non-existed in SpellStore spell #%u request, deleting for all characters in `character_spell`.", spellId);
-
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_INVALID_SPELL);
-
-            stmt->setUInt32(0, spellId);
-
-            CharacterDatabase.Execute(stmt);
+            CharacterDatabase.PExecute("DELETE FROM character_spell WHERE spell = '%u'", spell_id);
         }
         else
             sLog->outError(LOG_FILTER_SPELLS_AURAS, "Player::addSpell: Non-existed in SpellStore spell #%u request.", spellId);
@@ -3750,12 +3745,7 @@ bool Player::addSpell(uint32 spellId, bool active, bool learning, bool dependent
         if (!IsInWorld() && !learning)                       // spell load case
         {
             sLog->outError(LOG_FILTER_SPELLS_AURAS, "Player::addSpell: Broken spell #%u learning not allowed, deleting for all characters in `character_spell`.", spellId);
-
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_INVALID_SPELL);
-
-            stmt->setUInt32(0, spellId);
-
-            CharacterDatabase.Execute(stmt);
+            CharacterDatabase.PExecute("DELETE FROM character_spell WHERE spell = '%u'", spell_id);
         }
         else
             sLog->outError(LOG_FILTER_SPELLS_AURAS, "Player::addSpell: Broken spell #%u learning not allowed.", spellId);
@@ -12343,13 +12333,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
                 DestroyItem(slot, i, update);
 
         if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED))
-        {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_GIFT);
-
-            stmt->setUInt32(0, pItem->GetGUIDLow());
-
-            CharacterDatabase.Execute(stmt);
-        }
+            CharacterDatabase.PExecute("DELETE FROM character_gifts WHERE item_guid = '%u'", pItem->GetGUIDLow());
 
         RemoveEnchantmentDurations(pItem);
         RemoveItemDurations(pItem);
@@ -16745,16 +16729,9 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     m_name = fields[2].GetString();
 
     // check name limitations
-    if (ObjectMgr::CheckPlayerName(m_name) != CHAR_NAME_SUCCESS ||
-        (AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()) && sObjectMgr->IsReservedName(m_name)))
+    if (ObjectMgr::CheckPlayerName(m_name) != CHAR_NAME_SUCCESS || (AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()) && sObjectMgr->IsReservedName(m_name)))
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_UPD_ADD_AT_LOGIN_FLAG);
-
-        stmt->setUInt16(0, uint16(AT_LOGIN_RENAME));
-        stmt->setUInt32(1, guid);
-
-        CharacterDatabase.Execute(stmt);
-
+        CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '%u' WHERE guid ='%u'", uint32(AT_LOGIN_RENAME), guid);
         return false;
     }
 
@@ -18347,13 +18324,7 @@ void Player::_LoadBoundInstances(PreparedQueryResult result)
 
             if (deleteInstance)
             {
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
-
-                stmt->setUInt32(0, GetGUIDLow());
-                stmt->setUInt32(1, instanceId);
-
-                CharacterDatabase.Execute(stmt);
-
+                CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND instance = '%d'", GetGUIDLow(), instanceId);
                 continue;
             }
 
@@ -18402,14 +18373,7 @@ void Player::UnbindInstance(BoundInstancesMap::iterator &itr, Difficulty difficu
     if (itr != m_boundInstances[difficulty].end())
     {
         if (!unload)
-        {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
-
-            stmt->setUInt32(0, GetGUIDLow());
-            stmt->setUInt32(1, itr->second.save->GetInstanceId());
-
-            CharacterDatabase.Execute(stmt);
-        }
+            CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%u' AND instance = '%u'", GetGUIDLow(), itr->second.save->GetInstanceId());
 
         if (itr->second.perm)
             GetSession()->SendCalendarRaidLockout(itr->second.save, false);
@@ -18429,28 +18393,11 @@ InstancePlayerBind* Player::BindToInstance(InstanceSave* save, bool permanent, b
             // update the save when the group kills a boss
             if (permanent != bind.perm || save != bind.save)
                 if (!load)
-                {
-                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<4>(CHAR_UPD_CHAR_INSTANCE);
-
-                    stmt->setUInt32(0, save->GetInstanceId());
-                    stmt->setBool(1, permanent);
-                    stmt->setUInt32(2, GetGUIDLow());
-                    stmt->setUInt32(3, bind.save->GetInstanceId());
-
-                    CharacterDatabase.Execute(stmt);
-                }
+                    CharacterDatabase.PExecute("UPDATE character_instance SET instance = '%u', permanent = '%u' WHERE guid = '%u' AND instance = '%u'", save->GetInstanceId(), permanent, GetGUIDLow(), bind.save->GetInstanceId());
         }
         else
             if (!load)
-            {
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_INS_CHAR_INSTANCE);
-
-                stmt->setUInt32(0, GetGUIDLow());
-                stmt->setUInt32(1, save->GetInstanceId());
-                stmt->setBool(2, permanent);
-
-                CharacterDatabase.Execute(stmt);
-            }
+                CharacterDatabase.PExecute("INSERT INTO character_instance (guid, instance, permanent) VALUES ('%u', '%u', '%u')", GetGUIDLow(), save->GetInstanceId(), permanent);
 
         if (bind.save != save)
         {
@@ -19062,10 +19009,7 @@ void Player::SaveInventoryAndGoldToDB(SQLTransaction& trans)
 
 void Player::SaveGoldToDB(SQLTransaction& trans)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_UDP_CHAR_MONEY);
-    stmt->setUInt64(0, GetMoney());
-    stmt->setUInt32(1, GetGUIDLow());
-    trans->Append(stmt);
+    CharacterDatabase.PExecute("UPDATE characters SET money = '%u' WHERE guid = '%u'", GetMoney(), GetGUIDLow());
 }
 
 void Player::_SaveActions(SQLTransaction& trans)
@@ -19118,9 +19062,7 @@ void Player::_SaveActions(SQLTransaction& trans)
 
 void Player::_SaveAuras(SQLTransaction& trans)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_AURA);
-    stmt->setUInt32(0, GetGUIDLow());
-    trans->Append(stmt);
+    CharacterDatabase.PExecute("DELETE FROM character_aura WHERE guid = '%u'", GetGUIDLow());
 
     for (AuraMap::const_iterator itr = m_ownedAuras.begin(); itr != m_ownedAuras.end(); ++itr)
     {
@@ -19183,13 +19125,9 @@ void Player::_SaveInventory(SQLTransaction& trans)
         if (!item || item->GetState() == ITEM_NEW)
             continue;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
-        stmt->setUInt32(0, item->GetGUIDLow());
-        trans->Append(stmt);
+        CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item = '%u'", item->GetGUIDLow());
+        CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid = '%u'", item->GetGUIDLow());
 
-        stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_ITEM_INSTANCE);
-        stmt->setUInt32(0, item->GetGUIDLow());
-        trans->Append(stmt);
         m_items[i]->FSetState(ITEM_NEW);
     }
 
@@ -19245,12 +19183,7 @@ void Player::_SaveInventory(SQLTransaction& trans)
                     bagTestGUID = test2->GetGUIDLow();
                 sLog->outError(LOG_FILTER_PLAYER, "Player(GUID: %u Name: %s)::_SaveInventory - the bag(%u) and slot(%u) values for the item with guid %u (state %d) are incorrect, the player doesn't have an item at that position!", lowGuid, GetName(), item->GetBagSlot(), item->GetSlot(), item->GetGUIDLow(), (int32)item->GetState());
                 // according to the test that was just performed nothing should be in this slot, delete
-                stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_DEL_CHAR_INVENTORY_BY_BAG_SLOT);
-                stmt->setUInt32(0, bagTestGUID);
-                stmt->setUInt8(1, item->GetSlot());
-                stmt->setUInt32(2, lowGuid);
-                trans->Append(stmt);
-
+                CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE bag=%u AND slot=%u", bagTestGUID, item->GetSlot());
                 // also THIS item should be somewhere else, cheat attempt
                 item->FSetState(ITEM_REMOVED); // we are IN updateQueue right now, can't use SetState which modifies the queue
                 DeleteRefundReference(item->GetGUIDLow());
