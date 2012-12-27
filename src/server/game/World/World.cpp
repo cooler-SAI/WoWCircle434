@@ -2395,28 +2395,28 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, std::string dura
     switch (mode)
     {
          case BAN_IP:
-            // No SQL injection with prepared statements
-           stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_ACCOUNT_BY_IP);
-            stmt->setString(0, nameOrIP);
-            resultAccounts = LoginDatabase.Query(stmt);
-            stmt = LoginDatabase.GetPreparedStatement<4>(LOGIN_INS_IP_BANNED);
-            stmt->setString(0, nameOrIP);
-            stmt->setUInt32(1, duration_secs);
-           stmt->setString(2, author);
-            stmt->setString(3, reason);
-            LoginDatabase.Execute(stmt);
+             // No SQL injection with prepared statements
+             stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_ACCOUNT_BY_IP);
+             stmt->setString(0, nameOrIP);
+             resultAccounts = LoginDatabase.Query(stmt);
+             stmt = LoginDatabase.GetPreparedStatement<4>(LOGIN_INS_IP_BANNED);
+             stmt->setString(0, nameOrIP);
+             stmt->setUInt32(1, duration_secs);
+             stmt->setString(2, author);
+             stmt->setString(3, reason);
+             LoginDatabase.Execute(stmt);
              break;
          case BAN_ACCOUNT:
-            // No SQL injection with prepared statements
-            stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_ACCOUNT_ID_BY_NAME);
-            stmt->setString(0, nameOrIP);
-            resultAccounts = LoginDatabase.Query(stmt);
+             // No SQL injection with prepared statements
+             stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_ACCOUNT_ID_BY_NAME);
+             stmt->setString(0, nameOrIP);
+             resultAccounts = LoginDatabase.Query(stmt);
              break;
          case BAN_CHARACTER:
-            // No SQL injection with prepared statements
-            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_ACCOUNT_BY_NAME);
-            stmt->setString(0, nameOrIP);
-            resultAccounts = CharacterDatabase.Query(stmt);
+             // No SQL injection with prepared statements
+             stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_ACCOUNT_BY_NAME);
+             stmt->setString(0, nameOrIP);
+             resultAccounts = CharacterDatabase.Query(stmt);
              break;
         default:
             return BAN_SYNTAX_ERROR;
