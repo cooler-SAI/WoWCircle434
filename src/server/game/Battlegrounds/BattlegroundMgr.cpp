@@ -338,7 +338,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket *data, Battlegro
 
             data->WriteByteSeq(playerGuid[0]);
             data->WriteByteSeq(playerGuid[3]);
-            data->WriteByteSeq(playerGuid[2]);
+            data->WriteByteSeq(bgGuid[2]);
 
             *data << uint32(bg->GetClientInstanceID());                         // Client Instance ID
 
