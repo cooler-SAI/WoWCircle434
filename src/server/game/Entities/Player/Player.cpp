@@ -4527,9 +4527,7 @@ void Player::_LoadSpellCooldowns(PreparedQueryResult result)
 
 void Player::_SaveSpellCooldowns(SQLTransaction& trans)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_SPELL_COOLDOWN);
-    stmt->setUInt32(0, GetGUIDLow());
-    trans->Append(stmt);
+    CharacterDatabase.PExecute("DELETE FROM character_spell_cooldown WHERE guid = '%u'", GetGUIDLow());
 
     time_t curTime = time(NULL);
     time_t infTime = curTime + infinityCooldownDelayCheck;
@@ -7518,22 +7516,30 @@ void Player::SetInGuild(uint32 guildId)
 
 uint32 Player::GetGuildIdFromDB(uint64 guid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_GUILD_MEMBER);
-    stmt->setUInt32(0, GUID_LOPART(guid));
-    if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
-        return result->Fetch()[0].GetUInt32();
-
-    return 0;
+    std::ostringstream ss;
+    ss<<"SELECT guildid FROM guild_member WHERE guid='"<<guid<<"'";
+    QueryResult result = CharacterDatabase.Query(ss.str().c_str());
+    if (result)
+    {
+        uint32 v = result->Fetch()[0].GetUInt32();
+        return v;
+    }
+    else
+        return 0;
 }
 
 uint8 Player::GetRankFromDB(uint64 guid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_GUILD_MEMBER);
-    stmt->setUInt32(0, GUID_LOPART(guid));
-    if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
-        return result->Fetch()[1].GetUInt8();
-
-    return 0;
+    std::ostringstream ss;
+    ss<<"SELECT rank FROM guild_member WHERE guid='"<<guid<<"'";
+    QueryResult result = CharacterDatabase.Query(ss.str().c_str());
+    if (result)
+    {
+        uint32 v = result->Fetch()[0].GetUInt8();
+        return v;
+    }
+    else
+        return 0;
 }
 
 void Player::SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
@@ -7545,11 +7551,7 @@ void Player::SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 va
 
 uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_SEL_ARENA_TEAM_ID_BY_PLAYER_GUID);
-    stmt->setUInt32(0, GUID_LOPART(guid));
-    stmt->setUInt8(1, type);
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
+    QueryResult result = CharacterDatabase.PQuery("SELECT arena_team_member.arenateamid FROM arena_team_member JOIN arena_team ON arena_team_member.arenateamid = arena_team.arenateamid WHERE guid='%u' AND type='%u' LIMIT 1", GUID_LOPART(guid), type);
     if (!result)
         return 0;
 
@@ -7559,47 +7561,34 @@ uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
 
 uint32 Player::GetZoneIdFromDB(uint64 guid)
 {
-    PreparedStatement* stmt = NULL;
-    PreparedQueryResult result = NULL;
+    std::ostringstream ss;
 
-    uint32 guidLow = GUID_LOPART(guid);
-    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_ZONE);
-    stmt->setUInt32(0, guidLow);
-    result = CharacterDatabase.Query(stmt);
-
+    ss<<"SELECT zone FROM characters WHERE guid='"<<GUID_LOPART(guid)<<"'";
+    QueryResult result = CharacterDatabase.Query(ss.str().c_str());
     if (!result)
         return 0;
-
     Field* fields = result->Fetch();
     uint32 zone = fields[0].GetUInt16();
 
     if (!zone)
     {
         // stored zone is zero, use generic and slow zone detection
-        stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_POSITION_XYZ);
-        stmt->setUInt32(0, guidLow);
-        result = CharacterDatabase.Query(stmt);
-
+        ss.str("");
+        ss<<"SELECT map, position_x, position_y, position_z FROM characters WHERE guid='"<<GUID_LOPART(guid)<<"'";
+        result = CharacterDatabase.Query(ss.str().c_str());
         if (!result)
             return 0;
-
         fields = result->Fetch();
-        uint32 map = fields[0].GetUInt16();
+        uint32 map  = fields[0].GetUInt16();
         float posx = fields[1].GetFloat();
         float posy = fields[2].GetFloat();
         float posz = fields[3].GetFloat();
 
         zone = sMapMgr->GetZoneId(map, posx, posy, posz);
 
-        if (zone > 0)
-        {
-            stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_UPD_ZONE);
-
-            stmt->setUInt16(0, uint16(zone));
-            stmt->setUInt32(1, guidLow);
-
-            CharacterDatabase.Execute(stmt);
-        }
+        ss.str("");
+        ss << "UPDATE characters SET zone='"<<zone<<"' WHERE guid='"<<GUID_LOPART(guid)<<"'";
+        CharacterDatabase.Execute(ss.str().c_str());
     }
 
     return zone;
@@ -7607,10 +7596,7 @@ uint32 Player::GetZoneIdFromDB(uint64 guid)
 
 uint32 Player::GetLevelFromDB(uint64 guid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_LEVEL);
-    stmt->setUInt32(0, GUID_LOPART(guid));
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
+    QueryResult result = CharacterDatabase.PQuery("SELECT level FROM characters WHERE guid='%u'", GUID_LOPART(guid));
     if (!result)
         return 0;
 
@@ -16668,14 +16654,11 @@ void Player::_LoadBGData(PreparedQueryResult result)
 
 bool Player::LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, uint64 guid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_POSITION);
-    stmt->setUInt32(0, GUID_LOPART(guid));
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
+    QueryResult result = CharacterDatabase.PQuery("SELECT position_x, position_y, position_z, orientation, map, taxi_path FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
     if (!result)
         return false;
 
-    Field* fields = result->Fetch();
+    Field *fields = result->Fetch();
 
     x = fields[0].GetFloat();
     y = fields[1].GetFloat();
@@ -16696,14 +16679,8 @@ void Player::SetHomebind(WorldLocation const& /*loc*/, uint32 /*area_id*/)
     m_homebindZ = GetPositionZ();
 
     // update sql homebind
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<6>(CHAR_UPD_PLAYER_HOMEBIND);
-    stmt->setUInt16(0, m_homebindMapId);
-    stmt->setUInt16(1, m_homebindAreaId);
-    stmt->setFloat (2, m_homebindX);
-    stmt->setFloat (3, m_homebindY);
-    stmt->setFloat (4, m_homebindZ);
-    stmt->setUInt32(5, GetGUIDLow());
-    CharacterDatabase.Execute(stmt);
+    CharacterDatabase.PExecute("UPDATE character_homebind SET map = '%u', zone = '%u', position_x = '%f', position_y = '%f', position_z = '%f' WHERE guid = '%u'",
+        m_homebindMapId, m_homebindAreaId, m_homebindX, m_homebindY, m_homebindZ, GetGUIDLow());
 }
 
 uint32 Player::GetUInt32ValueFromArray(Tokenizer const& data, uint16 index)
@@ -18753,11 +18730,7 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
             !bindMapEntry->Instanceable() && GetSession()->Expansion() >= bindMapEntry->Expansion())
             ok = true;
         else
-        {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PLAYER_HOMEBIND);
-            stmt->setUInt32(0, GetGUIDLow());
-            CharacterDatabase.Execute(stmt);
-        }
+            CharacterDatabase.PExecute("DELETE FROM character_homebind WHERE guid = '%u'", GetGUIDLow());
     }
 
     if (!ok)
@@ -18768,14 +18741,7 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
         m_homebindY = info->positionY;
         m_homebindZ = info->positionZ;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<6>(CHAR_INS_PLAYER_HOMEBIND);
-        stmt->setUInt32(0, GetGUIDLow());
-        stmt->setUInt16(1, m_homebindMapId);
-        stmt->setUInt16(2, m_homebindAreaId);
-        stmt->setFloat (3, m_homebindX);
-        stmt->setFloat (4, m_homebindY);
-        stmt->setFloat (5, m_homebindZ);
-        CharacterDatabase.Execute(stmt);
+        CharacterDatabase.PExecute("INSERT INTO character_homebind (guid, map, zone, position_x, position_y, position_z) VALUES ('%u', '%u', '%u', '%f', '%f', '%f')", GetGUIDLow(), m_homebindMapId, (uint32)m_homebindAreaId, m_homebindX, m_homebindY, m_homebindZ);
     }
 
     sLog->outDebug(LOG_FILTER_PLAYER, "Setting player home position - mapid: %u, areaid: %u, X: %f, Y: %f, Z: %f",
@@ -19648,11 +19614,7 @@ void Player::_SaveSkills(SQLTransaction& trans)
 
         if (itr->second.uState == SKILL_DELETED)
         {
-            stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHAR_SKILL_BY_SKILL);
-            stmt->setUInt32(0, GetGUIDLow());
-            stmt->setUInt32(1, itr->first);
-            trans->Append(stmt);
-
+            CharacterDatabase.PExecute("DELETE FROM character_skills WHERE guid = '%u' AND skill = '%u'", GetGUIDLow(), itr->first);
             mSkillStatus.erase(itr++);
             continue;
         }
@@ -19666,20 +19628,12 @@ void Player::_SaveSkills(SQLTransaction& trans)
         switch (itr->second.uState)
         {
             case SKILL_NEW:
-                stmt = CharacterDatabase.GetPreparedStatement<4>(CHAR_INS_CHAR_SKILLS);
-                stmt->setUInt32(0, GetGUIDLow());
-                stmt->setUInt16(1, uint16(itr->first));
-                stmt->setUInt16(2, value);
-                stmt->setUInt16(3, max);
-                trans->Append(stmt);
+                CharacterDatabase.PExecute("INSERT INTO character_skills (guid, skill, value, max) VALUES ('%u', '%u', '%u', '%u')",
+                    GetGUIDLow(), itr->first, value, max);
                 break;
             case SKILL_CHANGED:
-                stmt = CharacterDatabase.GetPreparedStatement<4>(CHAR_UDP_CHAR_SKILLS);
-                stmt->setUInt16(0, value);
-                stmt->setUInt16(1, max);
-                stmt->setUInt32(2, GetGUIDLow());
-                stmt->setUInt16(3, uint16(itr->first));
-                trans->Append(stmt);
+                CharacterDatabase.PExecute("UPDATE character_skills SET value = '%u', max = '%u'WHERE guid = '%u' AND skill = '%u' ",
+                    value, max, GetGUIDLow(), itr->first );
                 break;
             default:
                 break;
@@ -19692,28 +19646,14 @@ void Player::_SaveSkills(SQLTransaction& trans)
 
 void Player::_SaveSpells(SQLTransaction& trans)
 {
-    PreparedStatement* stmt = NULL;
-
     for (PlayerSpellMap::iterator itr = m_spells.begin(); itr != m_spells.end();)
     {
         if (itr->second->state == PLAYERSPELL_REMOVED || itr->second->state == PLAYERSPELL_CHANGED)
-        {
-            stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHAR_SPELL_BY_SPELL);
-            stmt->setUInt32(0, itr->first);
-            stmt->setUInt32(1, GetGUIDLow());
-            trans->Append(stmt);
-        }
+            CharacterDatabase.PExecute("DELETE FROM character_spell WHERE guid = '%u' and spell = '%u'", GetGUIDLow(), itr->first);
 
         // add only changed/new not dependent spells
         if (!itr->second->dependent && (itr->second->state == PLAYERSPELL_NEW || itr->second->state == PLAYERSPELL_CHANGED))
-        {
-            stmt = CharacterDatabase.GetPreparedStatement<4>(CHAR_INS_CHAR_SPELL);
-            stmt->setUInt32(0, GetGUIDLow());
-            stmt->setUInt32(1, itr->first);
-            stmt->setBool(2, itr->second->active);
-            stmt->setBool(3, itr->second->disabled);
-            trans->Append(stmt);
-        }
+            CharacterDatabase.PExecute("INSERT INTO character_spell (guid, spell, active, disabled) VALUES ('%u', '%u', '%u', '%u')", GetGUIDLow(), itr->first, itr->second->active ? 1 : 0, itr->second->disabled ? 1 : 0);
 
         if (itr->second->state == PLAYERSPELL_REMOVED)
         {
@@ -19841,17 +19781,12 @@ void Player::SendAttackSwingNotInRange()
 
 void Player::SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, uint64 guid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<7>(CHAR_UPD_CHARACTER_POSITION);
-
-    stmt->setFloat(0, x);
-    stmt->setFloat(1, y);
-    stmt->setFloat(2, z);
-    stmt->setFloat(3, o);
-    stmt->setUInt16(4, uint16(mapid));
-    stmt->setUInt16(5, uint16(zone));
-    stmt->setUInt32(6, GUID_LOPART(guid));
-
-    CharacterDatabase.Execute(stmt);
+    std::ostringstream ss;
+    ss << "UPDATE characters SET position_x='"<<x<<"',position_y='"<<y
+       << "',position_z='"<<z<<"',orientation='"<<o<<"',map='"<<mapid
+       << "',zone='"<<zone<<"',trans_x='0',trans_y='0',trans_z='0',"
+       << "transguid='0',taxi_path='' WHERE guid='"<< GUID_LOPART(guid) <<"'";
+    CharacterDatabase.Execute(ss.str().c_str());
 }
 
 void Player::SetUInt32ValueInArray(Tokenizer& Tokenizer, uint16 index, uint32 value)
@@ -24536,14 +24471,7 @@ void Player::_LoadSkills(PreparedQueryResult result)
             if (value == 0)
             {
                 sLog->outError(LOG_FILTER_PLAYER, "Character %u has skill %u with value 0. Will be deleted.", GetGUIDLow(), skill);
-
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHARACTER_SKILL);
-
-                stmt->setUInt32(0, GetGUIDLow());
-                stmt->setUInt16(1, skill);
-
-                CharacterDatabase.Execute(stmt);
-
+                CharacterDatabase.PExecute("DELETE FROM character_skills WHERE guid = '%u' AND skill = '%u'", GetGUIDLow(), skill);
                 continue;
             }
 

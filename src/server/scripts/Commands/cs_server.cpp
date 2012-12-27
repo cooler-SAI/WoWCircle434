@@ -114,8 +114,8 @@ public:
         uint32 updateTime           = sWorld->GetUpdateTime();
 
         handler->PSendSysMessage("WoW Circle Cataclysm Development 4.3.4");
-        handler->PSendSysMessage("WoW Circle Core: Last Update: 18.12.2012 Updatepack: 3");
-        handler->PSendSysMessage("WoW Circle DB: Last Update: 14.12.2012 Updatepack: 7");
+        handler->PSendSysMessage("WoW Circle Core: Last Update: 27.12.2012 Updatepack: 4");
+        handler->PSendSysMessage("WoW Circle DB: Last Update: 27.12.2012 Updatepack: 17");
         handler->PSendSysMessage(LANG_CONNECTED_USERS, activeClientsNum, maxActiveClientsNum, queuedClientsNum, maxQueuedClientsNum);
         handler->PSendSysMessage(LANG_UPTIME, uptime.c_str());
         handler->PSendSysMessage("Server delay: %u ms", updateTime);

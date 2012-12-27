@@ -1015,13 +1015,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
 
     pCurrChar->SendInitialPacketsAfterAddToMap();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_UPD_CHAR_ONLINE);
-    stmt->setUInt32(0, pCurrChar->GetGUIDLow());
-    CharacterDatabase.Execute(stmt);
+    CharacterDatabase.PExecute("UPDATE characters SET online = 1 WHERE guid = '%u'", pCurrChar->GetGUIDLow());
 
-    stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_UPD_ACCOUNT_ONLINE);
-    stmt->setUInt32(0, GetAccountId());
-    LoginDatabase.Execute(stmt);
+    LoginDatabase.PExecute("UPDATE account SET online = 1 WHERE id = '%u'", GetAccountId());
 
     pCurrChar->SetInGameTime(getMSTime());
 
