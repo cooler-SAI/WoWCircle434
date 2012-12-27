@@ -1583,6 +1583,11 @@ void WorldSession::HandleTransmogrifyItems(WorldPacket& recvData)
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTransmogrifyItems - Player (GUID: %u, name: %s) tried to transmogrify to an invalid item (entry: %u).", player->GetGUIDLow(), player->GetName(), newEntries[i]);
                 return;
             }
+            if (!player->HasItemCount(newEntries[i]))
+            {
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTransmogrifyItems - Player (GUID: %u, name: %s) tried to transmogrify to an item he has not.", player->GetGUIDLow(), player->GetName(), newEntries[i]);
+                return;
+            }
         }
 
         Item* itemTransmogrifier = NULL;
