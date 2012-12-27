@@ -341,7 +341,7 @@ uint32 Player::_GetCurrencyWeekCap(const CurrencyTypesEntry* currency) const
     {
         // original conquest not have week cap
         case CURRENCY_TYPE_CONQUEST_POINTS:
-            return _ConquestCurrencytotalWeekCap;
+            return _ConquestCurrencytotalWeekCap * sCurrencyMgr->GetPrecision(currency);
         case CURRENCY_TYPE_CONQUEST_META_ARENA:
             return const_cast<Player*>(this)->GetArenaCap();
         case CURRENCY_TYPE_CONQUEST_META_BG:
