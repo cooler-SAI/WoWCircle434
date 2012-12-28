@@ -62,10 +62,19 @@ public:
             { NULL,             0,                  false, NULL,                                "", NULL }
         };
 
+        static ChatCommand learnCommandTableOld[] =
+        {
+            { "all",            SEC_ADMINISTRATOR,  false, NULL,                                "",  learnAllCommandTable },
+            { "",               SEC_ADMINISTRATOR,  false, &HandleLearnCommandOld,                 "", NULL },
+            { NULL,             0,                  false, NULL,                                "", NULL }
+        };
+
         static ChatCommand commandTable[] =
         {
             { "learn",          SEC_MODERATOR,      false, NULL,                                "", learnCommandTable },
             { "unlearn",        SEC_ADMINISTRATOR,  false, &HandleUnLearnCommand,               "", NULL },
+            { "olearn",         SEC_MODERATOR,      false, NULL,                                "", learnCommandTableOld },
+            { "ounlearn",       SEC_ADMINISTRATOR,  false, &HandleUnLearnCommandOld,               "", NULL },
             { NULL,             0,                  false, NULL,                                "", NULL }
         };
         return commandTable;
@@ -481,6 +490,90 @@ public:
 
         char const* allStr = strtok(NULL, " ");
         bool allRanks = allStr ? (strncmp(allStr, "all", strlen(allStr)) == 0) : false;
+
+        if (allRanks)
+            spellId = sSpellMgr->GetFirstSpellInChain (spellId);
+
+        if (target->HasSpell(spellId))
+            target->removeSpell(spellId, false, !allRanks);
+        else
+            handler->SendSysMessage(LANG_FORGET_SPELL);
+
+        if (GetTalentSpellCost(spellId))
+            target->SendTalentsInfoData(false);
+
+        return true;
+    }
+
+    static bool HandleLearnCommandOld(ChatHandler* handler, char const* args)
+    {
+        Player* targetPlayer = handler->getSelectedPlayer();
+
+        if (!targetPlayer)
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
+        uint32 spell = handler->extractSpellIdFromLink((char*)args);
+        if (!spell || !sSpellMgr->GetSpellInfo(spell))
+            return false;
+
+        char const* all = strtok(NULL, " ");
+        bool allRanks = all ? (strncmp(all, "all", strlen(all)) == 0) : false;
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell);
+        if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo, handler->GetSession()->GetPlayer()))
+        {
+            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!allRanks && targetPlayer->HasSpell(spell))
+        {
+            if (targetPlayer == handler->GetSession()->GetPlayer())
+                handler->SendSysMessage(LANG_YOU_KNOWN_SPELL);
+            else
+                handler->PSendSysMessage(LANG_TARGET_KNOWN_SPELL, handler->GetNameLink(targetPlayer).c_str());
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (allRanks)
+            targetPlayer->learnSpellHighRank(spell);
+        else
+            targetPlayer->learnSpell(spell, false);
+
+        uint32 firstSpell = sSpellMgr->GetFirstSpellInChain(spell);
+        if (GetTalentSpellCost(firstSpell))
+            targetPlayer->SendTalentsInfoData(false);
+
+        return true;
+    }
+
+    static bool HandleUnLearnCommandOld(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r
+        uint32 spellId = handler->extractSpellIdFromLink((char*)args);
+        if (!spellId)
+            return false;
+
+        char const* allStr = strtok(NULL, " ");
+        bool allRanks = allStr ? (strncmp(allStr, "all", strlen(allStr)) == 0) : false;
+
+        Player* target = handler->getSelectedPlayer();
+        if (!target)
+        {
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
         if (allRanks)
             spellId = sSpellMgr->GetFirstSpellInChain (spellId);

@@ -91,7 +91,9 @@ public:
             { "bank",               SEC_ADMINISTRATOR,      false, &HandleBankCommand,                  "", NULL },
             { "wchange",            SEC_ADMINISTRATOR,      false, &HandleChangeWeather,                "", NULL },
             { "maxskill",           SEC_ADMINISTRATOR,      false, &HandleMaxSkillCommand,              "", NULL },
+            { "omaxskill",          SEC_ADMINISTRATOR,      false, &HandleMaxSkillCommandOld,           "", NULL },
             { "setskill",           SEC_ADMINISTRATOR,      false, &HandleSetSkillCommand,              "", NULL },
+            { "osetskill",          SEC_ADMINISTRATOR,      false, &HandleSetSkillCommandOld,           "", NULL },
             { "pinfo",              SEC_GAMEMASTER,         true,  &HandlePInfoCommand,                 "", NULL },
             { "respawn",            SEC_ADMINISTRATOR,      false, &HandleRespawnCommand,               "", NULL },
             { "send",               SEC_MODERATOR,          true,  NULL,                                "", sendCommandTable },
@@ -1664,10 +1666,10 @@ public:
             case RACE_DRAENEI:
                 raceStr = "Draenei";
                 break;
-            case RACE_GOBLIN:	
+            case RACE_GOBLIN:
                 raceStr = "Goblin";
-                break;	
-            case RACE_WORGEN:	
+                break;
+            case RACE_WORGEN:
                 raceStr = "Worgen";
                 break;
         }
@@ -2788,6 +2790,81 @@ public:
         player->StopCastingBindSight();
         return true;
     }
+
+    static bool HandleMaxSkillCommandOld(ChatHandler* handler, char const* /*args*/)
+    {
+        Player* SelectedPlayer = handler->getSelectedPlayer();
+        if (!SelectedPlayer)
+        {
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        // each skills that have max skill value dependent from level seted to current level max skill value
+        SelectedPlayer->UpdateSkillsToMaxSkillsForLevel();
+        return true;
+    }
+
+    static bool HandleSetSkillCommandOld(ChatHandler* handler, char const* args)
+    {
+        // number or [name] Shift-click form |color|Hskill:skill_id|h[name]|h|r
+        char const* skillStr = handler->extractKeyFromLink((char*)args, "Hskill");
+        if (!skillStr)
+            return false;
+
+        char const* levelStr = strtok(NULL, " ");
+        if (!levelStr)
+            return false;
+
+        char const* maxPureSkill = strtok(NULL, " ");
+
+        int32 skill = atoi(skillStr);
+        if (skill <= 0)
+        {
+            handler->PSendSysMessage(LANG_INVALID_SKILL_ID, skill);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        int32 level = uint32(atol(levelStr));
+
+        Player* target = handler->getSelectedPlayer();
+        if (!target)
+        {
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        SkillLineEntry const* skillLine = sSkillLineStore.LookupEntry(skill);
+        if (!skillLine)
+        {
+            handler->PSendSysMessage(LANG_INVALID_SKILL_ID, skill);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        std::string tNameLink = handler->GetNameLink(target);
+
+        if (!target->GetSkillValue(skill))
+        {
+            handler->PSendSysMessage(LANG_SET_SKILL_ERROR, tNameLink.c_str(), skill, skillLine->name);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint16 max = maxPureSkill ? atol (maxPureSkill) : target->GetPureMaxSkillValue(skill);
+
+        if (level <= 0 || level > max || max <= 0)
+            return false;
+
+        target->SetSkill(skill, target->GetSkillStep(skill), level, max);
+        handler->PSendSysMessage(LANG_SET_SKILL, skill, skillLine->name, tNameLink.c_str(), level, max);
+
+        return true;
+    }
+
 };
 
 void AddSC_misc_commandscript()
