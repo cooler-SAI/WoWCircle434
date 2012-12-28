@@ -115,7 +115,7 @@ public:
 
         handler->PSendSysMessage("WoW Circle Cataclysm Development 4.3.4");
         handler->PSendSysMessage("WoW Circle Core: Last Update: 28.12.2012 Updatepack: 4");
-        handler->PSendSysMessage("WoW Circle DB: Last Update: 27.12.2012 Updatepack: 17");
+        handler->PSendSysMessage("WoW Circle DB: Last Update: 28.12.2012 Updatepack: 18");
         handler->PSendSysMessage(LANG_CONNECTED_USERS, activeClientsNum, maxActiveClientsNum, queuedClientsNum, maxQueuedClientsNum);
         handler->PSendSysMessage(LANG_UPTIME, uptime.c_str());
         handler->PSendSysMessage("Server delay: %u ms", updateTime);

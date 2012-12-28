@@ -2119,24 +2119,18 @@ bool Player::BuildEnumData(PreparedQueryResult result, ByteBuffer* data)
     return true;
 }
 
-bool Player::ToggleAFK()
+void Player::ToggleAFK()
 {
     ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK);
 
-    bool state = HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK);
-
     // afk player not allowed in battleground
-    if (state && InBattleground() && !InArena())
+    if (isAFK() && InBattleground() && !InArena())
         LeaveBattleground();
-
-    return state;
 }
 
-bool Player::ToggleDND()
+void Player::ToggleDND()
 {
     ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_DND);
-
-    return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DND);
 }
 
 uint8 Player::GetChatTag() const
@@ -2153,73 +2147,6 @@ uint8 Player::GetChatTag() const
         tag |= CHAT_TAG_DEV;
 
     return tag;
-}
-
-void Player::SendTeleportPacket(Position &oldPos)
-{
-    ObjectGuid guid = GetGUID();
-    ObjectGuid transGuid = GetTransGUID();
-
-    WorldPacket data(MSG_MOVE_TELEPORT, 38);
-
-    data
-        .WriteByteMask(guid[6])
-        .WriteByteMask(guid[0])
-        .WriteByteMask(guid[3])
-        .WriteByteMask(guid[2])
-        .WriteBit(false)
-        .WriteBit(uint64(transGuid) != 0)
-        .WriteByteMask(guid[1]);
-
-    if (transGuid)
-    {
-        data
-            .WriteByteMask(transGuid[1])
-            .WriteByteMask(transGuid[3])
-            .WriteByteMask(transGuid[2])
-            .WriteByteMask(transGuid[5])
-            .WriteByteMask(transGuid[0])
-            .WriteByteMask(transGuid[7])
-            .WriteByteMask(transGuid[6])
-            .WriteByteMask(transGuid[4]);
-    }
-
-    data
-        .WriteByteMask(guid[4])
-        .WriteByteMask(guid[7])
-        .WriteByteMask(guid[5]);
-
-    if (transGuid)
-    {
-        data
-            .WriteByteSeq(transGuid[6])
-            .WriteByteSeq(transGuid[5])
-            .WriteByteSeq(transGuid[1])
-            .WriteByteSeq(transGuid[7])
-            .WriteByteSeq(transGuid[0])
-            .WriteByteSeq(transGuid[2])
-            .WriteByteSeq(transGuid[4])
-            .WriteByteSeq(transGuid[3]);
-    }
-
-    data << uint32(0);  // counter
-    data
-        .WriteByteSeq(guid[1])
-        .WriteByteSeq(guid[2])
-        .WriteByteSeq(guid[3])
-        .WriteByteSeq(guid[5]);
-
-    data << float(GetPositionX());
-    data.WriteByteSeq(guid[4]);
-    data << float(GetOrientation());
-    data.WriteByteSeq(guid[7]);
-    data << float(GetPositionZMinusOffset());
-    data.WriteByteSeq(guid[0]);
-    data.WriteByteSeq(guid[6]);
-    data << float(GetPositionY());
-
-    Relocate(&oldPos);
-    SendDirectMessage(&data);
 }
 
 bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options)
@@ -2341,6 +2268,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             GetPosition(&oldPos);
             Relocate(x, y, z, orientation);
             SendTeleportPacket(oldPos); // this automatically relocates to oldPos in order to broadcast the packet in the right place
+            UpdateObjectVisibility();
         }
     }
     else
@@ -19207,9 +19135,8 @@ void Player::_SaveInventory(SQLTransaction& trans)
                 trans->Append(stmt);
                 break;
             case ITEM_REMOVED:
-                stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
-                stmt->setUInt32(0, item->GetGUIDLow());
-                trans->Append(stmt);
+                CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item = '%u'", item->GetGUIDLow());
+                break;
             case ITEM_UNCHANGED:
                 break;
         }
@@ -19336,9 +19263,8 @@ void Player::_SaveMail(SQLTransaction& trans)
                     trans->Append(stmt);
                 }
             }
-            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_MAIL_BY_ID);
-            stmt->setUInt32(0, m->messageID);
-            trans->Append(stmt);
+
+            CharacterDatabase.PExecute("DELETE FROM mail WHERE id = '%u'", m->messageID);
 
             stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_MAIL_ITEM_BY_ID);
             stmt->setUInt32(0, m->messageID);
@@ -20125,38 +20051,39 @@ void Player::WhisperAddon(const std::string& text, const std::string& prefix, Pl
 
 void Player::Whisper(const std::string& text, uint32 language, uint64 receiver)
 {
+    bool isAddonMessage = language == LANG_ADDON;
+
+    if (!isAddonMessage) // if not addon data
+        language = LANG_UNIVERSAL; // whispers should always be readable
+
     Player* rPlayer = ObjectAccessor::FindPlayer(receiver);
 
     std::string _text(text);
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_WHISPER, language, _text, rPlayer);
 
-    // when player you are whispering to is dnd, he cannot receive your message, unless you are in gm mode
-    if (!rPlayer->isDND() || isGameMaster())
-    {
-        WorldPacket data(SMSG_MESSAGECHAT, 200);
-        BuildPlayerChat(&data, CHAT_MSG_WHISPER, _text, language);
-        rPlayer->GetSession()->SendPacket(&data);
+    WorldPacket data(SMSG_MESSAGECHAT, 200);
+    BuildPlayerChat(&data, CHAT_MSG_WHISPER, _text, language);
+    rPlayer->GetSession()->SendPacket(&data);
 
-        data.Initialize(SMSG_MESSAGECHAT, 200);
-        rPlayer->BuildPlayerChat(&data, CHAT_MSG_WHISPER_INFORM, _text, language);
-        GetSession()->SendPacket(&data);
-    }
-    else // announce to player that player he is whispering to is dnd and cannot receive his message
-        ChatHandler(this).PSendSysMessage(LANG_PLAYER_DND, rPlayer->GetName(), rPlayer->dndMsg.c_str());
+    // rest stuff shouldn't happen in case of addon message
+    if (isAddonMessage)
+        return;
+
+    data.Initialize(SMSG_MESSAGECHAT, 200);
+    rPlayer->BuildPlayerChat(&data, CHAT_MSG_WHISPER_INFORM, _text, language);
+    GetSession()->SendPacket(&data);
 
     if (!isAcceptWhispers() && !isGameMaster() && !rPlayer->isGameMaster())
     {
         SetAcceptWhispers(true);
-        ChatHandler(this).SendSysMessage(LANG_COMMAND_WHISPERON);
+        ChatHandler(GetSession()).SendSysMessage(LANG_COMMAND_WHISPERON);
     }
 
-    // announce to player that player he is whispering to is afk
+    // announce afk or dnd message
     if (rPlayer->isAFK())
-        ChatHandler(this).PSendSysMessage(LANG_PLAYER_AFK, rPlayer->GetName(), rPlayer->afkMsg.c_str());
-
-    // if player whisper someone, auto turn of dnd to be able to receive an answer
-    if (isDND() && !rPlayer->isGameMaster())
-        ToggleDND();
+        ChatHandler(GetSession()).PSendSysMessage(LANG_PLAYER_AFK, rPlayer->GetName(), rPlayer->autoReplyMsg.c_str());
+    else if (rPlayer->isDND())
+        ChatHandler(GetSession()).PSendSysMessage(LANG_PLAYER_DND, rPlayer->GetName(), rPlayer->autoReplyMsg.c_str());
 }
 
 void Player::SendMessageBox(const std::string& text)
