@@ -2203,8 +2203,8 @@ class Player : public Unit, public GridObject<Player>
         void UpdateRuneRegen(RuneType rune);
         void UpdateFocusRegen(float mod);
         void UpdateAllRunesRegen();
-        float CalculateMeleeHastMod() const;
-        float CalculateRangeHastMod() const;
+        float CalculateMeleeHastMod(bool cr_only = false) const;
+        float CalculateRangeHastMod(bool cr_only = false) const;
         void UpdateMeleeHastMod();
         void UpdateRangeHastMod();
 

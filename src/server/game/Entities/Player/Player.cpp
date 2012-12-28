@@ -2639,7 +2639,7 @@ void Player::Regenerate(Powers power)
             break;
         }
         case POWER_ENERGY:                                              // Regenerate energy (rogue)
-            addvalue += ((0.01f * m_regenTimer) + CalculatePct(0.01f, meleeHaste)) * sWorld->getRate(RATE_POWER_ENERGY);
+            addvalue += (0.01f * m_regenTimer * (2.0f - GetFloatValue(PLAYER_FIELD_MOD_HASTE_REGEN))) * sWorld->getRate(RATE_POWER_ENERGY);
             break;
         case POWER_RUNIC_POWER:
         {

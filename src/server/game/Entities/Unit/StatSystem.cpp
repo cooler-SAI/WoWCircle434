@@ -778,30 +778,36 @@ void Player::UpdateAllRunesRegen()
         }
 }
 
-float Player::CalculateMeleeHastMod() const
+float Player::CalculateMeleeHastMod(bool cr_only) const
 {
     float hastePct = GetRatingBonusValue(CR_HASTE_MELEE);
 
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE);
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE_2);
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE_3);
+    if (!cr_only)
+    {
+        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE);
+        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE_2);
+        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE_3);
 
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE_2);
+        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
+        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE_2);
+    }
 
     return 1.0f - (hastePct / 100.0f);
 }
 
-float Player::CalculateRangeHastMod() const
+float Player::CalculateRangeHastMod(bool cr_only) const
 {
     float hastePct = GetRatingBonusValue(CR_HASTE_RANGED);
 
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_RANGED_HASTE);
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_RANGED_HASTE_2);
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_RANGED_HASTE_3);
+    if (!cr_only)
+    {
+        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_RANGED_HASTE);
+        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_RANGED_HASTE_2);
+        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_RANGED_HASTE_3);
 
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE_2);
+        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
+        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE_2);
+    }
 
     return 1.0f - (hastePct / 100.0f);
 }
@@ -809,10 +815,11 @@ float Player::CalculateRangeHastMod() const
 void Player::UpdateMeleeHastMod()
 {
     float mod = CalculateMeleeHastMod();
+    float regen_mod = CalculateMeleeHastMod(true);
 
     SetFloatValue(PLAYER_FIELD_MOD_HASTE, mod);
     SetFloatValue(PLAYER_FIELD_MOD_PET_HASTE, mod);
-    SetFloatValue(PLAYER_FIELD_MOD_HASTE_REGEN, mod);
+    SetFloatValue(PLAYER_FIELD_MOD_HASTE_REGEN, regen_mod);
 
     if (getClass() == CLASS_DEATH_KNIGHT)
         UpdateAllRunesRegen();
@@ -821,8 +828,9 @@ void Player::UpdateMeleeHastMod()
 void Player::UpdateRangeHastMod()
 {
     float mod = CalculateRangeHastMod();
+    float regen_mod = CalculateMeleeHastMod(true);
     SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, mod);
-    UpdateFocusRegen(mod);
+    UpdateFocusRegen(regen_mod);
 }
 
 void Player::_ApplyAllStatBonuses()
