@@ -5148,6 +5148,16 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Item - Paladin T12 Retribution 2P Bonus
+                case 99093:
+                {
+                    if (!victim || !damage)
+                        return false;
+
+                    basepoints0 = CalculatePct(damage, triggerAmount);
+                    triggered_spell_id = 99092;
+                    break;
+                }
                 // Weight of Feather, Scales of Life
                 case 96879:
                 case 97117:
