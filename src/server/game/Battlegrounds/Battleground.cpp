@@ -1735,7 +1735,7 @@ void Battleground::SendWarningToAll(int32 entry, ...)
     va_end(ap);
     std::string msg(str);
 
-    WorldPacket data(SMSG_MESSAGECHAT, 35 + msg.length() + 1);
+    WorldPacket data(SMSG_MESSAGECHAT, 40 + msg.length() + 1);
 
     data << (uint8)CHAT_MSG_RAID_BOSS_EMOTE;
     data << (uint32)LANG_UNIVERSAL;
