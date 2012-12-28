@@ -284,11 +284,7 @@ void AuthSocket::_SetVSFields(const std::string& rI)
     v_hex = v.AsHexStr();
     s_hex = s.AsHexStr();
 
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<3>(LOGIN_UPD_VS);
-    stmt->setString(0, v_hex);
-    stmt->setString(1, s_hex);
-    stmt->setString(2, _login);
-    LoginDatabase.Execute(stmt);
+    LoginDatabase.PExecute("UPDATE account SET v = '%s', s = '%s' WHERE username = '%s'", v_hex, s_hex, _login.c_str());
 
     OPENSSL_free((void*)v_hex);
     OPENSSL_free((void*)s_hex);
@@ -610,13 +606,7 @@ bool AuthSocket::_HandleLogonProof()
         // No SQL injection (escaped user name) and IP address as received by socket
         const char *K_hex = K.AsHexStr();
 
-        PreparedStatement *stmt = LoginDatabase.GetPreparedStatement<5>(LOGIN_UPD_LOGONPROOF);
-        stmt->setString(0, K_hex);
-        stmt->setString(1, socket().getRemoteAddress().c_str());
-        stmt->setUInt32(2, GetLocaleByName(_localizationName));
-        stmt->setString(3, _os);
-        stmt->setString(4, _login);
-        LoginDatabase.Execute(stmt);
+        LoginDatabase.PExecute("UPDATE account SET sessionkey = '%s', last_ip = '%s', last_login = NOW(), locale = '%u', os = '%s', failed_logins = 0 WHERE username = '%s'", K_hex, socket().getRemoteAddress().c_str(), GetLocaleByName(_localizationName),  _os.c_str(), _login.c_str());
 
         OPENSSL_free((void*)K_hex);
 
@@ -659,11 +649,9 @@ bool AuthSocket::_HandleLogonProof()
         if (MaxWrongPassCount > 0)
         {
             //Increment number of failed logins by one and if it reaches the limit temporarily ban that account or IP
-            PreparedStatement *stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_UPD_FAILEDLOGINS);
-            stmt->setString(0, _login);
-            LoginDatabase.Execute(stmt);
+            LoginDatabase.PExecute("UPDATE account SET failed_logins = failed_logins + 1 WHERE username = '%s'",_login.c_str());
 
-            stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_FAILEDLOGINS);
+            PreparedStatement *stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_FAILEDLOGINS);
             stmt->setString(0, _login);
 
             if (PreparedQueryResult loginfail = LoginDatabase.Query(stmt))
