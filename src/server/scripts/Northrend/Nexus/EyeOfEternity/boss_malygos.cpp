@@ -446,7 +446,7 @@ public:
                     break;
                 case MOVE_DEEP_BREATH_ROTATION:
                     _currentPos = _currentPos == MALYGOS_MAX_WAYPOINTS - 1 ? 0 : _currentPos+1;
-                    me->GetMotionMaster()->MovementExpired();
+                    me->GetMotionMaster()->MovementExpired(false);
                     me->GetMotionMaster()->MovePoint(MOVE_DEEP_BREATH_ROTATION, MalygosPhaseTwoWaypoints[_currentPos]);
                     break;
                 case MOVE_INIT_PHASE_ONE:
