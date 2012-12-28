@@ -5571,6 +5571,10 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
                 spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
+            // Shadow Fiend
+            case 34433:
+                spellInfo->Effects[EFFECT_0].MiscValueB = 1561;
+                break;
             default:
                 break;
         }
