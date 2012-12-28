@@ -882,7 +882,6 @@ void WorldSession::HandleGuildSetGuildMaster(WorldPacket& recvPacket)
 {
     std::string playerName;
     uint8 nameLength = recvPacket.ReadBits(7);
-    recvPacket.ReadBit();
     recvPacket.read(playerName, nameLength);
 
     if (Guild* guild = _GetPlayerGuild(this, true))	
