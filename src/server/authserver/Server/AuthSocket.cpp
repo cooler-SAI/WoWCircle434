@@ -651,7 +651,7 @@ bool AuthSocket::_HandleLogonProof()
             //Increment number of failed logins by one and if it reaches the limit temporarily ban that account or IP
             LoginDatabase.PExecute("UPDATE account SET failed_logins = failed_logins + 1 WHERE username = '%s'",_login.c_str());
 
-            PreparedStatement *stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_FAILEDLOGINS);
+            PreparedStatement *stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_FAILEDLOGINS);
             stmt->setString(0, _login);
 
             if (PreparedQueryResult loginfail = LoginDatabase.Query(stmt))
