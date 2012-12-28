@@ -576,12 +576,12 @@ void ReputationMgr::SaveToDB(SQLTransaction& trans)
     {
         if (itr->second.needSave)
         {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_CHAR_REPUTATION_BY_FACTION);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_REPUTATION_BY_FACTION);
             stmt->setUInt32(0, _player->GetGUIDLow());
             stmt->setUInt16(1, uint16(itr->second.ID));
             trans->Append(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement<4>(CHAR_INS_CHAR_REPUTATION_BY_FACTION);
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_REPUTATION_BY_FACTION);
             stmt->setUInt32(0, _player->GetGUIDLow());
             stmt->setUInt16(1, uint16(itr->second.ID));
             stmt->setInt32(2, itr->second.Standing);

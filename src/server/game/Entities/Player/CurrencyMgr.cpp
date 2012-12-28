@@ -415,7 +415,7 @@ void Player::ResetCurrencyWeekCap(SQLTransaction* trans /* = NULL */)
     // we need it after rated bg implementation
     //sCurrencyMgr->CalculatingCurrencyCap(m_currencyCap->currentRBgCap, true);
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<6>(CHAR_UPD_CURRENCY_WEEK_CAP);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CURRENCY_WEEK_CAP);
     stmt->setUInt16(0, m_currencyCap->currentArenaCap); // currentArenaCap
     stmt->setUInt16(1, 0);                              // currentRBgCap
     stmt->setUInt8(2, 0);                               // requireReset
@@ -462,7 +462,7 @@ void CurrencyMgr::AddCurrencyCapData(uint32 lowGuid, uint16 arenaRating /* = 0 *
 
 void CurrencyMgr::LoadPlayersCurrencyCap()
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<0>(CHAR_SEL_CURRENCY_CAP);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CURRENCY_CAP);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
     {
@@ -495,7 +495,7 @@ void CurrencyMgr::LoadPlayersCurrencyCap()
 
 bool CurrencyMgr::CheckIfNeedRestore()
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CURRENCY_RESTORE_DATA);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CURRENCY_RESTORE_DATA);
     stmt->setUInt8(0, 0);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -530,7 +530,7 @@ void CurrencyMgr::RestoreResettingCap()
 
         sCurrencyMgr->CalculatingCurrencyCap(second.highestArenaRating);
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<6>(CHAR_UPD_CURRENCY_WEEK_CAP);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CURRENCY_WEEK_CAP);
         stmt->setUInt16(0, second.highestArenaRating); // currentArenaCap
         stmt->setUInt16(1, 0);                         // currentRBgCap
         stmt->setUInt8(2, 0);                          // requireReset
@@ -579,7 +579,7 @@ void CurrencyMgr::setLastGuid(uint32 lowGuid, bool save)
     lastGuid = lowGuid;
     if (save)
     {
-        PreparedStatement *stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_INS_PLAYER_CURRENCY_CAP_PROGRESS);
+        PreparedStatement *stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_CURRENCY_CAP_PROGRESS);
         stmt->setUInt8(0, 1);
         stmt->setUInt32(1, lastGuid);
         CharacterDatabase.Execute(stmt);
@@ -588,7 +588,7 @@ void CurrencyMgr::setLastGuid(uint32 lowGuid, bool save)
 
 void CurrencyMgr::DeleteRestoreData()
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PLAYER_CURRENCY_CAP_PROGRESS);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_CURRENCY_CAP_PROGRESS);
     stmt->setUInt8(0, 1);
     CharacterDatabase.Execute(stmt);
 }
@@ -640,7 +640,7 @@ bool CapResetEvent::Execute(uint64 e_time, uint32 p_time)
             // We need it after rated bg implementation
             //sCurrencyMgr->CalculatingCurrencyCap(itr->second.highestRBgRating, true);
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<6>(CHAR_UPD_CURRENCY_WEEK_CAP);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CURRENCY_WEEK_CAP);
             stmt->setUInt16(0, second.highestArenaRating); // currentArenaCap
             stmt->setUInt16(1, 0);                         // currentRBgCap
             stmt->setUInt8(2, 0);                          // requireReset

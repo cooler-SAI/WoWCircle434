@@ -308,6 +308,7 @@ public:
                 else
                     ss << id << " - " << name;
 
+
                 if (factionState) // and then target != NULL also
                 {
                     uint32 index = target->GetReputationMgr().GetReputationRankStrIndex(factionEntry);
@@ -404,6 +405,7 @@ public:
             if (Utf8FitTo(name, wNamePart))
             {
                 if (maxResults && count++ == maxResults)
+
                 {
                     handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
                     return true;
@@ -1156,7 +1158,7 @@ public:
             limit = limitStr ? atoi(limitStr) : -1;
         }
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_ACCOUNT_BY_IP);
+        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_IP);
         stmt->setString(0, ip);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -1176,7 +1178,7 @@ public:
             (account))
             return false;
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_ACCOUNT_LIST_BY_NAME);
+        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_NAME);
         stmt->setString(0, account);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -1192,7 +1194,7 @@ public:
         char* limitStr = strtok(NULL, " ");
         int32 limit = limitStr ? atoi(limitStr) : -1;
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<1>(LOGIN_SEL_ACCOUNT_LIST_BY_EMAIL);
+        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_EMAIL);
         stmt->setString(0, email);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
@@ -1224,7 +1226,7 @@ public:
             uint32 accountId        = fields[0].GetUInt32();
             std::string accountName = fields[1].GetString();
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_GUID_NAME_BY_ACC);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_GUID_NAME_BY_ACC);
             stmt->setUInt32(0, accountId);
             PreparedQueryResult result2 = CharacterDatabase.Query(stmt);
 

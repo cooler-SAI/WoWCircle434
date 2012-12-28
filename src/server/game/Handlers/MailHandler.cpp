@@ -175,7 +175,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     {
         rc_team = sObjectMgr->GetPlayerTeamByGUID(rc);
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_MAIL_COUNT);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL_COUNT);
 
         stmt->setUInt32(0, GUID_LOPART(rc));
 
@@ -187,7 +187,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
             mails_count = fields[0].GetUInt64();
         }
 
-        stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_LEVEL);
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_LEVEL);
 
         stmt->setUInt32(0, GUID_LOPART(rc));
 
@@ -426,11 +426,11 @@ void WorldSession::HandleMailReturnToSender(WorldPacket & recvData)
     //so firstly delete the old one
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_MAIL_BY_ID);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
     stmt->setUInt32(0, mailId);
     trans->Append(stmt);
 
-    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_MAIL_ITEM_BY_ID);
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
     stmt->setUInt32(0, mailId);
     trans->Append(stmt);
 

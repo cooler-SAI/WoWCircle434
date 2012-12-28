@@ -72,15 +72,15 @@ AccountOpResult DeleteAccount(uint32 accountId)
     }
 
     // table realm specific but common for all characters of account for realm
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_TUTORIALS);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_TUTORIALS);
     stmt->setUInt32(0, accountId);
     CharacterDatabase.Execute(stmt);
 
-    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_ACCOUNT_DATA);
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ACCOUNT_DATA);
     stmt->setUInt32(0, accountId);
     CharacterDatabase.Execute(stmt);
 
-    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHARACTER_BAN);
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_BAN);
     stmt->setUInt32(0, accountId);
     CharacterDatabase.Execute(stmt);
 
@@ -111,7 +111,7 @@ AccountOpResult ChangeUsername(uint32 accountId, std::string newUsername, std::s
     normalizeString(newUsername);
     normalizeString(newPassword);
 
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<3>(LOGIN_UPD_USERNAME);
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_USERNAME);
 
     stmt->setString(0, newUsername);
     stmt->setString(1, CalculateShaPassHash(newUsername, newPassword));
@@ -135,7 +135,7 @@ AccountOpResult ChangePassword(uint32 accountId, std::string newPassword)
     normalizeString(username);
     normalizeString(newPassword);
 
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement<2>(LOGIN_UPD_PASSWORD);
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_PASSWORD);
 
     stmt->setString(0, CalculateShaPassHash(username, newPassword));
     stmt->setUInt32(1, accountId);

@@ -690,11 +690,11 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
 
     uint8 index = 0;
 
-    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement<1>(WORLD_DEL_GAMEOBJECT);
+    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAMEOBJECT);
     stmt->setUInt32(0, m_DBTableGuid);
     trans->Append(stmt);
 
-    stmt = WorldDatabase.GetPreparedStatement<16>(WORLD_INS_GAMEOBJECT);
+    stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_GAMEOBJECT);
     stmt->setUInt32(index++, m_DBTableGuid);
     stmt->setUInt32(index++, GetEntry());
     stmt->setUInt16(index++, uint16(mapid));
@@ -792,13 +792,13 @@ void GameObject::DeleteFromDB()
     GetMap()->RemoveGORespawnTime(m_DBTableGuid);
     sObjectMgr->DeleteGOData(m_DBTableGuid);
 
-    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement<1>(WORLD_DEL_GAMEOBJECT);
+    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAMEOBJECT);
 
     stmt->setUInt32(0, m_DBTableGuid);
 
     WorldDatabase.Execute(stmt);
 
-    stmt = WorldDatabase.GetPreparedStatement<1>(WORLD_DEL_EVENT_GAMEOBJECT);
+    stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_EVENT_GAMEOBJECT);
 
     stmt->setUInt32(0, m_DBTableGuid);
 

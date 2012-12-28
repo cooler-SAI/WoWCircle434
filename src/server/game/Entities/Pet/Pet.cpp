@@ -105,21 +105,21 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     if (petnumber)
     {
         // Known petnumber entry
-        stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_SEL_CHAR_PET_BY_ENTRY);
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY);
         stmt->setUInt32(0, ownerid);
         stmt->setUInt32(1, petnumber);
     }
     else if (current)
     {
         // Current pet (slot 0)
-        stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT);
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT);
         stmt->setUInt32(0, ownerid);
         stmt->setUInt8(1, uint8(PET_SAVE_AS_CURRENT));
     }
     else if (petentry)
     {
         // known petentry entry (unique for summoned pet, but non unique for hunter pet (only from current or not stabled pets)
-        stmt = CharacterDatabase.GetPreparedStatement<4>(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT_2);
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT_2);
         stmt->setUInt32(0, ownerid);
         stmt->setUInt32(1, petentry);
         stmt->setUInt8(2, uint8(PET_SAVE_AS_CURRENT));
@@ -128,7 +128,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     else
     {
         // Any current or other non-stabled pet (for hunter "call pet")
-        stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_SEL_CHAR_PET_BY_SLOT);
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_SLOT);
         stmt->setUInt32(0, ownerid);
         stmt->setUInt8(1, uint8(PET_SAVE_AS_CURRENT));
         stmt->setUInt8(2, uint8(PET_SAVE_LAST_STABLE_SLOT));
@@ -268,14 +268,14 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     {
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<4>(CHAR_UDP_CHAR_PET_SLOT_BY_SLOT_EXCLUDE_ID);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_PET_SLOT_BY_SLOT_EXCLUDE_ID);
         stmt->setUInt8(0, uint8(PET_SAVE_NOT_IN_SLOT));
         stmt->setUInt32(1, ownerid);
         stmt->setUInt8(2, uint8(PET_SAVE_AS_CURRENT));
         stmt->setUInt32(3, m_charmInfo->GetPetNumber());
         trans->Append(stmt);
 
-        stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
         stmt->setUInt8(0, uint8(PET_SAVE_AS_CURRENT));
         stmt->setUInt32(1, ownerid);
         stmt->setUInt32(2, m_charmInfo->GetPetNumber());
@@ -334,7 +334,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
 
     if (getPetType() == HUNTER_PET)
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_SEL_PET_DECLINED_NAME);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_DECLINED_NAME);
         stmt->setUInt32(0, owner->GetGUIDLow());
         stmt->setUInt32(1, GetCharmInfo()->GetPetNumber());
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
@@ -413,14 +413,14 @@ void Pet::SavePetToDB(PetSaveMode mode)
         trans = CharacterDatabase.BeginTransaction();
         // remove current data
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_PET_BY_ID);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_ID);
         stmt->setUInt32(0, m_charmInfo->GetPetNumber());
         trans->Append(stmt);
 
         // prevent duplicate using slot (except PET_SAVE_NOT_IN_SLOT)
         if (mode <= PET_SAVE_LAST_STABLE_SLOT)
         {
-            stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_UDP_CHAR_PET_SLOT_BY_SLOT);
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_PET_SLOT_BY_SLOT);
             stmt->setUInt8(0, uint8(PET_SAVE_NOT_IN_SLOT));
             stmt->setUInt32(1, ownerLowGUID);
             stmt->setUInt8(2, uint8(mode));
@@ -430,7 +430,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         // prevent existence another hunter pet in PET_SAVE_AS_CURRENT and PET_SAVE_NOT_IN_SLOT
         if (getPetType() == HUNTER_PET && (mode == PET_SAVE_AS_CURRENT || mode > PET_SAVE_LAST_STABLE_SLOT))
         {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_DEL_CHAR_PET_BY_SLOT);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_SLOT);
             stmt->setUInt32(0, ownerLowGUID);
             stmt->setUInt8(1, uint8(PET_SAVE_AS_CURRENT));
             stmt->setUInt8(2, uint8(PET_SAVE_LAST_STABLE_SLOT));
@@ -480,23 +480,23 @@ void Pet::DeleteFromDB(uint32 guidlow)
 {
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_PET_BY_ID);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_ID);
     stmt->setUInt32(0, guidlow);
     trans->Append(stmt);
 
-    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_CHAR_PET_DECLINEDNAME);
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_DECLINEDNAME);
     stmt->setUInt32(0, guidlow);
     trans->Append(stmt);
 
-    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PET_AURAS);
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_AURAS);
     stmt->setUInt32(0, guidlow);
     trans->Append(stmt);
 
-    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PET_SPELLS);
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELLS);
     stmt->setUInt32(0, guidlow);
     trans->Append(stmt);
 
-    stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PET_SPELL_COOLDOWNS);
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELL_COOLDOWNS);
     stmt->setUInt32(0, guidlow);
     trans->Append(stmt);
 
@@ -1126,7 +1126,7 @@ void Pet::_LoadSpellCooldowns()
     m_CreatureSpellCooldowns.clear();
     m_CreatureCategoryCooldowns.clear();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_PET_SPELL_COOLDOWN);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SPELL_COOLDOWN);
     stmt->setUInt32(0, m_charmInfo->GetPetNumber());
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -1171,7 +1171,7 @@ void Pet::_LoadSpellCooldowns()
 
 void Pet::_SaveSpellCooldowns(SQLTransaction& trans)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PET_SPELL_COOLDOWNS);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELL_COOLDOWNS);
     stmt->setUInt32(0, m_charmInfo->GetPetNumber());
     trans->Append(stmt);
 
@@ -1184,7 +1184,7 @@ void Pet::_SaveSpellCooldowns(SQLTransaction& trans)
             m_CreatureSpellCooldowns.erase(itr++);
         else
         {
-            stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_INS_PET_SPELL_COOLDOWN);
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL_COOLDOWN);
             stmt->setUInt32(0, m_charmInfo->GetPetNumber());
             stmt->setUInt32(1, itr->first);
             stmt->setUInt32(2, uint32(itr->second));
@@ -1197,7 +1197,7 @@ void Pet::_SaveSpellCooldowns(SQLTransaction& trans)
 
 void Pet::_LoadSpells()
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_PET_SPELL);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SPELL);
     stmt->setUInt32(0, m_charmInfo->GetPetNumber());
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -1228,7 +1228,7 @@ void Pet::_SaveSpells(SQLTransaction& trans)
         switch (itr->second.state)
         {
             case PETSPELL_REMOVED:
-                stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_PET_SPELL_BY_SPELL);
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELL_BY_SPELL);
                 stmt->setUInt32(0, m_charmInfo->GetPetNumber());
                 stmt->setUInt32(1, itr->first);
                 trans->Append(stmt);
@@ -1236,12 +1236,12 @@ void Pet::_SaveSpells(SQLTransaction& trans)
                 m_spells.erase(itr);
                 continue;
             case PETSPELL_CHANGED:
-                stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_DEL_PET_SPELL_BY_SPELL);
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELL_BY_SPELL);
                 stmt->setUInt32(0, m_charmInfo->GetPetNumber());
                 stmt->setUInt32(1, itr->first);
                 trans->Append(stmt);
 
-                stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_INS_PET_SPELL);
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL);
                 stmt->setUInt32(0, m_charmInfo->GetPetNumber());
                 stmt->setUInt32(1, itr->first);
                 stmt->setUInt8(2, itr->second.active);
@@ -1249,7 +1249,7 @@ void Pet::_SaveSpells(SQLTransaction& trans)
 
                 break;
             case PETSPELL_NEW:
-                stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_INS_PET_SPELL);
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL);
                 stmt->setUInt32(0, m_charmInfo->GetPetNumber());
                 stmt->setUInt32(1, itr->first);
                 stmt->setUInt8(2, itr->second.active);
@@ -1266,7 +1266,7 @@ void Pet::_LoadAuras(uint32 timediff)
 {
     sLog->outDebug(LOG_FILTER_PETS, "Loading auras for pet %u", GetGUIDLow());
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_PET_AURA);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_AURA);
     stmt->setUInt32(0, m_charmInfo->GetPetNumber());
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -1338,7 +1338,7 @@ void Pet::_LoadAuras(uint32 timediff)
 
 void Pet::_SaveAuras(SQLTransaction& trans)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_PET_AURAS);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_AURAS);
     stmt->setUInt32(0, m_charmInfo->GetPetNumber());
     trans->Append(stmt);
 
@@ -1375,7 +1375,7 @@ void Pet::_SaveAuras(SQLTransaction& trans)
 
         uint8 index = 0;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<15>(CHAR_INS_PET_AURA);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_AURA);
         stmt->setUInt32(index++, m_charmInfo->GetPetNumber());
         stmt->setUInt64(index++, casterGUID);
         stmt->setUInt32(index++, aura->GetId());
@@ -1406,7 +1406,7 @@ bool Pet::addSpell(uint32 spellId, ActiveStates active /*= ACT_DECIDE*/, PetSpel
         {
             sLog->outError(LOG_FILTER_PETS, "Pet::addSpell: Non-existed in SpellStore spell #%u request, deleting for all pets in `pet_spell`.", spellId);
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_DEL_INVALID_PET_SPELL);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_PET_SPELL);
 
             stmt->setUInt32(0, spellId);
 
@@ -1775,7 +1775,7 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* online_pet /*= NULL*/)
     // now need only reset for offline pets (all pets except online case)
     uint32 except_petnumber = online_pet ? online_pet->GetCharmInfo()->GetPetNumber() : 0;
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_SEL_CHAR_PET);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET);
     stmt->setUInt32(0, owner->GetGUIDLow());
     stmt->setUInt32(1, except_petnumber);
     PreparedQueryResult resultPets = CharacterDatabase.Query(stmt);
@@ -1784,7 +1784,7 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* online_pet /*= NULL*/)
     if (!resultPets)
         return;
 
-    stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_SEL_PET_SPELL_LIST);
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SPELL_LIST);
     stmt->setUInt32(0, owner->GetGUIDLow());
     stmt->setUInt32(1, except_petnumber);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);

@@ -72,7 +72,7 @@ class PreparedStatement
     friend class MySQLConnection;
 
     public:
-        explicit PreparedStatement(uint32 index, uint32 fieldCount = 0);
+        explicit PreparedStatement(uint32 index);
         ~PreparedStatement();
 
         void setBool(const uint8 index, const bool value);
@@ -90,7 +90,6 @@ class PreparedStatement
 
     protected:
         void BindParameters();
-        void SizeCheck(const uint8 index);
 
     protected:
         MySQLPreparedStatement* m_stmt;

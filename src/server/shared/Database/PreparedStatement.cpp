@@ -19,12 +19,10 @@
 #include "MySQLConnection.h"
 #include "Log.h"
 
-PreparedStatement::PreparedStatement(uint32 index, uint32 fieldCount /*= 0*/) :
+PreparedStatement::PreparedStatement(uint32 index) :
 m_stmt(NULL),
 m_index(index)
 {
-    if (fieldCount > 0) // Can't allocate memory for zero elements
-        statement_data.reserve(fieldCount);
 }
 
 PreparedStatement::~PreparedStatement()
@@ -84,16 +82,11 @@ void PreparedStatement::BindParameters()
     #endif
 }
 
-void PreparedStatement::SizeCheck(const uint8 index)
-{
-    if (index >= statement_data.size())
-        statement_data.resize(index+1);
-}
-
 //- Bind to buffer
 void PreparedStatement::setBool(const uint8 index, const bool value)
 {
-    SizeCheck(index);
+    if (index >= statement_data.size())
+        statement_data.resize(index+1);
 
     statement_data[index].data.boolean = value;
     statement_data[index].type = TYPE_BOOL;
@@ -101,7 +94,8 @@ void PreparedStatement::setBool(const uint8 index, const bool value)
 
 void PreparedStatement::setUInt8(const uint8 index, const uint8 value)
 {
-    SizeCheck(index);
+    if (index >= statement_data.size())
+        statement_data.resize(index+1);
 
     statement_data[index].data.ui8 = value;
     statement_data[index].type = TYPE_UI8;
@@ -109,7 +103,8 @@ void PreparedStatement::setUInt8(const uint8 index, const uint8 value)
 
 void PreparedStatement::setUInt16(const uint8 index, const uint16 value)
 {
-    SizeCheck(index);
+    if (index >= statement_data.size())
+        statement_data.resize(index+1);
 
     statement_data[index].data.ui16 = value;
     statement_data[index].type = TYPE_UI16;
@@ -117,7 +112,8 @@ void PreparedStatement::setUInt16(const uint8 index, const uint16 value)
 
 void PreparedStatement::setUInt32(const uint8 index, const uint32 value)
 {
-    SizeCheck(index);
+    if (index >= statement_data.size())
+        statement_data.resize(index+1);
 
     statement_data[index].data.ui32 = value;
     statement_data[index].type = TYPE_UI32;
@@ -125,7 +121,8 @@ void PreparedStatement::setUInt32(const uint8 index, const uint32 value)
 
 void PreparedStatement::setUInt64(const uint8 index, const uint64 value)
 {
-    SizeCheck(index);
+    if (index >= statement_data.size())
+        statement_data.resize(index+1);
 
     statement_data[index].data.ui64 = value;
     statement_data[index].type = TYPE_UI64;
@@ -133,7 +130,8 @@ void PreparedStatement::setUInt64(const uint8 index, const uint64 value)
 
 void PreparedStatement::setInt8(const uint8 index, const int8 value)
 {
-    SizeCheck(index);
+    if (index >= statement_data.size())
+        statement_data.resize(index+1);
 
     statement_data[index].data.i8 = value;
     statement_data[index].type = TYPE_I8;
@@ -141,7 +139,8 @@ void PreparedStatement::setInt8(const uint8 index, const int8 value)
 
 void PreparedStatement::setInt16(const uint8 index, const int16 value)
 {
-    SizeCheck(index);
+    if (index >= statement_data.size())
+        statement_data.resize(index+1);
 
     statement_data[index].data.i16 = value;
     statement_data[index].type = TYPE_I16;
@@ -149,7 +148,8 @@ void PreparedStatement::setInt16(const uint8 index, const int16 value)
 
 void PreparedStatement::setInt32(const uint8 index, const int32 value)
 {
-    SizeCheck(index);
+    if (index >= statement_data.size())
+        statement_data.resize(index+1);
 
     statement_data[index].data.i32 = value;
     statement_data[index].type = TYPE_I32;
@@ -157,7 +157,8 @@ void PreparedStatement::setInt32(const uint8 index, const int32 value)
 
 void PreparedStatement::setInt64(const uint8 index, const int64 value)
 {
-    SizeCheck(index);
+    if (index >= statement_data.size())
+        statement_data.resize(index+1);
 
     statement_data[index].data.i64 = value;
     statement_data[index].type = TYPE_I64;
@@ -165,7 +166,8 @@ void PreparedStatement::setInt64(const uint8 index, const int64 value)
 
 void PreparedStatement::setFloat(const uint8 index, const float value)
 {
-    SizeCheck(index);
+    if (index >= statement_data.size())
+        statement_data.resize(index+1);
 
     statement_data[index].data.f = value;
     statement_data[index].type = TYPE_FLOAT;
@@ -173,7 +175,8 @@ void PreparedStatement::setFloat(const uint8 index, const float value)
 
 void PreparedStatement::setDouble(const uint8 index, const double value)
 {
-    SizeCheck(index);
+    if (index >= statement_data.size())
+        statement_data.resize(index+1);
 
     statement_data[index].data.d = value;
     statement_data[index].type = TYPE_DOUBLE;
@@ -181,7 +184,8 @@ void PreparedStatement::setDouble(const uint8 index, const double value)
 
 void PreparedStatement::setString(const uint8 index, const std::string& value)
 {
-    SizeCheck(index);
+    if (index >= statement_data.size())
+        statement_data.resize(index+1);
 
     statement_data[index].str = value;
     statement_data[index].type = TYPE_STRING;

@@ -102,7 +102,7 @@ public:
             // search by GUID
             if (isNumeric(searchString.c_str()))
             {
-                stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_DEL_INFO_BY_GUID);
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_DEL_INFO_BY_GUID);
                 stmt->setUInt32(0, uint32(atoi(searchString.c_str())));
                 result = CharacterDatabase.Query(stmt);
             }
@@ -112,14 +112,14 @@ public:
                 if (!normalizePlayerName(searchString))
                     return false;
 
-                stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHAR_DEL_INFO_BY_NAME);
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_DEL_INFO_BY_NAME);
                 stmt->setString(0, searchString);
                 result = CharacterDatabase.Query(stmt);
             }
         }
         else
         {
-            stmt = CharacterDatabase.GetPreparedStatement<0>(CHAR_SEL_CHAR_DEL_INFO);
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_DEL_INFO);
             result = CharacterDatabase.Query(stmt);
         }
 
@@ -215,13 +215,13 @@ public:
             return;
         }
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<3>(CHAR_UDP_RESTORE_DELETE_INFO);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_RESTORE_DELETE_INFO);
         stmt->setString(0, delInfo.name);
         stmt->setUInt32(1, delInfo.accountId);
         stmt->setUInt32(2, delInfo.lowGuid);
         CharacterDatabase.Execute(stmt);
 
-        stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_CHARACTER_NAME_DATA);
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_NAME_DATA);
         stmt->setUInt32(0, delInfo.lowGuid);
         if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
             sWorld->AddCharacterNameData(delInfo.lowGuid, delInfo.name, (*result)[2].GetUInt8(), (*result)[0].GetUInt8(), (*result)[1].GetUInt8(), (*result)[3].GetUInt8());
@@ -248,7 +248,7 @@ public:
         else
         {
             // Update level and reset XP, everything else will be updated at login
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_UPD_LEVEL);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_LEVEL);
             stmt->setUInt8(0, uint8(newLevel));
             stmt->setUInt32(1, GUID_LOPART(playerGuid));
             CharacterDatabase.Execute(stmt);
@@ -324,7 +324,7 @@ public:
             std::string oldNameLink = handler->playerLink(targetName);
             handler->PSendSysMessage(LANG_RENAME_PLAYER_GUID, oldNameLink.c_str(), GUID_LOPART(targetGuid));
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
             stmt->setUInt16(0, uint16(AT_LOGIN_RENAME));
             stmt->setUInt32(1, GUID_LOPART(targetGuid));
             CharacterDatabase.Execute(stmt);
@@ -382,7 +382,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
             return false;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
         stmt->setUInt16(0, uint16(AT_LOGIN_CUSTOMIZE));
         if (target)
         {
@@ -410,7 +410,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
             return false;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
         stmt->setUInt16(0, uint16(AT_LOGIN_CHANGE_FACTION));
         if (target)
         {
@@ -437,7 +437,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
             return false;
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<2>(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
         stmt->setUInt16(0, uint16(AT_LOGIN_CHANGE_RACE));
         if (target)
         {

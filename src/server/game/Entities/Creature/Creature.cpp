@@ -1115,13 +1115,13 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     // update in DB
     SQLTransaction trans = WorldDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement<1>(WORLD_DEL_CREATURE);
+    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
     stmt->setUInt32(0, m_DBTableGuid);
     trans->Append(stmt);
 
     uint8 index = 0;
 
-    stmt = WorldDatabase.GetPreparedStatement<20>(WORLD_INS_CREATURE);
+    stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_CREATURE);
     stmt->setUInt32(index++, m_DBTableGuid);
     stmt->setUInt32(index++, GetEntry());
     stmt->setUInt16(index++, uint16(mapid));
@@ -1425,19 +1425,19 @@ void Creature::DeleteFromDB()
 
     SQLTransaction trans = WorldDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement<1>(WORLD_DEL_CREATURE);
+    PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
     stmt->setUInt32(0, m_DBTableGuid);
     trans->Append(stmt);
 
-    stmt = WorldDatabase.GetPreparedStatement<1>(WORLD_DEL_CREATURE_ADDON);
+    stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE_ADDON);
     stmt->setUInt32(0, m_DBTableGuid);
     trans->Append(stmt);
 
-    stmt = WorldDatabase.GetPreparedStatement<1>(WORLD_DEL_GAME_EVENT_CREATURE);
+    stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAME_EVENT_CREATURE);
     stmt->setUInt32(0, m_DBTableGuid);
     trans->Append(stmt);
 
-    stmt = WorldDatabase.GetPreparedStatement<1>(WORLD_DEL_GAME_EVENT_MODEL_EQUIP);
+    stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAME_EVENT_MODEL_EQUIP);
     stmt->setUInt32(0, m_DBTableGuid);
     trans->Append(stmt);
 

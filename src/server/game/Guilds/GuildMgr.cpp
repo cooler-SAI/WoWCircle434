@@ -117,7 +117,7 @@ uint32 GuildMgr::GetXPForGuildLevel(uint8 level) const
 
 void GuildMgr::ResetExperienceCaps()
 {
-    CharacterDatabase.Execute(CharacterDatabase.GetPreparedStatement<0>(CHAR_UPD_GUILD_RESET_TODAY_EXPERIENCE));
+    CharacterDatabase.Execute(CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_RESET_TODAY_EXPERIENCE));
 
     for (GuildContainer::iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
         itr->second->ResetDailyExperience();
@@ -125,7 +125,7 @@ void GuildMgr::ResetExperienceCaps()
 
 void GuildMgr::ResetReputationCaps()
 {
-    CharacterDatabase.Execute(CharacterDatabase.GetPreparedStatement<0>(CHAR_UPD_GUILD_RESET_WEEKLY_REPUTATION));
+    CharacterDatabase.Execute(CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_RESET_WEEKLY_REPUTATION));
 
     for (GuildContainer::iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
         itr->second->ResetWeeklyReputation();
@@ -429,10 +429,10 @@ void GuildMgr::LoadGuilds()
         PreparedQueryResult criteriaResult;
         for (GuildContainer::const_iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
         {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_GUILD_ACHIEVEMENT);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_ACHIEVEMENT);
             stmt->setUInt32(0, itr->first);
             achievementResult = CharacterDatabase.Query(stmt);
-            stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_SEL_GUILD_ACHIEVEMENT_CRITERIA);
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_ACHIEVEMENT_CRITERIA);
             stmt->setUInt32(0, itr->first);
             criteriaResult = CharacterDatabase.Query(stmt);
 
@@ -444,7 +444,7 @@ void GuildMgr::LoadGuilds()
     {
         for (GuildContainer::const_iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
         {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement<1>(CHAR_LOAD_GUILD_NEWS);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_LOAD_GUILD_NEWS);
             stmt->setInt32(0, itr->first);
             itr->second->GetNewsLog().LoadFromDB(CharacterDatabase.Query(stmt));
         }

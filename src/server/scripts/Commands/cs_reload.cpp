@@ -399,7 +399,7 @@ public:
         {
             uint32 entry = uint32(atoi(*itr));
 
-            PreparedStatement* stmt = WorldDatabase.GetPreparedStatement<1>(WORLD_SEL_CREATURE_TEMPLATE);
+            PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_TEMPLATE);
             stmt->setUInt32(0, entry);
             PreparedQueryResult result = WorldDatabase.Query(stmt);
 
