@@ -673,8 +673,8 @@ bool Guild::Member::LoadFromDB(Field* fields)
     SetProfession(0, fields[31].GetUInt32(), fields[32].GetUInt32(), fields[33].GetUInt32());
     SetProfession(1, fields[34].GetUInt32(), fields[35].GetUInt32(), fields[36].GetUInt32());
 
-    m_xpContrib = fields[37].GetUInt32();
-    m_xpContribWeek = fields[38].GetUInt32();
+    m_xpContrib = fields[37].GetUInt64();
+    m_xpContribWeek = fields[38].GetUInt64();
    
     if (!CheckStats())
         return false;
