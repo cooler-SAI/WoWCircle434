@@ -5132,6 +5132,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 81751:
                 spellInfo->MaxAffectedTargets = 1;
                 spellInfo->Effects[0].SetRadiusIndex(18);
+                spellInfo->Effects[0].RealPointsPerLevel = 0.0f;
                 break;
             // Whirlwind (MH+OH)
             case 1680:

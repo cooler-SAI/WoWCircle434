@@ -1274,16 +1274,13 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                     if (m_caster && m_caster->GetTypeId() == TYPEID_PLAYER)
                     {
                         Unit *aTarget = m_caster;
-                        if (m_targets.GetUnitTarget())
+                        unitTargets.sort(Trinity::HealthPctOrderPred());
+                        for (std::list<Unit*>::iterator itr = unitTargets.begin() ; itr != unitTargets.end(); ++itr)
                         {
-                            unitTargets.sort(Trinity::HealthPctOrderPred());
-                            for (std::list<Unit*>::iterator itr = unitTargets.begin() ; itr != unitTargets.end(); ++itr)
+                            if (m_caster != (*itr) && (*itr)->IsInRaidWith(m_caster))
                             {
-                                if (m_caster != (*itr) && (*itr)->IsInRaidWith(m_caster) && (*itr)->IsWithinDistInMap(m_targets.GetUnitTarget(), 15))
-                                {
-                                    aTarget = (*itr);
-                                    break;
-                                }
+                                aTarget = (*itr);
+                                break;
                             }
                         }
                         unitTargets.clear();
