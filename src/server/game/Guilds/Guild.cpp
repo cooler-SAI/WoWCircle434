@@ -672,6 +672,9 @@ bool Guild::Member::LoadFromDB(Field* fields)
  
     SetProfession(0, fields[31].GetUInt32(), fields[32].GetUInt32(), fields[33].GetUInt32());
     SetProfession(1, fields[34].GetUInt32(), fields[35].GetUInt32(), fields[36].GetUInt32());
+
+    m_xpContrib = fields[37].GetUInt32();
+    m_xpContribWeek = fields[38].GetUInt32();
    
     if (!CheckStats())
         return false;
@@ -1353,7 +1356,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         memberData << uint8(member->GetClass());
         memberData << int32(0);                                     // unk
         memberData.WriteByteSeq(guid[0]);
-        memberData << uint64(0);                                    // weekly activity
+        memberData << uint64(member->GetXPContribWeek());
         memberData << uint32(member->GetRankId());
         memberData << uint32(member->GetAchievementPoints());                                    // player->GetAchievementMgr().GetCompletedAchievementsAmount()
 
@@ -1363,7 +1366,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         memberData.WriteByteSeq(guid[2]);
         memberData << uint8(flags);
         memberData << uint32(player ? player->GetZoneId() : member->GetZone());
-        memberData << uint64(0);                                    // Total activity
+        memberData << uint64(member->GetXPContrib());
         memberData.WriteByteSeq(guid[7]);
         memberData << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP) - member->GetWeeklyReputation());// Remaining guild week Rep
 
@@ -3315,6 +3318,20 @@ void Guild::GiveXP(uint32 xp, Player* source)
     _experience += xp;
     _todayExperience += xp;
 
+    Member* member = GetMember(source->GetGUID());
+    {
+        ASSERT(member != NULL);
+
+        member->AddXPContrib(xp);
+        member->AddXPContribWeek(xp);
+
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_MEMBER_XP);
+        stmt->setUInt64(0, member->GetXPContrib());
+        stmt->setUInt64(1, member->GetXPContribWeek());
+        stmt->setUInt32(2, source->GetGUIDLow());
+        CharacterDatabase.Execute(stmt);
+    }
+
     uint32 oldLevel = GetLevel();
 
     // Ding, mon!
@@ -3348,13 +3365,14 @@ void Guild::GiveXP(uint32 xp, Player* source)
 
 void Guild::SendGuildXP(WorldSession* session) const
 {
-    //Member const* member = GetMember(session->GetGuidLow());
+    Member const* member = GetMember(session->GetGuidLow());
+    ASSERT(member != NULL);
 
     WorldPacket data(SMSG_GUILD_XP, 40);
-    data << uint64(/*member ? member->GetTotalActivity() :*/ 0);
+    data << uint64(member->GetXPContrib());
     data << uint64(sGuildMgr->GetXPForGuildLevel(GetLevel()) - GetExperience());    // XP missing for next level
     data << uint64(GetTodayExperience());
-    data << uint64(/*member ? member->GetWeeklyActivity() :*/ 0);
+    data << uint64(member->GetXPContribWeek());
     data << uint64(GetExperience());
     session->SendPacket(&data);
 }
@@ -3374,6 +3392,7 @@ void Guild::ResetWeeklyReputation()
         if (Guild::Member* pMember = itr->second)
         {
             pMember->SetWeeklyReputation(0);
+            pMember->ResetXPContribWeek();
             if (Player* pPlayer = pMember->FindPlayer())
                 SendGuildReputationWeeklyCap(pPlayer->GetSession()); 
         }

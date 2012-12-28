@@ -226,6 +226,8 @@ void GuildMgr::LoadGuilds()
                                                      "c.name, c.level, c.class, c.zone, c.account, c.logout_time, week_rep, achievementPoints, "
                                                      //    31               32                33              34               35                36
                                                      "FirstProffLevel, FirstProffSkill, FirstProffRank, SecondProffLevel, SecondProffSkill, SecondProffRank "
+                                                     //    37              38
+                                                     "total_activity, week_activity "
                                                      "FROM guild_member gm LEFT JOIN characters c ON c.guid = gm.guid ORDER BY guildid ASC");
 
         if (!result)

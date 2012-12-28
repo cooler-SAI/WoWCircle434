@@ -358,6 +358,14 @@ private:
         uint8 GetZone() const { return m_zoneId; }
         uint64 GetLogoutTime() const { return m_logoutTime; }
 
+        const uint64& GetXPContrib() const { return m_xpContrib; }
+        const uint64& GetXPContribWeek() const { return m_xpContribWeek; }
+
+        void AddXPContrib(uint64 value) { m_xpContrib += value; }
+        void AddXPContribWeek(uint64 value) { m_xpContribWeek += value; }
+
+        void ResetXPContribWeek() { m_xpContribWeek = 0LL; }
+
         void ChangeRank(uint8 newRank);
 
         inline void UpdateLogoutTime() { m_logoutTime = ::time(NULL); }
@@ -419,6 +427,9 @@ private:
         std::string m_officerNote;
         uint32 m_week_rep;
         uint32 m_achievementPoints;
+
+        uint64 m_xpContrib;
+        uint64 m_xpContribWeek;
 
         RemainingValue m_bankRemaining[GUILD_BANK_MAX_TABS + 1];
     };
