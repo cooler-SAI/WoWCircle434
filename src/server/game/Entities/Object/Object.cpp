@@ -341,57 +341,62 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     if (unit)
         const_cast<Unit*>(unit)->m_movementInfo.Normalize(GetTypeId() == TYPEID_UNIT);
 
-    data->WriteBit(false);
-    data->WriteBit(false);
-    data->WriteBit((flags & UPDATEFLAG_ROTATION) && go);
-    data->WriteBit(flags & UPDATEFLAG_ANIMKITS);
-    data->WriteBit((flags & UPDATEFLAG_HAS_TARGET) && unit && unit->getVictim());
-    data->WriteBit(flags & UPDATEFLAG_SELF);
-    data->WriteBit((flags & UPDATEFLAG_VEHICLE) && unit);
-    data->WriteBit((flags & UPDATEFLAG_LIVING) && unit);
-    data->WriteBits(transportPause ? 1 : 0, 24);
-    data->WriteBit(false);
-    data->WriteBit((flags & UPDATEFLAG_GO_TRANSPORT_POSITION) && wo);
-    data->WriteBit((flags & UPDATEFLAG_STATIONARY_POSITION) && wo);
-    data->WriteBit(flags & UPDATEFLAG_UNK5);
-    data->WriteBit(false);
-    data->WriteBit((flags & UPDATEFLAG_TRANSPORT) && wo);
+    (*data)
+        .WriteBit(false)
+        .WriteBit(false)
+        .WriteBit((flags & UPDATEFLAG_ROTATION) && go)
+        .WriteBit(flags & UPDATEFLAG_ANIMKITS)
+        .WriteBit((flags & UPDATEFLAG_HAS_TARGET) && unit && unit->getVictim())
+        .WriteBit(flags & UPDATEFLAG_SELF)
+        .WriteBit((flags & UPDATEFLAG_VEHICLE) && unit)
+        .WriteBit((flags & UPDATEFLAG_LIVING) && unit)
+        .WriteBits(transportPause ? 1 : 0, 24)
+        .WriteBit(false)
+        .WriteBit((flags & UPDATEFLAG_GO_TRANSPORT_POSITION) && wo)
+        .WriteBit((flags & UPDATEFLAG_STATIONARY_POSITION) && wo)
+        .WriteBit(flags & UPDATEFLAG_UNK5)
+        .WriteBit(false)
+        .WriteBit(flags & UPDATEFLAG_TRANSPORT);
 
     if ((flags & UPDATEFLAG_LIVING) && unit)
     {
         ObjectGuid guid = GetGUID();
 
-        data->WriteBit(!unit->m_movementInfo.flags);
-        data->WriteBit(!unit->m_movementInfo.HasOrientation());
-        data->WriteByteMask(guid[7]);
-        data->WriteByteMask(guid[3]);
-        data->WriteByteMask(guid[2]);
+        (*data)
+            .WriteBit(!unit->m_movementInfo.flags)
+            .WriteBit(!unit->m_movementInfo.pos.HaveOrientation())
+            .WriteByteMask(guid[7])
+            .WriteByteMask(guid[3])
+            .WriteByteMask(guid[2]);
 
         if (unit->m_movementInfo.flags)
             data->WriteBits(unit->m_movementInfo.flags, 30);
 
-        data->WriteBit(false);
-        data->WriteBit(!unit->m_movementInfo.HasPitch());
-        data->WriteBit(unit->IsSplineEnabled());
-        data->WriteBit(unit->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA));
-        data->WriteBit(!unit->m_movementInfo.HasSplineElevation());
-        data->WriteByteMask(guid[5]);
-        data->WriteBit(unit->m_movementInfo.HasTransportData());
-        data->WriteBit(!unit->m_movementInfo.time);
+        (*data)
+            .WriteBit(false) // p2.84
+            .WriteBit(!unit->m_movementInfo.HavePitch)
+            .WriteBit(unit->IsSplineEnabled())
+            .WriteBit(unit->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA))
+            .WriteBit(!unit->m_movementInfo.HaveSplineElevation)
+            .WriteByteMask(guid[5])
+            .WriteBit(unit->m_movementInfo.HasTransportData())
+            .WriteBit(!unit->m_movementInfo.time);
+
         if (unit->m_movementInfo.HasTransportData())
         {
             ObjectGuid transGuid = unit->m_movementInfo.t_guid;
 
-            data->WriteByteMask(transGuid[1]);
-            data->WriteBit(unit->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T2));
-            data->WriteByteMask(transGuid[4]);
-            data->WriteByteMask(transGuid[0]);
-            data->WriteByteMask(transGuid[6]);
-            data->WriteBit(unit->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T3));
-            data->WriteByteMask(transGuid[7]);
-            data->WriteByteMask(transGuid[5]);
-            data->WriteByteMask(transGuid[3]);
-            data->WriteByteMask(transGuid[2]);
+            (*data)
+                .WriteByteMask(transGuid[1])
+                .WriteBit(unit->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T2))
+                .WriteByteMask(transGuid[4])
+                .WriteByteMask(transGuid[0])
+                .WriteByteMask(transGuid[6])
+                .WriteBit(unit->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T3))
+                .WriteByteMask(transGuid[7])
+                .WriteByteMask(transGuid[5])
+                .WriteByteMask(transGuid[3])
+                .WriteByteMask(transGuid[2]);
         }
 
         data->WriteByteMask(guid[4]);
@@ -402,10 +407,11 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         if (unit->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA))
             data->WriteBit(unit->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_FALLDIRECTION));
 
-        data->WriteByteMask(guid[0]);
-        data->WriteByteMask(guid[1]);
-        data->WriteBit(false);
-        data->WriteBit(!unit->m_movementInfo.flags2);
+        (*data)
+            .WriteByteMask(guid[0])
+            .WriteByteMask(guid[1])
+            .WriteBit(false)
+            .WriteBit(!unit->m_movementInfo.flags2);
 
         if (unit->m_movementInfo.flags2)
             data->WriteBits(unit->m_movementInfo.flags2, 12);
@@ -415,36 +421,40 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     {
         ObjectGuid transGuid = wo->m_movementInfo.t_guid;
 
-        data->WriteByteMask(transGuid[5]);
-        data->WriteBit(wo->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T3));
-        data->WriteByteMask(transGuid[0]);
-        data->WriteByteMask(transGuid[3]);
-        data->WriteByteMask(transGuid[6]);
-        data->WriteByteMask(transGuid[1]);
-        data->WriteByteMask(transGuid[4]);
-        data->WriteByteMask(transGuid[2]);
-        data->WriteBit(wo->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T2));
-        data->WriteByteMask(transGuid[7]);
+        (*data)
+            .WriteByteMask(transGuid[5])
+            .WriteBit(wo->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T3))
+            .WriteByteMask(transGuid[0])
+            .WriteByteMask(transGuid[3])
+            .WriteByteMask(transGuid[6])
+            .WriteByteMask(transGuid[1])
+            .WriteByteMask(transGuid[4])
+            .WriteByteMask(transGuid[2])
+            .WriteBit(wo->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T2))
+            .WriteByteMask(transGuid[7]);
     }
 
     if ((flags & UPDATEFLAG_HAS_TARGET) && unit && unit->getVictim())
     {
         ObjectGuid victimGuid = unit->getVictim()->GetGUID();
-        data->WriteByteMask(victimGuid[2]);
-        data->WriteByteMask(victimGuid[7]);
-        data->WriteByteMask(victimGuid[0]);
-        data->WriteByteMask(victimGuid[4]);
-        data->WriteByteMask(victimGuid[5]);
-        data->WriteByteMask(victimGuid[6]);
-        data->WriteByteMask(victimGuid[1]);
-        data->WriteByteMask(victimGuid[3]);
+
+        (*data)
+            .WriteByteMask(victimGuid[2])
+            .WriteByteMask(victimGuid[7])
+            .WriteByteMask(victimGuid[0])
+            .WriteByteMask(victimGuid[4])
+            .WriteByteMask(victimGuid[5])
+            .WriteByteMask(victimGuid[6])
+            .WriteByteMask(victimGuid[1])
+            .WriteByteMask(victimGuid[3]);
     }
 
     if (flags & UPDATEFLAG_ANIMKITS)
     {
-        data->WriteBit(true);                                                      // Missing AnimKit1
-        data->WriteBit(true);                                                      // Missing AnimKit2
-        data->WriteBit(true);                                                      // Missing AnimKit3
+        (*data)
+            .WriteBit(true)                                                      // Missing AnimKit1
+            .WriteBit(true)                                                      // Missing AnimKit2
+            .WriteBit(true);                                                      // Missing AnimKit3
     }
 
     if (transportPause)
@@ -470,7 +480,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         }
 
         *data << unit->GetSpeed(MOVE_SWIM_BACK);
-        if (unit->m_movementInfo.HasSplineElevation())
+        if (unit->m_movementInfo.HaveSplineElevation)
             *data << float(unit->m_movementInfo.splineElevation);
 
         if (unit->IsSplineEnabled())
@@ -480,54 +490,60 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         data->WriteByteSeq(guid[5]);
         if (unit->m_movementInfo.HasTransportData())
         {
-            ObjectGuid transGuid = unit->m_movementInfo.t_guid;
+            ObjectGuid transGuid = wo->m_movementInfo.t_guid;
 
-            data->WriteByteSeq(transGuid[5]);
-            data->WriteByteSeq(transGuid[7]);
-            *data << uint32(unit->GetTransTime());
-            *data << float(unit->GetTransOffsetO());
+            (*data)
+                .WriteByteSeq(transGuid[5])
+                .WriteByteSeq(transGuid[7])
+                .append<uint32>(wo->GetTransTime())
+                .append<float>(wo->GetTransOffsetO());
 
-            if (unit->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T2))
-                *data << unit->m_movementInfo.t_time2;
+            if (wo->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T2))
+                *data << wo->m_movementInfo.t_time2;
 
-            *data << float(unit->GetTransOffsetY());
-            *data << float(unit->GetTransOffsetX());
-            data->WriteByteSeq(transGuid[3]);
-            *data << float(unit->GetTransOffsetZ());
-            data->WriteByteSeq(transGuid[0]);
+            (*data)
+                .append<float>(wo->GetTransOffsetY())
+                .append<float>(wo->GetTransOffsetX())
+                .WriteByteSeq(transGuid[3])
+                .append<float>(wo->GetTransOffsetZ())
+                .WriteByteSeq(transGuid[0]);
 
-            if (unit->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T3))
-                *data << unit->m_movementInfo.t_time3;
+            if (wo->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T3))
+                *data << wo->m_movementInfo.t_time3;
 
-            *data << int8(unit->GetTransSeat());
-            data->WriteByteSeq(transGuid[1]);
-            data->WriteByteSeq(transGuid[6]);
-            data->WriteByteSeq(transGuid[2]);
-            data->WriteByteSeq(transGuid[4]);
+            (*data)
+                .append<int8>(wo->GetTransSeat())
+                .WriteByteSeq(transGuid[1])
+                .WriteByteSeq(transGuid[6])
+                .WriteByteSeq(transGuid[2])
+                .WriteByteSeq(transGuid[4]);
         }
 
-        *data << float(unit->GetPositionX());
-        *data << unit->GetSpeed(MOVE_PITCH_RATE);
-        data->WriteByteSeq(guid[3]);
-        data->WriteByteSeq(guid[0]);
-        *data << unit->GetSpeed(MOVE_SWIM);
-        *data << float(unit->GetPositionY());
-        data->WriteByteSeq(guid[7]);
-        data->WriteByteSeq(guid[1]);
-        data->WriteByteSeq(guid[2]);
-        *data << unit->GetSpeed(MOVE_WALK);
+        (*data)
+            .append<float>(unit->GetPositionX())
+            .append<float>(unit->GetSpeed(MOVE_PITCH_RATE))
+            .WriteByteSeq(guid[3])
+            .WriteByteSeq(guid[0])
+            .append<float>(unit->GetSpeed(MOVE_SWIM))
+            .append<float>(unit->GetPositionY())
+            .WriteByteSeq(guid[7])
+            .WriteByteSeq(guid[1])
+            .WriteByteSeq(guid[2])
+            .append<float>(unit->GetSpeed(MOVE_WALK));
 
         if (unit->m_movementInfo.time)
             *data << uint32(unit->m_movementInfo.time);
 
-        *data << unit->GetSpeed(MOVE_FLIGHT_BACK);
-        data->WriteByteSeq(guid[6]);
-        *data << unit->GetSpeed(MOVE_TURN_RATE);
-        if (unit->m_movementInfo.HasOrientation())
+        (*data)
+            .append<float>(unit->GetSpeed(MOVE_FLIGHT_BACK))
+            .WriteByteSeq(guid[6])
+            .append<float>(unit->GetSpeed(MOVE_TURN_RATE));
+
+        if (unit->m_movementInfo.pos.HaveOrientation())
             *data << float(unit->GetOrientation());
 
         *data << unit->GetSpeed(MOVE_RUN);
-        if (unit->m_movementInfo.HasPitch())
+        if (unit->m_movementInfo.HavePitch)
             *data << float(unit->m_movementInfo.pitch);
 
         *data << unit->GetSpeed(MOVE_FLIGHT);
@@ -548,18 +564,20 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         if (wo->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T3))
             *data << wo->m_movementInfo.t_time3;
 
-        data->WriteByteMask(transGuid[3]);
-        *data << float(wo->GetTransOffsetX());
-        data->WriteByteMask(transGuid[4]);
-        data->WriteByteMask(transGuid[6]);
-        data->WriteByteMask(transGuid[1]);
-        *data << uint32(wo->GetTransTime());
-        *data << float(wo->GetTransOffsetY());
-        data->WriteByteMask(transGuid[2]);
-        data->WriteByteMask(transGuid[7]);
-        *data << float(wo->GetTransOffsetZ());
-        *data << int8(wo->GetTransSeat());
-        *data << float(wo->GetTransOffsetO());
+        (*data)
+            .WriteByteMask(transGuid[3])
+            .append<float>(wo->GetTransOffsetX())
+            .WriteByteMask(transGuid[4])
+            .WriteByteMask(transGuid[6])
+            .WriteByteMask(transGuid[1])
+            .append<uint32>(wo->GetTransTime())
+            .append<float>(wo->GetTransOffsetY())
+            .WriteByteMask(transGuid[2])
+            .WriteByteMask(transGuid[7])
+            .append<float>(wo->GetTransOffsetZ())
+            .append<int8>(wo->GetTransSeat())
+            .append<float>(wo->GetTransOffsetO());
+
         if (wo->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T2))
             *data << wo->m_movementInfo.t_time2;
     }
@@ -590,26 +608,27 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 
     if ((flags & UPDATEFLAG_STATIONARY_POSITION) && wo)
     {
-        *data << float(wo->GetOrientation());
-        *data << float(wo->GetPositionX());
-        *data << float(wo->GetPositionY());
-        if (unit)
-            *data << float(unit->GetPositionZMinusOffset());
-        else
-            *data << float(wo->GetPositionZ());
+        (*data)
+            << wo->GetOrientation()
+            << wo->GetPositionX()
+            << wo->GetPositionY()
+            << wo->GetPositionZ()
+            ;
     }
 
     if ((flags & UPDATEFLAG_HAS_TARGET) && unit && unit->getVictim())
     {
         ObjectGuid victimGuid = unit->getVictim()->GetGUID();
-        data->WriteByteSeq(victimGuid[4]);
-        data->WriteByteSeq(victimGuid[0]);
-        data->WriteByteSeq(victimGuid[3]);
-        data->WriteByteSeq(victimGuid[5]);
-        data->WriteByteSeq(victimGuid[7]);
-        data->WriteByteSeq(victimGuid[6]);
-        data->WriteByteSeq(victimGuid[2]);
-        data->WriteByteSeq(victimGuid[1]);
+
+        (*data)
+            .WriteByteSeq(victimGuid[4])
+            .WriteByteSeq(victimGuid[0])
+            .WriteByteSeq(victimGuid[3])
+            .WriteByteSeq(victimGuid[5])
+            .WriteByteSeq(victimGuid[7])
+            .WriteByteSeq(victimGuid[6])
+            .WriteByteSeq(victimGuid[2])
+            .WriteByteSeq(victimGuid[1]);
     }
 
     //if (flags & UPDATEFLAG_ANIMKITS)
@@ -1612,9 +1631,17 @@ bool MovementInfo::AcceptClientChanges(Player* player, MovementInfo& client, Opc
 
 void MovementInfo::Normalize(bool update)
 {
+    if (HaveSplineElevation)
+        AddMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
+    else
+        RemoveMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
+
     // move orientation to range [0, 2*PI)
     pos.m_orientation = Position::NormalizeOrientation(pos.m_orientation);
     t_pos.m_orientation = Position::NormalizeOrientation(t_pos.m_orientation);
+
+    // move pitch to range (-PI, PI)
+    pitch = Position::NormalizePitch(pitch);
 
     if (HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T2) && !t_time2)
         RemoveServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T2);
@@ -1945,9 +1972,7 @@ bool Position::HasInArc(float arc, const Position* obj) const
     angle -= m_orientation;
 
     // move angle to range -pi ... +pi
-    angle = NormalizeOrientation(angle);
-    if (angle > M_PI)
-        angle -= 2.0f*M_PI;
+    angle = NormalizePitch(angle);
 
     float lborder = -1 * (arc/2.0f);                        // in range -pi..0
     float rborder = (arc/2.0f);                             // in range 0..pi
@@ -2516,7 +2541,7 @@ void WorldObject::BuildMonsterChat(WorldPacket* data, uint8 msgtype, char const*
     unsigned int len = (unsigned int)strlen(text)+1;
     unsigned int nlen = (unsigned int)strlen(name)+1;
     {
-        size_t newSize = size_t(21 + nlen + 8 + (isNoPlayerGuid ? 5 : 0) + 4 + len + 1);
+        size_t newSize = size_t(21 + nlen + 8 + (isNoPlayerGuid ? 5 : 0) + 4 + len + 1 + ((msgtype == CHAT_MSG_RAID_BOSS_EMOTE || msgtype == CHAT_MSG_RAID_BOSS_WHISPER) ? 5 : 0));
         data->Initialize(SMSG_MESSAGECHAT, newSize);
     }
 
@@ -2535,6 +2560,12 @@ void WorldObject::BuildMonsterChat(WorldPacket* data, uint8 msgtype, char const*
     *data << len;
     *data << text;
     *data << uint8(0);                                      // ChatTag
+
+    if (msgtype == CHAT_MSG_RAID_BOSS_EMOTE || msgtype == CHAT_MSG_RAID_BOSS_WHISPER)
+    {
+        *data << float(0);
+        *data << uint8(0);
+    }
 }
 
 void WorldObject::SendMessageToSet(WorldPacket* data, bool self)

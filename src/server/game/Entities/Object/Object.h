@@ -451,6 +451,8 @@ struct Position
     float m_orientation;
 //public:
 
+    bool HaveOrientation() const { return m_orientation != 0.0f; }
+
     void Relocate(float x, float y)
         { m_positionX = x; m_positionY = y;}
     void Relocate(float x, float y, float z)
@@ -534,16 +536,30 @@ struct Position
     // modulos a radian orientation to the range of 0..2PI
     static float NormalizeOrientation(float o)
     {
+        if (o >= 0.0f && o < 6.2831864f)
+            return o;
+
         // fmod only supports positive numbers. Thus we have
         // to emulate negative numbers
         if (o < 0)
         {
-            float mod = o *-1;
-            mod = fmod(mod, 2.0f * static_cast<float>(M_PI));
-            mod = -mod + 2.0f * static_cast<float>(M_PI);
+            float mod = -o;
+            mod = fmod(mod, 6.2831864f);
+            mod = -mod + 6.2831864f;
             return mod;
         }
-        return fmod(o, 2.0f * static_cast<float>(M_PI));
+        return fmod(o, 6.2831864f);
+    }
+
+    // (-PI, PI)
+    static float NormalizePitch(float o)
+    {
+        if (o > -M_PI && o < M_PI)
+            return o;
+
+        o = NormalizeOrientation(o + M_PI) - M_PI;
+
+        return o;
     }
 };
 ByteBuffer& operator>>(ByteBuffer& buf, Position::PositionXYZOStreamer const& streamer);
@@ -568,13 +584,21 @@ struct MovementInfo
     uint32 t_time2;
     uint32 t_time3;
     // swimming/flying
-    float pitch;
+    union
+    {
+        float pitch;
+        uint32 HavePitch;
+    };
     // falling
     uint32 fallTime;
     // jumping
     float j_zspeed, j_cosAngle, j_sinAngle, j_xyspeed;
     // spline
-    float splineElevation;
+    union
+    {
+        float splineElevation;
+        uint32 HaveSplineElevation;
+    };
     // speed
     float speed;
 
@@ -594,10 +618,6 @@ struct MovementInfo
         t_seat = -1;
     }
 
-    bool HasPitch() const { return !G3D::fuzzyEq(pitch, 0.0f); }
-    bool HasOrientation() const { return !G3D::fuzzyEq(pos.m_orientation, 0.0f); }
-    bool HasSplineElevation() const { return !G3D::fuzzyEq(splineElevation, 0.0f); }
-
     uint32 GetMovementFlags() const { return flags; }
     void SetMovementFlags(uint32 flag) { flags = flag; }
     void AddMovementFlag(uint32 flag) { flags |= flag; }
@@ -606,6 +626,7 @@ struct MovementInfo
 
     uint16 GetExtraMovementFlags() const { return flags2; }
     void AddExtraMovementFlag(uint16 flag) { flags2 |= flag; }
+    void RemoveExtraMovementFlag(uint16 flag) { flags2 &= ~flag; }
     bool HasExtraMovementFlag(uint16 flag) const { return flags2 & flag; }
 
     uint16 GetServerMovementFlags() const { return flags_s; }

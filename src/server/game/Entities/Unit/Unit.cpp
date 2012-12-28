@@ -19397,7 +19397,7 @@ void Unit::SendMovementCanFlyChange()
 
 bool Unit::IsSplineEnabled() const
 {
-    return movespline->Initialized();
+    return movespline->Initialized() && !movespline->Finalized();
 }
 
 void Unit::FocusTarget(Spell const* focusSpell, uint64 target)

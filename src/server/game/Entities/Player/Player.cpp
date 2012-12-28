@@ -2260,7 +2260,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         if (GetTransport())
         {
             m_transport->RemovePassenger(this);
-            m_transport = NULL;
+            SetTransport(NULL);
             m_movementInfo.t_pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
             m_movementInfo.t_time = 0;
             m_movementInfo.t_seat = -1;
@@ -2287,11 +2287,10 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         if (!(options & TELE_TO_NOT_LEAVE_TRANSPORT))
         {
             m_transport->RemovePassenger(this);
-            m_transport = NULL;
+            SetTransport(NULL);
             m_movementInfo.t_pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
             m_movementInfo.t_time = 0;
             m_movementInfo.t_seat = -1;
-            m_movementInfo.t_guid = 0;
         }
     }
 
@@ -2455,10 +2454,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             // if the player is saved before worldportack (at logout for example)
             // this will be used instead of the current location in SaveToDB
 
-            // move packet sent by client always after far teleport
-            // code for finish transfer to new map called in WorldSession::HandleMoveWorldportAckOpcode at client packet
-            SetSemaphoreTeleportFar(true);
-
             if (!GetSession()->PlayerLogout())
             {
                 WorldPacket data(SMSG_NEW_WORLD, 4 + 4 + 4 + 4 + 4);
@@ -2471,6 +2466,10 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 GetSession()->SendPacket(&data);
                 SendSavedInstances();
             }
+
+            // move packet sent by client always after far teleport
+            // code for finish transfer to new map called in WorldSession::HandleMoveWorldportAckOpcode at client packet
+            SetSemaphoreTeleportFar(true);
         }
         //else
         //    return false;
