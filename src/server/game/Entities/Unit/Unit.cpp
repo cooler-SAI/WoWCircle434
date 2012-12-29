@@ -18926,7 +18926,7 @@ void Unit::SendTeleportPacket(Position &pos)
         Relocate(&pos);
     else
         Relocate(&oldPos);
-    SendMessageToSet(&data, true);
+    SendMessageToSet(&data, false);
 }
 
 bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool teleport)
