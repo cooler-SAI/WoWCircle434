@@ -5591,6 +5591,13 @@ void SpellMgr::LoadDbcDataCorrections()
             case 34433:
                 spellInfo->Effects[EFFECT_0].MiscValueB = 1561;
                 break;
+            // Inflate Air Balloon, Undersea Inflation quest
+            case 75346:
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_KILL_CREDIT;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_0].MiscValue = 40399;
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = 0;
             default:
                 break;
         }
