@@ -3128,6 +3128,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
         case 833:
         case 1161:
         case 3097: // Force of Nature
+        case 2929: // Summon Unbound Flamesparks, Flameseer's Staff
             numSummons = (damage > 0) ? damage : 1;
             break;
         default:

@@ -2263,6 +2263,39 @@ class spell_item_stay_of_execution : public SpellScriptLoader
         }
 };
 
+class spell_item_flameseers_staff_flamebreaker : public SpellScriptLoader
+{
+    public:
+        spell_item_flameseers_staff_flamebreaker() : SpellScriptLoader("spell_item_flameseers_staff_flamebreaker") { }
+
+        class spell_item_flameseers_staff_flamebreaker_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_item_flameseers_staff_flamebreaker_AuraScript);
+
+            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            { 
+                if (!GetCaster() || !GetTarget())
+                    return;
+
+                if (GetTarget()->GetEntry() == 38896)
+                {
+                    GetCaster()->CastSpell(GetTarget(), 74723, true);
+                    GetTarget()->Kill(GetTarget());
+                }
+            }
+
+            void Register()
+            {
+                 OnEffectRemove += AuraEffectRemoveFn(spell_item_flameseers_staff_flamebreaker_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_item_flameseers_staff_flamebreaker_AuraScript();
+        }
+};
+
 void AddSC_item_spell_scripts()
 {
     // 23074 Arcanite Dragonling
@@ -2321,4 +2354,5 @@ void AddSC_item_spell_scripts()
     new spell_item_crazy_alchemists_potion();
     new spell_item_flameseers_staff_weakening();
     new spell_item_stay_of_execution();
+    new spell_item_flameseers_staff_flamebreaker();
 }
