@@ -567,6 +567,17 @@ ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZStreamer const& str
 ByteBuffer& operator>>(ByteBuffer& buf, Position::PositionXYZStreamer const& streamer);
 ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZOStreamer const& streamer);
 
+enum ServerMovementFlags
+{
+    SERVERMOVEFLAG_NONE         = 0x0000,
+    SERVERMOVEFLAG_TRANSPORT_T2 = 0x0001,
+    SERVERMOVEFLAG_TRANSPORT_T3 = 0x0002,
+    SERVERMOVEFLAG_FALLDATA     = 0x0004,
+    SERVERMOVEFLAG_FALLDIRECTION= 0x0008,
+    SERVERMOVEFLAG_SPLINE1      = 0x0010,
+    SERVERMOVEFLAG_SPLINE2      = 0x0020,
+};
+
 struct MovementInfo
 {
     // common
@@ -638,7 +649,27 @@ struct MovementInfo
 
     void OutDebug();
 
-    void Normalize(bool update = false);
+    void Normalize(bool update = false, uint16 flags = 0);
+    bool FallDataFinite() const
+    {
+        return !HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA) || (fallTime >= 0 && _finite(j_zspeed) && (!HasServerMovementFlag(SERVERMOVEFLAG_FALLDIRECTION) || FallDirectionFinite()));
+    }
+
+    bool FallDirectionFinite() const
+    {
+        return _finite(j_cosAngle) && _finite(j_sinAngle) && _finite(j_xyspeed);
+    }
+
+    bool CoordFinite() const
+    {
+        return _finite(pos.m_positionX) && _finite(pos.m_positionY) && _finite(pos.m_positionZ) && (!pos.HaveOrientation() || _finite(pos.m_orientation));
+    }
+
+    bool TransportDataFinite() const
+    {
+        return !HasTransportData() || (_finite(t_pos.m_positionX) && _finite(t_pos.m_positionY) && _finite(t_pos.m_positionZ) && (!t_pos.HaveOrientation() || _finite(t_pos.m_orientation)));
+    }
+
     bool Check(Player* target, Opcodes opcode);
     bool AcceptClientChanges(Player* player, MovementInfo& client, Opcodes opcode);
     bool HasTransportData() const { return t_guid != 0LL; }

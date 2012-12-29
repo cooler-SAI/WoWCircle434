@@ -339,7 +339,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     }
 
     if (unit)
-        const_cast<Unit*>(unit)->m_movementInfo.Normalize(GetTypeId() == TYPEID_UNIT);
+        const_cast<Unit*>(unit)->m_movementInfo.Normalize(GetTypeId() == TYPEID_UNIT, flags);
 
     (*data)
         .WriteBit(false) // unkBit1
@@ -1629,15 +1629,21 @@ bool MovementInfo::AcceptClientChanges(Player* player, MovementInfo& client, Opc
     return true;
 }
 
-void MovementInfo::Normalize(bool update)
+void MovementInfo::Normalize(bool update, uint16 flags)
 {
-
     /* FlagCheck
      * Movement info normalization from client to prevent CMSG_OBJECT_UPDATE_FAILED
      */
     {
+        /*if (flags)
+        {
+            ASSERT(!(flags & UPDATEFLAG_LIVING) || !(flags & UPDATEFLAG_GO_TRANSPORT_POSITION) && (!(flags & UPDATEFLAG_LIVING) || !(flags & UPDATEFLAG_STATIONARY_POSITION))
+                && (!(flags & UPDATEFLAG_SELF) || (flags & UPDATEFLAG_LIVING))
+                && (!(flags & UPDATEFLAG_GO_TRANSPORT_POSITION) || TransportDataFinite()));
+        }*/
+
         /* FlagCheck return false if aplineElevation is infinity */
-        ASSERT(_finite(splineElevation));
+        ASSERT(_finite(splineElevation) && "splineElevation give a fuck");
 
         /*Client requires 0x2000000 flag if HaveSplineElevation bit is true
         * __asm
@@ -1673,10 +1679,10 @@ void MovementInfo::Normalize(bool update)
          *   comiss  xmm1, xmm0
          *   movss   [ebp+var_4], xmm0
          * }
-         * if ( _CF | _ZF ) // if ((esi+60h) != dword_BC1630 || _isnan((esi+60h)))
+         * if ( _CF | _ZF ) // if (pitch != dword_BC1630 || _isnan(pitch))
          *     return 0;
          * __asm { comiss  xmm0, ds:dword_BC162C }
-         * if ( _CF | _ZF ) // if ((esi+60h) != dword_BC162C || _isnan((esi+60h)))
+         * if ( _CF | _ZF ) // if (pitch != dword_BC162C || _isnan(pitch))
          *   goto LABEL_30;
          * if ( !_finite(v27) )
          *   goto LABEL_30;
@@ -1698,6 +1704,10 @@ void MovementInfo::Normalize(bool update)
          *
          * dword_BC1630, dword_BC162C, dword_BBDCC0 - probably some float const
          */
+
+        ASSERT(CoordFinite() && "pos give a fuck");
+        ASSERT(TransportDataFinite() && "t_pos give a fuck");
+        ASSERT(FallDataFinite() && "fallData give a fuck");
     }
 
     // move orientation to range [0, 2*PI)
