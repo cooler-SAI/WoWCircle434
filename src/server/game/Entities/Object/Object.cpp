@@ -342,21 +342,21 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         const_cast<Unit*>(unit)->m_movementInfo.Normalize(GetTypeId() == TYPEID_UNIT);
 
     (*data)
-        .WriteBit(false)
-        .WriteBit(false)
+        .WriteBit(false) // unkBit1
+        .WriteBit(false) // byte4
         .WriteBit((flags & UPDATEFLAG_ROTATION) && go)
         .WriteBit(flags & UPDATEFLAG_ANIMKITS)
         .WriteBit((flags & UPDATEFLAG_HAS_TARGET) && unit && unit->getVictim())
-        .WriteBit(flags & UPDATEFLAG_SELF)
+        .WriteBit(flags & UPDATEFLAG_SELF) // byte0
         .WriteBit((flags & UPDATEFLAG_VEHICLE) && unit)
         .WriteBit((flags & UPDATEFLAG_LIVING) && unit)
         .WriteBits(transportPause ? 1 : 0, 24)
-        .WriteBit(false)
+        .WriteBit(false) // byte1
         .WriteBit((flags & UPDATEFLAG_GO_TRANSPORT_POSITION) && wo)
         .WriteBit((flags & UPDATEFLAG_STATIONARY_POSITION) && wo)
         .WriteBit(flags & UPDATEFLAG_UNK5)
-        .WriteBit(false)
-        .WriteBit(flags & UPDATEFLAG_TRANSPORT);
+        .WriteBit(false) // byte2
+        .WriteBit(flags & UPDATEFLAG_TRANSPORT); // byte198
 
     if ((flags & UPDATEFLAG_LIVING) && unit)
     {
@@ -373,7 +373,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
             data->WriteBits(unit->m_movementInfo.flags, 30);
 
         (*data)
-            .WriteBit(false) // p2.84
+            .WriteBit(false) // p2.84 UnkFalse
             .WriteBit(!unit->m_movementInfo.HavePitch)
             .WriteBit(unit->IsSplineEnabled())
             .WriteBit(unit->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA))
@@ -410,7 +410,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         (*data)
             .WriteByteMask(guid[0])
             .WriteByteMask(guid[1])
-            .WriteBit(false)
+            .WriteBit(false) //byte95
             .WriteBit(!unit->m_movementInfo.flags2);
 
         if (unit->m_movementInfo.flags2)
@@ -1631,10 +1631,74 @@ bool MovementInfo::AcceptClientChanges(Player* player, MovementInfo& client, Opc
 
 void MovementInfo::Normalize(bool update)
 {
-    if (HaveSplineElevation)
-        AddMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
-    else
-        RemoveMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
+
+    /* FlagCheck
+     * Movement info normalization from client to prevent CMSG_OBJECT_UPDATE_FAILED
+     */
+    {
+        /* FlagCheck return false if aplineElevation is infinity */
+        ASSERT(_finite(splineElevation));
+
+        /*Client requires 0x2000000 flag if HaveSplineElevation bit is true
+        * __asm
+        * {
+        *   movss   xmm0, dword ptr [esi+80h]
+        *   ucomiss xmm0, ds:SrcStr
+        *   lahf
+        * }
+        * if ( __SETP__(_AH & 0x44, 0) )
+        * {
+        *   if ( !(m_info->MovementFlag & 0x2000000) )
+        *     return 0;
+        * }
+        */
+        if (HaveSplineElevation)
+            AddMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
+        else
+            RemoveMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
+
+        /* Client requires HasFallData or HasFallDirection if this flag (0x800) is present. Add both flags
+        * if ( m_info->MovementFlag & 0x800 && (!m_info->HasFallData || !m_info->HasFallDirection) )
+        *     return 0;
+        */
+        if (HasMovementFlag(MOVEMENTFLAG_FALLING))
+            AddServerMovementFlag(SERVERMOVEFLAG_FALLDATA | SERVERMOVEFLAG_FALLDIRECTION);
+
+        /*
+         * ZF - zero flag
+         * CF - carry flag - overflow, NaN
+         * {
+         *   movss   xmm0, dword ptr [esi+60h]
+         *   movss   xmm1, ds:dword_BC1630
+         *   comiss  xmm1, xmm0
+         *   movss   [ebp+var_4], xmm0
+         * }
+         * if ( _CF | _ZF ) // if ((esi+60h) != dword_BC1630 || _isnan((esi+60h)))
+         *     return 0;
+         * __asm { comiss  xmm0, ds:dword_BC162C }
+         * if ( _CF | _ZF ) // if ((esi+60h) != dword_BC162C || _isnan((esi+60h)))
+         *   goto LABEL_30;
+         * if ( !_finite(v27) )
+         *   goto LABEL_30;
+         * __asm
+         * {
+         *   movss   xmm0, dword ptr [esi+20h]
+         *   comiss  xmm0, ds:SrcStr
+         *   movss   [ebp+var_4], xmm0
+         * }
+         * if ( _CF )       // if (_isnan((esi+20h)))
+         *   goto LABEL_30;
+         * __asm
+         * {
+         *   movss   xmm1, ds:dword_BBDCC0
+         *   comiss  xmm1, xmm0
+         * }
+         * if ( _CF | _ZF ) // if ((esi+20h) != dword_BBDCC0 || _isnan((esi+20h)))
+         *   goto LABEL_30;
+         *
+         * dword_BC1630, dword_BC162C, dword_BBDCC0 - probably some float const
+         */
+    }
 
     // move orientation to range [0, 2*PI)
     pos.m_orientation = Position::NormalizeOrientation(pos.m_orientation);
