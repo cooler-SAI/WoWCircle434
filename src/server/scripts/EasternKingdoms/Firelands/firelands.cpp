@@ -31,6 +31,12 @@ enum Spells
     SPELL_FLAME_TORRENT         = 100795,
     SPELL_FIERY_TORMENT         = 100797,
     SPELL_FIERY_TORMENT_DMG     = 100802,
+
+    // Molten Lord
+    SPELL_FLAME_STOMP           = 99530,
+    SPELL_MELT_ARMOR            = 99532,
+    SPELL_SUMMON_LAVA_JETS      = 99555,
+    SPELL_SUMMON_LAVA_JET       = 99538,
 };
 
 enum Events
@@ -49,6 +55,11 @@ enum Events
     // Fire Archon
     EVENT_FIERY_TORMENT     = 6,
     EVENT_FLAME_TORRENT     = 7,
+
+    // Molten Lord
+    EVENT_MELT_ARMOR        = 8,
+    EVENT_FLAME_STOMP       = 9,
+    EVENT_SUMMON_LAVA_JETS  = 10,
 };
 
 class npc_firelands_ancient_core_hound : public CreatureScript
@@ -339,6 +350,116 @@ class npc_firelands_flame_archon : public CreatureScript
         };
 };
 
+class npc_firelands_molten_lord : public CreatureScript
+{
+    public:
+        npc_firelands_molten_lord() : CreatureScript("npc_firelands_molten_lord") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_firelands_molten_lordAI (pCreature);
+        }
+
+        struct npc_firelands_molten_lordAI : public ScriptedAI
+        {
+            npc_firelands_molten_lordAI(Creature* pCreature) : ScriptedAI(pCreature)
+            {
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+                pInstance = pCreature->GetInstanceScript();
+            }
+
+            InstanceScript* pInstance;
+            EventMap events;
+            
+            void Reset()
+            {
+                events.Reset();
+            }
+
+            void JustDied(Unit* killer)
+            {
+                if (pInstance)
+                {
+                    Map::PlayerList const& PlayerList = pInstance->instance->GetPlayers();
+                    if (!PlayerList.isEmpty())
+                    {
+                        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+                        {
+                            if (Player* pPlayer = itr->getSource())
+                            {
+                                if (!pPlayer->IsAtGroupRewardDistance(me))
+                                    continue;
+
+                                // Only mages, warlocks priests, shamans and druids
+                                // in caster specialization can accept quest
+                                if (!(pPlayer->getClass() == CLASS_MAGE ||
+                                    pPlayer->getClass() == CLASS_WARLOCK ||
+                                    pPlayer->getClass() == CLASS_PRIEST ||
+                                    (pPlayer->getClass() == CLASS_SHAMAN && (pPlayer->GetPrimaryTalentTree(pPlayer->GetActiveSpec()) == TALENT_TREE_SHAMAN_ELEMENTAL || pPlayer->GetPrimaryTalentTree(pPlayer->GetActiveSpec()) == TALENT_TREE_SHAMAN_RESTORATION)) ||
+                                    (pPlayer->getClass() == CLASS_DRUID && (pPlayer->GetPrimaryTalentTree(pPlayer->GetActiveSpec()) == TALENT_TREE_DRUID_BALANCE || pPlayer->GetPrimaryTalentTree(pPlayer->GetActiveSpec()) == TALENT_TREE_DRUID_RESTORATION))))
+                                    continue;
+
+                                if (pPlayer->GetTeam() == ALLIANCE && pPlayer->GetQuestStatus(29453) == QUEST_STATUS_NONE)
+                                    pPlayer->AddQuest(sObjectMgr->GetQuestTemplate(29453), NULL);
+                                else if (pPlayer->GetTeam() == HORDE && pPlayer->GetQuestStatus(29452) == QUEST_STATUS_NONE)
+                                    pPlayer->AddQuest(sObjectMgr->GetQuestTemplate(29452), NULL);
+                            }
+                        }
+                    }
+                }
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+                events.ScheduleEvent(EVENT_FLAME_STOMP, 5000);
+                events.ScheduleEvent(EVENT_MELT_ARMOR, urand(3000, 7000));
+                events.ScheduleEvent(EVENT_SUMMON_LAVA_JETS, 10000);
+            }
+
+            void UpdateAI(uint32 const diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+                
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_FLAME_STOMP:
+                            DoCast(me, SPELL_FLAME_STOMP);
+                            events.ScheduleEvent(EVENT_FLAME_STOMP, urand(10000, 18000));
+                            break;
+                        case EVENT_MELT_ARMOR:
+                            DoCastVictim(SPELL_MELT_ARMOR);
+                            events.ScheduleEvent(EVENT_MELT_ARMOR, urand(7000, 14000));
+                            break;
+                        case EVENT_SUMMON_LAVA_JETS:
+                            DoCast(me, SPELL_SUMMON_LAVA_JETS);
+                            events.ScheduleEvent(EVENT_SUMMON_LAVA_JETS, urand(20000, 25000));
+                            break;
+                    }
+                }
+                
+                DoMeleeAttackIfReady();
+            }
+        };
+};
+
 class spell_firelands_ancient_core_hound_dinner_time : public SpellScriptLoader
 {
     public:
@@ -534,6 +655,37 @@ class spell_firelands_flame_archon_fiery_torment : public SpellScriptLoader
         }
 };
 
+class spell_firelands_molten_lord_summon_lava_jets : public SpellScriptLoader
+{
+    public:
+        spell_firelands_molten_lord_summon_lava_jets() : SpellScriptLoader("spell_firelands_molten_lord_summon_lava_jets") { }
+
+
+        class spell_firelands_molten_lord_summon_lava_jets_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_firelands_molten_lord_summon_lava_jets_SpellScript);
+
+
+            void HandleScript(SpellEffIndex /*effIndex*/)
+            {
+                if (!GetCaster() || !GetHitUnit())
+                    return;
+
+                GetCaster()->CastSpell(GetHitUnit(), 99538, true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_firelands_molten_lord_summon_lava_jets_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_firelands_molten_lord_summon_lava_jets_SpellScript();
+        }
+};
+
 void AddSC_firelands()
 {
     new npc_firelands_ancient_core_hound();
@@ -541,9 +693,11 @@ void AddSC_firelands()
     new npc_firelands_fire_scorpion();
     new npc_firelands_fire_turtle_hatchling();
     new npc_firelands_flame_archon();
+    new npc_firelands_molten_lord();
     new spell_firelands_ancient_core_hound_dinner_time();
     new spell_firelands_ancient_core_hound_flame_breath();
     new spell_firelands_ancient_lava_dweller_lava_shower();
     new spell_firelands_fire_turtle_hatchling_shell_spin();
     new spell_firelands_flame_archon_fiery_torment();
+    new spell_firelands_molten_lord_summon_lava_jets();
 }

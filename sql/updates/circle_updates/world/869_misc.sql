@@ -1,0 +1,2 @@
+UPDATE `creature_template` SET `ScriptName`='npc_firelands_molten_lord' WHERE `entry`=53115;
+REPLACE INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (99555, 'spell_firelands_molten_lord_summon_lava_jets');

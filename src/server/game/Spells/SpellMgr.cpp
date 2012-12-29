@@ -4656,6 +4656,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 100799: // Fire Torment dmg
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
                 break;
+            case 99530: // Flame Stomp
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(13);
+                break;
+            case 99555: // Summon Lava Jest
+                spellInfo->MaxAffectedTargets = 4;
+                break;
             // ENDOF FIRELANDS
             // BASTION OF TWILIGHT SPELLS
             //
