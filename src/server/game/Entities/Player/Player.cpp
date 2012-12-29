@@ -17670,7 +17670,7 @@ void Player::_LoadVoidStorage(PreparedQueryResult result)
             continue;
         }
 
-        if (!sObjectMgr->GetPlayerByLowGUID(creatorGuid))
+        if (creatorGuid > 0 && !sObjectMgr->GetPlayerByLowGUID(creatorGuid))
         {
             sLog->outError(LOG_FILTER_PLAYER, "Player::_LoadVoidStorage - Player (GUID: %u, name: %s) has an item with an invalid creator guid, set to 0 (item id: " UI64FMTD ", entry: %u, creatorGuid: %u).", GetGUIDLow(), GetName(), itemId, itemEntry, creatorGuid);
             creatorGuid = 0;
