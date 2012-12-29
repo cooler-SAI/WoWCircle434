@@ -3028,7 +3028,14 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                 break;
             }
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_CREATURE_ENTRY: // 4
-                if (!unit || !unit->IsInWorld() || unit->GetEntry() != reqValue)
+                if (!unit || !unit->IsInWorld())
+                    return false;
+
+                // Hack for Bros. Before Ho Ho Ho's
+                if (criteria->achievement == 1685 || criteria->achievement == 1686)
+                    break;
+
+                if (unit->GetEntry() != reqValue)
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_MUST_BE_PLAYER: // 5
@@ -3044,6 +3051,14 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_SOURCE_HAS_AURA: // 8
+                
+                // Hack for Fa-la-la-la-Ogri'la, there are wrong auras in dbc
+                if (criteria->achievement == 1282)
+                {
+                    if (referencePlayer->HasAura(62061))
+                        break;
+                }
+
                 if (!referencePlayer->HasAura(reqValue))
                     return false;
                 break;
