@@ -1,0 +1,1 @@
+REPLACE `item_script_names` (`id`, `ScriptName`) VALUES (52253, 'item_sylvanas_music_box');

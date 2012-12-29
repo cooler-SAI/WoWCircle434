@@ -409,6 +409,32 @@ public:
     }
 };
 
+class item_sylvanas_music_box : public ItemScript
+{
+    public:
+        item_sylvanas_music_box() : ItemScript("item_sylvanas_music_box") { }
+
+        bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/)
+        {
+            Map* map = player->GetMap();
+            if (!map)
+                return false;
+
+            Map::PlayerList const &_list = map->GetPlayers();
+            if (_list.isEmpty())
+                return false;
+
+            for (Map::PlayerList::const_iterator i = _list.begin(); i != _list.end(); ++i)
+            {
+                if (Player* pPlayer = i->getSource())
+                    if (pPlayer->IsWithinDistInMap(player, 50.0f))
+                        pPlayer->SendSound(10896, player->GetGUID());
+            }
+
+            return false;
+        }
+};
+
 void AddSC_item_scripts()
 {
     new item_only_for_flight();
@@ -422,4 +448,5 @@ void AddSC_item_scripts()
     new item_dehta_trap_smasher();
     new item_trident_of_nazjan();
     new item_captured_frog();
+    new item_sylvanas_music_box();
 }
