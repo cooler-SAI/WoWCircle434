@@ -271,8 +271,8 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog /* = true */, 
             if (currency->Category == CURRENCY_CATEGORY_META_CONQUEST)
             {
                 // original conquest cap is highest of bg/arena conquest cap.
-                if (weekCap > _ConquestCurrencytotalWeekCap)
-                    _ConquestCurrencytotalWeekCap = weekCap;
+                if (weekCap > _ConquestCurrencytotalWeekCap / 100)
+                    _ConquestCurrencytotalWeekCap = weekCap * 100;
                 // count was changed to week limit, now we can modify original points.
                 ModifyCurrency(CURRENCY_TYPE_CONQUEST_POINTS, count * 100, printLog);
                 return;
@@ -343,10 +343,10 @@ uint32 Player::_GetCurrencyWeekCap(const CurrencyTypesEntry* currency) const
         case CURRENCY_TYPE_CONQUEST_POINTS:
         {
             uint32 cpCap = _ConquestCurrencytotalWeekCap;
-            if (cpCap < 1350)
-                cpCap = 1350;
+            if (cpCap < 135000)
+                cpCap = 135000;
 
-            return  cpCap * sCurrencyMgr->GetPrecision(currency);
+            return cpCap;
         }
         case CURRENCY_TYPE_CONQUEST_META_ARENA:
         {

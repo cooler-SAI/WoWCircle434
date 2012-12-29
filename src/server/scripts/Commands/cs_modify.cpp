@@ -1363,7 +1363,7 @@ public:
         if (!amount)
             return false;
 
-        amount *= currencyType->GetPrecision();
+        amount *= sCurrencyMgr->GetPrecision(currencyType);
 
         target->ModifyCurrency(currencyId, amount, true, true);
         return true;

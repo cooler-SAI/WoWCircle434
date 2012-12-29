@@ -7372,8 +7372,8 @@ void Player::_LoadCurrency(PreparedQueryResult result)
         if (currency->Category == CURRENCY_CATEGORY_META_CONQUEST)
         {
             uint32 cap = _GetCurrencyWeekCap(currency);
-            if (cap > _ConquestCurrencytotalWeekCap)
-                _ConquestCurrencytotalWeekCap = cap;
+            if (cap > _ConquestCurrencytotalWeekCap / 100)
+                _ConquestCurrencytotalWeekCap = cap * 100;
         }
 
     } while (result->NextRow());
