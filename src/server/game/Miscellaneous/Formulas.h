@@ -29,7 +29,7 @@ namespace Trinity
     {
         inline float hk_honor_at_level_f(uint8 level, float multiplier = 1.0f)
         {
-            float honor = multiplier * level * 11.8f;
+            float honor = multiplier * level * 0.118f;
             sScriptMgr->OnHonorCalculation(honor, level, multiplier);
             return honor;
         }

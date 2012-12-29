@@ -7310,7 +7310,7 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
     GetSession()->SendPacket(&data);
 
     // add honor points
-    ModifyCurrency(CURRENCY_TYPE_HONOR_POINTS, int32(honor));
+    ModifyCurrency(CURRENCY_TYPE_HONOR_POINTS, int32(honor * 100.0f));
 
     if (InBattleground() && honor > 0)
     {

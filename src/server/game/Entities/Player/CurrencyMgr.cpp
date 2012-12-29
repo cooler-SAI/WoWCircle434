@@ -341,11 +341,29 @@ uint32 Player::_GetCurrencyWeekCap(const CurrencyTypesEntry* currency) const
     {
         // original conquest not have week cap
         case CURRENCY_TYPE_CONQUEST_POINTS:
-            return _ConquestCurrencytotalWeekCap * sCurrencyMgr->GetPrecision(currency);
+        {
+            uint32 cpCap = _ConquestCurrencytotalWeekCap;
+            if (cpCap < 1350)
+                cpCap = 1350;
+
+            return  cpCap * sCurrencyMgr->GetPrecision(currency);
+        }
         case CURRENCY_TYPE_CONQUEST_META_ARENA:
-            return const_cast<Player*>(this)->GetArenaCap();
+        {
+            uint32 arenaCap = const_cast<Player*>(this)->GetArenaCap();
+            if (arenaCap < 1350)
+                arenaCap = 1350;
+
+            return arenaCap;
+        }
         case CURRENCY_TYPE_CONQUEST_META_BG:
-            return const_cast<Player*>(this)->GetBattlegroundCap();
+        {
+            uint32 bgCap = const_cast<Player*>(this)->GetBattlegroundCap();
+            if (bgCap < 1350)
+                bgCap = 1350;
+
+            return bgCap; 
+        }
         case CURRENCY_TYPE_HONOR_POINTS:
         {
             uint32 honorcap = sWorld->getIntConfig(CONFIG_CURRENCY_MAX_HONOR_POINTS);
