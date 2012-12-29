@@ -15078,7 +15078,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     {
         uint32 currId = quest->RewardCurrencyId[i];
         
-        CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
+        CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(currId);
         if (!currency)
             continue;
 
