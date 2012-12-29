@@ -15077,9 +15077,14 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     for (uint32 i = 0; i < QUEST_REWARD_CURRENCY_COUNT; i++)
     {
         uint32 currId = quest->RewardCurrencyId[i];
+        
+        CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(id);
+        if (!currency)
+            continue;
+
         uint32 currCount = quest->RewardCurrencyCount[i];
         if (currId && currCount)
-            ModifyCurrency(currId, currCount);
+            ModifyCurrency(currId, currCount * sCurrencyMgr->GetPrecision(currency));
     }
 
     // Send reward mail
