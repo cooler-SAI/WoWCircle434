@@ -883,16 +883,16 @@ void Battleground::EndBattleground(uint32 winner)
             {
                 if (IsRandom() || BattlegroundMgr::IsBGWeekend(GetTypeID()))
                 {
-                    UpdatePlayerScore(player, SCORE_BONUS_HONOR, GetBonusHonorFromKill(winner_kills));
+                    UpdatePlayerScore(player, SCORE_BONUS_HONOR, winner_kills);
                     if (!player->GetRandomWinner())
                     {
                         // 100cp awarded for the first rated battleground won each day 
                         player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_BG, BG_REWARD_WINNER_CONQUEST_FIRST);
                         player->SetRandomWinner(true);
                     }
+                    else // 50cp awarded for each non-rated battleground won 
+                        player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_BG, BG_REWARD_WINNER_CONQUEST_LAST);
                 }
-                else // 50cp awarded for each non-rated battleground won 
-                    player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_BG, BG_REWARD_WINNER_CONQUEST_LAST);
             }
 
             if (!guildAwarded)
@@ -912,7 +912,7 @@ void Battleground::EndBattleground(uint32 winner)
         else
         {
             if (IsRandom() || BattlegroundMgr::IsBGWeekend(GetTypeID()))
-                UpdatePlayerScore(player, SCORE_BONUS_HONOR, GetBonusHonorFromKill(loser_kills));
+                UpdatePlayerScore(player, SCORE_BONUS_HONOR, loser_kills);
         }
 
         player->ResetAllPowers();
