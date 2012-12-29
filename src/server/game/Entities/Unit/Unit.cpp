@@ -18084,11 +18084,11 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
 float Unit::GetCombatRatingReduction(CombatRating cr) const
 {
     if (Player const* player = ToPlayer())
-        return player->GetRatingBonusValue(cr);
+        return player->GetResilienceBonusValue();
     // Player's pet get resilience from owner
     else if (isPet() && GetOwner())
         if (Player* owner = GetOwner()->ToPlayer())
-            return owner->GetRatingBonusValue(cr);
+            return owner->GetResilienceBonusValue();
 
     return 0.0f;
 }
