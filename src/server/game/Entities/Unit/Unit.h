@@ -556,32 +556,32 @@ enum WeaponAttackType
 
 enum CombatRating
 {
-    CR_WEAPON_SKILL             = 0,
-    CR_DEFENSE_SKILL            = 1, // Removed in 4.0.1
-    CR_DODGE                    = 2,
-    CR_PARRY                    = 3,
-    CR_BLOCK                    = 4,
-    CR_HIT_MELEE                = 5,
-    CR_HIT_RANGED               = 6,
-    CR_HIT_SPELL                = 7,
-    CR_CRIT_MELEE               = 8,
-    CR_CRIT_RANGED              = 9,
-    CR_CRIT_SPELL               = 10,
-    CR_HIT_TAKEN_MELEE          = 11, // Deprecated since Cataclysm
-    CR_HIT_TAKEN_RANGED         = 12, // Deprecated since Cataclysm
-    CR_HIT_TAKEN_SPELL          = 13, // Deprecated since Cataclysm
-    CR_CRIT_TAKEN_MELEE         = 14, // Deprecated since Cataclysm
-    CR_RESILIENCE_TAKEN_ALL     = 15,
-    CR_CRIT_TAKEN_SPELL         = 16, // Deprecated since Cataclysm
-    CR_HASTE_MELEE              = 17,
-    CR_HASTE_RANGED             = 18,
-    CR_HASTE_SPELL              = 19,
-    CR_WEAPON_SKILL_MAINHAND    = 20,
-    CR_WEAPON_SKILL_OFFHAND     = 21,
-    CR_WEAPON_SKILL_RANGED      = 22,
-    CR_EXPERTISE                = 23,
-    CR_ARMOR_PENETRATION        = 24,
-    CR_MASTERY                  = 25,
+    CR_WEAPON_SKILL                     = 0,
+    CR_DEFENSE_SKILL                    = 1, // Removed in 4.0.1
+    CR_DODGE                            = 2,
+    CR_PARRY                            = 3,
+    CR_BLOCK                            = 4,
+    CR_HIT_MELEE                        = 5,
+    CR_HIT_RANGED                       = 6,
+    CR_HIT_SPELL                        = 7,
+    CR_CRIT_MELEE                       = 8,
+    CR_CRIT_RANGED                      = 9,
+    CR_CRIT_SPELL                       = 10,
+    CR_HIT_TAKEN_MELEE                  = 11, // Deprecated since Cataclysm
+    CR_HIT_TAKEN_RANGED                 = 12, // Deprecated since Cataclysm
+    CR_HIT_TAKEN_SPELL                  = 13, // Deprecated since Cataclysm
+    CR_RESILIENCE_CRIT_TAKEN            = 14,
+    CR_RESILIENCE_PLAYER_DAMAGE_TAKEN   = 15,
+    CR_CRIT_TAKEN_SPELL                 = 16, // Deprecated since Cataclysm
+    CR_HASTE_MELEE                      = 17,
+    CR_HASTE_RANGED                     = 18,
+    CR_HASTE_SPELL                      = 19,
+    CR_WEAPON_SKILL_MAINHAND            = 20,
+    CR_WEAPON_SKILL_OFFHAND             = 21,
+    CR_WEAPON_SKILL_RANGED              = 22,
+    CR_EXPERTISE                        = 23,
+    CR_ARMOR_PENETRATION                = 24,
+    CR_MASTERY                          = 25,
 };
 
 #define MAX_COMBAT_RATING         26
@@ -1484,9 +1484,11 @@ class Unit : public WorldObject
         void CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 damage, SpellInfo const* spellInfo, WeaponAttackType attackType = BASE_ATTACK, bool crit = false);
         void DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss);
 
-        // pvp damage reduction
-        uint32 GetPlayerDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(1.0f, 100.0f, damage); }
-        void ApplyResilience(const Unit * pVictim, int32 * damage) const;
+        // player or player's pet resilience (-1%)
+        uint32 GetCritDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_RESILIENCE_CRIT_TAKEN, 2.2f, 33.0f, damage); }
+        uint32 GetDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_RESILIENCE_PLAYER_DAMAGE_TAKEN, 2.0f, 100.0f, damage); }
+
+        void ApplyResilience(const Unit* victim, int32 * damage, bool isCrit) const;
 
         float MeleeSpellMissChance(const Unit* victim, WeaponAttackType attType, uint32 spellId) const;
         SpellMissInfo MeleeSpellHitResult(Unit* victim, SpellInfo const* spell);
@@ -2372,8 +2374,8 @@ class Unit : public WorldObject
         void UpdateSplinePosition();
 
         // player or player's pet
-        float GetCombatRatingReduction() const;
-        uint32 GetCombatRatingDamageReduction(float rate, float cap, uint32 damage) const;
+        float GetCombatRatingReduction(CombatRating cr) const;
+        uint32 GetCombatRatingDamageReduction(CombatRating cr, float rate, float cap, uint32 damage) const;
 
     protected:
         void SendMoveRoot(uint32 value);

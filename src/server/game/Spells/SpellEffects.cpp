@@ -2044,8 +2044,7 @@ void Spell::EffectPowerDrain(SpellEffIndex effIndex)
     damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
     damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
 
-    int32 power = damage;
-    int32 newDamage = -(unitTarget->ModifyPower(powerType, -int32(power)));
+    int32 newDamage = -(unitTarget->ModifyPower(powerType, -damage));
 
     float gainMultiplier = 0.0f;
 
@@ -2123,8 +2122,7 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
         damage = std::min(damage, maxDamage);
     }
 
-    int32 power = damage;
-    int32 newDamage = -(unitTarget->ModifyPower(powerType, -power));
+    int32 newDamage = -(unitTarget->ModifyPower(powerType, -damage));
 
     // NO - Not a typo - EffectPowerBurn uses effect value multiplier - not effect damage multiplier
     float dmgMultiplier = m_spellInfo->Effects[effIndex].CalcValueMultiplier(m_originalCaster, this);

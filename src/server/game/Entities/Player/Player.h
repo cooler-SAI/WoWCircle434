@@ -2175,7 +2175,6 @@ class Player : public Unit, public GridObject<Player>
         float OCTRegenMPPerSpirit();
         float GetRatingMultiplier(CombatRating cr) const;
         float GetRatingBonusValue(CombatRating cr) const;
-        float GetResilienceBonusValue() const;
 
         /// Returns base spellpower bonus from spellpower stat on items, without spellpower from intellect stat
         uint32 GetBaseSpellPowerBonus() const { return m_baseSpellPower; }
