@@ -737,10 +737,8 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket & recvData)
         return;
     }
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ACCOUNT_NAME_BY_GUID);
-    stmt->setUInt32(0, GUID_LOPART(guid));
-
-    if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+    QueryResult result = CharacterDatabase.PQuery("SELECT account, name FROM characters WHERE guid='%u'", GUID_LOPART(guid));	
+    if (result)
     {
         Field* fields = result->Fetch();
         accountId     = fields[0].GetUInt32();
@@ -1447,10 +1445,7 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
     uint8 gender, skin, face, hairStyle, hairColor, facialHair;
     recvData >> gender >> skin >> hairColor >> hairStyle >> facialHair >> face;
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_AT_LOGIN);
-    stmt->setUInt32(0, GUID_LOPART(guid));
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
+    QueryResult result = CharacterDatabase.PQuery("SELECT at_login FROM characters WHERE guid ='%u'", GUID_LOPART(guid));
     if (!result)
     {
         WorldPacket data(SMSG_CHAR_CUSTOMIZE, 1);
@@ -1509,11 +1504,7 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
         }
     }
 
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_NAME);
-    stmt->setUInt32(0, GUID_LOPART(guid));
-    result = CharacterDatabase.Query(stmt);
-
-    if (result)
+    if (QueryResult result = CharacterDatabase.PQuery("SELECT name FROM characters WHERE guid ='%u'", GUID_LOPART(guid)))
     {
         std::string oldname = result->Fetch()[0].GetString();
         sLog->outInfo(LOG_FILTER_CHARACTER, "Account: %d (IP: %s), Character[%s] (guid:%u) Customized to: %s", GetAccountId(), GetRemoteAddress().c_str(), oldname.c_str(), GUID_LOPART(guid), newName.c_str());
@@ -1521,7 +1512,7 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
 
     Player::Customize(guid, gender, skin, face, hairStyle, hairColor, facialHair);
 
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_NAME_AT_LOGIN);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_NAME_AT_LOGIN);
 
     stmt->setString(0, newName);
     stmt->setUInt16(1, uint16(AT_LOGIN_CUSTOMIZE));

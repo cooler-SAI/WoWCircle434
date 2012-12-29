@@ -1880,12 +1880,10 @@ uint64 ObjectMgr::GetPlayerGUIDByName(std::string name) const
 {
     uint64 guid = 0;
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUID_BY_NAME);
+    CharacterDatabase.EscapeString(name);
 
-    stmt->setString(0, name);
-
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
+    // Player name safe to sending to DB (checked at login) and this function using	  	
+    QueryResult result = CharacterDatabase.PQuery("SELECT guid FROM characters WHERE name = '%s'", name.c_str());
     if (result)
         guid = MAKE_NEW_GUID((*result)[0].GetUInt32(), 0, HIGHGUID_PLAYER);
 
@@ -1901,12 +1899,7 @@ bool ObjectMgr::GetPlayerNameByGUID(uint64 guid, std::string &name) const
         return true;
     }
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_NAME);
-
-    stmt->setUInt32(0, GUID_LOPART(guid));
-
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
+    QueryResult result = CharacterDatabase.PQuery("SELECT name FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
     if (result)
     {
         name = (*result)[0].GetString();
@@ -1924,12 +1917,7 @@ uint32 ObjectMgr::GetPlayerTeamByGUID(uint64 guid) const
         return Player::TeamForRace(player->getRace());
     }
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_RACE);
-
-    stmt->setUInt32(0, GUID_LOPART(guid));
-
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
+    QueryResult result = CharacterDatabase.PQuery("SELECT race FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
     if (result)
     {
         uint8 race = (*result)[0].GetUInt8();
@@ -1947,12 +1935,7 @@ uint32 ObjectMgr::GetPlayerAccountIdByGUID(uint64 guid) const
         return player->GetSession()->GetAccountId();
     }
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ACCOUNT_BY_GUID);
-
-    stmt->setUInt32(0, GUID_LOPART(guid));
-
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
+    QueryResult result = CharacterDatabase.PQuery("SELECT account FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
     if (result)
     {
         uint32 acc = (*result)[0].GetUInt32();
@@ -1964,12 +1947,7 @@ uint32 ObjectMgr::GetPlayerAccountIdByGUID(uint64 guid) const
 
 uint32 ObjectMgr::GetPlayerAccountIdByPlayerName(const std::string& name) const
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ACCOUNT_BY_NAME);
-
-    stmt->setString(0, name);
-
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
+    QueryResult result = CharacterDatabase.PQuery("SELECT account FROM characters WHERE name = '%s'", name.c_str());
     if (result)
     {
         uint32 acc = (*result)[0].GetUInt32();

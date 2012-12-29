@@ -4820,9 +4820,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
     LeaveAllArenaTeams(playerguid);
 
     // the player was uninvited already on logout so just remove from group
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GROUP_MEMBER);
-    stmt->setUInt32(0, guid);
-    PreparedQueryResult resultGroup = CharacterDatabase.Query(stmt);
+    QueryResult resultGroup = CharacterDatabase.PQuery("SELECT guid FROM group_member WHERE memberGuid=%u", guid);
 
     if (resultGroup)
         if (Group* group = sGroupMgr->GetGroupByDbStoreId((*resultGroup)[0].GetUInt32()))
@@ -4838,7 +4836,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
         {
             SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_COD_ITEM_MAIL);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_COD_ITEM_MAIL);
             stmt->setUInt32(0, guid);
             PreparedQueryResult resultMail = CharacterDatabase.Query(stmt);
 
@@ -7433,23 +7431,17 @@ void Player::SetInGuild(uint32 guildId)
 
 uint32 Player::GetGuildIdFromDB(uint64 guid)
 {
-    std::ostringstream ss;
-    ss<<"SELECT guildid FROM guild_member WHERE guid='"<<guid<<"'";
-    QueryResult result = CharacterDatabase.Query(ss.str().c_str());
-    if (result)
-    {
-        uint32 v = result->Fetch()[0].GetUInt32();
-        return v;
-    }
-    else
+    QueryResult result = CharacterDatabase.PQuery("SELECT guildid FROM guild_member WHERE guid='%u'", GUID_LOPART(guid));
+    if (!result)
         return 0;
+
+    uint32 id = result->Fetch()[0].GetUInt32();
+    return id;
 }
 
 uint8 Player::GetRankFromDB(uint64 guid)
 {
-    std::ostringstream ss;
-    ss<<"SELECT rank FROM guild_member WHERE guid='"<<guid<<"'";
-    QueryResult result = CharacterDatabase.Query(ss.str().c_str());
+    QueryResult result = CharacterDatabase.PQuery("SELECT rank FROM guild_member WHERE guid='%u'", GUID_LOPART(guid));
     if (result)
     {
         uint32 v = result->Fetch()[0].GetUInt8();
@@ -7478,21 +7470,19 @@ uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
 
 uint32 Player::GetZoneIdFromDB(uint64 guid)
 {
-    std::ostringstream ss;
+    uint32 guidLow = GUID_LOPART(guid);
 
-    ss<<"SELECT zone FROM characters WHERE guid='"<<GUID_LOPART(guid)<<"'";
-    QueryResult result = CharacterDatabase.Query(ss.str().c_str());
+    QueryResult result = CharacterDatabase.PQuery("SELECT zone FROM characters WHERE guid='%u'", guidLow);
     if (!result)
         return 0;
+
     Field* fields = result->Fetch();
     uint32 zone = fields[0].GetUInt16();
 
     if (!zone)
     {
         // stored zone is zero, use generic and slow zone detection
-        ss.str("");
-        ss<<"SELECT map, position_x, position_y, position_z FROM characters WHERE guid='"<<GUID_LOPART(guid)<<"'";
-        result = CharacterDatabase.Query(ss.str().c_str());
+        result = CharacterDatabase.PQuery("SELECT map, position_x, position_y, position_z FROM characters WHERE guid='%u'", guidLow);
         if (!result)
             return 0;
         fields = result->Fetch();
@@ -7503,6 +7493,7 @@ uint32 Player::GetZoneIdFromDB(uint64 guid)
 
         zone = sMapMgr->GetZoneId(map, posx, posy, posz);
 
+        std::ostringstream ss;
         ss.str("");
         ss << "UPDATE characters SET zone='"<<zone<<"' WHERE guid='"<<GUID_LOPART(guid)<<"'";
         CharacterDatabase.Execute(ss.str().c_str());
@@ -17884,11 +17875,8 @@ void Player::_LoadMailInit(PreparedQueryResult resultUnread, PreparedQueryResult
 void Player::_LoadMail()
 {
     m_mail.clear();
-
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL);
-    stmt->setUInt32(0, GetGUIDLow());
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
+    //mails are in right order                             0  1           2      3        4       5          6         7           8            9     10  11      12         13	  	
+    QueryResult result = CharacterDatabase.PQuery("SELECT id, messageType, sender, receiver, subject, body, has_items, expire_time, deliver_time, money, cod, checked, stationery, mailTemplateId FROM mail WHERE receiver = '%u' ORDER BY id DESC", GetGUIDLow());
     if (result)
     {
         do
@@ -19656,11 +19644,8 @@ void Player::SetUInt32ValueInArray(Tokenizer& Tokenizer, uint16 index, uint32 va
 }
 
 void Player::Customize(uint64 guid, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair)
-{
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PLAYERBYTES2);
-    stmt->setUInt32(0, GUID_LOPART(guid));
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
+{ 	
+    QueryResult result = CharacterDatabase.PQuery("SELECT playerBytes2 FROM characters WHERE guid = '%u'", GUID_LOPART(guid));
     if (!result)
         return;
 
@@ -19670,7 +19655,7 @@ void Player::Customize(uint64 guid, uint8 gender, uint8 skin, uint8 face, uint8 
     playerBytes2 &= ~0xFF;
     playerBytes2 |= facialHair;
 
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GENDER_PLAYERBYTES);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GENDER_PLAYERBYTES);
 
     stmt->setUInt8(0, gender);
     stmt->setUInt32(1, skin | (face << 8) | (hairStyle << 16) | (hairColor << 24));
@@ -26672,11 +26657,10 @@ void Player::SendBattlegroundTimer(uint32 currentTime, uint32 maxTime)
 void Player::SetMaxPersonalArenaRating(uint32 value)
 {
     _maxPersonalArenaRate = value;
-    SQLTransaction trans = NULL;
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
     PreparedStatement* stmt = NULL;
     if (!IsHaveCap())
     {
-        trans = CharacterDatabase.BeginTransaction();
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_CURRENCY_CAP);
         stmt->setUInt32(0, GetGUIDLow());
         stmt->setUInt16(1, _maxPersonalArenaRate);
