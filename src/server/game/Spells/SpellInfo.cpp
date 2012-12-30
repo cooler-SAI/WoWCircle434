@@ -464,7 +464,8 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
                 float preciseBasePoints = ScalingMultiplier * multiplier;
                 if (DeltaScalingMultiplier)
                 {
-                    if (float delta = DeltaScalingMultiplier * ScalingMultiplier * multiplier * 0.5f)
+                    float delta = DeltaScalingMultiplier * ScalingMultiplier * multiplier * 0.5f;
+                    if (delta != 0.0f && _finite(delta))
                         preciseBasePoints += frand(-delta, delta);
                 }
 
