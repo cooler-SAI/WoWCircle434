@@ -576,8 +576,16 @@ void WorldSession::HandleAddonMessagechatOpcode(WorldPacket& recvData)
             break;
         }
         case CHAT_MSG_PARTY:
-        case CHAT_MSG_RAID:
         case CHAT_MSG_OFFICER:
+        {
+            uint32 prefixLen = recvData.ReadBits(5);
+            uint32 msgLen = recvData.ReadBits(9);
+            recvData.read(message, msgLen);
+            recvData.read(prefix, prefixLen);
+            break;
+        }
+        case CHAT_MSG_RAID:
+        case CHAT_MSG_BATTLEGROUND:
         {
             uint32 prefixLen = recvData.ReadBits(5);
             uint32 msgLen = recvData.ReadBits(9);
@@ -586,7 +594,6 @@ void WorldSession::HandleAddonMessagechatOpcode(WorldPacket& recvData)
             break;
         }
         case CHAT_MSG_GUILD:
-        case CHAT_MSG_BATTLEGROUND:
         {
             uint32 msgLen = recvData.ReadBits(9);
             uint32 prefixLen = recvData.ReadBits(5);

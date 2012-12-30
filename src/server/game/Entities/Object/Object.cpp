@@ -1640,16 +1640,20 @@ void MovementInfo::Normalize(bool update, uint16 flags)
      * Movement info normalization from client to prevent CMSG_OBJECT_UPDATE_FAILED
      */
     {
-        #define NOT_ASSERT(assertion) { if (!(assertion)) { sLog->outError(LOG_FILTER_GENERAL, "MovementInfo:Normalize fail: %s", #assertion); }}
+    #define CHECK(exp) \
+        if (!(exp))\
+        {\
+            sLog->outError(LOG_FILTER_GENERAL, "MovementInfo:Normalize: expression '%s' failed", #exp);\
+        }
         /*if (flags)
         {
-            NOT_ASSERT(!(flags & UPDATEFLAG_LIVING) || !(flags & UPDATEFLAG_GO_TRANSPORT_POSITION) && (!(flags & UPDATEFLAG_LIVING) || !(flags & UPDATEFLAG_STATIONARY_POSITION))
+            CHECK(!(flags & UPDATEFLAG_LIVING) || !(flags & UPDATEFLAG_GO_TRANSPORT_POSITION) && (!(flags & UPDATEFLAG_LIVING) || !(flags & UPDATEFLAG_STATIONARY_POSITION))
                 && (!(flags & UPDATEFLAG_SELF) || (flags & UPDATEFLAG_LIVING))
                 && (!(flags & UPDATEFLAG_GO_TRANSPORT_POSITION) || TransportDataFinite()));
         }*/
 
         /* FlagCheck return false if aplineElevation is infinity */
-        NOT_ASSERT(finite(splineElevation) && "splineElevation give a fuck");
+        CHECK(finite(splineElevation) && "splineElevation give a fuck");
 
         /*Client requires 0x2000000 flag if HaveSplineElevation bit is true
         * __asm
@@ -1711,9 +1715,11 @@ void MovementInfo::Normalize(bool update, uint16 flags)
          * dword_BC1630, dword_BC162C, dword_BBDCC0 - probably some float const
          */
 
-        NOT_ASSERT(CoordFinite() && "pos give a fuck");
-        NOT_ASSERT(TransportDataFinite() && "t_pos give a fuck");
-        NOT_ASSERT(FallDataFinite() && "fallData give a fuck");
+        CHECK(CoordFinite() && "pos give a fuck");
+        CHECK(TransportDataFinite() && "t_pos give a fuck");
+        CHECK(FallDataFinite() && "fallData give a fuck");
+
+        #undef CHECK
     }
 
     // move orientation to range [0, 2*PI)
