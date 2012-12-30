@@ -11047,6 +11047,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
                     if (AuraEffect* aurEff = GetAuraEffect(55692, 0))
                         if (victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x100000, 0, 0, GetGUID()))
                             AddPct(DoneTotalMod, aurEff->GetAmount());
+                    break;
                 }
                 // Triple damage for Shadow word: death
                 case 2379:
