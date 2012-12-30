@@ -1640,12 +1640,12 @@ void MovementInfo::Normalize(bool update, uint16 flags)
      * Movement info normalization from client to prevent CMSG_OBJECT_UPDATE_FAILED
      */
     {
-    #define CHECK(exp) \
+        /*#define CHECK(exp) \
         if (!(exp))\
         {\
             sLog->outError(LOG_FILTER_GENERAL, "MovementInfo:Normalize: expression '%s' failed", #exp);\
         }
-        /*if (flags)
+        if (flags)
         {
             CHECK(!(flags & UPDATEFLAG_LIVING) || !(flags & UPDATEFLAG_GO_TRANSPORT_POSITION) && (!(flags & UPDATEFLAG_LIVING) || !(flags & UPDATEFLAG_STATIONARY_POSITION))
                 && (!(flags & UPDATEFLAG_SELF) || (flags & UPDATEFLAG_LIVING))
@@ -1713,13 +1713,13 @@ void MovementInfo::Normalize(bool update, uint16 flags)
          *   goto LABEL_30;
          *
          * dword_BC1630, dword_BC162C, dword_BBDCC0 - probably some float const
-         */
+         
 
         //CHECK(CoordFinite() && "pos give a fuck");
         //CHECK(TransportDataFinite() && "t_pos give a fuck");
         //CHECK(FallDataFinite() && "fallData give a fuck");
 
-        #undef CHECK
+        #undef CHECK*/
     }
 
     // move orientation to range [0, 2*PI)

@@ -22,6 +22,7 @@
 #include "Spell.h"
 #include "DBCStores.h"
 #include "ConditionMgr.h"
+#include "Common.h"
 
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType)
 {
@@ -465,7 +466,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
                 if (DeltaScalingMultiplier)
                 {
                     float delta = DeltaScalingMultiplier * ScalingMultiplier * multiplier * 0.5f;
-                    if (delta != 0.0f && _finite(delta))
+                    if (delta != 0.0f && finite(delta))
                         preciseBasePoints += frand(-delta, delta);
                 }
 
