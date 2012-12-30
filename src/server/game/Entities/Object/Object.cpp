@@ -1653,7 +1653,7 @@ void MovementInfo::Normalize(bool update, uint16 flags)
         }*/
 
         /* FlagCheck return false if aplineElevation is infinity */
-        CHECK(finite(splineElevation) && "splineElevation give a fuck");
+        //CHECK(finite(splineElevation) && "splineElevation give a fuck");
 
         /*Client requires 0x2000000 flag if HaveSplineElevation bit is true
         * __asm
@@ -1715,9 +1715,9 @@ void MovementInfo::Normalize(bool update, uint16 flags)
          * dword_BC1630, dword_BC162C, dword_BBDCC0 - probably some float const
          */
 
-        CHECK(CoordFinite() && "pos give a fuck");
-        CHECK(TransportDataFinite() && "t_pos give a fuck");
-        CHECK(FallDataFinite() && "fallData give a fuck");
+        //CHECK(CoordFinite() && "pos give a fuck");
+        //CHECK(TransportDataFinite() && "t_pos give a fuck");
+        //CHECK(FallDataFinite() && "fallData give a fuck");
 
         #undef CHECK
     }
