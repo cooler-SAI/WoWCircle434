@@ -1104,11 +1104,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
     recvData >> Guid;
 
     if (!Guid)
-    {
-        sLog->outError(LOG_FILTER_NETWORKIO, "Player %u (%s) sent CMSG_REQUEST_PARTY_MEMBER_STATS with empty guid!",
-            GetPlayer()->GetGUIDLow(), GetPlayer()->GetName());
         return;
-    }
 
     Player* player = HashMapHolder<Player>::Find(Guid);
     if (player && player->GetGroup() != GetPlayer()->GetGroup())
