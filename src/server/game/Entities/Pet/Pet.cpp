@@ -409,7 +409,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         // prevent duplicate using slot (except PET_SAVE_NOT_IN_SLOT)
         if (mode <= PET_SAVE_LAST_STABLE_SLOT)
         {
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_PET_SLOT_BY_SLOT);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_PET_SLOT_BY_SLOT);
             stmt->setUInt8(0, uint8(PET_SAVE_NOT_IN_SLOT));
             stmt->setUInt32(1, ownerLowGUID);
             stmt->setUInt8(2, uint8(mode));
