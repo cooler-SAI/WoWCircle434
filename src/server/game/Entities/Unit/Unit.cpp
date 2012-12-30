@@ -11064,7 +11064,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
                     break;
                 }
                 // Triple damage for Shadow word: death
-                case 2379:
+                case 32379:
                 {
                     if (victim->GetHealthPct() < 25)
                     {
