@@ -1649,7 +1649,7 @@ void MovementInfo::Normalize(bool update, uint16 flags)
         }*/
 
         /* FlagCheck return false if aplineElevation is infinity */
-        NOT_ASSERT(_finite(splineElevation) && "splineElevation give a fuck");
+        NOT_ASSERT(finite(splineElevation) && "splineElevation give a fuck");
 
         /*Client requires 0x2000000 flag if HaveSplineElevation bit is true
         * __asm
