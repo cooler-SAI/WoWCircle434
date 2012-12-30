@@ -1954,10 +1954,10 @@ void WorldSession::HandleObjectUpdateFailedOpcode(WorldPacket& recvPacket)
     WorldObject* object = ObjectAccessor::GetWorldObject(*player, guid);
     sLog->outError(LOG_FILTER_NETWORKIO, 
         "CMSG_OBJECT_UPDATE_FAILED: Object Guid=[" UI64FMTD "] Object Name: [%s] ObjectType: %i Local Player=[%u, %s] "
-        "Position=(%f, %f, %f) Map=%u, Player have vehicle: %s", uint64(guid),
+        "Position=(%f, %f, %f) Map=%u", uint64(guid),
         object ? object->GetName() : "NULL", object ? int(object->GetTypeId()) : -int(1), player->GetGUIDLow(), player->GetName(),
         player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(),
-        player->GetMapId(), (player->GetVehicle() != NULL) ? "true" : "false");
+        player->GetMapId());
 
     if (object && object->ToUnit())
     {

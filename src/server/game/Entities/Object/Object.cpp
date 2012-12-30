@@ -1484,9 +1484,9 @@ bool MovementInfo::Check(Player* target, Opcodes opcode)
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
     if (plMover && plMover->IsBeingTeleported())
     {
-        sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Opcode %u Session %u Mover is being teleported",
+        /*sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Opcode %u Session %u Mover is being teleported",
             uint32(opcode), target->GetSession()->GetAccountId()
-            );
+            );*/
         return false;
     }
 
@@ -1501,6 +1501,11 @@ bool MovementInfo::Check(Player* target, Opcodes opcode)
 
     if (mover->GetGUID() != guid)
     {
+        // For this opcode guid = old_mover_guid - always!!!
+        bool isGuidLogRequired = opcode == CMSG_FORCE_MOVE_ROOT_ACK || opcode == CMSG_FORCE_MOVE_UNROOT_ACK;
+        if (isGuidLogRequired)
+            return false;
+
         sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Opcode %u Session %u Invalid mover guid: client's " I64FMT " vs server's " I64FMT,
             uint32(opcode), target->GetSession()->GetAccountId(),
             guid, mover->GetGUID()
@@ -1635,15 +1640,16 @@ void MovementInfo::Normalize(bool update, uint16 flags)
      * Movement info normalization from client to prevent CMSG_OBJECT_UPDATE_FAILED
      */
     {
+        #define NOT_ASSERT(assertion) { if (!(assertion)) { sLog->outError(LOG_FILTER_GENERAL, "MovementInfo:Normalize fail: %s", #assertion); }}
         /*if (flags)
         {
-            ASSERT(!(flags & UPDATEFLAG_LIVING) || !(flags & UPDATEFLAG_GO_TRANSPORT_POSITION) && (!(flags & UPDATEFLAG_LIVING) || !(flags & UPDATEFLAG_STATIONARY_POSITION))
+            NOT_ASSERT(!(flags & UPDATEFLAG_LIVING) || !(flags & UPDATEFLAG_GO_TRANSPORT_POSITION) && (!(flags & UPDATEFLAG_LIVING) || !(flags & UPDATEFLAG_STATIONARY_POSITION))
                 && (!(flags & UPDATEFLAG_SELF) || (flags & UPDATEFLAG_LIVING))
                 && (!(flags & UPDATEFLAG_GO_TRANSPORT_POSITION) || TransportDataFinite()));
         }*/
 
         /* FlagCheck return false if aplineElevation is infinity */
-        ASSERT(_finite(splineElevation) && "splineElevation give a fuck");
+        NOT_ASSERT(_finite(splineElevation) && "splineElevation give a fuck");
 
         /*Client requires 0x2000000 flag if HaveSplineElevation bit is true
         * __asm
@@ -1705,9 +1711,9 @@ void MovementInfo::Normalize(bool update, uint16 flags)
          * dword_BC1630, dword_BC162C, dword_BBDCC0 - probably some float const
          */
 
-        ASSERT(CoordFinite() && "pos give a fuck");
-        ASSERT(TransportDataFinite() && "t_pos give a fuck");
-        ASSERT(FallDataFinite() && "fallData give a fuck");
+        NOT_ASSERT(CoordFinite() && "pos give a fuck");
+        NOT_ASSERT(TransportDataFinite() && "t_pos give a fuck");
+        NOT_ASSERT(FallDataFinite() && "fallData give a fuck");
     }
 
     // move orientation to range [0, 2*PI)
