@@ -3785,17 +3785,21 @@ void Unit::RemoveArenaAuras()
     // cleanup swap auras at first
     AuraEffectList const &swapAuras = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS_2);
     if (!swapAuras.empty())
+    {
         for (AuraEffectList::const_iterator i = swapAuras.begin(); i != swapAuras.end(); ++i)
         {
-            if (!(*i) || !(*i)->GetSpellInfo())
+            AuraEffect const* _eff = (*i);
+            if (!_eff)
                 continue;
 
-            if ((*i)->GetSpellInfo()->IsPassive())
+            SpellInfo const* info = _eff->GetSpellInfo();
+            if (!info || info->IsPassive())
                 continue;
 
-            CleanupSwapAuras((*i)->GetId());
-            RemoveAura((*i)->GetBase());
+            CleanupSwapAuras(_eff->GetId());
+            RemoveAura(_eff->GetBase());
         }
+    }
 
     // in join, remove positive buffs, on end, remove negative
     // used to remove positive visible auras in arenas
