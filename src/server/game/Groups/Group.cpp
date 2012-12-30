@@ -780,21 +780,14 @@ void Group::Disband(bool hideDestroy /* = false */)
     if (!isBGGroup() && !isBFGroup())
     {
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
-
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP);
-        stmt->setUInt32(0, m_dbStoreId);
-        trans->Append(stmt);
-
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP_MEMBER_ALL);
-        stmt->setUInt32(0, m_dbStoreId);
-        trans->Append(stmt);
-
+        trans->PAppend("DELETE FROM groups WHERE guid = %u", m_dbStoreId); 	
+        trans->PAppend("DELETE FROM group_member WHERE guid = %u", m_dbStoreId);
         CharacterDatabase.CommitTransaction(trans);
 
         ResetInstances(INSTANCE_RESET_GROUP_DISBAND, false, NULL);
         ResetInstances(INSTANCE_RESET_GROUP_DISBAND, true, NULL);
 
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_LFG_DATA);
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_LFG_DATA);
         stmt->setUInt32(0, m_dbStoreId);
         CharacterDatabase.Execute(stmt);
 
