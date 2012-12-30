@@ -8241,6 +8241,14 @@ bool Unit::HandleModifierAuraProc(Unit* victim, uint32 damage, AuraEffect* trigg
         {
             switch (triggeredByAuraSpell->Id)
             {
+                // Impending doom
+                case 85106:
+                case 85107:
+                case 85108:
+                {
+                    this->ToPlayer()->SpellCooldownReduction(47241, 15000);
+                    break;
+                }
                 // Empowered Imp
                 case 47220:
                 case 47221:
