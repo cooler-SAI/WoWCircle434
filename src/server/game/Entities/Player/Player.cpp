@@ -25311,8 +25311,8 @@ void Player::_SaveGlyphs(SQLTransaction& trans)
 
     for (uint8 spec = 0; spec < GetSpecsCount(); ++spec)
     {
-        trans->PAppend("INSERT INTO character_glyphs VALUES('%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u')",	  	
-            GetGUIDLow(), spec, GetGlyph(spec, 0), GetGlyph(spec, 1), GetGlyph(spec, 2), GetGlyph(spec, 3), GetGlyph(spec, 4), GetGlyph(spec, 5));	
+        trans->PAppend("INSERT INTO character_glyphs VALUES('%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u')",	  	
+            GetGUIDLow(), spec, GetGlyph(spec, 0), GetGlyph(spec, 1), GetGlyph(spec, 2), GetGlyph(spec, 3), GetGlyph(spec, 4), GetGlyph(spec, 5), GetGlyph(spec, 6), GetGlyph(spec, 7), GetGlyph(spec, 8));	
     }
 }
 
