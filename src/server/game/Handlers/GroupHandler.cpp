@@ -947,9 +947,6 @@ void _WriteUnitAuras(Unit* unit, WorldPacket* data, uint64 mask)
 
             if (flags & AFLAG_ANY_EFFECT_AMOUNT_SENT)
             {
-                if (!(flags & (1 << i)))
-                    continue;
-
                 for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
                 {
                     if (AuraEffect const* effect = aura->GetBase()->GetEffect(j))
