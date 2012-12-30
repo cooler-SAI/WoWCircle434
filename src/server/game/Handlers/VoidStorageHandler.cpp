@@ -165,6 +165,7 @@ void WorldSession::HandleVoidStorageQuery(WorldPacket& recvData)
         itemData.WriteByteSeq(itemId[0]);
         itemData.WriteByteSeq(itemId[6]);
         itemData.WriteByteSeq(creatorGuid[0]);
+        itemData.WriteByteSeq(creatorGuid[1]);
 
         itemData << uint32(item->ItemRandomPropertyId);
 
@@ -273,8 +274,8 @@ void WorldSession::HandleVoidStorageTransfer(WorldPacket& recvData)
     {
         recvData
             .ReadByteSeq(itemIds[i][3])
-            .ReadByteSeq(itemIds[i][1])
             .ReadByteSeq(itemIds[i][0])
+            .ReadByteSeq(itemIds[i][1])
             .ReadByteSeq(itemIds[i][6])
             .ReadByteSeq(itemIds[i][2])
             .ReadByteSeq(itemIds[i][7])
