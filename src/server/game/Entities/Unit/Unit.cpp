@@ -8487,6 +8487,7 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, uint32 absorb, Aura* trig
                     // Hot Streak
                     if (HasAura(44445))
                         *handled = true;
+
                     // Brain Freeze
                     if (GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_MAGE, 0, 0, 0x00008000, GetGUID()))
                         *handled = true;
@@ -8494,6 +8495,11 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, uint32 absorb, Aura* trig
                     // roll basepoints
                     if (!roll_chance_i(triggeredByAura->GetEffect(0)->GetAmount()))
                         *handled = true;
+
+                    // Disable proc from Arcane Missiles
+                    if (procSpell->Id == 7268)
+                        *handled = true;
+
                     break;
                 }
                 // Empowered Fire
