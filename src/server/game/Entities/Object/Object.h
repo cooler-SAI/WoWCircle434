@@ -27,6 +27,7 @@
 #include "GridDefines.h"
 #include "Map.h"
 #include "Opcodes.h"
+#include "Common.h"
 
 #include <set>
 #include <string>
@@ -652,22 +653,22 @@ struct MovementInfo
     void Normalize(bool update = false, uint16 flags = 0);
     bool FallDataFinite() const
     {
-        return !HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA) || (fallTime >= 0 && _finite(j_zspeed) && (!HasServerMovementFlag(SERVERMOVEFLAG_FALLDIRECTION) || FallDirectionFinite()));
+        return !HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA) || (fallTime >= 0 && finite(j_zspeed) && (!HasServerMovementFlag(SERVERMOVEFLAG_FALLDIRECTION) || FallDirectionFinite()));
     }
 
     bool FallDirectionFinite() const
     {
-        return _finite(j_cosAngle) && _finite(j_sinAngle) && _finite(j_xyspeed);
+        return finite(j_cosAngle) && finite(j_sinAngle) && finite(j_xyspeed);
     }
 
     bool CoordFinite() const
     {
-        return _finite(pos.m_positionX) && _finite(pos.m_positionY) && _finite(pos.m_positionZ) && (!pos.HaveOrientation() || _finite(pos.m_orientation));
+        return finite(pos.m_positionX) && finite(pos.m_positionY) && finite(pos.m_positionZ) && (!pos.HaveOrientation() || finite(pos.m_orientation));
     }
 
     bool TransportDataFinite() const
     {
-        return !HasTransportData() || (_finite(t_pos.m_positionX) && _finite(t_pos.m_positionY) && _finite(t_pos.m_positionZ) && (!t_pos.HaveOrientation() || _finite(t_pos.m_orientation)));
+        return !HasTransportData() || (finite(t_pos.m_positionX) && finite(t_pos.m_positionY) && finite(t_pos.m_positionZ) && (!t_pos.HaveOrientation() || finite(t_pos.m_orientation)));
     }
 
     bool Check(Player* target, Opcodes opcode);
