@@ -638,6 +638,11 @@ const char *WorldSession::GetTrinityString(int32 entry) const
     return sObjectMgr->GetTrinityString(entry, GetSessionDbLocaleIndex());
 }
 
+void WorldSession::Handle_NOT_NEED(WorldPacket& recvPacket)
+{
+    recvPacket.rfinish(); // to prevent spamming
+}
+
 void WorldSession::Handle_NULL(WorldPacket& recvPacket)
 {
     sLog->outError(LOG_FILTER_OPCODES, "Received unhandled opcode %s from %s"
