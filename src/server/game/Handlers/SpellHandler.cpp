@@ -271,12 +271,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
             pUser->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
             return;
         }
-
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
-
-        stmt->setUInt32(0, item->GetGUIDLow());
-
-        CharacterDatabase.Execute(stmt);
+        CharacterDatabase.PExecute("DELETE FROM character_gifts WHERE item_guid = '%u'", item->GetGUIDLow());
     }
     else
         pUser->SendLoot(item->GetGUID(), LOOT_CORPSE);

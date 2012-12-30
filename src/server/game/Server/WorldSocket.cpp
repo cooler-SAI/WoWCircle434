@@ -974,13 +974,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     if (mutetime < 0)
     {
         mutetime = time(NULL) + llabs(mutetime);
-
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
-
-        stmt->setInt64(0, mutetime);
-        stmt->setUInt32(1, id);
-
-        LoginDatabase.Execute(stmt);
+        LoginDatabase.PExecute("UPDATE account SET mutetime = " SI64FMTD " WHERE id = '%u'", mutetime, id);
     }
 
     locale = LocaleConstant (fields[8].GetUInt8());

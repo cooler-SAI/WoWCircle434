@@ -3585,12 +3585,7 @@ bool Player::AddTalent(uint32 spellId, uint8 spec, bool learning)
         if (!IsInWorld() && !learning)                       // spell load case
         {
             sLog->outError(LOG_FILTER_SPELLS_AURAS, "Player::addSpell: Non-existed in SpellStore spell #%u request, deleting for all characters in `character_spell`.", spellId);
-
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_SPELL);
-
-            stmt->setUInt32(0, spellId);
-
-            CharacterDatabase.Execute(stmt);
+            CharacterDatabase.PExecute("DELETE FROM character_talent WHERE spell = '%u'", spellId);
         }
         else
             sLog->outError(LOG_FILTER_SPELLS_AURAS, "Player::addSpell: Non-existed in SpellStore spell #%u request.", spellId);
@@ -3604,12 +3599,7 @@ bool Player::AddTalent(uint32 spellId, uint8 spec, bool learning)
         if (!IsInWorld() && !learning)                       // spell load case
         {
             sLog->outError(LOG_FILTER_SPELLS_AURAS, "Player::addTalent: Broken spell #%u learning not allowed, deleting for all characters in `character_talent`.", spellId);
-
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_SPELL);
-
-            stmt->setUInt32(0, spellId);
-
-            CharacterDatabase.Execute(stmt);
+            CharacterDatabase.PExecute("DELETE FROM character_talent WHERE spell = '%u'", spellId);	
         }
         else
             sLog->outError(LOG_FILTER_SPELLS_AURAS, "Player::addTalent: Broken spell #%u learning not allowed.", spellId);
@@ -7493,10 +7483,8 @@ uint32 Player::GetZoneIdFromDB(uint64 guid)
 
         zone = sMapMgr->GetZoneId(map, posx, posy, posz);
 
-        std::ostringstream ss;
-        ss.str("");
-        ss << "UPDATE characters SET zone='"<<zone<<"' WHERE guid='"<<GUID_LOPART(guid)<<"'";
-        CharacterDatabase.Execute(ss.str().c_str());
+        if (zone > 0)
+            CharacterDatabase.PExecute("UPDATE characters SET zone='%u' WHERE guid='%u'", zone, guidLow);	
     }
 
     return zone;
@@ -17838,11 +17826,7 @@ void Player::_LoadMailedItems(Mail* mail)
         if (!item->LoadFromDB(itemGuid, MAKE_NEW_GUID(fields[13].GetUInt32(), 0, HIGHGUID_PLAYER), fields, itemTemplate))
         {
             sLog->outError(LOG_FILTER_PLAYER, "Player::_LoadMailedItems - Item in mail (%u) doesn't exist !!!! - item guid: %u, deleted from mail", mail->messageID, itemGuid);
-
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM);
-            stmt->setUInt32(0, itemGuid);
-            CharacterDatabase.Execute(stmt);
-
+            CharacterDatabase.PExecute("DELETE FROM mail_items WHERE item_guid = '%u'", itemGuid);
             item->FSetState(ITEM_REMOVED);
 
             SQLTransaction temp = SQLTransaction(NULL);
