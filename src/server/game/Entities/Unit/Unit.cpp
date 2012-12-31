@@ -3782,24 +3782,18 @@ void Unit::RemoveAllAuras()
 
 void Unit::RemoveArenaAuras()
 {
-    // cleanup swap auras at first
-    AuraEffectList const &swapAuras = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS_2);
-    if (!swapAuras.empty())
-    {
-        for (AuraEffectList::const_iterator i = swapAuras.begin(); i != swapAuras.end(); ++i)
-        {
-            AuraEffect const* _eff = (*i);
-            if (!_eff)
-                continue;
-
-            SpellInfo const* info = _eff->GetSpellInfo();
-            if (!info || info->IsPassive())
-                continue;
-
-            CleanupSwapAuras(_eff->GetId());
-            RemoveAura(_eff->GetBase());
-        }
-    }
+    CleanupSwapAuras(77616); // Dark Simulacrum
+    RemoveAura(77616);
+    CleanupSwapAuras(77769); // Trap Launcher
+    RemoveAura(77769);
+    CleanupSwapAuras(81021); // Stampede
+    RemoveAura(81021);
+    CleanupSwapAuras(82926); // Fire
+    RemoveAura(82926);
+    CleanupSwapAuras(82946); // Trap Launcher
+    RemoveAura(82946);
+    CleanupSwapAuras(88688); // Surge of Light
+    RemoveAura(88688);
 
     // in join, remove positive buffs, on end, remove negative
     // used to remove positive visible auras in arenas
