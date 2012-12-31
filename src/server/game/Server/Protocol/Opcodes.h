@@ -28,8 +28,8 @@
 /// List of Opcodes
 enum Opcodes
 {
-    NUM_OPCODE_HANDLERS                               = (0x7FFF+1),
-    UNKNOWN_OPCODE                                    = (0xFFFF+1),
+    NUM_OPCODE_HANDLERS                              = (0xFFFF),
+    UNKNOWN_OPCODE                                   = NUM_OPCODE_HANDLERS,
     NULL_OPCODE                                       = 0,
     COMPRESSED_OPCODE_MASK                            = 0x8000,
 
@@ -1432,7 +1432,7 @@ class OpcodeTable
 
         ~OpcodeTable()
         {
-            for (uint16 i = 0; i < NUM_OPCODE_HANDLERS; ++i)
+            for (uint32 i = 0; i < NUM_OPCODE_HANDLERS; ++i)
                 delete _internalTable[i];
         }
 
