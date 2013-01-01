@@ -824,7 +824,7 @@ class npc_mechanolift : public CreatureScript
             {
                 if (MoveTimer <= diff)
                 {
-                    if (me->GetVehicleKit()->HasEmptySeat(-1))
+                    if (me->GetVehicleKit() && me->GetVehicleKit()->HasEmptySeat(-1))
                     {
                         Creature* container = me->FindNearestCreature(NPC_CONTAINER, 50, true);
                         if (container && !container->GetVehicle())
