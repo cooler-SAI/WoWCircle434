@@ -407,11 +407,7 @@ bool Guild::BankTab::LoadItemFromDB(Field* fields)
     {
         sLog->outError(LOG_FILTER_GUILD, "Item (GUID %u, id: %u) not found in item_instance, deleting from guild bank!", itemGuid, itemEntry);
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_NONEXISTENT_GUILD_BANK_ITEM);
-        stmt->setUInt32(0, m_guildId);
-        stmt->setUInt8 (1, m_tabId);
-        stmt->setUInt8 (2, slotId);
-        CharacterDatabase.Execute(stmt);
+        CharacterDatabase.PExecute("DELETE FROM guild_bank_item WHERE guildid = '%u' AND TabId = '%u' AND SlotId = '%u'", m_guildId, m_tabId, slotId);
 
         delete pItem;
         return false;

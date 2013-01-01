@@ -103,12 +103,7 @@ bool ArenaTeam::AddMember(uint64 playerGuid)
     }
     else
     {
-        //          0     1
-        // SELECT name, class FROM characters WHERE guid = ?
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_NAME_CLASS);
-        stmt->setUInt32(0, GUID_LOPART(playerGuid));
-        PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
+        QueryResult result = CharacterDatabase.PQuery("SELECT name, class FROM characters WHERE guid='%u'", GUID_LOPART(playerGuid));
         if (!result)
             return false;
 
@@ -132,10 +127,7 @@ bool ArenaTeam::AddMember(uint64 playerGuid)
         personalRating = 1000;
 
     // Try to get player's match maker rating from db and fall back to config setting if not found
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MATCH_MAKER_RATING);
-    stmt->setUInt32(0, GUID_LOPART(playerGuid));
-    stmt->setUInt8(1, GetSlot());
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+    QueryResult result = CharacterDatabase.PQuery("SELECT matchMakerRating FROM character_arena_stats WHERE guid ='%u' AND slot ='%u'", GUID_LOPART(playerGuid), GetSlot());
 
     uint32 matchMakerRating;
     if (result)
@@ -162,7 +154,7 @@ bool ArenaTeam::AddMember(uint64 playerGuid)
     Members.push_back(newMember);
 
     // Save player's arena team membership to db
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_TEAM_MEMBER);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_TEAM_MEMBER);
     stmt->setUInt32(0, TeamId);
     stmt->setUInt32(1, GUID_LOPART(playerGuid));
     CharacterDatabase.Execute(stmt);

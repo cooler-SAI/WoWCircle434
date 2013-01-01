@@ -358,26 +358,15 @@ void Item::SaveToDB(SQLTransaction& trans)
             trans->Append(stmt);
 
             if ((uState == ITEM_CHANGED) && HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED))
-            {
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GIFT_OWNER);
-                stmt->setUInt32(0, GUID_LOPART(GetOwnerGUID()));
-                stmt->setUInt32(1, guid);
-                trans->Append(stmt);
-            }
+                trans->PAppend("UPDATE character_gifts SET guid = '%u' WHERE item_guid = '%u'", GUID_LOPART(GetOwnerGUID()), guid);
             break;
         }
         case ITEM_REMOVED:
         {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-            stmt->setUInt32(0, guid);
-            trans->Append(stmt);
+            trans->PAppend("DELETE FROM item_instance WHERE guid = '%u'", guid);
 
             if (HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED))
-            {
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
-                stmt->setUInt32(0, guid);
-                trans->Append(stmt);
-            }
+                trans->PAppend("DELETE FROM character_gifts WHERE item_guid = '%u'", GetGUIDLow());
 
             if (!isInTransaction)
                 CharacterDatabase.CommitTransaction(trans);
@@ -480,9 +469,7 @@ bool Item::LoadFromDB(uint32 guid, uint64 owner_guid, Field* fields, uint32 entr
 /*static*/
 void Item::DeleteFromDB(SQLTransaction& trans, uint32 itemGuid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-    stmt->setUInt32(0, itemGuid);
-    trans->Append(stmt);
+    trans->PAppend("DELETE FROM item_instance WHERE guid = '%u'", itemGuid);
 }
 
 void Item::DeleteFromDB(SQLTransaction& trans)
@@ -493,9 +480,7 @@ void Item::DeleteFromDB(SQLTransaction& trans)
 /*static*/
 void Item::DeleteFromInventoryDB(SQLTransaction& trans, uint32 itemGuid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
-    stmt->setUInt32(0, itemGuid);
-    trans->Append(stmt);
+    trans->PAppend("DELETE FROM character_inventory WHERE item = '%u'", itemGuid);
 }
 
 void Item::DeleteFromInventoryDB(SQLTransaction& trans)

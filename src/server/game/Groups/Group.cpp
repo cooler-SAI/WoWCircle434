@@ -192,9 +192,7 @@ void Group::LoadMemberFromDB(uint32 guidLow, uint8 memberFlags, uint8 subgroup, 
     // skip non-existed member
     if (!sObjectMgr->GetPlayerNameByGUID(member.guid, member.name))
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP_MEMBER);
-        stmt->setUInt32(0, guidLow);
-        CharacterDatabase.Execute(stmt);
+        CharacterDatabase.PQuery("DELETE FROM group_member WHERE memberGuid=%u", guidLow);
         return;
     }
 
@@ -250,14 +248,7 @@ void Group::ConvertToGroup()
     }
 
     if (!isBGGroup() && !isBFGroup())
-    {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GROUP_TYPE);
-
-        stmt->setUInt8(0, uint8(m_groupType));
-        stmt->setUInt32(1, m_dbStoreId);
-
-        CharacterDatabase.Execute(stmt);
-    }
+        CharacterDatabase.PExecute("UPDATE groups SET groupType = ? WHERE guid = ?", uint8(m_groupType), m_dbStoreId);
 
     SendUpdate();
 

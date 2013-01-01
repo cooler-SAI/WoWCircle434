@@ -72,17 +72,9 @@ AccountOpResult DeleteAccount(uint32 accountId)
     }
 
     // table realm specific but common for all characters of account for realm
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_TUTORIALS);
-    stmt->setUInt32(0, accountId);
-    CharacterDatabase.Execute(stmt);
-
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ACCOUNT_DATA);
-    stmt->setUInt32(0, accountId);
-    CharacterDatabase.Execute(stmt);
-
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_BAN);
-    stmt->setUInt32(0, accountId);
-    CharacterDatabase.Execute(stmt);
+    CharacterDatabase.PExecute("DELETE FROM character_tutorial WHERE account = '%u'", accountId);
+    CharacterDatabase.PExecute("DELETE FROM account_data WHERE account = '%u'", accountId);
+    CharacterDatabase.PExecute("DELETE cb FROM character_banned cb INNER JOIN characters c ON c.guid = cb.guid WHERE c.account = '%u'", accountId);
 
     SQLTransaction trans = LoginDatabase.BeginTransaction();
 

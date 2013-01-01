@@ -71,12 +71,8 @@ void SaveAddon(AddonInfo const& addon)
 {
     std::string name = addon.Name;
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ADDON);
-
-    stmt->setString(0, name);
-    stmt->setUInt32(1, addon.CRC);
-
-    CharacterDatabase.Execute(stmt);
+    CharacterDatabase.EscapeString(name);
+    CharacterDatabase.PExecute("INSERT INTO addons (name, crc) VALUES ('%s', %u)", name.c_str(), addon.CRC);
 
     m_knownAddons.push_back(SavedAddon(addon.Name, addon.CRC));
 }
