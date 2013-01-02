@@ -5976,14 +5976,14 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
     // Archaeology
     if (m_spellInfo->Id == 80451)
     {
+        if (m_caster->ToPlayer())
+            go_id = m_caster->ToPlayer()->GetSurveyBotEntry(o);
 
-        uint32 id = m_caster->ToPlayer()->GetSurveyBotEntry(o);
-        if (!id)
-            return;
-
-        go_id = id;
         duration = 15000;
     }
+
+    if (go_id == 0)
+        return;
 
     uint8 slot = 0;
     switch (m_spellInfo->Effects[effIndex].Effect)

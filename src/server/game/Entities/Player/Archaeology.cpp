@@ -10,64 +10,71 @@
 #define ARCHAEOLOGY_DIG_SITE_MEDIUM_SURVEYBOT   206589
 #define ARCHAEOLOGY_DIG_SITE_CLOSE_SURVEYBOT    204272
 
-bool Player::GenerateDigitLoot(uint32 zoneid, float &x, float &y, float &z, uint32 &loot_id)
+const static uint16 _mapIds[4] = { 0, 1, 530, 571};
+
+const static int q_patt[2][2]= { {0,1}, {3,2} };
+
+bool Player::GenerateDigitLoot(uint16 zoneid, DigitSite &site)
 {
-    if (sObjectMgr->mResearchLoot.empty())
+    ResearchLootVector const& loot = sObjectMgr->GetResearchLoot();
+    if (loot.empty())
         return false;
 
-    ObjectMgr::ResearchLootVector lootList;
-    for (ObjectMgr::ResearchLootVector::const_iterator itr = sObjectMgr->mResearchLoot.begin(); itr != sObjectMgr->mResearchLoot.end(); ++itr)
-        if ((*itr)->id == zoneid)
-            lootList.push_back((*itr));
+    ResearchLootVector lootList;
+    for (ResearchLootVector::const_iterator itr = loot.begin(); itr != loot.end(); ++itr)
+    {
+        ResearchLootEntry entry = (*itr);
+        if (entry.id != zoneid)
+            continue;
+
+        if (site.loot_id == 0)
+        {
+            switch (entry.race)
+            {
+            case 1: site.loot_id = 204282; break;
+            case 2: site.loot_id = 207188; break;
+            case 3: site.loot_id = 206836; break;
+            case 4: site.loot_id = 203071; break;
+            case 5: site.loot_id = 203078; break;
+            case 6: site.loot_id = 207187; break;
+            case 7: site.loot_id = 207190; break;
+            case 8: site.loot_id = 202655; break;
+            case 27: site.loot_id = 207189; break;
+            default: site.loot_id = 0; break;
+            }
+        }
+
+        lootList.push_back(entry);
+    }
 
     if (lootList.empty())
         return false;
 
-    ObjectMgr::ResearchLootVector::const_iterator itr1 = lootList.begin();
-    std::advance(itr1, urand(0, lootList.size() - 1));
+    ResearchLootVector::const_iterator entry = lootList.begin();
+    std::advance(entry, urand(0, lootList.size() - 1));
 
-    x = (*itr1)->x;
-    y = (*itr1)->y;
-    z = (*itr1)->z;
-
-    for (ObjectMgr::ResearchLootVector::const_iterator itr = sObjectMgr->mResearchLoot.begin(); itr != sObjectMgr->mResearchLoot.end(); ++itr)
-    {
-        if ((*itr)->id == zoneid)
-        {
-            switch ((*itr)->race)
-            {
-                case 1: loot_id = 204282; break;
-                case 2: loot_id = 207188; break;
-                case 3: loot_id = 206836; break;
-                case 4: loot_id = 203071; break;
-                case 5: loot_id = 203078; break;
-                case 6: loot_id = 207187; break;
-                case 7: loot_id = 207190; break;
-                case 8: loot_id = 202655; break;
-                case 27: loot_id = 207189; break;
-                default: loot_id = 0; break;
-            }
-            break;
-        }
-    }
+    site.loot_x = entry->x;
+    site.loot_y = entry->y;
+    site.loot_z = entry->z;
 
     return true;
 }
 
 uint32 Player::GetSurveyBotEntry(float &orientation)
 {
-    uint32 skill_now = GetSkillValue(SKILL_ARCHAEOLOGY);
+    uint16 skill_now = GetSkillValue(SKILL_ARCHAEOLOGY);
     if (!skill_now)
         return 0;
 
-    uint32 zoneid = GetResearchSiteID();
+    uint16 zoneid = GetResearchSiteID();
     if (!zoneid)
         return 0;
 
     uint32 at_pos = 0xFFFF;
 
-    for(uint32 i = 0; i < MAX_RESEARCH_SITES / 2; ++i)
+    for(uint8 i = 0; i < MAX_RESEARCH_SITES / 2; ++i)
     {
+        //Replace by GetUInt16Value
         uint32 site_now_1 = GetUInt32Value(PLAYER_FIELD_RESERACH_SITE_1 + i) & 0xFFFF;
         uint32 site_now_2 = GetUInt32Value(PLAYER_FIELD_RESERACH_SITE_1 + i) >> 16;
 
@@ -86,15 +93,19 @@ uint32 Player::GetSurveyBotEntry(float &orientation)
     if (at_pos == 0xFFFF)
         return 0;
 
-    if (m_digSites[at_pos].site_id != zoneid)
+    ASSERT(at_pos < 16);
+
+    DigitSite &site = _digSites[at_pos];
+    if (site.site_id != zoneid)
     {
-        if (!GenerateDigitLoot(zoneid, m_digSites[at_pos].loot_x, m_digSites[at_pos].loot_y, m_digSites[at_pos].loot_z, m_digSites[at_pos].loot_id))
+        if (!GenerateDigitLoot(zoneid, site))
             return 0;
-        m_digSites[at_pos].site_id = zoneid;
+
+        site.site_id = zoneid;
     }
 
-    orientation = GetAngle(m_digSites[at_pos].loot_x, m_digSites[at_pos].loot_y);
-    float dist_now = GetDistance2d(m_digSites[at_pos].loot_x, m_digSites[at_pos].loot_y);
+    orientation = GetAngle(site.loot_x, site.loot_y);
+    float dist_now = GetDistance2d(site.loot_x, site.loot_y);
 
     if (dist_now >= ARCHAEOLOGY_DIG_SITE_FAR_DIST)
         return ARCHAEOLOGY_DIG_SITE_FAR_SURVEYBOT;
@@ -107,8 +118,7 @@ uint32 Player::GetSurveyBotEntry(float &orientation)
         UpdateSkill(SKILL_ARCHAEOLOGY, 1);
 
     uint32 curr_id = 0;
-
-    switch (m_digSites[at_pos].loot_id)
+    switch (site.loot_id)
     {
         case 204282: curr_id = 384; break;
         case 207188: curr_id = 398; break;
@@ -146,72 +156,71 @@ uint32 Player::GetSurveyBotEntry(float &orientation)
         0, 0, 0, 0, 0,
         time(NULL) + 30000);*/
 
-    if (m_digSites[at_pos].count < 2)
+    if (site.count < 2)
     {
-        m_digSites[at_pos].count++;
-        if (!GenerateDigitLoot(zoneid, m_digSites[at_pos].loot_x, m_digSites[at_pos].loot_y, m_digSites[at_pos].loot_z, m_digSites[at_pos].loot_id))
+        site.count++;
+        if (!GenerateDigitLoot(zoneid, site))
             return 0;
     }
     else
     {
-        m_digSites[at_pos].clear();
+        site.clear();
         UseResearchSite(zoneid);
     }
 
-    m_archaeology_changed = true;
+    _archaeologyChanged = true;
 
     return 0;
 }
 
-uint32 Player::GetResearchSiteID()
+uint16 Player::GetResearchSiteID()
 {
-    typedef std::vector<ResearchPOIPoint> digzoneType;
-    std::map<uint32, digzoneType> DigZonesMap;
+    ResearchPOIPointMap DigZonesMap;
 
-    for (ObjectMgr::ResearchZoneVector::const_iterator itr = sObjectMgr->mResearchZones.begin(); itr != sObjectMgr->mResearchZones.end(); ++itr)
+    ResearchZoneVector const& zone = sObjectMgr->GetResearchZones();
+    for (ResearchZoneVector::const_iterator itr = zone.begin(); itr != zone.end(); ++itr)
     {
-        if ((*itr)->map == GetMapId() && (*itr)->zone == GetZoneId())
+        ResearchZoneEntry entry = (*itr);
+        if (entry.map == GetMapId() && entry.zone == GetZoneId())
         {
             ResearchPOIPoint pt;
-            pt.x = (*itr)->x;
-            pt.y = (*itr)->y;
-            DigZonesMap[(*itr)->POIid].push_back(pt);
+            pt.x = entry.x;
+            pt.y = entry.y;
+            DigZonesMap[entry.POIid].push_back(pt);
         }
     }
 
     if (DigZonesMap.empty())
         return 0;
 
-    for (std::map<uint32, digzoneType>::const_iterator itr = DigZonesMap.begin(); itr != DigZonesMap.end(); ++itr)
+    for (ResearchPOIPointMap::const_iterator itr = DigZonesMap.begin(); itr != DigZonesMap.end(); ++itr)
     {
         ResearchPOIPoint pt;
         pt.x = int32(GetPositionX());
         pt.y = int32(GetPositionY());
-        if (IsPointInZone(pt, itr->second))
-        {
-            uint32 hashId = itr->first;
-            for (uint32 i = 0; i < sResearchSiteStore.GetNumRows(); ++i)
-            {
-                ResearchSiteEntry const* rs = sResearchSiteStore.LookupEntry(i);
-                if (!rs)
-                    continue;
+        if (!IsPointInZone(pt, itr->second))
+            continue;
 
+        uint32 hashId = itr->first;
+        for (uint32 i = 0; i < sResearchSiteStore.GetNumRows(); ++i)
+        {
+            if (ResearchSiteEntry const* rs = sResearchSiteStore.LookupEntry(i))
+            {
                 if (rs->POIid == hashId)
                     return rs->ID;
             }
         }
     }
+
     return 0;
 }
 
-bool Player::IsPointInZone(const ResearchPOIPoint &test, const std::vector<ResearchPOIPoint> &polygon)
+bool Player::IsPointInZone(const ResearchPOIPoint &test, const ResearchPOIPoints &polygon)
 {
-    static const int q_patt[2][2]= { {0,1}, {3,2} };
-
     if (polygon.size() < 3)
         return false;
 
-    std::vector<ResearchPOIPoint>::const_iterator end = polygon.end();
+    ResearchPOIPoints::const_iterator end = polygon.end();
     ResearchPOIPoint pred_pt = polygon.back();
     pred_pt.x -= test.x;
     pred_pt.y -= test.y;
@@ -255,20 +264,19 @@ bool Player::IsPointInZone(const ResearchPOIPoint &test, const std::vector<Resea
 
 void Player::UseResearchSite(uint32 id)
 {
-    m_ResearchSites.erase(id);
+    _researchSites.erase(id);
     GenerateResearchSiteInMap(GetMapId());
 }
 
 void Player::ShowResearchSites()
 {
-    uint32 skill_now = GetSkillValue(SKILL_ARCHAEOLOGY);
-    if (!skill_now)
+    if (!GetSkillValue(SKILL_ARCHAEOLOGY))
         return;
 
     uint8 count = 0;
     uint32 newvalue;
 
-    for (std::set<uint32>::const_iterator itr = m_ResearchSites.begin(); itr != m_ResearchSites.end(); ++itr)
+    for (Uint32Set::const_iterator itr = _researchSites.begin(); itr != _researchSites.end(); ++itr)
     {
         uint32 id = (*itr);
         ResearchSiteEntry const* rs = GetResearchSiteEntryById(id);
@@ -282,23 +290,21 @@ void Player::ShowResearchSites()
             SetUInt32Value(PLAYER_FIELD_RESERACH_SITE_1 + count / 2, newvalue);
         }
         else
-        {
             newvalue = id << 16;
-        }
+
         ++count;
     }
 }
 
 void Player::ShowResearchProjects()
 {
-    uint32 skill_now = GetSkillValue(SKILL_ARCHAEOLOGY);
-    if (!skill_now)
+    if (!GetSkillValue(SKILL_ARCHAEOLOGY))
         return;
 
     uint8 count = 0;
     uint32 newvalue;
 
-    for (std::set<uint32>::const_iterator itr = m_ResearchProjects.begin(); itr != m_ResearchProjects.end(); ++itr)
+    for (std::set<uint32>::const_iterator itr = _researchProjects.begin(); itr != _researchProjects.end(); ++itr)
     {
         if (count % 2 == 1)
         {
@@ -311,58 +317,67 @@ void Player::ShowResearchProjects()
             break;
         }
         else
-        {
             newvalue = (*itr) << 16;
-        }
+
         ++count;
     }
 }
 
 bool Player::CanResearchWithLevel(uint32 POIid)
 {
-    uint32 skill_now = GetSkillValue(SKILL_ARCHAEOLOGY);
-    if (!skill_now)
+    if (!GetSkillValue(SKILL_ARCHAEOLOGY))
         return false;
 
-    for (ObjectMgr::ResearchZoneVector::const_iterator itr = sObjectMgr->mResearchZones.begin(); itr != sObjectMgr->mResearchZones.end(); ++itr)
-        if ((*itr)->POIid == POIid)
-            return getLevel() + 19 >= (*itr)->level;
+    ResearchZoneVector const& zone = sObjectMgr->GetResearchZones();
+    for (ResearchZoneVector::const_iterator itr = zone.begin(); itr != zone.end(); ++itr)
+    {
+        if ((*itr).POIid == POIid)
+            return getLevel() + 19 >= (*itr).level;
+    }
     return true;
 }
 
 uint8 Player::CanResearchWithSkillLevel(uint32 POIid)
 {
-    uint32 skill_now = GetSkillValue(SKILL_ARCHAEOLOGY);
+    uint16 skill_now = GetSkillValue(SKILL_ARCHAEOLOGY);
     if (!skill_now)
         return 0;
 
-    for (ObjectMgr::ResearchZoneVector::const_iterator itr = sObjectMgr->mResearchZones.begin(); itr != sObjectMgr->mResearchZones.end(); ++itr)
-        if ((*itr)->POIid == POIid)
-        {
-            uint32 skill_cap = 0;
-            switch ((*itr)->map)
-            {
-            case 0:
-                if ((*itr)->zone == 4922) skill_cap = 450; break; // Twilight Hightlands
-            case 1:
-                if ((*itr)->zone == 616) skill_cap = 450; // Hidjal
-                else if ((*itr)->zone == 5034) skill_cap = 450; // Uldum
-                break;
-            case 530:
-                skill_cap = 275; // Outland
-                break;
-            case 571:
-                skill_cap = 350; // Northrend
-                break;
-            }
+    ResearchZoneVector const& zone = sObjectMgr->GetResearchZones();
+    for (ResearchZoneVector::const_iterator itr = zone.begin(); itr != zone.end(); ++itr)
+    {
+        ResearchZoneEntry entry = (*itr);
+        if (entry.POIid != POIid)
+            continue;
 
-            if (skill_now >= skill_cap)
-                return 1;
-            else if ((*itr)->map == 530 || (*itr)->map == 571)
-                return 2;
-            else
-                return 0;
+        uint16 skill_cap = 0;
+        switch (entry.map)
+        {
+        case 0:
+            if (entry.zone == 4922) // Twilight Hightlands
+                skill_cap = 450;
+            break;
+        case 1:
+            if (entry.zone == 616) // Hidjal
+                skill_cap = 450;
+            else if (entry.zone == 5034) // Uldum
+                skill_cap = 450;
+            break;
+        case 530:
+            skill_cap = 275; // Outland
+            break;
+        case 571:
+            skill_cap = 350; // Northrend
+            break;
         }
+
+        if (skill_now >= skill_cap)
+            return 1;
+        else if (entry.map == 530 || entry.map == 571)
+            return 2;
+        else
+            return 0;
+    }
     return 0;
 }
 
@@ -383,25 +398,26 @@ void Player::GenerateResearchSiteInMap(uint32 mapId)
     if (sResearchSiteSet.empty())
         return;
 
-    std::set<uint32> tempSites;
+    Uint32Set tempSites;
 
     for (std::set<ResearchSiteEntry const*>::const_iterator itr = sResearchSiteSet.begin(); itr != sResearchSiteSet.end(); ++itr)
     {
-        if (!HasResearchSite((*itr)->ID)
-            && (*itr)->mapId == mapId
-            && CanResearchWithLevel((*itr)->POIid)
-            && CanResearchWithSkillLevel((*itr)->POIid))
-            tempSites.insert((*itr)->ID);
+        ResearchSiteEntry const* entry = (*itr);
+        if (!HasResearchSite(entry->ID)
+            && entry->mapId == mapId
+            && CanResearchWithLevel(entry->POIid)
+            && CanResearchWithSkillLevel(entry->POIid))
+            tempSites.insert(entry->ID);
     }
 
     if (tempSites.empty())
         return;
 
-    std::set<uint32>::const_iterator itr = tempSites.begin();
-    std::advance(itr, urand(0, tempSites.size() - 1));
-    m_ResearchSites.insert((*itr));
+    Uint32Set::const_iterator entry = tempSites.begin();
+    std::advance(entry, urand(0, tempSites.size() - 1));
 
-    m_archaeology_changed = true;
+    _researchSites.insert((*entry));
+    _archaeologyChanged = true;
 
     ShowResearchSites();
 }
@@ -411,86 +427,36 @@ void Player::GenerateResearchSites()
     if (sResearchSiteSet.empty())
         return;
 
-    m_ResearchSites.clear();
+    _researchSites.clear();
 
-    typedef std::set<uint32> sites;
-    std::map<uint32, sites> tempSites;
-    uint8 mapMax = 4;
-
+    Sites tempSites;
     for (std::set<ResearchSiteEntry const*>::const_iterator itr = sResearchSiteSet.begin(); itr != sResearchSiteSet.end(); ++itr)
     {
-        if (CanResearchWithLevel((*itr)->POIid) && CanResearchWithSkillLevel((*itr)->POIid))
-        {
-            tempSites[(*itr)->mapId].insert((*itr)->ID);
-        }
+        ResearchSiteEntry const* entry = (*itr);
+        if (CanResearchWithLevel(entry->POIid) && CanResearchWithSkillLevel(entry->POIid))
+            tempSites[entry->mapId].insert(entry->ID);
     }
 
-    mapMax = tempSites[0].size() < 4? tempSites[0].size(): 4;
-
-    for (uint8 i = 0; i < mapMax;)
+    for (uint8 i = 0; i < 4; ++i)
     {
-        std::set<uint32>::const_iterator itr = tempSites[0].begin();
-        std::advance(itr, urand(0, tempSites[0].size() - 1));
-        if (!HasResearchSite((*itr)))
+        uint16 mapId = _mapIds[i];
+        uint8 mapMax = std::min<int>(tempSites[mapId].size(), 4);
+
+        for (uint8 i = 0; i < mapMax;)
         {
-            m_ResearchSites.insert((*itr));
-            ++i;
+            Uint32Set::const_iterator itr = tempSites[mapId].begin();
+            std::advance(itr, urand(0, tempSites[mapId].size() - 1));
+            if (!HasResearchSite((*itr)))
+            {
+                _researchSites.insert((*itr));
+                ++i;
+            }
         }
     }
 
-    mapMax = tempSites[1].size() < 4? tempSites[1].size(): 4;
-    for (uint8 i = 0; i < mapMax;)
-    {
-        std::set<uint32>::const_iterator itr = tempSites[1].begin();
-        std::advance(itr, urand(0, tempSites[1].size() - 1));
-        if (!HasResearchSite((*itr)))
-        {
-            m_ResearchSites.insert((*itr));
-            ++i;
-        }
-    }
-
-    mapMax = tempSites[530].size() < 4? tempSites[530].size(): 4;
-    for (uint8 i = 0; i < mapMax;)
-    {
-        std::set<uint32>::const_iterator itr = tempSites[530].begin();
-        std::advance(itr, urand(0, tempSites[530].size() - 1));
-        if (!HasResearchSite((*itr)))
-        {
-            m_ResearchSites.insert((*itr));
-            ++i;
-        }
-    }
-
-    mapMax = tempSites[571].size() < 4? tempSites[571].size(): 4;
-    for (uint8 i = 0; i < mapMax;)
-    {
-        std::set<uint32>::const_iterator itr = tempSites[571].begin();
-        std::advance(itr, urand(0, tempSites[571].size() - 1));
-        if (!HasResearchSite((*itr)))
-        {
-            m_ResearchSites.insert((*itr));
-            ++i;
-        }
-    }
-
-    m_archaeology_changed = true;
+    _archaeologyChanged = true;
 
     ShowResearchSites();
-}
-
-bool Player::HasResearchSite(uint32 id)
-{
-    if (m_ResearchSites.find(id) != m_ResearchSites.end())
-        return true;
-    return false;
-}
-
-bool Player::HasResearchProject(uint32 id)
-{
-    if (m_ResearchProjects.find(id) != m_ResearchProjects.end())
-        return true;
-    return false;
 }
 
 void Player::GenerateResearchProjects()
@@ -498,133 +464,115 @@ void Player::GenerateResearchProjects()
     if (sResearchProjectSet.empty())
         return;
 
-    uint32 skill_now = GetSkillValue(SKILL_ARCHAEOLOGY);
+    uint16 skill_now = GetSkillValue(SKILL_ARCHAEOLOGY);
     if (!skill_now)
         return;
 
-    m_ResearchProjects.clear();
+    _researchProjects.clear();
 
-    typedef std::set<uint32> projects;
-    std::map<uint32, projects> tempProjects;
+    Sites tempProjects;
+    uint32 chance_mod = skill_now / 50;
 
     for (std::set<ResearchProjectEntry const*>::const_iterator itr = sResearchProjectSet.begin(); itr != sResearchProjectSet.end(); ++itr)
     {
-        uint32 chance_mod =  skill_now / 50;
-        if ((*itr)->rare && urand(0, 100) > chance_mod || IsCompletedProject((*itr)->ID))
+        ResearchProjectEntry const* entry = (*itr);
+        if (entry->rare && urand(0, 100) > chance_mod || IsCompletedProject(entry->ID))
             continue;
-        tempProjects[(*itr)->branchId].insert((*itr)->ID);
+
+        tempProjects[entry->branchId].insert(entry->ID);
     }
 
-    std::set<uint32>::const_iterator itr = tempProjects[1].begin();
-    std::advance(itr, urand(0, tempProjects[1].size() - 1));
-    m_ResearchProjects.insert((*itr));
-    itr = tempProjects[2].begin();
-    std::advance(itr, urand(0, tempProjects[2].size() - 1));
-    m_ResearchProjects.insert((*itr));
-    itr = tempProjects[3].begin();
-    std::advance(itr, urand(0, tempProjects[3].size() - 1));
-    m_ResearchProjects.insert((*itr));
-    itr = tempProjects[4].begin();
-    std::advance(itr, urand(0, tempProjects[4].size() - 1));
-    m_ResearchProjects.insert((*itr));
-    itr = tempProjects[5].begin();
-    std::advance(itr, urand(0, tempProjects[5].size() - 1));
-    m_ResearchProjects.insert((*itr));
-    itr = tempProjects[6].begin();
-    std::advance(itr, urand(0, tempProjects[6].size() - 1));
-    m_ResearchProjects.insert((*itr));
-    itr = tempProjects[7].begin();
-    std::advance(itr, urand(0, tempProjects[7].size() - 1));
-    m_ResearchProjects.insert((*itr));
-    itr = tempProjects[8].begin();
-    std::advance(itr, urand(0, tempProjects[8].size() - 1));
-    m_ResearchProjects.insert((*itr));
-    itr = tempProjects[27].begin();
-    std::advance(itr, urand(0, tempProjects[27].size() - 1));
-    m_ResearchProjects.insert((*itr));
+    Uint32Set::const_iterator itr;
+    for (uint8 i = 1; i < 30; ++i)
+    {
+        itr = tempProjects[i].begin();
+        std::advance(itr, urand(0, tempProjects[i].size() - 1));
+        _researchProjects.insert((*itr));
+    }
 
-    m_archaeology_changed = true;
+    _archaeologyChanged = true;
 
     ShowResearchProjects();
 }
 
 bool Player::SolveResearchProject(uint32 spellId)
 {
-    uint32 skill_now = GetSkillValue(SKILL_ARCHAEOLOGY);
+    uint16 skill_now = GetSkillValue(SKILL_ARCHAEOLOGY);
     if (!skill_now)
         return false;
 
-    ResearchProjectEntry const* rp = NULL;
+    ResearchProjectEntry const* entry = NULL;
     for (std::set<ResearchProjectEntry const*>::const_iterator itr = sResearchProjectSet.begin(); itr != sResearchProjectSet.end(); ++itr)
     {
-        if ((*itr)->spellId == spellId)
-        {
-            rp = (*itr);
-            break;
-        }
+        if ((*itr)->spellId != spellId)
+            continue;
+
+        entry = (*itr);
+        break;
     }
 
-    if (!rp)
-        return false;
-
-    if (!HasResearchProject(rp->ID))
+    if (!entry || !HasResearchProject(entry->ID))
         return false;
 
     for (uint32 i = 0; i < sResearchBranchStore.GetNumRows(); ++i)
     {
-        ResearchBranchEntry const* rb = sResearchBranchStore.LookupEntry(i);
-        if (!rb)
+        ResearchBranchEntry const* branch = sResearchBranchStore.LookupEntry(i);
+        if (!branch)
             continue;
 
-        if (rb->ID == rp->branchId)
-        {
-            if (!HasCurrency(rb->currency, rp->req_currency))
-                return false;
-            ModifyCurrency(rb->currency, -(int32)rp->req_currency);
-            break;
-        }
+        if (branch->ID != entry->branchId)
+            continue;
+
+        if (!HasCurrency(branch->currency, entry->req_currency))
+            return false;
+
+        ModifyCurrency(branch->currency, -int32(entry->req_currency));
+        break;
     }
 
-    m_ResearchProjects.erase(rp->ID);
+    _researchProjects.erase(entry->ID);
 
-    UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHAEOLOGY_PROJECTS, rp->ID, 1);
-    UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHAEOLOGY_PROJECTS, rp->ID, 1);
+    UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHAEOLOGY_PROJECTS, entry->ID, 1);
+    UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHAEOLOGY_PROJECTS, entry->ID, 1);
 
-    if (rp->rare)
-        m_CompletedProjects.insert(rp->ID);
+    if (entry->rare)
+        _completedProjects.insert(entry->ID);
 
-    std::set<uint32> tempProjects;
+    Uint32Set tempProjects;
+    uint32 chance_mod = skill_now / 50;
 
     for (std::set<ResearchProjectEntry const*>::const_iterator itr = sResearchProjectSet.begin(); itr != sResearchProjectSet.end(); ++itr)
     {
-        if ((*itr)->branchId == rp->branchId)
+        ResearchProjectEntry const* project = (*itr);
+        if (project->branchId == entry->branchId)
         {
-            uint32 chance_mod =  skill_now / 50;
-            if ((*itr)->rare && urand(0, 100) > chance_mod || IsCompletedProject((*itr)->ID))
+            if (project->rare && urand(0, 100) > chance_mod || IsCompletedProject(project->ID))
                 continue;
-            tempProjects.insert((*itr)->ID);
+
+            tempProjects.insert(project->ID);
         }
     }
 
-    std::set<uint32>::const_iterator itr = tempProjects.begin();
+    Uint32Set::const_iterator itr = tempProjects.begin();
     std::advance(itr, urand(0, tempProjects.size() - 1));
-    m_ResearchProjects.insert((*itr));
 
-    m_archaeology_changed = true;
+    _researchProjects.insert((*itr));
+    _archaeologyChanged = true;
 
     ShowResearchProjects();
-
     return true;
 }
 
 bool Player::IsCompletedProject(uint32 id)
 {
-    if (!m_CompletedProjects.size())
+    if (_completedProjects.empty())
         return false;
 
-    for (std::set<uint32>::const_iterator itr = m_CompletedProjects.begin(); itr != m_CompletedProjects.end(); ++itr)
+    for (std::set<uint32>::const_iterator itr = _completedProjects.begin(); itr != _completedProjects.end(); ++itr)
+    {
         if (id == (*itr))
             return true;
+    }
 
     return false;
 }
@@ -634,7 +582,7 @@ void Player::SaveArchaeology(SQLTransaction& trans)
     if (!GetSkillValue(SKILL_ARCHAEOLOGY))
         return;
 
-    if (!m_archaeology_changed)
+    if (!_archaeologyChanged)
         return;
 
     trans->PAppend("DELETE FROM character_archaeology WHERE guid = '%u'", GUID_LOPART(GetGUID()));
@@ -645,33 +593,33 @@ void Player::SaveArchaeology(SQLTransaction& trans)
 
     ss << GUID_LOPART(GetGUID()) << ", '";
 
-    for (std::set<uint32>::const_iterator itr = m_ResearchSites.begin(); itr != m_ResearchSites.end(); ++itr)
+    for (std::set<uint32>::const_iterator itr = _researchSites.begin(); itr != _researchSites.end(); ++itr)
         ss << (*itr) << " ";
 
     ss << "', '";
 
     for (uint8 j = 0; j < MAX_RESEARCH_SITES; ++j)
-        ss << (m_digSites[j].count) << " ";
+        ss << (_digSites[j].count) << " ";
 
     ss << "', '";
 
-    for (std::set<uint32>::const_iterator itr = m_ResearchProjects.begin(); itr != m_ResearchProjects.end(); ++itr)
+    for (std::set<uint32>::const_iterator itr = _researchProjects.begin(); itr != _researchProjects.end(); ++itr)
         ss << (*itr) << " ";
 
     ss << "', '";
 
-    for (std::set<uint32>::const_iterator itr = m_CompletedProjects.begin(); itr != m_CompletedProjects.end(); ++itr)
+    for (std::set<uint32>::const_iterator itr = _completedProjects.begin(); itr != _completedProjects.end(); ++itr)
         ss << (*itr) << " ";
 
     ss << "')";
     trans->Append(ss.str().c_str());
-    m_archaeology_changed = false;
+    _archaeologyChanged = false;
 }
 
 void Player::LoadArchaeology(PreparedQueryResult result)
 {
     for (uint8 i = 0; i < MAX_RESEARCH_SITES; ++i)
-        m_digSites[i].count = 0;
+        _digSites[i].count = 0;
 
     if (!result)
         return;
@@ -684,11 +632,11 @@ void Player::LoadArchaeology(PreparedQueryResult result)
         Tokenizer tokens(fields[0].GetCString(), ' ', MAX_RESEARCH_SITES);
         if (tokens.size() != 0 && tokens.size() <= MAX_RESEARCH_SITES)
         {
-            m_ResearchSites.clear();
+            _researchSites.clear();
 
             for (uint8 i = 0; i < tokens.size(); ++i)
             {
-                m_ResearchSites.insert(uint32(atoi(tokens[i])));
+                _researchSites.insert(uint32(atoi(tokens[i])));
             }
         }
         else
@@ -704,7 +652,7 @@ void Player::LoadArchaeology(PreparedQueryResult result)
         if (tokens.size() == MAX_RESEARCH_SITES)
         {
             for (uint8 i = 0; i < MAX_RESEARCH_SITES; ++i)
-                m_digSites[i].count = uint32(atoi(tokens[i]));
+                _digSites[i].count = uint32(atoi(tokens[i]));
         }
     }
 
@@ -714,11 +662,11 @@ void Player::LoadArchaeology(PreparedQueryResult result)
         Tokenizer tokens(fields[2].GetCString(), ' ', MAX_RESEARCH_PROJECTS);
         if (tokens.size() == MAX_RESEARCH_PROJECTS)
         {
-            m_ResearchProjects.clear();
+            _researchProjects.clear();
 
             for (uint8 i = 0; i < MAX_RESEARCH_PROJECTS; ++i)
             {
-                m_ResearchProjects.insert(uint32(atoi(tokens[i])));
+                _researchProjects.insert(uint32(atoi(tokens[i])));
             }
         }
         else
@@ -735,6 +683,6 @@ void Player::LoadArchaeology(PreparedQueryResult result)
             return;
 
         for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
-            m_CompletedProjects.insert(atoi((*itr)));
+            _completedProjects.insert(atoi((*itr)));
     }
 }

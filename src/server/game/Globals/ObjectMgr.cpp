@@ -8889,13 +8889,13 @@ void ObjectMgr::LoadResearchSiteZones()
     {
         Field *fields = result->Fetch();
 
-        ResearchZoneEntry* ptr = new ResearchZoneEntry;
-        ptr->POIid = fields[0].GetUInt32();
-        ptr->x = fields[1].GetInt32();
-        ptr->y = fields[2].GetInt32();
-        ptr->map = fields[3].GetUInt16();
-        ptr->zone = fields[4].GetUInt16();
-        ptr->level = 0;
+        ResearchZoneEntry ptr;
+        ptr.POIid = fields[0].GetUInt32();
+        ptr.x = fields[1].GetInt32();
+        ptr.y = fields[2].GetInt32();
+        ptr.map = fields[3].GetUInt16();
+        ptr.zone = fields[4].GetUInt16();
+        ptr.level = 0;
 
         for (uint32 i = 0; i < sAreaStore.GetNumRows(); ++i)
         {
@@ -8903,13 +8903,13 @@ void ObjectMgr::LoadResearchSiteZones()
             if (!area)
                 continue;
 
-            if (area->mapid == ptr->map && area->zone == ptr->zone)
+            if (area->mapid == ptr.map && area->zone == ptr.zone)
             {
-                ptr->level = area->area_level;
+                ptr.level = area->area_level;
                 break;
             }
         }
-        mResearchZones.push_back(ptr);
+        _researchZones.push_back(ptr);
 
         ++counter;
     }
@@ -8931,17 +8931,18 @@ void ObjectMgr::LoadResearchSiteLoot()
 
     do
     {
-        ResearchLootEntry* dg = new ResearchLootEntry;
+        ResearchLootEntry dg;
+        {
+            Field *fields = result->Fetch();
 
-        Field *fields = result->Fetch();
+            dg.id = fields[0].GetUInt16();
+            dg.x = fields[1].GetFloat();
+            dg.y = fields[2].GetFloat();
+            dg.z = fields[3].GetFloat();
+            dg.race = fields[4].GetUInt8();
+        }
 
-        dg->id = fields[0].GetUInt32();
-        dg->x = fields[1].GetFloat();
-        dg->y = fields[2].GetFloat();
-        dg->z = fields[3].GetFloat();
-        dg->race = fields[4].GetUInt32();
-
-        mResearchLoot.push_back(dg);
+        _researchLoot.push_back(dg);
 
         ++counter;
     }

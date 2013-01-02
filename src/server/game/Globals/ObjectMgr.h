@@ -607,14 +607,14 @@ struct ResearchZoneEntry
     uint32 POIid;
     int32 x;
     int32 y;
-    uint32 map;
-    uint32 zone;
+    uint16 map;
+    uint16 zone;
     uint8 level;
 };
 
 struct ResearchLootEntry
 {
-    uint32 id;
+    uint16 id;
     float x;
     float y;
     float z;
@@ -622,6 +622,12 @@ struct ResearchLootEntry
 };
 
 typedef std::vector<HotfixInfo> HotfixData;
+typedef std::vector<ResearchZoneEntry> ResearchZoneVector;
+typedef std::vector<ResearchLootEntry> ResearchLootVector;
+typedef std::vector<ResearchPOIPoint> ResearchPOIPoints;
+typedef std::map<uint32, ResearchPOIPoints> ResearchPOIPointMap;
+typedef std::set<uint32> Uint32Set;
+typedef std::map<uint32, Uint32Set> Sites;
 
 class PlayerDumpReader;
 
@@ -977,10 +983,9 @@ class ObjectMgr
 
         void LoadResearchSiteZones();
         void LoadResearchSiteLoot();
-        typedef std::vector<ResearchZoneEntry*> ResearchZoneVector;
-        typedef std::vector<ResearchLootEntry*> ResearchLootVector;
-        ResearchZoneVector  mResearchZones;
-        ResearchLootVector mResearchLoot;
+
+        ResearchZoneVector const& GetResearchZones() const { return _researchZones; }
+        ResearchLootVector const& GetResearchLoot() const { return _researchLoot; }
 
         typedef std::map<uint32, uint8> PetScalingAurasMap;
 
@@ -1336,6 +1341,9 @@ class ObjectMgr
         SpellPhaseStore _SpellPhaseStore;
 
         PlayerDeleteInfoStore _playerDeleteInfoStore;
+
+        ResearchZoneVector _researchZones;
+        ResearchLootVector _researchLoot;
 
     private:
         void LoadScripts(ScriptsType type);

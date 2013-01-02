@@ -1318,6 +1318,30 @@ private:
     PlayerTalentInfo(PlayerTalentInfo const&);
 };
 
+struct DigitSite
+{
+    uint8 count;
+    uint16 site_id;
+    uint32 loot_id;
+    float loot_x;
+    float loot_y;
+    float loot_z;
+
+    void clear()
+    {
+        site_id = loot_id = 0;
+        loot_x = loot_y = loot_z = 0.0f;
+        count = 0;
+    }
+
+    bool empty() { return site_id == 0; }
+};
+
+typedef std::set<uint32> Uint32Set;
+typedef std::map<uint32, Uint32Set> Sites;
+typedef std::vector<ResearchPOIPoint> ResearchPOIPoints;
+typedef std::map<uint32, ResearchPOIPoints> ResearchPOIPointMap;
+
 #define SAVE_FOR_SECONDS 120
 
 class Player : public Unit, public GridObject<Player>
@@ -2692,8 +2716,16 @@ class Player : public Unit, public GridObject<Player>
         //-------------------------------------------------
         void SaveArchaeology(SQLTransaction& trans);
         void LoadArchaeology(PreparedQueryResult result);
-        bool HasResearchSite(uint32 id);
-        bool HasResearchProject(uint32 id);
+        bool Player::HasResearchSite(uint32 id) const
+        {
+            return _researchSites.find(id) != _researchSites.end();
+        }
+
+        bool Player::HasResearchProject(uint32 id) const
+        {
+            return _researchProjects.find(id) != _researchProjects.end();
+        }
+
         void ShowResearchSites();
         void ShowResearchProjects();
         void GenerateResearchSites();
@@ -2701,42 +2733,20 @@ class Player : public Unit, public GridObject<Player>
         void GenerateResearchProjects();
         bool SolveResearchProject(uint32 spellId);
         void UseResearchSite(uint32 id);
-        bool IsPointInZone(const ResearchPOIPoint &test, const std::vector<ResearchPOIPoint> &polygon);
-        uint32 GetResearchSiteID();
+        bool IsPointInZone(const ResearchPOIPoint &test, const ResearchPOIPoints &polygon);
+        uint16 GetResearchSiteID();
         uint32 GetSurveyBotEntry(float &orientation);
         bool CanResearchWithLevel(uint32 POIid);
         uint8 CanResearchWithSkillLevel(uint32 POIid);
         ResearchSiteEntry const* GetResearchSiteEntryById(uint32 id);
-        bool GenerateDigitLoot(uint32 zoneid, float &x, float &y, float &z, uint32 &loot_id);
+        bool GenerateDigitLoot(uint16 zoneid, DigitSite &site);
         bool IsCompletedProject(uint32 id);
 
-        struct DigitSite
-        {
-            uint32 site_id;
-            float loot_x;
-            float loot_y;
-            float loot_z;
-            uint32 count;
-            uint32 loot_id;
-
-            void clear()
-            {
-                site_id = 0;
-                loot_x = 0;
-                loot_y = 0;
-                loot_z = 0;
-                loot_id = 0;
-                count = 0;
-            }
-
-            bool empty(){ return !site_id; }
-        };
-
-        DigitSite m_digSites[16];
-        std::set<uint32> m_ResearchSites;
-        std::set<uint32> m_ResearchProjects;
-        std::set<uint32> m_CompletedProjects;
-        bool m_archaeology_changed;
+        DigitSite _digSites[16];
+        Uint32Set _researchSites;
+        Uint32Set _researchProjects;
+        Uint32Set _completedProjects;
+        bool _archaeologyChanged;
 
         // END
 
