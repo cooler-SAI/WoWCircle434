@@ -5623,6 +5623,9 @@ void SpellMgr::LoadDbcDataCorrections()
                     spellInfo->Effects[0].SetRadiusIndex(13);
 
                 break;
+            case 54424: // Fel Intelligence
+                spellInfo->Effects[1].SetRadiusIndex(12);
+                break;
             default:
                 break;
         }
