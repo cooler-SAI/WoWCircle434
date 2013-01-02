@@ -881,7 +881,7 @@ void WorldSession::HandleGuildNewsUpdateStickyOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleGuildSetGuildMaster(WorldPacket& recvPacket)	
 {
     std::string playerName;
-    uint8 nameLength = recvPacket.ReadBits(7);
+    uint8 nameLength = recvPacket.ReadBits(8);
     recvPacket.read(playerName, nameLength);
 
     if (Guild* guild = _GetPlayerGuild(this, true))	

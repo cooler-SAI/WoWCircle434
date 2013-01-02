@@ -101,7 +101,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
         case ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE:
         case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL:
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST:    // only Children's Week achievements
-        case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:                // only Children's Week achievements
+        case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
         case ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS:
         case ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL:
             break;

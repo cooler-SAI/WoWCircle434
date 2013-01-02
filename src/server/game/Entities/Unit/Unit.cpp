@@ -7982,12 +7982,11 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         uint32 procDmg = damage / 2;
                         pPet->SendSpellNonMeleeDamageLog(pPet->getVictim(), procSpell->Id, procDmg, procSpell->GetSchoolMask(), 0, 0, false, 0, false);
                         pPet->DealDamage(pPet->getVictim(), procDmg, NULL, SPELL_DIRECT_DAMAGE, procSpell->GetSchoolMask(), procSpell, true);
-                        break;
+                        return true;
                     }
                     else
                         return false;
-
-                    break;
+                    return true; // Return true because triggered_spell_id is not exist in DBC, nothing to trigger
                 }
                 // Unholy Blight
                 case 49194:
@@ -12710,7 +12709,7 @@ void Unit::UpdateMount()
             if (reqFlags&8 && !(currentMountFlags&8))
                 continue;
 
-            if (HasExtraUnitMovementFlag(MOVEMENTFLAG2_FULL_SPEED_PITCHING))
+            if (m_movementInfo.HavePitch)
             {
                 if (!(reqFlags & MOUNT_FLAG_CAN_PITCH))
                     continue;
