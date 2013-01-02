@@ -868,7 +868,7 @@ Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_rep
 
     m_isActive = true;
 
-    m_runes = NULL;
+    m_runes = new Runes;
 
     m_lastFallTime = 0;
     m_lastFallZ = 0;
@@ -23797,7 +23797,6 @@ void Player::InitRunes()
         return;
 
     m_runes = new Runes;
-
     m_runes->runeState = 0;
 
     for (uint8 i = 0; i < MAX_RUNES; ++i)
