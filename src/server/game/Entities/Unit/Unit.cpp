@@ -6449,7 +6449,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 {
                     if (procSpell->Id == 15407)
                         triggered_spell_id = 87117;
-                    else
+                    else if (!(procFlag & PROC_FLAG_DONE_PERIODIC)) // for holy fire dot
                         triggered_spell_id = 81660;
                     break;
                 }
@@ -6458,7 +6458,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 {
                     if (procSpell->Id == 15407)
                         triggered_spell_id = 87118;
-                    else
+                    else if (!(procFlag & PROC_FLAG_DONE_PERIODIC)) // for holy fire dot
                         triggered_spell_id = 81661;
                     break;
                 }
