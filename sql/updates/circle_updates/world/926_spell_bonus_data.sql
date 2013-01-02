@@ -1,0 +1,1 @@
+INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `comments`) VALUES ('88686', '0.042', 'Priest - Holy Word: Sanctuary');
