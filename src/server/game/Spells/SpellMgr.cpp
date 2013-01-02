@@ -3073,7 +3073,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 99:    // Demoralizing Roar
             case 5857:  // Hellfire Effect
             case 49203: // Hungering Cold
-            case 52212: // Death and Decay
+//             case 52212: // Death and Decay
                 spellInfo->Effects[0].SetRadiusIndex(13);
                 break;
             case 6343: // Thunder Clap (Battle, Defensive Stance)
@@ -5467,10 +5467,6 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ALLY;
                 spellInfo->Effects[EFFECT_0].TargetB = 0;
                 break;
-            // Efflorescence
-            case 81269:
-                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ALLY;
-                break;
             // Relentless Strikes
             case 14179:
             case 58422:
@@ -5609,6 +5605,23 @@ void SpellMgr::LoadDbcDataCorrections()
             // Summon Unbound Flamesparks, Flameseer's Staff, Flamebreaker quest
             case 74723:
                 spellInfo->Effects[EFFECT_0].MiscValue = 40065;
+                break;
+            // alot of aoe spells
+            case 42208: // Blizzard
+            case 42223: // Rain of Fire
+            case 42231: // Hurricane
+            case 52212: // Death and Decay
+            case 81269: // Efflorescence
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(0);
+
+                if (spellInfo->Id == 81269) // Death and Decay
+                    spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ALLY;
+
+                if (spellInfo->Id == 52212) // Efflorescence
+                    spellInfo->Effects[0].SetRadiusIndex(13);
+
                 break;
             default:
                 break;
