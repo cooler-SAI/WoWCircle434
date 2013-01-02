@@ -741,6 +741,9 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 break;
             case 29166: // Innervate
             {
+                if (!caster)
+                    break;
+
                 int32 base_amount = 5;
                 if (caster == GetBase()->GetUnitOwner())
                 {
