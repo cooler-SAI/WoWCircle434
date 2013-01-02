@@ -3160,11 +3160,17 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
         // a possible alternative sollution for those would be validating aura target on unit state change
         if (triggeredByAura && triggeredByAura->IsPeriodic() && !triggeredByAura->GetBase()->IsPassive())
         {
-            SendChannelUpdate(0);
-            triggeredByAura->GetBase()->SetDuration(0);
+            if (result != SPELL_FAILED_BAD_TARGETS)
+            {
+                SendChannelUpdate(0);
+                triggeredByAura->GetBase()->SetDuration(0);
+                SendCastResult(result);
+            }
         }
-
-        SendCastResult(result);
+        else
+        {
+            SendCastResult(result);
+        }
 
         finish(false);
         return;
