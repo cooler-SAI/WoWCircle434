@@ -46,6 +46,7 @@
 #include "ScriptMgr.h"
 #include "SpellScript.h"
 #include "PoolMgr.h"
+#include "DBCStores.h"
 #include "DB2Structure.h"
 #include "DB2Stores.h"
 #include "LFGMgr.h"
@@ -2236,6 +2237,10 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.SoundOverrideSubclass = db2Data->SoundOverrideSubclass;
         itemTemplate.Name1 = sparse->Name;
         itemTemplate.DisplayInfoID = db2Data->DisplayId;
+        {
+            if (!sItemDisplayInfoStore.LookupEntry(itemTemplate.DisplayInfoID))
+                sLog->outError(LOG_FILTER_GENERAL, "LoadItemTemplates: Error while loading item %u from sItemSparseStore - ItemDisplayid (%u) not present in DBC. This may lead to client crash!", itemId, itemTemplate.DisplayInfoID);
+        }
         itemTemplate.Quality = sparse->Quality;
         itemTemplate.Flags = sparse->Flags;
         itemTemplate.Flags2 = sparse->Flags2;
@@ -2388,6 +2393,10 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.SoundOverrideSubclass     = fields[3].GetInt32();
             itemTemplate.Name1                     = fields[4].GetString();
             itemTemplate.DisplayInfoID             = fields[5].GetUInt32();
+            {
+                if (!sItemDisplayInfoStore.LookupEntry(itemTemplate.DisplayInfoID))
+                    sLog->outError(LOG_FILTER_GENERAL, "LoadItemTemplates: Error while loading item %u from item_template - ItemDisplayid (%u) not present in DBC. This may lead to client crash!", itemId, itemTemplate.DisplayInfoID);
+            }
             itemTemplate.Quality                   = uint32(fields[6].GetUInt8());
             itemTemplate.Flags                     = uint32(fields[7].GetInt64());
             itemTemplate.Flags2                    = fields[8].GetUInt32();
@@ -5573,12 +5582,11 @@ WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float
     //     then check faction
     //   if mapId != graveyard.mapId (ghost in instance) and search any graveyard associated
     //     then check faction
-    GraveYardContainer::const_iterator graveLow  = GraveYardStore.lower_bound(zoneId);
-    GraveYardContainer::const_iterator graveUp   = GraveYardStore.upper_bound(zoneId);
+    GraveYardMapBounds range = GraveYardStore.equal_range(zoneId);
     MapEntry const* map = sMapStore.LookupEntry(MapId);
-    // not need to check validity of map object; MapId _MUST_ be valid here
 
-    if (graveLow == graveUp && !map->IsBattleArena())
+    // not need to check validity of map object; MapId _MUST_ be valid here
+    if (range.first == range.second && !map->IsBattleArena())
     {
         sLog->outError(LOG_FILTER_SQL, "Table `game_graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.", zoneId, team);
         return GetDefaultGraveYard(team);
@@ -5599,9 +5607,9 @@ WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float
 
     MapEntry const* mapEntry = sMapStore.LookupEntry(MapId);
 
-    for (GraveYardContainer::const_iterator itr = graveLow; itr != graveUp; ++itr)
+    for (; range.first != range.second; ++range.first)
     {
-        GraveYardData const& data = itr->second;
+        GraveYardData const& data = range.first->second;
 
         WorldSafeLocsEntry const* entry = sWorldSafeLocsStore.LookupEntry(data.safeLocId);
         if (!entry)
@@ -5679,15 +5687,13 @@ WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float
 
 GraveYardData const* ObjectMgr::FindGraveYardData(uint32 id, uint32 zoneId)
 {
-    GraveYardContainer::const_iterator graveLow  = GraveYardStore.lower_bound(zoneId);
-    GraveYardContainer::const_iterator graveUp   = GraveYardStore.upper_bound(zoneId);
-
-    for (GraveYardContainer::const_iterator itr = graveLow; itr != graveUp; ++itr)
+    GraveYardMapBounds range = GraveYardStore.equal_range(zoneId);
+    for (; range.first != range.second; ++range.first)
     {
-        if (itr->second.safeLocId == id)
-            return &itr->second;
+        GraveYardData const& data = range.first->second;
+        if (data.safeLocId == id)
+            return &data;
     }
-
     return NULL;
 }
 
@@ -5720,21 +5726,17 @@ bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, uint32 team, bool per
 
 void ObjectMgr::RemoveGraveYardLink(uint32 id, uint32 zoneId, uint32 team, bool persist /*= false*/)
 {
-    GraveYardContainer::iterator graveLow  = GraveYardStore.lower_bound(zoneId);
-    GraveYardContainer::iterator graveUp   = GraveYardStore.upper_bound(zoneId);
-    if (graveLow == graveUp)
+    GraveYardMapBoundsNonConst range = GraveYardStore.equal_range(zoneId);
+    if (range.first == range.second)
     {
         //sLog->outError(LOG_FILTER_SQL, "Table `game_graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.", zoneId, team);
         return;
     }
 
     bool found = false;
-
-    GraveYardContainer::iterator itr;
-
-    for (itr = graveLow; itr != graveUp; ++itr)
+    for (; range.first != range.second; ++range.first)
     {
-        GraveYardData & data = itr->second;
+        GraveYardData & data = range.first->second;
 
         // skip not matching safezone id
         if (data.safeLocId != id)
@@ -5754,7 +5756,7 @@ void ObjectMgr::RemoveGraveYardLink(uint32 id, uint32 zoneId, uint32 team, bool 
         return;
 
     // remove from links
-    GraveYardStore.erase(itr);
+    GraveYardStore.erase(range.first);
 
     // remove link from DB
     if (persist)
@@ -8929,15 +8931,16 @@ void ObjectMgr::LoadResearchSiteLoot()
 
     do
     {
-        Field *fields = result->Fetch();
-
         ResearchLootEntry* dg = new ResearchLootEntry;
+
+        Field *fields = result->Fetch();
 
         dg->id = fields[0].GetUInt32();
         dg->x = fields[1].GetFloat();
         dg->y = fields[2].GetFloat();
         dg->z = fields[3].GetFloat();
         dg->race = fields[4].GetUInt32();
+
         mResearchLoot.push_back(dg);
 
         ++counter;

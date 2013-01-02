@@ -1946,31 +1946,28 @@ InstanceGroupBind* Group::GetBoundInstance(Map* aMap)
     if (aMap->IsRaid())
         difficulty = REGULAR_DIFFICULTY;
 
-    // some instances only have one difficulty
-    GetDownscaledMapDifficultyData(aMap->GetId(), difficulty);
-
-    BoundInstancesMap::iterator itr = m_boundInstances[difficulty].find(aMap->GetId());
-    if (itr != m_boundInstances[difficulty].end())
-        return &itr->second;
-    else
-        return NULL;
+    return GetBoundInstance(difficulty, aMap->GetId());
 }
 
 InstanceGroupBind* Group::GetBoundInstance(MapEntry const* mapEntry)
 {
-    if (!mapEntry)
+    if (!mapEntry || !mapEntry->IsDungeon())
         return NULL;
 
     Difficulty difficulty = GetDifficulty(mapEntry->IsRaid());
-
     // Raids have only one save
     if (mapEntry->IsRaid())
         difficulty = REGULAR_DIFFICULTY;
 
-    // some instances only have one difficulty
-    GetDownscaledMapDifficultyData(mapEntry->MapID, difficulty);
+    return GetBoundInstance(difficulty, mapEntry->MapID);
+}
 
-    BoundInstancesMap::iterator itr = m_boundInstances[difficulty].find(mapEntry->MapID);
+InstanceGroupBind* Group::GetBoundInstance(Difficulty difficulty, uint32 mapId)
+{
+    // some instances only have one difficulty
+    GetDownscaledMapDifficultyData(mapId, difficulty);
+
+    BoundInstancesMap::iterator itr = m_boundInstances[difficulty].find(mapId);
     if (itr != m_boundInstances[difficulty].end())
         return &itr->second;
     else

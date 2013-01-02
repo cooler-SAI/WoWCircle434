@@ -842,12 +842,16 @@ void Spell::SelectEffectImplicitTargets(SpellEffIndex effIndex, SpellImplicitTar
                 return;
             // choose which targets we can select at once
             for (uint32 j = effIndex + 1; j < MAX_SPELL_EFFECTS; ++j)
-                if (GetSpellInfo()->IsRequireAdditionalTargetCheck() && GetSpellInfo()->Effects[effIndex].TargetA.GetTarget() == GetSpellInfo()->Effects[j].TargetA.GetTarget() &&
-                    GetSpellInfo()->Effects[effIndex].TargetB.GetTarget() == GetSpellInfo()->Effects[j].TargetB.GetTarget() &&
-                    GetSpellInfo()->Effects[effIndex].ImplicitTargetConditions == GetSpellInfo()->Effects[j].ImplicitTargetConditions &&
-                    GetSpellInfo()->Effects[effIndex].CalcRadius(m_caster, NULL, false) == GetSpellInfo()->Effects[j].CalcRadius(m_caster, NULL, false) &&
-                    GetSpellInfo()->Effects[effIndex].CalcRadius(m_caster, NULL, true) == GetSpellInfo()->Effects[j].CalcRadius(m_caster, NULL, true))
+            {
+                SpellEffectInfo const* effects = GetSpellInfo()->Effects;
+                if (GetSpellInfo()->IsRequireAdditionalTargetCheck() && effects[effIndex].TargetA.GetTarget() == effects[j].TargetA.GetTarget() &&
+                    effects[effIndex].TargetB.GetTarget() == effects[j].TargetB.GetTarget() &&
+                    effects[effIndex].ImplicitTargetConditions == effects[j].ImplicitTargetConditions &&
+                    effects[effIndex].CalcRadius(m_caster, NULL, false) == effects[j].CalcRadius(m_caster, NULL, false) &&
+                    effects[effIndex].CalcRadius(m_caster, NULL, true) == effects[j].CalcRadius(m_caster, NULL, true))
+
                     effectMask |= 1 << j;
+            }
             processedEffectMask |= effectMask;
             break;
         default:
@@ -5650,7 +5654,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
                 break;
             }
-            case SPELL_EFFECT_SUMMON_DEAD_PET:
+            case SPELL_EFFECT_RESURRECT_PET:
             {
                 Creature* pet = m_caster->GetGuardianPet();
 

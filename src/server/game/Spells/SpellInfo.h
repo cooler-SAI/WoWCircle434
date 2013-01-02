@@ -471,7 +471,7 @@ public:
     bool IsPeriodic() const;
 
     bool IsAffectedBySpellMods() const;
-    bool IsAffectedBySpellMod(SpellModifier* mod) const;
+    bool IsAffectedBySpellMod(SpellModifier const* mod) const;
 
     bool CanPierceImmuneAura(SpellInfo const* aura) const;
     bool CanDispelAura(SpellInfo const* aura) const;
@@ -526,7 +526,7 @@ public:
     uint32 CalcCastTime(Unit* caster = NULL, Spell* spell = NULL) const;
     uint32 GetRecoveryTime() const;
 
-    uint32 CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) const;
+    int32 CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) const;
 
     bool IsRanked() const;
     uint8 GetRank() const;
