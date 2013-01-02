@@ -3353,10 +3353,9 @@ void Guild::GiveXP(uint32 xp, Player* source)
                     player->learnSpell(perksToLearn[i], true);
             }
         }
-    }
 
-        AddGuildNews(GUILD_NEWS_LEVEL_UP, 0, 0, _level);
-        UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_GUILD_LEVEL, GetLevel(), 0, 0, NULL, source);
+        GetNewsLog().AddNewEvent(GUILD_NEWS_LEVEL_UP, time(NULL), 0, 0, _level);
+        GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_GUILD_LEVEL, GetLevel(), 0, 0, NULL, source);
 
         ++oldLevel;
     }
