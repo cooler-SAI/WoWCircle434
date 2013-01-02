@@ -124,15 +124,9 @@ void GuildFinderMgr::AddMembershipRequest(uint32 guildGuid, MembershipRequest co
     _membershipRequests[guildGuid].push_back(request);
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_GUILD_FINDER_APPLICANT);
-    stmt->setUInt32(0, request.GetGuildId());
-    stmt->setUInt32(1, request.GetPlayerGUID());
-    stmt->setUInt8(2, request.GetAvailability());
-    stmt->setUInt8(3, request.GetClassRoles());
-    stmt->setUInt8(4, request.GetInterests());
-    stmt->setString(5, request.GetComment());
-    stmt->setUInt32(6, request.GetSubmitTime());
-    trans->Append(stmt);
+
+    trans->PAppend("REPLACE INTO guild_finder_applicant (guildId, playerGuid, availability, classRole, interests, comment, submitTime) VALUES('%u', '%u', '%u', '%u', '%u', '%s', '%u')", request.GetGuildId(), request.GetPlayerGUID(), request.GetAvailability(), request.GetClassRoles(), request.GetInterests(), request.GetComment().c_str(), request.GetSubmitTime());
+
     CharacterDatabase.CommitTransaction(trans);
 
     // Notify the applicant his submittion has been added
@@ -158,10 +152,7 @@ void GuildFinderMgr::RemoveAllMembershipRequestsFromPlayer(uint32 playerId)
 
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_FINDER_APPLICANT);
-        stmt->setUInt32(0, itr2->GetGuildId());
-        stmt->setUInt32(1, itr2->GetPlayerGUID());
-        trans->Append(stmt);
+        trans->PAppend("DELETE FROM guild_finder_applicant WHERE guildId = '%u' AND playerGuid = '%u'", itr2->GetGuildId(), itr2->GetPlayerGUID());
 
         CharacterDatabase.CommitTransaction(trans);
         itr->second.erase(itr2);
@@ -184,10 +175,7 @@ void GuildFinderMgr::RemoveMembershipRequest(uint32 playerId, uint32 guildId)
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_FINDER_APPLICANT);
-    stmt->setUInt32(0, itr->GetGuildId());
-    stmt->setUInt32(1, itr->GetPlayerGUID());
-    trans->Append(stmt);
+    trans->PAppend("DELETE FROM guild_finder_applicant WHERE guildId = '%u' AND playerGuid = '%u'", itr->GetGuildId(), itr->GetPlayerGUID());
 
     CharacterDatabase.CommitTransaction(trans);
 
@@ -278,15 +266,7 @@ void GuildFinderMgr::SetGuildSettings(uint32 guildGuid, LFGuildSettings const& s
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_GUILD_FINDER_GUILD_SETTINGS);
-    stmt->setUInt32(0, settings.GetGUID());
-    stmt->setUInt8(1, settings.GetAvailability());
-    stmt->setUInt8(2, settings.GetClassRoles());
-    stmt->setUInt8(3, settings.GetInterests());
-    stmt->setUInt8(4, settings.GetLevel());
-    stmt->setUInt8(5, settings.IsListed());
-    stmt->setString(6, settings.GetComment());
-    trans->Append(stmt);
+    trans->PAppend("REPLACE INTO guild_finder_guild_settings (guildId, availability, classRoles, interests, level, listed, comment) VALUES('%u', '%u', '%u', '%u', '%u', '%u', '%s')", settings.GetGUID(), settings.GetAvailability(), settings.GetClassRoles(), settings.GetInterests(), settings.GetLevel(), settings.IsListed(), settings.GetComment().c_str());
 
     CharacterDatabase.CommitTransaction(trans);
 }
@@ -300,14 +280,8 @@ void GuildFinderMgr::DeleteGuild(uint32 guildId)
 
         uint32 applicant = itr->GetPlayerGUID();
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_FINDER_APPLICANT);
-        stmt->setUInt32(0, itr->GetGuildId());
-        stmt->setUInt32(1, applicant);
-        trans->Append(stmt);
-
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_FINDER_GUILD_SETTINGS);
-        stmt->setUInt32(0, itr->GetGuildId());
-        trans->Append(stmt);
+        trans->PAppend("DELETE FROM guild_finder_applicant WHERE guildId = '%u' AND playerGuid = '%u'", itr->GetGuildId(), applicant);
+        trans->PAppend("DELETE FROM guild_finder_guild_settings WHERE guildId = '%u'", itr->GetGuildId());
 
         CharacterDatabase.CommitTransaction(trans);
         _membershipRequests[guildId].erase(itr);

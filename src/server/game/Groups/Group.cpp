@@ -192,7 +192,7 @@ void Group::LoadMemberFromDB(uint32 guidLow, uint8 memberFlags, uint8 subgroup, 
     // skip non-existed member
     if (!sObjectMgr->GetPlayerNameByGUID(member.guid, member.name))
     {
-        CharacterDatabase.PQuery("DELETE FROM group_member WHERE memberGuid=%u", guidLow);
+        CharacterDatabase.PQuery("DELETE FROM group_member WHERE memberGuid='%u'", guidLow);
         return;
     }
 
@@ -248,7 +248,7 @@ void Group::ConvertToGroup()
     }
 
     if (!isBGGroup() && !isBFGroup())
-        CharacterDatabase.PExecute("UPDATE groups SET groupType = ? WHERE guid = ?", uint8(m_groupType), m_dbStoreId);
+        CharacterDatabase.PExecute("UPDATE groups SET groupType = '%u' WHERE guid = '%u'", uint8(m_groupType), m_dbStoreId);
 
     SendUpdate();
 
@@ -717,16 +717,15 @@ void Group::Disband(bool hideDestroy /* = false */)
     if (!isBGGroup() && !isBFGroup())
     {
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
-        trans->PAppend("DELETE FROM groups WHERE guid = %u", m_dbStoreId); 	
-        trans->PAppend("DELETE FROM group_member WHERE guid = %u", m_dbStoreId);
-        CharacterDatabase.CommitTransaction(trans);
+        trans->PAppend("DELETE FROM groups WHERE guid = '%u'", m_dbStoreId); 	
+        trans->PAppend("DELETE FROM group_member WHERE guid = '%u'", m_dbStoreId);
 
         ResetInstances(INSTANCE_RESET_GROUP_DISBAND, false, NULL);
         ResetInstances(INSTANCE_RESET_GROUP_DISBAND, true, NULL);
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_LFG_DATA);
-        stmt->setUInt32(0, m_dbStoreId);
-        CharacterDatabase.Execute(stmt);
+        trans->PAppend("DELETE FROM lfg_data WHERE guid = '%u'", m_dbStoreId);
+
+        CharacterDatabase.CommitTransaction(trans);
 
         sGroupMgr->FreeGroupDbStoreId(this);
     }

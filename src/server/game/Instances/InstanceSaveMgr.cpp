@@ -180,14 +180,7 @@ void InstanceSave::SaveToDB()
         }
     }
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_INSTANCE_SAVE);
-    stmt->setUInt32(0, m_instanceid);
-    stmt->setUInt16(1, GetMapId());
-    stmt->setUInt32(2, uint32(GetResetTimeForDB()));
-    stmt->setUInt8(3, uint8(GetDifficulty()));
-    stmt->setUInt32(4, completedEncounters);
-    stmt->setString(5, data);
-    CharacterDatabase.Execute(stmt);
+    CharacterDatabase.PExecute("INSERT INTO instance (id, map, resettime, difficulty, completedEncounters, data) VALUES ('%u', '%u', '%u', '%u', '%u', '%s')", m_instanceid, GetMapId(), uint32(GetResetTimeForDB()), uint8(GetDifficulty()), completedEncounters, data.c_str());
 }
 
 time_t InstanceSave::GetResetTimeForDB()
@@ -313,7 +306,8 @@ void InstanceSaveManager::LoadResetTimes()
         while (result->NextRow());
 
         // update reset time for normal instances with the max creature respawn time + X hours
-        if (PreparedQueryResult result2 = CharacterDatabase.Query(CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAX_CREATURE_RESPAWNS)))
+        QueryResult result2 = CharacterDatabase.Query("SELECT MAX(respawnTime), instanceId FROM creature_respawn WHERE instanceId > 0 GROUP BY instanceId");
+        if (result2)
         {
             do
             {

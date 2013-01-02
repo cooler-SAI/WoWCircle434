@@ -7254,31 +7254,14 @@ void Player::_SaveCurrency(SQLTransaction& trans)
     PreparedStatement* stmt = NULL;
     for (PlayerCurrenciesMap::iterator itr = _currencyStorage.begin(); itr != _currencyStorage.end(); ++itr)
     {
-        CurrencyTypesEntry const* entry = sCurrencyTypesStore.LookupEntry(itr->first);
-        if (!entry) // should never happen
+        if (!sCurrencyTypesStore.LookupEntry(itr->first)) // should never happen
             continue;
 
         switch(itr->second.state)
         {
             case PLAYERCURRENCY_NEW:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_PLAYER_CURRENCY);
-                stmt->setUInt32(0, GetGUIDLow());
-                stmt->setUInt16(1, itr->first);
-                stmt->setUInt32(2, itr->second.weekCount);
-                stmt->setUInt32(3, itr->second.totalCount);
-                stmt->setUInt32(4, itr->second.seasonCount);
-                stmt->setUInt8(5, itr->second.flags);
-                trans->Append(stmt);
-                break;
             case PLAYERCURRENCY_CHANGED:
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PLAYER_CURRENCY);
-                stmt->setUInt32(0, itr->second.weekCount);
-                stmt->setUInt32(1, itr->second.totalCount);
-                stmt->setUInt32(2, itr->second.seasonCount);
-                stmt->setUInt8(3, itr->second.flags);
-                stmt->setUInt32(4, GetGUIDLow());
-                stmt->setUInt16(5, itr->first);
-                trans->Append(stmt);
+                trans->PAppend("REPLACE INTO character_currency (guid, currency, week_count, total_count, season_count, flags) VALUES ('%u', '%u', '%u', '%u', '%u', '%u')", GetGUIDLow(), itr->first, itr->second.weekCount, itr->second.totalCount, itr->second.seasonCount, itr->second.flags);
                 break;
             default:
                 break;
@@ -18957,54 +18940,30 @@ void Player::_SaveInventory(SQLTransaction& trans)
 
 void Player::_SaveVoidStorage(SQLTransaction& trans)
 {
-    PreparedStatement* stmt = NULL;
     uint32 lowGuid = GetGUIDLow();
 
     for (uint8 i = 0; i < VOID_STORAGE_MAX_SLOT; ++i)
     {
         if (!_voidStorageItems[i]) // unused item
-        {
-            // DELETE FROM void_storage WHERE slot = ? AND playerGuid = ?
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_VOID_STORAGE_ITEM_BY_SLOT);
-            stmt->setUInt8(0, i);
-            stmt->setUInt32(1, lowGuid);
-        }
+            trans->PAppend("DELETE FROM character_void_storage WHERE slot = '%u' AND playerGuid = '%u'", i, lowGuid);
         else
-        {
-            // REPLACE INTO character_inventory (itemId, playerGuid, itemEntry, slot, creatorGuid) VALUES (?, ?, ?, ?, ?)
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_VOID_STORAGE_ITEM);
-            stmt->setUInt64(0, _voidStorageItems[i]->ItemId);
-            stmt->setUInt32(1, lowGuid);
-            stmt->setUInt32(2, _voidStorageItems[i]->ItemEntry);
-            stmt->setUInt8(3, i);
-            stmt->setUInt32(4, _voidStorageItems[i]->CreatorGuid);
-            stmt->setUInt32(5, _voidStorageItems[i]->ItemRandomPropertyId);
-            stmt->setUInt32(6, _voidStorageItems[i]->ItemSuffixFactor);
-        }
-
-        trans->Append(stmt);
+            trans->PAppend("REPLACE INTO character_void_storage (itemId, playerGuid, itemEntry, slot, creatorGuid, randomProperty, suffixFactor) VALUES ('" UI64FMTD "', '%u', '%u', '%u', '%u', '%u', '%u')", _voidStorageItems[i]->ItemId, lowGuid, _voidStorageItems[i]->ItemEntry, i, _voidStorageItems[i]->CreatorGuid, _voidStorageItems[i]->ItemRandomPropertyId, _voidStorageItems[i]->ItemSuffixFactor);
     }
 }
 
 
 void Player::_SaveCUFProfiles(SQLTransaction& trans)
 {
-    PreparedStatement* stmt = NULL;
     uint32 lowGuid = GetGUIDLow();
 
     for (uint8 i = 0; i < MAX_CUF_PROFILES; ++i)
     {
         if (!_CUFProfiles[i]) // unused profile
-        {
-            // DELETE FROM character_cuf_profiles WHERE guid = ? and id = ?
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_CUF_PROFILES);
-            stmt->setUInt32(0, lowGuid);
-            stmt->setUInt8(1, i);
-        }
+            trans->PAppend("DELETE FROM character_cuf_profiles WHERE guid = '%u' and id = '%u'", lowGuid, i);
         else
         {
             // REPLACE INTO character_cuf_profiles (guid, id, name, frameHeight, frameWidth, sortBy, healthText, boolOptions, unk146, unk147, unk148, unk150, unk152, unk154) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_CUF_PROFILES);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_CUF_PROFILES);
             stmt->setUInt32(0, lowGuid);
             stmt->setUInt8(1, i);
             stmt->setString(2, _CUFProfiles[i]->ProfileName);
@@ -19019,9 +18978,9 @@ void Player::_SaveCUFProfiles(SQLTransaction& trans)
             stmt->setUInt16(11, _CUFProfiles[i]->Unk150);
             stmt->setUInt16(12, _CUFProfiles[i]->Unk152);
             stmt->setUInt16(13, _CUFProfiles[i]->Unk154);
-        }
 
-        trans->Append(stmt);
+            trans->Append(stmt);
+        }
     }
 }
 
@@ -19029,8 +18988,6 @@ void Player::_SaveMail(SQLTransaction& trans)
 {
     if (!m_mailsLoaded)
         return;
-
-    PreparedStatement* stmt = NULL;
 
     for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
     {
@@ -20284,10 +20241,7 @@ void Player::RemovePetitionsAndSigns(uint64 guid)
 
 void Player::LeaveAllArenaTeams(uint64 guid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PLAYER_ARENA_TEAMS);
-    stmt->setUInt32(0, GUID_LOPART(guid));
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
+    QueryResult result = CharacterDatabase.PQuery("SELECT arena_team_member.arenaTeamId FROM arena_team_member JOIN arena_team ON arena_team_member.arenaTeamId = arena_team.arenaTeamId WHERE guid = '%u'", GUID_LOPART(guid));
     if (!result)
         return;
 
@@ -25382,6 +25336,7 @@ void Player::ActivateSpec(uint8 spec)
         stmt->setUInt32(0, GetGUIDLow());
         stmt->setUInt8(1, GetActiveSpec());
         if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+        if (result)
             _LoadActions(result);
     }
 
@@ -26305,31 +26260,15 @@ void Player::SetMaxPersonalArenaRating(uint32 value)
 {
     _maxPersonalArenaRate = value;
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
-    PreparedStatement* stmt = NULL;
     if (!IsHaveCap())
     {
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_CURRENCY_CAP);
-        stmt->setUInt32(0, GetGUIDLow());
-        stmt->setUInt16(1, _maxPersonalArenaRate);
-        stmt->setUInt16(2, 0);
-        stmt->setUInt16(3, DEFAULT_ARENA_CAP);
-        stmt->setUInt16(4, 0);
-        stmt->setUInt8(5, 1);
-        trans->Append(stmt);
+        trans->PAppend("INSERT INTO character_currency_cap (guid, highestArenaRating, highestRBgRating, currentArenaCap, currentRBgCap, requireReset) VALUES ('%u', '%u', '0', '%u', '0', '1')", GetGUIDLow(), _maxPersonalArenaRate, DEFAULT_ARENA_CAP);
         sCurrencyMgr->AddCurrencyCapData(GetGUIDLow(), _maxPersonalArenaRate, 0, DEFAULT_ARENA_CAP, 0, 1);
         m_currencyCap = sCurrencyMgr->getCurrencyCapData(GetGUIDLow());
     }
     else
-    {
-        m_currencyCap->highestArenaRating = _maxPersonalArenaRate;
-        m_currencyCap->requireReset = 1;
-        trans = CharacterDatabase.BeginTransaction();
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PLAYER_CURRENCY_CAP_RESET);
-        stmt->setUInt16(0, m_currencyCap->highestArenaRating);
-        stmt->setUInt16(1, 0);
-        stmt->setUInt32(2, GetGUIDLow());
-        trans->Append(stmt);
-    }
+        trans->PAppend("UPDATE character_currency_cap SET highestArenaRating = '%u', highestRBgRating = '0', requireReset = '1' WHERE guid = '%u'", m_currencyCap->highestArenaRating, GetGUIDLow());
+
     CharacterDatabase.CommitTransaction(trans);
 }
 

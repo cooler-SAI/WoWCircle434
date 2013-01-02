@@ -433,16 +433,8 @@ void Player::ResetCurrencyWeekCap(SQLTransaction* trans /* = NULL */)
     // we need it after rated bg implementation
     //sCurrencyMgr->CalculatingCurrencyCap(m_currencyCap->currentRBgCap, true);
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CURRENCY_WEEK_CAP);
-    stmt->setUInt16(0, m_currencyCap->currentArenaCap); // currentArenaCap
-    stmt->setUInt16(1, 0);                              // currentRBgCap
-    stmt->setUInt8(2, 0);                               // requireReset
-    stmt->setUInt16(3, 0);                              // highestArenaRating
-    stmt->setUInt16(4, 0);                              // highestRBgRating
-    stmt->setUInt32(5, GetGUIDLow());                   // guid
-
     if (trans && !trans->null())
-        (*trans)->Append(stmt);
+        (*trans)->PAppend("UPDATE character_currency_cap SET currentArenaCap = '%u', currentRBgCap = '0', requireReset = '0', highestArenaRating = '0', highestRBgRating = '0' where guid = '%u'", m_currencyCap->currentArenaCap, GetGUIDLow());
 }
 
 void Player::SendPvpRewards()
@@ -480,8 +472,7 @@ void CurrencyMgr::AddCurrencyCapData(uint32 lowGuid, uint16 arenaRating /* = 0 *
 
 void CurrencyMgr::LoadPlayersCurrencyCap()
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CURRENCY_CAP);
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+    QueryResult result = CharacterDatabase.PQuery("SELECT highestArenaRating, highestRBgRating, currentArenaCap, currentRBgCap, requireReset FROM character_currency_cap ORDER BY guid");
     if (!result)
     {
         sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 players who have any currency cap data. DB table `character_currency_cap` is empty!");
@@ -513,10 +504,7 @@ void CurrencyMgr::LoadPlayersCurrencyCap()
 
 bool CurrencyMgr::CheckIfNeedRestore()
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CURRENCY_RESTORE_DATA);
-    stmt->setUInt8(0, 0);
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
+    QueryResult result = CharacterDatabase.PQuery("SELECT lastguid FROM currency_reset_save WHERE id = '0'");
     if (!result)
         return false;
 
@@ -548,15 +536,7 @@ void CurrencyMgr::RestoreResettingCap()
 
         sCurrencyMgr->CalculatingCurrencyCap(second.highestArenaRating);
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CURRENCY_WEEK_CAP);
-        stmt->setUInt16(0, second.highestArenaRating); // currentArenaCap
-        stmt->setUInt16(1, 0);                         // currentRBgCap
-        stmt->setUInt8(2, 0);                          // requireReset
-        stmt->setUInt16(3, 0);                         // highestArenaRating
-        stmt->setUInt16(4, 0);                         // highestRBgRating
-        stmt->setUInt32(5, itr->first);                // guid
-
-        trans->Append(stmt);
+        trans->PAppend("UPDATE character_currency_cap SET currentArenaCap = '%u', currentRBgCap = '0', requireReset = '0', highestArenaRating = '0', highestRBgRating = '0' where guid = '%u'", second.highestArenaRating, itr->first);
     }
 
     CharacterDatabase.CommitTransaction(trans);
@@ -596,19 +576,12 @@ void CurrencyMgr::setLastGuid(uint32 lowGuid, bool save)
 {
     lastGuid = lowGuid;
     if (save)
-    {
-        PreparedStatement *stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_CURRENCY_CAP_PROGRESS);
-        stmt->setUInt8(0, 1);
-        stmt->setUInt32(1, lastGuid);
-        CharacterDatabase.Execute(stmt);
-    }
+        CharacterDatabase.PExecute("REPLACE INTO currency_reset_save (id, lastguid) VALUES ('1', '%u')", lastGuid);
 }
 
 void CurrencyMgr::DeleteRestoreData()
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_CURRENCY_CAP_PROGRESS);
-    stmt->setUInt8(0, 1);
-    CharacterDatabase.Execute(stmt);
+    CharacterDatabase.PExecute("DELETE FROM currency_reset_save WHERE id = '1'");
 }
 
 void CurrencyMgr::UpdateEvents(uint32 diff)
@@ -658,15 +631,7 @@ bool CapResetEvent::Execute(uint64 e_time, uint32 p_time)
             // We need it after rated bg implementation
             //sCurrencyMgr->CalculatingCurrencyCap(itr->second.highestRBgRating, true);
 
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CURRENCY_WEEK_CAP);
-            stmt->setUInt16(0, second.highestArenaRating); // currentArenaCap
-            stmt->setUInt16(1, 0);                         // currentRBgCap
-            stmt->setUInt8(2, 0);                          // requireReset
-            stmt->setUInt16(3, 0);                         // highestArenaRating
-            stmt->setUInt16(4, 0);                         // highestRBgRating
-            stmt->setUInt32(5, itr->first);                // guid
-
-            trans->Append(stmt);
+            trans->PAppend("UPDATE character_currency_cap SET currentArenaCap = '%u', currentRBgCap = '0', requireReset = '0', highestArenaRating = '0', highestRBgRating = '0' where guid = '%u'", second.highestArenaRating, itr->first);
         }
 
         if (count > numberInPart)

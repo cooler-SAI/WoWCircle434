@@ -455,12 +455,13 @@ bool Item::LoadFromDB(uint32 guid, uint64 owner_guid, Field* fields, uint32 entr
 
     if (need_save)                                           // normal item changed state set not work at loading
     {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_INSTANCE_ON_LOAD);
-        stmt->setUInt32(0, GetUInt32Value(ITEM_FIELD_DURATION));
-        stmt->setUInt32(1, GetUInt32Value(ITEM_FIELD_FLAGS));
-        stmt->setUInt32(2, GetUInt32Value(ITEM_FIELD_DURABILITY));
-        stmt->setUInt32(3, guid);
-        CharacterDatabase.Execute(stmt);
+        std::ostringstream ss;
+        ss << "UPDATE item_instance SET duration = " << GetUInt32Value(ITEM_FIELD_DURABILITY)
+            << ", flags = " << GetUInt32Value(ITEM_FIELD_FLAGS)
+            << ", durability = " << GetUInt32Value(ITEM_FIELD_DURABILITY)
+            << " WHERE guid = " << guid;
+
+        CharacterDatabase.Execute(ss.str().c_str());
     }
 
     return true;
@@ -1139,9 +1140,8 @@ void Item::ClearSoulboundTradeable(Player* currentOwner)
 
     allowedGUIDs.clear();
     SetState(ITEM_CHANGED, currentOwner);
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_BOP_TRADE);
-    stmt->setUInt32(0, GetGUIDLow());
-    CharacterDatabase.Execute(stmt);
+
+    CharacterDatabase.PExecute("DELETE FROM item_soulbound_trade_data WHERE itemGuid = '%u' LIMIT 1", GetGUIDLow());
 }
 
 bool Item::CheckSoulboundTradeExpire()

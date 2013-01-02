@@ -115,11 +115,7 @@ void MailDraft::deleteIncludedItems(SQLTransaction& trans, bool inDB /*= false*/
         Item* item = mailItemIter->second;
 
         if (inDB)
-        {
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-            stmt->setUInt32(0, item->GetGUIDLow());
-            trans->Append(stmt);
-        }
+            trans->PAppend("DELETE FROM item_instance WHERE guid = '%u'", item->GetGUIDLow());
 
         delete item;
     }
@@ -155,10 +151,7 @@ void MailDraft::SendReturnToSender(uint32 sender_acc, uint32 sender_guid, uint32
             Item* item = mailItemIter->second;
             item->SaveToDB(trans);                      // item not in inventory and can be save standalone
             // owner in data will set at mail receive and item extracting
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
-            stmt->setUInt32(0, receiver_guid);
-            stmt->setUInt32(1, item->GetGUIDLow());
-            trans->Append(stmt);
+            trans->PAppend("UPDATE item_instance SET owner_guid = '%u' WHERE guid = '%u'", receiver_guid, item->GetGUIDLow());
         }
     }
 
@@ -221,11 +214,7 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, 
     for (MailItemMap::const_iterator mailItemIter = m_items.begin(); mailItemIter != m_items.end(); ++mailItemIter)
     {
         Item* pItem = mailItemIter->second;
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_MAIL_ITEM);
-        stmt->setUInt32(0, mailId);
-        stmt->setUInt32(1, pItem->GetGUIDLow());
-        stmt->setUInt32(2, receiver.GetPlayerGUIDLow());
-        trans->Append(stmt);
+        trans->PAppend("INSERT INTO mail_items(mail_id, item_guid, receiver) VALUES ('%u', '%u', '%u')", mailId, pItem->GetGUIDLow(), receiver.GetPlayerGUIDLow());
     }
 
     // For online receiver update in game mail status and data
