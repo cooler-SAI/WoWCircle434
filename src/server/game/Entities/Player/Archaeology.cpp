@@ -12,6 +12,8 @@
 
 const static uint16 _mapIds[4] = { 0, 1, 530, 571};
 
+const static uint8 _races[9] = {1, 2, 3, 4, 5, 6, 7, 8, 27};
+
 const static int q_patt[2][2]= { {0,1}, {3,2} };
 
 bool Player::GenerateDigitLoot(uint16 zoneid, DigitSite &site)
@@ -437,15 +439,15 @@ void Player::GenerateResearchSites()
             tempSites[entry->mapId].insert(entry->ID);
     }
 
-    for (uint8 i = 0; i < 4; ++i)
+    uint16 const* map = _mapIds;
+    do
     {
-        uint16 mapId = _mapIds[i];
-        uint8 mapMax = std::min<int>(tempSites[mapId].size(), 4);
+        uint8 mapMax = std::min<int>(tempSites[*map].size(), 4);
 
         for (uint8 i = 0; i < mapMax;)
         {
-            Uint32Set::const_iterator itr = tempSites[mapId].begin();
-            std::advance(itr, urand(0, tempSites[mapId].size() - 1));
+            Uint32Set::const_iterator itr = tempSites[*map].begin();
+            std::advance(itr, urand(0, tempSites[*map].size() - 1));
             if (!HasResearchSite((*itr)))
             {
                 _researchSites.insert((*itr));
@@ -453,6 +455,7 @@ void Player::GenerateResearchSites()
             }
         }
     }
+    while(*++map);
 
     _archaeologyChanged = true;
 
@@ -482,13 +485,15 @@ void Player::GenerateResearchProjects()
         tempProjects[entry->branchId].insert(entry->ID);
     }
 
+    uint8 const* race = _races;
     Uint32Set::const_iterator itr;
-    for (uint8 i = 1; i < 30; ++i)
+    do
     {
-        itr = tempProjects[i].begin();
-        std::advance(itr, urand(0, tempProjects[i].size() - 1));
+        itr = tempProjects[*race].begin();
+        std::advance(itr, urand(0, tempProjects[*race].size() - 1));
         _researchProjects.insert((*itr));
     }
+    while(*++race);
 
     _archaeologyChanged = true;
 
