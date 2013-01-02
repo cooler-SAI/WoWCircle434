@@ -2106,6 +2106,25 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 break;
             }
             break;
+        case SPELLFAMILY_SHAMAN:
+            // Glyph of Healing Stream Totem
+            if (GetId() == 5672)
+            {
+                if (apply && caster)
+                {
+                    if (Unit * owner = caster->GetOwner())
+                    {
+                        if(owner->HasAura(55456))
+                        {
+                            Unit *auraOwner  = GetOwner()->ToUnit();
+                            auraOwner->CastSpell(auraOwner, 8185, true, 0, this->GetEffect(0), caster->GetGUID());
+                            break;
+                        }
+                    }
+                }
+                GetOwner()->ToUnit()->RemoveAurasDueToSpell(8185, caster ? caster->GetGUID() : 0);
+            }
+            break;
         case SPELLFAMILY_DEATHKNIGHT:
             if (!caster)
                 break;
