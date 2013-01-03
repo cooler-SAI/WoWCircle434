@@ -412,26 +412,57 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             }
             case SPELLFAMILY_WARRIOR:
             {
-                // Victory Rush
-                if (m_spellInfo->Id == 34428)
-                    ApplyPct(damage, m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
-                // Cleave
-                else if (m_spellInfo->Id == 845)
-                    damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)* 0.45);
-                // Intercept
-                else if (m_spellInfo->Id == 20253)
-                    damage = uint32(1 + m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.12);
-                // Shockwave
-                else if (m_spellInfo->Id == 46968)
+                switch (m_spellInfo->Id)
                 {
-                    int32 pct = m_caster->CalculateSpellDamage(unitTarget, m_spellInfo, 2);
-                    if (pct > 0)
-                        damage += int32(CalculatePct(m_caster->GetTotalAttackPowerValue(BASE_ATTACK), pct));
-                    break;
+                    // Victory Rush
+                    case 34428:
+                        ApplyPct(damage, m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                        break;
+                    // Cleave
+                    case 845:
+                        damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)* 0.45);
+                        break;
+                    // Intercept
+                    case 20253:
+                        damage = uint32(1 + m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.12);
+                        break;
+                    // Shockwave
+                    case 46968:
+                    {
+                        int32 pct = m_caster->CalculateSpellDamage(unitTarget, m_spellInfo, 2);
+                        if (pct > 0)
+                            damage += int32(CalculatePct(m_caster->GetTotalAttackPowerValue(BASE_ATTACK), pct));
+                        break;
+                    }
+                    // Heroic Strike
+                    case 78: 
+                        damage += int32(0.60f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
+                        break;
+                    // Execute
+                    case 5308:
+                    {
+                        int32 leveldamage = damage;
+                        float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                        damage = uint32 (10 + ap * 0.437f * leveldamage / 100);
+                        uint32 power = m_caster->GetPower(POWER_RAGE);
+                        if (power > 0)
+                        {
+                            uint32 mod = power > 200? 200: power;
+                            uint32 bonus_rage = 0;
+
+                            // Sudden Death
+                            if (AuraEffect const* aurEff = m_caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_GENERIC, 1989, 0))
+                                bonus_rage = aurEff->GetAmount() * 10;
+
+                            uint32 add_damage = uint32(ap * 0.874f * leveldamage / 100);
+
+                            damage += uint32(add_damage * mod / 200);
+
+                            m_caster->SetPower(POWER_RAGE, (power - mod) + bonus_rage);
+                        }
+                        break;
+                    }
                 }
-                // Heroic Strike
-                else if (m_spellInfo->Id == 78) 
-                    damage += int32(0.60f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
                 break;
             }
             case SPELLFAMILY_WARLOCK:
