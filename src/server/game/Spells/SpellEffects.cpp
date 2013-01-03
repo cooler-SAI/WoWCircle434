@@ -4606,6 +4606,11 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                case 87763: // Broiled Dragon Feast
+                {
+                    m_caster->CastSpell(unitTarget, 87544, true);
+                    break;
+                }
                 // Blood in the Water
                 case 80863:
                 {
