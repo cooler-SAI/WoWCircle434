@@ -2716,12 +2716,12 @@ class Player : public Unit, public GridObject<Player>
         //-------------------------------------------------
         void SaveArchaeology(SQLTransaction& trans);
         void LoadArchaeology(PreparedQueryResult result);
-        bool Player::HasResearchSite(uint32 id) const
+        bool HasResearchSite(uint32 id) const
         {
             return _researchSites.find(id) != _researchSites.end();
         }
 
-        bool Player::HasResearchProject(uint32 id) const
+        bool HasResearchProject(uint32 id) const
         {
             return _researchProjects.find(id) != _researchProjects.end();
         }

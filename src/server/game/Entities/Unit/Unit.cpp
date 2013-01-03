@@ -1911,14 +1911,14 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst (const Unit* victim, WeaponAttackT
 
     // bonus from skills is 0.04%
     int32    skillBonus  = 4 * (attackerMaxSkillValueForLevel - victimMaxSkillValueForLevel);
-    int32    sum = 0, tmp = 0;
+    int32    sum = 0;
     int32    roll = urand (0, 10000);
 
     sLog->outDebug(LOG_FILTER_UNITS, "RollMeleeOutcomeAgainst: skill bonus of %d for attacker", skillBonus);
     sLog->outDebug(LOG_FILTER_UNITS, "RollMeleeOutcomeAgainst: rolled %d, miss %d, dodge %d, parry %d, block %d, crit %d",
         roll, miss_chance, dodge_chance, parry_chance, block_chance, crit_chance);
 
-    tmp = miss_chance;
+    int32 tmp = miss_chance;
 
     if (tmp > 0 && roll < (sum += tmp))
     {
@@ -7174,6 +7174,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                     triggered_spell_id = 76663;
                     basepoints0 = 0;
+                    break;
                 }
                 // Sic 'Em! (Rank 1)
                 case 83340:
@@ -7995,7 +7996,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     for (uint8 i = 0; i < MAX_RUNES; i++)
                         if (this->ToPlayer()->GetRuneCooldown(i) == this->ToPlayer()->GetRuneBaseCooldown(i))
                             runes.insert(i);
-                    if (runes.size())
+                    if (!runes.empty())
                     {
                         std::set<uint8>::iterator itr = runes.begin();
                         std::advance(itr, urand(0, runes.size()-1));
@@ -19741,7 +19742,7 @@ void Unit::SpreadAura(uint32 spellId, float radius, bool positive, int8 count)
                 continue;
             }
 
-            itr++;
+            ++itr;
         }
     }
 
