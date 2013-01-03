@@ -868,8 +868,6 @@ Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_rep
 
     m_isActive = true;
 
-    m_runes = new Runes;
-
     m_lastFallTime = 0;
     m_lastFallZ = 0;
 
@@ -935,7 +933,6 @@ Player::~Player()
         delete ItemSetEff[x];
 
     delete m_declinedname;
-    delete m_runes;
 
     for (uint8 i = 0; i < VOID_STORAGE_MAX_SLOT; ++i)
         delete _voidStorageItems[i];
@@ -23671,7 +23668,7 @@ void Player::RemoveRunesBySpell(uint32 spell_id)
 {
     for (uint8 i = 0; i < MAX_RUNES; ++i)
     {
-        if (m_runes->runes[i].spell_id == spell_id)
+        if (m_runes.runes[i].spell_id == spell_id)
         {
             ConvertRune(i, GetBaseRune(i));
             SetRuneConvertSpell(i, 0);
@@ -23681,7 +23678,7 @@ void Player::RemoveRunesBySpell(uint32 spell_id)
 
 void Player::RestoreBaseRune(uint8 index)
 {
-    uint32 spell_id = m_runes->runes[index].spell_id;
+    uint32 spell_id = m_runes.runes[index].spell_id;
     ConvertRune(index, GetBaseRune(index));
     SetRuneConvertSpell(index, 0);
     // Only Blood Tap can be removed
@@ -23718,7 +23715,7 @@ void Player::SendDeathRuneUpdate()
 
     for (uint8 i = 0; i < MAX_RUNES; ++i)
     {
-        if (m_runes->runes[i].CurrentRune != RUNE_DEATH)
+        if (m_runes.runes[i].CurrentRune != RUNE_DEATH)
             continue;
 
         WorldPacket data(SMSG_CONVERT_RUNE, 2);
@@ -23750,8 +23747,7 @@ void Player::InitRunes()
     if (getClass() != CLASS_DEATH_KNIGHT)
         return;
 
-    m_runes = new Runes;
-    m_runes->runeState = 0;
+    m_runes.runeState = 0;
 
     for (uint8 i = 0; i < MAX_RUNES; ++i)
     {
@@ -23759,7 +23755,7 @@ void Player::InitRunes()
         SetCurrentRune(i, runeSlotTypes[i]);                           // init current types
         SetRuneCooldown(i, 0);                                         // reset cooldowns
         SetRuneConvertSpell(i, 0);
-        m_runes->SetRuneState(i);
+        m_runes.SetRuneState(i);
         SetDeathRuneUsed(i, false);
     }
 
