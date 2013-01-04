@@ -4037,6 +4037,13 @@ void Spell::finish(bool ok)
             if (isInstant)
                 m_caster->RemoveAuraFromStack(44544);
             break;
+        case 53351: // Glyph of Kill Shot
+            if (unitTarget && unitTarget->isAlive() && unitTarget->GetHealthPct() < 20.0f && m_caster->HasAura(63067) && !m_caster->HasAura(90967))
+            {
+                m_caster->CastSpell(m_caster, 90967, true);
+                m_caster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+            }
+            break;
     }
 }
 
