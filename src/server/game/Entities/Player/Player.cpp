@@ -4310,14 +4310,15 @@ void Player::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */, boo
         m_spellCooldownToRemove.push_back(spell_id);
 }
 
-void Player::RemoveSpellCooldown(SpellCooldowns::const_iterator itr, bool update /* = false */, bool manySpells /* = false */)
+void Player::RemoveSpellCooldown(SpellCooldowns::iterator itr, bool update /* = false */, bool manySpells /* = false */)
 {
+    uint32 spell_id = itr->first;
     m_spellCooldowns.erase(itr);
 
     if (update && !manySpells)
-        SendClearCooldown(itr->first, this);
+        SendClearCooldown(spell_id, this);
     if (manySpells)
-        m_spellCooldownToRemove.push_back(itr->first);
+        m_spellCooldownToRemove.push_back(spell_id);
 }
 
 // I am not sure which one is more efficient
@@ -4338,7 +4339,7 @@ void Player::RemoveSpellCategoryCooldown(uint32 cat, bool update /* = false */)
         return;
 
     const SpellCategorySet& ct_set = ct->second;
-    for (SpellCooldowns::const_iterator i = m_spellCooldowns.begin(); i != m_spellCooldowns.end();)
+    for (SpellCooldowns::iterator i = m_spellCooldowns.begin(); i != m_spellCooldowns.end();)
     {
         if (ct_set.find(i->first) != ct_set.end())
             RemoveSpellCooldown(i++, update, true);
