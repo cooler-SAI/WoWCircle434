@@ -2047,6 +2047,7 @@ class Player : public Unit, public GridObject<Player>
         void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs);
         void ReduceSpellCooldown(uint32 spell_id, time_t modifyTime);
         void RemoveSpellCooldown(uint32 spell_id, bool update = false, bool manySpells = false);
+        void RemoveSpellCooldown(SpellCooldowns::const_iterator itr, bool update = false, bool manySpells = false);
         void RemoveSpellCategoryCooldown(uint32 cat, bool update = false);
         void SendClearCooldown(uint32 spell_id, Unit* target);
         void SendClearCooldownMap(Unit* target);

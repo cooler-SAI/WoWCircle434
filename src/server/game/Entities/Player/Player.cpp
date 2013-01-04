@@ -4310,6 +4310,16 @@ void Player::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */, boo
         m_spellCooldownToRemove.push_back(spell_id);
 }
 
+void Player::RemoveSpellCooldown(SpellCooldowns::const_iterator itr, bool update /* = false */, bool manySpells /* = false */)
+{
+    m_spellCooldowns.erase(itr);
+
+    if (update && !manySpells)
+        SendClearCooldown(itr->first, this);
+    if (manySpells)
+        m_spellCooldownToRemove.push_back(itr->first);
+}
+
 // I am not sure which one is more efficient
 void Player::RemoveCategoryCooldown(uint32 cat)
 {
@@ -4331,7 +4341,7 @@ void Player::RemoveSpellCategoryCooldown(uint32 cat, bool update /* = false */)
     for (SpellCooldowns::const_iterator i = m_spellCooldowns.begin(); i != m_spellCooldowns.end();)
     {
         if (ct_set.find(i->first) != ct_set.end())
-            RemoveSpellCooldown((i++)->first, update, true);
+            RemoveSpellCooldown(i++, update, true);
         else
             ++i;
     }
@@ -4355,7 +4365,7 @@ void Player::RemoveArenaSpellCooldowns(bool removeActivePetCooldowns)
             entry->CategoryRecoveryTime <= 10 * MINUTE * IN_MILLISECONDS)
         {
             // remove & notify
-            RemoveSpellCooldown(itr->first, true, true);
+            RemoveSpellCooldown(itr, true, true);
 
         }
     }
