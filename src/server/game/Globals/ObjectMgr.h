@@ -626,8 +626,6 @@ typedef std::vector<ResearchZoneEntry> ResearchZoneVector;
 typedef std::vector<ResearchLootEntry> ResearchLootVector;
 typedef std::vector<ResearchPOIPoint> ResearchPOIPoints;
 typedef std::map<uint32, ResearchPOIPoints> ResearchPOIPointMap;
-typedef std::set<uint32> Uint32Set;
-typedef std::map<uint32, Uint32Set> Sites;
 
 class PlayerDumpReader;
 

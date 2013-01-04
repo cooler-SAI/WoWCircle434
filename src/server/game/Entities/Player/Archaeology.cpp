@@ -278,7 +278,7 @@ void Player::ShowResearchSites()
     uint8 count = 0;
     uint32 newvalue;
 
-    for (Uint32Set::const_iterator itr = _researchSites.begin(); itr != _researchSites.end(); ++itr)
+    for (ResearchSiteSet::const_iterator itr = _researchSites.begin(); itr != _researchSites.end(); ++itr)
     {
         uint32 id = (*itr);
         ResearchSiteEntry const* rs = GetResearchSiteEntryById(id);
@@ -306,7 +306,7 @@ void Player::ShowResearchProjects()
     uint8 count = 0;
     uint32 newvalue;
 
-    for (std::set<uint32>::const_iterator itr = _researchProjects.begin(); itr != _researchProjects.end(); ++itr)
+    for (ResearchProjectSet::const_iterator itr = _researchProjects.begin(); itr != _researchProjects.end(); ++itr)
     {
         if (count % 2 == 1)
         {
@@ -400,7 +400,7 @@ void Player::GenerateResearchSiteInMap(uint32 mapId)
     if (sResearchSiteSet.empty())
         return;
 
-    Uint32Set tempSites;
+    SiteSet tempSites;
 
     for (std::set<ResearchSiteEntry const*>::const_iterator itr = sResearchSiteSet.begin(); itr != sResearchSiteSet.end(); ++itr)
     {
@@ -415,7 +415,7 @@ void Player::GenerateResearchSiteInMap(uint32 mapId)
     if (tempSites.empty())
         return;
 
-    Uint32Set::const_iterator entry = tempSites.begin();
+    SiteSet::const_iterator entry = tempSites.begin();
     std::advance(entry, urand(0, tempSites.size() - 1));
 
     _researchSites.insert((*entry));
@@ -446,7 +446,7 @@ void Player::GenerateResearchSites()
 
         for (uint8 i = 0; i < mapMax;)
         {
-            Uint32Set::const_iterator itr = tempSites[*map].begin();
+            SiteSet::const_iterator itr = tempSites[*map].begin();
             std::advance(itr, urand(0, tempSites[*map].size() - 1));
             if (!HasResearchSite((*itr)))
             {
@@ -473,7 +473,7 @@ void Player::GenerateResearchProjects()
 
     _researchProjects.clear();
 
-    Sites tempProjects;
+    Projects tempProjects;
     uint32 chance_mod = skill_now / 50;
 
     for (std::set<ResearchProjectEntry const*>::const_iterator itr = sResearchProjectSet.begin(); itr != sResearchProjectSet.end(); ++itr)
@@ -486,7 +486,7 @@ void Player::GenerateResearchProjects()
     }
 
     uint8 const* race = _races;
-    Uint32Set::const_iterator itr;
+    ProjectSet::const_iterator itr;
     do
     {
         itr = tempProjects[*race].begin();
@@ -543,7 +543,7 @@ bool Player::SolveResearchProject(uint32 spellId)
     if (entry->rare)
         _completedProjects.insert(entry->ID);
 
-    Uint32Set tempProjects;
+    ProjectSet tempProjects;
     uint32 chance_mod = skill_now / 50;
 
     for (std::set<ResearchProjectEntry const*>::const_iterator itr = sResearchProjectSet.begin(); itr != sResearchProjectSet.end(); ++itr)
@@ -558,7 +558,7 @@ bool Player::SolveResearchProject(uint32 spellId)
         }
     }
 
-    Uint32Set::const_iterator itr = tempProjects.begin();
+    ProjectSet::const_iterator itr = tempProjects.begin();
     std::advance(itr, urand(0, tempProjects.size() - 1));
 
     _researchProjects.insert((*itr));
@@ -573,7 +573,7 @@ bool Player::IsCompletedProject(uint32 id)
     if (_completedProjects.empty())
         return false;
 
-    for (std::set<uint32>::const_iterator itr = _completedProjects.begin(); itr != _completedProjects.end(); ++itr)
+    for (CompletedProjectSet::const_iterator itr = _completedProjects.begin(); itr != _completedProjects.end(); ++itr)
     {
         if (id == (*itr))
             return true;
@@ -598,25 +598,26 @@ void Player::SaveArchaeology(SQLTransaction& trans)
 
     ss << GUID_LOPART(GetGUID()) << ", '";
 
-    for (std::set<uint32>::const_iterator itr = _researchSites.begin(); itr != _researchSites.end(); ++itr)
+    for (ResearchSiteSet::const_iterator itr = _researchSites.begin(); itr != _researchSites.end(); ++itr)
         ss << (*itr) << " ";
 
     ss << "', '";
 
     for (uint8 j = 0; j < MAX_RESEARCH_SITES; ++j)
-        ss << (_digSites[j].count) << " ";
+        ss << uint32(_digSites[j].count) << " ";
 
     ss << "', '";
 
-    for (std::set<uint32>::const_iterator itr = _researchProjects.begin(); itr != _researchProjects.end(); ++itr)
+    for (ResearchProjectSet::const_iterator itr = _researchProjects.begin(); itr != _researchProjects.end(); ++itr)
         ss << (*itr) << " ";
 
     ss << "', '";
 
-    for (std::set<uint32>::const_iterator itr = _completedProjects.begin(); itr != _completedProjects.end(); ++itr)
+    for (CompletedProjectSet::const_iterator itr = _completedProjects.begin(); itr != _completedProjects.end(); ++itr)
         ss << (*itr) << " ";
 
     ss << "')";
+
     trans->Append(ss.str().c_str());
     _archaeologyChanged = false;
 }

@@ -1337,10 +1337,16 @@ struct DigitSite
     bool empty() { return site_id == 0; }
 };
 
-typedef std::set<uint32> Uint32Set;
-typedef std::map<uint32, Uint32Set> Sites;
+typedef std::set<uint32> SiteSet;
+typedef std::map<uint32, SiteSet> Sites;
+typedef std::set<uint32> ProjectSet;
+typedef std::map<uint32, ProjectSet> Projects;
 typedef std::vector<ResearchPOIPoint> ResearchPOIPoints;
 typedef std::map<uint32, ResearchPOIPoints> ResearchPOIPointMap;
+
+typedef std::set<uint32> ResearchSiteSet;
+typedef std::set<uint32> ResearchProjectSet;
+typedef std::set<uint32> CompletedProjectSet;
 
 #define SAVE_FOR_SECONDS 120
 
@@ -2744,9 +2750,9 @@ class Player : public Unit, public GridObject<Player>
         bool IsCompletedProject(uint32 id);
 
         DigitSite _digSites[16];
-        Uint32Set _researchSites;
-        Uint32Set _researchProjects;
-        Uint32Set _completedProjects;
+        ResearchSiteSet _researchSites;
+        ResearchProjectSet _researchProjects;
+        CompletedProjectSet _completedProjects;
         bool _archaeologyChanged;
 
         // END
