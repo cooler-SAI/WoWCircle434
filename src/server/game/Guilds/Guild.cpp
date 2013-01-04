@@ -1760,7 +1760,7 @@ void Guild::HandleAcceptMember(WorldSession* session)
         _LogEvent(GUILD_EVENT_LOG_JOIN_GUILD, player->GetGUIDLow());
         _BroadcastEvent(GE_JOINED, player->GetGUID(), player->GetName());
         player->SetReputation(1168, 1);
-        sGuildFinderMgr->RemoveAllMembershipRequestsFromPlayer(player->GetGUIDLow());
+        sGuildFinderMgr->RemoveMembershipRequest(player->GetGUIDLow(), GUID_LOPART(this->GetGUID()));
     }
 }
 
