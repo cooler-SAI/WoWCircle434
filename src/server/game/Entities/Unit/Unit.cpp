@@ -11923,7 +11923,6 @@ uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, u
         case 64801: // Gift of the Earthmother
         case 81751: // Atonement
         case 91394: // Permafrost
-        case 6262:  // Warlock Healthstone
         case 63544: // Divine Touch
             return healamount;
             break;
