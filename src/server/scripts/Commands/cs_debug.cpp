@@ -88,6 +88,7 @@ public:
             { "anim",           SEC_GAMEMASTER,     false, &HandleDebugAnimCommand,            "", NULL },
             { "arena",          SEC_ADMINISTRATOR,  false, &HandleDebugArenaCommand,           "", NULL },
             { "bg",             SEC_ADMINISTRATOR,  false, &HandleDebugBattlegroundCommand,    "", NULL },
+            { "cooldown",       SEC_ADMINISTRATOR,  false, &HandleDebugCooldownCommand,        "", NULL },
             { "getitemstate",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemStateCommand,    "", NULL },
             { "lootrecipient",  SEC_GAMEMASTER,     false, &HandleDebugGetLootRecipientCommand,"", NULL },
             { "getvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugGetValueCommand,        "", NULL },
@@ -898,6 +899,21 @@ public:
     static bool HandleDebugArenaCommand(ChatHandler* /*handler*/, char const* /*args*/)
     {
         sBattlegroundMgr->ToggleArenaTesting();
+        return true;
+    }
+
+    static bool HandleDebugCooldownCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        Unit* unit = handler->getSelectedUnit();
+        Player* player = NULL;
+        if (!unit || (unit->GetTypeId() != TYPEID_PLAYER))
+            player = handler->GetSession()->GetPlayer();
+        else
+            player = (Player*)unit;
+        if (!unit) unit = player;
+
+        player->RemoveArenaSpellCooldowns(true);
+
         return true;
     }
 
