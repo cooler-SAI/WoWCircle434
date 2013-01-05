@@ -1,0 +1,1 @@
+INSERT INTO `disables` VALUE (0, 77361, 8, 0, 0, 'Temporary disable');
