@@ -7114,7 +7114,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 {
                     if (procSpell->Id != 56641) // not steady shot
                     {
-                        triggeredByAura->GetBase()->SetCharges(0);
+                        if (!(procEx & (PROC_EX_INTERNAL_TRIGGERED|PROC_EX_INTERNAL_CANT_PROC))) // shitty procs
+                            triggeredByAura->GetBase()->SetCharges(0);
                         return false;
                     }
 
