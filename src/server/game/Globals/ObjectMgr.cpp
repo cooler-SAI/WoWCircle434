@@ -2390,7 +2390,7 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.ItemId                    = itemId;
             itemTemplate.Class                     = uint32(fields[1].GetUInt8());
             itemTemplate.SubClass                  = uint32(fields[2].GetUInt8());
-            itemTemplate.SoundOverrideSubclass     = fields[3].GetInt32();
+            itemTemplate.SoundOverrideSubclass     = int(fields[3].GetInt8());
             itemTemplate.Name1                     = fields[4].GetString();
             itemTemplate.DisplayInfoID             = fields[5].GetUInt32();
             {
@@ -8770,11 +8770,11 @@ void ObjectMgr::LoadPhaseDefinitions()
         PhaseDefinition PhaseDefinition;
 
         PhaseDefinition.zoneId                = fields[0].GetUInt32();
-        PhaseDefinition.entry                 = fields[1].GetUInt32();
-        PhaseDefinition.phasemask             = fields[2].GetUInt32();
-        PhaseDefinition.phaseId               = fields[3].GetUInt32();
-        PhaseDefinition.terrainswapmap        = fields[4].GetUInt32();
-        PhaseDefinition.flags                 = fields[5].GetUInt32();
+        PhaseDefinition.entry                 = uint32(fields[1].GetUInt16());
+        PhaseDefinition.phasemask             = uint32(fields[2].GetUInt64());
+        PhaseDefinition.phaseId               = uint32(fields[3].GetUInt16());
+        PhaseDefinition.terrainswapmap        = uint32(fields[4].GetUInt16());
+        PhaseDefinition.flags                 = fields[5].GetUInt8();
 
         // Checks
         if ((PhaseDefinition.flags & PHASE_FLAG_OVERWRITE_EXISTING) && (PhaseDefinition.flags & PHASE_FLAG_NEGATE_PHASE))
@@ -8828,8 +8828,8 @@ void ObjectMgr::LoadSpellPhaseInfo()
             continue;
         }
 
-        spellPhaseInfo.phasemask              = fields[1].GetUInt32();
-        spellPhaseInfo.terrainswapmap         = fields[2].GetUInt32();
+        spellPhaseInfo.phasemask              = uint32(fields[1].GetUInt64());
+        spellPhaseInfo.terrainswapmap         = uint32(fields[2].GetUInt16());
 
         _SpellPhaseStore[spellPhaseInfo.spellId] = spellPhaseInfo;
 
