@@ -13267,7 +13267,7 @@ int32 Unit::ModifyPower(Powers power, int32 dVal)
 
     // Modify POWER_RUNIC_POWER from SPELL_AURA_MOD_RUNE_POWER_REGEN
     // I have not found a better place for this
-    if (power == POWER_RUNIC_POWER)
+    if (power == POWER_RUNIC_POWER && dVal > 0)
     {
         int32 pct = GetTotalAuraModifier(SPELL_AURA_MOD_RUNE_POWER_REGEN);
         AddPct<int>(dVal, pct);
