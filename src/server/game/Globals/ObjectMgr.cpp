@@ -8935,7 +8935,7 @@ void ObjectMgr::LoadResearchSiteLoot()
         {
             Field *fields = result->Fetch();
 
-            dg.id = fields[0].GetUInt16();
+            dg.id = uint16(fields[0].GetUInt32());
             dg.x = fields[1].GetFloat();
             dg.y = fields[2].GetFloat();
             dg.z = fields[3].GetFloat();

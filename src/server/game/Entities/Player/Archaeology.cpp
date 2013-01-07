@@ -22,6 +22,8 @@ bool Player::GenerateDigitLoot(uint16 zoneid, DigitSite &site)
     if (loot.empty())
         return false;
 
+    site.loot_id = 0;
+
     ResearchLootVector lootList;
     for (ResearchLootVector::const_iterator itr = loot.begin(); itr != loot.end(); ++itr)
     {
