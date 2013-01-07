@@ -639,6 +639,13 @@ void AddSC_boss_forgemaster_throngus();
 void AddSC_boss_drahga_shadowburner();
 void AddSC_boss_erudax();
 
+void AddSC_instance_lost_city_of_the_tolvir(); // Lost City of the Tol'Vir
+void AddSC_lost_city_of_the_tolvir();
+void AddSC_boss_general_husam();
+void AddSC_boss_lockmaw_augh();
+void AddSC_boss_high_prophet_barim();
+void AddSC_boss_siamat();
+
 void AddSC_instance_bastion_of_twilight(); // Bastion of Twilight
 void AddSC_bastion_of_twilight();
 void AddSC_boss_halfus_wyrmbreaker();
@@ -1332,6 +1339,13 @@ void AddNorthrendScripts()
     AddSC_boss_forgemaster_throngus();
     AddSC_boss_drahga_shadowburner();
     AddSC_boss_erudax();
+
+    AddSC_instance_lost_city_of_the_tolvir(); // Lost City of the Tol'Vir
+    AddSC_lost_city_of_the_tolvir();
+    AddSC_boss_general_husam();
+    AddSC_boss_lockmaw_augh();
+    AddSC_boss_high_prophet_barim();
+    AddSC_boss_siamat();
 
     AddSC_instance_bastion_of_twilight(); // Bastion of Twilight
     AddSC_bastion_of_twilight();
