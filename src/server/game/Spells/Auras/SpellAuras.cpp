@@ -1678,43 +1678,70 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_WARLOCK:
                 if (!caster)
                     break;
-                // Improved Fear
-                if (GetSpellInfo()->SpellFamilyFlags[1] & 0x00000400)
+                switch (GetSpellInfo()->Id)
                 {
-                    if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_WARLOCK, 98, 0))
+                    //Fear
+                    case 5782:
                     {
-                        uint32 spellId = 0;
-                        switch (aurEff->GetId())
+                        // Improved Fear
+                        if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_WARLOCK, 98, 0))
                         {
-                            case 53759: spellId = 60947; break;
-                            case 53754: spellId = 60946; break;
-                            default:
-                                sLog->outError(LOG_FILTER_SPELLS_AURAS, "Aura::HandleAuraSpecificMods: Unknown rank of Improved Fear (%d) found", aurEff->GetId());
+                            uint32 spellId = 0;
+                            switch (aurEff->GetId())
+                            {
+                                case 53759: spellId = 60947; break;
+                                case 53754: spellId = 60946; break;
+                                default:
+                                    sLog->outError(LOG_FILTER_SPELLS_AURAS, "Aura::HandleAuraSpecificMods: Unknown rank of Improved Fear (%d) found", aurEff->GetId());
+                            }
+                            if (spellId)
+                                caster->CastSpell(target, spellId, true);
                         }
-                        if (spellId)
-                            caster->CastSpell(target, spellId, true);
+                        break;
                     }
-                }
-                // Shadowburn
-                else if (m_spellInfo->Id == 29341 && aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
-                {
-                    if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
-                        caster->ModifyPower(POWER_SOUL_SHARDS, 3);
-                }
-                // Drain Soul
-                else if (m_spellInfo->Id == 1120 && aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
-                {
-                    if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
-                        caster->ModifyPower(POWER_SOUL_SHARDS, 3);
-                    
-                    // Glyph of Drain Soul
-                    if (caster->HasAura(58070))
-                        caster->CastSpell(caster, 58068, true);
-                }
-                // Dark Intent
-                else if (m_spellInfo->Id == 85767)
-                {
-                    caster->RemoveAurasDueToSpell(85767);
+                    // Shadowburn
+                    case 29341:
+                    {
+                        if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+                        {
+                            if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
+                                caster->ModifyPower(POWER_SOUL_SHARDS, 3);
+                        }
+                        break;
+                    }
+                    // Drain Soul
+                    case 1120:
+                    {
+                        if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+                        {
+                            if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
+                            caster->ModifyPower(POWER_SOUL_SHARDS, 3);
+                        
+                            // Glyph of Drain Soul
+                            if (caster->HasAura(58070))
+                                caster->CastSpell(caster, 58068, true);
+                        }
+                        break;
+                    }
+                    // Dark Intent
+                    case 85767:
+                    {
+                        caster->RemoveAurasDueToSpell(85767);
+                        break;
+                    }
+                    // Haunt
+                    case 48181:
+                    {
+                        if (target)
+                        {
+                            if (AuraEffect const* aurEff = GetEffect(EFFECT_1))
+                            {
+                                int32 bp0 = aurEff->GetAmount();
+                                target->CastCustomSpell(caster, 48210, &bp0, 0, 0, true, NULL, aurEff, GetCasterGUID());
+                            }
+                        }
+                        break;
+                    }
                 }
                 break;
             case SPELLFAMILY_PRIEST:

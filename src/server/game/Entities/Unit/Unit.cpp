@@ -6185,6 +6185,14 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             switch (dummySpell->Id)
             {
+                // Fel Armor
+                case 28176: 
+                {
+                    triggered_spell_id = 96379;
+                    basepoints0 = CalculatePct(int32(damage), triggerAmount);
+                    target = this;
+                    break;
+                }
                 // Curse of Weakness - Jinx
                 case 85479:
                 case 18179:

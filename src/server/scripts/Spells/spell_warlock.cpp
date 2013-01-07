@@ -501,40 +501,9 @@ class spell_warl_haunt : public SpellScriptLoader
             }
         };
 
-        class spell_warl_haunt_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_warl_haunt_AuraScript);
-
-            bool Validate(SpellInfo const* /*spell*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(WARLOCK_HAUNT_HEAL))
-                    return false;
-                return true;
-            }
-
-            void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-            {
-                if (Unit* caster = GetCaster())
-                {
-                    int32 amount = aurEff->GetAmount();
-                    GetTarget()->CastCustomSpell(caster, WARLOCK_HAUNT_HEAL, &amount, NULL, NULL, true, NULL, aurEff, GetCasterGUID());
-                }
-            }
-
-            void Register()
-            {
-                OnEffectRemove += AuraEffectApplyFn(spell_warl_haunt_AuraScript::HandleRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-            }
-        };
-
         SpellScript* GetSpellScript() const
         {
             return new spell_warl_haunt_SpellScript();
-        }
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_warl_haunt_AuraScript();
         }
 };
 
@@ -558,7 +527,7 @@ class spell_warl_unstable_affliction : public SpellScriptLoader
             void HandleDispel(DispelInfo* dispelInfo)
             {
                 if (Unit* caster = GetCaster())
-                    if (AuraEffect const* aurEff = GetEffect(EFFECT_0))
+                    if (AuraEffect const* aurEff = GetEffect(EFFECT_1))
                     {
                         int32 damage = aurEff->GetAmount() * 9;
                         // backfire damage and silence

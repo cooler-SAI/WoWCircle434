@@ -5626,6 +5626,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 54424: // Fel Intelligence
                 spellInfo->Effects[1].SetRadiusIndex(12);
                 break;
+            // Unstable Affliction dispel dmg
+            case 31117:
+                spellInfo->AttributesEx6 &= ~SPELL_ATTR6_NO_DONE_PCT_DAMAGE_MODS;
+                break;
             default:
                 break;
         }

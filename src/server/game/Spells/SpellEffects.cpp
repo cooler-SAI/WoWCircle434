@@ -1048,6 +1048,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             {
                 // Have Group, Will Travel
                 case 83967:
+                {
                     // Summon each player in group
                     if (Group* group = m_caster->ToPlayer()->GetGroup())
                     {
@@ -1074,7 +1075,14 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                             pPlayer->GetSession()->SendPacket(&data);
                         }
                     }
-                    break; 
+                    break;
+                }
+                // Soul Link
+                case 19028:
+                {
+                    unitTarget->CastSpell(unitTarget, 25228, true);
+                    return;
+                }
             }
             break;
         case SPELLFAMILY_PALADIN:
