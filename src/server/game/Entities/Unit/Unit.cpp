@@ -6059,6 +6059,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     RemoveAura(dummySpell->Id);
                     return false;
                 }
+                // Glyph of Colossus Smash
+                case 89003:
+                {
+                    triggered_spell_id = 58567;
+                    break;
+                }
             }
 
             // Retaliation
