@@ -3512,10 +3512,13 @@ void Spell::cast(bool skipCheck)
                 int32 healthPct = 7;
 
                 // Glyph of Dark Succor
-                if (AuraEffect const* aurEff = m_caster->GetAuraEffect(96279, EFFECT_0))
+                if (AuraEffect const* aurEff = m_caster->GetAuraEffect(101568, EFFECT_0))
                 {
                     if (m_caster->HasAura(48265) || m_caster->HasAura(48266)) // Work only in frost / unholy presence
+                    {
                         healthPct = aurEff->GetAmount();
+                        m_caster->RemoveAurasDueToSpell(101568);
+                    }
                 }
 
                 int32 minimumHp = int32(m_caster->CountPctFromMaxHealth(healthPct));
