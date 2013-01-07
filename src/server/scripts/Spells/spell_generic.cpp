@@ -646,30 +646,35 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
 
         class spell_pvp_trinket_wotf_shared_cd_SpellScript : public SpellScript
         {
-            PrepareSpellScript(spell_pvp_trinket_wotf_shared_cd_SpellScript);
-
-            bool Load()
+            PrepareSpellScript(spell_pvp_trinket_wotf_shared_cd_SpellScript)
+            bool Validate(SpellEntry const * /*spellEntry*/)
             {
-                return GetCaster()->GetTypeId() == TYPEID_PLAYER;
-            }
-
-            bool Validate(SpellInfo const* /*spellEntry*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER) || !sSpellMgr->GetSpellInfo(SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER_WOTF))
+                if (!sSpellStore.LookupEntry(SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER))
+                    return false;
+                if (!sSpellStore.LookupEntry(SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER_WOTF))
                     return false;
                 return true;
             }
 
-            void HandleScript()
+            void HandleScript(SpellEffIndex /*effIndex*/)
             {
-                // This is only needed because spells cast from spell_linked_spell are triggered by default
-                // Spell::SendSpellCooldown() skips all spells with TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD
-                GetCaster()->ToPlayer()->AddSpellAndCategoryCooldowns(GetSpellInfo(), GetCastItem() ? GetCastItem()->GetEntry() : 0, GetSpell());
+                Player* pCaster = GetCaster()->ToPlayer();
+                if (!pCaster)
+                    return;
+                SpellInfo const* m_spellInfo = GetSpellInfo();
+
+                pCaster->AddSpellCooldown(m_spellInfo->Id, NULL, time(NULL) + sSpellMgr->GetSpellInfo(SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER)->GetRecoveryTime() / IN_MILLISECONDS);
+                WorldPacket data(SMSG_SPELL_COOLDOWN, 8+1+4);
+                data << uint64(pCaster->GetGUID());
+                data << uint8(0);
+                data << uint32(m_spellInfo->Id);
+                data << uint32(0);
+                pCaster->GetSession()->SendPacket(&data);
             }
 
             void Register()
             {
-                AfterCast += SpellCastFn(spell_pvp_trinket_wotf_shared_cd_SpellScript::HandleScript);
+                OnEffectHitTarget += SpellEffectFn(spell_pvp_trinket_wotf_shared_cd_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
         };
 
