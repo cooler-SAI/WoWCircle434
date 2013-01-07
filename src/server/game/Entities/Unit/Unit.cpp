@@ -19757,7 +19757,6 @@ void Unit::SpreadAura(uint32 spellId, float radius, bool positive, int8 count)
         }
     }
 
-
     // apply aura
     for (UnitList::iterator itr = targets_limited.begin(); itr != targets_limited.end(); ++itr)
     {
@@ -19773,5 +19772,24 @@ void Unit::SpreadAura(uint32 spellId, float radius, bool positive, int8 count)
             if (--count == 0)
                 break;
         }
+    }
+}
+
+void Unit::RemoveBattlegroundStartingAuras()
+{
+    // remove auras with duration lower than 30s
+    AuraApplicationMap &auraMap = GetAppliedAuras();
+    for (Unit::AuraApplicationMap::iterator iter = auraMap.begin(); iter != auraMap.end();)
+    {
+        AuraApplication* aurApp = iter->second;
+        Aura* aura = aurApp->GetBase();
+        if (!aura->IsPermanent()
+            && aura->GetDuration() <= 30*IN_MILLISECONDS
+            && aurApp->IsPositive()
+            && (!(aura->GetSpellInfo()->Attributes & SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY))
+            && (!aura->HasEffectType(SPELL_AURA_MOD_INVISIBILITY)))
+            RemoveAura(iter);
+        else
+            ++iter;
     }
 }

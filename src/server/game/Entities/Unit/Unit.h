@@ -1796,6 +1796,7 @@ class Unit : public WorldObject
         void RemoveAllAurasExceptType(AuraType type);
         void DelayOwnedAuras(uint32 spellId, uint64 caster, int32 delaytime);
         void CleanupSwapAuras(uint32 spellId);
+        void RemoveBattlegroundStartingAuras();
 
         void _RemoveAllAuraStatMods();
         void _ApplyAllAuraStatMods();
