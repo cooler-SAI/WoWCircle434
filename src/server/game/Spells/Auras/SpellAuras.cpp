@@ -1540,6 +1540,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             }
                         }
                         break;
+                    // Pillar of Frost
+                    case 51271:
+                        if (target->HasAura(58635))
+                            target->CastSpell(target, 90259, true);
+                        break;
                     default:
                         break;
                 }
