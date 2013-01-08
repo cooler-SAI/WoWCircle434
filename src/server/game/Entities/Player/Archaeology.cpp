@@ -14,7 +14,17 @@ const static uint16 _mapIds[4] = { 0, 1, 530, 571};
 
 const static uint8 _races[9] = {1, 2, 3, 4, 5, 6, 7, 8, 27};
 
-const static int q_patt[2][2]= { {0,1}, {3,2} };
+const static int q_patt[2][2] = { {0,1}, {3,2} };
+
+const static uint8 currencyAmountForLevel[8][2] = {
+{3, 5  },  // 1
+{5, 7  },  // 75
+{7, 8  },  // 150
+{8, 10 },  // 225
+{10, 11},  // 300
+{11, 12},  // 375
+{12, 13},  // 450
+{13, 14}}; // 525
 
 bool Player::GenerateDigitLoot(uint16 zoneid, DigitSite &site)
 {
@@ -121,34 +131,27 @@ uint32 Player::GetSurveyBotEntry(float &orientation)
     if (skill_now < 50)
         UpdateSkill(SKILL_ARCHAEOLOGY, 1);
 
-    uint32 curr_id = 0;
+    uint32 currencyId = 0;
     switch (site.loot_id)
     {
-        case 204282: curr_id = 384; break;
-        case 207188: curr_id = 398; break;
-        case 206836: curr_id = 393; break;
-        case 203071: curr_id = 394; break;
-        case 203078: curr_id = 400; break;
-        case 207187: curr_id = 397; break;
-        case 207190: curr_id = 401; break;
-        case 202655: curr_id = 385; break;
-        case 207189: curr_id = 399; break;
+        case 204282: currencyId = 384; break;
+        case 207188: currencyId = 398; break;
+        case 206836: currencyId = 393; break;
+        case 203071: currencyId = 394; break;
+        case 203078: currencyId = 400; break;
+        case 207187: currencyId = 397; break;
+        case 207190: currencyId = 401; break;
+        case 202655: currencyId = 385; break;
+        case 207189: currencyId = 399; break;
     }
 
-    if (curr_id)
+    if (currencyId)
     {
-        uint32 curr_min = 0;
-        uint32 curr_max = 0;
-        if (skill_now == 525) { curr_min = 6; curr_max = 7; }
-        else if (skill_now >= 450) { curr_min = 5; curr_max = 6; }
-        else if (skill_now >= 375) { curr_min = 4; curr_max = 6; }
-        else if (skill_now >= 300) { curr_min = 4; curr_max = 5; }
-        else if (skill_now >= 225) { curr_min = 3; curr_max = 5; }
-        else if (skill_now >= 150) { curr_min = 3; curr_max = 4; }
-        else if (skill_now >= 75) { curr_min = 2; curr_max = 4; }
-        else if (skill_now >= 1) { curr_min = 2; curr_max = 3; }
+        int level = int(skill_now / 75);
+        ASSERT(level < 8);
 
-        ModifyCurrency(curr_id, urand(curr_min, curr_max));
+        uint32 amount = urand(uint32(currencyAmountForLevel[level][0]), uint32(currencyAmountForLevel[level][1]));
+        ModifyCurrency(currencyId, amount);
     }
 
     // We cannot implement special race fragments, so don't  spawn go
