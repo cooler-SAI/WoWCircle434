@@ -3108,19 +3108,26 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
                 creatureEntry = 15665;
         }
 
-        CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(creatureEntry);
-        if (!ci)
-        {
-            sLog->outError(LOG_FILTER_SQL, "AuraMounted: `creature_template`='%u' not found in database (only need its modelid)", GetMiscValue());
-            return;
-        }
-
         uint32 team = 0;
         if (target->GetTypeId() == TYPEID_PLAYER)
             team = target->ToPlayer()->GetTeam();
 
-        uint32 displayID = ObjectMgr::ChooseDisplayId(team, ci);
-        sObjectMgr->GetCreatureModelRandomGender(&displayID);
+        uint32 vehicleId = 0;
+        uint32 displayID = 0;
+        if (CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(creatureEntry))
+        {
+            vehicleId = ci->VehicleId;
+            displayID = ObjectMgr::ChooseDisplayId(team, ci);
+            sObjectMgr->GetCreatureModelRandomGender(&displayID);
+        }
+
+        if (GetBase()->GetId() == 87840)
+        {
+            displayID = target->getGender() == GENDER_FEMALE ? 29423 : 29422;
+            if (target->GetTypeId() == TYPEID_PLAYER)
+                target->ToPlayer()->SwitchToWorgenForm();
+            target->SetDisplayId(displayID);
+        }
 
         //some spell has one aura of mount and one of vehicle
         for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -3128,10 +3135,13 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
                 && GetSpellInfo()->Effects[i].MiscValue == GetMiscValue())
                 displayID = 0;
 
-        target->Mount(displayID, ci->VehicleId, GetMiscValue());
+        target->Mount(displayID, vehicleId, GetMiscValue());
     }
     else
     {
+        if (GetBase()->GetId() == 87840)
+            target->DeMorph();
+
         target->Dismount();
         //some mounts like Headless Horseman's Mount or broom stick are skill based spell
         // need to remove ALL arura related to mounts, this will stop client crash with broom stick
