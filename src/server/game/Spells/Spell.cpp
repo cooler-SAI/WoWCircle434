@@ -2632,6 +2632,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         m_damage = damageInfo.damage;
 
         caster->DealSpellDamage(&damageInfo, true);
+
+        // Used in spell scripts
+        m_final_damage = damageInfo.damage;
+        m_absorbed_damage = damageInfo.absorb;
     }
     // Passive spell hits/misses or active spells only misses (only triggers)
     else
@@ -4039,6 +4043,20 @@ void Spell::finish(bool ok)
         case 44614: // Instant Frostfire Bolt
             if (isInstant)
                 m_caster->RemoveAuraFromStack(44544);
+            break;
+        case 32379: // Shadow Word: Death
+            if (!unitTarget)
+                break;
+            if (Aura* aura = m_caster->GetAura(55682)) // Glyph of Shadow Word: Death
+            {
+                uint32 cast_health = unitTarget->GetHealth() + uint32(m_final_damage);
+                if (unitTarget && unitTarget->isAlive() && !m_caster->HasAura(95652) &&
+                    cast_health <= unitTarget->CountPctFromMaxHealth(aura->GetEffect(0)->GetAmount()))
+                {
+                    m_caster->CastSpell(m_caster, 95652, true);
+                    m_caster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+                }
+            }
             break;
         case 53351: // Glyph of Kill Shot
             if (unitTarget && unitTarget->isAlive() && unitTarget->GetHealthPct() < 20.0f && m_caster->HasAura(63067) && !m_caster->HasAura(90967))
