@@ -898,6 +898,14 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                case 68996: // Two Forms (Racial)
+                {
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    m_caster->ToPlayer()->SwitchForm();
+                    break;
+                }
                 case 96934: // Blessing of Khaz'goroth
                 case 97127: // Blessing of Khaz'goroth (H)
                 {

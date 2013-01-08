@@ -12946,6 +12946,9 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
         (*itr)->SetInCombatState(PvP, enemy);
         (*itr)->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
     }
+
+    if (GetTypeId() == TYPEID_PLAYER && !ToPlayer()->IsInWorgenForm())
+        ToPlayer()->SwitchToWorgenForm();
 }
 
 void Unit::ClearInCombat()

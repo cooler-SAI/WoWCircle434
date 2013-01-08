@@ -5466,6 +5466,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                 // Skull Bash
                 else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DRUID && m_spellInfo->SpellFamilyFlags[2] & 0x10000000 && m_caster->HasUnitState(UNIT_STATE_ROOT) && !m_caster->IsWithinDistInMap(m_targets.GetUnitTarget(), 5))
                     return SPELL_FAILED_ROOTED;
+                else if (m_spellInfo->Id == 68996) // Two Forms (Racial)
+                {
+                    if (m_caster->isInCombat())
+                        return SPELL_FAILED_AFFECTING_COMBAT;
+                }
                 break;
             }
             case SPELL_EFFECT_LEARN_SPELL:

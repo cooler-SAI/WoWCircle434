@@ -2263,6 +2263,12 @@ class Player : public Unit, public GridObject<Player>
         void UpdateArmorSpecializations(uint8 Slot = NULL);
         bool CheckArmorSpecializationItemConditions(SpellInfo const* spellInfo) const;
 
+        bool CanSwitch() const;
+        bool IsInWorgenForm() const { return HasAuraType(SPELL_AURA_WORGEN_ALTERED_FORM); }
+        void SwitchToHumanForm() { RemoveAurasByType(SPELL_AURA_WORGEN_ALTERED_FORM); }
+        void SwitchToWorgenForm() { CastSpell(this, 97709, true); }
+        void SwitchForm();
+
         void RemoveMasterySpells();
         void ApplyMasterySpells();
         void UpdateMastery();

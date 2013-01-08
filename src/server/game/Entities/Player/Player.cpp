@@ -26342,3 +26342,26 @@ void Player::SendSoundToAll(uint32 soundId, uint64 source)
             player->SendSound(soundId, source);
     }
 }
+
+
+bool Player::CanSwitch() const
+{
+    if (getRace() != RACE_WORGEN)
+        return false;
+
+    if (isInCombat() || !HasAuraType(SPELL_AURA_WORGEN_CAN_TRANSFORM))
+        return false;
+
+    return true;
+}
+
+void Player::SwitchForm()
+{
+    if (!CanSwitch())
+        return;
+
+    if (IsInWorgenForm())
+        SwitchToHumanForm();
+    else
+        SwitchToWorgenForm();
+}
