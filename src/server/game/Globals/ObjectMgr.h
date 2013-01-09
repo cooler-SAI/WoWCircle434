@@ -602,6 +602,14 @@ struct HotfixInfo
     uint32 Entry;
 };
 
+struct GuildChallengeReward
+{
+    uint32 Expirience;
+    uint32 Gold;
+    uint32 ChallengeCount;
+    uint32 Gold2;
+};
+
 struct ResearchZoneEntry
 {
     uint32 POIid;
@@ -622,6 +630,7 @@ struct ResearchLootEntry
 };
 
 typedef std::vector<HotfixInfo> HotfixData;
+typedef std::vector<GuildChallengeReward> GuildChallengeRewardData;
 typedef std::vector<ResearchZoneEntry> ResearchZoneVector;
 typedef std::vector<ResearchLootEntry> ResearchLootVector;
 typedef std::vector<ResearchPOIPoint> ResearchPOIPoints;
@@ -979,6 +988,8 @@ class ObjectMgr
 
         void LoadPlayerDeleteInfo();
 
+        void LoadGuildChallengeRewardInfo();
+
         void LoadResearchSiteZones();
         void LoadResearchSiteLoot();
 
@@ -1235,6 +1246,8 @@ class ObjectMgr
 
             return ret ? ret : time(NULL);
         }
+        
+        GuildChallengeRewardData const& GetGuildChallengeRewardData() const { return _challengeRewardData; }
 
         PetScalingAurasMap petScalingAuras;
 
@@ -1410,6 +1423,7 @@ class ObjectMgr
             GO_TO_CREATURE          // GO is dependant on creature
         };
         HotfixData _hotfixData;
+        GuildChallengeRewardData _challengeRewardData;
 };
 
 #define sObjectMgr ACE_Singleton<ObjectMgr, ACE_Null_Mutex>::instance()

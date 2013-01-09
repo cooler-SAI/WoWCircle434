@@ -51,7 +51,7 @@ public:
     uint32 GenerateGuildId();
     void SetNextGuildId(uint32 Id) { NextGuildId = Id; }
 
-    uint32 GetXPForGuildLevel(uint8 level) const;
+    uint64 GetXPForGuildLevel(uint8 level) const;
     std::vector<GuildReward> const& GetGuildRewards() const { return GuildRewards; }
 
     GuildReward const* FindGuildReward(uint32 item_id)

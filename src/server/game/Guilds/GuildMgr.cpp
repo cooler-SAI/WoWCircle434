@@ -108,7 +108,7 @@ Guild* GuildMgr::GetGuildByLeader(uint64 guid) const
     return NULL;
 }
 
-uint32 GuildMgr::GetXPForGuildLevel(uint8 level) const
+uint64 GuildMgr::GetXPForGuildLevel(uint8 level) const
 {
     if (level < GuildXPperLevel.size())
         return GuildXPperLevel[level];
@@ -497,8 +497,8 @@ void GuildMgr::LoadGuildXpForLevel()
     {
         Field* fields = result->Fetch();
 
-        uint32 level        = fields[0].GetUInt8();
-        uint32 requiredXP   = fields[1].GetUInt64();
+        uint32 level        = uint32(fields[0].GetUInt8());
+        uint64 requiredXP   = fields[1].GetUInt64();
 
         if (level >= sWorld->getIntConfig(CONFIG_GUILD_MAX_LEVEL))
         {

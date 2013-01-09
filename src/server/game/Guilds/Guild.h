@@ -245,6 +245,16 @@ enum GuildNews
     GUILD_NEWS_LEVEL_UP               = 6,
 };
 
+enum GuildChallengeType
+{
+    CHALLENGE_NONE     = 0,
+    CHALLENGE_DUNGEON  = 1,
+    CHALLENGE_RAID     = 2,
+    CHALLENGE_RATED_BG = 3,
+
+    CHALLENGE_MAX,
+};
+
 struct GuildNewsEntry
 {
     GuildNews EventType;
