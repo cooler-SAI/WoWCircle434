@@ -148,7 +148,9 @@ uint32 Player::GetSurveyBotEntry(float &orientation)
     if (currencyId)
     {
         int level = int(skill_now / 75);
-        ASSERT(level < 8);
+
+        if (level > 8)
+            return 0;
 
         uint32 amount = urand(uint32(currencyAmountForLevel[level][0]), uint32(currencyAmountForLevel[level][1]));
         ModifyCurrency(currencyId, amount);
