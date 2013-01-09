@@ -1545,7 +1545,7 @@ void Guild::HandleSetEmblem(WorldSession* session, const EmblemInfo& emblemInfo)
 
         HandleQuery(session);
 
-        m_achievementMgr.UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_TABARD, 1, 0, NULL, player);
+        m_achievementMgr.UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_TABARD, 1, 0, 0, NULL, player);
     }
 }
 
@@ -1637,7 +1637,7 @@ void Guild::HandleBuyBankTab(WorldSession* session, uint8 tabId)
     _SetRankBankTabRightsAndSlots(player->GetRank(), tabId, GuildBankRightsAndSlots(GUILD_BANK_RIGHT_FULL, uint32(GUILD_WITHDRAW_SLOT_UNLIMITED)));
     HandleRoster();                                         // Broadcast for tab rights update
     SendBankList(session, tabId, false, true);
-    m_achievementMgr.UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_BANK_SLOTS, _GetPurchasedTabsSize(), 0, NULL, player);
+    m_achievementMgr.UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_BANK_SLOTS, _GetPurchasedTabsSize(), 0, 0, NULL, player);
 }
 
 void Guild::HandleInviteMember(WorldSession* session, const std::string& name)
