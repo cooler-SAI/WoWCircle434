@@ -2739,7 +2739,7 @@ bool AchievementMgr<T>::RequirementsSatisfied(AchievementCriteriaEntry const *ac
             if (!miscValue1)
                 return false;
             ItemTemplate const* proto = sObjectMgr->GetItemTemplate(uint32(miscValue1));
-            if (!proto || proto->Quality < ITEM_QUALITY_EPIC)
+            if (!proto)
                 return false;
             break;
         }
@@ -3068,7 +3068,7 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
             {	
                 // miscValue1 is itemid	
                 ItemTemplate const * const item = sObjectMgr->GetItemTemplate(uint32(miscValue1));	
-                if (!item || item->Quality != reqValue)	
+                if (!item || item->Quality < reqValue)	
                     return false;
                 break;	
             }
