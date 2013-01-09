@@ -1835,19 +1835,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         caster->CastSpell(target, 61394, true);
 
                 break;
-            case SPELLFAMILY_SHAMAN:
-                switch(GetSpellInfo()->Id)
-                {
-                    // Grownding Totem effect
-                    case 89523:
-                    case 8178:
-                        if (caster == target && removeMode == AURA_REMOVE_BY_DEFAULT)
-                            caster->setDeathState(JUST_DIED);
-                        break;
-                    default:
-                        break;
-                }
-                break;
         }
     }
 

@@ -2475,8 +2475,13 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
         for (Unit::AuraEffectList::const_iterator i = mReflectSpellsSchool.begin(); i != mReflectSpellsSchool.end(); ++i)
             if ((*i)->GetMiscValue() & spell->GetSchoolMask())
                 reflectchance += (*i)->GetAmount();
+
         if (reflectchance > 0 && roll_chance_i(reflectchance))
         {
+//             Unit::AuraEffectList alist = victim->GetAuraEffectsByType(SPELL_AURA_REFLECT_SPELLS);
+//             for (AuraEffectList::const_iterator i = alist.begin(); i != alist.end(); ++i)
+//                 (*i)->GetBase()->DropCharge();
+
             return SPELL_MISS_REFLECT;
         }
     }
@@ -3235,11 +3240,12 @@ void Unit::_UnapplyAura(AuraApplicationMap::iterator &i, AuraRemoveMode removeMo
     ASSERT(!aurApp->GetEffectMask());
 
     // Remove totem at next update if totem loses its aura
-    if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE && GetTypeId() == TYPEID_UNIT && ToCreature()->isTotem()&& ToTotem()->GetSummonerGUID() == aura->GetCasterGUID())
-    {
-        if (ToTotem()->GetSpell() == aura->GetId() && ToTotem()->GetTotemType() == TOTEM_PASSIVE)
-            ToTotem()->setDeathState(JUST_DIED);
-    }
+    if (Totem * totem = caster ? caster->ToTotem() : 0)
+        if (totem->GetSummonerGUID() == aura->GetCasterGUID() || totem->GetGUID() == aura->GetCasterGUID())
+        {
+            if (caster->ToTotem()->GetSpell() == aura->GetId())
+                caster->ToTotem()->setDeathState(JUST_DIED);
+        }
 
     // Remove aurastates only if were not found
     if (!auraStateFound)

@@ -170,3 +170,12 @@ bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) con
 
     return Creature::IsImmunedToSpellEffect(spellInfo, index);
 }
+
+uint32 Totem::GetSpell(uint8 slot)
+{
+    // Glyph of Grounding Totem
+    if (m_spells[slot] == 8178 && this->GetOwner()->HasAura(55441))
+        return 89523;
+
+    return m_spells[slot];
+}
