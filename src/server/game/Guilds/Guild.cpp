@@ -3145,12 +3145,11 @@ void Guild::_SendBankContentUpdate(uint8 tabId, SlotIds slots) const
             uint32 enchantCount = 0;
             if (tabItem)
             {
-                for (uint32 enchSlot = 0; enchSlot < MAX_ENCHANTMENT_SLOT; ++enchSlot)
+                for (uint32 i = 0; i < MAX_GEM_SOCKETS; ++i)
                 {
-                    if (uint32 enchantId = tabItem->GetEnchantmentId(EnchantmentSlot(enchSlot)))
+                    if (uint32 enchantId = tabItem->GetEnchantmentId(EnchantmentSlot(i)))
                     {
-                        tabData << uint32(enchantId);
-                        tabData << uint32(enchSlot);
+                        tabData << uint32(enchantId) << uint32(i);
                         ++enchantCount;
                     }
                 }
