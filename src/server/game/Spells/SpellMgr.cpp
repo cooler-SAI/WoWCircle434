@@ -5633,6 +5633,9 @@ void SpellMgr::LoadDbcDataCorrections()
             case 31117:
                 spellInfo->AttributesEx6 &= ~SPELL_ATTR6_NO_DONE_PCT_DAMAGE_MODS;
                 break;
+            case 82691: // Ring of Frost
+                spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REFLECTED;
+                break;
             default:
                 break;
         }
