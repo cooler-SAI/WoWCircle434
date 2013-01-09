@@ -5356,6 +5356,9 @@ void SpellMgr::LoadDbcDataCorrections()
             // Impact
             case 12355:
                 spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
+                spellInfo->Attributes |= SPELL_ATTR0_NEGATIVE_1;
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[1].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
             // Mirror Image - Clone Me!
             case 45204:

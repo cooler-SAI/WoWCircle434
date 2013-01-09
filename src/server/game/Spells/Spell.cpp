@@ -2287,8 +2287,14 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /* 
     {
         // process reflect removal (not delayed)
         if (!targetInfo.timeDelay)
+        {
             m_caster->ProcDamageAndSpell(target, PROC_FLAG_NONE, PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG, PROC_EX_REFLECT, 1, 0, BASE_ATTACK, m_spellInfo);
-
+            if (m_spellInfo->Id == 2136) // hack to trigger impact in reflect
+            {
+                m_caster->ProcDamageAndSpell(m_caster, PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG, 
+                    PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG, PROC_EX_NORMAL_HIT, 1, 0, BASE_ATTACK, m_spellInfo);
+            }
+        }
         // Calculate reflected spell result on caster
         targetInfo.reflectResult = m_caster->SpellHitResult(m_caster, m_spellInfo, m_canReflect);
 
