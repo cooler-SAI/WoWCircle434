@@ -2010,7 +2010,7 @@ bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool
         SendBankList(session, 0, false, false);
 
     if (repair)
-        m_achievementMgr.UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPENT_GOLD_GUILD_REPAIRS, amount, 0, NULL, player);
+        m_achievementMgr.UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPENT_GOLD_GUILD_REPAIRS, amount, 0, 0, NULL, player);
     
     return true;
 }
