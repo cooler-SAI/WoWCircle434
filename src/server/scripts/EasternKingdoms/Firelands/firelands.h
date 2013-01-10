@@ -12,11 +12,15 @@ enum Data
     DATA_BALEROC    = 4,
     DATA_STAGHELM   = 5,
     DATA_RAGNAROS   = 6,
+    DATA_RIPLIMB    = 7,
+    DATA_RAGEFACE   = 8,
 };
 
 enum CreatureIds
 {
     NPC_SHANNOX     = 53691,
+    NPC_RAGEFACE    = 53695, 
+    NPC_RIPLIMB     = 53694,
     NPC_RHYOLITH    = 52558,
     NPC_BETHTILAC   = 52498,
     NPC_ALYSRAZOR   = 52530, 

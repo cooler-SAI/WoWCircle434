@@ -4662,6 +4662,32 @@ void SpellMgr::LoadDbcDataCorrections()
             case 99555: // Summon Lava Jest
                 spellInfo->MaxAffectedTargets = 4;
                 break;
+            // Shannox
+            case 100002: // Hurl Spear dmg
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(15);
+                break;
+            case 100031: // Hurl Spear aoe
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 100495: // Magma Flare
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(27);
+                break;
+            case 99945: // Face Rage jump
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+                spellInfo->Attributes |= SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK;
+                break;
+            case 99947: // Face Rage aura
+                spellInfo->Attributes |= SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK;
+                break;
+            case 100415: // Rage
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
+                break;
+            case 99937: // Jagged Tear
+            case 101218:
+            case 101219:
+            case 101220:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
             // ENDOF FIRELANDS
             // BASTION OF TWILIGHT SPELLS
             //

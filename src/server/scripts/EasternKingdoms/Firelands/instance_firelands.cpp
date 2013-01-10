@@ -30,6 +30,9 @@ class instance_firelands : public InstanceMapScript
             {
                 SetBossNumber(MAX_ENCOUNTER);
                 LoadDoorData(doordata);
+                uiShannoxGUID = 0;
+                uiRiplimbGUID = 0;
+                uiRagefaceGUID = 0;
             }
 
             void OnPlayerEnter(Player* pPlayer)
@@ -40,6 +43,20 @@ class instance_firelands : public InstanceMapScript
 
             void OnCreatureCreate(Creature* pCreature)
             {
+                switch (pCreature->GetEntry())
+                {
+                    case NPC_SHANNOX:
+                        uiShannoxGUID = pCreature->GetGUID();
+                        break;
+                    case NPC_RIPLIMB:
+                        uiRiplimbGUID = pCreature->GetGUID();
+                        break;
+                    case NPC_RAGEFACE:
+                        uiRagefaceGUID = pCreature->GetGUID();
+                        break;
+                    default:
+                        break;
+                }
 		    }
 
             void OnGameObjectCreate(GameObject* pGo)
@@ -61,6 +78,13 @@ class instance_firelands : public InstanceMapScript
 
             uint64 GetData64(uint32 type)
             {
+                switch (type)
+                {
+                    case DATA_SHANNOX: return uiShannoxGUID;
+                    case DATA_RIPLIMB: return uiRiplimbGUID;
+                    case DATA_RAGEFACE: return uiRagefaceGUID;
+                    default: return 0;
+                }
                 return 0;
             }
 
@@ -118,7 +142,9 @@ class instance_firelands : public InstanceMapScript
 
             private:
                 uint32 uiTeamInInstance;
-               
+                uint64 uiShannoxGUID;
+                uint64 uiRiplimbGUID;
+                uint64 uiRagefaceGUID;
         };
 };
 

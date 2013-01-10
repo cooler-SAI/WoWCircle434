@@ -664,6 +664,7 @@ void AddSC_boss_atramedes();
 
 void AddSC_instance_firelands(); // Firelands
 void AddSC_firelands();
+void AddSC_boss_shannox();
 
 // battlegrounds
 
@@ -1365,6 +1366,7 @@ void AddNorthrendScripts()
 
     AddSC_instance_firelands(); // Firelands
     AddSC_firelands();
+    AddSC_boss_shannox();
 
 #endif
 }

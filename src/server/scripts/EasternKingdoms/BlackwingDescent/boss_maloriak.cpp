@@ -587,7 +587,7 @@ class npc_maloriak_flash_freeze : public CreatureScript
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void SetGUID(const uint64& guid, int32 type)
+            void SetGUID(uint64 guid, int32 type)
             {
                 if (type == DATA_TRAPPED_PLAYER)
                 {
