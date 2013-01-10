@@ -30,7 +30,7 @@ EndScriptData */
 enum eEnums
 {
     NPC_ANZU   = 23035,
-    IKISS_DOOR = 177203,
+    IKISS_DOOR = 175353,
 };
 
 class instance_sethekk_halls : public InstanceMapScript
