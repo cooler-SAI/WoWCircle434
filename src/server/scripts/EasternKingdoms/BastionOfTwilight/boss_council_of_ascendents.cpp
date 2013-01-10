@@ -1501,7 +1501,7 @@ class npc_feludius_water_bomb : public CreatureScript
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void SpellHit(Unit* attacker, const SpellEntry* spell)
+            void SpellHit(Unit* attacker, const SpellInfo* spell)
             {
                 if (spell->Id == SPELL_WATER_BOMB)
                     DoCastAOE(SPELL_WATER_BOMB_1);
@@ -1536,7 +1536,7 @@ class npc_ignacious_flame_strike : public CreatureScript
                 DoCast(SPELL_FLAME_STRIKE);
             }
 
-            void SpellHit(Unit* attacker, const SpellEntry* spell)
+            void SpellHit(Unit* attacker, const SpellInfo* spell)
             {
                 if (spell->Id == SPELL_FLAME_STRIKE_DUMMY)
                 {

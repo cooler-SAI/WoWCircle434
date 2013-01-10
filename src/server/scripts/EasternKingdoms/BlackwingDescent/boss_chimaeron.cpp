@@ -217,7 +217,7 @@ public:
                 pNefarius->AI()->DoAction(ACTION_CHIMAERON_DEATH);
         }
 
-        void SpellHit(Unit* who, const SpellEntry* spell)
+        void SpellHit(Unit* who, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_SHADOW_WHIP)
             {

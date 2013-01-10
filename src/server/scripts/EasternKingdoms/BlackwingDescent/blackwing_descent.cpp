@@ -1343,7 +1343,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, SpellEntry const* spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell)
         {
             switch (spell->Id)
             {

@@ -146,6 +146,8 @@ enum Others
     TYPE_RESURRECT,
     ACTION_EGG,
     ACTION_WIPE,
+    ACTION_START_EGG,
+    ACTION_END_EGG,
 };
 
 const Position addsPos[16] = 
@@ -281,6 +283,10 @@ class boss_sinestra : public CreatureScript
                 pEgg1 = me->SummonCreature(NPC_PULSING_TWILIGHT_EGG, addsPos[1], TEMPSUMMON_DEAD_DESPAWN);
                 pEgg2 = me->SummonCreature(NPC_PULSING_TWILIGHT_EGG, addsPos[3], TEMPSUMMON_DEAD_DESPAWN);
 
+                pOrb1 = NULL;
+                pOrb2 = NULL;
+                pCalen = NULL;
+
                 if (!pInstance)
                     return;
                 pInstance->SetBossState(DATA_SINESTRA, NOT_STARTED);
@@ -309,12 +315,14 @@ class boss_sinestra : public CreatureScript
                 me->SummonCreature(NPC_CONVECTIVE_FLAMES, addsPos[2]);
                 me->SummonCreature(NPC_CONVECTIVE_FLAMES, addsPos[4]);
 
+                summons.DoZoneInCombat(NPC_PULSING_TWILIGHT_EGG);
+
                 events.ScheduleEvent(EVENT_CALL_FLAMES, 1500);
                 events.ScheduleEvent(EVENT_FLAME_BREATH, 25000);
                 events.ScheduleEvent(EVENT_SUMMON_ORB, 27000);
                 events.ScheduleEvent(EVENT_SUMMON_WHELP, 10000);
                 events.ScheduleEvent(EVENT_WRACK, 15000);
-                events.ScheduleEvent(EVENT_MELEE_CHECK, 5000);
+                //events.ScheduleEvent(EVENT_MELEE_CHECK, 5000);
 
 
                 Talk(SAY_SINESTRA_AGGRO);
@@ -506,40 +514,20 @@ class boss_sinestra : public CreatureScript
                             events.ScheduleEvent(EVENT_SUMMON_DRAKE, 50000);
                             break;
                         case EVENT_TALK_SINESTRA_PHASE_2_2:
+                        {
                             Talk(SAY_SINESTRA_PHASE_2_2);
-                            if (pEgg1)
-                            {
-                                pEgg1->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                                pEgg1->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                pEgg1->RemoveAurasDueToSpell(SPELL_TWILIGHT_CARAPACE);
-                                pEgg1->CastSpell(me, SPELL_TWILIGHT_INFUSION, false);
-                            }
-                            if (pEgg2)
-                            {
-                                pEgg2->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                                pEgg2->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                pEgg2->RemoveAurasDueToSpell(SPELL_TWILIGHT_CARAPACE);
-                                pEgg2->CastSpell(me, SPELL_TWILIGHT_INFUSION, false);
-                            }
+                            EntryCheckPredicate pred(NPC_PULSING_TWILIGHT_EGG);
+                            summons.DoAction(ACTION_START_EGG, pred);
+                            
                             me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
                             events.ScheduleEvent(EVENT_CONTINUE_PHASE_2, 30000);
                             break;
+                        }
                         case EVENT_CONTINUE_PHASE_2:
-                            if (pEgg1)
-                            {
-                                pEgg1->InterruptNonMeleeSpells(false);
-                                pEgg1->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                                pEgg1->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                pEgg1->RemoveAurasDueToSpell(SPELL_TWILIGHT_CARAPACE);
-                                pEgg1->CastSpell(me, SPELL_TWILIGHT_CARAPACE, false);
-                            }
-                            if (pEgg2)
-                            {
-                                pEgg2->InterruptNonMeleeSpells(false);
-                                pEgg2->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                                pEgg2->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                                pEgg2->CastSpell(me, SPELL_TWILIGHT_CARAPACE, false);
-                            }
+                        {
+                            me->RemoveAurasDueToSpell(SPELL_TWILIGHT_INFUSION);
+                            EntryCheckPredicate pred(NPC_PULSING_TWILIGHT_EGG);
+                            summons.DoAction(ACTION_END_EGG, pred);
                             if (Creature* pStalker = me->FindNearestCreature(NPC_BARRIER_COSMETIC_STALKER, 100.0f))
                             {
                                 pStalker->GetMotionMaster()->MovementExpired(false);
@@ -547,6 +535,7 @@ class boss_sinestra : public CreatureScript
                             }
                             phase = 1;
                             break;
+                        }
                         case EVENT_SUMMON_CALLER:
                             if (Creature* pCaller = me->SummonCreature(NPC_TWILIGHT_SPITECALLER, addsPos[9], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                                 pCaller->GetMotionMaster()->MovePoint(0, addsPos[10]);
@@ -631,7 +620,7 @@ class npc_sinestra_calen : public CreatureScript
                 }
             }
 
-            void SpellHit(Unit* caster, const SpellEntry* spell)
+            void SpellHit(Unit* caster, const SpellInfo* spell)
             {
                 if (spell->Id == SPELL_TWILIGHT_BLAST_DUMMY)
                 {
@@ -790,18 +779,10 @@ class npc_sinestra_twilight_flames : public CreatureScript
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void Reset()
-            {
-            }
-
-            void SpellHit(Unit* caster, const SpellEntry* spellEntry)
+            void SpellHit(Unit* caster, const SpellInfo* spellEntry)
             {
                 if (spellEntry->Id == SPELL_CALL_FLAMES)
                     DoCast(me, SPELL_TWILIGHT_FLAMES, true);
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
             }
         };
 };
@@ -976,6 +957,22 @@ class npc_sinestra_pulsing_twilight_egg : public CreatureScript
             void Reset()
             {
                 DoCast(me, SPELL_TWILIGHT_CARAPACE);
+            }
+
+            void DoAction(const int32 action)
+            {
+                if (action == ACTION_START_EGG)
+                {
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveAllAuras();
+                    if (Creature* pSinestra = me->FindNearestCreature(NPC_SINESTRA, 200.0f))
+                        DoCast(pSinestra, SPELL_TWILIGHT_INFUSION);
+                }
+                else if (action == ACTION_END_EGG)
+                {
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    DoCast(me, SPELL_TWILIGHT_CARAPACE, true);
+                }
             }
 
             void JustDied(Unit* killer)
@@ -1330,8 +1327,8 @@ class spell_sinestra_pyrrhic_focus : public SpellScriptLoader
                     uint32 addHealth = uint32(0.01f * caster->GetMaxHealth());
                     if (caster->GetHealth() <= addHealth)
                         caster->Kill(caster);
-                    else
-                        caster->ModifyHealth(-int32(addHealth));
+                    //else
+                        //caster->ModifyHealth(-int32(addHealth));
                 }
             }
 
@@ -1402,7 +1399,7 @@ class spell_sinestra_twilight_essence : public SpellScriptLoader
             void Register()
             {
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sinestra_twilight_essence_SpellScript::CorrectRange, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sinestra_twilight_essence_SpellScript::CorrectRange, EFFECT_1, TARGET_UNIT_SRC_AREA_ENTRY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sinestra_twilight_essence_SpellScript::CorrectRange, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
             }
         };
 

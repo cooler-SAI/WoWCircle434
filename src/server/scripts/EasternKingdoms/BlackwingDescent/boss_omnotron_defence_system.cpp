@@ -1292,7 +1292,7 @@ public:
             DoCast(me, SPELL_POWER_GENERATOR_10);
         }
 
-        void SpellHit(Unit* caster, SpellEntry const* spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell)
         {
             if (spell->Id == SPELL_OVERCHARGE)
                 events.ScheduleEvent(EVENT_OVERCHARGED, 2000);                
