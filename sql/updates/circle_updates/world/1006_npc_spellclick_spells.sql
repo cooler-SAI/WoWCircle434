@@ -1,0 +1,1 @@
+DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` IN (51391, 51395 , 51396, 51397, 45191);
