@@ -31,6 +31,7 @@
 BattlegroundAB::BattlegroundAB()
 {
     m_BuffChange = true;
+    m_IsInformedNearVictory = false;
     BgObjects.resize(BG_AB_OBJECT_MAX);
     BgCreatures.resize(BG_AB_ALL_NODES_COUNT + 5);//+5 for aura triggers
 
