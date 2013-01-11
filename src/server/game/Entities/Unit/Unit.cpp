@@ -11137,6 +11137,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
                             mod += aur->GetAmount();
                         AddPct(DoneTotalMod, 300);
                     }
+                    break;
                 }
                 case 73510: // Mind Blast
                 case 8092:  // Mind Spike
