@@ -472,7 +472,7 @@ void CurrencyMgr::AddCurrencyCapData(uint32 lowGuid, uint16 arenaRating /* = 0 *
 
 void CurrencyMgr::LoadPlayersCurrencyCap()
 {
-    QueryResult result = CharacterDatabase.PQuery("SELECT highestArenaRating, highestRBgRating, currentArenaCap, currentRBgCap, requireReset FROM character_currency_cap ORDER BY guid");
+    QueryResult result = CharacterDatabase.PQuery("SELECT * FROM character_currency_cap ORDER BY guid");
     if (!result)
     {
         sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 players who have any currency cap data. DB table `character_currency_cap` is empty!");
