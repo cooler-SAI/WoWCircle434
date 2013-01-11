@@ -139,26 +139,26 @@ void WorldSession::HandleGuildFinderBrowse(WorldPacket& recvPacket)
         data.WriteByteMask(guildGUID[6]);
         data.WriteByteMask(guildGUID[3]);
 
-        bufferData << int32(guild->GetEmblemInfo().GetColor());
-        bufferData << int32(guild->GetEmblemInfo().GetBorderStyle()); // Guessed
-        bufferData << int32(guild->GetEmblemInfo().GetStyle());
+        bufferData << uint32(guild->GetEmblemInfo().GetColor());
+        bufferData << uint32(guild->GetEmblemInfo().GetBorderStyle()); // Guessed
+        bufferData << uint32(guild->GetEmblemInfo().GetStyle());
 
         bufferData << WriteBuffer(guildSettings.GetComment().c_str(), guildSettings.GetComment().size());
 
-        bufferData << uint8(0); // Cached ? Idk
+        bufferData << uint8(0); // Unk
 
         bufferData.WriteByteSeq(guildGUID[5]);
 
-        bufferData << uint32(guildSettings.GetInterests()); // Guild Interests
+        bufferData << uint32(guildSettings.GetInterests());
 
         bufferData.WriteByteSeq(guildGUID[6]);
         bufferData.WriteByteSeq(guildGUID[4]);
 
-        bufferData << guild->GetLevel();
+        bufferData << uint32(guild->GetLevel());
 
         bufferData << WriteBuffer(guild->GetName().c_str(), guild->GetName().size());
 
-        bufferData << int32(0); // guild->GetAchievementMgr().GetAchievementPoints()
+        bufferData << uint32(guild->GetAchievementMgr().GetAchievementPoints());
 
         bufferData.WriteByteSeq(guildGUID[7]);
 
@@ -171,9 +171,9 @@ void WorldSession::HandleGuildFinderBrowse(WorldPacket& recvPacket)
 
         bufferData.WriteByteSeq(guildGUID[1]);
 
-        bufferData << int32(guild->GetEmblemInfo().GetBackgroundColor());
+        bufferData << uint32(guild->GetEmblemInfo().GetBackgroundColor());
         bufferData << uint32(0); // Unk Int 2 (+ 128) // Always 0 or 1
-        bufferData << int32(guild->GetEmblemInfo().GetBorderColor());
+        bufferData << uint32(guild->GetEmblemInfo().GetBorderColor());
         bufferData << uint32(guildSettings.GetClassRoles());
 
         bufferData.WriteByteSeq(guildGUID[3]);
