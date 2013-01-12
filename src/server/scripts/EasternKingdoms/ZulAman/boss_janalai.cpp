@@ -48,6 +48,7 @@ enum Events
     EVENT_SUMMON_BOMBS      = 5,
     EVENT_DETONATE_BOMBS    = 6,
     EVENT_TELEPORT          = 7,
+    EVENT_FLAMEBUFFET       = 8,
 };
 
 const int area_dx = 44;
@@ -239,7 +240,7 @@ class boss_janalai : public CreatureScript
                             me->AttackStop();
                             if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                                 DoCast(pTarget, SPELL_FLAME_BREATH);
-                            events.ScheduleEvent(EVENT_CONTINUE, 1500);
+                            events.ScheduleEvent(EVENT_CONTINUE, 3000);
                             events.ScheduleEvent(EVENT_FLAME_BREATH, 9000);
                             break;
                         case EVENT_CONTINUE:
@@ -255,6 +256,8 @@ class boss_janalai : public CreatureScript
                             events.ScheduleEvent(EVENT_SUMMON_HATCHERS, 90000);
                             break;
                         case EVENT_SPAWN_BOMBS:
+                            me->SetReactState(REACT_PASSIVE);
+                            me->AttackStop();
                             bombsCount = 0;
                             Talk(SAY_FIRE_BOMB);
                             SpawnBombs();
@@ -310,13 +313,14 @@ class npc_janalai_hatcher : public CreatureScript
 
         struct npc_janalai_hatcherAI : public ScriptedAI
         {
-            npc_janalai_hatcherAI(Creature* creature) : ScriptedAI(creature)
+            npc_janalai_hatcherAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
+                me->SetSpeed(MOVE_RUN, 0.8f);
                 me->SetReactState(REACT_PASSIVE);
-                instance = creature->GetInstanceScript();
+                pInstance = pCreature->GetInstanceScript();
             }
 
-            InstanceScript* instance;
+            InstanceScript* pInstance;
 
             uint32 waypoint;
             uint32 WaitTimer;
@@ -346,7 +350,7 @@ class npc_janalai_hatcher : public CreatureScript
 
             void UpdateAI(const uint32 diff)
             {
-                if (!instance || !(instance->GetBossState(DATA_JANALAI) == IN_PROGRESS))
+                if (!pInstance || !(pInstance->GetBossState(DATA_JANALAI) == IN_PROGRESS))
                 {
                     me->DespawnOrUnsummon();
                     return;
@@ -369,7 +373,7 @@ class npc_janalai_hatcher : public CreatureScript
                         if (me->FindNearestCreature(NPC_EGG, 50.0f))
                         {
                             DoCast(SPELL_HATCH_EGG);
-                            WaitTimer = 5000;
+                            WaitTimer = 6000;
                         }
                         else if (!hasChangedSide)
                         {
@@ -448,24 +452,24 @@ class npc_janalai_hatchling : public CreatureScript
     public:
         npc_janalai_hatchling() : CreatureScript("npc_janalai_hatchling")  {}
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* pCreature) const
         {
-            return new npc_janalai_hatchlingAI(creature);
+            return new npc_janalai_hatchlingAI(pCreature);
         }
 
         struct npc_janalai_hatchlingAI : public ScriptedAI
         {
-            npc_janalai_hatchlingAI(Creature* creature) : ScriptedAI(creature)
+            npc_janalai_hatchlingAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
-                instance = creature->GetInstanceScript();
+                pInstance = pCreature->GetInstanceScript();
             }
 
-            InstanceScript* instance;
-            uint32 BuffetTimer;
+            InstanceScript* pInstance;
+            EventMap events;
 
             void Reset()
             {
-                BuffetTimer = urand(7000, 10000);
+                events.Reset();
                 if (me->GetPositionY() > 1150)
                     me->GetMotionMaster()->MovePoint(0, posHatchersWay[0][3].GetPositionX()+rand()%4-2, 1150.0f+rand()%4-2, posHatchersWay[0][3].GetPositionZ());
                 else
@@ -474,11 +478,14 @@ class npc_janalai_hatchling : public CreatureScript
                 //me->SetUnitMovementFlags(MOVEMENTFLAG_DISABLE_GRAVITY);
             }
 
-            void EnterCombat(Unit* /*who*/) {/*DoZoneInCombat();*/}
+            void EnterCombat(Unit* /*who*/) 
+            {
+                events.ScheduleEvent(EVENT_FLAMEBUFFET, urand(7000, 15000));
+            }
 
             void UpdateAI(const uint32 diff)
             {
-                if (!instance || !(instance->GetBossState(DATA_JANALAI) == IN_PROGRESS))
+                if (!pInstance || !(pInstance->GetBossState(DATA_JANALAI) == IN_PROGRESS))
                 {
                     me->DisappearAndDie();
                     return;
@@ -487,11 +494,15 @@ class npc_janalai_hatchling : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-                if (BuffetTimer <= diff)
+                while (uint32 eventId = events.ExecuteEvent())
                 {
-                    DoCastVictim(SPELL_FLAMEBUFFET);
-                    BuffetTimer = urand(70000, 15000);
-                } else BuffetTimer -= diff;
+                     switch (eventId)
+                     {
+                        case EVENT_FLAMEBUFFET:
+                            DoCastVictim(SPELL_FLAMEBUFFET);
+                            break;
+                     }
+                }
 
                 DoMeleeAttackIfReady();
             }

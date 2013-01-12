@@ -5147,6 +5147,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 42630: // Fire Bomb dmg
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(15);
                 break;
+            case 43140: // Flame Breath
+            case 97855:
+                spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
+                spellInfo->ChannelInterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
+                break;
             // Halazzi
             case 97505: // Refreshing Stream heal
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
