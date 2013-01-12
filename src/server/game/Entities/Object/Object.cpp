@@ -329,14 +329,14 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         go ? (const WorldObject*)go : dob ? (const WorldObject*)dob : (const WorldObject*)ToCorpse()));
 
     uint32 transportPause = 0;
-    if (go)
+    /*if (go)
     {
         if (GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(go->GetEntry()))
         {
             if (goinfo->type == GAMEOBJECT_TYPE_TRANSPORT && goinfo->transport.pause)
                 transportPause = goinfo->transport.pause;
         }
-    }
+    }*/
 
     if (unit)
         const_cast<Unit*>(unit)->m_movementInfo.Normalize(GetTypeId() == TYPEID_UNIT, flags);
