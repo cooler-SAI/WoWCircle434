@@ -81,6 +81,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Gnaw
             else if (spellproto->Id == 47481)
                 return DIMINISHING_CONTROLLED_STUN;
+            // Earthquake
+            else if (spellproto->Id == 64697)
+                return DIMINISHING_NONE;
             break;
         }
         // Event spells
@@ -2939,6 +2942,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 72444: // Mark of the Fallen Champion (Deathbringer Saurfang)
             case 72445: // Mark of the Fallen Champion (Deathbringer Saurfang)
             case 72446: // Mark of the Fallen Champion (Deathbringer Saurfang)
+            case 62775: // Tympanic Tantrum (XT-002 encounter)
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
             case 64422: // Sonic Screech (Auriaya)
@@ -3476,10 +3480,27 @@ void SpellMgr::LoadDbcDataCorrections()
             case 70650: // Death Knight T10 Tank 2P Bonus
                 spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_ADD_PCT_MODIFIER;
                 break;
+            case 68872: // Soulstorm (Bronjahm Encounter)
+                spellInfo->InterruptFlags = 0;
+                break;
             // ULDUAR SPELLS
             //
+            case 64014: // Expedition Base Camp Teleport
+            case 64032: // Formation Grounds Teleport
+            case 64028: // Colossal Forge Teleport
+            case 64031: // Scrapyard Teleport
+            case 64030: // Antechamber Teleport
+            case 64029: // Shattered Walkway Teleport
+            case 64024: // Conservatory Teleport
+            case 64025: // Halls of Invention Teleport
+            case 64027: // Descent into Madness Teleport
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DB;
+                break;
             case 62374: // Pursued (Flame Leviathan)
                 spellInfo->Effects[0].SetRadiusIndex(EFFECT_RADIUS_50000_YARDS);   // 50000yd
+                break;
+            case 62383: // Shatter (Ignis)
+                spellInfo->SpellVisual[0] = 12639;
                 break;
             case 63342: // Focused Eyebeam Summon Trigger (Kologarn)
                 spellInfo->MaxAffectedTargets = 1;

@@ -2498,6 +2498,8 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                 case 61716: // Rabbit Costume
                 case 61734: // Noblegarden Bunny
                 case 62344: // Fists of Stone
+                case 62478: // Frozen Blows (Hodir)
+                case 63512: // Frozen Blows (Hodir)
                     return true;
                 default:
                     break;

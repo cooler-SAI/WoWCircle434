@@ -322,7 +322,7 @@ class boss_sinestra : public CreatureScript
                 events.ScheduleEvent(EVENT_SUMMON_ORB, 27000);
                 events.ScheduleEvent(EVENT_SUMMON_WHELP, 10000);
                 events.ScheduleEvent(EVENT_WRACK, 15000);
-                //events.ScheduleEvent(EVENT_MELEE_CHECK, 5000);
+                events.ScheduleEvent(EVENT_MELEE_CHECK, 5000);
 
 
                 Talk(SAY_SINESTRA_AGGRO);
@@ -1327,8 +1327,8 @@ class spell_sinestra_pyrrhic_focus : public SpellScriptLoader
                     uint32 addHealth = uint32(0.01f * caster->GetMaxHealth());
                     if (caster->GetHealth() <= addHealth)
                         caster->Kill(caster);
-                    //else
-                        //caster->ModifyHealth(-int32(addHealth));
+                    else
+                        caster->ModifyHealth(-int32(addHealth));
                 }
             }
 

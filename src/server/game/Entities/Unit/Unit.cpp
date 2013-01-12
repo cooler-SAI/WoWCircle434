@@ -5047,6 +5047,10 @@ bool Unit::HandleSpellCritChanceAuraProc(Unit* victim, uint32 /*damage*/, AuraEf
     if (cooldown && GetTypeId() == TYPEID_PLAYER)
         ToPlayer()->AddSpellCooldown(triggered_spell_id, 0, time(NULL) + cooldown);
 
+    Creature* creature = ToCreature();
+    if (creature && creature->IsAIEnabled)
+        creature->AI()->DoAction(EVENT_SPELLCLICK);
+
     return true;
 }
 
@@ -18743,9 +18747,9 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
     return result;
 }
 
-void Unit::EnterVehicle(Unit* base, int8 seatId)
+void Unit::EnterVehicle(Unit* base, int8 seatId, bool fullTriggered)
 {
-    CastCustomSpell(VEHICLE_SPELL_RIDE_HARDCODED, SPELLVALUE_BASE_POINT0, seatId + 1, base, TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE);
+    CastCustomSpell(VEHICLE_SPELL_RIDE_HARDCODED, SPELLVALUE_BASE_POINT0, seatId + 1, base, fullTriggered ? TRIGGERED_FULL_MASK : TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE);
 }
 
 void Unit::_EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* aurApp)
