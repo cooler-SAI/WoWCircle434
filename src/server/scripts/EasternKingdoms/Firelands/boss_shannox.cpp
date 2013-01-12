@@ -127,6 +127,14 @@ class boss_shannox : public CreatureScript
             bool bRagefaceDead;
             bool bFrenzy;
 
+            void InitializeAI()
+            {
+                if (!instance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(FLScriptName))
+                    me->IsAIEnabled = false;
+                else if (!me->isDead())
+                    Reset();
+            }
+
             void Reset()
             {
                 _Reset();
@@ -178,13 +186,15 @@ class boss_shannox : public CreatureScript
             void EnterCombat(Unit* attacker)
             {
                 if (Creature* pRiplimb = me->FindNearestCreature(NPC_RIPLIMB, 300.0f))
-                    pRiplimb->SetInCombatWithZone();
+                    if (!pRiplimb->isInCombat() && pRiplimb->IsAIEnabled)
+                        pRiplimb->AI()->AttackStart(attacker);
                 if (Creature* pRageface = me->FindNearestCreature(NPC_RAGEFACE, 300.0f))
-                    pRageface->SetInCombatWithZone();
+                    if (!pRageface->isInCombat() && pRageface->IsAIEnabled)
+                        pRageface->AI()->AttackStart(attacker);
 
                 Talk(SAY_AGGRO);
                 events.ScheduleEvent(EVENT_BERSERK, 60 * MINUTE * IN_MILLISECONDS);
-                events.ScheduleEvent(EVENT_HURL_SPEAR, 10000);
+                events.ScheduleEvent(EVENT_HURL_SPEAR, 15000);
                 events.ScheduleEvent(EVENT_SEPARATION_ANXIETY, 2000);
                 events.ScheduleEvent(EVENT_IMMOLATION_TRAP, urand(10000, 20000));
                 events.ScheduleEvent(EVENT_CRYSTAL_PRISON_TRAP, urand(10000, 25500));
@@ -351,9 +361,11 @@ class npc_shannox_riplimb : public CreatureScript
             void EnterCombat(Unit* who)
             {
                 if (Creature* pShannox = me->FindNearestCreature(NPC_SHANNOX, 300.0f))
-                    pShannox->SetInCombatWithZone();
+                    if (!pShannox->isInCombat() && pShannox->IsAIEnabled)
+                        pShannox->AI()->AttackStart(who);
                 if (Creature* pRageface = me->FindNearestCreature(NPC_RAGEFACE, 300.0f))
-                    pRageface->SetInCombatWithZone();
+                    if (!pRageface->isInCombat() && pRageface->IsAIEnabled)
+                        pRageface->AI()->AttackStart(who);
 
                 DoZoneInCombat();
                 events.ScheduleEvent(EVENT_LIMB_RIP, 6000);
@@ -528,9 +540,11 @@ class npc_shannox_rageface : public CreatureScript
             void EnterCombat(Unit* who)
             {
                 if (Creature* pShannox = me->FindNearestCreature(NPC_SHANNOX, 300.0f))
-                    pShannox->SetInCombatWithZone();
+                    if (!pShannox->isInCombat() && pShannox->IsAIEnabled)
+                        pShannox->AI()->AttackStart(who);
                 if (Creature* pRiplimb = me->FindNearestCreature(NPC_RIPLIMB, 300.0f))
-                    pRiplimb->SetInCombatWithZone();
+                    if (!pRiplimb->isInCombat() && pRiplimb->IsAIEnabled)
+                        pRiplimb->AI()->AttackStart(who);
 
                 DoZoneInCombat();
                 events.ScheduleEvent(EVENT_FACE_RAGE, 7000);
