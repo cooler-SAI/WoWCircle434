@@ -137,7 +137,7 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
         case SPELLFAMILY_DRUID:
         {
             // Pounce
-            if (spellproto->SpellFamilyFlags[0] & 0x20000)
+            if (spellproto->Id == 9005)
                 return DIMINISHING_CONTROLLED_STUN;
             // Cyclone
             else if (spellproto->SpellFamilyFlags[1] & 0x20)
