@@ -77,6 +77,7 @@ enum UlduarNPCs
 
     NPC_XT002                               = 33293,
     NPC_XT_TOY_PILE                         = 33337,
+
     NPC_STEELBREAKER                        = 32867,
     NPC_MOLGEIM                             = 32927,
     NPC_BRUNDIR                             = 32857,
@@ -92,17 +93,7 @@ enum UlduarNPCs
     NPC_ARM_SWEEP_STALKER                   = 33661,
 
     NPC_AURIAYA                             = 33515,
-    NPC_MIMIRON                             = 33350,
     
-    // Hodir
-    NPC_HODIR                               = 32845,
-    NPC_FLASH_FREEZE                        = 32926,
-    NPC_ICE_BLOCK                           = 32938,
-    NPC_SNOWPACKED_ICICLE                   = 33174,
-    NPC_ICICLE                              = 33169,
-    NPC_ICICLE_SNOWDRIFT                    = 33173,
-    NPC_TOASTY_FIRE                         = 33342,
-
     // Thorim
     NPC_THORIM                              = 32865,
     NPC_JORMUNGAR_BEHEMOTH                  = 32882,
@@ -128,25 +119,20 @@ enum UlduarNPCs
     NPC_IRON_HONOR_GUARD                    = 32875,
     NPC_DARK_RUNE_ACOLYTE_TUNNEL            = 33110,
 
-    // Freya
-    NPC_FREYA                               = 32906,
-    NPC_ELDER_IRONBRANCH                    = 32913,
-    NPC_ELDER_STONEBARK                     = 32914,
-    NPC_ELDER_BRIGHTLEAF                    = 32915,
-
-    NPC_VEZAX                               = 33271,
-    NPC_YOGGSARON                           = 33288,
-    NPC_ALGALON                             = 32871,
-
     // Mimiron
     NPC_LEVIATHAN_MKII                      = 33432,
     NPC_VX_001                              = 33651,
     NPC_AERIAL_COMMAND_UNIT                 = 33670,
+    NPC_MIMIRON                             = 33350,
 
-    // Freya's Keepers
-    NPC_IRONBRANCH                          = 32913,
-    NPC_BRIGHTLEAF                          = 32915,
-    NPC_STONEBARK                           = 32914,
+    // Hodir
+    NPC_HODIR                               = 32845,
+    NPC_FLASH_FREEZE                        = 32926,
+    NPC_ICE_BLOCK                           = 32938,
+    NPC_SNOWPACKED_ICICLE                   = 33174,
+    NPC_ICICLE                              = 33169,
+    NPC_ICICLE_SNOWDRIFT                    = 33173,
+    NPC_TOASTY_FIRE                         = 33342,
 
     // Hodir's Helper NPCs
     NPC_TOR_GREYCLOUD                       = 32941,
@@ -166,6 +152,17 @@ enum UlduarNPCs
     NPC_FIELD_MEDIC_PENNY                   = 32897,
     NPC_FIELD_MEDIC_JESSI                   = 33326,
 
+    // Freya
+    NPC_FREYA                               = 32906,
+    NPC_ELDER_IRONBRANCH                    = 32913,
+    NPC_ELDER_STONEBARK                     = 32914,
+    NPC_ELDER_BRIGHTLEAF                    = 32915,
+
+    // Freya's Keepers
+    NPC_IRONBRANCH                          = 32913,
+    NPC_BRIGHTLEAF                          = 32915,
+    NPC_STONEBARK                           = 32914,
+
     // Freya's trash NPCs
     NPC_CORRUPTED_SERVITOR                  = 33354,
     NPC_MISGUIDED_NYMPH                     = 33355,
@@ -175,6 +172,10 @@ enum UlduarNPCs
     NPC_IRONROOT_LASHER                     = 33526,
     NPC_NATURES_BLADE                       = 33527,
     NPC_GUARDIAN_OF_LIFE                    = 33528,
+
+    NPC_VEZAX                               = 33271,
+    NPC_YOGGSARON                           = 33288,
+    NPC_ALGALON                             = 32871,
 
     // Algalon the Observer
     NPC_BRANN_BRONZBEARD_ALG                = 34064,

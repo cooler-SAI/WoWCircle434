@@ -1610,7 +1610,7 @@ void AddSC_boss_theralion_and_valiona()
     new npc_valiona_twilight_flames();
     new npc_unstable_twilight();
     new npc_collapsing_twilight_portal();
-    new npc_theralion_flight_target_stalker();
+    //new npc_theralion_flight_target_stalker();
     new npc_twilight_sentry();
     new npc_twilight_rift();
     new spell_valiona_blackout();

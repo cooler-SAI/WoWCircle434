@@ -312,7 +312,7 @@ class boss_mimiron : public CreatureScript
                 _gotHardMode = false;
                 _enraged = false;
 
-                events.ScheduleEvent(EVENT_CHECK_TARGET, 7*IN_MILLISECONDS);
+                //events.ScheduleEvent(EVENT_CHECK_TARGET, 7*IN_MILLISECONDS);
 
                 DespawnCreatures(NPC_FLAMES_INITIAL, 100.0f);
                 DespawnCreatures(NPC_PROXIMITY_MINE, 100.0f);
