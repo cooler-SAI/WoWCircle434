@@ -4454,6 +4454,24 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
                 break;
             // Omnotron Defence System
+            case 78697: // Recharging blue
+            case 95019:
+            case 95020:
+            case 95021:
+            case 78698: // Recharging orange
+            case 95025:
+            case 95026:
+            case 95027:
+            case 78699: // Recharging purple
+            case 95028:
+            case 95029:
+            case 95030:
+            case 78700: // Recharging green
+            case 95022:
+            case 95023:
+            case 95024:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
             case 91540: // Arcane Annihilator
             case 91542:
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
@@ -4486,11 +4504,18 @@ void SpellMgr::LoadDbcDataCorrections()
             case 91525:
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
                 break;
+            case 79501: // Acquiring Target
+            case 92035:
+            case 92036:
+            case 92037:
+                spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
+                break;
             case 79504: // Flamethrower
             case 91535:
             case 91536:
             case 91537:
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CONE_ENEMY_24;
+                spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
                 break;
             case 79617: // Backdraft
             case 91528:
