@@ -719,6 +719,7 @@ Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_rep
     m_regenTimer = 0;
     m_regenTimerCount = 0;
     m_holyPowerRegenTimerCount = 0;
+    m_focusRegenTimerCount = 0;
     m_weaponChangeTimer = 0;
 
     m_zoneUpdateId = 0;
@@ -2540,9 +2541,11 @@ void Player::RegenerateAll()
     if (getClass() == CLASS_PALADIN)
         m_holyPowerRegenTimerCount += m_regenTimer;
 
+    if (getClass() == CLASS_HUNTER)
+        m_focusRegenTimerCount += m_regenTimer;
+
     Regenerate(POWER_ENERGY);
     Regenerate(POWER_MANA);
-    Regenerate(POWER_FOCUS);
 
     // Runes act as cooldowns, and they don't need to send any data
     if (getClass() == CLASS_DEATH_KNIGHT)
@@ -2559,6 +2562,12 @@ void Player::RegenerateAll()
             else if (secondRuneCd)
                 SetRuneCooldown(i + 1, (secondRuneCd > m_regenTimer * runeCdMod) ? secondRuneCd - m_regenTimer * runeCdMod : 0);
         }
+    }
+
+    if (m_focusRegenTimerCount >= 1000 && getClass() == CLASS_HUNTER)
+    {
+        Regenerate(POWER_FOCUS);
+        m_focusRegenTimerCount -= 1000;
     }
 
     if (m_regenTimerCount >= 2000)
@@ -2633,10 +2642,8 @@ void Player::Regenerate(Powers power)
         }
         break;
         case POWER_FOCUS:
-        {
-            addvalue += m_regenTimer * 0.001f * (GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) + 5); // 5 for cleint correct tooltip
+            addvalue += (6.0f + CalculatePct(6.0f, rangedHaste)) * sWorld->getRate(RATE_POWER_FOCUS);
             break;
-        }
         case POWER_ENERGY:                                              // Regenerate energy (rogue)
             addvalue += (0.01f * m_regenTimer * (2.0f - GetFloatValue(PLAYER_FIELD_MOD_HASTE_REGEN))) * sWorld->getRate(RATE_POWER_ENERGY);
             break;
