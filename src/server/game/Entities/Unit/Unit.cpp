@@ -1834,7 +1834,13 @@ void Unit::AttackerStateUpdate (Unit* victim, WeaponAttackType attType, bool ext
         return;
 
     if ((attType == BASE_ATTACK || attType == OFF_ATTACK) && !IsWithinLOSInMap(victim))
+    {
+        // Test function
+        // Send event in script to prevent exploits with los
+        if (IsAIEnabled && GetMap()->IsRaid())
+            GetAI()->DoAction(EVENT_UNIT_WITHIN_LOS);
         return;
+    }
 
     CombatStart(victim);
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MELEE_ATTACK);
