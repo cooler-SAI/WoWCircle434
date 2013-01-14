@@ -4709,9 +4709,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 99945: // Face Rage jump
                 spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
                 spellInfo->Attributes |= SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK;
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
                 break;
             case 99947: // Face Rage aura
                 spellInfo->Attributes |= SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK;
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
                 break;
             case 100415: // Rage
                 spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;

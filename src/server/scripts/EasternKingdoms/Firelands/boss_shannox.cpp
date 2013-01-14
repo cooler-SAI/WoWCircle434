@@ -186,11 +186,9 @@ class boss_shannox : public CreatureScript
             void EnterCombat(Unit* attacker)
             {
                 if (Creature* pRiplimb = me->FindNearestCreature(NPC_RIPLIMB, 300.0f))
-                    if (!pRiplimb->isInCombat() && pRiplimb->IsAIEnabled)
-                        pRiplimb->AI()->AttackStart(attacker);
+                    DoZoneInCombat(pRiplimb);
                 if (Creature* pRageface = me->FindNearestCreature(NPC_RAGEFACE, 300.0f))
-                    if (!pRageface->isInCombat() && pRageface->IsAIEnabled)
-                        pRageface->AI()->AttackStart(attacker);
+                    DoZoneInCombat(pRageface);
 
                 Talk(SAY_AGGRO);
                 events.ScheduleEvent(EVENT_BERSERK, 60 * MINUTE * IN_MILLISECONDS);
@@ -361,11 +359,9 @@ class npc_shannox_riplimb : public CreatureScript
             void EnterCombat(Unit* who)
             {
                 if (Creature* pShannox = me->FindNearestCreature(NPC_SHANNOX, 300.0f))
-                    if (!pShannox->isInCombat() && pShannox->IsAIEnabled)
-                        pShannox->AI()->AttackStart(who);
+                    DoZoneInCombat(pShannox);
                 if (Creature* pRageface = me->FindNearestCreature(NPC_RAGEFACE, 300.0f))
-                    if (!pRageface->isInCombat() && pRageface->IsAIEnabled)
-                        pRageface->AI()->AttackStart(who);
+                    DoZoneInCombat(pRageface);
 
                 DoZoneInCombat();
                 events.ScheduleEvent(EVENT_LIMB_RIP, 6000);
@@ -540,11 +536,9 @@ class npc_shannox_rageface : public CreatureScript
             void EnterCombat(Unit* who)
             {
                 if (Creature* pShannox = me->FindNearestCreature(NPC_SHANNOX, 300.0f))
-                    if (!pShannox->isInCombat() && pShannox->IsAIEnabled)
-                        pShannox->AI()->AttackStart(who);
+                    DoZoneInCombat(pShannox);
                 if (Creature* pRiplimb = me->FindNearestCreature(NPC_RIPLIMB, 300.0f))
-                    if (!pRiplimb->isInCombat() && pRiplimb->IsAIEnabled)
-                        pRiplimb->AI()->AttackStart(who);
+                    DoZoneInCombat(pRiplimb);
 
                 DoZoneInCombat();
                 events.ScheduleEvent(EVENT_FACE_RAGE, 7000);
