@@ -1982,6 +1982,7 @@ class Player : public Unit, public GridObject<Player>
         uint8 GetSpecsCount() const { return _talentMgr->SpecsCount; }
         void SetSpecsCount(uint8 count) { _talentMgr->SpecsCount = count; }
         uint32 GetActiveTalentTree() const { return _talentMgr->SpecInfo[_talentMgr->ActiveSpec].TalentTree; }
+        Stats GetMaxStatType() const;
         PlayerRole GetRole() const;
 
         bool ResetTalents(bool no_cost = false);

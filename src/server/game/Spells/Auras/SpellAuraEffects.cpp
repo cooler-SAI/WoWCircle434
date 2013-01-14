@@ -4214,16 +4214,28 @@ void AuraEffect::HandleAuraModStat(AuraApplication const* aurApp, uint8 mode, bo
 
     Unit* target = aurApp->GetTarget();
 
-    if (GetMiscValue() < -2 || GetMiscValue() > 4)
+    int32 statType = GetMiscValue();
+    if (statType < -2 || statType > 4)
     {
-        sLog->outError(LOG_FILTER_SPELLS_AURAS, "WARNING: Spell %u effect %u has an unsupported misc value (%i) for SPELL_AURA_MOD_STAT ", GetId(), GetEffIndex(), GetMiscValue());
+        sLog->outError(LOG_FILTER_SPELLS_AURAS, "WARNING: Spell %u effect %u has an unsupported misc value (%i) for SPELL_AURA_MOD_STAT ", GetId(), GetEffIndex(), statType);
         return;
+    }
+
+    switch (GetBase()->GetId())
+    {
+        case 87545: // Well Fed
+        case 87556: // Well Fed
+            if (target->ToPlayer() && GetEffIndex() == EFFECT_0)
+                statType = int32(target->ToPlayer()->GetMaxStatType());
+            break;
+        default:
+            break;
     }
 
     for (int32 i = STAT_STRENGTH; i < MAX_STATS; i++)
     {
         // -1 or -2 is all stats (misc < -2 checked in function beginning)
-        if (GetMiscValue() < 0 || GetMiscValue() == i)
+        if (statType < 0 || statType == i)
         {
             //target->ApplyStatMod(Stats(i), m_amount, apply);
             target->HandleStatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_VALUE, float(GetAmount()), apply);

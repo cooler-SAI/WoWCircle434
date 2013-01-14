@@ -26221,32 +26221,39 @@ void Player::SendPetitionTurnInResult(uint32 result)
     GetSession()->SendPacket(&data);
 }
 
+Stats Player::GetMaxStatType() const
+{
+    Stats type = STAT_STRENGTH;
+    float value = 0.0f;
+    float temp = 0.0f;
+    for (uint8 i = STAT_STRENGTH; i < MAX_STATS; ++i)
+    {
+        if ((temp = GetStat(Stats(i))) > value)
+        {
+            type = Stats(i);
+            value = temp;
+        }
+    }
+    return type;
+}
+
 PlayerRole Player::GetRole() const
 {
     TalentTabEntry const* talentTab = sTalentTabStore.LookupEntry(GetPrimaryTalentTree(GetActiveSpec()));
     if (!talentTab)
         return ROLE_NONE;
 
+    Stats type = GetMaxStatType();
     PlayerRole role = PlayerRole(talentTab->tabRole);
-    float statValue = 0.0f;
     switch (role)
     {
         case ROLE_DAMAGE:
         {
-            if (GetStat(STAT_STRENGTH) > statValue)
+            switch (type)
             {
-                statValue = GetStat(STAT_STRENGTH);
-                role = ROLE_DAMAGE_STRENGTH;
-            }
-            if (GetStat(STAT_AGILITY) > statValue)
-            {
-                statValue = GetStat(STAT_AGILITY);
-                role = ROLE_DAMAGE_AGILITY;
-            }
-            if (GetStat(STAT_INTELLECT) > statValue)
-            {
-                statValue = GetStat(STAT_INTELLECT);
-                role = ROLE_DAMAGE_INTELLECT;
+                case STAT_STRENGTH: role = ROLE_DAMAGE_STRENGTH; break;
+                case STAT_AGILITY: role = ROLE_DAMAGE_AGILITY; break;
+                case STAT_INTELLECT: role = ROLE_DAMAGE_INTELLECT; break;
             }
             break;
         }
