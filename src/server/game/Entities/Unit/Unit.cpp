@@ -6460,6 +6460,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     RemoveMovementImpairingAuras();
                     break;
                 }
+                // Glyph of Spirit Tap
+                case 63237:
+                {
+                    triggered_spell_id = 81301;
+                    break;
+                }
                 // Sin and Punishment
                 case 87099:
                 case 87100:
