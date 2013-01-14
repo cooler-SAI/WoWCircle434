@@ -25167,20 +25167,31 @@ void Player::ActivateSpec(uint8 spec)
     if (GetPet())
         GetPet()->RemoveAllAurasOnDeath();*/
 
-    // Hack: Remove DK Presences, to avoid some exploits
-    RemoveAurasDueToSpell(48263);
-    RemoveAurasDueToSpell(63611);
-    RemoveAurasDueToSpell(61261);
-    RemoveAurasDueToSpell(48265);
-    RemoveAurasDueToSpell(63622);
-    RemoveAurasDueToSpell(48266);
-    RemoveAurasDueToSpell(63621);
+    // Remove endless auras
+    std::map <uint8, AuraApplication*> listAuras = *GetVisibleAuras();
+    for (Unit::VisibleAuraMap::const_iterator itr = listAuras.begin(); itr != listAuras.end(); ++itr)
+    {
+        SpellInfo const* spellInfo = itr->second->GetBase()->GetSpellInfo();
+        if (spellInfo->IsPassive() || spellInfo->GetMaxDuration() != -1)
+            continue;
 
-    // Rogue: Overkill & Master of Subtlety
-    RemoveAurasDueToSpell(31665);
-    RemoveAurasDueToSpell(58427);
+        RemoveAurasDueToSpell(spellInfo->Id, GetGUID());
+    }
 
-    RemoveAurasDueToSpell(588); // Inner Fire
+//     // Hack: Remove DK Presences, to avoid some exploits
+//     RemoveAurasDueToSpell(48263);
+//     RemoveAurasDueToSpell(63611);
+//     RemoveAurasDueToSpell(61261);
+//     RemoveAurasDueToSpell(48265);
+//     RemoveAurasDueToSpell(63622);
+//     RemoveAurasDueToSpell(48266);
+//     RemoveAurasDueToSpell(63621);
+// 
+//     // Rogue: Overkill & Master of Subtlety
+//     RemoveAurasDueToSpell(31665);
+//     RemoveAurasDueToSpell(58427);
+// 
+//     RemoveAurasDueToSpell(588); // Inner Fire
 
     //RemoveAllAuras(GetGUID(), NULL, false, true); // removes too many auras
     //ExitVehicle(); // should be impossible to switch specs from inside a vehicle..
