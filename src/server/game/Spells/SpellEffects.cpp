@@ -949,6 +949,11 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                         return;
 
                     m_caster->ToPlayer()->RemoveSpellCooldown(51505, true);
+
+                    // Item - Shaman T12 Elemental 4P Bonus
+                    if (m_caster->HasAura(99206))
+                        m_caster->CastSpell(m_caster, 99207, true);
+
                     return;
                 }
                 case 82626: // Grounded Plasma Shield
@@ -2742,6 +2747,12 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
                 m_caster->RemoveAurasDueToSpell(92596);
             }
             break;
+        case 99069: // Fires of Heaven, Item - Paladin T12 Holy 2P Bonus
+        case 99007: // Heartfire, Item - Druid T12 Restoration 2P Bonus
+        case 99131: // Divine Fire, Item - Mage T12 2P Bonus
+        case 99189: // Flametide, Item - Shaman T12 Restoration 2P Bonus 
+            damage = int32(CalculatePct(unitTarget->GetCreateMana(), damage));
+            break;
         default:
             break;
     }
@@ -4241,7 +4252,14 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                     // Searing Flames
                     if (Aura* aur = unitTarget->GetAura(77661, m_caster->GetGUID()))
                     {
-                        AddPct(totalDamagePercentMod, aurEff->GetAmount() * aur->GetStackAmount());
+                        uint8 stacks = aur->GetStackAmount();
+                        uint32 sf_bonus = aurEff->GetAmount();
+
+                        // Item - Shaman T12 Enhancement 2P Bonus
+                        if (m_caster->HasAura(99209))
+                            sf_bonus +=5;
+
+                        AddPct(totalDamagePercentMod, sf_bonus * stacks);
                         unitTarget->RemoveAura(77661, m_caster->GetGUID());
                     }
 
@@ -4325,7 +4343,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             // Blood Strike
             if (m_spellInfo->SpellFamilyFlags[0] & 0x400000)
             {
-                float bonusPct = m_spellInfo->Effects[EFFECT_2].CalcValue(m_caster) * float(unitTarget->GetDiseasesByCaster(m_caster->GetGUID())) / 2.0f;
+                float bonusPct = m_spellInfo->Effects[EFFECT_2].CalcValue(m_caster) * float(unitTarget->GetDiseasesByCaster(m_caster->GetGUID())) / 10.0f;
                 // Death Knight T8 Melee 4P Bonus
                 if (AuraEffect const* aurEff = m_caster->GetAuraEffect(64736, EFFECT_0))
                     AddPct(bonusPct, aurEff->GetAmount());
@@ -5531,6 +5549,19 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     break;
             }
             break;
+        }
+        case SPELLFAMILY_SHAMAN:
+        {
+            switch (m_spellInfo->Id)
+            {
+                // Taming the Flames, Item - Shaman T12 Elemental 2P Bonus
+                case 99202:
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    m_caster->ToPlayer()->ReduceSpellCooldown(2894, 1000); 
+                    break;
+            }
         }
     }
 

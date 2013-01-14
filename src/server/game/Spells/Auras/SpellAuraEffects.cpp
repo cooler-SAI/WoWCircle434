@@ -6163,6 +6163,9 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
         case SPELLFAMILY_GENERIC:
             switch (GetId())
             {
+                case 98971: // Smoldering Rune, Item - Death Knight T12 DPS 2P Bonus
+                    GetCaster()->CastSpell(GetCaster(), 99055, true);
+                    break;
                 case 91296: // Egg Shell, Corrupted Egg Shell
                     GetCaster()->CastSpell(GetCaster(), 91306, true);
                     break;

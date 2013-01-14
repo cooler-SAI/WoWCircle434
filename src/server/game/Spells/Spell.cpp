@@ -1238,6 +1238,7 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                     case 52759: // Ancestral Awakening
                     case 71610: // Echoes of Light (Althor's Abacus normal version)
                     case 71641: // Echoes of Light (Althor's Abacus heroic version)
+                    case 99152: // Cauterizing Flame, Item - Priest Healer T12 4P Bonus
                         maxSize = 1;
                         power = POWER_HEALTH;
                         break;
@@ -1261,39 +1262,43 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                 }
                 break;
             case SPELLFAMILY_PRIEST:
-                if (m_spellInfo->SpellFamilyFlags[0] == 0x10000000) // Circle of Healing
+                switch (m_spellInfo->Id)
                 {
-                    maxSize = m_caster->HasAura(55675) ? 6 : 5; // Glyph of Circle of Healing
-                    power = POWER_HEALTH;
-                }
-                else if (m_spellInfo->Id == 64844) // Divine Hymn
-                {
-                    maxSize = 3;
-                    power = POWER_HEALTH;
-                }
-                else if (m_spellInfo->Id == 64904) // Hymn of Hope
-                {
-                    maxSize = 3;
-                    power = POWER_MANA;
-                }
-                else if (m_spellInfo->Id == 81751) // Atonement
-                {
-                    if (m_caster && m_caster->GetTypeId() == TYPEID_PLAYER)
+                    // Circle of Healing
+                    case 34861:
+                        maxSize = m_caster->HasAura(55675) ? 6 : 5; // Glyph of Circle of Healing
+                        power = POWER_HEALTH;
+                        break;
+                    // Divine Hymn
+                    case 64844:
+                        maxSize = 3;
+                        power = POWER_HEALTH;
+                        break;
+                    // Hymn of Hope
+                    case 64904: 
+                        maxSize = 3;
+                        power = POWER_MANA;
+                        break;
+                    // Atonement
+                    case 81751: 
                     {
-                        Unit *aTarget = m_caster;
-                        unitTargets.sort(Trinity::HealthPctOrderPred());
-                        for (std::list<Unit*>::iterator itr = unitTargets.begin() ; itr != unitTargets.end(); ++itr)
+                        if (m_caster && m_caster->GetTypeId() == TYPEID_PLAYER)
                         {
-                            if (m_caster != (*itr) && (*itr)->IsInRaidWith(m_caster))
+                            Unit *aTarget = m_caster;
+                            unitTargets.sort(Trinity::HealthPctOrderPred());
+                            for (std::list<Unit*>::iterator itr = unitTargets.begin() ; itr != unitTargets.end(); ++itr)
                             {
-                                aTarget = (*itr);
-                                break;
+                                if (m_caster != (*itr) && (*itr)->IsInRaidWith(m_caster))
+                                {
+                                    aTarget = (*itr);
+                                    break;
+                                }
                             }
+                            unitTargets.clear();
+                            unitTargets.push_back(aTarget);
                         }
-                        unitTargets.clear();
-                        unitTargets.push_back(aTarget);
+                        break;
                     }
-                    break;
                 }
                 break;
             case SPELLFAMILY_PALADIN:
@@ -1347,6 +1352,12 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                         else
                             ++itr;
                     }
+                }
+                // Firebloom, Item  Druid T12 Restoration 4P Bonus
+                else if (m_spellInfo->Id == 99017)
+                {
+                    maxSize = 1;
+                    power = POWER_HEALTH;
                 }
                 break;
             default:

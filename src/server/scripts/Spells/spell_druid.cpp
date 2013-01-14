@@ -179,6 +179,10 @@ public:
                                 //caster->CastCustomSpell(caster, SPELL_DRUID_EUPHORIA_ENERGIZE, &energizeAmount, 0, 0, true);
                                 energizeAmount *=2;
 
+                        // Item - Druid T12 Balance 4P Bonus
+                        if (caster->HasAura(99049))
+                            energizeAmount -= 3;
+
                         caster->CastCustomSpell(caster,SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE,&energizeAmount,0,0,true);
                         // If the energize was due to 0 power, cast the eclipse marker aura
                         if (!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
@@ -202,6 +206,10 @@ public:
                             if (roll_chance_i(aurEff->GetAmount()))
                                 //caster->CastCustomSpell(caster, SPELL_DRUID_EUPHORIA_ENERGIZE, &energizeAmount, 0, 0, true);
                                 energizeAmount *=2;
+
+                        // Item - Druid T12 Balance 4P Bonus
+                        if (caster->HasAura(99049))
+                            energizeAmount += 5;
 
                         caster->CastCustomSpell(caster,SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE,&energizeAmount,0,0,true);
                         // If the energize was due to 0 power, cast the eclipse marker aura

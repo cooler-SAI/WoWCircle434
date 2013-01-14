@@ -4244,6 +4244,11 @@ uint32 Unit::GetDiseasesByCaster(uint64 casterGUID, bool remove)
             ++i;
         }
     }
+
+    // Burning Blood, Item - Death Knight T12 Blood 2P Bonus
+    if (HasAura(98957, casterGUID))
+        diseases += 2;
+
     return diseases;
 }
 
@@ -5236,16 +5241,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     triggered_spell_id = DamageSpell[index][urand(0, 2)];
                     break;
                 }
-                // Item - Paladin T12 Retribution 2P Bonus
-                case 99093:
-                {
-                    if (!victim || !damage)
-                        return false;
-
-                    basepoints0 = CalculatePct(damage, triggerAmount);
-                    triggered_spell_id = 99092;
-                    break;
-                }
                 // Weight of Feather, Scales of Life
                 case 96879:
                 case 97117:
@@ -6050,6 +6045,14 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Item - Warrior T12 Protection 2P Bonus
+                case 99239:
+                {
+                    basepoints0 = int32(CalculatePct(damage, triggerAmount / 2)); // 2 ticks
+                    triggered_spell_id = 99240;
+                    target = victim;
+                    break;
+                }
                 // Strikes of Opportunity (Mastery Arms Warrior)
                 case 76838:
                 {
@@ -6665,6 +6668,47 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Item - Shaman T12 Enhancement 4P Bonus
+                case 99213:
+                    triggered_spell_id = 99212;
+                    target = victim;
+                    break;
+                // Item - Rogue T12 2P Bonus
+                case 99174:
+                {
+                    triggerAmount = 3;
+                    basepoints0 = CalculatePct(damage, triggerAmount);
+                    triggered_spell_id = 99173;
+                    basepoints0 += victim->GetRemainingPeriodicAmount(GetGUID(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE);
+                    break;
+                }
+                // Item  Druid T12 Restoration 4P Bonus
+                case 99015:
+                    // need to fix, it shouldn't be casted on caster
+                    //CastSpell(GetPositionX(), GetPositionY(), GetPositionZ(), 99017, true);
+                    break;
+                // Item - Druid T12 Feral 4P Bonus
+                case 99009:
+                {
+                    if (GetTypeId() != TYPEID_PLAYER)
+                        return false;
+
+                    uint32 ui_chance = 20 * ToPlayer()->GetComboPoints();
+                    if (!roll_chance_i(ui_chance))
+                        return false;
+
+                    if (Aura* aur = GetAura(50334))
+                        aur->SetDuration(aur->GetDuration() + 2000);
+                    break;
+                }
+                // Item  Druid T12 Feral 2P Bonus
+                case 99001:
+                {
+                    basepoints0 = int32(CalculatePct(damage, triggerAmount / 2)); // 2 ticks
+                    triggered_spell_id = 99002;
+                    target = victim;
+                    break;
+                }
                 // Nature's Ward
                 case 33881:
                 case 33882:
@@ -7054,8 +7098,22 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 }
                 case 57934: // Tricks of the Trade
                 {
+                    if (GetTypeId() != TYPEID_PLAYER)
+                        return false;
+
                     Unit* redirectTarget = GetMisdirectionTarget();
                     RemoveAura(57934);
+
+                    // Item - Rogue T12 4P Bonus
+                    if (HasAura(99175))
+                    {
+                        uint32 spellIds[3] = {99186, 99187, 99188}; 
+                        uint32 crIds[3] = {CR_HASTE_MELEE, CR_CRIT_MELEE, CR_MASTERY};
+                        uint32 i = urand(0, 2);
+                        int32 bp0 = int32(CalculatePct(GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + crIds[i]), triggerAmount));
+                        CastCustomSpell(this, spellIds[i], &bp0, 0, 0, true);
+                    }
+
                     if (!redirectTarget)
                         break;
                     CastSpell(this,59628,true);
@@ -7226,95 +7284,107 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         }
         case SPELLFAMILY_PALADIN:
         {
-            // Ancient Crusader (player)
-            if (dummySpell->Id == 86701)
-            {
-                if (GetTypeId() != TYPEID_PLAYER)
-                    return false;
-
-                //if caster has no guardian of ancient kings aura then remove dummy aura
-                if (!HasAura(86698))
-                {
-                    RemoveAurasDueToSpell(86701);
-                    return false;
-                }
-
-                CastSpell(this, 86700, true);
-                return true;
-            }
-            // Ancient Crusader (guardian)
-            if (dummySpell->Id == 86703)
-            {
-                if (!GetOwner() || GetOwner()->GetTypeId() != TYPEID_PLAYER)
-                    return false;
-
-                GetOwner()->CastSpell(this, 86700, true);
-                return true;
-            }
-            // Ancient Healer
-            if (dummySpell->Id == 86674)
-            {
-                if (GetTypeId() != TYPEID_PLAYER)
-                    return false;
-
-                // if caster has no guardian of ancient kings aura then remove dummy aura
-                if (!HasAura(86669))
-                {
-                    RemoveAurasDueToSpell(86674);
-                    return false;
-                }
-
-                // check for single target spell (TARGET_SINGLE_FRIEND, NO_TARGET)
-                if (!(procSpell->Effects[triggeredByAura->GetEffIndex()].TargetA.GetTarget() == TARGET_UNIT_TARGET_ALLY) &&
-                    (procSpell->Effects[triggeredByAura->GetEffIndex()].TargetB.GetTarget() == 0))
-                    return false;
-
-                // Need to get guardian but that's NOT WORK!!!
-                //if (Creature* pet = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, GetPetGUID()))
-
-                std::list<Creature*> petlist;
-                GetCreatureListWithEntryInGrid(petlist, 46499, 100.0f);
-                if (!petlist.empty())
-                    for (std::list<Creature*>::const_iterator itr = petlist.begin(); itr != petlist.end(); ++itr)
-                    {
-                        Unit* pPet = (*itr);
-                        if (pPet->GetOwnerGUID() == GetGUID())
-                        {
-                            int32 bp0 = damage;
-                            int32 bp1 = damage / 10;
-                            pPet->CastCustomSpell(victim, 86678, &bp0, &bp1, NULL, true);
-                        }
-                    }
-                return true;
-            }
-            // Light's Beacon - Beacon of Light
-            if (dummySpell->Id == 53651)
-            {
-                // Get target of beacon of light
-                if (Unit* beaconTarget = triggeredByAura->GetBase()->GetCaster())
-                {
-                    // do not proc when target of beacon of light is healed
-                    if (!victim || beaconTarget->GetGUID() == GetGUID())
-                        return false;
-
-                    float healing = 1.0f;
-                    if (procSpell->Id != 635)
-                        healing = 0.5f;
-                    // check if it was heal by paladin which casted this beacon of light
-                    if (beaconTarget->GetAura(53563, victim->GetGUID()))
-                    {
-                        if (beaconTarget->IsWithinLOSInMap(victim))
-                        {
-                            basepoints0 = damage * healing;
-                            victim->CastCustomSpell(beaconTarget, 53652, &basepoints0, 0, 0, true);
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
             switch (dummySpell->Id)
             {
+                // Item - Paladin T12 Protection 2P Bonus
+                case 99074:
+                    basepoints0 = int32(CalculatePct(damage, triggerAmount));
+                    triggered_spell_id = 99075;
+                    target = victim;
+                    break;
+                // Item - Paladin T12 Retribution 2P Bonus
+                case 99093:
+                    basepoints0 = int32(CalculatePct(damage, triggerAmount / 2)); // 2 ticks
+                    triggered_spell_id = 99092;
+                    target = victim;
+                    break;
+                // Ancient Crusader (player)
+                case 86701:
+                {
+                    if (GetTypeId() != TYPEID_PLAYER)
+                        return false;
+
+                    //if caster has no guardian of ancient kings aura then remove dummy aura
+                    if (!HasAura(86698))
+                    {
+                        RemoveAurasDueToSpell(86701);
+                        return false;
+                    }
+
+                    CastSpell(this, 86700, true);
+                    return true;
+                }
+                // Ancient Crusader (guardian)
+                case 86703:
+                {
+                    if (!GetOwner() || GetOwner()->GetTypeId() != TYPEID_PLAYER)
+                        return false;
+
+                    GetOwner()->CastSpell(this, 86700, true);
+                    return true;
+                }
+                // Ancient Healer
+                case 86674:
+                {
+                    if (GetTypeId() != TYPEID_PLAYER)
+                        return false;
+
+                    // if caster has no guardian of ancient kings aura then remove dummy aura
+                    if (!HasAura(86669))
+                    {
+                        RemoveAurasDueToSpell(86674);
+                        return false;
+                    }
+
+                    // check for single target spell (TARGET_SINGLE_FRIEND, NO_TARGET)
+                    if (!(procSpell->Effects[triggeredByAura->GetEffIndex()].TargetA.GetTarget() == TARGET_UNIT_TARGET_ALLY) &&
+                        (procSpell->Effects[triggeredByAura->GetEffIndex()].TargetB.GetTarget() == 0))
+                        return false;
+
+                    // Need to get guardian but that's NOT WORK!!!
+                    //if (Creature* pet = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, GetPetGUID()))
+
+                    std::list<Creature*> petlist;
+                    GetCreatureListWithEntryInGrid(petlist, 46499, 100.0f);
+                    if (!petlist.empty())
+                        for (std::list<Creature*>::const_iterator itr = petlist.begin(); itr != petlist.end(); ++itr)
+                        {
+                            Unit* pPet = (*itr);
+                            if (pPet->GetOwnerGUID() == GetGUID())
+                            {
+                                int32 bp0 = damage;
+                                int32 bp1 = damage / 10;
+                                pPet->CastCustomSpell(victim, 86678, &bp0, &bp1, NULL, true);
+                            }
+                        }
+                    return true;
+                }
+                // Light's Beacon - Beacon of Light
+                case 53651:
+                {
+                    // Get target of beacon of light
+                    if (Unit* beaconTarget = triggeredByAura->GetBase()->GetCaster())
+                    {
+                        // do not proc when target of beacon of light is healed
+                        if (!victim || beaconTarget->GetGUID() == GetGUID())
+                            return false;
+
+                        float healing = 1.0f;
+                        if (procSpell->Id != 635)
+                            healing = 0.5f;
+                        // check if it was heal by paladin which casted this beacon of light
+                        if (beaconTarget->GetAura(53563, victim->GetGUID()))
+                        {
+                            if (beaconTarget->IsWithinLOSInMap(victim))
+                            {
+                                basepoints0 = damage * healing;
+                                victim->CastCustomSpell(beaconTarget, 53652, &basepoints0, 0, 0, true);
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
                 // Item - Collecting Mana, Tyrande's Favirite Doll
                 case 92272:
                 {
@@ -7998,6 +8068,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Item - Death Knight T12 DPS 4P Bonus
+                case 98996:
+                    basepoints0 = int32(CalculatePct(damage, triggerAmount));
+                    triggered_spell_id = 99000;
+                    target = victim;
+                    break;
                 // Ebon Plaguebringer
                 case 51099:
                 case 51160:
@@ -9189,6 +9265,12 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Item - Warrior T12 DPS 4P Bonus
+        case 99238:
+            // there are 3 Raging Blow spells, filter it
+            if (!procSpell || !(procSpell->Id == 12294 || procSpell->Id == 96103))
+                return false;
+            break;
         case 90998: // Song of Sorrow, Sorrowsong
         case 91003: // Song of Sorrow, Sorrowsong (H)
         case 92180: // Item - Proc Armor, Leaden Despair

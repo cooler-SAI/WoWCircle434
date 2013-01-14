@@ -5701,6 +5701,34 @@ void SpellMgr::LoadDbcDataCorrections()
             case 82691: // Ring of Frost
                 spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REFLECTED;
                 break;
+            // Item - Druid T12 Feral 4P Bonus
+            case 99009:
+                spellInfo->ProcChance = 100;
+                spellInfo->ProcFlags = 16;
+                break;
+            // Item - Shaman T12 Enhancement 2P Bonus
+            case 99209:
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
+                break;
+            // Item - Shaman T12 Enhancement 4P Bonus
+            case 99213:
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
+                spellInfo->ProcChance = 100;
+                spellInfo->ProcFlags = 16;
+                break;
+            // Stormfire, Item - Shaman T12 Enhancement 4P Bonus
+            case 99212:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            // Item - Shaman T12 Elemental 4P Bonus
+            case 99206:
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
+                break;
+            // Item - Rogue T12 4P Bonus
+            case 99175:
+                spellInfo->ProcChance = 0;
+                spellInfo->ProcFlags = 0;
+                break;
             default:
                 break;
         }

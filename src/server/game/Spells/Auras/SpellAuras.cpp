@@ -1227,6 +1227,20 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_GENERIC:
                 switch (GetId())
                 {
+                    // Burning Rage, Item - Warrior T12 DPS 2P Bonus
+                    case 99233:
+                    {
+                        if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+                            break;
+
+                        uint32 max_duration = 12000;
+
+                        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_WARRIOR, 47, EFFECT_1))
+                            max_duration -= 6000 * (0.01f * aurEff->GetAmount());
+
+                        SetDuration(max_duration);
+                        break;
+                    }
                     // Arion - Swirling Winds
                     case 83500:
                         target->RemoveAurasDueToSpell(83581);
@@ -1810,6 +1824,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Comunion
                 else if (m_spellInfo->SpellFamilyFlags[2] & 0x20)
                     caster->RemoveAurasDueToSpell(63531);
+                // Divine Protection
+                else if (m_spellInfo->Id == 498)
+                    // Item - Paladin T12 Protection 4P Bonus
+                    if (caster && caster->HasAura(99091) && (removeMode == AURA_REMOVE_BY_EXPIRE))
+                        caster->CastSpell(caster, 99090, true);
                 break;
             case SPELLFAMILY_DEATHKNIGHT:
                 // Blood of the North
@@ -1827,6 +1846,13 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                      // aura removed - remove death runes
                     target->ToPlayer()->RemoveRunesBySpell(GetId());
                 }
+                // Dancing Rune Weapon
+                else if (GetId() == 81256)
+                {
+                    // Item - Death Knight T12 Tank 4P Bonus
+                    if (target->HasAura(98966)  && (removeMode == AURA_REMOVE_BY_EXPIRE))
+                        target->CastSpell(target, 101162, true);
+                }
                 break;
             case SPELLFAMILY_HUNTER:
                 // Glyph of Freezing Trap
@@ -1834,6 +1860,20 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (caster && caster->HasAura(56845))
                         caster->CastSpell(target, 61394, true);
 
+                break;
+            case SPELLFAMILY_DRUID:
+                // Barkskin
+                if (GetId() == 22812)
+                    // Item - Druid T12 Feral 4P Bonus
+                    if (caster && caster->HasAura(99009) && (removeMode == AURA_REMOVE_BY_EXPIRE))
+                        caster->CastSpell(caster, 99011, true);
+                break;
+            case SPELLFAMILY_WARRIOR:
+                // Shield Block
+                if (GetId() == 2565)
+                    // Item - Item - Warrior T12 Protection 4P Bonus
+                    if (caster && caster->HasAura(99242) && (removeMode == AURA_REMOVE_BY_EXPIRE))
+                        caster->CastSpell(caster, 99243, true);
                 break;
         }
     }

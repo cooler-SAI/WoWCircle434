@@ -401,6 +401,9 @@ class spell_sha_chain_heal : public SpellScriptLoader
 
             void HandleHeal(SpellEffIndex /*effIndex*/)
             {
+                if (!GetCaster() || !GetHitUnit())
+                    return;
+
                 if (firstHeal)
                 {
                     // Check if the target has Riptide
@@ -408,8 +411,11 @@ class spell_sha_chain_heal : public SpellScriptLoader
                     {
                         riptide = true;
                         amount = aurEff->GetSpellInfo()->Effects[EFFECT_2].CalcValue();
+                        
                         // Consume it
-                        GetHitUnit()->RemoveAura(aurEff->GetBase());
+                        // if caster has no Item - Shaman T12 Restoration 4P Bonus
+                        if (!GetCaster()->HasAura(99195))
+                            GetHitUnit()->RemoveAura(aurEff->GetBase());
                     }
                     firstHeal = false;
                 }
