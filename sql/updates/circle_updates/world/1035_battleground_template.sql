@@ -1,0 +1,1 @@
+UPDATE `battleground_template` SET `MinLvl`=86, `MaxLvl`=86 WHERE `id`=9;
