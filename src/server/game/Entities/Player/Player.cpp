@@ -2616,7 +2616,7 @@ void Player::Regenerate(Powers power)
     float addvalue = 0.0f;
 
     // Powers now benefit from haste.
-    //float rangedHaste = GetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE);
+    float rangedHaste = GetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE);
     float meleeHaste = GetFloatValue(PLAYER_FIELD_MOD_HASTE);
     float spellHaste = GetFloatValue(UNIT_MOD_CAST_SPEED);
 
