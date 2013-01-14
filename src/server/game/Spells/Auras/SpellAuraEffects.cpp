@@ -3368,6 +3368,21 @@ void AuraEffect::HandleAuraModStun(AuraApplication const* aurApp, uint8 mode, bo
     Unit* target = aurApp->GetTarget();
 
     target->SetControlled(apply, UNIT_STATE_STUNNED);
+
+    // Seduction (Succubus spell)
+    if (apply && m_spellInfo->Id == 6358)
+    {
+        Unit* pCaster = GetCaster();
+
+        if (!pCaster)
+            return;
+
+        if (target->isAlive() && pCaster->GetOwner() && pCaster->GetOwner()->HasAura(56250)) // Glyph of Seduction
+        {
+            target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+            target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
+        }
+    }
 }
 
 void AuraEffect::HandleAuraModRoot(AuraApplication const* aurApp, uint8 mode, bool apply) const
