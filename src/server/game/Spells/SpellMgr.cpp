@@ -5371,6 +5371,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].SetRadiusIndex(10);
                 spellInfo->Effects[0].TargetB = TARGET_UNIT_CASTER_AREA_RAID;
                 break;
+            // Sin and Punishment
+            case 87099:
+            case 87100:
+                spellInfo->Effects[0].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_DUMMY;
+                break;
             // Chakra
             case 14751:
                 spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_DUMMY;

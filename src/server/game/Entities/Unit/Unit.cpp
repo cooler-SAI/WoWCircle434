@@ -6470,6 +6470,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 87099:
                 case 87100:
                 {
+                    if (effIndex != EFFECT_1)
+                        return false;
+
                     ToPlayer()->ReduceSpellCooldown(34433, (triggerAmount * 1000));
                     break;
                 }
