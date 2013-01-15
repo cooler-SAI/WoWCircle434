@@ -1953,23 +1953,26 @@ void WorldSession::HandleObjectUpdateFailedOpcode(WorldPacket& recvPacket)
     Player* player = GetPlayer();
     WorldObject* object = ObjectAccessor::GetWorldObject(*player, guid);
     
-    if (object)
+    if (false)
     {
-        sLog->outError(LOG_FILTER_NETWORKIO,
-            "CMSG_OBJECT_UPDATE_FAILED: Object Guid=[" UI64FMTD "] Object Name: [%s] Object pos=(%f, %f, %f) Local Player=[%u, %s] "
-            "Player pos=(%f, %f, %f) Map=%u, Zone=%u", uint64(guid),
-            object->GetName(), object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), player->GetGUIDLow(), player->GetName(),
-            player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(),
-            player->GetMapId(), player->GetZoneId());
-    }
-    else
-    {
-        sLog->outError(LOG_FILTER_NETWORKIO,
-            "CMSG_OBJECT_UPDATE_FAILED: Object Guid=[" UI64FMTD "] Object Name: [NULL - object not found] Object pos=(-1, -1, -1) Local Player=[%u, %s] "
-            "Player pos=(%f, %f, %f) Map=%u, Zone=%u", uint64(guid),
-            player->GetGUIDLow(), player->GetName(),
-            player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(),
-            player->GetMapId(), player->GetZoneId());
+        if (object)
+        {
+            sLog->outError(LOG_FILTER_NETWORKIO,
+                "CMSG_OBJECT_UPDATE_FAILED: Object Guid=[" UI64FMTD "] Object Name: [%s] Object pos=(%f, %f, %f) Local Player=[%u, %s] "
+                "Player pos=(%f, %f, %f) Map=%u, Zone=%u", uint64(guid),
+                object->GetName(), object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), player->GetGUIDLow(), player->GetName(),
+                player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(),
+                player->GetMapId(), player->GetZoneId());
+        }
+        else
+        {
+            sLog->outError(LOG_FILTER_NETWORKIO,
+                "CMSG_OBJECT_UPDATE_FAILED: Object Guid=[" UI64FMTD "] Object Name: [NULL - object not found] Object pos=(-1, -1, -1) Local Player=[%u, %s] "
+                "Player pos=(%f, %f, %f) Map=%u, Zone=%u", uint64(guid),
+                player->GetGUIDLow(), player->GetName(),
+                player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(),
+                player->GetMapId(), player->GetZoneId());
+        }
     }
 
     // workaround to fix visibility objects bug
