@@ -719,7 +719,6 @@ Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_rep
     m_regenTimer = 0;
     m_regenTimerCount = 0;
     m_holyPowerRegenTimerCount = 0;
-    m_focusRegenTimerCount = 0;
     m_weaponChangeTimer = 0;
 
     m_zoneUpdateId = 0;
@@ -2541,11 +2540,9 @@ void Player::RegenerateAll()
     if (getClass() == CLASS_PALADIN)
         m_holyPowerRegenTimerCount += m_regenTimer;
 
-    if (getClass() == CLASS_HUNTER)
-        m_focusRegenTimerCount += m_regenTimer;
-
     Regenerate(POWER_ENERGY);
     Regenerate(POWER_MANA);
+    Regenerate(POWER_FOCUS);
 
     // Runes act as cooldowns, and they don't need to send any data
     if (getClass() == CLASS_DEATH_KNIGHT)
@@ -2562,12 +2559,6 @@ void Player::RegenerateAll()
             else if (secondRuneCd)
                 SetRuneCooldown(i + 1, (secondRuneCd > m_regenTimer * runeCdMod) ? secondRuneCd - m_regenTimer * runeCdMod : 0);
         }
-    }
-
-    if (m_focusRegenTimerCount >= 1000 && getClass() == CLASS_HUNTER)
-    {
-        Regenerate(POWER_FOCUS);
-        m_focusRegenTimerCount -= 1000;
     }
 
     if (m_regenTimerCount >= 2000)
@@ -2642,10 +2633,12 @@ void Player::Regenerate(Powers power)
         }
         break;
         case POWER_FOCUS:
-            addvalue += (6.0f + CalculatePct(6.0f, rangedHaste)) * sWorld->getRate(RATE_POWER_FOCUS);
+        {
+            addvalue += m_regenTimer * 0.001f * 5.0f * (2.0f - rangedHaste) * sWorld->getRate(RATE_POWER_FOCUS);
             break;
+        }
         case POWER_ENERGY:                                              // Regenerate energy (rogue)
-            addvalue += (0.01f * m_regenTimer * (2.0f - GetFloatValue(PLAYER_FIELD_MOD_HASTE_REGEN))) * sWorld->getRate(RATE_POWER_ENERGY);
+            addvalue += (0.01f * m_regenTimer * (2.0f - meleeHaste) * sWorld->getRate(RATE_POWER_ENERGY);
             break;
         case POWER_RUNIC_POWER:
         {
@@ -5900,21 +5893,33 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
     {
         case CR_HASTE_MELEE:
         {
-            float RatingChange = value * GetRatingMultiplier(cr);
-            ApplyAttackTimePercentMod(BASE_ATTACK, RatingChange, apply);
-            ApplyAttackTimePercentMod(OFF_ATTACK, RatingChange, apply);
+            float mult = GetRatingMultiplier(cr);
+            float newchange = m_baseRatingValue[cr] * mult;
+            float oldchange = (m_baseRatingValue[cr] - (apply ? value: -value)) * mult;
+            ApplyAttackTimePercentMod(BASE_ATTACK, oldchange, false);
+            ApplyAttackTimePercentMod(OFF_ATTACK, oldchange, false);
+            ApplyAttackTimePercentMod(BASE_ATTACK, newchange, true);
+            ApplyAttackTimePercentMod(OFF_ATTACK, newchange, true);
+            UpdateFocusRegen();
             break;
         }
         case CR_HASTE_RANGED:
         {
-            float RatingChange = value * GetRatingMultiplier(cr);
-            ApplyAttackTimePercentMod(RANGED_ATTACK, RatingChange, apply);
+            float mult = GetRatingMultiplier(cr);
+            float newchange = m_baseRatingValue[cr] * mult;
+            float oldchange = (m_baseRatingValue[cr] - (apply ? value: -value)) * mult;
+            ApplyAttackTimePercentMod(RANGED_ATTACK, oldchange, false);
+            ApplyAttackTimePercentMod(RANGED_ATTACK, newchange, true);
+            UpdateFocusRegen();
             break;
         }
         case CR_HASTE_SPELL:
         {
-            float RatingChange = value * GetRatingMultiplier(cr);
-            ApplyCastTimePercentMod(RatingChange, apply);
+            float mult = GetRatingMultiplier(cr);
+            float newchange = m_baseRatingValue[cr] * mult;
+            float oldchange = (m_baseRatingValue[cr] - (apply ? value: -value)) * mult;
+            ApplyCastTimePercentMod(oldchange, false);
+            ApplyCastTimePercentMod(newchange, true);
             break;
         }
         default:
@@ -5980,11 +5985,7 @@ void Player::UpdateRating(CombatRating cr)
         case CR_RESILIENCE_TAKEN_ALL:
             break;
         case CR_HASTE_MELEE:                                // Implemented in Player::ApplyRatingMod
-            UpdateMeleeHastMod();
-            break;
         case CR_HASTE_RANGED:
-            UpdateRangeHastMod();
-            break;
         case CR_HASTE_SPELL:
             break;
         case CR_WEAPON_SKILL_MAINHAND:                      // Implemented in Unit::RollMeleeOutcomeAgainst

@@ -2253,12 +2253,9 @@ class Player : public Unit, public GridObject<Player>
         void ApplyManaRegenBonus(int32 amount, bool apply);
         void ApplyHealthRegenBonus(int32 amount, bool apply);
         void UpdateManaRegen();
+        void UpdateFocusRegen();
         void UpdateRuneRegen(RuneType rune);
         void UpdateAllRunesRegen();
-        float CalculateMeleeHastMod(bool cr_only = false) const;
-        float CalculateRangeHastMod(bool cr_only = false) const;
-        void UpdateMeleeHastMod();
-        void UpdateRangeHastMod();
 
         void UpdateArmorSpecializations(uint8 Slot = NULL);
         bool CheckArmorSpecializationItemConditions(SpellInfo const* spellInfo) const;
@@ -3073,7 +3070,6 @@ class Player : public Unit, public GridObject<Player>
         WhisperListContainer WhisperList;
         uint32 m_regenTimerCount;
         uint32 m_holyPowerRegenTimerCount;
-        uint32 m_focusRegenTimerCount;
         float m_powerFraction[MAX_POWERS_PER_CLASS];
         uint32 m_contestedPvPTimer;
 

@@ -161,6 +161,7 @@ bool Player::UpdateAllStats()
     UpdateDodgePercentage();
     UpdateSpellDamageAndHealingBonus();
     UpdateManaRegen();
+    UpdateFocusRegen();
     UpdateExpertise(BASE_ATTACK);
     UpdateExpertise(OFF_ATTACK);
     UpdateMastery();
@@ -714,6 +715,9 @@ void Player::ApplyHealthRegenBonus(int32 amount, bool apply)
 
 void Player::UpdateManaRegen()
 {
+    if (getPowerType() == POWER_FOCUS)
+        return;
+
     // Mana regen from spirit
     float spirit_regen = OCTRegenMPPerSpirit();
     // Apply PCT bonus from SPELL_AURA_MOD_POWER_REGEN_PERCENT aura on spirit base regen
@@ -731,6 +735,15 @@ void Player::UpdateManaRegen()
 
     SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER, base_regen + CalculatePct(spirit_regen, modManaRegenInterrupt));
     SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, 0.001f + spirit_regen + base_regen);
+}
+
+void Player::UpdateFocusRegen()
+{
+    if (getPowerType() != POWER_FOCUS)
+        return;
+
+    float base_regen = 5.0f - 5.0f;
+    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, base_regen);
 }
 
 void Player::UpdateRuneRegen(RuneType rune)
@@ -763,60 +776,6 @@ void Player::UpdateAllRunesRegen()
             ASSERT(regen > 0.0099999998f);
             SetFloatValue(PLAYER_RUNE_REGEN_1 + i, regen);
         }
-}
-
-float Player::CalculateMeleeHastMod(bool cr_only) const
-{
-    float hastePct = GetRatingBonusValue(CR_HASTE_MELEE);
-
-    if (!cr_only)
-    {
-        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE);
-        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE_2);
-        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE_3);
-
-        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
-        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE_2);
-    }
-
-    return 1.0f - (hastePct / 100.0f);
-}
-
-float Player::CalculateRangeHastMod(bool cr_only) const
-{
-    float hastePct = GetRatingBonusValue(CR_HASTE_RANGED);
-
-    if (!cr_only)
-    {
-        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_RANGED_HASTE);
-        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_RANGED_HASTE_2);
-        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_RANGED_HASTE_3);
-
-        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
-        hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE_2);
-    }
-
-    return 1.0f - (hastePct / 100.0f);
-}
-
-void Player::UpdateMeleeHastMod()
-{
-    float mod = CalculateMeleeHastMod();
-    float regen_mod = CalculateMeleeHastMod(true);
-
-    SetFloatValue(PLAYER_FIELD_MOD_HASTE, mod);
-    SetFloatValue(PLAYER_FIELD_MOD_PET_HASTE, mod);
-    SetFloatValue(PLAYER_FIELD_MOD_HASTE_REGEN, regen_mod);
-
-    if (getClass() == CLASS_DEATH_KNIGHT)
-        UpdateAllRunesRegen();
-}
-
-void Player::UpdateRangeHastMod()
-{
-    float mod = CalculateRangeHastMod();
-    float regen_mod = CalculateMeleeHastMod(true);
-    SetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE, mod);
 }
 
 void Player::_ApplyAllStatBonuses()
