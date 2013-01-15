@@ -1307,14 +1307,16 @@ void Guild::UpdateMemberData(Player* pPlayer, uint8 dataid, uint32 value)
 
 void Guild::HandleRoster(WorldSession* session /*= NULL*/)
 {
-    ByteBuffer memberData(100);
-    WorldPacket data(SMSG_GUILD_ROSTER, 200);
-
     uint32 motdSize = uint32(m_motd.length());
+    uint32 infoLength = uint32(m_info.length());
+    uint32 membersSize = uint32(m_members.size());
+
+    ByteBuffer memberData((membersSize * 100));
+    WorldPacket data(SMSG_GUILD_ROSTER, motdSize + infoLength + ((41 + (33 * membersSize)) / 8) + 1024 + (membersSize * 100));
 
     data 
         << WriteAsUnaligned<11>(motdSize)
-        << WriteAsUnaligned<18>(m_members.size());
+        << WriteAsUnaligned<18>(membersSize);
 
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
@@ -1350,7 +1352,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         }
 
         memberData << uint8(member->GetClass());
-        memberData << int32(0);                                     // unk
+        memberData << int32(member->GetGuildReputation());
         memberData.WriteByteSeq(guid[0]);
         memberData << uint64(member->GetXPContribWeek());
         memberData << uint32(member->GetRankId());
@@ -1375,14 +1377,13 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         memberData.WriteByteSeq(guid[4]);
         memberData << uint8(player ? player->getGender() : 0);
         memberData.WriteByteSeq(guid[1]);
-        memberData << float(player ? 0.0f : float(::time(NULL) - member->GetLogoutTime()) / DAY);
+        memberData << float(player ? 0.0f : float(float(::time(NULL) - member->GetLogoutTime()) / DAY));
 
         memberData << WriteBuffer(member->GetOfficerNote().c_str(), offNoteLength);
         memberData.WriteByteSeq(guid[6]);
         memberData << WriteBuffer(member->GetName().c_str(), nameSize);
     }
 
-    uint32 infoLength = uint32(m_info.length());
     data.WriteBits(infoLength, 12);
 
     data.append(memberData);
