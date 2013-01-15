@@ -3368,7 +3368,11 @@ public:
                 uiBurstTimer -= diff;
 
             if (!UpdateVictim())
+            {
+                if (Unit* target = me->SelectVictim())
+                    me->Attack(target, true);
                 return;
+            }
 
             DoMeleeAttackIfReady();
         }
