@@ -159,9 +159,15 @@ class boss_daakara : public CreatureScript
                 Talk(SAY_DEATH);
             }
 
+            void SpellHit(Unit* attacker, const SpellInfo* spellInfo)
+            {
+                if (spellInfo->HasEffect(SPELL_EFFECT_ATTACK_ME) ||
+                    spellInfo->HasAura(SPELL_AURA_MOD_TAUNT))
+                    me->RemoveAurasDueToSpell(SPELL_CLAW_RAGE);
+            }
+
             void EnterPhase(uint8 form)
             {
-                me->NearTeleportTo(CENTER_X, CENTER_Y, CENTER_Z, 100);
                 DoResetThreat();
                 me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 0);
                 
@@ -187,7 +193,7 @@ class boss_daakara : public CreatureScript
                         Talk(SAY_DRAGONHAWK);
                         me->AttackStop();
                         me->SetReactState(REACT_PASSIVE);
-                        me->GetMotionMaster()->MoveIdle();
+                        me->NearTeleportTo(CENTER_X, CENTER_Y, CENTER_Z, 0.0f);
                         me->RemoveAurasDueToSpell(SPELL_SHAPE_OF_THE_LYNX);
                         me->RemoveAurasDueToSpell(SPELL_SHAPE_OF_THE_BEAR);
                         DoCast(me, SPELL_SHAPE_OF_THE_DRAGONHAWK, true);
@@ -199,7 +205,7 @@ class boss_daakara : public CreatureScript
                         Talk(SAY_EAGLE);
                         me->AttackStop();
                         me->SetReactState(REACT_PASSIVE);
-                        me->GetMotionMaster()->MoveIdle();
+                        me->NearTeleportTo(CENTER_X, CENTER_Y, CENTER_Z, 0.0f);
                         me->RemoveAurasDueToSpell(SPELL_SHAPE_OF_THE_LYNX);
                         me->RemoveAurasDueToSpell(SPELL_SHAPE_OF_THE_BEAR);
                         DoCast(me, SPELL_SHAPE_OF_THE_EAGLE, true);
@@ -292,15 +298,8 @@ class boss_daakara : public CreatureScript
                             events.ScheduleEvent(EVENT_FLAME_WHIRL, 12000);
                             break;
                         case EVENT_FLAME_BREATH:
-                            me->SetReactState(REACT_PASSIVE);
-                            me->AttackStop();
-                            DoCastVictim(SPELL_FLAME_BREATH);
-                            events.ScheduleEvent(EVENT_CONTINUE, 1500);
+                            DoCastAOE(SPELL_FLAME_BREATH);
                             events.ScheduleEvent(EVENT_FLAME_BREATH, 15000);
-                            break;
-                        case EVENT_CONTINUE:
-                            me->SetReactState(REACT_AGGRESSIVE);
-                            AttackStart(me->getVictim());
                             break;
                         case EVENT_PILLAR_OF_FLAME:
                             if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM,0, 0.0f, true))
@@ -463,7 +462,7 @@ class npc_daakara_amani_lynx : public CreatureScript
                      {
                         case EVENT_FERAL_SWIPE:
                             DoCastVictim(SPELL_FERAL_SWIPE);
-                            events.ScheduleEvent(EVENT_FERAL_SWIPE, urand(70000, 12000));
+                            events.ScheduleEvent(EVENT_FERAL_SWIPE, urand(7000, 12000));
                             break;
                      }
                 }
@@ -483,15 +482,19 @@ class spell_daakara_claw_rage_charge : public SpellScriptLoader
         {
             PrepareSpellScript(spell_daakara_claw_rage_charge_SpellScript);
 
-            void HandleDummy(SpellEffIndex effIndex)
+            void HandleCharge(SpellEffIndex effIndex)
             {
                 if (GetCaster() && GetHitUnit())
+                {
+                    if (GetCaster()->IsAIEnabled)
+                        GetCaster()->GetAI()->AttackStart(GetHitUnit());
                     GetCaster()->CastSpell(GetHitUnit(), SPELL_CLAW_RAGE, true);
+                }
             }
 
             void Register()
             {
-                OnEffectHitTarget += SpellEffectFn(spell_daakara_claw_rage_charge_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+                OnEffectHitTarget += SpellEffectFn(spell_daakara_claw_rage_charge_SpellScript::HandleCharge, EFFECT_0, SPELL_EFFECT_CHARGE);
             }
         };
 
