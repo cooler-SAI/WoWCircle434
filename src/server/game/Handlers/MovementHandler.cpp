@@ -284,7 +284,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
     if (!mover->m_movementInfo.AcceptClientChanges(_player, movementInfo, recvPacket.GetOpcode()))
         return;
 
-    BuildMoveUpdatePacket(mover, &movementInfo, recvPacket.size(), _player);
+    BuildMoveUpdatePacket(mover, movementInfo, recvPacket.size(), _player);
 
     if (fall)
         plrMover->SetFallInformation(mover->m_movementInfo.fallTime, mover->m_movementInfo.pos.GetPositionZ());
@@ -395,13 +395,12 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recvData)
     _player->m_movementInfo = mi;
 }
 
-void WorldSession::BuildMoveUpdatePacket(Unit* mover, MovementInfo* movementInfo, size_t size, Player const* skip) const
+void WorldSession::BuildMoveUpdatePacket(Unit* mover, MovementInfo& movementInfo, size_t size, Player* skip) const
 {
     ASSERT(mover);
-    ASSERT(movementInfo);
 
     WorldPacket data(SMSG_PLAYER_MOVE, size);
-    WriteMovementInfo(data, movementInfo);
+    WriteMovementInfo(data, &movementInfo);
     mover->SendMessageToSet(&data, skip);
 }
 
@@ -671,6 +670,10 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
                 break;
         }
     }
+
+    if (data.size() != data.rpos())
+        sLog->outError(LOG_FILTER_GENERAL, "Error in ReadMovementInfo: Packet (opcode = %u) not fully readed! Size = %d, readed = %d, diff = %d", 
+        uint32(data.GetOpcode()), data.size(), data.rpos(), data.size() - data.rpos());
 
     mi->guid = guid;
     mi->t_guid = tguid;

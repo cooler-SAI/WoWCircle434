@@ -380,7 +380,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
             .WriteBit(!unit->m_movementInfo.HaveSplineElevation)
             .WriteByteMask(guid[5])
             .WriteBit(unit->m_movementInfo.HasTransportData())
-            .WriteBit(!unit->m_movementInfo.time);
+            .WriteBit(false/*!unit->m_movementInfo.time*/);
 
         if (unit->m_movementInfo.HasTransportData())
         {
@@ -531,8 +531,8 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
             .WriteByteSeq(guid[2])
             .append<float>(unit->GetSpeed(MOVE_WALK));
 
-        if (unit->m_movementInfo.time)
-            *data << uint32(unit->m_movementInfo.time);
+        if (true/*unit->m_movementInfo.time*/)
+            *data << uint32(getMSTime()/*unit->m_movementInfo.time*/);
 
         (*data)
             .append<float>(unit->GetSpeed(MOVE_FLIGHT_BACK))
