@@ -10,6 +10,7 @@ static const DoorData doordata[] =
     {GO_MANDOKIR_EXIT4,         DATA_MANDOKIR,           DOOR_TYPE_ROOM,     BOUNDARY_NONE},
     {GO_MANDOKIR_EXIT5,         DATA_MANDOKIR,           DOOR_TYPE_ROOM,     BOUNDARY_NONE},
     {GO_ZANZIL_EXIT,            DATA_ZANZIL,             DOOR_TYPE_ROOM,     BOUNDARY_NONE},
+    {GO_KILNARA_EXIT,           DATA_KILNARA,            DOOR_TYPE_ROOM,     BOUNDARY_NONE},
     {0,                         0,                       DOOR_TYPE_ROOM,     BOUNDARY_NONE},
 };
 
@@ -81,16 +82,13 @@ class instance_zulgurub : public InstanceMapScript
                 switch (pGo->GetEntry())
                 {
                     case GO_VENOXIS_EXIT:
-                        AddDoor(pGo, true);
-                        break;
                     case GO_MANDOKIR_EXIT1:
                     case GO_MANDOKIR_EXIT2:
                     case GO_MANDOKIR_EXIT3:
                     case GO_MANDOKIR_EXIT4:
                     case GO_MANDOKIR_EXIT5:
-                        AddDoor(pGo, true);
-                        break;
                     case GO_ZANZIL_EXIT:
+                    case GO_KILNARA_EXIT:
                         AddDoor(pGo, true);
                         break;
                 }

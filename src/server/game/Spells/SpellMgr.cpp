@@ -5159,6 +5159,35 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
                 spellInfo->Effects[EFFECT_0].TargetB = 0;
                 break;
+            // Kilnara
+            case 96457: // Wall of Agony
+                spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNELED_1;
+                break;
+            case 96909: // Wail of Sorrow
+            case 96948:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                break;
+            case 96422: // Tears of Blood dmg
+            case 96957:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(32);
+                break;
+            case 97355: // Gaping Wound jump
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                break;
+            case 97357: // Gaping Wound dmg
+            case 97358:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                break;
+            case 98238: // Rat Lure
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(10);
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENTRY;
+                break;
             // ENDOF ZUL'GURUB SPELLS
             // ZUL'AMAN SPELLS
             //

@@ -44,6 +44,7 @@ enum GameObjectIds
     GO_MANDOKIR_EXIT4   = 208848,
     GO_MANDOKIR_EXIT5   = 208849,
     GO_ZANZIL_EXIT      = 208850,
+    GO_KILNARA_EXIT     = 180497,
 };
 
 enum OtherSpells
