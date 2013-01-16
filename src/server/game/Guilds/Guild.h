@@ -338,9 +338,12 @@ private:
 
         struct Profession
         {
-            uint32 skillID;
-            uint32 rank;
-            uint32 level;
+            Profession() : skillId(0), value(0), rank(0) { }
+            Profession(uint32 _skillId, uint16 _value, uint8 _rank) : skillId(_skillId), value(_value), rank(_rank) { }
+
+            uint8 rank;
+            uint16 value;
+            uint32 skillId;
         };
 
     public:
@@ -353,20 +356,19 @@ private:
         void SetPublicNote(const std::string& publicNote);
         void SetOfficerNote(const std::string& officerNote);
 
-        std::string GetPublicNote() { return m_publicNote; };
-        std::string GetOfficerNote() { return m_officerNote; };
-
+        const std::string& GetPublicNote() const { return m_publicNote; };
+        const std::string& GetOfficerNote() const { return m_officerNote; };
+        const std::string& GetName() const { return m_name; }
         bool LoadFromDB(Field* fields);
         void SaveToDB(SQLTransaction& trans) const;
 
         uint64 GetGUID() const { return m_guid; }
-        std::string GetName() const { return m_name; }
         uint32 GetAccountId() const { return m_accountId; }
         uint32 GetRankId() const { return m_rankId; }
         uint8 GetClass() const { return m_class; }
         uint8 GetLevel() const { return m_level; }
         uint8 GetZone() const { return m_zoneId; }
-        uint64 GetLogoutTime() const { return m_logoutTime; }
+        const uint64& GetLogoutTime() const { return m_logoutTime; }
 
         const uint64& GetXPContrib() const { return m_xpContrib; }
         const uint64& GetXPContribWeek() const { return m_xpContribWeek; }
@@ -412,14 +414,12 @@ private:
         void SetAchievementPoints(uint32 val);
         uint32 GetAchievementPoints() { return m_achievementPoints; }
 
-        Profession m_professions[2];
-
-        void SetProfession(uint32 num, uint32 level, uint32 skill, uint32 rank)
+        void SetProfession(uint8 index, uint16 value, uint32 skill, uint8 rank)
         {
-            m_professions[num].level = level;
-            m_professions[num].skillID = skill;
-            m_professions[num].rank = rank;
+            _professions[index] = Profession(skill, value, rank);
         }
+
+        const Profession& GetProfession(uint8 index) const { return _professions[index]; }
 
     private:
         uint32 m_guildId;
@@ -440,6 +440,8 @@ private:
 
         uint64 m_xpContrib;
         uint64 m_xpContribWeek;
+
+        Profession _professions[2];
 
         RemainingValue m_bankRemaining[GUILD_BANK_MAX_TABS + 1];
     };

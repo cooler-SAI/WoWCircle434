@@ -522,56 +522,55 @@ void Guild::Member::SetStats(Player* player)
 
     m_achievementPoints = player->GetAchievementMgr().GetAchievementPoints();
 
-    uint8 count_prof = 0;
+    uint8 maxProf = 2;
     uint32 prev_skill = 0;
     for (PlayerSpellMap::const_iterator spellIter = player->GetSpellMap().begin(); spellIter != player->GetSpellMap().end(); ++spellIter)
     {
-        if (count_prof >= 2)
+        if (maxProf == 0)
             break;
 
-        const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellIter->first);
+        uint32 spellId = spellIter->first;
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
         if (!spellInfo)
             continue;
 
-        if (spellInfo->IsPrimaryProfession())
+        if (!spellInfo->IsPrimaryProfession())
+            continue;
+
+        uint32 skillId = 0;
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
-            uint32 skill = 0;
-            uint32 value = 0;
-            uint32 rank = 0;
-
-            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SKILL)
             {
-                if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SKILL)
-                {
-                    skill = uint32(spellInfo->Effects[i].MiscValue);
-                    break;
-                }
+                skillId = uint32(spellInfo->Effects[i].MiscValue);
+                break;
             }
-
-            if (prev_skill == skill)
-                continue;
-
-            value = player->GetSkillValue(skill);
-            rank = sSpellMgr->GetSpellRank(spellIter->first);
-
-            SetProfession(count_prof, value, skill, rank);
-
-            prev_skill = skill;
-            count_prof++;
         }
+
+        if (prev_skill == skillId)
+            continue;
+
+        prev_skill = skillId;
+
+        uint16 value = player->GetSkillValue(skillId);
+        uint8 rank = sSpellMgr->GetSpellRank(spellId);
+
+        SetProfession(maxProf--, value, skillId, rank);
     }
 
-    if (count_prof < 2)
-        for (uint8 i = 0; i < (2 - count_prof); i++)
-            SetProfession(count_prof + i, 0, 0, 0);
+    if (prev_skill > 0)
+    {
+        for (uint8 i = prev_skill; i < 2; ++i)
+            SetProfession(i, 0, 0, 0);
+    }
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_MEMBER_PROFESSIONS);
-    stmt->setUInt32(0, m_professions[0].level);
-    stmt->setUInt32(1, m_professions[0].skillID);
-    stmt->setUInt32(2, m_professions[0].rank);
-    stmt->setUInt32(3, m_professions[1].level);
-    stmt->setUInt32(4, m_professions[1].skillID);
-    stmt->setUInt32(5, m_professions[1].rank);
+    stmt->setUInt32(0, _professions[0].value);
+    stmt->setUInt32(1, _professions[0].skillId);
+    stmt->setUInt32(2, _professions[0].rank);
+    stmt->setUInt32(3, _professions[1].value);
+    stmt->setUInt32(4, _professions[1].skillId);
+    stmt->setUInt32(5, _professions[1].rank);
     stmt->setUInt32(6, m_guildId);
     stmt->setUInt32(7, GUID_LOPART(m_guid));
     CharacterDatabase.Execute(stmt);
@@ -666,8 +665,8 @@ bool Guild::Member::LoadFromDB(Field* fields)
 
     SetAchievementPoints(fields[30].GetUInt32());
  
-    SetProfession(0, fields[31].GetUInt32(), fields[32].GetUInt32(), fields[33].GetUInt32());
-    SetProfession(1, fields[34].GetUInt32(), fields[35].GetUInt32(), fields[36].GetUInt32());
+    SetProfession(0, uint16(fields[31].GetUInt32()), fields[32].GetUInt32(), uint8(fields[33].GetUInt32()));
+    SetProfession(1, uint16(fields[34].GetUInt32()), fields[35].GetUInt32(), uint8(fields[36].GetUInt32()));
 
     m_xpContrib = fields[37].GetUInt64();
     m_xpContribWeek = fields[38].GetUInt64();
@@ -1310,21 +1309,24 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
     uint32 motdSize = uint32(m_motd.length());
     uint32 infoLength = uint32(m_info.length());
     uint32 membersSize = uint32(m_members.size());
+    uint32 weeklyRepCap = uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP));
 
     ByteBuffer memberData((membersSize * 100));
-    WorldPacket data(SMSG_GUILD_ROSTER, motdSize + infoLength + ((41 + (33 * membersSize)) / 8) + 1024 + (membersSize * 100));
+    WorldPacket data(SMSG_GUILD_ROSTER, motdSize + infoLength + 16 + ((41 + (33 * membersSize)) / 8) + (membersSize * 100));
 
     data 
         << WriteAsUnaligned<11>(motdSize)
         << WriteAsUnaligned<18>(membersSize);
 
+    time_t now = ::time(NULL);
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
         Member* member = itr->second;
         Player* player = member->FindPlayer();
+
+        uint32 nameSize = uint32(member->GetName().length());
         uint32 pubNoteLength = uint32(member->GetPublicNote().length());
         uint32 offNoteLength = uint32(member->GetOfficerNote().length());
-        uint32 nameSize = uint32(member->GetName().length());
 
         ObjectGuid guid = member->GetGUID();
         data.WriteByteMask(guid[3]);
@@ -1352,21 +1354,25 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         }
 
         memberData << uint8(member->GetClass());
-        memberData << int32(member->GetGuildReputation());
+        memberData << int32(player ? player->GetReputation(1168) : 0);
         memberData.WriteByteSeq(guid[0]);
         memberData << uint64(member->GetXPContribWeek());
         memberData << uint32(member->GetRankId());
         memberData << uint32(member->GetAchievementPoints());                                    // player->GetAchievementMgr().GetCompletedAchievementsAmount()
 
-        memberData << uint32(member->m_professions[0].rank) << uint32(member->m_professions[0].level) << uint32(member->m_professions[0].skillID);
-        memberData << uint32(member->m_professions[1].rank) << uint32(member->m_professions[1].level) << uint32(member->m_professions[1].skillID);
+        for (uint8 i = 0; i < 2; ++i)
+        {
+            memberData << uint32(member->GetProfession(i).rank);
+            memberData << uint32(member->GetProfession(i).value);
+            memberData << uint32(member->GetProfession(i).skillId);
+        }
 
         memberData.WriteByteSeq(guid[2]);
         memberData << uint8(flags);
         memberData << uint32(player ? player->GetZoneId() : member->GetZone());
         memberData << uint64(member->GetXPContrib());
         memberData.WriteByteSeq(guid[7]);
-        memberData << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP) - member->GetWeeklyReputation());// Remaining guild week Rep
+        memberData << uint32(weeklyRepCap - member->GetWeeklyReputation()); // Remaining guild week Rep
 
         memberData << WriteBuffer(member->GetPublicNote().c_str(), pubNoteLength);
 
@@ -1377,7 +1383,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
         memberData.WriteByteSeq(guid[4]);
         memberData << uint8(player ? player->getGender() : 0);
         memberData.WriteByteSeq(guid[1]);
-        memberData << float(player ? 0.0f : float(float(::time(NULL) - member->GetLogoutTime()) / DAY));
+        memberData << float(player ? 0.0f : float(float(now - member->GetLogoutTime()) / DAY));
 
         memberData << WriteBuffer(member->GetOfficerNote().c_str(), offNoteLength);
         memberData.WriteByteSeq(guid[6]);
@@ -1391,7 +1397,7 @@ void Guild::HandleRoster(WorldSession* session /*= NULL*/)
     data << WriteBuffer(m_info.c_str(), infoLength);
     data << WriteBuffer(m_motd.c_str(), motdSize);
     data << uint32(m_accountsNumber);
-    data << uint32(sWorld->getIntConfig(CONFIG_GUILD_WEEKLY_REP_CAP));
+    data << uint32(weeklyRepCap);
     data.AppendPackedTime(m_createdDate);
     data << uint32(0);
 
