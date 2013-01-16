@@ -696,8 +696,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket & recvData)
     recvData >> auctionSlotID >> auctionMainCategory >> auctionSubCategory;
     recvData >> quality >> usable;
 
-    recvData.read_skip<uint8>();                           // related to time
-    recvData.read_skip<uint8>();                           // unk
+    recvData.read_skip<uint8>();                           // something with time
     recvData.read_skip<uint8>();                           // unk
 
     // this block looks like it uses some lame byte packing or similar...
