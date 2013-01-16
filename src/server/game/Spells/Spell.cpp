@@ -2290,6 +2290,18 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /* 
             }
         }
     }
+    // Removing Death Grip cooldown
+    else if (m_spellInfo->Id == 90289)
+    {
+        targetInfo.timeDelay = 100LL;
+        m_delayMoment = 100LL;
+    }
+    // Misdirection
+    else if (m_spellInfo->Id == 35079 || m_spellInfo->Id == 57934)
+    {
+        targetInfo.timeDelay = 100LL;
+        m_delayMoment = 100LL;
+    }
     else
         targetInfo.timeDelay = 0LL;
 
@@ -4080,6 +4092,16 @@ void Spell::finish(bool ok)
             {
                 m_caster->CastSpell(m_caster, 90967, true);
                 m_caster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+            }
+            break;
+        case 49560: // Glyph of Resilient Grip
+            if (!unitTarget || !m_caster->ToPlayer())
+                break;
+
+            for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+            {
+                if (ihit->missCondition == SPELL_MISS_IMMUNE && m_caster->HasAura(59309))
+                    m_caster->CastSpell(m_caster, 90289, true);
             }
             break;
     }
