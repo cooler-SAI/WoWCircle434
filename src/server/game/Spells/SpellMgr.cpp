@@ -5766,6 +5766,10 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->ProcChance = 0;
                 spellInfo->ProcFlags = 0;
                 break;
+            // Glyph of Grounding Totem
+            case 89523:
+                spellInfo->SpellFamilyName = SPELLFAMILY_SHAMAN;
+                break;
             default:
                 break;
         }

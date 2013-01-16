@@ -3245,14 +3245,6 @@ void Unit::_UnapplyAura(AuraApplicationMap::iterator &i, AuraRemoveMode removeMo
     // all effect mustn't be applied
     ASSERT(!aurApp->GetEffectMask());
 
-    // Remove totem at next update if totem loses its aura
-    if (Totem * totem = caster ? caster->ToTotem() : 0)
-        if (totem->GetSummonerGUID() == aura->GetCasterGUID() || totem->GetGUID() == aura->GetCasterGUID())
-        {
-            if (caster->ToTotem()->GetSpell() == aura->GetId())
-                caster->ToTotem()->setDeathState(JUST_DIED);
-        }
-
     // Remove aurastates only if were not found
     if (!auraStateFound)
         ModifyAuraState(auraState, false);
