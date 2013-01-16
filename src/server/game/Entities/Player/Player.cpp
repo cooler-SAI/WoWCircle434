@@ -16579,7 +16579,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     InitDisplayIds();
 
     // Currency Cap Data
-    m_currencyCap = sCurrencyMgr->getCurrencyCapData(guid);
+    m_currencyCap = sCurrencyMgr->GetCurrencyCapData(guid);
 
     // cleanup inventory related item value fields (its will be filled correctly in _LoadInventory)
     for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
@@ -26299,8 +26299,8 @@ void Player::SetMaxPersonalArenaRating(uint32 value)
     if (!IsHaveCap())
     {
         trans->PAppend("INSERT INTO character_currency_cap (guid, highestArenaRating, highestRBgRating, currentArenaCap, currentRBgCap, requireReset) VALUES ('%u', '%u', '0', '%u', '0', '1')", GetGUIDLow(), _maxPersonalArenaRate, DEFAULT_ARENA_CAP);
-        sCurrencyMgr->AddCurrencyCapData(GetGUIDLow(), _maxPersonalArenaRate, 0, DEFAULT_ARENA_CAP, 0, 1);
-        m_currencyCap = sCurrencyMgr->getCurrencyCapData(GetGUIDLow());
+        sCurrencyMgr->UpdateCurrencyCap(GetGUIDLow(), _maxPersonalArenaRate, 0, DEFAULT_ARENA_CAP, 0, 1);
+        m_currencyCap = sCurrencyMgr->GetCurrencyCapData(GetGUIDLow());
     }
     else
         trans->PAppend("UPDATE character_currency_cap SET highestArenaRating = '%u', highestRBgRating = '0', requireReset = '1' WHERE guid = '%u'", m_currencyCap->highestArenaRating, GetGUIDLow());

@@ -37,12 +37,12 @@ public:
         return itr != _capValuesStorage.end();
     }
 
-    void AddCurrencyCapData(uint32 lowGuid, uint16 arenaRating = 0, uint16 RBgRating = 0, uint16 arenaCap = DEFAULT_ARENA_CAP, uint16 rbgCap = 0, uint8 reset = 0);
+    void UpdateCurrencyCap(uint32 lowGuid, uint16 arenaRating = 0, uint16 RBgRating = 0, uint16 arenaCap = DEFAULT_ARENA_CAP, uint16 rbgCap = 0, uint8 reset = 0);
     void CalculatingCurrencyCap(uint16 &rating, bool ratedBattleground = false);
     
     float GetPrecision(CurrencyTypesEntry const* currency) const;
     
-    CurrencyCap* getCurrencyCapData(uint32 lowGuid);
+    CurrencyCap* GetCurrencyCapData(uint32 lowGuid);
 
     PlayerCurrencyCapMap& getCapMap() { return _capValuesStorage; }
     PlayerCurrencyCapMap::iterator getCapBegin() { return _capValuesStorage.begin(); }

@@ -2914,6 +2914,11 @@ class Player : public Unit, public GridObject<Player>
         void SetMaxPersonalArenaRating(uint32 value);
 
         bool IsHaveCap() { return m_currencyCap; }
+        void UpdateCurrencyCap(uint32 guid = 0) 
+        { 
+            m_currencyCap = guid ? sCurrencyMgr->GetCurrencyCapData(guid) : sCurrencyMgr->GetCurrencyCapData(GetGUIDLow()); 
+            SendPvpRewards();
+        }
 
         /// return count of currency gaind on current week
         uint32 GetCurrencyOnWeek(uint32 id, bool precision) const;
