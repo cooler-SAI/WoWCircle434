@@ -1184,6 +1184,12 @@ void Guardian::UpdateAttackPowerAndDamage(bool ranged)
                 frost = 0;
             SetBonusDamage(int32(frost * 0.4f));
         }
+        // Summon Gargoyle AP
+        else if (GetEntry() == 27829)
+        {
+            bonusAP = owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.4f;
+            SetBonusDamage(int32(m_owner->GetTotalAttackPowerValue(BASE_ATTACK)));
+        }
     }
 
     SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, val + bonusAP);
