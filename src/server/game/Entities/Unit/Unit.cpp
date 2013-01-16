@@ -16139,9 +16139,10 @@ void Unit::StopMoving()
 
 void Unit::SendMovementFlagUpdate(bool self /* = false */)
 {
-    WorldPacket data(MSG_MOVE_HEARTBEAT, 30);
-    WorldSession::WriteMovementInfo(data, &m_movementInfo);
-    SendMessageToSet(&data, self);
+    WorldSession::BuildMoveUpdatePacket(const_cast<Unit*>(this), m_movementInfo, size_t(40), self);
+    //WorldPacket data(MSG_MOVE_HEARTBEAT, 30);
+    //WorldSession::WriteMovementInfo(data, &m_movementInfo);
+    //SendMessageToSet(&data, self);
 }
 
 bool Unit::IsSitState() const
@@ -19003,6 +19004,8 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     if (player)
         player->ResummonPetTemporaryUnSummonedIfAny();
 
+    SendMovementFlagUpdate();
+
     if (vehicle->GetBase()->HasUnitTypeMask(UNIT_MASK_MINION))
         if (((Minion*)vehicle->GetBase())->GetOwner() == this)
             vehicle->Dismiss();
@@ -19037,6 +19040,7 @@ void Unit::NearTeleportTo(float x, float y, float z, float orientation, bool cas
         SendTeleportPacket(pos);
         UpdatePosition(x, y, z, orientation, true);
         UpdateObjectVisibility();
+        SendMovementFlagUpdate();
     }
 }
 

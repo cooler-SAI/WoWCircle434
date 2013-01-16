@@ -395,13 +395,22 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recvData)
     _player->m_movementInfo = mi;
 }
 
-void WorldSession::BuildMoveUpdatePacket(Unit* mover, MovementInfo& movementInfo, size_t size, Player* skip) const
+void WorldSession::BuildMoveUpdatePacket(Unit* mover, MovementInfo& movementInfo, size_t size, Player* skip)
 {
     ASSERT(mover);
 
     WorldPacket data(SMSG_PLAYER_MOVE, size);
     WriteMovementInfo(data, &movementInfo);
     mover->SendMessageToSet(&data, skip);
+}
+
+void WorldSession::BuildMoveUpdatePacket(Unit* mover, MovementInfo& movementInfo, size_t size, bool self)
+{
+    ASSERT(mover);
+
+    WorldPacket data(SMSG_PLAYER_MOVE, size);
+    WriteMovementInfo(data, &movementInfo);
+    mover->SendMessageToSet(&data, self);
 }
 
 void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvData*/)
