@@ -2610,6 +2610,7 @@ void Player::Regenerate(Powers power)
     float rangedHaste = GetFloatValue(PLAYER_FIELD_MOD_RANGED_HASTE);
     float meleeHaste = GetFloatValue(PLAYER_FIELD_MOD_HASTE);
     float spellHaste = GetFloatValue(UNIT_MOD_CAST_SPEED);
+    float regenmod = 1.0f / GetFloatValue(PLAYER_FIELD_MOD_HASTE_REGEN);
 
     switch (power)
     {
@@ -2634,11 +2635,14 @@ void Player::Regenerate(Powers power)
         break;
         case POWER_FOCUS:
         {
-            addvalue += m_regenTimer * 0.001f * 5.0f * (2.0f - rangedHaste) * sWorld->getRate(RATE_POWER_FOCUS);
+            addvalue += m_regenTimer * 0.001f * 5.0f * regenmod * sWorld->getRate(RATE_POWER_FOCUS);
+//             std::ostringstream oss;
+//             oss << GetPower(POWER_FOCUS) + addvalue;
+//             this->Say(oss.str(), LANG_UNIVERSAL
             break;
         }
         case POWER_ENERGY:                                              // Regenerate energy (rogue)
-            addvalue += (0.01f * m_regenTimer * (2.0f - meleeHaste)) * sWorld->getRate(RATE_POWER_ENERGY);
+            addvalue += (0.01f * m_regenTimer * regenmod) * sWorld->getRate(RATE_POWER_ENERGY);
             break;
         case POWER_RUNIC_POWER:
         {
@@ -5900,7 +5904,8 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
             ApplyAttackTimePercentMod(OFF_ATTACK, oldchange, false);
             ApplyAttackTimePercentMod(BASE_ATTACK, newchange, true);
             ApplyAttackTimePercentMod(OFF_ATTACK, newchange, true);
-            UpdateFocusRegen();
+            float haste_regen = 1.0f / (1.0f + newchange / 100.0f);
+            SetFloatValue(PLAYER_FIELD_MOD_HASTE_REGEN, haste_regen);
             break;
         }
         case CR_HASTE_RANGED:
@@ -5911,6 +5916,8 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
             ApplyAttackTimePercentMod(RANGED_ATTACK, oldchange, false);
             ApplyAttackTimePercentMod(RANGED_ATTACK, newchange, true);
             UpdateFocusRegen();
+            float haste_regen = 1.0f / (1.0f + newchange / 100.0f);
+            SetFloatValue(PLAYER_FIELD_MOD_HASTE_REGEN, haste_regen);
             break;
         }
         case CR_HASTE_SPELL:
