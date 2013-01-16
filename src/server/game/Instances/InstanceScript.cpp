@@ -320,6 +320,17 @@ void InstanceScript::DoSendNotifyToInstance(char const* format, ...)
     }
 }
 
+// Reset Achievement Criteria for all players in instance
+void InstanceScript::DoResetAchievementCriteria(AchievementCriteriaTypes type, uint64 miscValue1 /*= 0*/, uint64 miscValue2 /*= 0*/, bool evenIfCriteriaComplete /*= false*/)
+{
+    Map::PlayerList const &PlayerList = instance->GetPlayers();
+
+    if (!PlayerList.isEmpty())
+        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+            if (Player* player = i->getSource())
+                player->ResetAchievementCriteria(type, miscValue1, miscValue2, evenIfCriteriaComplete);
+}
+
 // Complete Achievement for all players in instance
 void InstanceScript::DoCompleteAchievement(uint32 achievement)
 {
@@ -335,14 +346,14 @@ void InstanceScript::DoCompleteAchievement(uint32 achievement)
 }
 
 // Update Achievement Criteria for all players in instance
-void InstanceScript::DoUpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, Unit* unit /*= NULL*/)
+void InstanceScript::DoUpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, uint32 miscValue3 /*=0*/, Unit* unit /*= NULL*/)
 {
     Map::PlayerList const &PlayerList = instance->GetPlayers();
 
     if (!PlayerList.isEmpty())
         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             if (Player* player = i->getSource())
-                player->UpdateAchievementCriteria(type, miscValue1, miscValue2, 0, unit);
+                player->UpdateAchievementCriteria(type, miscValue1, miscValue2, miscValue3, unit);
 }
 
 // Start timed achievement for all players in instance

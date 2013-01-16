@@ -5058,10 +5058,6 @@ bool Unit::HandleSpellCritChanceAuraProc(Unit* victim, uint32 /*damage*/, AuraEf
     if (cooldown && GetTypeId() == TYPEID_PLAYER)
         ToPlayer()->AddSpellCooldown(triggered_spell_id, 0, time(NULL) + cooldown);
 
-    Creature* creature = ToCreature();
-    if (creature && creature->IsAIEnabled)
-        creature->AI()->DoAction(EVENT_SPELLCLICK);
-
     return true;
 }
 

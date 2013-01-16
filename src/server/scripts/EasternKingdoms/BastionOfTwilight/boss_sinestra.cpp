@@ -2,7 +2,7 @@
 #include "Spell.h"
 #include "bastion_of_twilight.h"
 
-enum ScriptTexts
+enum SinestraScriptTexts
 {
     SAY_SINESTRA_AGGRO      = 0,
     SAY_SINESTRA_DEATH      = 1,
@@ -11,7 +11,10 @@ enum ScriptTexts
     SAY_SINESTRA_PHASE_2_1  = 4,
     SAY_SINESTRA_PHASE_3    = 6,
     SAY_SINESTRA_WHELP      = 7,
+};
 
+enum CalenScriptTexts
+{
     SAY_CALEN_INTRO         = 0,
     SAY_CALEN_LOSE          = 1,
     SAY_CALEN_PHASE_2       = 2,
