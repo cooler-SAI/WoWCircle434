@@ -6308,6 +6308,18 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
     if (!id)
         return;
 
+    if (IsPrimaryProfessionSkill(id))
+    {
+        for (uint8 i = 0; i < DEFAULT_MAX_PRIMARY_TRADE_SKILL; ++i)
+        {
+            if (GetPrimaryProfession(i) == (newVal ? 0 : id))
+            {
+                SetPrimaryProfession(i, newVal ? id : 0);
+                break;
+            }
+        }
+    }
+
     uint16 currVal;
     SkillStatusMap::iterator itr = mSkillStatus.find(id);
 
@@ -6324,6 +6336,7 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
                 UpdateSkillEnchantments(id, currVal, newVal);
 
             // update step
+            SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, id);
             SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, step);
             // update value
             SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, newVal);
@@ -6364,12 +6377,6 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
                 if (SkillLineAbilityEntry const* pAbility = sSkillLineAbilityStore.LookupEntry(j))
                     if (pAbility->skillId == id)
                         removeSpell(sSpellMgr->GetFirstSpellInChain(pAbility->spellId));
-
-            // Clear profession lines
-            if (GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1) == id)
-                SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1, 0);
-            else if (GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1) == id)
-                SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1, 0);
         }
     }
     else if (newVal)                                        //add
@@ -6390,14 +6397,6 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
                 }
 
                 SetUInt16Value(PLAYER_SKILL_LINEID_0 + field, offset, id);
-                if (skillEntry->categoryId == SKILL_CATEGORY_PROFESSION)
-                {
-                    if (!GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1))
-                        SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1, id);
-                    else if (!GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1))
-                        SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + 1, id);
-                }
-
                 SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, step);
                 SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, newVal);
                 SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, maxVal);
@@ -24024,8 +24023,8 @@ void Player::_LoadSkills(PreparedQueryResult result)
             {
                 step = max / 75;
 
-                if (professionCount < 2)
-                    SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + professionCount++, skill);
+                if (professionCount < DEFAULT_MAX_PRIMARY_TRADE_SKILL)
+                    SetPrimaryProfession(professionCount++, skill);
             }
 
             SetUInt16Value(PLAYER_SKILL_STEP_0 + field, offset, step);

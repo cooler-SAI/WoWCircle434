@@ -63,6 +63,7 @@ class PhaseMgr;
 typedef std::deque<Mail*> PlayerMails;
 
 #define PLAYER_MAX_SKILLS           128
+#define DEFAULT_MAX_PRIMARY_TRADE_SKILL 2
 #define PLAYER_MAX_DAILY_QUESTS     25
 #define PLAYER_EXPLORED_ZONES_SIZE  156
 
@@ -2994,6 +2995,18 @@ class Player : public Unit, public GridObject<Player>
 
                 return modelData->CollisionHeight;
             }
+        }
+
+        uint16 GetPrimaryProfession(uint8 index) const
+        {
+            //ASSERT(index < DEFAULT_MAX_PRIMARY_TRADE_SKILL);
+            return uint16(GetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + index));
+        }
+
+        void SetPrimaryProfession(uint8 index, uint16 skillId)
+        {
+            //ASSERT(index < DEFAULT_MAX_PRIMARY_TRADE_SKILL);
+            SetUInt32Value(PLAYER_PROFESSION_SKILL_LINE_1 + index, skillId);
         }
 
         // Void Storage
