@@ -2586,6 +2586,12 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                     if (uint32 modelid = ci->GetRandomValidModelId())
                         model_id = modelid;                     // Will use the default model here
 
+                    // Leyara's Locket
+                    if (GetSpellInfo()->Id == 101185)
+                        if (Unit* caster = GetCaster())
+                            if (caster->getGender() == GENDER_FEMALE)
+                                model_id = 38744;
+
                     // Polymorph (sheep)
                     if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_MAGE && GetSpellInfo()->SpellIconID == 82 && GetSpellInfo()->SpellVisual[0] == 12978)
                         if (Unit* caster = GetCaster())
