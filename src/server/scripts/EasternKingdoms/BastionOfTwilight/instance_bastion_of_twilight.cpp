@@ -279,6 +279,10 @@ public:
                 if (GetBossState(DATA_COUNCIL) != DONE)
                     return false;
                 break;
+            case DATA_SINESTRA:
+                if (GetBossState(DATA_CHOGALL) != DONE)
+                    return false;
+                break;
             default:   
                 break;
             }
