@@ -39,6 +39,7 @@ class instance_zulgurub : public InstanceMapScript
                 renatakiGUID    = 0;
                 wushoolayGUID   = 0;
                 grilekGUID      = 0;
+                uiBosses        = 0;
             }
     
             void OnCreatureCreate(Creature* creature)
@@ -99,43 +100,21 @@ class instance_zulgurub : public InstanceMapScript
                 if (!InstanceScript::SetBossState(type, state))
                     return false;
 
-                switch (type)
+                if (state == DONE)
                 {
-                   case DATA_VENOXIS:
-                   case DATA_MANDOKIR:
-                   case DATA_KILNARA:
-                   case DATA_ZANZIL:
-                   case DATA_JINDO:
-                   case DATA_HAZZARAH:
-                   case DATA_RENATAKI:
-                   case DATA_WUSHOOLAY:
-                   case DATA_GRILEK:
-                      break;
-                   default:
-                      break;
+                    uiBosses++;
+                    SaveToDB();
                 }
 
                 return true;
             }
 
-            /*
-            void SetData(uint32 type, uint32 data)
-            {
-                switch (type)
-                {
-                }
-            }
-
             uint32 GetData(uint32 type)
             {
-                switch (type)
-                {
-                }
-
+                if (type == DATA_BOSSES)
+                    return uiBosses;
                 return 0;
             }
-            */
-
             uint64 GetData64(uint32 type)
             {
                 switch (type)
@@ -171,7 +150,7 @@ class instance_zulgurub : public InstanceMapScript
                 OUT_SAVE_INST_DATA;
 
                 std::ostringstream saveStream;
-                saveStream << "Z G " << GetBossSaveData();
+                saveStream << "Z G " << uiBosses << " " << GetBossSaveData();
 
                 OUT_SAVE_INST_DATA_COMPLETE;
                 return saveStream.str();
@@ -194,6 +173,9 @@ class instance_zulgurub : public InstanceMapScript
 
                 if (dataHead1 == 'Z' && dataHead2 == 'G')
                 {
+                    loadStream >> uiBosses;
+                    if (uiBosses > 5)
+                        uiBosses = 0;
                     for (uint8 i = 0; i < EncounterCount; ++i)
                     {
                         uint32 tmpState;
@@ -220,6 +202,7 @@ class instance_zulgurub : public InstanceMapScript
              uint64 renatakiGUID;
              uint64 wushoolayGUID;
              uint64 grilekGUID;
+             uint32 uiBosses; 
         };
 };
 

@@ -5188,7 +5188,44 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(10);
                 spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENTRY;
                 break;
+            // Jindo The Godbreaker
+            case 96689: // Spirit World aura
+                spellInfo->Effects[EFFECT_1].MiscValue = 2;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+                break;
+            case 97022: // Hakkar's Chains
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                spellInfo->ChannelInterruptFlags = 0;
+                break;
+            case 97172: // Shadows of Hakkar
+            case 97198: // Body Slam
+                spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
+                break;
+            case 97597: // Spirit Warrior's Gaze
+            case 97158:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 97152: // Summon Spirit target
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(33);
+                break;
+            case 96964: // Sunder Rift
+                spellInfo->SetDurationIndex(18);
+                break;
+            case 96970: // Sunder Rift:
+                spellInfo->ProcChance = 100;
+                break;
+            case 97320: // Sunder Rift
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_SRC_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ALLY;
+                spellInfo->InterruptFlags = 0;
+                break;
             // ENDOF ZUL'GURUB SPELLS
+            //
             // ZUL'AMAN SPELLS
             //
             // Akil'zon

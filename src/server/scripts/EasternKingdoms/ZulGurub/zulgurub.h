@@ -18,6 +18,7 @@ enum DataTypes
     DATA_RENATAKI           = 6,
     DATA_WUSHOOLAY          = 7,
     DATA_GRILEK             = 8,
+    DATA_BOSSES             = 9,
 };
 
 enum CreatureIds
