@@ -12455,8 +12455,13 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
     // SPELL_AURA_MOD_AUTOATTACK_DAMAGE
     if (!spellProto)
     {
+        Item *weapon = 0;
+        if (GetTypeId() == TYPEID_PLAYER)
+            weapon = this->ToPlayer()->GetWeaponForAttack(BASE_ATTACK, true);
+
         AuraEffectList const &mDamageDoneAutoAttacks = GetAuraEffectsByType(SPELL_AURA_MOD_AUTOATTACK_DAMAGE);
         for (AuraEffectList::const_iterator i = mDamageDoneAutoAttacks.begin(); i != mDamageDoneAutoAttacks.end(); ++i)
+            if (!weapon || weapon->IsFitToSpellRequirements((*i)->GetSpellInfo()))
                 DoneTotalMod *= ((*i)->GetAmount()+100.0f)/100.0f;
     }
 
