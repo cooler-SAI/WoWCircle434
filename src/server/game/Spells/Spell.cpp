@@ -6855,7 +6855,7 @@ void Spell::Delayed() // only called in DealDamage()
     //    return;
 
     //check pushback reduce
-    int32 delaytime = 500;                                  // spellcasting delay is normally 150ms
+    int32 delaytime = 150;                                  // spellcasting delay is normally 150ms
     int32 delayReduce = 100;                                // must be initialized to 100 for percent modifiers
     m_caster->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_NOT_LOSE_CASTING_TIME, delayReduce, this);
     delayReduce += m_caster->GetTotalAuraModifier(SPELL_AURA_REDUCE_PUSHBACK) - 100;
