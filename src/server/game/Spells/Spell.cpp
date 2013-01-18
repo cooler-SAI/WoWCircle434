@@ -6089,6 +6089,18 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
         if (creatureCaster->HasSpellCooldown(m_spellInfo->Id))
             return SPELL_FAILED_NOT_READY;
 
+    if (!IsTriggered())
+    {
+        m_powerCost = m_spellInfo->CalcPowerCost(m_caster, m_spellSchoolMask);
+        SpellCastResult castResult = CheckPower();
+        if (castResult != SPELL_CAST_OK)
+            return castResult;
+
+        castResult = CheckCasterAuras();
+        if (castResult != SPELL_CAST_OK)
+            return castResult;
+    }
+
     return CheckCast(true);
 }
 
