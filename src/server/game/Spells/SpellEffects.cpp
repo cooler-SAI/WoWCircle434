@@ -7186,6 +7186,7 @@ void Spell::EffectActivateRune(SpellEffIndex effIndex)
                 if (player->GetBaseRune(j) != RuneType(m_spellInfo->Effects[effIndex].MiscValueB))
                     continue;
             player->SetRuneCooldown(j, 0);
+            player->ResyncRunes(MAX_RUNES);
             --count;
         }
     }
