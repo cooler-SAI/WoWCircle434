@@ -5004,11 +5004,11 @@ void ObjectMgr::LoadInstanceEncounters()
                 break;
             }
             case ENCOUNTER_CREDIT_CAST_SPELL:
-                if (!sSpellMgr->GetSpellInfo(creditEntry))
+                /*if (!sSpellMgr->GetSpellInfo(creditEntry))
                 {
                     sLog->outError(LOG_FILTER_SQL, "Table `instance_encounters` has an invalid spell (entry %u) linked to the encounter %u (%s), skipped!", creditEntry, entry, dungeonEncounter->encounterName);
                     continue;
-                }
+                }*/
                 break;
             default:
                 sLog->outError(LOG_FILTER_SQL, "Table `instance_encounters` has an invalid credit type (%u) for encounter %u (%s), skipped!", creditType, entry, dungeonEncounter->encounterName);

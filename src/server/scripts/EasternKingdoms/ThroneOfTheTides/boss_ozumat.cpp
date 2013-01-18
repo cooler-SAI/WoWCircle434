@@ -48,7 +48,7 @@ enum Spells
     // Faceless Sapper
     SPELL_ENTANGLING_GRASP              = 83463,
 
-    SPELL_ENCOUNTER_COMPLETE            = 72959,
+    SPELL_ENCOUNTER_COMPLETE            = 95673,
 }; 
 
 enum Events
