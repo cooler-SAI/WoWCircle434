@@ -168,8 +168,7 @@ void WorldSession::HandleLfgProposalResultOpcode(WorldPacket& recvData)
         .ReadByteSeq(instanceGuid[0])
         .ReadByteSeq(instanceGuid[2]);
 
-    if (!IS_PLAYER_GUID(playerGuid))
-        sLog->outError(LOG_FILTER_GENERAL, "CMSG_LFG_PROPOSAL_RESULT: playerGuid is not player guid");
+    sLog->outError(LOG_FILTER_GENERAL, "HandleLfgProposalResultOpcode: playerGuid is player guid = %s. proposalId = %u, time = %u, roles = %u, unk = %u", IS_PLAYER_GUID(playerGuid) ? "true" : "false", lfgGroupID, time, roles, unk);
 
     sLog->outDebug(LOG_FILTER_LFG, "CMSG_LFG_PROPOSAL_RESULT %s proposal: %u accept: %u",
         GetPlayer()->GetGUID(), lfgGroupID, accept ? 1 : 0);
