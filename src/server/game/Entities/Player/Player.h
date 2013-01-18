@@ -2811,6 +2811,7 @@ class Player : public Unit, public GridObject<Player>
         Group* GetGroupInvite() { return m_groupInvite; }
         void SetGroupInvite(Group* group) { m_groupInvite = group; }
         Group* GetGroup() { return m_group.getTarget(); }
+        const bool HasGroup() const { return GetGroup() != NULL; }
         const Group* GetGroup() const { return (const Group*)m_group.getTarget(); }
         GroupReference& GetGroupRef() { return m_group; }
         void SetGroup(Group* group, int8 subgroup = -1);

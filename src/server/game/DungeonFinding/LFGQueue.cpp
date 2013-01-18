@@ -140,7 +140,7 @@ void LFGQueue::RemoveFromCurrentQueue(uint64 guid)
     currentQueueStore.remove(guid);
 }
 
-void LFGQueue::AddQueueData(uint64 guid, time_t joinTime, const LfgDungeonSet &dungeons, const LfgRolesMap &rolesMap)
+void LFGQueue::AddQueueData(uint64 guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap)
 {
     QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap);
     AddToQueue(guid);
@@ -483,8 +483,9 @@ LfgCompatibility LFGQueue::CheckCompatibility(LfgGuidList check)
         return LFG_COMPATIBLES_WITH_LESS_PLAYERS;
     }
 
+    uint64 gguid = *check.begin();
     proposal.queues = check;
-    proposal.isNew = numLfgGroups != 1;
+    proposal.isNew = numLfgGroups != 1 || !sLFGMgr->GetDungeon(gguid);
 
     if (!sLFGMgr->AllQueued(check))
     {
@@ -579,8 +580,7 @@ void LFGQueue::UpdateQueueTimers(time_t currTime)
         LfgQueueStatusData queueData(dungeonId, queueinfo.joinTime, waitTime, wtAvg, wtTank, wtHealer, wtDps, queuedTime, queueinfo.tanks, queueinfo.healers, queueinfo.dps);
         for (LfgRolesMap::const_iterator itPlayer = queueinfo.roles.begin(); itPlayer != queueinfo.roles.end(); ++itPlayer)
         {
-            uint64 pguid = itPlayer->first;
-            LFGMgr::SendLfgQueueStatus(pguid, queueData);
+            LFGMgr::SendLfgQueueStatus(itPlayer->first, queueData);
         }
     }
 }

@@ -286,7 +286,7 @@ public:
             return false;
 
         LfgJoinResult error = LfgJoinResult(atoi(result));
-        handler->GetSession()->SendLfgJoinResult(handler->GetSession()->GetPlayer()->GetGUID(), 0, LfgJoinResultData(error));
+        handler->GetSession()->SendLfgJoinResult(handler->GetSession()->GetPlayer()->GetGUID(), LfgJoinResultData(error));
         return true;
     }
 
@@ -300,7 +300,7 @@ public:
             return false;
 
         LfgRoleCheckState error = LfgRoleCheckState(atoi(result));
-        handler->GetSession()->SendLfgJoinResult(handler->GetSession()->GetPlayer()->GetGUID(), 0, LfgJoinResultData(LFG_JOIN_OK, error));
+        handler->GetSession()->SendLfgJoinResult(handler->GetSession()->GetPlayer()->GetGUID(), LfgJoinResultData(LFG_JOIN_OK, error));
         return true;
     }
 

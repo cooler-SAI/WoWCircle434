@@ -27,6 +27,7 @@
 
 class Group;
 class Player;
+class Quest;
 
 enum LfgOptions
 {
@@ -36,9 +37,9 @@ enum LfgOptions
 
 enum LFGMgrEnum
 {
-    LFG_TIME_ROLECHECK                           = 40 * IN_MILLISECONDS,
+    LFG_TIME_ROLECHECK                           = 45 * IN_MILLISECONDS,
     LFG_TIME_BOOT                                = 120,
-    LFG_TIME_PROPOSAL                            = 120,
+    LFG_TIME_PROPOSAL                            = 45,
     LFG_QUEUEUPDATE_INTERVAL                     = 15 * IN_MILLISECONDS,
     LFG_SPELL_DUNGEON_COOLDOWN                   = 71328,
     LFG_SPELL_DUNGEON_DESERTER                   = 71041,
@@ -156,7 +157,7 @@ struct LfgJoinResultData
 struct LfgUpdateData
 {
     LfgUpdateData(LfgUpdateType _type = LFG_UPDATETYPE_DEFAULT): updateType(_type), state(LFG_STATE_NONE), comment("") { }
-    LfgUpdateData(LfgUpdateType _type, LfgDungeonSet const& _dungeons, std::string _comment):
+    LfgUpdateData(LfgUpdateType _type, LfgDungeonSet const& _dungeons, std::string _comment) :
         updateType(_type), state(LFG_STATE_NONE), dungeons(_dungeons), comment(_comment) { }
     LfgUpdateData(LfgUpdateType _type, LfgState _state, LfgDungeonSet const& _dungeons, std::string const& _comment = ""):
         updateType(_type), state(_state), dungeons(_dungeons), comment(_comment) { }
@@ -188,27 +189,25 @@ struct LfgQueueStatusData
     uint8 dps;
 };
 
+struct LfgPlayerRewardData
+{
+    LfgPlayerRewardData(uint32 random, uint32 current, bool _done, Quest const* _quest):
+        rdungeonEntry(random), sdungeonEntry(current), done(_done), quest(_quest) { }
+    uint32 rdungeonEntry;
+    uint32 sdungeonEntry;
+    bool done;
+    Quest const* quest;
+};
+
 /// Reward info
 struct LfgReward
 {
-    uint32 maxLevel;
-    struct
-    {
-        uint32 questId;
-        uint32 variableMoney;
-        uint32 variableXP;
-    } reward[2];
+    LfgReward(uint32 _maxLevel = 0, uint32 _firstQuest = 0, uint32 _otherQuest = 0):
+        maxLevel(_maxLevel), firstQuest(_firstQuest), otherQuest(_otherQuest) { }
 
-    LfgReward(uint32 _maxLevel = 0, uint32 firstQuest = 0, uint32 firstVarMoney = 0, uint32 firstVarXp = 0, uint32 otherQuest = 0, uint32 otherVarMoney = 0, uint32 otherVarXp = 0)
-        : maxLevel(_maxLevel)
-    {
-        reward[0].questId = firstQuest;
-        reward[0].variableMoney = firstVarMoney;
-        reward[0].variableXP = firstVarXp;
-        reward[1].questId = otherQuest;
-        reward[1].variableMoney = otherVarMoney;
-        reward[1].variableXP = otherVarXp;
-    }
+    uint32 maxLevel;
+    uint32 firstQuest;
+    uint32 otherQuest;
 };
 
 /// Stores player data related to proposal to join
@@ -223,10 +222,11 @@ struct LfgProposalPlayer
 /// Stores group data related to proposal to join
 struct LfgProposal
 {
-    LfgProposal(uint32 dungeon = 0): dungeonId(dungeon), state(LFG_PROPOSAL_INITIATING),
+    LfgProposal(uint32 dungeon = 0): id(0), dungeonId(dungeon), state(LFG_PROPOSAL_INITIATING),
         group(0), leader(0), cancelTime(0), encounters(0), isNew(true)
         { }
 
+    uint32 id;                                             ///< Proposal Id
     uint32 dungeonId;                                      ///< Dungeon to join
     LfgProposalState state;                                ///< State of the proposal
     uint64 group;                                          ///< Proposal group (0 if new)
@@ -235,7 +235,8 @@ struct LfgProposal
     uint32 encounters;                                     ///< Dungeon Encounters
     bool isNew;                                            ///< Determines if it's new group or not
     LfgGuidList queues;                                    ///< Queue Ids to remove/readd
-    LfgProposalPlayerContainer players;                          ///< Players data
+    LfgGuidList showorder;                                 ///< Show order in update window
+    LfgProposalPlayerContainer players;                    ///< Players data
 };
 
 /// Stores all rolecheck info of a group that wants to join
@@ -286,6 +287,8 @@ struct LFGDungeonData
     uint32 Entry() const { return id + (type << 24); }
 };
 
+typedef std::map<uint64, uint32> GuidQueueMap;
+
 class LFGMgr
 {
     friend class ACE_Singleton<LFGMgr, ACE_Null_Mutex>;
@@ -299,7 +302,7 @@ class LFGMgr
 
         // Reward
         void LoadRewards();
-        void RewardDungeonDoneFor(uint32 const dungeonId, Player* player);
+        void FinishDungeon(uint64 gguid, uint32 dungeonId);
         LfgReward const* GetRandomDungeonReward(uint32 dungeon, uint8 level);
 
         // Queue
@@ -314,7 +317,7 @@ class LFGMgr
         void GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap);
 
         // Proposals
-        uint32 AddProposal(LfgProposal const& proposal);
+        uint32 AddProposal(LfgProposal& proposal);
         void UpdateProposal(uint32 proposalId, uint64 guid, bool accept);
 
         // Teleportation
@@ -327,6 +330,7 @@ class LFGMgr
         void InitializeLockedDungeons(Player* player, uint8 level = 0);
 
         void SetRoles(uint64 guid, uint8 roles);
+
         void SetComment(uint64 guid, std::string const& comment);
         void SetTeam(uint64 guid, uint8 team);
         void SetGroup(uint64 guid, uint64 group);
@@ -379,6 +383,31 @@ class LFGMgr
         void SetupGroupMember(uint64 guid, uint64 gguid);
         uint64 GetGroup(uint64 guid);
 
+        uint32 GetNewQueueId()
+        {
+            if (m_queueId >= 0xFFFFFFFE)
+            {
+                sLog->outError(LOG_FILTER_GENERAL, "Queue id overflow!! Can't continue, shutting down server. ");
+                World::StopNow(ERROR_EXIT_CODE);
+            }
+            return m_queueId++;
+        }
+
+        template<bool group>
+        uint32 GetOrGenerateQueueId(uint64 const& guid)
+        {
+            uint32& queueId = (group ? _groupQueue : _playerQueue)[guid];
+            if (queueId == 0)
+                queueId = GetNewQueueId();
+            return /*queueId*/0;
+        }
+
+        template<bool group>
+        void SetQueueId(uint64 const& guid, uint32 queueId)
+        {
+            (group ? _groupQueue : _playerQueue)[guid] = queueId;
+        }
+
     private:
         uint8 GetTeam(uint64 guid);
         void RestoreState(uint64 guid, char const *debugMsg);
@@ -403,12 +432,14 @@ class LFGMgr
         void SendLfgRoleCheckUpdate(uint64 guid, LfgRoleCheck const& roleCheck);
         void SendLfgUpdateParty(uint64 guid, LfgUpdateData const& data);
         void SendLfgUpdatePlayer(uint64 guid, LfgUpdateData const& data);
-        void SendLfgUpdateProposal(uint64 guid, uint32 proposalId, LfgProposal const& proposal);
+        void SendLfgUpdateProposal(uint64 guid, LfgProposal const& proposal);
 
         // General variables
         uint32 m_QueueTimer;                               ///< used to check interval of update
         uint32 m_lfgProposalId;                            ///< used as internal counter for proposals
         uint32 m_options;                                  ///< Stores config options
+
+        uint32 m_queueId;                                  ///< Queue Id
 
         LfgQueueContainer QueuesStore;                     ///< Queues
         LfgCachedDungeonContainer CachedDungeonMapStore;   ///< Stores all dungeons by groupType
@@ -422,6 +453,8 @@ class LFGMgr
         LfgPlayerDataContainer PlayersStore;               ///< Player data
         LfgGroupDataContainer GroupsStore;                 ///< Group data
         LfgGuidList teleportStore;                         ///< Players being teleported
+        GuidQueueMap _playerQueue;                         ///< Player queue ids
+        GuidQueueMap _groupQueue;                          ///< Group queue ids
 };
 
 #define sLFGMgr ACE_Singleton<LFGMgr, ACE_Null_Mutex>::instance()
