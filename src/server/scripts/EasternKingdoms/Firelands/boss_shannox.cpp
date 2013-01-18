@@ -86,6 +86,15 @@ enum Other
     DATA_TRAPPED_DOG        = 5,
 };
 
+enum AreaIds
+{
+    AREA_1          = 5764, // Логово Бет'тилак
+    AREA_2          = 5821, // Порочный путь
+    AREA_3          = 5766, // Каменный Венец
+    AREA_4          = 5791, // Гряда Древнего Пламени
+    AREA_5          = 5765, // Огненный портал
+};
+
 const Position dogPos[2] = 
 {
     {-153.604f, 198.994f, 46.174f, 3.68f}, // Riplimb
@@ -122,6 +131,7 @@ class boss_shannox : public CreatureScript
                 bIntro = false;
             }
 
+            bool areas[5];
             bool bIntro;
             bool bRiplimbDead;
             bool bRagefaceDead;
@@ -135,6 +145,14 @@ class boss_shannox : public CreatureScript
                     Reset();
             }
 
+            bool AllowAchieve()
+            {
+                for (uint8 i = 0; i < 5; ++i)
+                    if (!areas[i])
+                        return false;
+                return true;
+            }
+
             void Reset()
             {
                 _Reset();
@@ -144,6 +162,7 @@ class boss_shannox : public CreatureScript
                 bRiplimbDead = false;
                 bRagefaceDead = false;
                 bFrenzy = false;
+                memset(areas, false, sizeof(areas));
             }
 
             void MoveInLineOfSight(Unit* who)
@@ -157,11 +176,16 @@ class boss_shannox : public CreatureScript
 
             void DoAction(const int32 action)
             {
-                if (action == ACTION_RESURRECT)
+                switch (action)
                 {
-                    bRiplimbDead = false;
-                    events.CancelEvent(EVENT_MAGMA_RUPTURE);
-                    events.ScheduleEvent(EVENT_HURL_SPEAR, urand(5000, 10000));
+                    case ACTION_RESURRECT:
+                        bRiplimbDead = false;
+                        events.CancelEvent(EVENT_MAGMA_RUPTURE);
+                        events.ScheduleEvent(EVENT_HURL_SPEAR, urand(5000, 10000));
+                        break;
+                    case EVENT_UNIT_WITHIN_LOS:
+                        EnterEvadeMode();
+                        break;
                 }
             }
 
@@ -171,7 +195,8 @@ class boss_shannox : public CreatureScript
                 {
                     bRiplimbDead = true;
                     Talk(SAY_RIPLIMB);
-                    DoCast(me, SPELL_FRENZY, true);
+                    if (!IsHeroic())
+                        DoCast(me, SPELL_FRENZY, true);
                     events.CancelEvent(EVENT_HURL_SPEAR);
                     events.ScheduleEvent(EVENT_MAGMA_RUPTURE, urand(5000, 15000));
                 }
@@ -179,7 +204,8 @@ class boss_shannox : public CreatureScript
                 {
                     bRagefaceDead = true;
                     Talk(SAY_RAGEFACE);
-                    DoCast(me, SPELL_FRENZY, true);
+                    if (!IsHeroic())
+                        DoCast(me, SPELL_FRENZY, true);
                 }
             }
 
@@ -189,6 +215,11 @@ class boss_shannox : public CreatureScript
                     DoZoneInCombat(pRiplimb);
                 if (Creature* pRageface = me->FindNearestCreature(NPC_RAGEFACE, 300.0f))
                     DoZoneInCombat(pRageface);
+
+                bRiplimbDead = false;
+                bRagefaceDead = false;
+                bFrenzy = false;
+                memset(areas, false, sizeof(areas));
 
                 Talk(SAY_AGGRO);
                 events.ScheduleEvent(EVENT_BERSERK, 60 * MINUTE * IN_MILLISECONDS);
@@ -229,6 +260,31 @@ class boss_shannox : public CreatureScript
             {
                 if (!UpdateVictim())
                     return;
+
+                // Bucket List
+                switch (me->GetAreaId())
+                {
+                    case AREA_1:
+                        if (!areas[0])
+                            areas[0] = true;
+                        break;
+                    case AREA_2:
+                        if (!areas[1])
+                            areas[1] = true;
+                        break;
+                    case AREA_3:
+                        if (!areas[2])
+                            areas[2] = true;
+                        break;
+                    case AREA_4:
+                        if (!areas[3])
+                            areas[3] = true;
+                        break;
+                    case AREA_5:
+                        if (!areas[4])
+                            areas[4] = true;
+                        break;
+                }
 
                 events.Update(diff);
 
@@ -290,11 +346,11 @@ class boss_shannox : public CreatureScript
                             events.ScheduleEvent(EVENT_MAGMA_RUPTURE, 20000);
                             break;
                         case EVENT_MAGMA_RUPTURE_2:
-                            // There will be a spiral, 3 "circles", 10 points per circle
+                            // There will be a spiral, 3 "circles", 20 points per circle
                             Position pos;
-                            for (uint8 i = 0; i < 30; ++i)
+                            for (uint8 i = 0; i < 60; ++i)
                             {
-                                me->GetNearPosition(pos, 15.0f + i * 0.75f, (M_PI * i) / 5);
+                                me->GetNearPosition(pos, 15.0f + i * 0.75f, (M_PI * i) / 10);
                                 pos.m_positionZ = me->GetMap()->GetHeight(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, MAX_HEIGHT);
                                 me->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_MAGMA_RUPTURE_MISSILE, true);
                             }
@@ -336,7 +392,7 @@ class npc_shannox_riplimb : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
                 me->setActive(true);
-                me->SetSpeed(MOVE_RUN, 1.0f);
+                me->SetSpeed(MOVE_RUN, 1.1f);
                 pInstance = me->GetInstanceScript();
             }
 
@@ -383,7 +439,7 @@ class npc_shannox_riplimb : public CreatureScript
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
                     me->SetStandState(UNIT_STAND_STATE_DEAD);
                     me->RemoveAllAuras();
-                    events.ScheduleEvent(EVENT_RESURRECT, 5000);
+                    events.ScheduleEvent(EVENT_RESURRECT, 30000);
                 }
             }
 
@@ -399,6 +455,11 @@ class npc_shannox_riplimb : public CreatureScript
                         me->RemoveMovementImpairingAuras();
                         me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SNARE, false);
                         DoCast(me, SPELL_DOGGED_DETERMINATION, true);
+                        break;
+                    case EVENT_UNIT_WITHIN_LOS:
+                        if (pInstance)
+                            if (Creature* pShannox = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_SHANNOX)))
+                                pShannox->AI()->EnterEvadeMode();
                         break;
                 }
             }
@@ -519,7 +580,7 @@ class npc_shannox_rageface : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
                 me->setActive(true);
-                me->SetSpeed(MOVE_RUN, 1.0f);
+                me->SetSpeed(MOVE_RUN, 1.1f);
                 pInstance = me->GetInstanceScript();
             }
 
@@ -531,6 +592,14 @@ class npc_shannox_rageface : public CreatureScript
                 events.Reset();
                 if (IsHeroic())
                     DoCast(me, SPELL_FEEDING_FRENZY, true);
+            }
+
+            void DoAction(const int32 action)
+            {
+                if (action == EVENT_UNIT_WITHIN_LOS)
+                    if (pInstance)
+                        if (Creature* pShannox = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_SHANNOX)))
+                           pShannox->AI()->EnterEvadeMode();
             }
 
             void EnterCombat(Unit* who)
@@ -553,7 +622,7 @@ class npc_shannox_rageface : public CreatureScript
 
                 if (AuraEffect const* aurEff = me->GetAuraEffect(RAID_MODE(100129, 101212, 101213, 101214), EFFECT_1))
                 {
-                    if (damage >= aurEff->GetAmount())
+                    if (int32(damage) >= aurEff->GetAmount())
                     {
                         me->InterruptSpell(CURRENT_CHANNELED_SPELL, false);
                         DoResetThreat();
@@ -668,11 +737,11 @@ class npc_shannox_spear_of_shannox : public CreatureScript
                     {
                         if (Creature* pShannox = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_SHANNOX)))
                         {
-                            // There will be a spiral, 3 "circles", 10 points per circle
+                            // There will be a spiral, 3 "circles", 20 points per circle
                             Position pos;
-                            for (uint8 i = 0; i < 30; ++i)
+                            for (uint8 i = 0; i < 60; ++i)
                             {
-                                me->GetNearPosition(pos, 15.0f + i * 0.75f, (M_PI * i) / 5);
+                                me->GetNearPosition(pos, 15.0f + i * 0.75f, (M_PI * i) / 10);
                                 pos.m_positionZ = me->GetMap()->GetHeight(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, MAX_HEIGHT);
                                 pShannox->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_MAGMA_RUPTURE_MISSILE, true);
                             }
@@ -724,13 +793,13 @@ class npc_shannox_immolation_trap : public CreatureScript
                 }
                 else if (bReady && !bExplode)
                 {
-                    if (Player* pPlayer = me->SelectNearestPlayer(0.5f))
+                    if (Player* pPlayer = me->SelectNearestPlayer(0.1f))
                     {
                         bExplode = true;
                         DoCast(pPlayer, SPELL_IMMOLATION_TRAP_DMG, true);
                         me->DespawnOrUnsummon(1000);
                     }
-                    else if (Creature* pRiplimb = me->FindNearestCreature(NPC_RIPLIMB, 0.5f))
+                    else if (Creature* pRiplimb = me->FindNearestCreature(NPC_RIPLIMB, 0.1f))
                     {
                         if (!pRiplimb->HasAura(SPELL_WARRY))
                         {
@@ -739,7 +808,7 @@ class npc_shannox_immolation_trap : public CreatureScript
                             me->DespawnOrUnsummon(500);
                         }
                     }
-                    else if (Creature* pRageface = me->FindNearestCreature(NPC_RAGEFACE, 0.5f))
+                    else if (Creature* pRageface = me->FindNearestCreature(NPC_RAGEFACE, 0.1f))
                     {
                         if (!pRageface->HasAura(SPELL_WARRY))
                         {
@@ -788,13 +857,13 @@ class npc_shannox_crystal_prison_trap : public CreatureScript
                 }
                 else if (bReady && !bExplode)
                 {
-                    if (Player* pPlayer = me->SelectNearestPlayer(0.5f))
+                    if (Player* pPlayer = me->SelectNearestPlayer(0.1f))
                     {
                         bExplode = true;
                         DoCast(pPlayer, SPELL_CRYSTAL_PRISON_TRAP, true);
                         me->DespawnOrUnsummon(500);
                     }
-                    else if (Creature* pRiplimb = me->FindNearestCreature(NPC_RIPLIMB, 0.5f))
+                    else if (Creature* pRiplimb = me->FindNearestCreature(NPC_RIPLIMB, 0.1f))
                     {
                         if (!pRiplimb->HasAura(SPELL_WARRY))
                         {
@@ -803,7 +872,7 @@ class npc_shannox_crystal_prison_trap : public CreatureScript
                             me->DespawnOrUnsummon(500);
                         }
                     }
-                    else if (Creature* pRageface = me->FindNearestCreature(NPC_RAGEFACE, 0.5f))
+                    else if (Creature* pRageface = me->FindNearestCreature(NPC_RAGEFACE, 0.1f))
                     {
                         if (!pRageface->HasAura(SPELL_WARRY))
                         {
@@ -1004,6 +1073,25 @@ class spell_shannox_immolation_trap : public SpellScriptLoader
         }
 };
 
+typedef boss_shannox::boss_shannoxAI ShannoxAI;
+
+class achievement_bucket_list : public AchievementCriteriaScript
+{
+    public:
+        achievement_bucket_list() : AchievementCriteriaScript("achievement_bucket_list") { }
+
+        bool OnCheck(Player* source, Unit* target)
+        {
+            if (!target)
+                return false;
+
+            if (ShannoxAI* shannoxAI = CAST_AI(ShannoxAI, target->GetAI()))
+                return shannoxAI->AllowAchieve();
+
+            return false;
+        }
+};
+
 void AddSC_boss_shannox()
 {
     new boss_shannox();
@@ -1016,4 +1104,5 @@ void AddSC_boss_shannox()
     new spell_shannox_riplimb_dogged_determination();
     new spell_shannox_crystal_prison_trap();
     new spell_shannox_immolation_trap();
+    new achievement_bucket_list();
 }
