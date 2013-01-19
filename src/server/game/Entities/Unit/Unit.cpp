@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "MovementStructures.h"
 #include "Common.h"
 #include "CreatureAIImpl.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "WorldPacket.h"
+#include "MovementStructures.h"
 #include "WorldSession.h"
 #include "World.h"
 #include "ObjectMgr.h"
