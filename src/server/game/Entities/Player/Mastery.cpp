@@ -45,10 +45,18 @@ uint8 Player::GetMasteryScalingValue(SpellInfo const* spellInfo, int32& amount) 
     
     amount = 0;
 
-    if (spellInfo->Id == 77215)
-        amount = 163;
-    if (spellInfo->Id == 76808)
-        amount = 250;
+    switch (spellInfo->Id)
+    {
+        case 77215: // Mastery: Potent Afflictions, spell has no amount;
+            amount = 163;
+            break;
+        case 76808:
+            amount = 250; // Mastery: Executioner, spell has no amount;
+            break;
+        case 76658: // Mastery: Essence of the Viper, amount is second value, but spell has three effects
+            amount = 100;
+            break;
+    }
 
     if (amount != 0)
         return MAX_SPELL_EFFECTS;
