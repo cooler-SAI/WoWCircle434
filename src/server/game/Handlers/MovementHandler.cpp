@@ -264,7 +264,7 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvPacket)
 void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
 {
     MovementInfo movementInfo;
-    ReadMovementInfo(recvPacket, &movementInfo);
+    GetPlayer()->ReadMovementInfo(recvPacket, &movementInfo);
 
     Unit* mover = _player->m_mover;
 
@@ -284,7 +284,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
     if (!mover->m_movementInfo.AcceptClientChanges(_player, movementInfo, recvPacket.GetOpcode()))
         return;
 
-    BuildMoveUpdatePacket(mover, movementInfo, recvPacket.size(), _player);
+    WorldPacket data(SMSG_PLAYER_MOVE, recvPacket.size());
+    _player->WriteMovementInfo(data);
+    mover->SendMessageToSet(&data, _player);
 
     if (fall)
         plrMover->SetFallInformation(mover->m_movementInfo.fallTime, mover->m_movementInfo.pos.GetPositionZ());
@@ -312,7 +314,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
     }
 
     MovementInfo movementInfo;
-    ReadMovementInfo(recvData, &movementInfo);
+    GetPlayer()->ReadMovementInfo(recvData, &movementInfo);
 
     if (_player->GetGUID() != movementInfo.guid)
         return;
@@ -381,7 +383,7 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
 
     MovementInfo mi;
-    ReadMovementInfo(recvData, &mi);
+    GetPlayer()->ReadMovementInfo(recvData, &mi);
 
     /*if (_player->m_mover->GetGUID() != mi.guid)
     {
@@ -393,24 +395,6 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recvData)
     }*/
 
     _player->m_movementInfo = mi;
-}
-
-void WorldSession::BuildMoveUpdatePacket(Unit* mover, MovementInfo& movementInfo, size_t size, Player* skip)
-{
-    ASSERT(mover);
-
-    WorldPacket data(SMSG_PLAYER_MOVE, size);
-    WriteMovementInfo(data, &movementInfo);
-    mover->SendMessageToSet(&data, skip);
-}
-
-void WorldSession::BuildMoveUpdatePacket(Unit* mover, MovementInfo& movementInfo, size_t size, bool self)
-{
-    ASSERT(mover);
-
-    WorldPacket data(SMSG_PLAYER_MOVE, size);
-    WriteMovementInfo(data, &movementInfo);
-    mover->SendMessageToSet(&data, self);
 }
 
 void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvData*/)
@@ -426,7 +410,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket & recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_KNOCK_BACK_ACK");
 
     MovementInfo movementInfo;
-    ReadMovementInfo(recvData, &movementInfo);
+    GetPlayer()->ReadMovementInfo(recvData, &movementInfo);
 
     if (!_player->m_movementInfo.AcceptClientChanges(_player, movementInfo, recvData.GetOpcode()))
         return;
@@ -438,7 +422,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket & recvData)
     else
         data.Initialize(SMSG_MOVE_UPDATE_KNOCK_BACK, recvData.size());
 
-    WriteMovementInfo(data, &movementInfo);
+    _player->WriteMovementInfo(data);
     _player->SendMessageToSet(&data, false);
 }
 
@@ -453,444 +437,4 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
     recvData >> agree;
 
     _player->SummonIfPossible(agree);
-}
-
-void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
-{
-    bool hasMovementFlags = false;
-    bool hasMovementFlags2 = false;
-    bool hasTimestamp = false;
-    bool hasTransportData = false;
-
-    MovementStatusElements* sequence = GetMovementStatusElementsSequence(data.GetOpcode());
-    if (sequence == NULL)
-    {
-        sLog->outError(LOG_FILTER_NETWORKIO, "WorldSession::ReadMovementInfo: No movement sequence found for opcode 0x%04X", uint32(data.GetOpcode()));
-        return;
-    }
-
-    ObjectGuid guid;
-    ObjectGuid tguid;
-
-    for (uint32 i = 0; i < MSE_COUNT; ++i)
-    {
-        MovementStatusElements element = sequence[i];
-        if (element == MSEEnd)
-            break;
-
-        if (element >= MSEHasGuidByte0 && element <= MSEHasGuidByte7)
-        {
-            data.ReadByteMask(guid[element - MSEHasGuidByte0]);
-            continue;
-        }
-
-        if (element >= MSEHasTransportGuidByte0 &&
-            element <= MSEHasTransportGuidByte7)
-        {
-            if (hasTransportData)
-                data.ReadByteMask(tguid[element - MSEHasTransportGuidByte0]);
-            continue;
-        }
-
-        if (element >= MSEGuidByte0 && element <= MSEGuidByte7)
-        {
-            data.ReadByteSeq(guid[element - MSEGuidByte0]);
-            continue;
-        }
-
-        if (element >= MSETransportGuidByte0 &&
-            element <= MSETransportGuidByte7)
-        {
-            if (hasTransportData)
-                data.ReadByteSeq(tguid[element - MSETransportGuidByte0]);
-            continue;
-        }
-
-        switch (element)
-        {
-            case MSEHasMovementFlags:
-                hasMovementFlags = !data.ReadBit();
-                break;
-            case MSEHasMovementFlags2:
-                hasMovementFlags2 = !data.ReadBit();
-                break;
-            case MSEHasTimestamp:
-                hasTimestamp = !data.ReadBit();
-                break;
-            case MSEHasOrientation:
-                mi->pos.m_orientation = !data.ReadBit() ? 1.0f : 0.0f;
-                break;
-            case MSEHasTransportData:
-                hasTransportData = data.ReadBit();
-                break;
-            case MSEHasTransportTime2:
-                if (hasTransportData)
-                {
-                    if (data.ReadBit())
-                        mi->AddServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T2);
-                    else
-                        mi->RemoveServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T2);
-                }
-                break;
-            case MSEHasTransportTime3:
-                if (hasTransportData)
-                {
-                    if (data.ReadBit())
-                        mi->AddServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T3);
-                    else
-                        mi->RemoveServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T3);
-                }
-                break;
-            case MSEHasPitch:
-                mi->HavePitch = !data.ReadBit();
-                break;
-            case MSEHasFallData:
-                if (data.ReadBit())
-                    mi->AddServerMovementFlag(SERVERMOVEFLAG_FALLDATA);
-                else
-                    mi->RemoveServerMovementFlag(SERVERMOVEFLAG_FALLDATA);
-                break;
-            case MSEHasFallDirection:
-                if (mi->HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA))
-                {
-                    if (data.ReadBit())
-                        mi->AddServerMovementFlag(SERVERMOVEFLAG_FALLDIRECTION);
-                    else
-                        mi->RemoveServerMovementFlag(SERVERMOVEFLAG_FALLDIRECTION);
-                }                    
-                break;
-            case MSEHasSplineElevation:
-                mi->HaveSplineElevation = !data.ReadBit();
-                break;
-            case MSEHasSpline:
-                if (data.ReadBit())
-                    mi->AddServerMovementFlag(SERVERMOVEFLAG_SPLINE1);
-                else
-                    mi->RemoveServerMovementFlag(SERVERMOVEFLAG_SPLINE1);
-                break;
-            case MSEHasSpline2:
-                if (data.ReadBit())
-                    mi->AddServerMovementFlag(SERVERMOVEFLAG_SPLINE2);
-                else
-                    mi->RemoveServerMovementFlag(SERVERMOVEFLAG_SPLINE2);
-                break;
-            case MSEMovementFlags:
-                if (hasMovementFlags)
-                    mi->flags = data.ReadBits(30);
-                break;
-            case MSEMovementFlags2:
-                if (hasMovementFlags2)
-                    mi->flags2 = data.ReadBits(12);
-                break;
-            case MSETimestamp:
-                if (hasTimestamp)
-                    data >> mi->time;
-                break;
-            case MSEPositionX:
-                data >> mi->pos.m_positionX;
-                break;
-            case MSEPositionY:
-                data >> mi->pos.m_positionY;
-                break;
-            case MSEPositionZ:
-                data >> mi->pos.m_positionZ;
-                break;
-            case MSEOrientation:
-                if (mi->pos.HaveOrientation())
-                    data >> mi->pos.m_orientation;
-                break;
-            case MSETransportPositionX:
-                if (hasTransportData)
-                    data >> mi->t_pos.m_positionX;
-                break;
-            case MSETransportPositionY:
-                if (hasTransportData)
-                    data >> mi->t_pos.m_positionY;
-                break;
-            case MSETransportPositionZ:
-                if (hasTransportData)
-                    data >> mi->t_pos.m_positionZ;
-                break;
-            case MSETransportOrientation:
-                if (hasTransportData)
-                    data >> mi->t_pos.m_orientation;
-                break;
-            case MSETransportSeat:
-                if (hasTransportData)
-                    data >> mi->t_seat;
-                break;
-            case MSETransportTime:
-                if (hasTransportData)
-                    data >> mi->t_time;
-                break;
-            case MSETransportTime2:
-                if (hasTransportData && mi->HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T2))
-                    data >> mi->t_time2;
-                break;
-            case MSETransportTime3:
-                if (hasTransportData && mi->HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T3))
-                    data >> mi->t_time3;
-                break;
-            case MSEPitch:
-                if (mi->HavePitch)
-                    data >> mi->pitch;
-                break;
-            case MSEFallTime:
-                if (mi->HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA))
-                    data >> mi->fallTime;
-                break;
-            case MSEFallVerticalSpeed:
-                if (mi->HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA))
-                    data >> mi->j_zspeed;
-                break;
-            case MSEFallCosAngle:
-                if (mi->HasServerMovementFlag(SERVERMOVEFLAG_FALLDIRECTION))
-                    data >> mi->j_cosAngle;
-                break;
-            case MSEFallSinAngle:
-                if (mi->HasServerMovementFlag(SERVERMOVEFLAG_FALLDIRECTION))
-                    data >> mi->j_sinAngle;
-                break;
-            case MSEFallHorizontalSpeed:
-                if (mi->HasServerMovementFlag(SERVERMOVEFLAG_FALLDIRECTION))
-                    data >> mi->j_xyspeed;
-                break;
-            case MSESplineElevation:
-                if (mi->HaveSplineElevation)
-                    data >> mi->splineElevation;
-                break;
-            case MSEZeroBit:
-            case MSEOneBit:
-                data.ReadBit();
-                break;
-            case MSEGenericDword0:
-            case MSEGenericDword1:
-            case MSEMovementCounter:
-                data.read_skip<uint32>();
-                break;
-            case MSESpeed:
-                data >> mi->speed;
-                break;
-            case MSE2Bits:
-                data.ReadBits(2);
-                break;
-            default:
-                ASSERT(false && "Incorrect sequence element detected at ReadMovementInfo");
-                break;
-        }
-    }
-
-    if (data.size() != data.rpos())
-        sLog->outError(LOG_FILTER_GENERAL, "Error in ReadMovementInfo: Packet (opcode = %u) not fully readed! Size = %d, readed = %d, diff = %d", 
-        uint32(data.GetOpcode()), data.size(), data.rpos(), data.size() - data.rpos());
-
-    mi->guid = guid;
-    mi->t_guid = tguid;
-
-    mi->Normalize();
-
-   if (hasTransportData && mi->pos.m_positionX != mi->t_pos.m_positionX)
-       if (GetPlayer()->GetTransport())
-           GetPlayer()->GetTransport()->UpdatePosition(mi);
-}
-
-void WorldSession::WriteMovementInfo(WorldPacket &data, MovementInfo* mi)
-{
-    MovementStatusElements* sequence = GetMovementStatusElementsSequence(data.GetOpcode());
-    if (!sequence)
-    {
-        sLog->outError(LOG_FILTER_NETWORKIO, "WorldSession::WriteMovementInfo: No movement sequence found for opcode %s, 0x%04X", GetOpcodeNameForLogging(data.GetOpcode()).c_str(), uint32(data.GetOpcode()));
-        return;
-    }
-
-    mi->Normalize();
-
-    ObjectGuid guid = mi->guid;
-    ObjectGuid tguid = mi->t_guid;
-
-    bool hasTransportData = mi->HasTransportData();
-
-    for(uint32 i = 0; i < MSE_COUNT; ++i)
-    {
-        MovementStatusElements element = sequence[i];
-        if (element == MSEEnd)
-            break;
-
-        if (element >= MSEHasGuidByte0 && element <= MSEHasGuidByte7)
-        {
-            data.WriteByteMask(guid[element - MSEHasGuidByte0]);
-            continue;
-        }
-
-        if (element >= MSEHasTransportGuidByte0 &&
-            element <= MSEHasTransportGuidByte7)
-        {
-            if (hasTransportData)
-                data.WriteByteMask(tguid[element - MSEHasTransportGuidByte0]);
-            continue;
-        }
-
-        if (element >= MSEGuidByte0 && element <= MSEGuidByte7)
-        {
-            data.WriteByteSeq(guid[element - MSEGuidByte0]);
-            continue;
-        }
-
-        if (element >= MSETransportGuidByte0 &&
-            element <= MSETransportGuidByte7)
-        {
-            if (hasTransportData)
-                data.WriteByteSeq(tguid[element - MSETransportGuidByte0]);
-            continue;
-        }
-
-        switch (element)
-        {
-            case MSEHasMovementFlags:
-                data.WriteBit(mi->GetMovementFlags() == 0);
-                break;
-            case MSEHasMovementFlags2:
-                data.WriteBit(mi->GetExtraMovementFlags() == 0);
-                break;
-            case MSEHasTimestamp:
-                data.WriteBit(mi->time == 0);
-                break;
-            case MSEHasOrientation:
-                data.WriteBit(!mi->pos.HaveOrientation());
-                break;
-            case MSEHasTransportData:
-                data.WriteBit(hasTransportData);
-                break;
-            case MSEHasTransportTime2:
-                if (hasTransportData)
-                    data.WriteBit(mi->HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T2));
-                break;
-            case MSEHasTransportTime3:
-                if (hasTransportData)
-                    data.WriteBit(mi->HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T3));
-                break;
-            case MSEHasPitch:
-                data.WriteBit(!mi->HavePitch);
-                break;
-            case MSEHasFallData:
-                data.WriteBit(mi->HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA));
-                break;
-            case MSEHasFallDirection:
-                if (mi->HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA))
-                    data.WriteBit(mi->HasServerMovementFlag(SERVERMOVEFLAG_FALLDIRECTION));
-                break;
-            case MSEHasSplineElevation:
-                data.WriteBit(!mi->HaveSplineElevation);
-                break;
-            case MSEHasSpline:
-                data.WriteBit(mi->HasServerMovementFlag(SERVERMOVEFLAG_SPLINE1));
-                break;
-            case MSEHasSpline2:
-                data.WriteBit(mi->HasServerMovementFlag(SERVERMOVEFLAG_SPLINE2));
-                break;
-            case MSEMovementFlags:
-                if (mi->GetMovementFlags() != 0)
-                    data.WriteBits(mi->flags, 30);
-                break;
-            case MSEMovementFlags2:
-                if (mi->GetExtraMovementFlags() != 0)
-                    data.WriteBits(mi->flags2, 12);
-                break;
-            case MSETimestamp:
-                if (mi->time != 0)
-                    data << mi->time;
-                break;
-            case MSEPositionX:
-                data << mi->pos.m_positionX;
-                break;
-            case MSEPositionY:
-                data << mi->pos.m_positionY;
-                break;
-            case MSEPositionZ:
-                data << mi->pos.m_positionZ;
-                break;
-            case MSEOrientation:
-                if (mi->pos.HaveOrientation())
-                    data << mi->pos.GetOrientation();
-                break;
-            case MSETransportPositionX:
-                if (hasTransportData)
-                    data << mi->t_pos.m_positionX;
-                break;
-            case MSETransportPositionY:
-                if (hasTransportData)
-                    data << mi->t_pos.m_positionY;
-                break;
-            case MSETransportPositionZ:
-                if (hasTransportData)
-                    data << mi->t_pos.m_positionZ;
-                break;
-            case MSETransportOrientation:
-                if (hasTransportData)
-                    data << mi->t_pos.GetOrientation();
-                break;
-            case MSETransportSeat:
-                if (hasTransportData)
-                    data << mi->t_seat;
-                break;
-            case MSETransportTime:
-                if (hasTransportData)
-                    data << mi->t_time;
-                break;
-            case MSETransportTime2:
-                if (hasTransportData && mi->HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T2))
-                    data << mi->t_time2;
-                break;
-            case MSETransportTime3:
-                if (hasTransportData && mi->HasServerMovementFlag(SERVERMOVEFLAG_TRANSPORT_T3))
-                    data << mi->t_time3;
-                break;
-            case MSEPitch:
-                if (mi->HavePitch)
-                    data << mi->pitch;
-                break;
-            case MSEFallTime:
-                if (mi->HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA))
-                    data << mi->fallTime;
-                break;
-            case MSEFallVerticalSpeed:
-                if (mi->HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA))
-                    data << mi->j_zspeed;
-                break;
-            case MSEFallCosAngle:
-                if (mi->HasServerMovementFlag(SERVERMOVEFLAG_FALLDIRECTION))
-                    data << mi->j_cosAngle;
-                break;
-            case MSEFallSinAngle:
-                if (mi->HasServerMovementFlag(SERVERMOVEFLAG_FALLDIRECTION))
-                    data << mi->j_sinAngle;
-                break;
-            case MSEFallHorizontalSpeed:
-                if (mi->HasServerMovementFlag(SERVERMOVEFLAG_FALLDIRECTION))
-                    data << mi->j_xyspeed;
-                break;
-            case MSESplineElevation:
-                if (mi->HaveSplineElevation)
-                    data << mi->splineElevation;
-                break;
-            case MSEZeroBit:
-            case MSEOneBit:
-                data.WriteBit(element == MSEOneBit);
-                break;
-            case MSEGenericDword0:
-            case MSEGenericDword1:
-            case MSEMovementCounter:
-                data << uint32(0); // counter
-                break;
-            case MSESpeed:
-                data << mi->speed;
-                break;
-            case MSE2Bits:
-                data.WriteBits(0, 2);
-                break;
-            default:
-                ASSERT(false && "Incorrect sequence element detected at ReadMovementInfo");
-                break;
-        }
-    }
 }

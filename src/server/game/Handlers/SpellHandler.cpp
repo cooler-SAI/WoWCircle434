@@ -53,7 +53,7 @@ void WorldSession::HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlag
         if (hasMovementData)
         {
             MovementInfo movementInfo;
-            ReadMovementInfo(recvPacket, &movementInfo);
+            GetPlayer()->ReadMovementInfo(recvPacket, &movementInfo);
 
             targets.SetSrc(movementInfo.pos.m_positionX, movementInfo.pos.m_positionY, movementInfo.pos.m_positionZ);
         }

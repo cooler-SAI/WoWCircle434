@@ -747,6 +747,7 @@ enum MovementFlags
     MOVEMENTFLAG_MASK_PLAYER_ONLY =
         MOVEMENTFLAG_FLYING
 };
+
 enum MovementFlags2
 {
     MOVEMENTFLAG2_NONE                     = 0x00000000,
@@ -2204,6 +2205,9 @@ class Unit : public WorldObject
         void _ExitVehicle(Position const* exitPosition = NULL);
         void _EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* aurApp = NULL);
 
+        void ReadMovementInfo(WorldPacket& data, MovementInfo* mi);
+        void WriteMovementInfo(WorldPacket& data);
+
         bool isMoving() const   { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING); }
         bool isTurning() const  { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_TURNING); }
         virtual bool CanFly() const = 0;
@@ -2345,6 +2349,8 @@ class Unit : public WorldObject
         uint32 m_unitTypeMask;
         LiquidTypeEntry const* _lastLiquid;
         MountCapabilityEntry const* _mount;
+        
+        uint32 GetNextMovementCounter() { return ++m_movementCounters; }
 
         bool IsAlwaysVisibleFor(WorldObject const* seer) const;
         bool IsAlwaysDetectableFor(WorldObject const* seer) const;
@@ -2388,6 +2394,7 @@ class Unit : public WorldObject
         bool m_VisibilityUpdScheduled;
 
         uint32 m_rootTimes;
+        uint32 m_movementCounters;
 
         uint32 m_state;                                     // Even derived shouldn't modify
         uint32 m_CombatTimer;

@@ -201,7 +201,7 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_MOVE_SPLINE_DONE");
 
     MovementInfo movementInfo;                              // used only for proper packet read
-    ReadMovementInfo(recvData, &movementInfo);
+    GetPlayer()->ReadMovementInfo(recvData, &movementInfo);
 
     // in taxi flight packet received in 2 case:
     // 1) end taxi path in far (multi-node) flight

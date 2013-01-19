@@ -452,7 +452,7 @@ struct Position
     float m_orientation;
 //public:
 
-    bool HaveOrientation() const { return m_orientation != 0.0f; }
+    bool HaveOrientation() const { return !G3D::fuzzyEq(m_orientation, 0.0f); }
 
     void Relocate(float x, float y)
         { m_positionX = x; m_positionY = y;}
@@ -650,7 +650,7 @@ struct MovementInfo
 
     void OutDebug();
 
-    void Normalize(bool update = false, uint16 flags = 0);
+    void Normalize(bool update = false);
     bool FallDataFinite() const
     {
         return !HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA) || (fallTime >= 0 && finite(j_zspeed) && (!HasServerMovementFlag(SERVERMOVEFLAG_FALLDIRECTION) || FallDirectionFinite()));

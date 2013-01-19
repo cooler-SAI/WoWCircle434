@@ -339,7 +339,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     }*/
 
     if (unit)
-        const_cast<Unit*>(unit)->m_movementInfo.Normalize(GetTypeId() == TYPEID_UNIT, flags);
+        const_cast<Unit*>(unit)->m_movementInfo.Normalize(GetTypeId() == TYPEID_UNIT);
 
     (*data)
         .WriteBit(false) // unkBit1
@@ -1636,7 +1636,7 @@ bool MovementInfo::AcceptClientChanges(Player* player, MovementInfo& client, Opc
     return true;
 }
 
-void MovementInfo::Normalize(bool update, uint16 flags)
+void MovementInfo::Normalize(bool update)
 {
     if (HaveSplineElevation)
         AddMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
