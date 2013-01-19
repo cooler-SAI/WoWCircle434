@@ -5807,6 +5807,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 89523:
                 spellInfo->SpellFamilyName = SPELLFAMILY_SHAMAN;
                 break;
+            // General Hunter Passives (x2ccrit bonus has already calculated) 
+            case 87816:
+                spellInfo->Effects[EFFECT_0].SpellClassMask = 0;
+                break;
             default:
                 break;
         }
