@@ -715,7 +715,7 @@ void Player::ApplyHealthRegenBonus(int32 amount, bool apply)
 
 void Player::UpdateManaRegen()
 {
-    if (getPowerType() == POWER_FOCUS)
+    if (getPowerType() != POWER_MANA)
         return;
 
     // Mana regen from spirit
