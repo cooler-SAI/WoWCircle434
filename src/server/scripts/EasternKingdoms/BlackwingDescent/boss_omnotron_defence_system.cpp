@@ -631,12 +631,6 @@ class boss_electron : public CreatureScript
                 if (attacker->GetGUID() == me->GetGUID())
                     return;
 
-                if (me->HasAura(SPELL_UNSTABLE_SHIELD) ||
-                    me->HasAura(SPELL_UNSTABLE_SHIELD_25) ||
-                    me->HasAura(SPELL_UNSTABLE_SHIELD_10H) ||
-                    me->HasAura(SPELL_UNSTABLE_SHIELD_25H))
-                    DoCast(attacker, SPELL_STATIC_SHOCK, true);
-
                 instance->SetData(DATA_HEALTH_OMNOTRON_SHARED, me->GetHealth() > damage ? me->GetHealth() - damage : 0);
             }
 
