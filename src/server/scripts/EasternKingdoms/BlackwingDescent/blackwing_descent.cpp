@@ -174,8 +174,6 @@ enum Spells
     SPELL_IGNITION                        = 92131,
     SPELL_IGNITION_TRIGGER_SPAWN        = 92121,
     SPELL_IGNITION_TRIGGER_M            = 92119,
-    //maloriak
-    SPELL_MASTER_ADVENTURER_AWARD        = 89798,
     //chimaeron
     SPELL_SHADOW_WHIP                    = 91304,
     SPELL_MOCKING_SHADOWS                = 91307,
@@ -1528,7 +1526,7 @@ public:
                     events.ScheduleEvent(EVENT_MALORIAK_INTRO, 7000);
                     break;
                 case ACTION_MALORIAK_DEATH:
-                    events.ScheduleEvent(EVENT_MALORIAK_DEATH, 1000);
+                    events.ScheduleEvent(EVENT_MALORIAK_DEATH, 3000);
                     break;
                 case ACTION_CHIMAERON_INTRO:
                     events.ScheduleEvent(EVENT_CHIMAERON_INTRO, 1000);
@@ -1698,10 +1696,11 @@ public:
                     break;
                 case EVENT_MALORIAK_DEATH:
                     Talk(IsHeroic()? SAY_MALORIAK_DEATH_2: SAY_MALORIAK_DEATH_1);
-                    //DoCast(me, SPELL_MASTER_ADVENTURER_AWARD);
                     me->DespawnOrUnsummon();
                     break;
                 case EVENT_MALORIAK_DARK_MAGIC:
+                    if (GameObject* pGo = me->FindNearestGameObject(203306, 300.0f))
+                        me->CastSpell(pGo, 92831, false);
                     Talk(SAY_MALORIAK_DARK);
                     break;
                 case EVENT_CHIMAERON_INTRO:

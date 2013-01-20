@@ -104,8 +104,6 @@ class instance_blackwing_descent : public InstanceMapScript
                         HandleGameObject(NULL, true, go);
                     break;
                 case GO_NEFARIAN_FLOOR:
-                    go->SetUInt32Value(GAMEOBJECT_LEVEL, go->GetGOInfo()->transport.pause);
-                    go->SetGoState(GO_STATE_ACTIVE);
                     uiNefarianFloorGUID = go->GetGUID();
                     break;
                 }

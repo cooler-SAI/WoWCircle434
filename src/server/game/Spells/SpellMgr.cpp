@@ -2902,6 +2902,10 @@ void SpellMgr::LoadSpellCustomAttr()
             case 92879: // Blackout
             case 92880: // Blackout
             case 92881: // Blackout
+            case 77679: // Scorching Blast
+            case 92968: // Scorching Blast
+            case 92969: // Scorching Blast
+            case 92970: // Scorching Blast
                 // ONLY SPELLS WITH SPELLFAMILY_GENERIC and EFFECT_SCHOOL_DAMAGE
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 break;
@@ -4429,9 +4433,6 @@ void SpellMgr::LoadDbcDataCorrections()
             case 92195:
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
                 break;
-            case 89798: // Master Adventurer Award
-                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
-                break;
             // Magmaw
             case 89773: // Mangle
             case 91912:
@@ -4548,6 +4549,23 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(13);
                 break;
             // Maloriak
+            case 89798: // Master Adventurer Award
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                break;
+            case 78194: // Magma Jets summon
+                spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
+                break;
+            case 77569: // Release Aberrations
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_GAMEOBJECT_SRC_AREA;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                break;
+            case 77991: // Release All
+                spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_GAMEOBJECT_SRC_AREA;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                break;
             case 77699: // Flash Freeze dmg
             case 92978:
             case 92979:
@@ -4559,18 +4577,25 @@ void SpellMgr::LoadDbcDataCorrections()
             case 92975:
             case 92976:
             case 92977:
-                spellInfo->Effects[EFFECT_0].SetRadiusIndex(29);
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(15);
                 break;
             case 77615: // Debilitating Slime
-                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
-                spellInfo->Effects[EFFECT_1].SetRadiusIndex(12);
-                spellInfo->Effects[EFFECT_2].SetRadiusIndex(12);
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(28);
+                break;
+            case 77948: // Debilitating Slime knock back
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(10);
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(10);
                 break;
             case 77908: // Arcane Storm dmg
             case 92961:
             case 92962:
             case 92963:
-                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(31);
                 break;
             case 78095: // Magma Jets dmg
             case 93014:
@@ -4583,9 +4608,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 93011:
             case 93012:
             case 93013:
-                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
                 break;
             case 77987: // Grown Catalyst
+            case 101440:
+            case 101441:
+            case 101442:
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(13);
                 spellInfo->Effects[EFFECT_1].SetRadiusIndex(13);
                 spellInfo->Effects[EFFECT_2].SetRadiusIndex(13);
@@ -4604,6 +4632,16 @@ void SpellMgr::LoadDbcDataCorrections()
             case 95657:
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
                 spellInfo->Effects[EFFECT_1].SetRadiusIndex(8);
+                break;
+            case 77925: // Throw Red Bottle
+            case 77928: // Throw Red Bottle
+            case 77932: // Throw Blue Bottle
+            case 77934: // Throw Blue Bottle
+            case 77937: // Throw Green Bottle
+            case 77938: // Throw Green Bottle
+            case 92831: // Throw Black Bottle
+            case 92837: // Throw Black Bottle
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_GAMEOBJECT_TARGET;
                 break;
             // Chimaeron
             case 82705: // Finkle's Mixture
