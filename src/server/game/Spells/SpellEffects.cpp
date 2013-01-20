@@ -357,6 +357,18 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                 switch (m_spellInfo->Id)                     // better way to check unknown
                 {
+                    // Rocket Barrage, Goblin racial
+                    case 69041:
+                    {
+                        if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                            break;
+
+                        uint8 level = m_caster->getLevel();
+                        float ap = m_caster->GetTotalAttackPowerValue(m_caster->getClass() == CLASS_HUNTER? RANGED_ATTACK: BASE_ATTACK);
+                        int32 spd = m_caster->SpellBaseDamageBonusDone(SpellSchoolMask(GetSpellInfo()->SchoolMask));
+                        damage += int32(0.25f * ap + 0.49f * spd + level * 2);
+                        break;
+                    }
                     // Detonate Mana, Tyrande's Favorite Doll
                     case 92601:
                         if (AuraEffect const* aurEff = m_caster->GetAuraEffect(92596, EFFECT_0))
