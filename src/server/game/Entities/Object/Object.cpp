@@ -470,8 +470,8 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         {
             if (unit->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_FALLDIRECTION))
             {
-                *data << float(unit->m_movementInfo.j_cosAngle);
                 *data << float(unit->m_movementInfo.j_xyspeed);
+                *data << float(unit->m_movementInfo.j_cosAngle);
                 *data << float(unit->m_movementInfo.j_sinAngle);
             }
 

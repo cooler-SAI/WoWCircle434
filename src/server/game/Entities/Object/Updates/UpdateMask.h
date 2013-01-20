@@ -53,7 +53,7 @@ class UpdateMask
         uint32 GetCount() const { return mCount; }
         uint8* GetMask() { return (uint8*)mUpdateMask; }
 
-        void SetCount (uint32 valuesCount)
+        void SetCount(uint32 valuesCount)
         {
             delete [] mUpdateMask;
 
