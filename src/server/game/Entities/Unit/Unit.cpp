@@ -8853,7 +8853,13 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             case SPELLFAMILY_GENERIC:
                 switch (auraSpellInfo->Id)
                 {
-
+                    case 79900: // Unstable Shield, Electron
+                    case 91447:
+                    case 91448:
+                    case 91449:
+                        if (victim)
+                            CastSpell(victim, 79911, true);
+                        break;
                     case 99984: // Slightly Warm Pincers
                         trigger_spell_id = 99987;
                         target = victim;
@@ -9263,6 +9269,20 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Lock'n'Load
+        case 56342:
+        case 56343:
+        {
+            if (procSpell->Id == 13797 || procSpell->Id == 13812 || procSpell->Id == 3674)
+            {
+                int32 _chance = 0;
+                if (AuraEffect const* aurEff = GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_HUNTER, 355, EFFECT_0))
+                    _chance = aurEff->GetAmount();
+                if (!_chance || !roll_chance_i(_chance))
+                    return false;
+            }
+            break;
+        }
         // Item - Warrior T12 DPS 4P Bonus
         case 99238:
             // there are 3 Raging Blow spells, filter it
