@@ -695,6 +695,10 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* 
 
     WPAssert(updateMask && updateMask->GetCount() == valCount);
 
+    // Client block count check
+    if (updateMask->GetBlockCount() > 44)
+        sLog->outError(LOG_FILTER_GENERAL, "_BuildValuesUpdate: GetBlockCount (%u) > 44 - error! Lead to client visible problems! Object type: %u, Guid " I64FMT ", Name: '%s'", updateMask->GetBlockCount(), GetTypeId(), GetGUID(), ToPlayer() ? ToPlayer()->GetName() : "<none>");
+
     *data << (uint8)updateMask->GetBlockCount();
     data->append(updateMask->GetMask(), updateMask->GetLength());
 
@@ -1443,33 +1447,39 @@ ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZOStreamer const& st
     return buf;
 }
 
-void MovementInfo::OutDebug()
+void MovementInfo::OutDebug() const
 {
     sLog->outInfo(LOG_FILTER_GENERAL, "MOVEMENT INFO");
     sLog->outInfo(LOG_FILTER_GENERAL, "guid " UI64FMTD, guid);
     sLog->outInfo(LOG_FILTER_GENERAL, "flags %u", flags);
     sLog->outInfo(LOG_FILTER_GENERAL, "flags2 %u", flags2);
-    sLog->outInfo(LOG_FILTER_GENERAL, "time %u current time " UI64FMTD "", flags2, uint64(::time(NULL)));
+    sLog->outInfo(LOG_FILTER_GENERAL, "flags_s %u", flags_s);
+    sLog->outInfo(LOG_FILTER_GENERAL, "time %u current time " UI64FMTD "", time, uint64(::time(NULL)));
     sLog->outInfo(LOG_FILTER_GENERAL, "position: `%s`", pos.ToString().c_str());
-    if (t_guid)
+    if (HasTransportData())
     {
         sLog->outInfo(LOG_FILTER_GENERAL, "TRANSPORT:");
         sLog->outInfo(LOG_FILTER_GENERAL, "guid: " UI64FMTD, t_guid);
         sLog->outInfo(LOG_FILTER_GENERAL, "position: `%s`", t_pos.ToString().c_str());
         sLog->outInfo(LOG_FILTER_GENERAL, "seat: %i", t_seat);
         sLog->outInfo(LOG_FILTER_GENERAL, "time: %u", t_time);
-        if (flags2 & MOVEMENTFLAG2_INTERPOLATED_MOVEMENT)
+        if (flags_s & SERVERMOVEFLAG_TRANSPORT_T2)
             sLog->outInfo(LOG_FILTER_GENERAL, "time2: %u", t_time2);
+        if (flags_s & SERVERMOVEFLAG_TRANSPORT_T3)
+            sLog->outInfo(LOG_FILTER_GENERAL, "time3: %u", t_time3);
     }
 
-    if ((flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (flags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
+    if (HavePitch)
         sLog->outInfo(LOG_FILTER_GENERAL, "pitch: %f", pitch);
 
-    sLog->outInfo(LOG_FILTER_GENERAL, "fallTime: %u", fallTime);
-    if (flags & MOVEMENTFLAG_FALLING)
-        sLog->outInfo(LOG_FILTER_GENERAL, "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", j_zspeed, j_sinAngle, j_cosAngle, j_xyspeed);
+    if (flags_s & SERVERMOVEFLAG_FALLDATA)
+    {
+        sLog->outInfo(LOG_FILTER_GENERAL, "fallTime: %u j_zspeed: %f", fallTime, j_zspeed);
+        if (flags_s & SERVERMOVEFLAG_FALLDIRECTION)
+            sLog->outInfo(LOG_FILTER_GENERAL, "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", j_sinAngle, j_cosAngle, j_xyspeed);
+    }
 
-    if (flags & MOVEMENTFLAG_SPLINE_ELEVATION)
+    if (HaveSplineElevation)
         sLog->outInfo(LOG_FILTER_GENERAL, "splineElevation: %f", splineElevation);
 }
 
