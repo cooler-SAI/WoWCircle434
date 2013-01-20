@@ -7,7 +7,7 @@ UPDATE `creature_template` SET `unit_flags`=0 WHERE `entry` IN
 49976, 49988, 41505);
 UPDATE `creature_template_addon` SET `auras`='' WHERE `entry` IN
 (41440, 49971, 49977, 49983,
-41841, 49975, 49981, 49987)
+41841, 49975, 49981, 49987);
 
 DELETE FROM `creature` WHERE `id`=41505;
 

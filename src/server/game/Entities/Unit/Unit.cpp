@@ -7153,7 +7153,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!procSpell)
                         return false;
 
-                    basepoints0 = CalculatePct(procSpell->CalcPowerCost(this, SpellSchoolMask(procSpell->SchoolMask)), triggerAmount);
+                    basepoints0 = CalculatePct(procSpell->ManaCost, triggerAmount);
 
                     if (basepoints0 <= 0)
                         return false;
