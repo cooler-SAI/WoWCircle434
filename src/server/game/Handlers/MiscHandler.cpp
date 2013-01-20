@@ -1953,18 +1953,20 @@ void WorldSession::HandleObjectUpdateFailedOpcode(WorldPacket& recvPacket)
     Player* player = GetPlayer();
     WorldObject* object = ObjectAccessor::GetWorldObject(*player, guid);
     
-    if (false)
+    if (true)
     {
         if (object)
         {
-            sLog->outError(LOG_FILTER_NETWORKIO,
+            /*sLog->outError(LOG_FILTER_NETWORKIO,
                 "CMSG_OBJECT_UPDATE_FAILED: Object Guid=[" UI64FMTD "] Object Name: [%s] Object pos=(%f, %f, %f) Local Player=[%u, %s] "
                 "Player pos=(%f, %f, %f) Map=%u, Zone=%u", uint64(guid),
                 object->GetName(), object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), player->GetGUIDLow(), player->GetName(),
                 player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(),
-                player->GetMapId(), player->GetZoneId());
+                player->GetMapId(), player->GetZoneId());*/
+
+            object->m_movementInfo.OutDebug();
         }
-        else
+        /*else
         {
             sLog->outError(LOG_FILTER_NETWORKIO,
                 "CMSG_OBJECT_UPDATE_FAILED: Object Guid=[" UI64FMTD "] Object Name: [NULL - object not found] Object pos=(-1, -1, -1) Local Player=[%u, %s] "
@@ -1972,7 +1974,7 @@ void WorldSession::HandleObjectUpdateFailedOpcode(WorldPacket& recvPacket)
                 player->GetGUIDLow(), player->GetName(),
                 player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(),
                 player->GetMapId(), player->GetZoneId());
-        }
+        }*/
     }
 
     // workaround to fix visibility objects bug

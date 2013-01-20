@@ -1449,38 +1449,38 @@ ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZOStreamer const& st
 
 void MovementInfo::OutDebug() const
 {
-    sLog->outInfo(LOG_FILTER_GENERAL, "MOVEMENT INFO");
-    sLog->outInfo(LOG_FILTER_GENERAL, "guid " UI64FMTD, guid);
-    sLog->outInfo(LOG_FILTER_GENERAL, "flags %u", flags);
-    sLog->outInfo(LOG_FILTER_GENERAL, "flags2 %u", flags2);
-    sLog->outInfo(LOG_FILTER_GENERAL, "flags_s %u", flags_s);
-    sLog->outInfo(LOG_FILTER_GENERAL, "time %u current time " UI64FMTD "", time, uint64(::time(NULL)));
-    sLog->outInfo(LOG_FILTER_GENERAL, "position: `%s`", pos.ToString().c_str());
+    sLog->outError(LOG_FILTER_GENERAL, "MOVEMENT INFO");
+    sLog->outError(LOG_FILTER_GENERAL, "guid " UI64FMTD, guid);
+    sLog->outError(LOG_FILTER_GENERAL, "flags %u", flags);
+    sLog->outError(LOG_FILTER_GENERAL, "flags2 %u", flags2);
+    sLog->outError(LOG_FILTER_GENERAL, "flags_s %u", flags_s);
+    sLog->outError(LOG_FILTER_GENERAL, "time %u current time " UI64FMTD "", time, uint64(::time(NULL)));
+    sLog->outError(LOG_FILTER_GENERAL, "position: `%s`", pos.ToString().c_str());
     if (HasTransportData())
     {
-        sLog->outInfo(LOG_FILTER_GENERAL, "TRANSPORT:");
-        sLog->outInfo(LOG_FILTER_GENERAL, "guid: " UI64FMTD, t_guid);
-        sLog->outInfo(LOG_FILTER_GENERAL, "position: `%s`", t_pos.ToString().c_str());
-        sLog->outInfo(LOG_FILTER_GENERAL, "seat: %i", t_seat);
-        sLog->outInfo(LOG_FILTER_GENERAL, "time: %u", t_time);
+        sLog->outError(LOG_FILTER_GENERAL, "TRANSPORT:");
+        sLog->outError(LOG_FILTER_GENERAL, "guid: " UI64FMTD, t_guid);
+        sLog->outError(LOG_FILTER_GENERAL, "position: `%s`", t_pos.ToString().c_str());
+        sLog->outError(LOG_FILTER_GENERAL, "seat: %i", t_seat);
+        sLog->outError(LOG_FILTER_GENERAL, "time: %u", t_time);
         if (flags_s & SERVERMOVEFLAG_TRANSPORT_T2)
-            sLog->outInfo(LOG_FILTER_GENERAL, "time2: %u", t_time2);
+            sLog->outError(LOG_FILTER_GENERAL, "time2: %u", t_time2);
         if (flags_s & SERVERMOVEFLAG_TRANSPORT_T3)
-            sLog->outInfo(LOG_FILTER_GENERAL, "time3: %u", t_time3);
+            sLog->outError(LOG_FILTER_GENERAL, "time3: %u", t_time3);
     }
 
     if (HavePitch)
-        sLog->outInfo(LOG_FILTER_GENERAL, "pitch: %f", pitch);
+        sLog->outError(LOG_FILTER_GENERAL, "pitch: %f", pitch);
 
     if (flags_s & SERVERMOVEFLAG_FALLDATA)
     {
-        sLog->outInfo(LOG_FILTER_GENERAL, "fallTime: %u j_zspeed: %f", fallTime, j_zspeed);
+        sLog->outError(LOG_FILTER_GENERAL, "fallTime: %u j_zspeed: %f", fallTime, j_zspeed);
         if (flags_s & SERVERMOVEFLAG_FALLDIRECTION)
-            sLog->outInfo(LOG_FILTER_GENERAL, "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", j_sinAngle, j_cosAngle, j_xyspeed);
+            sLog->outError(LOG_FILTER_GENERAL, "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", j_sinAngle, j_cosAngle, j_xyspeed);
     }
 
     if (HaveSplineElevation)
-        sLog->outInfo(LOG_FILTER_GENERAL, "splineElevation: %f", splineElevation);
+        sLog->outError(LOG_FILTER_GENERAL, "splineElevation: %f", splineElevation);
 }
 
 bool MovementInfo::Check(Player* target, Opcodes opcode)
