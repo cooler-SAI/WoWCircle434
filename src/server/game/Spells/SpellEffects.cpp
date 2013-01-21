@@ -910,6 +910,22 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                // Flask of Enhancement
+                case 79637:
+                {
+                    uint32 stat_str = m_caster->GetStat(STAT_STRENGTH);
+                    uint32 stat_agi = m_caster->GetStat(STAT_AGILITY);
+                    uint32 stat_int = m_caster->GetStat(STAT_INTELLECT);
+
+                    if (stat_str > stat_agi && stat_str > stat_int)
+                        m_caster->CastSpell(m_caster, 79638, true);
+                    else if (stat_agi > stat_str && stat_agi > stat_int)
+                        m_caster->CastSpell(m_caster, 79639, true);
+                    else if (stat_int > stat_agi && stat_int > stat_str)
+                        m_caster->CastSpell(m_caster, 79640, true);
+
+                    break;
+                }
                 case 68996: // Two Forms (Racial)
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
