@@ -411,6 +411,13 @@ bool SpellEffectInfo::IsAreaAuraEffect() const
     return false;
 }
 
+bool SpellEffectInfo::IsAreaAuraRaidEffect() const
+{
+    if (Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID)
+        return true;
+    return false;
+}
+
 bool SpellEffectInfo::IsFarUnitTargetEffect() const
 {
     return (Effect == SPELL_EFFECT_SUMMON_PLAYER)
@@ -1034,6 +1041,14 @@ bool SpellInfo::HasAreaAuraEffect() const
 {
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         if (Effects[i].IsAreaAuraEffect())
+            return true;
+    return false;
+}
+
+bool SpellInfo::HasAreaAuraRaidEffect() const
+{
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        if (Effects[i].IsAreaAuraRaidEffect())
             return true;
     return false;
 }

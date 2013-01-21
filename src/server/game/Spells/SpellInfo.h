@@ -272,6 +272,7 @@ public:
     bool IsAura(AuraType aura) const;
     bool IsTargetingArea() const;
     bool IsAreaAuraEffect() const;
+    bool IsAreaAuraRaidEffect() const;
     bool IsFarUnitTargetEffect() const;
     bool IsFarDestTargetEffect() const;
     bool IsUnitOwnedAuraEffect() const;
@@ -433,6 +434,7 @@ public:
     bool HasEffect(SpellEffects effect) const;
     bool HasAura(AuraType aura) const;
     bool HasAreaAuraEffect() const;
+    bool HasAreaAuraRaidEffect() const;
 
     bool HasPersistenAura() const;
 

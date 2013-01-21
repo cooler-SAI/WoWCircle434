@@ -4603,7 +4603,7 @@ bool Player::ResetTalents(bool no_cost)
     for (AuraMap::iterator itr = m_ownedAuras.begin(); itr != m_ownedAuras.end();)
     {
         SpellInfo const* spellInfo = itr->second->GetSpellInfo();
-        if ((spellInfo->IsPassive() && spellInfo->Effects[0].Effect != SPELL_EFFECT_APPLY_AREA_AURA_RAID) || 
+        if ((spellInfo->IsPassive() && !spellInfo->HasAreaAuraRaidEffect()) || 
             (!spellInfo->IsPassive() && spellInfo->GetMaxDuration() != -1 && spellInfo->GetMaxDuration() != 0))
         {
             itr++;
