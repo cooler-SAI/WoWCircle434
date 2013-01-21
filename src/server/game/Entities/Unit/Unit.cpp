@@ -9618,6 +9618,16 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                 return false;
             break;
         }
+        // Focus Magic
+        case 54646:
+        {
+            Unit* caster = triggeredByAura->GetCaster();
+            if (!caster)
+                return false;
+
+            caster->CastSpell(caster, 54648, true);
+            return true;
+        }
         default:
             break;
     }
