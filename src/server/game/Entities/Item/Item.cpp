@@ -456,7 +456,7 @@ bool Item::LoadFromDB(uint32 guid, uint64 owner_guid, Field* fields, uint32 entr
     if (need_save)                                           // normal item changed state set not work at loading
     {
         std::ostringstream ss;
-        ss << "UPDATE item_instance SET duration = " << GetUInt32Value(ITEM_FIELD_DURABILITY)
+        ss << "UPDATE item_instance SET duration = " << GetUInt32Value(ITEM_FIELD_DURATION)
             << ", flags = " << GetUInt32Value(ITEM_FIELD_FLAGS)
             << ", durability = " << GetUInt32Value(ITEM_FIELD_DURABILITY)
             << " WHERE guid = " << guid;

@@ -7,7 +7,7 @@ CREATE TABLE `guild_challenge_reward`
    `Gold2` INT(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Gold reward 2', 
    `Count` INT(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'ChallengeCount', 
    PRIMARY KEY (`Type`)
- )
+ );
 
 INSERT INTO `guild_challenge_reward` (`Type`, `Expirience`, `Gold`, `Gold2`, `Count`) VALUES
 (0,       0,    0,   0, 0),
