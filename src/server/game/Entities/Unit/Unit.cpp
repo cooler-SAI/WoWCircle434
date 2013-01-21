@@ -6776,6 +6776,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // if not found Rip
                     return false;
                 }
+                // Glyph of Starsurge
+                case 62971:
+                {
+                    ToPlayer()->SpellCooldownReduction(48505, 5000);
+                    return true;
+                }
                 // Leader of the Pack
                 case 17007:
                 {
