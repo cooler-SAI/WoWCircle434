@@ -3287,6 +3287,16 @@ void Guild::GainReputationForXP(uint32 rep, Player* player)
         weekrep += rep;
 
         pMember->SetWeeklyReputation(weekrep);
+
+        // Guild Champion
+        if (Player* plr = pMember->FindPlayer())
+        {
+            if (plr->HasAura(97340))
+                AddPct(rep, 50);
+            else if (plr->HasAura(97341))
+                AddPct(rep, 100);
+        }
+
         pMember->SetGuildReputation(currep + rep);
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_WEEKLY_REPUTATION);
