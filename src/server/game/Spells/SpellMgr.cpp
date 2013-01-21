@@ -3122,6 +3122,18 @@ void SpellMgr::LoadDbcDataCorrections()
             case 80243: // Transmute: Truegold
             case 61288: // Minor Inscription Research
             case 61177: // Northrend Inscription Research
+            case 53773: // Transmute: Eternal Life to Fire
+            case 53784: // Transmute: Eternal Water to Fire
+            case 53780: // Transmute: Eternal Shadow to Life
+            case 53775: // Transmute: Eternal Fire to Life
+            case 53776: // Transmute: Eternal Air to Water
+            case 53774: // Transmute: Eternal Fire to Water
+            case 53777: // Transmute: Eternal Air to Earth
+            case 53779: // Transmute: Eternal Shadow to Earth
+            case 53781: // Transmute: Eternal Earth to Air
+            case 53783: // Transmute: Eternal Water to Air
+            case 53782: // Transmute: Eternal Earth to Shadow
+            case 53771: // Transmute: Eternal Life to Shadow
                 spellInfo->RecoveryTime = 0;
                 spellInfo->CategoryRecoveryTime = 86400000; 
                 break;
