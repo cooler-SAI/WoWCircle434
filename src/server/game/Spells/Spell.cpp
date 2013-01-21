@@ -6031,6 +6031,17 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
     }
 
+    switch(m_spellInfo->Id)
+    {
+        case 50334: // Berserk
+        case 61336: // Survival Instincts 
+        {
+            if (m_caster->GetTypeId() != TYPEID_PLAYER || !m_caster->ToPlayer()->IsInFeralForm())
+                return SPELL_FAILED_ONLY_SHAPESHIFT;
+        }
+        default: break;
+    }
+
     // check trade slot case (last, for allow catch any another cast problems)
     if (m_targets.GetTargetMask() & TARGET_FLAG_TRADE_ITEM)
     {
