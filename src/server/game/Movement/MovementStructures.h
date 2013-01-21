@@ -1044,11 +1044,14 @@ MovementStatusElements MovementStopSequence[] =
     MSEOrientation,
     MSEPitch,
     MSESplineElevation,
+    
     MSEFallCosAngle,
     MSEFallSinAngle,
     MSEFallHorizontalSpeed,
+    
     MSEFallVerticalSpeed,
     MSEFallTime,
+    
     MSEEnd,
 };
 
