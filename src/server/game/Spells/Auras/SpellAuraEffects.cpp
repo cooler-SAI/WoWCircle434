@@ -893,6 +893,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             break;
         }
         case SPELL_AURA_MOD_STAT:
+        {
             if (!caster)
                 break;
 
@@ -904,6 +905,22 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             }
 
             break;
+        }
+        case SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS:
+        {
+            switch( GetId() )
+            {
+                // Revelations
+                case 81206:
+                case 81208:
+                    if (!caster->HasAura(88627))
+                        return 88625;
+                    break;
+                default: break;
+            }
+            break;
+        }
+
         default:
             break;
     }
