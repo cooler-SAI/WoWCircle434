@@ -787,7 +787,7 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
                     if (_player->GetReputationRank(1168) < ReputationRank(pReward->Standing))
                         continue;
 
-                    if (!pGuild->GetAchievementMgr().HasAchieved(pReward->AchievementId))
+                    if (pReward->AchievementId && !pGuild->GetAchievementMgr().HasAchieved(pReward->AchievementId))
                         continue;
                 }
             }
