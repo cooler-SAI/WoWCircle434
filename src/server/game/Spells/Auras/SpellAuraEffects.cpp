@@ -338,7 +338,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleAuraModDisarm,                             //278 SPELL_AURA_MOD_DISARM_RANGED disarm ranged weapon
     &AuraEffect::HandleAuraInitializeImages,                      //279 SPELL_AURA_INITIALIZE_IMAGES
     &AuraEffect::HandleUnused,                                    //280 unused (4.3.4) old SPELL_AURA_MOD_ARMOR_PENETRATION_PCT
-    &AuraEffect::HandleNoImmediateEffect,                         //281 SPELL_AURA_MOD_HONOR_GAIN_PCT implemented in Player::RewardHonor
+    &AuraEffect::HandleNoImmediateEffect,                         //281 SPELL_AURA_MOD_REPUTATION_GAIN_PCT
     &AuraEffect::HandleAuraIncreaseBaseHealthPercent,             //282 SPELL_AURA_INCREASE_BASE_HEALTH_PERCENT
     &AuraEffect::HandleNoImmediateEffect,                         //283 SPELL_AURA_MOD_HEALING_RECEIVED       implemented in Unit::SpellHealingBonus
     &AuraEffect::HandleAuraLinked,                                //284 SPELL_AURA_LINKED
@@ -777,6 +777,16 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             
             switch (GetSpellInfo()->Id)
             {
+                // Gift of Naaru
+                case 28880:
+                case 59542:
+                case 59543:
+                case 59544:
+                case 59545:
+                case 59546:
+                case 59547:
+                    amount = int32(CalculatePct(GetBase()->GetUnitOwner()->GetMaxHealth(), 4));
+                    break;
                 // Lightwell Renew
                 case 7001:
                 {
