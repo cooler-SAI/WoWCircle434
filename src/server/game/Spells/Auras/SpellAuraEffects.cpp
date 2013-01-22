@@ -5214,15 +5214,6 @@ void AuraEffect::HandleModCategoryCooldown(AuraApplication const* aurApp, uint8 
         return;
     }
 
-    for (uint32 i = 1; i < sSpellStore.GetNumRows(); ++i)
-    {
-        SpellInfo const* _spellInfo = sSpellMgr->GetSpellInfo(i);
-        if (!_spellInfo || _spellInfo->Category != categoryId)
-            continue;
-
-        sSpellMgr->mSpellInfoMap[i]->CategoryRecoveryTime += apply ? GetAmount() : -GetAmount();
-    }
-
     target->ToPlayer()->SendCategoryCooldown(categoryId, value);
 }
 

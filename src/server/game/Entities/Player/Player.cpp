@@ -21198,10 +21198,32 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
 
         // Now we have cooldown data (if found any), time to apply mods
         if (rec > 0)
+        {
+            Unit::AuraEffectList const& categoryCooldownAuras = GetAuraEffectsByType(SPELL_AURA_MOD_SPELL_CATEGORY_COOLDOWN);
+            for (Unit::AuraEffectList::const_iterator itr = categoryCooldownAuras.begin(); itr != categoryCooldownAuras.end(); ++itr)
+            {
+                 if ((*itr)->GetMiscValue() != spellInfo->Category)
+                     continue;
+
+                 rec += (*itr)->GetAmount();
+            }
+
             ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, rec, spell);
+        }
 
         if (catrec > 0)
+        {
+            Unit::AuraEffectList const& categoryCooldownAuras = GetAuraEffectsByType(SPELL_AURA_MOD_SPELL_CATEGORY_COOLDOWN);
+            for (Unit::AuraEffectList::const_iterator itr = categoryCooldownAuras.begin(); itr != categoryCooldownAuras.end(); ++itr)
+            {
+                if ((*itr)->GetMiscValue() != spellInfo->Category)
+                    continue;
+
+                catrec += (*itr)->GetAmount();
+            }
+
             ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, catrec, spell);
+        }
 
         // replace negative cooldowns by 0
         if (rec < 0) rec = 0;
