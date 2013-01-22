@@ -5487,6 +5487,12 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                // Mobile Banking
+                case 83958:
+                    // There are tow spells, I don't know which I have to use
+                    // 86304, 86306
+                    m_caster->CastSpell(m_caster, 88304, true);
+                    break;
                 // Combustion
                 case 11129:
                     int32 basepoints0 = 0;
