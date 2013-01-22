@@ -463,6 +463,18 @@ bool SpellEffectInfo::IsPeriodicEffect() const
     return false;
 }
 
+bool SpellEffectInfo::IsRessurrectionEffect() const
+{
+    switch (Effect)
+    {
+        case SPELL_EFFECT_RESURRECT:
+        case SPELL_EFFECT_RESURRECT_WITH_AURA:
+            return true;
+    }
+
+    return false;
+}
+
 int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const* target) const
 {
     float basePointsPerLevel = RealPointsPerLevel;
@@ -1267,7 +1279,7 @@ bool SpellInfo::IsRequiringDeadTarget() const
 
 bool SpellInfo::IsAllowingDeadTarget() const
 {
-    return AttributesEx2 & SPELL_ATTR2_CAN_TARGET_DEAD || Targets & (TARGET_FLAG_CORPSE_ALLY | TARGET_FLAG_CORPSE_ENEMY | TARGET_FLAG_UNIT_DEAD);
+    return AttributesEx2 & SPELL_ATTR2_CAN_TARGET_DEAD || Targets & (TARGET_FLAG_CORPSE_ALLY | TARGET_FLAG_CORPSE_ENEMY | TARGET_FLAG_UNIT_DEAD) || IsRessurrect();
 }
 
 bool SpellInfo::CanBeUsedInCombat() const
@@ -1322,6 +1334,15 @@ bool SpellInfo::IsPeriodic() const
        if (Effects[i].IsPeriodicEffect())
            return true;
     }
+    return false;
+}
+
+bool SpellInfo::IsRessurrect() const
+{
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        if (Effects[i].IsRessurrectionEffect())
+            return true;
+
     return false;
 }
 

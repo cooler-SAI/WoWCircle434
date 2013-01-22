@@ -277,6 +277,7 @@ public:
     bool IsFarDestTargetEffect() const;
     bool IsUnitOwnedAuraEffect() const;
     bool IsPeriodicEffect() const;
+    bool IsRessurrectionEffect() const;
 
     int32 CalcValue(Unit const* caster = NULL, int32 const* basePoints = NULL, Unit const* target = NULL) const;
     int32 CalcBaseValue(int32 value) const;
@@ -471,6 +472,7 @@ public:
     bool IsRangedWeaponSpell() const;
     bool IsAutoRepeatRangedSpell() const;
     bool IsPeriodic() const;
+    bool IsRessurrect() const;
 
     bool IsAffectedBySpellMods() const;
     bool IsAffectedBySpellMod(SpellModifier const* mod) const;
