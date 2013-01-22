@@ -5267,6 +5267,17 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
             }
             switch (GetId())
             {
+                // Satisfied
+                case 87649:
+                {
+                    if (target->GetTypeId() != TYPEID_PLAYER)
+                        break;
+                    if (Aura* aur = target->GetAura(87649))
+                        if (aur->GetStackAmount() >= 91)
+                            target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 99041);
+
+                    break;
+                }
                 // Sudden Death
                 case 52437:
                 {

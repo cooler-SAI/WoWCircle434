@@ -2659,6 +2659,10 @@ bool AchievementMgr<T>::RequirementsSatisfied(AchievementCriteriaEntry const *ac
                     break;
 
                 int32 exploreFlag = GetAreaFlagByAreaID(area_id);
+
+                // Hack: Explore Southern Barrens
+                if (achievementCriteria->explore_area.areaReference == 3009) exploreFlag = 515;
+
                 if (exploreFlag < 0)
                     continue;
 
