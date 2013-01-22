@@ -6465,6 +6465,13 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     ToPlayer()->ReduceSpellCooldown(34433, (triggerAmount * 1000));
                     break;
                 }
+                // Holy Walk
+                case 33333:
+                {
+                    if (target == this)
+                        triggered_spell_id = 96219;
+                    break;
+                }
                 // Train of Thought
                 case 92295:
                 case 92297:
