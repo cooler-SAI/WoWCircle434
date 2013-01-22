@@ -20207,6 +20207,8 @@ void Unit::WriteMovementInfo(WorldPacket &data)
     ObjectGuid guid = mover->GetGUID();
     ObjectGuid tguid = hasTransportData ? GetTransport()->GetGUID() : 0;
 
+    mover->m_movementInfo.Normalize();
+
     for(uint32 i = 0; i < MSE_COUNT; ++i)
     {
         MovementStatusElements element = sequence[i];
