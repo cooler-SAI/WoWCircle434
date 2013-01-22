@@ -5874,6 +5874,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->SetDurationIndex(25);
                 spellInfo->Effects[EFFECT_0].MiscValue = 40107;
                 break;
+            // Heroic Presence
+            case 6562:
+            case 28878:
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
+                break;
             default:
                 break;
         }
