@@ -1573,6 +1573,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_GENERIC:
                 switch (GetId())
                 {
+                    // Finkle's Mixture, Chimaeron
+                    case 82705:
+                        target->RemoveAurasDueToSpell(89084);                            
+                        break;
                     case 91296: // Egg Shell, Corrupted Egg Shell
                         if (caster)
                             caster->CastSpell(caster, 91305, true);

@@ -26,12 +26,12 @@ enum ScriptTexts
     SAY_MALORIAK_DEATH_2    = 16,
     SAY_MALORIAK_DEATH_1    = 17,
 
-    SAY_CHIMAERON_DEATH_1    = 30,
-    SAY_CHIMAERON_DEATH_2    = 31,
-    SAY_CHIMAERON_INTRO        = 32,
-    SAY_CHIMAERON_SPELL        = 33,
-    SAY_CHIMAERON_FEUD        = 34,
-    SAY_CHIMAERON_LOW        = 35,
+    SAY_CHIMAERON_DEATH_1    = 23,
+    SAY_CHIMAERON_DEATH_2    = 24,
+    SAY_CHIMAERON_INTRO        = 25,
+    SAY_CHIMAERON_SPELL        = 26,
+    SAY_CHIMAERON_FEUD        = 27,
+    SAY_CHIMAERON_LOW        = 28,
 };
 
 enum Spells
@@ -308,9 +308,8 @@ enum Events
     //chimaeron
     EVENT_CHIMAERON_INTRO                = 59,
     EVENT_CHIMAERON_DEATH                = 60,
-    EVENT_CHIMAERON_SPELL                = 61,
-    EVENT_CHIMAERON_FEUD                = 62,
-    EVENT_CHIMAERON_LOW                    = 63,
+    EVENT_CHIMAERON_FEUD                = 61,
+    EVENT_CHIMAERON_LOW                    = 62,
 };
 
 class npc_golem_sentry : public CreatureScript
@@ -1580,11 +1579,8 @@ public:
                 case ACTION_MALORIAK_DARK_MAGIC:
                     events.ScheduleEvent(EVENT_MALORIAK_DARK_MAGIC, 1000);
                     break;
-                case ACTION_CHIMAERON_SPELL:
-                    events.ScheduleEvent(EVENT_CHIMAERON_SPELL, 1000);
-                    break;
                 case ACTION_CHIMAERON_FEUD:
-                    events.ScheduleEvent(EVENT_CHIMAERON_FEUD, 5000);
+                    events.ScheduleEvent(EVENT_CHIMAERON_FEUD, 500);
                     break;
                 case ACTION_CHIMAERON_LOW:
                     events.ScheduleEvent(EVENT_CHIMAERON_LOW, 1000);
@@ -1712,7 +1708,7 @@ public:
                     break;
                 case EVENT_CHIMAERON_FEUD:
                     Talk(SAY_CHIMAERON_FEUD);
-                    if (Creature* pChimaeron = me->FindNearestCreature(NPC_CHIMAERON, 200.0f))
+                    if (Creature* pChimaeron = me->FindNearestCreature(NPC_CHIMAERON, 300.0f))
                         DoCast(pChimaeron, SPELL_SHADOW_WHIP);
                     break;
                 case EVENT_CHIMAERON_LOW:

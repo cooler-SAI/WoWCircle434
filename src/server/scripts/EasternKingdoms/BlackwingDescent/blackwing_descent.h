@@ -72,9 +72,8 @@ enum NefariusActions
     //chimaeron
     ACTION_CHIMAERON_INTRO        = 14,
     ACTION_CHIMAERON_DEATH        = 15,
-    ACTION_CHIMAERON_SPELL        = 16,
-    ACTION_CHIMAERON_FEUD        = 17,
-    ACTION_CHIMAERON_LOW        = 18,
+    ACTION_CHIMAERON_FEUD        = 16,
+    ACTION_CHIMAERON_LOW        = 17,
 };
 
 #endif

@@ -4656,11 +4656,18 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_GAMEOBJECT_TARGET;
                 break;
             // Chimaeron
-            case 82705: // Finkle's Mixture
-                spellInfo->Effects[EFFECT_1].Effect = 0;
-                break;
             case 82848: // Massacre
-                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
+                break;
+            case 88872: // Feud
+                spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
+                break;
+            case 82881: // Break
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
+                break;
+            case 91304: // Shadow Whip
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
             // Atramedes
             case 77612: // Modulation
