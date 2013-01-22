@@ -2186,6 +2186,13 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /* 
         if (m_caster->HasAura(61205) == (effectIndex == 0))
             return;
 
+    // Quest item spell 'Kill Golden Stonefish'
+    if (m_spellInfo->Id == 80962)
+    {
+        if (!target->ToCreature() || target->ToCreature()->GetEntry() != 43331)
+            return;
+    }
+
     uint64 targetGUID = target->GetGUID();
 
     // Lookup target in already in list
