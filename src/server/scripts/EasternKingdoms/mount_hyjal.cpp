@@ -171,10 +171,35 @@ class npc_garr_firesworn : public CreatureScript
                 DoMeleeAttackIfReady();
             }   
         };
+}; 
+
+class npc_lycanthoth : public CreatureScript
+{
+    public:
+        npc_lycanthoth() : CreatureScript("npc_lycanthoth") { }
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_lycanthothAI(creature);
+        }
+
+        struct npc_lycanthothAI : public ScriptedAI
+        {
+            npc_lycanthothAI(Creature* creature) : ScriptedAI(creature)
+            {
+            }
+			
+
+            void JustDied(Unit* killer)
+            {
+                killer->CastSpell(killer, 74077, true);
+            } 
+        };
 };
 
 void AddSC_mount_hyjal()
 {
     new npc_garr();
     new npc_garr_firesworn();
+    new npc_lycanthoth();
 }

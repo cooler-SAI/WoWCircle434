@@ -5868,6 +5868,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 87816:
                 spellInfo->Effects[EFFECT_0].SpellClassMask = 0;
                 break;
+            // Summoning Ritual, Charred Branch, Black Heart of Flame
+            case 74793:
+                spellInfo->AreaGroupId = 0;
+                spellInfo->SetDurationIndex(25);
+                spellInfo->Effects[EFFECT_0].MiscValue = 40107;
+                break;
             default:
                 break;
         }
