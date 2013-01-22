@@ -4498,7 +4498,25 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             case SPELL_EFFECT_WEAPON_DAMAGE:
             case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
             case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
-                weaponDamage += fixed_bonus;
+
+                // Pulverize
+                if (m_spellInfo->Id == 80313)
+                {
+                    if (Aura* aur = unitTarget->GetAura(33745, m_caster->GetGUID()))
+                    {
+                        uint8 stacks = aur->GetStackAmount();
+                        
+                        if (stacks > 0)
+                        {
+                            int32 bp0 = 3 * stacks;
+                            m_caster->CastCustomSpell(m_caster, 80951, &bp0, 0, 0, true);
+                            aur->Remove();
+                            weaponDamage += int32(0.01f * fixed_bonus * m_spellInfo->Effects[EFFECT_0].CalcValue() * stacks);
+                        }
+                    }
+                }
+                else
+                    weaponDamage += fixed_bonus;
                 break;
             case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
                 weaponDamage = int32(weaponDamage* weaponDamagePercentMod);
