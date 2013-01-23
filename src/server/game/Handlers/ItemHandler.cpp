@@ -739,10 +739,8 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
         vendor->StopMoving();
 
     VendorItemData const* vendorItems = vendor->GetVendorItems();
-    uint8 rawItemCount = vendorItems ? vendorItems->GetItemCount() : 0;
-
-    //if (rawItemCount > 300),
-    //    rawItemCount = 300; // client cap but uint8 max value is 255
+    uint32 tempCount = vendorItems ? vendorItems->GetItemCount() : 0;
+    uint8 rawItemCount = (tempCount > 255)? 255: 0;
 
     ByteBuffer itemsData(32 * rawItemCount);
     std::vector<bool> enablers;
@@ -750,8 +748,11 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
 
     const float discountMod = _player->GetReputationPriceDiscount(vendor);
     uint8 count = 0;
-    for (uint8 slot = 0; slot < rawItemCount; ++slot)
+    for (uint32 slot = 0; slot < rawItemCount; ++slot)
     {
+        if (count >= 255)
+            break;
+
         VendorItem const* vendorItem = vendorItems->GetItem(slot);
         if (!vendorItem) continue;
 
