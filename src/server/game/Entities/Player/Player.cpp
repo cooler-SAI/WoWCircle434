@@ -23709,7 +23709,7 @@ uint32 Player::GetRuneTypeBaseCooldown(RuneType runeType) const
         if ((*i)->GetMiscValue() == POWER_RUNES)
             cooldown /= ((*i)->GetAmount() + 100.0f) / 100.0f;
 
-    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE) / 10.0f;
+    hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE);
     hastePct += GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE) / 10.0f;
 
     cooldown *=  1.0f - (hastePct / 100.0f);

@@ -4837,6 +4837,9 @@ void AuraEffect::HandleModMeleeSpeedPct(AuraApplication const* aurApp, uint8 mod
 
     target->ApplyAttackTimePercentMod(BASE_ATTACK,   (float)GetAmount(), apply);
     target->ApplyAttackTimePercentMod(OFF_ATTACK,    (float)GetAmount(), apply);
+
+    if (target->getClass() == CLASS_DEATH_KNIGHT && target->ToPlayer())
+        target->ToPlayer()->UpdateAllRunesRegen();
 }
 
 void AuraEffect::HandleAuraModRangedHaste(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -4848,6 +4851,8 @@ void AuraEffect::HandleAuraModRangedHaste(AuraApplication const* aurApp, uint8 m
     Unit* target = aurApp->GetTarget();
 
     target->ApplyAttackTimePercentMod(RANGED_ATTACK, (float)GetAmount(), apply);
+    if (target->getClass() == CLASS_DEATH_KNIGHT && target->ToPlayer())
+        target->ToPlayer()->UpdateAllRunesRegen();
 }
 
 /********************************/
