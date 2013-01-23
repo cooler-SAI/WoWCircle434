@@ -1524,9 +1524,9 @@ bool MovementInfo::Check(Player* target, Opcodes opcode)
         if (isGuidLogRequired)
             return false;
 
-        sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Opcode %u Session %u Invalid mover guid: client's " I64FMT " vs server's " I64FMT,
+        sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Opcode %u Session %u Invalid mover guid: client's 0x" I64FMT " (%s) vs server's 0x" I64FMT " (%s)",
             uint32(opcode), target->GetSession()->GetAccountId(),
-            guid, mover->GetGUID()
+            guid, GetLogNameForGuid(guid), mover->GetGUID(), GetLogNameForGuid(mover->GetGUID())
             );
         return false;
     }
