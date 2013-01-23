@@ -63,6 +63,7 @@ EndContentData */
 enum CatFigurine
 {
     SPELL_SUMMON_GHOST_SABER    = 5968,
+    NPC_GHOST_SABER             = 3619,
 };
 
 class go_cat_figurine : public GameObjectScript
@@ -70,9 +71,11 @@ class go_cat_figurine : public GameObjectScript
 public:
     go_cat_figurine() : GameObjectScript("go_cat_figurine") { }
 
-    bool OnGossipHello(Player* player, GameObject* /*go*/)
+    bool OnGossipHello(Player* player, GameObject* go)
     {
-        player->CastSpell(player, SPELL_SUMMON_GHOST_SABER, true);
+        Creature* ghostSaber = go->FindNearestCreature(NPC_GHOST_SABER, 5.0f, true);
+        if (!ghostSaber)
+            player->CastSpell(player, SPELL_SUMMON_GHOST_SABER, true);
         return false;
     }
 };
@@ -650,6 +653,9 @@ public:
 ## matrix_punchograph
 ######*/
 
+#define GOSSIP_MATRIX_PUNCHOGRAPH_3005B "Learn me the schematic of Minor Recombobulator"
+#define GOSSIP_MATRIX_PUNCHOGRAPH_3005D "Learn me the schematic of Discombobulator Ray"
+
 enum MatrixPunchograph
 {
     ITEM_WHITE_PUNCH_CARD = 9279,
@@ -657,6 +663,9 @@ enum MatrixPunchograph
     ITEM_BLUE_PUNCH_CARD = 9282,
     ITEM_RED_PUNCH_CARD = 9281,
     ITEM_PRISMATIC_PUNCH_CARD = 9316,
+    ITEM_SECURITY_DELTA_DATA_CARD = 9327,
+    SPELL_MINOR_RECOMBOBULATOR_LEARN = 4011,
+    SPELL_DISCOMBOBULATOR_RAY_LEARN = 11595,
     SPELL_YELLOW_PUNCH_CARD = 11512,
     SPELL_BLUE_PUNCH_CARD = 11525,
     SPELL_RED_PUNCH_CARD = 11528,
@@ -689,6 +698,14 @@ public:
                     player->DestroyItemCount(ITEM_YELLOW_PUNCH_CARD, 1, true);
                     player->CastSpell(player, SPELL_BLUE_PUNCH_CARD, true);
                 }
+                // learn some recipes if engineer
+                if (player->HasSkill(SKILL_ENGINEERING) && player->GetSkillValue(SKILL_ENGINEERING) >= 140
+                    && !player->HasSpell(3952))
+                {
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_MATRIX_PUNCHOGRAPH_3005B, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                    player->SEND_GOSSIP_MENU(player->GetGossipTextId(go), go->GetGUID());
+                    return true;
+                }
                 break;
             case MATRIX_PUNCHOGRAPH_3005_C:
                 if (player->HasItemCount(ITEM_BLUE_PUNCH_CARD))
@@ -703,11 +720,36 @@ public:
                     player->DestroyItemCount(ITEM_RED_PUNCH_CARD, 1, true);
                     player->CastSpell(player, SPELL_PRISMATIC_PUNCH_CARD, true);
                 }
+                // learn some recipes if engineer
+                if (player->HasSkill(SKILL_ENGINEERING) && player->GetSkillValue(SKILL_ENGINEERING) >= 160
+                    && player->HasItemCount(ITEM_SECURITY_DELTA_DATA_CARD, 1) && !player->HasSpell(3959))
+                {
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_MATRIX_PUNCHOGRAPH_3005D, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    player->SEND_GOSSIP_MENU(player->GetGossipTextId(go), go->GetGUID());
+                    return true;
+                }
                 break;
             default:
                 break;
         }
         return false;
+    }
+
+    bool OnGossipSelect(Player* player, GameObject* go, uint32 /*sender*/, uint32 action)
+    {
+        player->PlayerTalkClass->ClearMenus();
+        switch (action)
+        {
+            case GOSSIP_ACTION_INFO_DEF:
+                player->CastSpell(player, SPELL_MINOR_RECOMBOBULATOR_LEARN, false);
+                player->CLOSE_GOSSIP_MENU();
+                break;
+            case GOSSIP_ACTION_INFO_DEF + 1:
+                player->CastSpell(player, SPELL_DISCOMBOBULATOR_RAY_LEARN, false);
+                player->CLOSE_GOSSIP_MENU();
+                break;
+        }
+        return true;
     }
 };
 

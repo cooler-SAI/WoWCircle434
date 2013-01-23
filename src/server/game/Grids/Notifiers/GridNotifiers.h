@@ -110,7 +110,7 @@ namespace Trinity
         void SendPacket(Player* player)
         {
             // never send packet to self
-            if (player == i_source || (team && player->GetTeam() != team) || skipped_receiver == player)
+            if (player == i_source || (team && player->GetTeam() != team && !player->isGameMaster()) || skipped_receiver == player)
                 return;
 
 

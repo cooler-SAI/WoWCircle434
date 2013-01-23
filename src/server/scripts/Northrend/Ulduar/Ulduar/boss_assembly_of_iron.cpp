@@ -933,6 +933,9 @@ class boss_stormcaller_brundir : public CreatureScript
 
             void EnterCombat(Unit* who)
             {
+                if (!who)
+                    return;
+
                 if (!instance->CheckRequiredBosses(BOSS_ASSEMBLY_OF_IRON, who->ToPlayer()))
                 {
                     EnterEvadeMode();

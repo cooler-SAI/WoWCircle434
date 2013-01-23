@@ -453,8 +453,19 @@ void Pet::setDeathState(DeathState s)                       // overwrite virtual
     }
     else if (getDeathState() == ALIVE)
     {
-        //RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-        CastPetAuras(true);
+        if (getPetType() == HUNTER_PET)
+        {
+            CastPetAuras(true);
+
+            if (Unit* owner = GetOwner())
+                if (Player* player = owner->ToPlayer())
+                    player->StopCastingCharm();
+        }
+        else
+        {
+            //RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+            CastPetAuras(true);
+        }
     }
 }
 

@@ -3130,11 +3130,11 @@ class spell_gen_mount : public SpellScriptLoader
                             break;
                     }
 
+                    PreventHitAura();
                     if (mount)
-                    {
-                        PreventHitAura();
                         target->CastSpell(target, mount, true);
-                    }
+                    else
+                        FinishCast(SPELL_FAILED_NOT_HERE);
                 }
             }
 

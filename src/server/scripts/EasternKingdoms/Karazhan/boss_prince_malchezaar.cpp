@@ -130,7 +130,8 @@ public:
                     DoCast(me, SPELL_HELLFIRE);
                     HellfireTimer = 0;
                 }
-                else HellfireTimer -= diff;
+                else
+                    HellfireTimer -= diff;
             }
 
             if (CleanupTimer)
@@ -139,15 +140,20 @@ public:
                 {
                     Cleanup();
                     CleanupTimer = 0;
-                } else CleanupTimer -= diff;
+                }
+                else
+                    CleanupTimer -= diff;
             }
         }
 
         void KilledUnit(Unit* who)
         {
-            Unit* pMalchezaar = Unit::GetUnit(*me, malchezaar);
-            if (pMalchezaar)
-                CAST_CRE(pMalchezaar)->AI()->KilledUnit(who);
+            if (!malchezaar)
+                return;
+
+            Creature* pMalchezaar = Unit::GetCreature(*me, malchezaar);
+            if (pMalchezaar && pMalchezaar->isAlive())
+                pMalchezaar->AI()->KilledUnit(who);
         }
 
         void SpellHit(Unit* /*who*/, const SpellInfo* spell)
@@ -163,6 +169,9 @@ public:
 
         void DamageTaken(Unit* done_by, uint32 &damage)
         {
+            if (!malchezaar)
+                return;
+
             if (done_by->GetGUID() != malchezaar)
                 damage = 0;
         }
@@ -274,6 +283,9 @@ public:
 
         void InfernalCleanup()
         {
+            if (infernals.empty())
+                return;
+
             //Infernal Cleanup
             for (std::vector<uint64>::const_iterator itr = infernals.begin(); itr != infernals.end(); ++itr)
                 if (Unit* pInfernal = Unit::GetUnit(*me, *itr))
@@ -303,8 +315,11 @@ public:
 
             //damage
             const CreatureTemplate* cinfo = me->GetCreatureTemplate();
-            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->mindmg);
-            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->maxdmg);
+            if (cinfo)
+            {
+                me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->mindmg);
+                me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->maxdmg);
+            }
             me->UpdateDamagePhysical(BASE_ATTACK);
         }
 
@@ -396,7 +411,9 @@ public:
             {
                 EnfeebleResetHealth();
                 EnfeebleResetTimer = 0;
-            } else EnfeebleResetTimer -= diff;
+            } 
+            else
+                EnfeebleResetTimer -= diff;
 
             if (me->HasUnitState(UNIT_STATE_STUNNED))      // While shifting to phase 2 malchezaar stuns himself
                 return;
@@ -426,15 +443,18 @@ public:
 
                     //damage
                     const CreatureTemplate* cinfo = me->GetCreatureTemplate();
-                    me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 2*cinfo->mindmg);
-                    me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 2*cinfo->maxdmg);
-                    me->UpdateDamagePhysical(BASE_ATTACK);
+                    if (cinfo)
+                    {
+                        me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 2*cinfo->mindmg);
+                        me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 2*cinfo->maxdmg);
+                        me->UpdateDamagePhysical(BASE_ATTACK);
 
-                    me->SetBaseWeaponDamage(OFF_ATTACK, MINDAMAGE, cinfo->mindmg);
-                    me->SetBaseWeaponDamage(OFF_ATTACK, MAXDAMAGE, cinfo->maxdmg);
-                    //Sigh, updating only works on main attack, do it manually ....
-                    me->SetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE, cinfo->mindmg);
-                    me->SetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE, cinfo->maxdmg);
+                        me->SetBaseWeaponDamage(OFF_ATTACK, MINDAMAGE, cinfo->mindmg);
+                        me->SetBaseWeaponDamage(OFF_ATTACK, MAXDAMAGE, cinfo->maxdmg);
+                        //Sigh, updating only works on main attack, do it manually ....
+                        me->SetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE, cinfo->mindmg);
+                        me->SetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE, cinfo->maxdmg);
+                    }
 
                     me->SetAttackTime(OFF_ATTACK, (me->GetAttackTime(BASE_ATTACK)*150)/100);
                 }
@@ -481,17 +501,19 @@ public:
 
                 if (SunderArmorTimer <= diff)
                 {
-                    DoCast(me->getVictim(), SPELL_SUNDER_ARMOR);
+                    DoCastVictim(SPELL_SUNDER_ARMOR);
                     SunderArmorTimer = urand(10000, 18000);
-
-                } else SunderArmorTimer -= diff;
+                }
+                else
+                    SunderArmorTimer -= diff;
 
                 if (Cleave_Timer <= diff)
                 {
-                    DoCast(me->getVictim(), SPELL_CLEAVE);
+                    DoCastVictim(SPELL_CLEAVE);
                     Cleave_Timer = urand(6000, 12000);
-
-                } else Cleave_Timer -= diff;
+                }
+                else
+                    Cleave_Timer -= diff;
             }
             else
             {
@@ -514,14 +536,18 @@ public:
                             }
                         }
                     }
-                } else AxesTargetSwitchTimer -= diff;
+                }
+                else
+                    AxesTargetSwitchTimer -= diff;
 
                 if (AmplifyDamageTimer <= diff)
                 {
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                         DoCast(target, SPELL_AMPLIFY_DAMAGE);
                     AmplifyDamageTimer = urand(20000, 30000);
-                } else AmplifyDamageTimer -= diff;
+                }
+                else
+                    AmplifyDamageTimer -= diff;
             }
 
             //Time for global and double timers
@@ -529,13 +555,17 @@ public:
             {
                 SummonInfernal(diff);
                 InfernalTimer = phase == 3 ? 14500 : 44500;    // 15 secs in phase 3, 45 otherwise
-            } else InfernalTimer -= diff;
+            }
+            else
+                InfernalTimer -= diff;
 
             if (ShadowNovaTimer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_SHADOWNOVA);
+                DoCastVictim(SPELL_SHADOWNOVA);
                 ShadowNovaTimer = phase == 3 ? 31000 : uint32(-1);
-            } else ShadowNovaTimer -= diff;
+            }
+            else
+                ShadowNovaTimer -= diff;
 
             if (phase != 2)
             {
@@ -551,7 +581,9 @@ public:
                         DoCast(target, SPELL_SW_PAIN);
 
                     SWPainTimer = 20000;
-                } else SWPainTimer -= diff;
+                }
+                else
+                    SWPainTimer -= diff;
             }
 
             if (phase != 3)
@@ -562,7 +594,9 @@ public:
                     EnfeebleTimer = 30000;
                     ShadowNovaTimer = 5000;
                     EnfeebleResetTimer = 9000;
-                } else EnfeebleTimer -= diff;
+                }
+                else
+                    EnfeebleTimer -= diff;
             }
 
             if (phase == 2)
@@ -592,6 +626,9 @@ public:
 
         void Cleanup(Creature* infernal, InfernalPoint *point)
         {
+            if (infernals.empty())
+                return;
+
             for (std::vector<uint64>::iterator itr = infernals.begin(); itr!= infernals.end(); ++itr)
                 if (*itr == infernal->GetGUID())
             {
@@ -607,10 +644,10 @@ public:
 
 void netherspite_infernal::netherspite_infernalAI::Cleanup()
 {
-    Unit* pMalchezaar = Unit::GetUnit(*me, malchezaar);
+    Creature* pMalchezaar = Unit::GetCreature(*me, malchezaar);
 
     if (pMalchezaar && pMalchezaar->isAlive())
-        CAST_AI(boss_malchezaar::boss_malchezaarAI, CAST_CRE(pMalchezaar)->AI())->Cleanup(me, point);
+        CAST_AI(boss_malchezaar::boss_malchezaarAI, pMalchezaar->AI())->Cleanup(me, point);
 }
 
 void AddSC_boss_malchezaar()

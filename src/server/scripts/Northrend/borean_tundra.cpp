@@ -2537,6 +2537,23 @@ public:
 
 };
 
+/*######
+## go_frozen_phylactery
+######*/
+
+class go_frozen_phylactery : public GameObjectScript
+{
+    public:
+        go_frozen_phylactery() : GameObjectScript("go_frozen_phylactery") { }
+
+        bool OnGossipHello(Player* /*player*/, GameObject* go)
+        {
+            go->SetLootState(GO_JUST_DEACTIVATED);
+            go->SetGoState(GO_STATE_READY);
+            return false;
+        }
+};
+
 void AddSC_borean_tundra()
 {
     new npc_sinkhole_kill_credit();
@@ -2566,4 +2583,5 @@ void AddSC_borean_tundra()
     new npc_valiance_keep_cannoneer();
     new npc_warmage_coldarra();
     new npc_hidden_cultist();
+    new go_frozen_phylactery();
 }

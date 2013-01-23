@@ -702,17 +702,31 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
         }
     }
 
-    if (GetTypeId() == TYPEID_PLAYER && this != victim)
+    if (this != victim)
     {
-        Player* killer = ToPlayer();
+        // damage of hunter pets must be counted in bg stat
+        if (isHunterPet())
+        {
+            if (Player * owner = GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                // in bg, count dmg if victim is also a player
+                if (victim->GetTypeId() == TYPEID_PLAYER)
+                    if (Battleground* bg = owner->GetBattleground())
+                        bg->UpdatePlayerScore(owner, SCORE_DAMAGE_DONE, damage);
+            }
+        }
+        else if (GetTypeId() == TYPEID_PLAYER)
+        {
+            Player * killer = ToPlayer();
 
-        // in bg, count dmg if victim is also a player
-        if (victim->GetTypeId() == TYPEID_PLAYER)
-            if (Battleground* bg = killer->GetBattleground())
-                bg->UpdatePlayerScore(killer, SCORE_DAMAGE_DONE, damage);
+            // in bg, count dmg if victim is also a player
+            if (victim->GetTypeId() == TYPEID_PLAYER)
+                if (Battleground* bg = killer->GetBattleground())
+                    bg->UpdatePlayerScore(killer, SCORE_DAMAGE_DONE, damage);
 
-        killer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DAMAGE_DONE, damage, 0, 0, victim);
-        killer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_DEALT, damage);
+            killer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DAMAGE_DONE, damage, 0, 0, victim);
+            killer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_DEALT, damage);
+        }
     }
 
     if (victim->GetTypeId() == TYPEID_PLAYER)
@@ -7955,7 +7969,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     {
                         Aura* flameShock  = aurEff->GetBase();
                         int32 maxDuration = flameShock->GetMaxDuration();
-                        int32 newDuration = flameShock->GetDuration() + 2 * aurEff->GetAmplitude();
+                        int32 newDuration = flameShock->GetDuration() + 2 * aurEff->GetSpellInfo()->Effects[EFFECT_1].Amplitude;
 
                         flameShock->SetDuration(newDuration);
                         // is it blizzlike to change max duration for FS?
@@ -11603,6 +11617,10 @@ int32 Unit::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
         int32 spModPct = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_SPELL_POWER_PCT);
         DoneAdvertisedBenefit += DoneAdvertisedBenefit * spModPct / 100;
     }
+
+    if (DoneAdvertisedBenefit < 0)
+        DoneAdvertisedBenefit = 0;
+
     return DoneAdvertisedBenefit;
 }
 

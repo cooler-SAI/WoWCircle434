@@ -2047,6 +2047,9 @@ void Map::RemoveAllObjectsInRemoveList()
         std::set<WorldObject*>::iterator itr = i_objectsToRemove.begin();
         WorldObject* obj = *itr;
 
+        if (!obj)
+            continue;
+
         switch (obj->GetTypeId())
         {
             case TYPEID_CORPSE:

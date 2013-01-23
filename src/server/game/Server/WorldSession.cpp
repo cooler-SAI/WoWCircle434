@@ -421,6 +421,11 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 /// %Log the player out
 void WorldSession::LogoutPlayer(bool Save)
 {
+    // fix exploit with Aura Bind Sight
+    _player->StopCastingBindSight();
+    _player->StopCastingCharm();
+    _player->RemoveAurasByType(SPELL_AURA_BIND_SIGHT);
+
     // finish pending transfers before starting the logout
     while (_player && _player->IsBeingTeleportedFar())
         HandleMoveWorldportAckOpcode();

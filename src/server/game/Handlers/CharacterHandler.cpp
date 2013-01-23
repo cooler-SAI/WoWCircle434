@@ -1099,6 +1099,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
 
     m_playerLoading = false;
 
+    // fix exploit with Aura Bind Sight
+    pCurrChar->StopCastingBindSight();
+    pCurrChar->StopCastingCharm();
+    pCurrChar->RemoveAurasByType(SPELL_AURA_BIND_SIGHT);
+
     sScriptMgr->OnPlayerLogin(pCurrChar);
     delete holder;
 }

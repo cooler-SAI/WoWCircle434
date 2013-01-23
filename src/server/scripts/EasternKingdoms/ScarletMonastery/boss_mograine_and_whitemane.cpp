@@ -25,6 +25,7 @@ EndScriptData */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptedCreature.h"
 #include "scarlet_monastery.h"
 
 enum Says
@@ -205,7 +206,7 @@ public:
             //CrusaderStrike_Timer
             if (CrusaderStrike_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_CRUSADERSTRIKE);
+                DoCastVictim(SPELL_CRUSADERSTRIKE);
                 CrusaderStrike_Timer = 10000;
             }
             else CrusaderStrike_Timer -= diff;
@@ -213,7 +214,7 @@ public:
             //HammerOfJustice_Timer
             if (HammerOfJustice_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_HAMMEROFJUSTICE);
+                DoCastVictim(SPELL_HAMMEROFJUSTICE);
                 HammerOfJustice_Timer = 60000;
             }
             else HammerOfJustice_Timer -= diff;
@@ -315,7 +316,11 @@ public:
                 if (me->IsNonMeleeSpellCasted(false))
                     me->InterruptNonMeleeSpells(false);
 
-                DoCast(me->getVictim(), SPELL_DEEPSLEEP);
+                me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
+                me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
+                me->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+
+                DoCastVictim(SPELL_DEEPSLEEP);
                 _bCanResurrectCheck = true;
                 _bCanResurrect = true;
                 return;
@@ -335,7 +340,7 @@ public:
 
                 if (instance)
                 {
-                    if (Creature* mograine = Unit::GetCreature((*me), instance->GetData64(DATA_MOGRAINE)))
+                    if (Creature* mograine = Unit::GetCreature(*me, instance->GetData64(DATA_MOGRAINE)))
                     {
                         // checking _bCanResurrectCheck prevents her healing Mograine while he is "faking death"
                         if (_bCanResurrectCheck && mograine->isAlive() && !mograine->HealthAbovePct(75))
@@ -361,7 +366,7 @@ public:
             //HolySmite_Timer
             if (HolySmite_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_HOLYSMITE);
+                DoCastVictim(SPELL_HOLYSMITE);
                 HolySmite_Timer = 6000;
             }
             else HolySmite_Timer -= diff;

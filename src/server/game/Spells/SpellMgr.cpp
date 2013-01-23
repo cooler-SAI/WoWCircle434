@@ -1136,14 +1136,20 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
         case 68719: // Oil Refinery - Isle of Conquest.
         case 68720: // Quarry - Isle of Conquest.
         {
-            if (!player || player->GetBattlegroundTypeId() != BATTLEGROUND_IC || !player->GetBattleground())
+            if (!player)
                 return false;
 
-            uint8 nodeType = spellId == 68719 ? NODE_TYPE_REFINERY : NODE_TYPE_QUARRY;
-            uint8 nodeState = player->GetTeamId() == TEAM_ALLIANCE ? NODE_STATE_CONTROLLED_A : NODE_STATE_CONTROLLED_H;
+            Battleground* bg = player->GetBattleground();
+            if (!bg)
+                return false;
 
-            BattlegroundIC* pIC = static_cast<BattlegroundIC*>(player->GetBattleground());
-            if (pIC->GetNodeState(nodeType) == nodeState)
+            if (bg->GetTypeID(true) != BATTLEGROUND_IC)
+                return false;
+
+            uint8 nodeType = (spellId == 68719) ? NODE_TYPE_REFINERY : NODE_TYPE_QUARRY;
+            uint8 nodeState = (player->GetTeamId() == TEAM_ALLIANCE) ? NODE_STATE_CONTROLLED_A : NODE_STATE_CONTROLLED_H;
+
+            if (static_cast<BattlegroundIC*>(bg)->GetNodeState(nodeType) == nodeState)
                 return true;
 
             return false;
@@ -3498,6 +3504,9 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 68872: // Soulstorm (Bronjahm Encounter)
                 spellInfo->InterruptFlags = 0;
+                break;
+            case 71436: // Booty Bay - Teleport
+                spellInfo->AttributesEx7 = 0;
                 break;
             // ULDUAR SPELLS
             //

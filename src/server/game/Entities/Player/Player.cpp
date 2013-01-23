@@ -23350,6 +23350,12 @@ void Player::SetOriginalGroup(Group* group, int8 subgroup)
 
 void Player::UpdateUnderwaterState(Map* m, float x, float y, float z)
 {
+    // temporary hack
+    // player can't be on the ship and in the water at the same time
+    // If this is not submarine
+    if (GetTransport())
+        return;
+
     LiquidData liquid_status;
     ZLiquidStatus res = m->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquid_status);
     if (!res)
