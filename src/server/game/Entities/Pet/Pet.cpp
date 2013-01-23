@@ -183,16 +183,23 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
     SetName(fields[8].GetString());
 
+    Powers powerType = POWER_MANA;
+    switch (cinfo->unit_class)
+    {
+        case CLASS_WARRIOR:
+            powerType = POWER_RAGE;
+            break;
+        case CLASS_ROGUE:
+            powerType = POWER_ENERGY;
+            break;
+    }
+
     switch (getPetType())
     {
         case SUMMON_PET:
             petlevel = owner->getLevel();
-            SetUInt32Value(UNIT_FIELD_BYTES_0, 0x800); // class = mage
+            SetUInt32Value(UNIT_FIELD_BYTES_0, ((getRace()) | (cinfo->unit_class << 8) | (getGender() << 16) | (uint8(powerType) << 24))); // class = unit_class from DB
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
-                                   
-            if (IsPetGhoul())
-                SetUInt32Value(UNIT_FIELD_BYTES_0, CLASS_ROGUE << 8);
-
             break;
         case HUNTER_PET:
             SetUInt32Value(UNIT_FIELD_BYTES_0, CLASS_HUNTER << 8); // class = hunter, gender = none
@@ -232,6 +239,12 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
             SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
             SetPower(POWER_MANA, savedmana > uint32(GetMaxPower(POWER_MANA)) ? GetMaxPower(POWER_MANA) : savedmana);
         }
+    }
+
+    if (powerType > Powers::POWER_MANA)
+    {
+        setPowerType(powerType);
+        SetPower(powerType, GetCreatePowers(powerType));
     }
 
     // set current pet as current

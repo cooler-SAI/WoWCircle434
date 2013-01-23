@@ -7415,8 +7415,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 {
                     if (procSpell && procSpell->ManaCostPercentage)
                     {
-                        uint32 maxmana = 4200;
-                        uint32 mana = int32(0.2f * CalculatePct(GetCreateMana(), procSpell->ManaCostPercentage));
+                        const int32 maxmana = 4200;
+                        int32 mana = int32(0.2f * CalculatePct(GetCreateMana(), procSpell->ManaCostPercentage));
                         if (AuraEffect* aurEff = GetAuraEffect(92596, EFFECT_0))
                         {
                             int32 oldamount = aurEff->GetAmount();
@@ -19706,11 +19706,6 @@ void Unit::SendMovementFeatherFall()
     SendMessageToSet(&data, false);
 }
 
-void Unit::SendMovementGravityChange()
-{
-#pragma warning "MSG_MOVE_GRAVITY_CHNG not found in 434, replaced by SMSG_MOVE_GRAVITY_ENABLE, SMSG_MOVE_GRAVITY_DISABLE, SMSG_SPLINE_MOVE_GRAVITY_DISABLE, SMSG_SPLINE_MOVE_GRAVITY_ENABLE opcode ?"
-}
-
 void Unit::SendMovementCanFlyChange()
 {
     /*!
@@ -19822,7 +19817,6 @@ bool Unit::IsVisionObscured(Unit* victim) const
     Aura* myAura = NULL;
     Unit* myCaster = NULL;
 
-    #pragma warning "Replace for loop by vAuras.front()"
     AuraEffectList const& vAuras = victim->GetAuraEffectsByType(SPELL_AURA_INTERFERE_TARGETTING);
     for (AuraEffectList::const_iterator i = vAuras.begin(); i != vAuras.end(); ++i)
     {
@@ -19831,7 +19825,6 @@ bool Unit::IsVisionObscured(Unit* victim) const
         break;
     }
 
-    #pragma warning "Replace for loop by myAuras.front()"
     AuraEffectList const& myAuras = GetAuraEffectsByType(SPELL_AURA_INTERFERE_TARGETTING);
     for (AuraEffectList::const_iterator i = myAuras.begin(); i != myAuras.end(); ++i)
     {
