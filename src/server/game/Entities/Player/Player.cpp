@@ -7329,7 +7329,7 @@ uint8 Player::GetRankFromDB(uint64 guid)
 void Player::SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
 {
     SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + type, value);
-    if (type == ARENA_TEAM_PERSONAL_RATING && value > _maxPersonalArenaRate)
+    if (value > 0 && type == ARENA_TEAM_PERSONAL_RATING && (!IsHaveCap() || m_currencyCap->highestArenaRating < value))
          SetMaxPersonalArenaRating(value);
 }
 
@@ -26316,16 +26316,19 @@ void Player::SendBattlegroundTimer(uint32 currentTime, uint32 maxTime)
 
 void Player::SetMaxPersonalArenaRating(uint32 value)
 {
-    _maxPersonalArenaRate = value;
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     if (!IsHaveCap())
     {
-        trans->PAppend("INSERT INTO character_currency_cap (guid, highestArenaRating, highestRBgRating, currentArenaCap, currentRBgCap, requireReset) VALUES ('%u', '%u', '0', '%u', '0', '1')", GetGUIDLow(), _maxPersonalArenaRate, DEFAULT_ARENA_CAP);
-        sCurrencyMgr->UpdateCurrencyCap(GetGUIDLow(), _maxPersonalArenaRate, 0, DEFAULT_ARENA_CAP, 0, 1);
+        trans->PAppend("INSERT INTO character_currency_cap (guid, highestArenaRating, highestRBgRating, currentArenaCap, currentRBgCap, requireReset) VALUES ('%u', '%u', '0', '%u', '0', '1')", GetGUIDLow(), value, DEFAULT_ARENA_CAP);
+        sCurrencyMgr->UpdateCurrencyCap(GetGUIDLow(), value, 0, DEFAULT_ARENA_CAP, 0, 1);
         m_currencyCap = sCurrencyMgr->GetCurrencyCapData(GetGUIDLow());
     }
     else
+    {
+        m_currencyCap->highestArenaRating = value;
         trans->PAppend("UPDATE character_currency_cap SET highestArenaRating = '%u', highestRBgRating = '0', requireReset = '1' WHERE guid = '%u'", m_currencyCap->highestArenaRating, GetGUIDLow());
+        sCurrencyMgr->UpdateCurrencyCap(*m_currencyCap, GetGUIDLow());
+    }
 
     CharacterDatabase.CommitTransaction(trans);
 }

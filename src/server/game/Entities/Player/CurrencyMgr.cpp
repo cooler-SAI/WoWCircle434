@@ -471,8 +471,14 @@ void CurrencyMgr::UpdateCurrencyCap(uint32 lowGuid, uint16 arenaRating /* = 0 */
     data.highestArenaRating = arenaRating;
     data.highestRBgRating = RBgRating;
     data.currentArenaCap = cap;
-    data.currentRBgCap = cap;
+    data.currentRBgCap = 0;
     data.requireReset = reset;
+}
+
+void CurrencyMgr::UpdateCurrencyCap(CurrencyCap capData, uint32 lowGuid)
+{
+    CurrencyCap &data = _capValuesStorage[lowGuid];
+    data = capData;
 }
 
 void CurrencyMgr::LoadPlayersCurrencyCap()

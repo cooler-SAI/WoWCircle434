@@ -38,6 +38,7 @@ public:
     }
 
     void UpdateCurrencyCap(uint32 lowGuid, uint16 arenaRating = 0, uint16 RBgRating = 0, uint16 arenaCap = DEFAULT_ARENA_CAP, uint16 rbgCap = 0, uint8 reset = 0);
+    void UpdateCurrencyCap(CurrencyCap capData, uint32 lowGuid);
     void CalculatingCurrencyCap(uint16 &rating, bool ratedBattleground = false);
     
     float GetPrecision(CurrencyTypesEntry const* currency) const;
