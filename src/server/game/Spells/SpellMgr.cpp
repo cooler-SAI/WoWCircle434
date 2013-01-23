@@ -3025,6 +3025,12 @@ void SpellMgr::LoadDbcDataCorrections()
 
         switch (spellInfo->Id)
         {
+            // Glyph of Fear
+            case 56244:
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_ADD_FLAT_MODIFIER;
+                spellInfo->Effects[EFFECT_0].BasePoints = 5000;
+                spellInfo->Effects[EFFECT_0].MiscValue = SPELLMOD_COOLDOWN;
+                break;
             case 87934: // Serpent Spread
             case 87935:
                 spellInfo->Effects[0].Effect = SPELL_EFFECT_APPLY_AURA;

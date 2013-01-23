@@ -3423,10 +3423,32 @@ void AuraEffect::HandleAuraModRoot(AuraApplication const* aurApp, uint8 mode, bo
     if (!(mode & AURA_EFFECT_HANDLE_REAL))
         return;
 
-    if (GetBase()->GetSpellInfo()->HasAura(SPELL_AURA_MOD_FEAR))
-        return;
-
     Unit* target = aurApp->GetTarget();
+
+    if (apply)
+    {
+        switch (m_spellInfo->Id)
+        {
+            // Fear
+            case 5782:
+                // Glyph of Fear
+                if (!GetCaster() || !GetCaster()->HasAura(56244))
+                    return;
+                break;
+            // Mental Scream
+            case 8122:
+                // Glyph of Mental Scream
+                if (!GetCaster() || !GetCaster()->HasAura(55676))
+                    return;
+                break;
+            // Intimidating Shout
+            case 5246:
+                // Glyph of Intimidating Shout
+                if (!GetCaster() || !GetCaster()->HasAura(63327))
+                    return;
+                break;
+        }
+    }
 
     target->SetControlled(apply, UNIT_STATE_ROOT);
 }
