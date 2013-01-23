@@ -94,7 +94,7 @@ namespace Movement
 
         moveFlags |= MOVEMENTFLAG_FORWARD;
 
-        if (!args.HasVelocity)
+        if (!args.HasVelocity || args.velocity == 0.f)
             args.velocity = unit.GetSpeed(SelectSpeedType(moveFlags));
 
         if (!args.Validate())
