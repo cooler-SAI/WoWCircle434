@@ -8333,7 +8333,40 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
                 chance = 100.0f;
 
             if (roll_chance_f(chance))
-            {
+            { 
+                // Deadly Poison
+                if (spellInfo->Id == 2818)
+                {
+                    if (Aura* aur = target->GetAura(2818, GetGUID()))
+                    {
+                        if (aur->GetStackAmount() >= 5)
+                        {
+                            // Get item from other hand
+                            uint16 _slot = 0;
+                            if (item->GetSlot() == EQUIPMENT_SLOT_MAINHAND)
+                                _slot = EQUIPMENT_SLOT_OFFHAND;
+                            else if (item->GetSlot() == EQUIPMENT_SLOT_OFFHAND)
+                                _slot = EQUIPMENT_SLOT_MAINHAND;
+
+                            if (_slot)
+                            {
+                                if (Item* _item = GetItemByPos(INVENTORY_SLOT_BAG_0, _slot))
+                                {
+                                    uint32 _spell_id = 0;
+                                    switch (_item->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
+                                    {
+                                        case 22: _spell_id = 3409; break;
+                                        case 35: _spell_id = 5760; break;
+                                        case 323: _spell_id = 8680; break;
+                                        case 703: _spell_id = 13218; break;
+                                    }
+                                    if (_spell_id)
+                                        CastSpell(target, sSpellMgr->GetSpellInfo(_spell_id), true, _item); 
+                                }
+                            }                         
+                        }
+                    }
+                }
                 if (spellInfo->IsPositive())
                     CastSpell(this, spellInfo, true, item);
                 else
