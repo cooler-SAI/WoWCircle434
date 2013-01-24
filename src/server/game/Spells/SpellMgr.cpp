@@ -2790,6 +2790,11 @@ void SpellMgr::LoadSpellCustomAttr()
 
         switch (spellInfo->Id)
         {
+            case 2818: // Deadly Poison
+            case 31803: // Censure
+            case 77661: // Searing Flame
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER;
+                break;
             case 60256:
                 //Crashes client on pressing ESC (Maybe because of ReqSpellFocus and GameObject)
                 spellInfo->AttributesEx4 &= ~SPELL_ATTR4_TRIGGERED;
@@ -4685,11 +4690,29 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
             // Atramedes
+            case 77611: // Resonating Clash interrupt
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(28);
+                break;
+            case 77709: // Resonating Clash energize
+                spellInfo->Effects[EFFECT_1].TargetB = TARGET_UNIT_SRC_AREA_ALLY;
+                spellInfo->Effects[EFFECT_2].TargetB = TARGET_UNIT_SRC_AREA_ALLY;
+                break;
+            case 77782: // Sonic Flames dmg
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            case 77672: // Sinar Pulse target
+            case 92411:
+            case 92412:
+            case 92413:
+                spellInfo->MaxAffectedTargets = 3;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                break;
             case 77612: // Modulation
             case 92451:
             case 92452:
             case 92453:
-                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
                 break;
             case 77675: // Sonar Pulse dmg
             case 92417:

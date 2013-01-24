@@ -833,6 +833,10 @@ void Aura::RefreshTimers()
         }
     }
 
+    if (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER)
+        resetPeriodic = false;
+     
+
     RefreshDuration();
     Unit* caster = GetCaster();
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
