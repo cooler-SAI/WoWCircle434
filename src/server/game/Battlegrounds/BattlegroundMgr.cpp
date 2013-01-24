@@ -356,11 +356,11 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg,
     bool isRated = bg->isRated();               // type (normal=0/rated=1) -- ATM arena or bg, RBG NYI
     bool isArena = bg->isArena();               // Arena names
 
-    unsigned int size = (unsigned int)bg->GetPlayerScoresSize();
+    unsigned int scoreSize = (unsigned int)bg->GetPlayerScoresSize();
 
-    size_t newSize = size_t((8 + (!isArena ? 12 : 0) + 8 + 8 + 1) * size);
+    size_t newSize = size_t((8 + (!isArena ? 12 : 0) + 8 + 8 + 1) * scoreSize);
     *buff = ByteBuffer(newSize);
-    data->Initialize(SMSG_PVP_LOG_DATA, (2 + (isArena ? 16 : 0) + 21 + (size * 39) + 1) / 8 + (isRated ? 24 : 0) + (isArena ? 26 : 0) + 2 + (bg->GetStatus() == STATUS_WAIT_LEAVE ? 1 : 0) + newSize);
+    data->Initialize(SMSG_PVP_LOG_DATA, (2 + (isArena ? 16 : 0) + 21 + (scoreSize * 39) + 1) / 8 + (isRated ? 24 : 0) + (isArena ? 26 : 0) + 2 + (bg->GetStatus() == STATUS_WAIT_LEAVE ? 1 : 0) + newSize);
     data->WriteBit(isArena);
     data->WriteBit(isRated);
 
@@ -368,27 +368,33 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg,
     {
         for (int8 i = 0; i < BG_TEAMS_COUNT; ++i)
         {
-            uint32 size = 0;
+            uint32 nameSize = 0;
             if (ArenaTeam* at = sArenaTeamMgr->GetArenaTeamById(bg->GetArenaTeamIdByIndex(i)))
-                size = uint32(at->GetName().length());
+                nameSize = uint32(at->GetName().length());
 
-            *data << WriteAsUnaligned<8>(size);
+            *data << WriteAsUnaligned<8>(nameSize);
         }
     }
 
-    data->WriteBits(bg->GetPlayerScoresSize(), 21);
+    uint32 tempTotalSize = 0;
+    uint32 tempPlayerSize = 0;
+
+    data->WriteBits(scoreSize, 21);
     for (Battleground::BattlegroundScoreMap::const_iterator itr = bg->GetPlayerScoresBegin(); itr != bg->GetPlayerScoresEnd(); ++itr)
     {
-        if (!bg->IsPlayerInBattleground(itr->first))
+        ObjectGuid playerGUID = itr->first;
+        if (!bg->IsPlayerInBattleground(playerGUID))
         {
-            sLog->outError(LOG_FILTER_BATTLEGROUND, "Player " UI64FMTD " has scoreboard entry for battleground %u but is not in battleground!", itr->first, bg->GetTypeID(true));
+            sLog->outError(LOG_FILTER_BATTLEGROUND, "Player " UI64FMTD " has scoreboard entry for battleground %u but is not in battleground!", playerGUID, bg->GetTypeID(true));
             continue;
         }
 
+        ++tempTotalSize;
+        if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+            ++tempPlayerSize;
+
         BattlegroundScore* second = itr->second;
-        Player* player = ObjectAccessor::FindPlayer(itr->first);
-        ObjectGuid playerGUID = itr->first;
-        uint32 team = bg->GetPlayerTeam(itr->first);
+        uint32 team = bg->GetPlayerTeam(playerGUID);
 
         data->WriteBit(false);              // Unk 1
         data->WriteBit(false);              // Unk 2
@@ -545,6 +551,9 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg,
         buff->WriteByteSeq(playerGUID[7]);
         buff->WriteByteSeq(playerGUID[2]);
     }
+
+    if (scoreSize != tempTotalSize || scoreSize != tempPlayerSize)
+        sLog->outError(LOG_FILTER_GENERAL, "BuildPvpLogDataPacket: Error! scoreSize = %u, tempTotalSize = %u, tempPlayerSize = %u", scoreSize, tempTotalSize, tempPlayerSize);
 
     data->WriteBit(bg->GetStatus() == STATUS_WAIT_LEAVE);    // If Ended
 }
