@@ -11282,7 +11282,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
                         // Mind Melt
                         if (AuraEffect* aur = GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3139, 0))
                             mod += aur->GetAmount();
-                        AddPct(DoneTotalMod, 300);
+                        AddPct(DoneTotalMod, mod);
                     }
                     break;
                 }
