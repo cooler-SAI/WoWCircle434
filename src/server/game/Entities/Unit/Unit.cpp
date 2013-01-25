@@ -6329,17 +6329,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     triggered_spell_id = 17941;
                     break;
                 }
-                // Soul Leech
-                case 30293:
-                case 30295:
-                {
-                    basepoints0 = CalculatePct(int32(damage), triggerAmount);
-                    target = this;
-                    triggered_spell_id = 30294;
-                    // Replenishment
-                    CastSpell(this, 57669, true, castItem, triggeredByAura);
-                    break;
-                }
                 // Shadowflame (Voidheart Raiment set bonus)
                 case 37377:
                 {
@@ -9296,6 +9285,27 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Soul Leech
+        case 30293:
+        case 30295:
+        {
+            int32 bp = triggerAmount;
+            CastCustomSpell(this, trigger_spell_id, &bp, &bp, 0, true);
+            CastSpell(this, 57669, true, NULL, triggeredByAura);
+            return true;
+        }
+        // Mana Feed
+        case 91702:
+        {
+            if (Unit* owner = GetOwner())
+            {
+                if (AuraEffect const* aurEff = owner->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_WARLOCK, 1982, EFFECT_2))
+                    basepoints0 = aurEff->GetAmount();
+                else
+                    return false;
+            }
+            break;
+        }
         // Lock'n'Load
         case 56342:
         case 56343:

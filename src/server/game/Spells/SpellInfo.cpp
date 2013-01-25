@@ -3087,7 +3087,6 @@ bool SpellInfo::IsShouldProcOnOwner() const
 {
     switch (Id)
     {
-        case 3110:  // Firebolt -> Burning Embers / Empowered Imp
         case 6358:  // Seduction -> Glyph of Seduction
         case 82739: // Fire Orb -> Ignite
         case 86719:
