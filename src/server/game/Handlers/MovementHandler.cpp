@@ -393,7 +393,8 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recvData)
         return;
     }*/
 
-    _player->m_movementInfo = mi;
+    if (!_player->m_movementInfo.AcceptClientChanges(_player, mi, CMSG_MOVE_NOT_ACTIVE_MOVER))
+        return;
 }
 
 void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvData*/)
