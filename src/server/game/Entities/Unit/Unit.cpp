@@ -16867,6 +16867,15 @@ bool Unit::HandleAuraRaidProcFromChargeWithValue(AuraEffect* triggeredByAura)
                 if (Aura* aura = target->GetAura(spellProto->Id, caster->GetGUID()))
                     aura->SetCharges(jumps);
             }
+            if (Player * modOwner = caster->GetSpellModOwner())
+            {
+                // first jump - Glyph of Prayer of Mending
+                if (jumps == 4)
+                    if (AuraEffect * aur = modOwner->GetAuraEffect(55685, 0))
+                        heal*=(100.0f+aur->GetAmount())/100.0f;
+
+                modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_RADIUS, radius, NULL);
+            }
         }
     }
 
