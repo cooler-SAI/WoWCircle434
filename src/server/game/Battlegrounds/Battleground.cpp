@@ -554,7 +554,6 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
                     player->RemoveAurasDueToSpell(SPELL_ARENA_PREPARATION);
                     player->ResetAllPowers();
-                    UpdatePlayerScore(player, SCORE_PLAYER_SPEC, player->GetActiveTalentTree());
                     if (!player->isGameMaster())
                     {
                         player->RemoveBattlegroundStartingAuras();
@@ -574,7 +573,6 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                 {
                     player->RemoveAurasDueToSpell(SPELL_PREPARATION);
                     player->ResetAllPowers();
-                    UpdatePlayerScore(player, SCORE_PLAYER_SPEC, player->GetActiveTalentTree());
                 }
             // Announce BG starting
             if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
@@ -1407,9 +1405,6 @@ void Battleground::UpdatePlayerScore(Player* Source, uint32 type, uint32 value, 
             break;
         case SCORE_HEALING_DONE:                            // Healing Done
             itr->second->HealingDone += value;
-            break;
-        case SCORE_PLAYER_SPEC:
-            itr->second->Spec = value;
             break;
         default:
             sLog->outError(LOG_FILTER_BATTLEGROUND, "Battleground::UpdatePlayerScore: unknown score type (%u) for BG (map: %u, instance id: %u)!",

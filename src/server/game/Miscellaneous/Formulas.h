@@ -229,7 +229,7 @@ namespace Trinity
         inline void ConquestRatingCalculator(uint16 &rate, bool isBg = false)
         {
             // http://www.arenajunkies.com/topic/179536-conquest-point-cap-vs-personal-rating-chart/page__st__60#entry3085246
-            rate = uint16(1.4326 * ((1511.26 / (1 + 1639.28 / exp(0.00412 * rate))) + 850.15));
+            rate = uint16(1.4326f * ((1511.26f / (1 + 1639.28f / exp(0.00412 * rate))) + 850.15f));
 
             if (rate <= 1500)
                 rate = DEFAULT_ARENA_CAP;

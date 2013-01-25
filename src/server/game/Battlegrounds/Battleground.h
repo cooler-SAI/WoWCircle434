@@ -298,7 +298,7 @@ typedef std::map<uint64, int32> MatchMakingRatingChangeStore;
 struct BattlegroundScore
 {
     BattlegroundScore() : KillingBlows(0), Deaths(0), HonorableKills(0), BonusHonor(0),
-        DamageDone(0), HealingDone(0), Spec(0)
+        DamageDone(0), HealingDone(0)
     { }
 
     virtual ~BattlegroundScore() { }                        //virtual destructor is used when deleting score from scores map
@@ -309,7 +309,6 @@ struct BattlegroundScore
     uint32 BonusHonor;
     uint32 DamageDone;
     uint32 HealingDone;
-    uint32 Spec;
 };
 
 enum BGHonorMode
