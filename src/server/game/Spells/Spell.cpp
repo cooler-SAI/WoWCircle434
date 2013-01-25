@@ -2914,7 +2914,15 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                             for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                                 if (AuraEffect const* eff = m_spellAura->GetEffect(i))
                                     if (int32 amplitude = eff->GetAmplitude())  // amplitude is hastened by UNIT_MOD_CAST_SPEED
-                                        duration = std::max(std::max(origDuration / amplitude, 1) * amplitude, duration);
+                                    {
+                                        float temp_ticks = float(float(origDuration) / amplitude);
+                                        int32 new_ticks = floor(temp_ticks + 0.5f);
+                                        if (new_ticks >= temp_ticks)
+                                            duration = origDuration;
+                                        else
+                                            duration = int32(amplitude * new_ticks);
+                                        duration = std::max(std::max(duration / amplitude, 1) * amplitude, duration);
+                                    }
 
                             // if there is no periodic effect
                             if (!duration)

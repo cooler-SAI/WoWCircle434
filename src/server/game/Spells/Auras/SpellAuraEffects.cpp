@@ -1010,7 +1010,16 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool resetPeriodicTimer /*= tru
                     caster->ModSpellCastTime(m_spellInfo, m_amplitude);
             }
             else if (m_spellInfo->AttributesEx5 & SPELL_ATTR5_HASTE_AFFECT_DURATION)
-                m_amplitude = int32(m_amplitude * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+            {
+                int32 duration = caster->ModSpellDuration(GetSpellInfo(), GetBase()->GetUnitOwner(), GetBase()->GetMaxDuration(), GetSpellInfo()->IsPositive(), (1 << GetEffIndex()));
+                int32 new_amplitude = int32(m_amplitude * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+                float tmp_ticks = float(float(duration) / new_amplitude);
+                uint32 new_ticks = floor(tmp_ticks + 0.5f);
+                if (new_ticks >= tmp_ticks)
+                    m_amplitude = int32(duration / new_ticks);
+                else
+                    m_amplitude = int32(duration / tmp_ticks);
+            }
         }
     }
 
