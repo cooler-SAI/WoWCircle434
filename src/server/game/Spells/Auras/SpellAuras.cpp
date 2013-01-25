@@ -1007,6 +1007,10 @@ bool Aura::CanBeSaved() const
         case 48518:
         // Incanter's Absorbtion
         case 44413:
+        // Pyromaniac
+        case 83582:
+        // Nature's Bounty
+        case 96206:
             return false;
     }
 
