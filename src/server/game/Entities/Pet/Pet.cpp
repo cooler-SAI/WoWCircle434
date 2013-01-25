@@ -241,7 +241,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         }
     }
 
-    if (powerType > POWER_MANA)
+    if (powerType > POWER_MANA && getPetType() == SUMMON_PET)
     {
         setPowerType(powerType);
         SetPower(powerType, GetCreatePowers(powerType));
