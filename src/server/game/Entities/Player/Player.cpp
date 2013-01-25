@@ -4292,11 +4292,13 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
 
 void Player::ReduceSpellCooldown(uint32 spell_id, time_t modifyTime)
 {
-    int32 newCooldown = GetSpellCooldownDelay(spell_id) - modifyTime;
+    int32 newCooldown = GetSpellCooldownDelay(spell_id) * 1000;
     if (newCooldown < 0)
         newCooldown = 0;
+    else
+        newCooldown -= modifyTime;
 
-    AddSpellCooldown(spell_id, 0, uint32(time(NULL) + newCooldown));
+    AddSpellCooldown(spell_id, 0, uint32(time(NULL) + newCooldown / 1000));
     WorldPacket data(SMSG_MODIFY_COOLDOWN, 4+8+4);
     data << uint32(spell_id);
     data << uint64(GetGUID());
