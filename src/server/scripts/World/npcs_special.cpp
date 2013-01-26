@@ -3654,6 +3654,70 @@ public:
     }
 };
 
+enum BurningTreant
+{
+    EVENT_FIRESEED  = 1,
+
+    SPELL_FIRESEED  = 99026,
+};
+
+class npc_burning_treant : public CreatureScript
+{
+    public:
+        npc_burning_treant() : CreatureScript("npc_burning_treant") { }
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_burning_treantAI(creature);
+        }
+
+        struct npc_burning_treantAI : CasterAI
+        {
+            npc_burning_treantAI(Creature* creature) : CasterAI(creature) {}
+
+
+            void EnterCombat(Unit* who)
+            {
+                events.ScheduleEvent(EVENT_FIRESEED, 500);
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->getVictim()->HasCrowdControlAura(me))
+                {
+                    me->InterruptNonMeleeSpells(false);
+                    return;
+                }
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                if (uint32 event_id = events.ExecuteEvent())
+                {
+                    float const maxRange = 40.0f;
+                    float normalRange = maxRange / 1.2f;
+
+                    if (Unit* victim = me->getVictim())
+                    {
+                        if (maxRange && !me->IsWithinDistInMap(victim, maxRange))
+                            me->GetMotionMaster()->MoveChase(victim, normalRange);
+
+                        if (maxRange && !me->IsWithinLOSInMap(victim))
+                            me->GetMotionMaster()->MoveChase(victim, MELEE_RANGE);
+                    }
+
+                    DoCastVictim(SPELL_FIRESEED);
+                    events.ScheduleEvent(EVENT_FIRESEED, 4000);
+                }
+            }
+        };
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3697,4 +3761,5 @@ void AddSC_npcs_special()
     new npc_wild_mushroom();
     new npc_metzen();
     new npc_anachronos_15192();
+    new npc_burning_treant();
 }
