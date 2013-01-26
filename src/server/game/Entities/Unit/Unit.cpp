@@ -9303,7 +9303,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
         case 12355:
         case 12358:
             // Can't proc from Molten Armor
-            if (procSpell && procSpell->Id = 34913))
+            if (procSpell && procSpell->Id == 34913)
                 return false;
             break;
         // Soul Leech
