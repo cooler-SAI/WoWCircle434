@@ -2416,6 +2416,9 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
             if (m_caster == unitTarget)
                 addhealth *= 0.5f;
 
+        if (m_spellInfo->Id == 27827)
+            addhealth = m_caster->GetMaxHealth();
+
         m_damage -= addhealth;
     }
 }

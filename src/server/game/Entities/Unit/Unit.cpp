@@ -16979,6 +16979,10 @@ void Unit::Kill(Unit* victim, bool durabilityLoss)
     if (!victim->GetHealth())
         return;
 
+    // Spirit of Redemption can't be killed twice
+    if (victim->HasAura(27827))
+        return;
+
     // find player: owner of controlled `this` or `this` itself maybe
     Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
     Creature* creature = victim->ToCreature();
@@ -17095,6 +17099,7 @@ void Unit::Kill(Unit* victim, bool durabilityLoss)
 
                 // FORM_SPIRITOFREDEMPTION and related auras
                 victim->CastSpell(victim, 27827, true, NULL, aurEff);
+                victim->CastSpell(victim, 27792, true);
                 spiritOfRedemption = true;
                 break;
             }
