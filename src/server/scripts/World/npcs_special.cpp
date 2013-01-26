@@ -3237,14 +3237,22 @@ class npc_ring_of_frost : public CreatureScript
 public:
     npc_ring_of_frost() : CreatureScript("npc_ring_of_frost") { }
 
-    struct npc_ring_of_frostAI : public ScriptedAI
+    struct npc_ring_of_frostAI : public Scripted_NoMovementAI
     {
-        npc_ring_of_frostAI(Creature *c) : ScriptedAI(c) {}
+        npc_ring_of_frostAI(Creature *c) : Scripted_NoMovementAI(c) 
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        }
         bool isReady;
         uint32 releaseTimer;
 
         void Reset()
         {
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             releaseTimer = 3000;
             isReady = false;
         }
@@ -3301,7 +3309,8 @@ public:
             Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
             me->VisitNearbyObject(5.0f, searcher);
             for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
-                CheckIfMoveInRing(*iter);
+                if (!(*iter)->isTotem())
+                    CheckIfMoveInRing(*iter);
         }
     };
 
