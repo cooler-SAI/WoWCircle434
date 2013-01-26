@@ -9298,6 +9298,14 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Impact
+        case 11103:
+        case 12355:
+        case 12358:
+            // Can't proc from Molten Armor
+            if (procSpell && procSpell->Id = 34913))
+                return false;
+            break;
         // Soul Leech
         case 30293:
         case 30295:
