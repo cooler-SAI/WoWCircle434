@@ -5922,6 +5922,16 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             switch (dummySpell->Id)
             {
+                // Improved Cone of Cold (Rank 1)
+                case 11190:
+                    target = victim;
+                    trigger_spell_id = 83301;
+                    break;
+                // Improved Cone of Cold (Rank 2)
+                case 12489:
+                    target = victim;
+                    trigger_spell_id = 83302;
+                    break;
                 // Glyph of Polymorph
                 case 56375:
                 {
@@ -5947,6 +5957,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // Trigger amount should be divided by ticks count. Assumed that player can't change ticks count
                     triggerAmount /= 2;
                     basepoints0 = CalculatePct(damage, triggerAmount);
+                    // Mastery should affect damage
+                    if (AuraEffect const* aurEff = GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_MAGE, 37, EFFECT_0))
+                        AddPct<int32>(basepoints0, aurEff->GetAmount());
                     triggered_spell_id = 12654;
                     basepoints0 += victim->GetRemainingPeriodicAmount(GetGUID(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE);
                     break;

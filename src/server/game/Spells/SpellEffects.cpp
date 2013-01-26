@@ -5499,7 +5499,12 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                         basepoints0 += m_caster->SpellDamageBonusDone(unitTarget, (*i)->GetSpellInfo(), (*i)->GetAmount(), DOT) * 1000 / (*i)->GetAmplitude();
                     }
                     if (basepoints0)
+                    {
+                        // Mastery should affect damage
+                        if (AuraEffect const* aurEff = m_caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_MAGE, 37, EFFECT_0))
+                            AddPct<int32>(basepoints0, aurEff->GetAmount());
                         m_caster->CastCustomSpell(unitTarget, 83853, &basepoints0, NULL, NULL, true);
+                    }
                     break;
             }
             break;
