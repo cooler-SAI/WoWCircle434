@@ -434,6 +434,7 @@ bool Item::LoadFromDB(uint32 guid, uint64 owner_guid, Field* fields, uint32 entr
 
     std::string enchants = fields[6].GetString();
     _LoadIntoDataField(enchants.c_str(), ITEM_FIELD_ENCHANTMENT_1_1, MAX_ENCHANTMENT_SLOT * MAX_ENCHANTMENT_OFFSET);
+    UpdateItemEnchantment();
     SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, fields[7].GetInt16());
     // recalculate suffix factor
     if (GetItemRandomPropertyId() < 0)
@@ -1458,4 +1459,18 @@ int32 Item::GetReforgableStat(ItemModType statType) const
     }
 
     return 0;
+}
+
+void Item::UpdateItemEnchantment()
+{
+    if (!Item::GetEnchantmentId(PERM_ENCHANTMENT_SLOT))
+        return;
+
+    SpellItemEnchantmentEntry const* pEnchant = sSpellItemEnchantmentStore.LookupEntry(GetEnchantmentId(PERM_ENCHANTMENT_SLOT));
+    if (pEnchant && pEnchant->requiredSkill == SKILL_ENGINEERING)
+    {
+        SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + PERM_ENCHANTMENT_SLOT * MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_ID_OFFSET, 0);
+        if (!GetEnchantmentId(ENGINEERING_ENCHANTMENT_SLOT))
+            SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + ENGINEERING_ENCHANTMENT_SLOT * MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_ID_OFFSET, pEnchant->ID);
+    }
 }
