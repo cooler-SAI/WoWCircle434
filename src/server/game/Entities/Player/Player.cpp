@@ -3823,6 +3823,7 @@ bool Player::addSpell(uint32 spellId, bool active, bool learning, bool dependent
                 }
             }
         }
+
         // non talent spell: learn low ranks (recursive call)
         else if (uint32 prev_spell = sSpellMgr->GetPrevSpellInChain(spellId))
         {
@@ -6457,6 +6458,14 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
                 return;
             }
         }
+    }
+    // Some spells can be without skills, clean
+    else if (itr == mSkillStatus.end() && !newVal)
+    {
+        for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
+            if (SkillLineAbilityEntry const* pAbility = sSkillLineAbilityStore.LookupEntry(j))
+                if (pAbility->skillId == id)
+                    removeSpell(sSpellMgr->GetFirstSpellInChain(pAbility->spellId), false, false);
     }
 }
 
