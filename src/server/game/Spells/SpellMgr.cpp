@@ -5929,6 +5929,10 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ENEMY;
                 break;
+            // Righteous Defense
+            case 31789:
+                spellInfo->Effects[1].TargetA = TARGET_UNIT_TARGET_ALLY;
+                break;
             default:
                 break;
         }

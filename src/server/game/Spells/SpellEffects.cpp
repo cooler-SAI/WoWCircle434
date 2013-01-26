@@ -1176,29 +1176,6 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 }
                 case 31789:                                 // Righteous Defense (step 1)
                 {
-                    // Clear targets for eff 1
-                    for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
-                        ihit->effectMask &= ~(1<<1);
-
-                    // not empty (checked), copy
-                    Unit::AttackerSet attackers = unitTarget->getAttackers();
-
-                    // remove invalid attackers
-                    for (Unit::AttackerSet::iterator aItr = attackers.begin(); aItr != attackers.end();)
-                        if (!(*aItr)->IsValidAttackTarget(m_caster))
-                            attackers.erase(aItr++);
-                        else
-                            ++aItr;
-
-                    // selected from list 3
-                    uint32 maxTargets = std::min<uint32>(3, attackers.size());
-                    for (uint32 i = 0; i < maxTargets; ++i)
-                    {
-                        Unit* attacker = Trinity::Containers::SelectRandomContainerElement(attackers);
-                        AddUnitTarget(attacker, 1 << 1);
-                        attackers.erase(attacker);
-                    }
-
                     // now let next effect cast spell at each target.
                     return;
                 }
@@ -1620,7 +1597,28 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
             // Righteous Defense
             case 31980:
             {
-                m_caster->CastSpell(unitTarget, 31790, true);
+                // Clear targets for eff 1
+                for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+                    ihit->effectMask &= ~(1<<1);
+
+                // not empty (checked), copy
+                Unit::AttackerSet attackers = unitTarget->getAttackers();
+
+                // remove invalid attackers
+                for (Unit::AttackerSet::iterator aItr = attackers.begin(); aItr != attackers.end();)
+                    if (!(*aItr)->IsValidAttackTarget(m_caster))
+                        attackers.erase(aItr++);
+                    else
+                        ++aItr;
+
+                // selected from list 3
+                uint32 maxTargets = std::min<uint32>(3, attackers.size());
+                for (uint32 i = 0; i < maxTargets; ++i)
+                {
+                    Unit* attacker = Trinity::Containers::SelectRandomContainerElement(attackers);
+                    m_caster->CastSpell(attacker, 31790, true);
+                    attackers.erase(attacker);
+                }
                 return;
             }
             // Cloak of Shadows
