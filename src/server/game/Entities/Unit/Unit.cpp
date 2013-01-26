@@ -5925,12 +5925,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 // Improved Cone of Cold (Rank 1)
                 case 11190:
                     target = victim;
-                    trigger_spell_id = 83301;
+                    triggered_spell_id = 83301;
                     break;
                 // Improved Cone of Cold (Rank 2)
                 case 12489:
                     target = victim;
-                    trigger_spell_id = 83302;
+                    triggered_spell_id = 83302;
                     break;
                 // Glyph of Polymorph
                 case 56375:
