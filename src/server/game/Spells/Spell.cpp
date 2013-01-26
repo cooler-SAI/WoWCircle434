@@ -2917,10 +2917,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                                     {
                                         float temp_ticks = float(float(origDuration) / amplitude);
                                         int32 new_ticks = floor(temp_ticks + 0.5f);
-                                        if (new_ticks >= temp_ticks)
-                                            duration = origDuration;
-                                        else
-                                            duration = int32(amplitude * new_ticks);
+                                        duration = amplitude * new_ticks;
                                         duration = std::max(std::max(duration / amplitude, 1) * amplitude, duration);
                                     }
 
