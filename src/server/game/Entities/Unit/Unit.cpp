@@ -7450,7 +7450,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!victim || (GetGUID() == victim->GetGUID()) || effIndex != 0)
                         return false;
 
-                    triggered_spell_id = 25742;
+                    // Seal of Righteousness - Seals of Command
+                    triggered_spell_id = HasAura(85126) ? 101423: 25742;
+
                     float ap = GetTotalAttackPowerValue(BASE_ATTACK);
                     int32 holy = this->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_HOLY);
                     basepoints0 = int32((GetAttackTime(BASE_ATTACK) / 1000) * (0.0011f * ap + 0.022f * holy));
