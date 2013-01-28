@@ -359,7 +359,7 @@ private:
         const std::string& GetPublicNote() const { return m_publicNote; };
         const std::string& GetOfficerNote() const { return m_officerNote; };
         const std::string& GetName() const { return m_name; }
-        bool LoadFromDB(Field* fields);
+        bool LoadFromDB(Field* fields, uint32 lowGuid);
         void SaveToDB(SQLTransaction& trans) const;
 
         uint64 GetGUID() const { return m_guid; }
@@ -411,7 +411,7 @@ private:
 
         void SetZoneID(uint32 id) { m_zoneId = id; }
         void SetLevel(uint8 var) { m_level = var; }
-        void SetAchievementPoints(uint32 val);
+        void SetAchievementPoints(uint32 val, uint32 lowGuid, bool saveData = false);
         uint32 GetAchievementPoints() { return m_achievementPoints; }
 
         void SetProfession(uint8 index, uint16 value, uint32 skill, uint8 rank)

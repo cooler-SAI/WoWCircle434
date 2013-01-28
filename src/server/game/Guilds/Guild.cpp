@@ -642,7 +642,7 @@ void Guild::Member::SaveToDB(SQLTransaction& trans) const
 // Loads member's data from database.
 // If member has broken fields (level, class) returns false.
 // In this case member has to be removed from guild.
-bool Guild::Member::LoadFromDB(Field* fields)
+bool Guild::Member::LoadFromDB(Field* fields, uint32 lowGuid)
 {
     m_publicNote    = fields[3].GetString();
     m_officerNote   = fields[4].GetString();
@@ -662,8 +662,7 @@ bool Guild::Member::LoadFromDB(Field* fields)
     m_logoutTime    = fields[28].GetUInt32();               // characters.logout_time
     
     SetWeeklyReputation(fields[29].GetUInt32());
-
-    SetAchievementPoints(fields[30].GetUInt32());
+    SetAchievementPoints(fields[30].GetUInt32(), lowGuid);
  
     SetProfession(0, uint16(fields[31].GetUInt32()), fields[32].GetUInt32(), uint8(fields[33].GetUInt32()));
     SetProfession(1, uint16(fields[34].GetUInt32()), fields[35].GetUInt32(), uint8(fields[36].GetUInt32()));
@@ -753,14 +752,17 @@ uint32 Guild::Member::GetBankRemainingValue(uint8 tabId, const Guild* guild) con
     return m_bankRemaining[tabId].value;
 }
 
-void Guild::Member::SetAchievementPoints(uint32 val)
+void Guild::Member::SetAchievementPoints(uint32 val, uint32 lowGuid, bool saveData)
 {
     m_achievementPoints = val;
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_MEMBER_ACHIEVEMENTS);
-    stmt->setUInt64(0, m_achievementPoints);
-    stmt->setUInt32(1, m_guildId);
-    stmt->setUInt32(2, GUID_LOPART(GetGUID()));
-    CharacterDatabase.Execute(stmt);
+    if (saveData)
+    {
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_MEMBER_ACHIEVEMENTS);
+        stmt->setUInt64(0, m_achievementPoints);
+        stmt->setUInt32(1, m_guildId);
+        stmt->setUInt32(2, lowGuid);
+        CharacterDatabase.Execute(stmt);
+    }
 }
 
 inline void Guild::Member::ResetTabTimes()
@@ -1295,7 +1297,7 @@ void Guild::UpdateMemberData(Player* pPlayer, uint8 dataid, uint32 value)
                 pMember->SetZoneID(value);
                 break;
             case GUILD_MEMBER_DATA_ACHIEVEMENT_POINTS:
-                pMember->SetAchievementPoints(value);
+                pMember->SetAchievementPoints(value, pPlayer->GetGUIDLow(), true);
                 break;
             case GUILD_MEMBER_DATA_LEVEL:
                 pMember->SetLevel(value);
@@ -2305,7 +2307,7 @@ bool Guild::LoadMemberFromDB(Field* fields)
 {
     uint32 lowguid = fields[1].GetUInt32();
     Member *member = new Member(m_id, MAKE_NEW_GUID(lowguid, 0, HIGHGUID_PLAYER), fields[2].GetUInt8());
-    if (!member->LoadFromDB(fields))
+    if (!member->LoadFromDB(fields, lowguid))
     {
         _DeleteMemberFromDB(lowguid);
         delete member;
