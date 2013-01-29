@@ -2440,12 +2440,12 @@ void Player::ProcessDelayedOperations()
     {
         ResurrectPlayer(0.0f, false);
 
-        if (GetMaxHealth() > _resurrectionData->Health)
+        if (_resurrectionData && GetMaxHealth() > _resurrectionData->Health)
             SetHealth(_resurrectionData->Health);
         else
             SetFullHealth();
 
-        if (uint32(GetMaxPower(POWER_MANA)) > _resurrectionData->Mana)
+        if (_resurrectionData && uint32(GetMaxPower(POWER_MANA)) > _resurrectionData->Mana)
             SetPower(POWER_MANA, _resurrectionData->Mana);
         else
             SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
@@ -2454,8 +2454,9 @@ void Player::ProcessDelayedOperations()
         SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
         SetPower(POWER_ECLIPSE, 0);
 
-        if (uint32 aura = _resurrectionData->Aura)
-            CastSpell(this, aura, true, NULL, NULL, _resurrectionData->GUID);
+        if (_resurrectionData)
+            if (uint32 aura = _resurrectionData->Aura)
+                CastSpell(this, aura, true, NULL, NULL, _resurrectionData->GUID);
 
         SpawnCorpseBones();
     }

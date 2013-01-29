@@ -426,9 +426,9 @@ class boss_theralion : public CreatureScript
                     me->GetMotionMaster()->MovePoint(POINT_LAND, valionatheralionflightPos);
                     break;
                 case ACTION_DAZZLING_DESTRUCTION:
-                    if (_stalker1)
+                    if (_stalker1 && _stalker1->IsInWorld())
                         me->CastSpell(_stalker1, SPELL_DAZZLING_DESTRUCTION_MISSILE, true);
-                    if (_stalker2)
+                    if (_stalker2 && _stalker2->IsInWorld())
                         me->CastSpell(_stalker2, SPELL_DAZZLING_DESTRUCTION_MISSILE, true);
                     break;
                 }
@@ -563,7 +563,7 @@ class boss_theralion : public CreatureScript
                                 target->GetPositionY(),
                                 target->GetPositionZ(),
                                 0.0f,
-                                TEMPSUMMON_TIMED_DESPAWN, me->GetDistance(target)/15*1000 + 5000);
+                                TEMPSUMMON_TIMED_DESPAWN, me->GetDistance(target)/15*1000 + 7000);
                         }
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                         {
