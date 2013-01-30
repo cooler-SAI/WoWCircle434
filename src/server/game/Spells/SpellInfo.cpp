@@ -1049,6 +1049,29 @@ bool SpellInfo::HasAura(AuraType aura) const
     return false;
 }
 
+const AuraType cc_auras[] = { SPELL_AURA_MOD_CONFUSE,
+    SPELL_AURA_MOD_FEAR,
+    SPELL_AURA_MOD_STUN,
+    SPELL_AURA_MOD_ROOT,
+    SPELL_AURA_TRANSFORM,
+    SPELL_AURA_NONE };
+
+bool SpellInfo::HasCCAura() const
+{
+    bool has_cc_aura = false;
+    int i = 0;
+    do
+    {
+        if (HasAura(cc_auras[i]))
+        {
+            has_cc_aura = true;
+            break;
+        }
+    }
+    while (cc_auras[++i] != SPELL_AURA_NONE);
+    return has_cc_aura;
+}
+
 bool SpellInfo::HasAreaAuraEffect() const
 {
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)

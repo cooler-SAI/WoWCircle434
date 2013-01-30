@@ -437,6 +437,7 @@ public:
     bool HasAura(AuraType aura) const;
     bool HasAreaAuraEffect() const;
     bool HasAreaAuraRaidEffect() const;
+    bool HasCCAura() const;
 
     bool HasPersistenAura() const;
 
