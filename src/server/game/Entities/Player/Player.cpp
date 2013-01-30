@@ -5939,6 +5939,7 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
             ApplyAttackTimePercentMod(RANGED_ATTACK, oldchange, false);
             ApplyAttackTimePercentMod(RANGED_ATTACK, newchange, true);
             UpdateFocusRegen();
+            UpdateEnergyRegen();
             float haste_regen = 1.0f / (1.0f + newchange / 100.0f);
             SetFloatValue(PLAYER_FIELD_MOD_HASTE_REGEN, haste_regen);
             break;

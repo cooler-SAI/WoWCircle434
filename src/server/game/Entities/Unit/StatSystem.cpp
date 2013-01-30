@@ -162,6 +162,7 @@ bool Player::UpdateAllStats()
     UpdateSpellDamageAndHealingBonus();
     UpdateManaRegen();
     UpdateFocusRegen();
+    UpdateEnergyRegen();
     UpdateExpertise(BASE_ATTACK);
     UpdateExpertise(OFF_ATTACK);
     UpdateMastery();
@@ -743,6 +744,17 @@ void Player::UpdateFocusRegen()
         return;
 
     float base_regen = 5.0f - 5.0f;
+    base_regen += 5.0f * GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_FOCUS) / 100.0f;
+    SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, base_regen);
+}
+
+void Player::UpdateEnergyRegen()
+{
+    if (getPowerType() != POWER_ENERGY)
+        return;
+    
+    float base_regen = 0.0f;
+    base_regen += 10.0f * GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_ENERGY) / 100.0f;
     SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, base_regen);
 }
 

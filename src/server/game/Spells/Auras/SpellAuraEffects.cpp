@@ -4504,6 +4504,14 @@ void AuraEffect::HandleModPowerRegen(AuraApplication const* aurApp, uint8 mode, 
         else
             target->ToPlayer()->UpdateRuneRegen(RuneType(GetMiscValueB()));
     }
+    else if (GetMiscValue() == POWER_ENERGY)
+    {
+        target->ToPlayer()->UpdateEnergyRegen();
+    }
+    else if (GetMiscValue() == POWER_FOCUS)
+    {
+        target->ToPlayer()->UpdateFocusRegen();
+    }
     // other powers are not immediate effects - implemented in Player::Regenerate, Creature::Regenerate
 }
 
