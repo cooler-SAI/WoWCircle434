@@ -9793,7 +9793,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                 return false;
 
             // proc only on your pet
-            if (target && target->GetOwner() != this)
+            if (victim && victim->GetOwner() != this)
                 return false;
 
             break;
