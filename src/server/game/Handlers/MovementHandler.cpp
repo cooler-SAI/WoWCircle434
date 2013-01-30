@@ -208,7 +208,7 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvPacket)
         .ReadByteMask(guid[6])
         .ReadByteMask(guid[3])
         .ReadByteMask(guid[7])
-        .ReadByteMask(guid[5])
+        .ReadByteMask(guid[2])
         .ReadByteMask(guid[4])
 
         .ReadByteSeq(guid[4])
