@@ -615,7 +615,6 @@ bool CurrencyMgr::IsPrecisionAreConsidered(uint32 currencyId) const
     return false;
 }
 
-
 bool CapResetEvent::Execute(uint64 e_time, uint32 p_time)
 {
     // check table if empty

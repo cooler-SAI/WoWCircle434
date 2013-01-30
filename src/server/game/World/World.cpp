@@ -2891,12 +2891,7 @@ void World::ResetCurrencyWeekCap()
     stmt->setUInt32(0, 0);
     CharacterDatabase.Execute(stmt);
 
-    for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
-    {
-        if (Player* player = itr->second->GetPlayer())
-            player->ResetCurrencyWeekCap();
-    }
-
+    sCurrencyMgr->ResetCurrencyCapToAllPlayers();
     m_NextCurrencyReset = time_t(m_NextCurrencyReset + DAY * getIntConfig(CONFIG_CURRENCY_RESET_INTERVAL));
     sWorld->setWorldState(WS_CURRENCY_RESET_TIME, uint64(m_NextCurrencyReset));
 }
