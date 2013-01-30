@@ -1070,6 +1070,15 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                         m_caster->CastSpell(unitTarget, 91809, true); // Leap
                     break;
                 }
+                case 54092: // Monster Slayer's Kit
+                {
+                    if (!unitTarget)
+                        return;
+
+                    uint32 spellIds[] = {51853, 54063, 54071, 54086};
+                    m_caster->CastSpell(unitTarget, spellIds[urand(0, 3)], true);
+                    return;
+                }
             }
             break;
         }
@@ -5300,6 +5309,37 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                 {
                     DoCreateItem(effIndex, urand(62552, 62591));
                     break;
+                }
+                case 59789: // Oracle Ablutions
+                {
+                    if (!unitTarget)
+                        return;
+
+                    switch (unitTarget->getPowerType())
+                    {
+                        case POWER_RUNIC_POWER:
+                        {
+                            unitTarget->CastSpell(unitTarget, 59812, true);
+                            break;
+                        }
+                        case POWER_MANA:
+                        {
+                            int32 manapool = unitTarget->GetMaxPower(POWER_MANA) * 0.05;
+                            unitTarget->CastCustomSpell(unitTarget, 59813, &manapool, NULL, NULL, true);
+                            break;
+                        }
+                        case POWER_RAGE:
+                        {
+                            unitTarget->CastSpell(unitTarget, 59814, true);
+                            break;
+                        }
+                        case POWER_ENERGY:
+                        {
+                            unitTarget->CastSpell(unitTarget, 59815, true);
+                            break;
+                        }
+                    }
+                    return;
                 }
             }
             break;

@@ -2588,6 +2588,10 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                     case 65495:
                         target->SetDisplayId(target->getGender() == GENDER_MALE ? 29203 : 29204);
                         break;
+                    // Crown Parcel Service Uniform
+                    case 71450:
+                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 31002 : 31003);
+                        break;
                     // Darkspear Pride
                     case 75532:
                         target->SetDisplayId(target->getGender() == GENDER_MALE ? 31737 : 31738);

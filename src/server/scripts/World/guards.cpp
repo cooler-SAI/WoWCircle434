@@ -44,7 +44,10 @@ enum GuardGeneric
     NPC_CENARION_HOLD_INFANTRY      = 15184,
     NPC_STORMWIND_CITY_GUARD        = 68,
     NPC_STORMWIND_CITY_PATROLLER    = 1976,
-    NPC_ORGRIMMAR_GRUNT             = 3296
+    NPC_ORGRIMMAR_GRUNT             = 3296,
+
+    // Love is in the Air
+    SPELL_HEAVILY_PERFUMED          = 71507,
 };
 
 class guard_generic : public CreatureScript
@@ -60,6 +63,11 @@ public:
         {
             globalCooldown = 0;
             buffTimer = 0;
+
+            if (sGameEventMgr->IsActiveEvent(8))
+                if (me->GetEntry() == NPC_STORMWIND_CITY_GUARD || me->GetEntry() == NPC_STORMWIND_CITY_PATROLLER
+                    || me->GetEntry() == NPC_ORGRIMMAR_GRUNT)
+                perfumedTimer = urand(8000,40000);
         }
 
         void EnterCombat(Unit* who)
@@ -77,6 +85,16 @@ public:
                 globalCooldown -= diff;
             else
                 globalCooldown = 0;
+
+            // Love is in the Air - quest Something Stinks
+            if (perfumedTimer <= diff)
+            {
+                if (!me->HasAura(SPELL_HEAVILY_PERFUMED))
+                    DoCast(me, SPELL_HEAVILY_PERFUMED);
+                perfumedTimer = urand(20000,60000);
+            }
+            else
+                perfumedTimer -= diff;
 
             //Buff timer (only buff when we are alive and not in combat
             if (me->isAlive() && !me->isInCombat())
@@ -240,6 +258,7 @@ public:
     private:
         uint32 globalCooldown;
         uint32 buffTimer;
+        uint32 perfumedTimer;
     };
 
     CreatureAI* GetAI(Creature* creature) const
