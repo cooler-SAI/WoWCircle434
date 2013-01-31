@@ -2240,6 +2240,16 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
 
         switch (m_spellInfo->Id)
         {
+            // Spirit Mend
+            case 90361:
+            {
+                if (Unit* owner = m_caster->GetOwner())
+                {
+                    uint32 ap = owner->GetTotalAttackPowerValue(RANGED_ATTACK);
+                    addhealth += int32((ap * 0.35f) * 0.5f);
+                }
+                break;
+            }
             // Tipping of the Scales, Scales of Life
             case 96880:
             {

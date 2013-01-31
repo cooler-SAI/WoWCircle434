@@ -777,6 +777,16 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             
             switch (GetSpellInfo()->Id)
             {
+                // Spirit Mend
+                case 90361:
+                {
+                    if (Unit* owner = caster->GetOwner())
+                    {
+                        uint32 ap = owner->GetTotalAttackPowerValue(RANGED_ATTACK);
+                        amount += int32((ap * 0.35f) * 0.335);
+                    }
+                    break;
+                }
                 // Gift of Naaru
                 case 28880:
                 case 59542:
