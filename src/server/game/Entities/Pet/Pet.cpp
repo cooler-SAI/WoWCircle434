@@ -2018,3 +2018,16 @@ void Pet::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
     if (Player* owner = GetOwner())
         owner->GetSession()->SendPacket(&data);
 }
+
+PetTalentType Pet::GetTalentType()
+{
+    CreatureTemplate const* ci = this->GetCreatureTemplate();
+    if (!ci)
+        return PET_TALENT_TYPE_NOT_HUNTER_PET;
+
+    CreatureFamilyEntry const* petFamily = sCreatureFamilyStore.LookupEntry(ci->family);
+    if (!petFamily)
+        return PET_TALENT_TYPE_NOT_HUNTER_PET;
+    
+    return (PetTalentType)petFamily->petTalentType;
+}

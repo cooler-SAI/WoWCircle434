@@ -976,59 +976,78 @@ bool Guardian::UpdateStats(Stats stat)
     float ownersBonus = 0.0f;
 
     Unit* owner = GetOwner();
-    // Handle Death Knight Glyphs and Talents
+    
     float mod = 0.75f;
-    if (IsPetGhoul() && (stat == STAT_STAMINA || stat == STAT_STRENGTH))
+
+    switch (stat)
     {
-        switch (stat)
+        case STAT_STRENGTH:
         {
-            case STAT_STAMINA:  mod = 0.45f; break;               // Default Owner's Stamina scale
-            case STAT_STRENGTH: mod = 0.7f; break;                // Default Owner's Strength scale
-            default: break;
+            if (IsPetGhoul())
+            {
+                mod = 0.7f;
+                
+                // Glyph of the Ghoul
+                if (AuraEffect const* aurEff = owner->GetAuraEffect(58686, 0))
+                    mod += CalculatePct(1.0f, aurEff->GetAmount());
+
+                ownersBonus = owner->GetStat(stat) * mod;
+                value += ownersBonus;
+            }
+            break;
         }
-        // Ravenous Dead
-        // Check just if owner has Ravenous Dead since it's effect is not an aura
-        AuraEffect const* aurEff = owner->GetAuraEffect(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, SPELLFAMILY_DEATHKNIGHT, 3010, 0);
-        if (aurEff)
+        case STAT_STAMINA:
         {
-            SpellInfo const* spellInfo = aurEff->GetSpellInfo();                                                 // Then get the SpellProto and add the dummy effect value
-            AddPct(mod, spellInfo->Effects[EFFECT_1].CalcValue(owner));                                              // Ravenous Dead edits the original scale
-        }
-        // Glyph of the Ghoul
-        aurEff = owner->GetAuraEffect(58686, 0);
-        if (aurEff)
-            mod += CalculatePct(1.0f, aurEff->GetAmount());                                                    // Glyph of the Ghoul adds a flat value to the scale mod
-        ownersBonus = float(owner->GetStat(stat)) * mod;
-        value += ownersBonus;
-    }
-    else if (stat == STAT_STAMINA)
-    {
-        ownersBonus = CalculatePct(owner->GetStat(STAT_STAMINA), 30);
-        value += ownersBonus;
-    }
-                                                            //warlock's and mage's pets gain 30% of owner's intellect
-    else if (stat == STAT_INTELLECT)
-    {
-        if (owner->getClass() == CLASS_WARLOCK || owner->getClass() == CLASS_MAGE)
-        {
-            ownersBonus = CalculatePct(owner->GetStat(stat), 30);
-            value += ownersBonus;
-        }
-        else if (owner->getClass() == CLASS_DEATH_KNIGHT && GetEntry() == 31216)
-        {
-            if (owner->getSimulacrumTarget())
-                ownersBonus = float(owner->getSimulacrumTarget()->GetStat(stat)) * 0.3f;
+            if (IsPetGhoul() || IsPetGargoyle())
+            {
+                mod = 0.45f;
+                
+                // Glyph of the Ghoul
+                if (AuraEffect const* aurEff = owner->GetAuraEffect(58686, 0))
+                    mod += CalculatePct(1.0f, aurEff->GetAmount()); 
+            }
+            else if (owner->getClass() == CLASS_WARLOCK && isPet())
+                mod = 0.75f;
+            else if (owner->getClass() == CLASS_MAGE && isPet())
+                mod = 0.75f;
             else
-                ownersBonus = float(owner->GetStat(stat)) * 0.3f;
+            {
+                mod = 0.45f;
+
+                if (isPet())
+                {
+                    switch(ToPet()->GetTalentType())
+                    {
+                        case PET_TALENT_TYPE_FEROCITY: mod = 0.67f; break;
+                        case PET_TALENT_TYPE_TENACITY: mod = 0.78f; break;
+                        case PET_TALENT_TYPE_CUNNING: mod = 0.725f; break;
+                    }
+                }
+            }
+            ownersBonus = owner->GetStat(stat) * mod;
+            ownersBonus *= GetModifierValue(UNIT_MOD_STAT_STAMINA, TOTAL_PCT);
+            value += ownersBonus;
+            break;
+        }
+        case STAT_INTELLECT:
+        {
+            if (owner->getClass() == CLASS_WARLOCK || owner->getClass() == CLASS_MAGE)
+            {
+                mod = 0.3f;
+                ownersBonus = owner->GetStat(stat) * mod;
+            }
+            else if (owner->getClass() == CLASS_DEATH_KNIGHT && GetEntry() == 31216)
+            {
+                mod = 0.3f;
+                if (owner->getSimulacrumTarget())
+                    ownersBonus = owner->getSimulacrumTarget()->GetStat(stat) * mod;
+                else
+                    ownersBonus = owner->GetStat(stat) * mod;
+            }
+            value += ownersBonus;
+            break;
         }
     }
-/*
-    else if (stat == STAT_STRENGTH)
-    {
-        if (IsPetGhoul())
-            value += float(owner->GetStat(stat)) * 0.3f;
-    }
-*/
 
     SetStat(stat, int32(value));
     m_statFromOwner[stat] = ownersBonus;

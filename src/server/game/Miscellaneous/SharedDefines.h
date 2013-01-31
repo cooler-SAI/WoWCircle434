@@ -3394,6 +3394,14 @@ enum PetDiet
 
 #define MAX_PET_DIET 9
 
+enum PetTalentType
+{
+    PET_TALENT_TYPE_NOT_HUNTER_PET  = -1,
+    PET_TALENT_TYPE_FEROCITY        = 0,
+    PET_TALENT_TYPE_TENACITY        = 1,
+    PET_TALENT_TYPE_CUNNING         = 2,
+};
+
 #define CHAIN_SPELL_JUMP_RADIUS 8
 
 #define GUILD_BANKLOG_MAX_RECORDS   25
