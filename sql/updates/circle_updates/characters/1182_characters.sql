@@ -22,7 +22,7 @@ OPEN cur;
 WHILE done = 0 DO
 FETCH cur INTO owner_guid;
 UPDATE `characters` SET `currentPetSlot`=0, `petSlotUsed`=1 WHERE `class`=3 AND `guid`=owner_guid;
-UPDATE `characters` SET `currentPetSlot`=100, `petSlotUsed`=3452816845 WHERE `class` IN (6, 9);
+UPDATE `characters` SET `currentPetSlot`=100, `petSlotUsed`=3452816845 WHERE `class` IN (6, 9) AND `guid`=owner_guid;
 END WHILE;
 CLOSE cur;
 END;
