@@ -3278,12 +3278,15 @@ public:
 
         void CheckIfMoveInRing(Unit *who)
         {
-            if (who->isAlive() && me->IsInRange(who, 2.5f, 5.0f) && me->IsWithinLOSInMap(who) && isReady)
+            if (who->isAlive() && me->IsInRange(who, 2.0f, 4.7f) && me->IsWithinLOSInMap(who) && isReady)
             {
                 if (!who->HasAura(82691))
                 {
                     if (!who->HasAura(91264))
+                    {
                         me->CastSpell(who, 82691, true);
+                        me->CastSpell(who, 91264, true);
+                    }
                 }
                 else me->CastSpell(who, 91264, true);
             }
