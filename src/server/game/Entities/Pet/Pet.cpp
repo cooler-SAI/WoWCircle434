@@ -51,6 +51,7 @@ m_auraRaidUpdateMask(0), m_loading(false), m_declinedname(NULL)
 
     m_name = "Pet";
     m_regenTimer = PET_FOCUS_REGEN_INTERVAL;
+    m_slot = 0;
 }
 
 Pet::~Pet()
@@ -93,9 +94,12 @@ void Pet::RemoveFromWorld()
     }
 }
 
-bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool current)
+bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool current, PetSlot slotID)
 {
     m_loading = true;
+
+    if (slotID == PET_SLOT_ACTUAL_PET_SLOT)
+        slotID = owner->m_currentPetSlot;
 
     uint32 ownerid = owner->GetGUIDLow();
 
@@ -103,12 +107,12 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
 
     if (petnumber)
         result = CharacterDatabase.PQuery("SELECT id, entry, owner, modelid, level, exp, Reactstate, slot, name, renamed, curhealth, curmana, abdata, savetime, CreatedBySpell, PetType FROM character_pet WHERE owner = '%u' AND id = '%u'", ownerid, petnumber);
-    else if (current)
-        result = CharacterDatabase.PQuery("SELECT id, entry, owner, modelid, level, exp, Reactstate, slot, name, renamed, curhealth, curmana, abdata, savetime, CreatedBySpell, PetType FROM character_pet WHERE owner = '%u' AND slot = '%u'", ownerid, uint8(PET_SAVE_AS_CURRENT));
+    else if (current && slotID != PET_SLOT_UNK_SLOT)
+        result = CharacterDatabase.PQuery("SELECT id, entry, owner, modelid, level, exp, Reactstate, slot, name, renamed, curhealth, curmana, abdata, savetime, CreatedBySpell, PetType FROM character_pet WHERE owner = '%u' AND slot = '%u'", ownerid, uint8(slotID));
     else if (petentry)
-        result = CharacterDatabase.PQuery("SELECT id, entry, owner, modelid, level, exp, Reactstate, slot, name, renamed, curhealth, curmana, abdata, savetime, CreatedBySpell, PetType FROM character_pet WHERE owner = '%u' AND entry = '%u' AND (slot = '%u' OR slot > '%u')", ownerid, petentry, uint8(PET_SAVE_AS_CURRENT), uint8(PET_SAVE_LAST_STABLE_SLOT));
+        result = CharacterDatabase.PQuery("SELECT id, entry, owner, modelid, level, exp, Reactstate, slot, name, renamed, curhealth, curmana, abdata, savetime, CreatedBySpell, PetType FROM character_pet WHERE owner = '%u' AND entry = '%u' AND ((slot >= '%u' AND slot <= '%u') OR slot > '%u')", ownerid, petentry, uint8(PET_SLOT_HUNTER_FIRST), uint8(PET_SLOT_HUNTER_LAST), uint8(PET_SLOT_STABLE_LAST));
     else
-        result = CharacterDatabase.PQuery("SELECT id, entry, owner, modelid, level, exp, Reactstate, slot, name, renamed, curhealth, curmana, abdata, savetime, CreatedBySpell, PetType FROM character_pet WHERE owner = '%u' AND (slot = '%u' OR slot > '%u')", ownerid, uint8(PET_SAVE_AS_CURRENT), uint8(PET_SAVE_LAST_STABLE_SLOT));
+        result = CharacterDatabase.PQuery("SELECT id, entry, owner, modelid, level, exp, Reactstate, slot, name, renamed, curhealth, curmana, abdata, savetime, CreatedBySpell, PetType FROM character_pet WHERE owner = '%u' AND ((slot >= '%u' AND slot <= '%u') OR slot > '%u')", ownerid, uint8(PET_SLOT_HUNTER_FIRST), uint8(PET_SLOT_HUNTER_LAST), uint8(PET_SLOT_STABLE_LAST));
 
     if (!result)
     {
@@ -251,7 +255,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     // 0=current
     // 1..MAX_PET_STABLES in stable slot
     // PET_SAVE_NOT_IN_SLOT(100) = not stable slot (summoning))
-    if (fields[7].GetUInt8())
+    /*if (fields[7].GetUInt8())
     {
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
@@ -261,7 +265,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
             PET_SAVE_AS_CURRENT, ownerid, m_charmInfo->GetPetNumber());
 
         CharacterDatabase.CommitTransaction(trans);
-    }
+    } */
 
     // Send fake summon spell cast - this is needed for correct cooldown application for spells
     // Example: 46584 - without this cooldown (which should be set always when pet is loaded) isn't set clientside
@@ -278,8 +282,10 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         owner->SendMessageToSet(&data, true);
     }
 
-    owner->SetMinion(this, true);
+    owner->SetMinion(this, true, slotID == PET_SLOT_UNK_SLOT? PET_SLOT_OTHER_PET: slotID);
     map->AddToMap(this->ToCreature());
+
+    m_slot = fields[7].GetUInt8();
 
     InitTalentForLevel();                                   // set original talents points before spell loading
 
@@ -335,7 +341,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     return true;
 }
 
-void Pet::SavePetToDB(PetSaveMode mode)
+void Pet::SavePetToDB(PetSlot mode)
 {
     if (!GetEntry())
         return;
@@ -352,8 +358,13 @@ void Pet::SavePetToDB(PetSaveMode mode)
     if (!owner)
         return;
 
+    if (mode == PET_SLOT_ACTUAL_PET_SLOT)
+        mode = owner->m_currentPetSlot;
+
+    SetSlot(mode);
+
     // not save pet as current if another pet temporary unsummoned
-    if (mode == PET_SAVE_AS_CURRENT && owner->GetTemporaryUnsummonedPetNumber() &&
+    if (mode == owner->m_currentPetSlot && owner->GetTemporaryUnsummonedPetNumber() &&
         owner->GetTemporaryUnsummonedPetNumber() != m_charmInfo->GetPetNumber())
     {
         // pet will lost anyway at restore temporary unsummoned
@@ -361,7 +372,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
             return;
 
         // for warlock case
-        mode = PET_SAVE_NOT_IN_SLOT;
+        mode = PET_SLOT_OTHER_PET;
     }
 
     uint32 curhealth = GetHealth();
@@ -372,7 +383,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
     _SaveAuras(trans);
 
     // stable and not in slot saves
-    if (mode > PET_SAVE_AS_CURRENT)
+    if (mode > PET_SLOT_HUNTER_LAST && getPetType() == HUNTER_PET)
         RemoveAllAuras();
 
     _SaveSpells(trans);
@@ -380,7 +391,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
     CharacterDatabase.CommitTransaction(trans);
 
     // current/stable/not_in_slot
-    if (mode >= PET_SAVE_AS_CURRENT)
+    if (mode >= PET_SLOT_HUNTER_FIRST)
     {
         uint32 ownerLowGUID = GUID_LOPART(GetOwnerGUID());
         std::string name = m_name;
@@ -389,7 +400,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         // remove current data
         trans->PAppend("DELETE FROM character_pet WHERE owner = '%u' AND id = '%u'", ownerLowGUID, m_charmInfo->GetPetNumber());	
 
-        // prevent duplicate using slot (except PET_SAVE_NOT_IN_SLOT)
+        /*// prevent duplicate using slot (except PET_SAVE_NOT_IN_SLOT)
         if (mode <= PET_SAVE_LAST_STABLE_SLOT)
             trans->PAppend("UPDATE character_pet SET slot = '%u' WHERE owner = '%u' AND slot = '%u'",
                 uint8(PET_SAVE_NOT_IN_SLOT), ownerLowGUID, uint8(mode));
@@ -397,7 +408,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         // prevent existence another hunter pet in PET_SAVE_AS_CURRENT and PET_SAVE_NOT_IN_SLOT
         if (getPetType() == HUNTER_PET && (mode == PET_SAVE_AS_CURRENT || mode > PET_SAVE_LAST_STABLE_SLOT))
             trans->PAppend("DELETE FROM character_pet WHERE owner = '%u' AND (slot = '%u' OR slot > '%u')",	  	
-                ownerLowGUID, PET_SAVE_AS_CURRENT, PET_SAVE_LAST_STABLE_SLOT);
+                ownerLowGUID, PET_SAVE_AS_CURRENT, PET_SAVE_LAST_STABLE_SLOT); */
 
         // save pet
         std::ostringstream ss;
@@ -433,6 +444,8 @@ void Pet::SavePetToDB(PetSaveMode mode)
     // delete
     else
     {
+        if (owner->m_currentPetSlot >= PET_SLOT_HUNTER_FIRST && owner->m_currentPetSlot <= PET_SLOT_HUNTER_LAST)
+            owner->setPetSlotUsed(owner->m_currentPetSlot, false);
         RemoveAllAuras();
         DeleteFromDB(m_charmInfo->GetPetNumber());
     }
@@ -496,7 +509,7 @@ void Pet::Update(uint32 diff)
         {
             if (getPetType() != HUNTER_PET || m_corpseRemoveTime <= time(NULL))
             {
-                Remove(PET_SAVE_NOT_IN_SLOT);               //hunters' pets never get removed because of death, NEVER!
+                Remove(PET_SLOT_ACTUAL_PET_SLOT);               //hunters' pets never get removed because of death, NEVER!
                 return;
             }
             break;
@@ -508,7 +521,7 @@ void Pet::Update(uint32 diff)
             if (!owner || (!IsWithinDistInMap(owner, GetMap()->GetVisibilityRange()) && !isPossessed()) || (isControlled() && !owner->GetPetGUID()))
             //if (!owner || (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) && (owner->GetCharmGUID() && (owner->GetCharmGUID() != GetGUID()))) || (isControlled() && !owner->GetPetGUID()))
             {
-                Remove(PET_SAVE_NOT_IN_SLOT, true);
+                Remove(PET_SLOT_ACTUAL_PET_SLOT, true);
                 return;
             }
 
@@ -517,7 +530,7 @@ void Pet::Update(uint32 diff)
                 if (owner->GetPetGUID() != GetGUID())
                 {
                     sLog->outError(LOG_FILTER_PETS, "Pet %u is not pet of owner %s, removed", GetEntry(), m_owner->GetName());
-                    Remove(getPetType() == HUNTER_PET?PET_SAVE_AS_DELETED:PET_SAVE_NOT_IN_SLOT);
+                    Remove(getPetType() == HUNTER_PET?PET_SLOT_DELETED:PET_SLOT_ACTUAL_PET_SLOT);
                     return;
                 }
             }
@@ -528,7 +541,7 @@ void Pet::Update(uint32 diff)
                     m_duration -= diff;
                 else
                 {
-                    Remove(getPetType() != SUMMON_PET ? PET_SAVE_AS_DELETED:PET_SAVE_NOT_IN_SLOT);
+                    Remove(getPetType() != SUMMON_PET ? PET_SLOT_DELETED:PET_SLOT_ACTUAL_PET_SLOT);
                     return;
                 }
             }
@@ -623,7 +636,7 @@ void Creature::Regenerate(Powers power)
     ModifyPower(power, int32(addvalue));
 }
 
-void Pet::Remove(PetSaveMode mode, bool returnreagent)
+void Pet::Remove(PetSlot mode, bool returnreagent)
 {
     m_owner->RemovePet(this, mode, returnreagent);
 }

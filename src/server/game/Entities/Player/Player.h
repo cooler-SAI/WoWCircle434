@@ -1478,8 +1478,8 @@ class Player : public Unit, public GridObject<Player>
         void UpdateInnerTime (time_t time) { time_inn_enter = time; }
 
         Pet* GetPet() const;
-        Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime);
-        void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
+        Pet* SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime, PetSlot slotId = PET_SLOT_UNK_SLOT);
+        void RemovePet(Pet* pet, PetSlot mode, bool returnreagent = false);
 
         PhaseMgr& GetPhaseMgr() { return phaseMgr; }
 
@@ -2682,6 +2682,49 @@ class Player : public Unit, public GridObject<Player>
         float m_homebindZ;
 
         WorldLocation GetStartPosition() const;
+
+        // current pet slot
+        PetSlot m_currentPetSlot;
+        uint32 m_petSlotUsed;
+
+        void setPetSlotUsed(PetSlot slot, bool used)
+        {
+            if (used)
+                m_petSlotUsed |= (1 << int32(slot));
+            else
+                m_petSlotUsed &= ~(1 << int32(slot));
+        }
+
+        PetSlot getSlotForNewPet()
+        {
+            uint32 last_known = 0;
+            // Call Pet Spells
+            // 883 83242 83243 83244 83245
+            //  1    2     3     4     5
+            if (HasSpell(83245))
+                last_known = 5;
+            else if (HasSpell(83244))
+                last_known = 4;
+            else if (HasSpell(83243))
+                last_known = 3;
+            else if (HasSpell(83242))
+                last_known = 2;
+            else if (HasSpell(883))
+                last_known = 1;
+
+            for (uint32 i = uint32(PET_SLOT_HUNTER_FIRST); i < last_known; ++i)
+                if ((m_petSlotUsed & (1 << i)) == 0)
+                    return PetSlot(i);
+
+            return PET_SLOT_FULL_LIST;
+        }
+
+        void SendToMantPets(Player* player)
+        {
+            //ChatHandler(player).PSendSysMessage(LANG_FAILED_NO_PLACE_FOR_PET);
+        }
+
+        void SendPetTameResult(PetTameResult result);
 
         // currently visible objects at player client
         typedef std::set<uint64> ClientGUIDs;
