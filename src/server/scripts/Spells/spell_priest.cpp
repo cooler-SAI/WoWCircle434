@@ -433,7 +433,9 @@ class spell_pri_shadow_word_death : public SpellScriptLoader
                 int32 damage = GetHitDamage();
 
                 // Pain and Suffering reduces damage
-                if (AuraEffect* aurEff = GetCaster()->GetDummyAuraEffect(SPELLFAMILY_PRIEST, PRIEST_ICON_ID_PAIN_AND_SUFFERING, EFFECT_1))
+                if (AuraEffect* aurEff = GetCaster()->GetAuraEffect(47580, 1))
+                    AddPct(damage, aurEff->GetAmount());
+                else if (AuraEffect* aurEff = GetCaster()->GetAuraEffect(47581, 1))
                     AddPct(damage, aurEff->GetAmount());
 
                 GetCaster()->CastCustomSpell(GetCaster(), PRIEST_SHADOW_WORD_DEATH, &damage, 0, 0, true);
