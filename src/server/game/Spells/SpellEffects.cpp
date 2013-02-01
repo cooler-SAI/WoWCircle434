@@ -479,114 +479,172 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             }
             case SPELLFAMILY_WARLOCK:
             {
-                // Incinerate Rank 1 & 2
-                if ((m_spellInfo->SpellFamilyFlags[1] & 0x000040) && m_spellInfo->SpellIconID == 2128)
+                switch (m_spellInfo->Id)
                 {
-                    // Incinerate does more dmg (dmg/6) if the target have Immolate debuff.
-                    // Check aura state for speed but aura state set not only for Immolate spell
-                    if (unitTarget->HasAuraState(AURA_STATE_CONFLAGRATE))
+                    // Whiplash
+                    case 6360:
                     {
-                        if (unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x4, 0, 0))
-                            damage += damage / 6;
-                    }
-                }
-                // Conflagrate - consumes Immolate
-                else if (m_spellInfo->Id == 17962)
-                {
-                    AuraEffect const* aura = NULL;                // found req. aura for damage calculation
-
-                    Unit::AuraEffectList const &mPeriodic = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
-                    for (Unit::AuraEffectList::const_iterator i = mPeriodic.begin(); i != mPeriodic.end(); ++i)
-                    {
-                        // for caster applied auras only
-                        if ((*i)->GetSpellInfo()->SpellFamilyName != SPELLFAMILY_WARLOCK ||
-                            (*i)->GetCasterGUID() != m_caster->GetGUID())
-                            continue;
-
-                        // Immolate
-                        if ((*i)->GetSpellInfo()->SpellFamilyFlags[0] & 0x4)
+                        if (Unit* owner = m_caster->GetOwner())
                         {
-                            aura = *i;                      // it selected always if exist
-                            break;
+                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
+                            damage += spd * 0.425f;
                         }
-                    }
-                    if (aura)
-                    {
-                        uint32 pdamage = aura->GetAmount() > 0 ? aura->GetAmount() : 0;
-                        pdamage = m_caster->SpellDamageBonusDone(unitTarget, aura->GetSpellInfo(), pdamage, DOT);
-                        pdamage = unitTarget->SpellDamageBonusTaken(m_caster, aura->GetSpellInfo(), pdamage, DOT);
-                        damage += pdamage * aura->GetTotalTicks() * 0.6f;
-                        apply_direct_bonus = false;
                         break;
                     }
-                }
-                // Soul Swap
-                else if (m_spellInfo->Id == 86121)
-                {
-                    m_caster->CastSpell(m_caster, 86211, true);
-                    m_caster->m_BufferAuras.clear();
-                    m_caster->m_SoulSwapTarget = unitTarget;
-                    Unit::AuraApplicationMap const auraMap = unitTarget->GetAppliedAuras();
-                    if (auraMap.size() > 0)
+                    // Torment
+                    case 3716:
                     {
-                        for (Unit::AuraApplicationMap::const_iterator itr = auraMap.begin(); itr != auraMap.end(); ++itr)
+                        if (Unit* owner = m_caster->GetOwner())
                         {
-                            // Check for caster
-                            if (itr->second->GetBase()->GetCaster() != m_caster)
-                                continue;
-
-                            // Check for schoolmask
-                            if (!(itr->second->GetBase()->GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
-                                continue;
-
-                            // Check for periodic effect
-                            bool bPeriodic = false;
-                            for (uint8 i = 0; i < 3; ++i)
-                                if (AuraEffect* aurEff = itr->second->GetBase()->GetEffect(i))
-                                    if (aurEff->IsPeriodic())
-                                        bPeriodic = true;
-                            if (!bPeriodic)
-                                continue;
-
-                            // All is done, add aura to buffer
-                            m_caster->m_BufferAuras.push_back(itr->first);
-                            if (!m_caster->HasAura(56226))
-                                unitTarget->RemoveAurasDueToSpell(itr->first);
+                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
+                            damage += spd * 0.26f;
                         }
+                        break;
                     }
-                    unitTarget->CastSpell(m_caster, 92795, true);
-                }
-                else if (m_spellInfo->Id == 86213)
-                {
-                     if (Aura * aur = m_caster->GetAura(86211))
+                    // Shadow Bite
+                    case 54049:
                     {
-                        aur->Remove();
-                        if (m_caster->m_BufferAuras.size() > 0)
-                            for (std::list<uint32>::const_iterator itr = m_caster->m_BufferAuras.begin(); itr != m_caster->m_BufferAuras.end(); ++itr)
-                                m_caster->AddAura((*itr), unitTarget);
+                        if (Unit* owner = m_caster->GetOwner())
+                        {
+                            float mod = 1.0f;
+                            Unit::AuraEffectList const& aurasPereodic = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
+                            for (Unit::AuraEffectList::const_iterator i = aurasPereodic.begin(); i !=  aurasPereodic.end(); ++i)
+                            {
+                                if ((*i)->GetCasterGUID() != m_caster->GetGUID())
+                                    continue;
+                                mod += 0.3f;
+                            }
 
-                        m_caster->m_BufferAuras.clear();
-                        m_caster->CastSpell(unitTarget, 92795, true);
-                         if (m_caster->HasAura(56226))
-                            m_caster->ToPlayer()->AddSpellCooldown(86121, 0, time(NULL) + 10);
+                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
+                            damage += spd * 0.614f * mod;
+                        }
+                        break;
                     }
-                }
-                // Rain of Fire - Aftermath
-                else if (m_spellInfo->Id == 42223)
-                {
-                    if (AuraEffect * auraeff = m_caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_WARLOCK, 11, 0))
+                    // Lash of Pain
+                    case 7814:
                     {
-                        int32 chance = auraeff->GetAmount();
-                        if (roll_chance_i(chance))
-                            m_caster->CastSpell(unitTarget, 85387, true);
+                        if (Unit* owner = m_caster->GetOwner())
+                        {
+                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
+                            damage += spd * 0.306f;
+                        }
+                        break;
                     }
-                }
-                // Seed of Corruption dmg
-                else if (m_spellInfo->Id == 27285)
-                {
-                    // Soul Burn
-                    if (m_caster->HasAura(86664))
-                        m_caster->AddAura(172, unitTarget);
+                    // Incinerate
+                    case 29722:
+                    {
+                        // Incinerate does more dmg (dmg/6) if the target have Immolate debuff.
+                        // Check aura state for speed but aura state set not only for Immolate spell
+                        if (unitTarget->HasAuraState(AURA_STATE_CONFLAGRATE))
+                        {
+                            if (unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x4, 0, 0))
+                                damage += damage / 6;
+                        }
+                        break;
+                    }
+                    // Conflagrate - consumes Immolate
+                    case 17962:
+                    {
+                        AuraEffect const* aura = NULL;                // found req. aura for damage calculation
+
+                        Unit::AuraEffectList const &mPeriodic = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
+                        for (Unit::AuraEffectList::const_iterator i = mPeriodic.begin(); i != mPeriodic.end(); ++i)
+                        {
+                            // for caster applied auras only
+                            if ((*i)->GetSpellInfo()->SpellFamilyName != SPELLFAMILY_WARLOCK ||
+                                (*i)->GetCasterGUID() != m_caster->GetGUID())
+                                continue;
+
+                            // Immolate
+                            if ((*i)->GetSpellInfo()->SpellFamilyFlags[0] & 0x4)
+                            {
+                                aura = *i;                      // it selected always if exist
+                                break;
+                            }
+                        }
+                        if (aura)
+                        {
+                            uint32 pdamage = aura->GetAmount() > 0 ? aura->GetAmount() : 0;
+                            pdamage = m_caster->SpellDamageBonusDone(unitTarget, aura->GetSpellInfo(), pdamage, DOT);
+                            pdamage = unitTarget->SpellDamageBonusTaken(m_caster, aura->GetSpellInfo(), pdamage, DOT);
+                            damage += pdamage * aura->GetTotalTicks() * 0.6f;
+                            apply_direct_bonus = false;
+                            break;
+                        }
+                        break;
+                    }
+                    // Soul Swap
+                    case 86121:
+                    {
+                        m_caster->CastSpell(m_caster, 86211, true);
+                        m_caster->m_BufferAuras.clear();
+                        m_caster->m_SoulSwapTarget = unitTarget;
+                        Unit::AuraApplicationMap const auraMap = unitTarget->GetAppliedAuras();
+                        if (auraMap.size() > 0)
+                        {
+                            for (Unit::AuraApplicationMap::const_iterator itr = auraMap.begin(); itr != auraMap.end(); ++itr)
+                            {
+                                // Check for caster
+                                if (itr->second->GetBase()->GetCaster() != m_caster)
+                                    continue;
+
+                                // Check for schoolmask
+                                if (!(itr->second->GetBase()->GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
+                                    continue;
+
+                                // Check for periodic effect
+                                bool bPeriodic = false;
+                                for (uint8 i = 0; i < 3; ++i)
+                                    if (AuraEffect* aurEff = itr->second->GetBase()->GetEffect(i))
+                                        if (aurEff->IsPeriodic())
+                                            bPeriodic = true;
+                                if (!bPeriodic)
+                                    continue;
+
+                                // All is done, add aura to buffer
+                                m_caster->m_BufferAuras.push_back(itr->first);
+                                if (!m_caster->HasAura(56226))
+                                    unitTarget->RemoveAurasDueToSpell(itr->first);
+                            }
+                        }
+                        unitTarget->CastSpell(m_caster, 92795, true);
+                        break;
+                    }
+                    case 86213:
+                    {
+                        if (Aura * aur = m_caster->GetAura(86211))
+                        {
+                            aur->Remove();
+                            if (m_caster->m_BufferAuras.size() > 0)
+                                for (std::list<uint32>::const_iterator itr = m_caster->m_BufferAuras.begin(); itr != m_caster->m_BufferAuras.end(); ++itr)
+                                    m_caster->AddAura((*itr), unitTarget);
+
+                            m_caster->m_BufferAuras.clear();
+                            m_caster->CastSpell(unitTarget, 92795, true);
+                            if (m_caster->HasAura(56226))
+                                m_caster->ToPlayer()->AddSpellCooldown(86121, 0, time(NULL) + 10);
+                        }
+                        break;
+                    }
+                    // Rain of Fire - Aftermath
+                    case 42223:
+                    {
+                        if (AuraEffect * auraeff = m_caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_WARLOCK, 11, 0))
+                        {
+                            int32 chance = auraeff->GetAmount();
+                            if (roll_chance_i(chance))
+                                m_caster->CastSpell(unitTarget, 85387, true);
+                        }
+                        break;
+                    }
+                    // Seed of Corruption dmg
+                    case 27285:
+                    {
+                        // Soul Burn
+                        if (m_caster->HasAura(86664))
+                            m_caster->AddAura(172, unitTarget);
+                        break;
+                    }
                 }
                 break;
             }
@@ -4204,6 +4262,29 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             }
             break;
         }
+        case SPELLFAMILY_WARLOCK:
+        {
+            switch (m_spellInfo->Id)
+            {
+                // Fel Storm
+                case 89753:
+                    if (Unit* owner = m_caster->GetOwner())
+                    {
+                        int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
+                        fixed_bonus += spd * 0.33f;
+                    }
+                    break;
+                // Legion Strike
+                case 30213:
+                    if (Unit* owner = m_caster->GetOwner())
+                    {
+                        int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
+                        fixed_bonus += spd * 0.264f;
+                    }
+                    break;
+            }
+            break;
+        }
         case SPELLFAMILY_PALADIN:
         {
             // Templar's Verdict
@@ -4563,6 +4644,17 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     uint32 damage = m_caster->MeleeDamageBonusDone(unitTarget, eff_damage, m_attackType, m_spellInfo);
 
     m_damage += unitTarget->MeleeDamageBonusTaken(m_caster, damage, m_attackType, m_spellInfo);
+
+    // Legion Strike
+    if (m_spellInfo->Id == 30213)
+    {
+        uint32 count = 0;
+        for (std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+            if (ihit->effectMask & (1<<effIndex))
+                ++count;
+
+        m_damage /= count;
+    }
 }
 
 void Spell::EffectThreat(SpellEffIndex /*effIndex*/)

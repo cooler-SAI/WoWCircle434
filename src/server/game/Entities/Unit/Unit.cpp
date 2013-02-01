@@ -1512,12 +1512,11 @@ uint32 Unit::CalcArmorReducedDamage(Unit* victim, const uint32 damage, SpellInfo
     if (armor < 0.0f)
         armor = 0.0f;
 
-    float levelModifier = getLevel();
-    if (levelModifier > 59)
-        levelModifier = levelModifier + (4.5f * (levelModifier - 59));
-
-    float tmpvalue = 0.1f * armor / (8.5f * levelModifier + 40);
-    tmpvalue = tmpvalue / (1.0f + tmpvalue);
+    float tmpvalue = armor / (armor + 85.0f * getLevel() + 400.0f);
+    if (getLevel() > 59)
+        tmpvalue = armor / (armor + 467.5f * getLevel() - 22167.5f);
+    if (getLevel() > 80)
+        tmpvalue = armor / (armor + 2167.5f * getLevel() - 158167.5f);
 
     if (tmpvalue < 0.0f)
         tmpvalue = 0.0f;
@@ -2108,12 +2107,6 @@ uint32 Unit::CalculateDamage(WeaponAttackType attType, bool normalized, bool add
     }
 
     float DoneTotalMod = 1.0f;
-
-    // Master Demonologist (Warlock Demonology Mastery)
-    if (GetTypeId() == TYPEID_UNIT && this->ToCreature()->isPet())
-        if (Unit* owner = GetOwner())
-            if (Aura* masterDemonologist = owner->GetAura(77219))
-                DoneTotalMod *= float(masterDemonologist->GetEffect(0)->GetAmount() + 100.0f) / 100.0f;
 
     min_damage *= DoneTotalMod;
     max_damage *= DoneTotalMod;
@@ -11437,16 +11430,6 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
         float manaPct = float(GetPower(POWER_MANA)) / float(GetMaxPower(POWER_MANA)) * 100.0f;
         float bonusDmg = manaPct * manaAdept->GetAmount() / 100.0f;
         AddPct(DoneTotalMod, bonusDmg);
-    }
-
-    // Master Demonologist (Mastery Demonology Warlock)
-    if (GetTypeId() == TYPEID_UNIT && ToCreature()->isPet())
-    {
-        if (Unit* owner = GetOwner())
-        {
-            if (AuraEffect const* _effect = owner->GetAuraEffect(77219, EFFECT_0))
-                AddPct(DoneTotalMod, _effect->GetAmount());
-        }
     }
 
     // Done fixed damage bonus auras
