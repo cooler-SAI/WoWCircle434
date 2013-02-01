@@ -613,6 +613,13 @@ class spell_dru_starfall_aoe : public SpellScriptLoader
             void FilterTargets(std::list<WorldObject*>& targets)
             {
                 targets.remove(GetExplTargetUnit());
+                for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); )
+                {
+                    if (!(*itr)->ToUnit()->IsHostileTo(GetCaster()))
+                        itr = targets.erase(itr);
+                    else
+                        ++itr;
+                }
             }
 
             void Register()
@@ -631,15 +638,9 @@ class spell_dru_starfall_dummy : public SpellScriptLoader
 {
     public:
         spell_dru_starfall_dummy() : SpellScriptLoader("spell_dru_starfall_dummy") { }
-
         class spell_dru_starfall_dummy_SpellScript : public SpellScript
         {
             PrepareSpellScript(spell_dru_starfall_dummy_SpellScript);
-
-            void FilterTargets(std::list<WorldObject*>& targets)
-            {
-                Trinity::Containers::RandomResizeList(targets, 2);
-            }
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
@@ -661,7 +662,6 @@ class spell_dru_starfall_dummy : public SpellScriptLoader
 
             void Register()
             {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dru_starfall_dummy_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
                 OnEffectHitTarget += SpellEffectFn(spell_dru_starfall_dummy_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
         };
