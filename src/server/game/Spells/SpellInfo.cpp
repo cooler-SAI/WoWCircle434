@@ -2892,6 +2892,7 @@ bool SpellInfo::_IsNeedDelay() const
         case 63536: // Slag Imbued (Ignis, Ulduar)
         case 70802: // Mayhem (Rogue)
         case 70157: // Ice Tomb (Sindragosa, ICC)
+        case 79128: // Improved Expose Armor
             return true;
     }
 
