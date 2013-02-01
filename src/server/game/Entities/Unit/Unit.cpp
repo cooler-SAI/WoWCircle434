@@ -9566,7 +9566,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
         case 81274:
         case 81275:
         {
-            basepoints0 = damage * triggerAmount / 100 / 8;
+            basepoints0 = int32(CalculatePct(damage, triggerAmount));
             target = victim;
             trigger_spell_id = 81262;
             break;
