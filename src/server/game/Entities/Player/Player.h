@@ -174,28 +174,29 @@ struct armorSpecializationInfo
     uint32 spellId;
     uint8 Class;
     uint16 Tree;
+    uint8 Form;
 };
 
 const armorSpecializationInfo ArmorSpecializationTree[MAX_ARMOR_SPECIALIZATION_SPELLS] =
 {
-    { 86537, CLASS_DEATH_KNIGHT, TALENT_TREE_DEATH_KNIGHT_BLOOD  }, // blood
-    { 86113, CLASS_DEATH_KNIGHT, TALENT_TREE_DEATH_KNIGHT_FROST  }, // frost
-    { 86536, CLASS_DEATH_KNIGHT, TALENT_TREE_DEATH_KNIGHT_UNHOLY }, // unholy
-    { 86093, CLASS_DRUID, TALENT_TREE_DRUID_BALANCE              }, // balance
-    { 86096, CLASS_DRUID, TALENT_TREE_DRUID_FERAL_COMBAT         }, // feral (bear)
-    { 86097, CLASS_DRUID, TALENT_TREE_DRUID_FERAL_COMBAT         }, // feral (cat)
-    { 86104, CLASS_DRUID, TALENT_TREE_DRUID_RESTORATION          }, // restor
-    { 86538, CLASS_HUNTER, 0                                     }, // all
-    { 86103, CLASS_PALADIN, TALENT_TREE_PALADIN_HOLY             }, // holy
-    { 86102, CLASS_PALADIN, TALENT_TREE_PALADIN_PROTECTION       }, // prot
-    { 86539, CLASS_PALADIN, TALENT_TREE_PALADIN_RETRIBUTION      }, // retro
-    { 86092, CLASS_ROGUE, 0                                      }, // all
-    { 86100, CLASS_SHAMAN, TALENT_TREE_SHAMAN_ELEMENTAL          }, // elem
-    { 86099, CLASS_SHAMAN, TALENT_TREE_SHAMAN_ENHANCEMENT        }, // ench
-    { 86108, CLASS_SHAMAN, TALENT_TREE_SHAMAN_RESTORATION        }, // restor
-    { 86101, CLASS_WARRIOR, TALENT_TREE_WARRIOR_ARMS             }, // arms
-    { 86110, CLASS_WARRIOR, TALENT_TREE_WARRIOR_FURY             }, // fury
-    { 86535, CLASS_WARRIOR, TALENT_TREE_WARRIOR_PROTECTION       }, // prot
+    { 86537, CLASS_DEATH_KNIGHT, TALENT_TREE_DEATH_KNIGHT_BLOOD  , 0}, // blood
+    { 86113, CLASS_DEATH_KNIGHT, TALENT_TREE_DEATH_KNIGHT_FROST  , 0}, // frost
+    { 86536, CLASS_DEATH_KNIGHT, TALENT_TREE_DEATH_KNIGHT_UNHOLY , 0}, // unholy
+    { 86093, CLASS_DRUID, TALENT_TREE_DRUID_BALANCE              , 0}, // balance
+    { 86096, CLASS_DRUID, TALENT_TREE_DRUID_FERAL_COMBAT         , FORM_BEAR}, // feral (bear)
+    { 86097, CLASS_DRUID, TALENT_TREE_DRUID_FERAL_COMBAT         , FORM_CAT}, // feral (cat)
+    { 86104, CLASS_DRUID, TALENT_TREE_DRUID_RESTORATION          , 0}, // restor
+    { 86538, CLASS_HUNTER, 0                                     , 0}, // all
+    { 86103, CLASS_PALADIN, TALENT_TREE_PALADIN_HOLY             , 0}, // holy
+    { 86102, CLASS_PALADIN, TALENT_TREE_PALADIN_PROTECTION       , 0}, // prot
+    { 86539, CLASS_PALADIN, TALENT_TREE_PALADIN_RETRIBUTION      , 0}, // retro
+    { 86092, CLASS_ROGUE, 0                                      , 0}, // all
+    { 86100, CLASS_SHAMAN, TALENT_TREE_SHAMAN_ELEMENTAL          , 0}, // elem
+    { 86099, CLASS_SHAMAN, TALENT_TREE_SHAMAN_ENHANCEMENT        , 0}, // ench
+    { 86108, CLASS_SHAMAN, TALENT_TREE_SHAMAN_RESTORATION        , 0}, // restor
+    { 86101, CLASS_WARRIOR, TALENT_TREE_WARRIOR_ARMS             , 0}, // arms
+    { 86110, CLASS_WARRIOR, TALENT_TREE_WARRIOR_FURY             , 0}, // fury
+    { 86535, CLASS_WARRIOR, TALENT_TREE_WARRIOR_PROTECTION       , 0}, // prot
 };
 
 

@@ -10355,23 +10355,10 @@ void Player::UpdateArmorSpecializations(uint8 Slot)
 
         RemoveAurasDueToSpell(spellId);
 
-        if (GetPrimaryTalentTree(GetActiveSpec()) == TALENT_TREE_DRUID_FERAL_COMBAT)
-        {
-            switch (GetShapeshiftForm())
-            {
-                case FORM_CAT:
-                    spellId = 86097;
-                    break;
-                case FORM_BEAR:
-                    spellId = 86096;
-                    break;
-                default:
-                    break;
-            }
-        }
 
         if (!ArmorSpecializationTree[i].Tree && GetPrimaryTalentTree(GetActiveSpec()) == 0 ||
-            ArmorSpecializationTree[i].Tree && ArmorSpecializationTree[i].Tree != GetPrimaryTalentTree(GetActiveSpec()))
+            ArmorSpecializationTree[i].Tree && ArmorSpecializationTree[i].Tree != GetPrimaryTalentTree(GetActiveSpec()) ||
+            ArmorSpecializationTree[i].Form && this->GetShapeshiftForm() != ArmorSpecializationTree[i].Form)
             continue;
 
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
