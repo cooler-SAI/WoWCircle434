@@ -4077,6 +4077,20 @@ void Spell::finish(bool ok)
 
     switch (m_spellInfo->Id)
     {
+        // Smack, Claw, Bite
+        case 49966:
+        case 16827:
+        case 17253:
+            if (Unit* owner = m_caster->GetOwner())
+            {
+                // Remove Cobra Strikes 
+                owner->RemoveAuraFromStack(53257);
+
+                // Remove Sic 'em!
+                owner->RemoveAurasDueToSpell(83359);
+                owner->RemoveAurasDueToSpell(89388);
+            }
+            break;
         case 30455: // Ice Lance
         case 44572: // Deep Freeze
             m_caster->RemoveAuraFromStack(44544);
@@ -5892,6 +5906,23 @@ SpellCastResult Spell::CheckCast(bool strict)
     {
         switch (m_spellInfo->Effects[i].ApplyAuraName)
         {
+            case SPELL_AURA_MOD_RANGED_HASTE:
+            {
+                // Focus Fire
+                if (m_spellInfo->Id == 82692)
+                {
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return SPELL_FAILED_CASTER_AURASTATE;
+                    
+                    Pet* pet = m_caster->ToPlayer()->GetPet();
+                    if (!pet)
+                        return SPELL_FAILED_CASTER_AURASTATE;
+
+                    if (!pet->HasAura(19615))
+                        return SPELL_FAILED_CASTER_AURASTATE;
+                }
+                break;
+            }
             case SPELL_AURA_MOD_POSSESS_PET:
             {
                 if (m_caster->GetTypeId() != TYPEID_PLAYER)

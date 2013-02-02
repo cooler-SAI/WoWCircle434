@@ -511,6 +511,23 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
     // custom amount calculations go here
     switch (GetAuraType())
     {
+        case SPELL_AURA_MOD_RANGED_HASTE:
+        {
+            // Focus Fire
+            if (m_spellInfo->Id == 82692)
+                if (caster && caster->GetTypeId() == TYPEID_PLAYER)
+                    if (Pet* pet = caster->ToPlayer()->GetPet())
+                    {
+                        if (Aura* aur = pet->GetAura(19615))
+                        {
+                            amount = aur->GetStackAmount() * 3;
+                            int32 addFocus = aur->GetStackAmount() * 4;
+                            caster->CastCustomSpell(pet, 83468, &addFocus, 0, 0, true);
+                            pet->RemoveAurasDueToSpell(19615);
+                        }
+                    }
+            break;
+        }
         case SPELL_AURA_BYPASS_ARMOR_FOR_CASTER:
         {
             if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR) // Colossus Smash

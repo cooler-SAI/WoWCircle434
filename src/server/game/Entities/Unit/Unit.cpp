@@ -9293,6 +9293,13 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Tamed Pet Passive 07 (DND)
+        case 20784:
+            if (Aura* aur = GetAura(trigger_spell_id))
+                if (aur->GetStackAmount() >= 4)
+                    if (Unit* owner = GetOwner())
+                        owner->CastSpell(owner, 88843, true);
+            break;
         // Impact
         case 11103:
         case 12355:

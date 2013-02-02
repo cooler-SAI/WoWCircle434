@@ -5933,6 +5933,14 @@ void SpellMgr::LoadDbcDataCorrections()
             case 31789:
                 spellInfo->Effects[1].TargetA = TARGET_UNIT_TARGET_ALLY;
                 break;
+            // Tamed Pet Passive 07 (DND)
+            case 20784:
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE;
+                break;
+            // Focus Fire mark
+            case 88843:
+                spellInfo->SetDurationIndex(1); // 10 seconds
+                break;
             default:
                 break;
         }
