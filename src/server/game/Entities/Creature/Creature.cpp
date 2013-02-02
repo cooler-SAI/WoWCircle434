@@ -683,12 +683,7 @@ void Creature::RegenerateHealth()
     if (GetCharmerOrOwnerGUID())
     {
         float HealthIncreaseRate = sWorld->getRate(RATE_HEALTH);
-        float Spirit = GetStat(STAT_SPIRIT);
-
-        if (GetPower(POWER_MANA) > 0)
-            addvalue = uint32(Spirit * 0.25 * HealthIncreaseRate);
-        else
-            addvalue = uint32(Spirit * 0.80 * HealthIncreaseRate);
+        addvalue = uint32(maxValue * 0.03 * HealthIncreaseRate);
     }
     else
         addvalue = maxValue/3;

@@ -310,7 +310,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint32 spellid
                     pet->AttackStop();
 
                 case REACT_DEFENSIVE:                       //recovery
-                case REACT_AGGRESSIVE:                      //activete
+                case REACT_ASSIST:
                     if (pet->GetTypeId() == TYPEID_UNIT)
                         pet->ToCreature()->SetReactState(ReactStates(spellid));
                     break;
@@ -535,7 +535,6 @@ void WorldSession::HandlePetSetAction(WorldPacket & recvData)
 
     uint32 position[2];
     uint32 data[2];
-    bool move_command = false;
 
     for (uint8 i = 0; i < count; ++i)
     {
@@ -547,41 +546,6 @@ void WorldSession::HandlePetSetAction(WorldPacket & recvData)
         //ignore invalid position
         if (position[i] >= MAX_UNIT_ACTION_BAR_INDEX)
             return;
-
-        // in the normal case, command and reaction buttons can only be moved, not removed
-        // at moving count == 2, at removing count == 1
-        // ignore attempt to remove command|reaction buttons (not possible at normal case)
-        if (act_state == ACT_COMMAND || act_state == ACT_REACTION)
-        {
-            if (count == 1)
-                return;
-
-            move_command = true;
-        }
-    }
-
-    // check swap (at command->spell swap client remove spell first in another packet, so check only command move correctness)
-    if (move_command)
-    {
-        uint8 act_state_0 = UNIT_ACTION_BUTTON_TYPE(data[0]);
-        if (act_state_0 == ACT_COMMAND || act_state_0 == ACT_REACTION)
-        {
-            uint32 spell_id_0 = UNIT_ACTION_BUTTON_ACTION(data[0]);
-            UnitActionBarEntry const* actionEntry_1 = charmInfo->GetActionBarEntry(position[1]);
-            if (!actionEntry_1 || spell_id_0 != actionEntry_1->GetAction() ||
-                act_state_0 != actionEntry_1->GetType())
-                return;
-        }
-
-        uint8 act_state_1 = UNIT_ACTION_BUTTON_TYPE(data[1]);
-        if (act_state_1 == ACT_COMMAND || act_state_1 == ACT_REACTION)
-        {
-            uint32 spell_id_1 = UNIT_ACTION_BUTTON_ACTION(data[1]);
-            UnitActionBarEntry const* actionEntry_0 = charmInfo->GetActionBarEntry(position[0]);
-            if (!actionEntry_0 || spell_id_1 != actionEntry_0->GetAction() ||
-                act_state_1 != actionEntry_0->GetType())
-                return;
-        }
     }
 
     for (uint8 i = 0; i < count; ++i)

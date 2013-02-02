@@ -366,7 +366,7 @@ void PetAI::OwnerAttacked(Unit* target)
         return;
 
     // Passive pets don't do anything
-    if (me->HasReactState(REACT_PASSIVE))
+    if (!me->HasReactState(REACT_ASSIST))
         return;
 
     // Prevent pet from disengaging from current target
