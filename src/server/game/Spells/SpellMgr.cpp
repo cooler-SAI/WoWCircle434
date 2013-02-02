@@ -149,6 +149,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Faerie Fire
             else if (spellproto->SpellFamilyFlags[0] & 0x400)
                 return DIMINISHING_LIMITONLY;
+            // Solar Beam
+            else if (spellproto->Id == 81261)
+                return DIMINISHING_LIMITONLY;
             break;
         }
         case SPELLFAMILY_ROGUE:
