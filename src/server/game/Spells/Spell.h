@@ -495,6 +495,20 @@ class Spell
 
         void SetPeriodicDamageModifier(float newModifier) { m_periodicDamageModifier = newModifier; }
 
+        struct TargetInfo
+        {
+            uint64 targetGUID;
+            uint64 timeDelay;
+            SpellMissInfo missCondition:8;
+            SpellMissInfo reflectResult:8;
+            uint8  effectMask:8;
+            bool   processed:1;
+            bool   alive:1;
+            bool   crit:1;
+            bool   scaleAura:1;
+            int32  damage;
+        };
+        const std::list<TargetInfo> &GetUniqueTargets() { return m_UniqueTargetInfo; }
     protected:
         bool HasGlobalCooldown() const;
         void TriggerGlobalCooldown();
@@ -582,19 +596,6 @@ class Spell
         // Spell target subsystem
         // *****************************************
         // Targets store structures and data
-        struct TargetInfo
-        {
-            uint64 targetGUID;
-            uint64 timeDelay;
-            SpellMissInfo missCondition:8;
-            SpellMissInfo reflectResult:8;
-            uint8  effectMask:8;
-            bool   processed:1;
-            bool   alive:1;
-            bool   crit:1;
-            bool   scaleAura:1;
-            int32  damage;
-        };
         std::list<TargetInfo> m_UniqueTargetInfo;
         uint8 m_channelTargetEffectMask;                        // Mask req. alive targets
 

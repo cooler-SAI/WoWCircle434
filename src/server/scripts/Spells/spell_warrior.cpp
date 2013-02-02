@@ -322,6 +322,34 @@ class spell_warr_bloodthirst_heal : public SpellScriptLoader
         }
 };
 
+class spell_warr_whirlwind: public SpellScriptLoader
+{
+    public:
+        spell_warr_whirlwind(): SpellScriptLoader("spell_warr_whirlwind") { }
+
+    class spell_warr_whirlwind_SpellScript: public SpellScript
+    {
+        PrepareSpellScript(spell_warr_whirlwind_SpellScript);
+
+        void SelectTargets()
+        {
+
+            if (GetCaster()->GetTypeId() == TYPEID_PLAYER && GetSpell()->GetUniqueTargets().size() > 4)
+                GetCaster()->ToPlayer()->SpellCooldownReduction(GetSpellInfo()->Id, 4000);
+        }
+
+        void Register()
+        {
+            AfterCast += SpellCastFn(spell_warr_whirlwind_SpellScript::SelectTargets);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_warr_whirlwind_SpellScript();
+    }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_last_stand();
@@ -331,4 +359,5 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_concussion_blow();
     new spell_warr_bloodthirst();
     new spell_warr_bloodthirst_heal();
+    new spell_warr_whirlwind();
 }
