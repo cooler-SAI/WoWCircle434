@@ -821,19 +821,19 @@ void WorldSession::HandleGuildRewardsQueryOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildQueryNewsOpcode(WorldPacket& recvPacket)
 {
-    recvPacket.read_skip<uint32>();
+    /*recvPacket.read_skip<uint32>();
 
     if (Guild* guild = sGuildMgr->GetGuildById(_player->GetGuildId()))
     {
         WorldPacket data;
         guild->GetNewsLog().BuildNewsData(data);
         SendPacket(&data);
-    }
+    }*/
 }
 
 void WorldSession::HandleGuildNewsUpdateStickyOpcode(WorldPacket& recvPacket)
 {
-    uint32 newsId;
+    /*uint32 newsId;
     bool sticky;
     ObjectGuid guid;
 
@@ -875,7 +875,7 @@ void WorldSession::HandleGuildNewsUpdateStickyOpcode(WorldPacket& recvPacket)
             guild->GetNewsLog().BuildNewsData(newsId, *newsEntry, data);
             SendPacket(&data);
         }
-    }
+    }*/
 }
 
 void WorldSession::HandleGuildSetGuildMaster(WorldPacket& recvPacket)	
