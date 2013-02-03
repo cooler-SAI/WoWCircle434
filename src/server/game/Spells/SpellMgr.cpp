@@ -5944,6 +5944,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 88843:
                 spellInfo->SetDurationIndex(1); // 10 seconds
                 break;
+            // Prayer of Mending
+            case 33110:
+                spellInfo->AttributesEx3 &= ~SPELL_ATTR3_CANT_TRIGGER_PROC;
+                break;
             default:
                 break;
         }
