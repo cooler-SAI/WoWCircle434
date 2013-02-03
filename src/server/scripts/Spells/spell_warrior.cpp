@@ -210,7 +210,14 @@ class spell_warr_slam : public SpellScriptLoader
             {
                 int32 bp0 = GetEffectValue();
                 if (GetHitUnit())
+                {
                     GetCaster()->CastCustomSpell(GetHitUnit(), SPELL_SLAM, &bp0, NULL, NULL, true, 0);
+
+                    // Single-Minded Fury
+                    if (AuraEffect * auraeff = GetCaster()->GetAuraEffect(81099, 0))
+                        if (auraeff->GetAmount())
+                            GetCaster()->CastCustomSpell(GetHitUnit(), 81101, &bp0, NULL, NULL, true, 0);
+                }
             }
 
             void Register()
