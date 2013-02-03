@@ -1,3 +1,11 @@
+
+--
+-- Table structure for table `account_data`
+--
+
+ALTER TABLE `account_data`
+    CHANGE COLUMN `account` `accountId` INT(10) UNSIGNED NOT NULL DEFAULT '0' FIRST;
+
 --
 -- Table structure for table `account_tutorial`
 --
@@ -18,6 +26,34 @@ CREATE TABLE `account_tutorial` (
   PRIMARY KEY (`accountId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `characters`    
+--
+    
+ALTER TABLE `characters`
+    ADD COLUMN `slot` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `name`,
+    CHANGE COLUMN `map` `map` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Map Identifier' AFTER `position_z`,
+    ADD COLUMN `talentTree` VARCHAR(10) NOT NULL DEFAULT '0 0' AFTER `resettalents_time`,
+    DROP COLUMN `power6`,
+    DROP COLUMN `power7`,
+    DROP COLUMN `power8`,
+    DROP COLUMN `power9`,
+    DROP COLUMN `power10`,
+    DROP COLUMN `ammoId`,
+    ADD COLUMN `grantableLevels` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `actionBars`,
+    CHANGE COLUMN `petSlotUsed` `petSlotUsed` INT(10) UNSIGNED NULL DEFAULT NULL AFTER `currentPetSlot`;
+
+--
+-- Table structure for table `character_achievement`
+--
+
+ALTER TABLE `character_achievement`
+    CHANGE COLUMN `achievement` `achievement` SMALLINT(5) UNSIGNED NOT NULL AFTER `guid`;
+
+--
+-- Table structure for table `character_arena_stats`
+--
 
 ALTER TABLE `character_arena_stats` DROP COLUMN `personalRating`;
 
@@ -49,50 +85,52 @@ CREATE TABLE `character_cuf_profiles` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `account_data`
+-- Table structure for table `character_currency`
 --
 
-ALTER TABLE `account_data`
-	CHANGE COLUMN `account` `accountId` INT(10) UNSIGNED NOT NULL DEFAULT '0' FIRST;
+ALTER TABLE `character_currency`
+    CHANGE COLUMN `count` `total_count` INT(11) UNSIGNED NOT NULL AFTER `currency`,
+    CHANGE COLUMN `thisweek` `week_count` INT(11) UNSIGNED NOT NULL AFTER `total_count`,
+    ADD COLUMN `season_count` INT(11) UNSIGNED NOT NULL DEFAULT '0' AFTER `week_count`;
 
 --
--- Table structure for table `account_achievement`
---	
+-- Table structure for table `character_currency_cap`
+--
 
-ALTER TABLE `character_achievement`
-	CHANGE COLUMN `achievement` `achievement` SMALLINT(5) UNSIGNED NOT NULL AFTER `guid`;
-	
+DROP TABLE IF EXISTS `character_currency_cap`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `character_currency_cap` (
+  `guid` int(10) NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
+  `highestArenaRating` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Highest rating of all arena brakets',
+  `highestRBgRating` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Highest rating in rated battleground',
+  `currentArenaCap` smallint(5) unsigned NOT NULL DEFAULT '1350' COMMENT 'Week cap',
+  `currentRBgCap` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Battleground week cap',
+  `requireReset` tinyint(3) NOT NULL DEFAULT '0' COMMENT 'Need reset once a week',
+  PRIMARY KEY (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 --
 -- Table structure for table `character_equipmentsets`
 --
 
 ALTER TABLE `character_equipmentsets`
-	ADD COLUMN `ignore_mask` INT(11) UNSIGNED NOT NULL DEFAULT '0' AFTER `iconname`;
-
---
--- Table structure for table `character_homebind`
---
-
-ALTER TABLE `character_homebind`
-	CHANGE COLUMN `map` `mapId` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Map Identifier' AFTER `guid`,
-	CHANGE COLUMN `zone` `zoneId` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Zone Identifier' AFTER `mapId`,
-	CHANGE COLUMN `position_x` `posX` FLOAT NOT NULL DEFAULT '0' AFTER `zoneId`,
-	CHANGE COLUMN `position_y` `posY` FLOAT NOT NULL DEFAULT '0' AFTER `posX`,
-	CHANGE COLUMN `position_z` `posZ` FLOAT NOT NULL DEFAULT '0' AFTER `posY`;
+    ADD COLUMN `ignore_mask` INT(11) UNSIGNED NOT NULL DEFAULT '0' AFTER `iconname`;
 
 --
 -- Table structure for table `character_pet`
 --
 
 ALTER TABLE `character_pet` 
-	DROP COLUMN `curhappiness`;
+    DROP COLUMN `curhappiness`;
 
 --
 -- Table structure for table `character_queststatus`
 --
 
 ALTER TABLE `character_queststatus` 
-	ADD COLUMN `playerCount` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' AFTER `itemcount4`;
+    ADD COLUMN `playerCount` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' AFTER `itemcount4`;
 
 --
 -- Table structure for table `character_queststatus_seasonal`
@@ -115,17 +153,17 @@ CREATE TABLE `character_queststatus_seasonal` (
 --
 
 ALTER TABLE `character_stats`
-	ADD COLUMN `resilience` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `spellPower`,
-	DROP COLUMN `maxpower6`,
-	DROP COLUMN `maxpower7`,
-	DROP COLUMN `maxpower8`,
-	DROP COLUMN `maxpower9`,
-	DROP COLUMN `maxpower10`;
+    ADD COLUMN `resilience` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `spellPower`,
+    DROP COLUMN `maxpower6`,
+    DROP COLUMN `maxpower7`,
+    DROP COLUMN `maxpower8`,
+    DROP COLUMN `maxpower9`,
+    DROP COLUMN `maxpower10`;
 
 --
 -- Table structure for table `character_void_storage`
 --
-	
+
 DROP TABLE IF EXISTS `character_void_storage`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -144,114 +182,101 @@ CREATE TABLE `character_void_storage` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `characters`	
---
-	
-ALTER TABLE `characters`
-	ADD COLUMN `slot` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `name`,
-	ADD COLUMN `talentTree` VARCHAR(10) NOT NULL DEFAULT '0 0' AFTER `resettalents_time`,
-	ADD COLUMN `grantableLevels` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `actionBars`,
-	ADD COLUMN `guildId` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `grantableLevels`,
-	CHANGE COLUMN `map` `map` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Map Identifier' AFTER `position_z`,
-	DROP COLUMN `power6`,
-	DROP COLUMN `power7`,
-	DROP COLUMN `power8`,
-	DROP COLUMN `power9`,
-	DROP COLUMN `power10`,
-	DROP COLUMN `ammoId`,
-	DROP COLUMN `currentPetSlot`,
-	DROP COLUMN `petSlotUsed`;
-
---
 -- Table structure for table `corpse`
 --
-	
+
 ALTER TABLE `corpse`
-	DROP COLUMN `guildId`;
-	
+    DROP COLUMN `guildId`;
+
 --
 -- Table structure for table `creature_respawn`
---	
+--
 
 ALTER TABLE `creature_respawn`
-	ADD COLUMN `mapId` SMALLINT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `respawnTime`;
+    ADD COLUMN `mapId` SMALLINT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `respawnTime`;
+
+--
+-- Table structure for table `currency_reset_save`
+--
+
+
+DROP TABLE IF EXISTS `currency_reset_save`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE IF NOT EXISTS `currency_reset_save` (
+  `id` tinyint(3) NOT NULL,
+  `lastguid` int(10) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `gameobject_respawn`
 --
 
 ALTER TABLE `gameobject_respawn`
-	ADD COLUMN `mapId` SMALLINT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `respawnTime`;
+    ADD COLUMN `mapId` SMALLINT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `respawnTime`;
 
 --
 -- Table structure for table `game_event_condition_save`
 --
-	
+    
 ALTER TABLE `game_event_condition_save`
-	CHANGE COLUMN `event_id` `eventEntry` SMALLINT(5) UNSIGNED NOT NULL FIRST;
+    CHANGE COLUMN `event_id` `eventEntry` SMALLINT(5) UNSIGNED NOT NULL FIRST;
 
 --
 -- Table structure for table `game_event_save`
 --
-	
+
 ALTER TABLE `game_event_save`
-	CHANGE COLUMN `event_id` `eventEntry` MEDIUMINT(8) UNSIGNED NOT NULL FIRST;
+    CHANGE COLUMN `event_id` `eventEntry` MEDIUMINT(8) UNSIGNED NOT NULL FIRST;
 
 --
 -- Table structure for table `gm_surveys`
 --
 
 ALTER TABLE `gm_surveys`
-	CHANGE COLUMN `player` `guid` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `surveyid`,
-	CHANGE COLUMN `overall_comment` `overallComment` LONGTEXT NOT NULL AFTER `mainSurvey`,
-	CHANGE COLUMN `timestamp` `createTime` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `overallComment`;
-	
+    CHANGE COLUMN `player` `guid` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `surveyid`,
+    CHANGE COLUMN `overall_comment` `overallComment` LONGTEXT NOT NULL AFTER `mainSurvey`,
+    CHANGE COLUMN `timestamp` `createTime` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `overallComment`;
 
 --
 -- Table structure for table `gm_tickets`
 --
-	
+    
 ALTER TABLE `gm_tickets`
-	CHANGE COLUMN `guid` `ticketId` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT FIRST,
-	CHANGE COLUMN `playerGuid` `guid` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `ticketId`,
-	CHANGE COLUMN `map` `mapId` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' AFTER `createtime`,
-	CHANGE COLUMN `timestamp` `lastModifiedTime` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `posZ`,
-	CHANGE COLUMN `closed` `closedBy` INT(11) NOT NULL DEFAULT '0' AFTER `lastModifiedTime`,
-	ADD COLUMN `response` TEXT NOT NULL AFTER `comment`,
-	ADD COLUMN `haveTicket` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `viewed`;
-
---
--- Table structure for table `character_currency`
---
-	
-ALTER TABLE `character_currency`
-	CHANGE COLUMN `count` `total_count` INT(11) UNSIGNED NOT NULL AFTER `currency`,
-	CHANGE COLUMN `thisweek` `week_count` INT(11) UNSIGNED NOT NULL AFTER `total_count`;
+    CHANGE COLUMN `guid` `ticketId` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT FIRST,
+    CHANGE COLUMN `playerGuid` `guid` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `ticketId`,
+    CHANGE COLUMN `map` `mapId` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' AFTER `createtime`,
+    CHANGE COLUMN `timestamp` `lastModifiedTime` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `posZ`,
+    CHANGE COLUMN `closed` `closedBy` INT(11) NOT NULL DEFAULT '0' AFTER `lastModifiedTime`,
+    ADD COLUMN `response` TEXT NOT NULL AFTER `comment`,
+    ADD COLUMN `haveTicket` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `viewed`;
 
 --
 -- Table structure for table `guild`
 --
-	
+    
 ALTER TABLE `guild`
-	CHANGE COLUMN `level` `level` INT(10) UNSIGNED NOT NULL DEFAULT '1' AFTER `BankMoney`,
-	CHANGE COLUMN `xp` `experience` BIGINT(20) UNSIGNED NOT NULL AFTER `level`,
-	CHANGE COLUMN `day_xp` `todayExperience` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' AFTER `experience`;
+    CHANGE COLUMN `level` `level` INT(10) UNSIGNED NOT NULL DEFAULT '1' AFTER `BankMoney`,
+    CHANGE COLUMN `xp` `experience` BIGINT(20) UNSIGNED NOT NULL AFTER `level`,
+    CHANGE COLUMN `day_xp` `todayExperience` BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' AFTER `experience`;
 
 --
 -- Table structure for table `guild_achievement`
 --
-	
+    
 ALTER TABLE `guild_achievement`
-	CHANGE COLUMN `achievement` `achievement` SMALLINT(5) UNSIGNED NOT NULL AFTER `guildid`,
-	ADD COLUMN `guids` TEXT NOT NULL AFTER `date`;	
+    CHANGE COLUMN `achievement` `achievement` SMALLINT(5) UNSIGNED NOT NULL AFTER `guildid`,
+    ADD COLUMN `guids` TEXT NOT NULL AFTER `date`;    
 
 --
 -- Table structure for table `guild_achievement_progress`
 --
-	
+    
 ALTER TABLE `guild_achievement_progress`
-	ADD COLUMN `completedGuid` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `date`;
-	
+    ADD COLUMN `completedGuid` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `date`;
+
 --
 -- Table structure for table `guild_finder_applicant`
 --
@@ -314,13 +339,13 @@ CREATE TABLE `guild_news_log` (
 --
 
 ALTER TABLE `lag_reports`
-	CHANGE COLUMN `report_id` `reportId` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT FIRST,
-	CHANGE COLUMN `player` `guid` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `reportId`,
-	CHANGE COLUMN `lag_type` `lagtype` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `guid`,
-	CHANGE COLUMN `map` `mapId` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' AFTER `lagtype`,
-	ADD COLUMN `latency` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `posZ`,
-	ADD COLUMN `createTime` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `latency`;
-	
+    CHANGE COLUMN `report_id` `reportId` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT FIRST,
+    CHANGE COLUMN `player` `guid` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `reportId`,
+    CHANGE COLUMN `lag_type` `lagtype` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `guid`,
+    CHANGE COLUMN `map` `mapId` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' AFTER `lagtype`,
+    ADD COLUMN `latency` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `posZ`,
+    ADD COLUMN `createTime` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `latency`;
+    
 --
 -- Table structure for table `lfg_data`
 --
@@ -336,13 +361,6 @@ CREATE TABLE `lfg_data` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='LFG Data';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `petition`
---
-
-ALTER TABLE `petition`
-	ADD COLUMN `type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `name`;
-	
 --
 -- Table structure for table `reserved_name`
 --
@@ -369,34 +387,3 @@ CREATE TABLE `warden_action` (
   PRIMARY KEY (`wardenId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
-delimiter //
-CREATE PROCEDURE `update_enchantments_1`()
-	LANGUAGE SQL
-	NOT DETERMINISTIC
-	CONTAINS SQL
-	SQL SECURITY DEFINER
-	COMMENT ''
-BEGIN
-DECLARE enchant TEXT;
-DECLARE guid INT;
-DECLARE lstr TEXT DEFAULT '';
-DECLARE rstr TEXT DEFAULT '';
-DECLARE newstr TEXT DEFAULT '';
-DECLARE done INT DEFAULT 0;
-DECLARE cur CURSOR FOR SELECT `item_instance`.`guid`, `item_instance`.`enchantments` FROM  `item_instance`;
-DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET done = 1; 
-OPEN cur; 
-WHILE done = 0 DO
-FETCH cur INTO guid, enchant;
-SET lstr = SUBSTRING_INDEX(enchant, ' ', 24);
-SET rstr = SUBSTRING_INDEX(enchant, ' ', -19);
-SET newstr = CONCAT_WS(' ', lstr, '0', '0', '0', rstr);
-UPDATE `item_instance` SET `item_instance`.`enchantments`=newstr WHERE `item_instance`.`guid`=guid;  
-END WHILE;
-CLOSE cur;
-END;
-//
-delimiter ;
-
-CALL `update_enchantments_1`;
