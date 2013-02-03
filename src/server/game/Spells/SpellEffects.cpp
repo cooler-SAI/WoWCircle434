@@ -6291,7 +6291,7 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
     uint8 slot = 0;
     switch (m_spellInfo->Effects[effIndex].Effect)
     {
-        case SPELL_EFFECT_SUMMON_OBJECT_SLOT1: slot = 0; break;
+        case SPELL_EFFECT_SUMMON_OBJECT_SLOT1: slot = m_spellInfo->Effects[effIndex].MiscValueB; break;
         case SPELL_EFFECT_SUMMON_OBJECT_SLOT2: slot = 1; break;
         case SPELL_EFFECT_SUMMON_OBJECT_SLOT3: slot = 2; break;
         case SPELL_EFFECT_SUMMON_OBJECT_SLOT4: slot = 3; break;
