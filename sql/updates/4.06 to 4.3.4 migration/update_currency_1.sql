@@ -8,6 +8,9 @@ CREATE PROCEDURE `temp_update_currency_1`()
     SQL SECURITY DEFINER
     COMMENT 'Reset justice and valor points.'
 BEGIN
+
+DECLARE rate INT DEFAULT 1;
+
 DECLARE guid INT DEFAULT 0;
 DECLARE currency INT DEFAULT 0;
 DECLARE justice INT DEFAULT 0;
@@ -15,7 +18,7 @@ DECLARE valor INT DEFAULT 0;
 DECLARE counts INT DEFAULT 0;
 DECLARE done INT DEFAULT 0;
 DECLARE money INT DEFAULT 0;
-DECLARE cur CURSOR FOR SELECT `character_currency`.`guid`, `character_currency`.`currency`, `character_currency`.`total_count` FROM `character_currency` WHERE `character_currency`.`currency` IN (395, 396) AND `character_currency`.`guid`=15 ORDER BY `character_currency`.`guid`, `character_currency`.`currency`;
+DECLARE cur CURSOR FOR SELECT `character_currency`.`guid`, `character_currency`.`currency`, `character_currency`.`total_count` FROM `character_currency` WHERE `character_currency`.`currency` IN (395, 396) ORDER BY `character_currency`.`guid`, `character_currency`.`currency`;
 DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET done = 1; 
 -- sort rows
 -- there are 2 rows per guid (currencies 395 and 396)
@@ -40,7 +43,7 @@ WHILE done = 0 DO
             SET justice = justice + valor;
             IF justice > 400000 THEN
                 -- calculate money immediately
-                SET money = (justice - 400000) * 47;
+                SET money = (justice - 400000) * 47 * rate;
                 SET justice = 400000;
             END IF;
         END IF;
@@ -65,6 +68,3 @@ delimiter ;
 CALL `temp_update_currency_1`;
 
 DROP PROCEDURE IF EXISTS `temp_update_currency_1`;
-
--- Clear all valor points
-UPDATE `character_currency` SET `character_currency`.`total_count`=0 WHERE `character_currency`.`currency`=396;
