@@ -14595,6 +14595,14 @@ int32 Unit::ModSpellDuration(SpellInfo const* spellProto, Unit const* target, in
         else
             durationMod += durationMod_always;
 
+        // Glyph of Strangulate
+        if (spellProto->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && spellProto->SpellFamilyFlags[0] & 0x00000200)
+        {
+            if (AuraEffect * aurEff = GetAuraEffect(58618, 0))
+               if (target->IsNonMeleeSpellCasted(false, false, true, false, true))
+                   duration += aurEff->GetAmount();
+        }
+
         if (durationMod != 0)
             AddPct(duration, durationMod);
     }
