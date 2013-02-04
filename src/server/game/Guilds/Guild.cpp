@@ -3414,7 +3414,7 @@ void Guild::ResetWeeklyReputation()
 
 void Guild::GuildNewsLog::AddNewEvent(GuildNews eventType, time_t date, uint64 playerGuid, uint32 flags, uint32 data)
 {
-    uint32 id = _newsLog.size();
+    /*uint32 id = _newsLog.size();
 
     GuildNewsEntry& log = _newsLog[id];
     log.EventType = eventType;
@@ -3435,14 +3435,14 @@ void Guild::GuildNewsLog::AddNewEvent(GuildNews eventType, time_t date, uint64 p
 
     WorldPacket packet;
     BuildNewsData(id, log, packet);
-    GetGuild()->BroadcastPacket(&packet);
+    GetGuild()->BroadcastPacket(&packet);*/
 }
 
 void Guild::GuildNewsLog::LoadFromDB(PreparedQueryResult result)
 {
     if (!result)
         return;
-    do
+    /*do
     {
         Field* fields = result->Fetch();
         uint32 id = fields[0].GetInt32();
@@ -3453,7 +3453,7 @@ void Guild::GuildNewsLog::LoadFromDB(PreparedQueryResult result)
         log.Flags = fields[4].GetInt32();
         log.Date = time_t(fields[5].GetInt32());
     }
-    while (result->NextRow());
+    while (result->NextRow());*/
 }
 
 void Guild::GuildNewsLog::BuildNewsData(uint32 id, GuildNewsEntry& guildNew, WorldPacket& data)
