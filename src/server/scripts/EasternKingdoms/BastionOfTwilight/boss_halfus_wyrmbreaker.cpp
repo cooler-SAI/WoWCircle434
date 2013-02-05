@@ -95,6 +95,7 @@ enum Action
 {
     ACTION_WHELP_DIED       = 1,
     ACTION_ACTIVE_GOSSIP    = 2,
+    ACTION_WHELPS_RELEASE   = 3,
 };
 
 
@@ -360,6 +361,33 @@ class boss_halfus_wyrmbreaker : public CreatureScript
             {
                 switch(action)
                 {
+                    case ACTION_WHELPS_RELEASE:
+                        if (instance->GetBossState(DATA_HALFUS) != IN_PROGRESS)
+                            return;
+
+                        if (!bWhelps)
+                            return;
+
+                        for (uint8 i = 0; i < 8; ++i)
+                        {
+                            Creature* whelpsN = whelps[i];
+                            if (!whelpsN)
+                                continue;
+
+                            whelpsN->SetReactState(REACT_AGGRESSIVE);
+                            whelpsN->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                            whelpsN->setFaction(16);
+
+                            if (Creature* proto = whelpsN->FindNearestCreature(NPC_PROTO_BEHEMOTH, 200.0f))
+                                whelpsN->CastSpell(proto, SPELL_ATROPHIC_POISON, false);
+
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                            {
+                                if (whelpsN->AI())
+                                    whelpsN->AI()->AttackStart(target);
+                            }
+                        }
+                        break;
                     case ACTION_WHELP_DIED:
                         whelpcount++;
                         if (whelpcount == 8)
@@ -622,25 +650,8 @@ public:
 
         if (Creature* halfus = ObjectAccessor::GetCreature(*pGo, pInstance->GetData64(DATA_HALFUS)))
         {
-            for (uint8 i = 0; i < 8; i++)
-            {
-                Creature* whelpsN = whelps[i];
-                if (!whelpsN)
-                    continue;
-
-                whelpsN->SetReactState(REACT_AGGRESSIVE);
-                whelpsN->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                whelpsN->setFaction(16);
-
-                if (Creature* proto = whelpsN->FindNearestCreature(NPC_PROTO_BEHEMOTH, 200.0f))
-                    whelpsN->CastSpell(proto, SPELL_ATROPHIC_POISON, false);
-
-                if (Unit* target = halfus->AI()->SelectTarget(SELECT_TARGET_RANDOM))
-                {
-                    if (whelpsN->AI())
-                        whelpsN->AI()->AttackStart(target);
-                }
-            }
+            halfus->AI()->DoAction(ACTION_WHELPS_RELEASE);
+            pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND);
         }
         return false;
     }
