@@ -8070,6 +8070,24 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     CastCustomSpell(victim, triggered_spell_id, &basepoints0, NULL, NULL, true, castItem, triggeredByAura);
                     return true;
                 }
+                // Resurgence
+                case 16180:
+                case 16196:
+                {
+                    // Default chance for Healing Wave and Riptide
+                    float freq = 1.0f;
+
+                    if (procSpell->SpellFamilyFlags[0] & 0x80)
+                        // Lesser Healing Wave - 0.6 of default
+                        freq = 0.6f;
+                    else if (procSpell->SpellFamilyFlags[0] & 0x100)
+                        // Chain heal - 0.3 of default
+                        freq = 0.3f;
+
+                    basepoints0 = triggerAmount * freq;
+                    triggered_spell_id = 101033;
+                    break;
+                }
                 // Static Shock
                 case 51525:
                 case 51526:

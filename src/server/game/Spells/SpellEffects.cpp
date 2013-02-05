@@ -1317,29 +1317,6 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     if (Unit* pet = m_caster->GetGuardianPet())
                         pet->CastSpell(pet, 51753, true);
                     break;
-                // Steady Shot - energy gain
-                case 56641:
-                {
-                    if (!m_targets.GetUnitTarget())
-                        break;
-
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(77443);
-                    int32 basepoints0 = spellInfo->Effects[EFFECT_0].BasePoints;
-
-                    // Termination
-                    if (AuraEffect* termination = m_caster->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 2008, 0))
-                        if (m_targets.GetUnitTarget()->GetHealthPct() <= termination->GetSpellInfo()->Effects[EFFECT_1].BasePoints)
-                            basepoints0 += termination->GetAmount();
-
-                    // Glyph of Dazzled Prey
-                    if (AuraEffect * dazzledprey = m_caster->GetAuraEffect(56856, 0))
-                        if (m_targets.GetUnitTarget()->HasAuraWithMechanic(1<<MECHANIC_SNARE))
-                            basepoints0 += dazzledprey->GetAmount();
-
-
-                    m_caster->CastCustomSpell(m_caster, spellInfo->Id, &basepoints0, NULL, NULL, true);
-                    break;
-                }
                 // Kill Command
                 case 34026:
                 {
@@ -5588,32 +5565,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
-                // Cobra Shot
-                case 77767:
-                {
-                    if (!m_targets.GetUnitTarget())
-                        break;
-
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(91954);
-                    int32 basepoints0 = spellInfo->Effects[EFFECT_0].BasePoints;
-                    // Termination
-                    if (AuraEffect* termination = m_caster->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 2008, 0))
-                        if (m_targets.GetUnitTarget()->GetHealthPct() <= termination->GetSpellInfo()->Effects[EFFECT_1].BasePoints)
-                            basepoints0 += termination->GetAmount();
-
-                    // Glyph of Dazzled Prey
-                    if (AuraEffect * dazzledprey = m_caster->GetAuraEffect(56856, 0))
-                        if (m_targets.GetUnitTarget()->HasAuraWithMechanic(1<<MECHANIC_SNARE))
-                            basepoints0 += dazzledprey->GetAmount();
-
-                    m_caster->CastCustomSpell(m_caster, spellInfo->Id, &basepoints0, NULL, NULL, true);
-
-                    // Update Serpent Sting duration
-                    if (Aura * aur = unitTarget->GetAura(1978, m_caster->GetGUID()))
-                        aur->SetDuration((std::min(aur->GetDuration() + 6000, aur->GetMaxDuration())), true);
-
-                    break;
-                }
                 // Chimera Shot
                 case 53209:
                 {

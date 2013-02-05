@@ -611,6 +611,92 @@ class spell_hun_tame_beast : public SpellScriptLoader
         }
 };
 
+class spell_hun_steady_shot : public SpellScriptLoader
+{
+    public:
+        spell_hun_steady_shot() : SpellScriptLoader("spell_hun_steady_shot") { }
+
+        class spell_hun_steady_shot_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_hun_steady_shot_SpellScript);
+
+            void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+            {
+                Unit *caster = GetCaster();
+
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(77443);
+                int32 basepoints0 = spellInfo->Effects[EFFECT_0].BasePoints;
+
+                // Termination
+                if (AuraEffect* termination = caster->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 2008, 0))
+                    if (GetHitUnit()->GetHealthPct() <= termination->GetSpellInfo()->Effects[EFFECT_1].BasePoints)
+                        basepoints0 += termination->GetAmount();
+
+                // Glyph of Dazzled Prey
+                if (AuraEffect * dazzledprey = caster->GetAuraEffect(56856, 0))
+                    if (GetHitUnit()->HasAuraWithMechanic(1<<MECHANIC_SNARE))
+                        basepoints0 += dazzledprey->GetAmount();
+
+
+                caster->CastCustomSpell(caster, spellInfo->Id, &basepoints0, NULL, NULL, true);
+            }
+
+            void Register()
+            {
+                OnEffectLaunchTarget += SpellEffectFn(spell_hun_steady_shot_SpellScript::HandleScriptEffect, EFFECT_2, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_hun_steady_shot_SpellScript();
+        }
+};
+
+class spell_hun_cobra_shot : public SpellScriptLoader
+{
+    public:
+        spell_hun_cobra_shot() : SpellScriptLoader("spell_hun_cobra_shot") { }
+
+        class spell_hun_cobra_shot_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_hun_cobra_shot_SpellScript);
+
+            void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+            {
+                Unit *caster = GetCaster();
+
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(91954);
+                int32 basepoints0 = spellInfo->Effects[EFFECT_0].BasePoints;
+                // Termination
+                if (AuraEffect* termination = caster->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 2008, 0))
+                    if (GetHitUnit()->GetHealthPct() <= termination->GetSpellInfo()->Effects[EFFECT_1].BasePoints)
+                        basepoints0 += termination->GetAmount();
+
+                // Glyph of Dazzled Prey
+                if (AuraEffect * dazzledprey = caster->GetAuraEffect(56856, 0))
+                    if (GetHitUnit()->HasAuraWithMechanic(1<<MECHANIC_SNARE))
+                        basepoints0 += dazzledprey->GetAmount();
+
+                caster->CastCustomSpell(caster, spellInfo->Id, &basepoints0, NULL, NULL, true);
+
+                // Update Serpent Sting duration
+                if (Aura * aur = GetHitUnit()->GetAura(1978, caster->GetGUID()))
+                    aur->SetDuration((std::min(aur->GetDuration() + 6000, aur->GetMaxDuration())), true);
+            }
+
+            void Register()
+            {
+                OnEffectLaunchTarget += SpellEffectFn(spell_hun_cobra_shot_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_hun_cobra_shot_SpellScript();
+        }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     new spell_hun_aspect_of_the_beast();
@@ -626,4 +712,6 @@ void AddSC_hunter_spell_scripts()
     new spell_hun_misdirection_proc();
     new spell_hun_disengage();
     new spell_hun_tame_beast();
+    new spell_hun_steady_shot();
+    new spell_hun_cobra_shot();
 }
