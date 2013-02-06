@@ -180,6 +180,8 @@ class boss_maloriak : public CreatureScript
 
             bool bExecute;
             bool bDark;
+            bool bLos;
+            uint32 losTimer;
 
             void InitializeAI()
             {
@@ -195,6 +197,8 @@ class boss_maloriak : public CreatureScript
 
                 bExecute = false;
                 bDark = false;
+                bLos = false;
+                losTimer = 5000;
 
                 me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 7);
                 me->SetFloatValue(UNIT_FIELD_COMBATREACH, 7);
@@ -226,8 +230,20 @@ class boss_maloriak : public CreatureScript
 
             void DoAction(const int32 action)
             {
-                if (action == EVENT_UNIT_WITHIN_LOS)
-                    EnterEvadeMode();
+                if (action == EVENT_IN_LOS)
+                {
+                    bLos = true;
+                    losTimer = 5000;
+                }
+            }
+
+            void DamageDealt(Unit* victim, uint32 &damage, DamageEffectType effect)
+            {
+                if (effect == DIRECT_DAMAGE)
+                {
+                    bLos = false;
+                    losTimer = 5000;
+                }
             }
 
             void JustReachedHome()
@@ -311,6 +327,18 @@ class boss_maloriak : public CreatureScript
             {
                 if (!UpdateVictim())
                     return;
+
+                if (bLos)
+                {
+                    if (losTimer <= diff)
+                    {
+                        bLos = false;
+                        losTimer = 5000;
+                        EnterEvadeMode();
+                    }
+                    else
+                        losTimer -= diff;
+                }
 
                 if (me->HealthBelowPct(25) && !bExecute)
                 {

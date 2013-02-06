@@ -49,6 +49,9 @@ enum Spells
     SPELL_FEEDING_FRENZY            = 100655,
     SPELL_FRENZIED_DEVOTION         = 100064,
     SPELL_WARRY                     = 100167,
+    SPELL_WARRY_25                  = 101215,
+    SPELL_WARRY_10H                 = 101216,
+    SPELL_WARRY_25H                 = 101217,
 };
 
 enum Events
@@ -66,6 +69,7 @@ enum Events
     EVENT_FACE_RAGE             = 11,
     EVENT_RESURRECT             = 12,
     EVENT_MAGMA_RUPTURE_2       = 13,
+    EVENT_UNIT_IN_LOS           = 14,
 };
 
 enum Adds
@@ -136,6 +140,8 @@ class boss_shannox : public CreatureScript
             bool bRiplimbDead;
             bool bRagefaceDead;
             bool bFrenzy;
+            bool bLos;
+            uint32 losTimer;
 
             void InitializeAI()
             {
@@ -163,6 +169,14 @@ class boss_shannox : public CreatureScript
                 bRagefaceDead = false;
                 bFrenzy = false;
                 memset(areas, false, sizeof(areas));
+                bLos = false;
+                losTimer = 5000;
+            }
+
+            void DamageTaken(Unit* attacker, uint32 &damage)
+            {
+                if (attacker->GetGUID() == me->GetGUID())
+                    damage = 0;
             }
 
             void MoveInLineOfSight(Unit* who)
@@ -183,8 +197,9 @@ class boss_shannox : public CreatureScript
                         events.CancelEvent(EVENT_MAGMA_RUPTURE);
                         events.ScheduleEvent(EVENT_HURL_SPEAR, urand(5000, 10000));
                         break;
-                    case EVENT_UNIT_WITHIN_LOS:
-                        EnterEvadeMode();
+                    case EVENT_IN_LOS:
+                        bLos = true;
+                        losTimer = 5000;
                         break;
                 }
             }
@@ -220,6 +235,8 @@ class boss_shannox : public CreatureScript
                 bRagefaceDead = false;
                 bFrenzy = false;
                 memset(areas, false, sizeof(areas));
+                bLos = false;
+                losTimer = 5000;
 
                 Talk(SAY_AGGRO);
                 events.ScheduleEvent(EVENT_BERSERK, 60 * MINUTE * IN_MILLISECONDS);
@@ -243,6 +260,15 @@ class boss_shannox : public CreatureScript
                 Talk(SAY_KILL);
             }
 
+            void DamageDealt(Unit* victim, uint32 &damage, DamageEffectType effect)
+            {
+                if (effect == DIRECT_DAMAGE)
+                {
+                    bLos = false;
+                    losTimer = 5000;
+                }
+            }
+
             void JustSummoned(Creature* summon)
             {
                 summons.Summon(summon);
@@ -260,6 +286,18 @@ class boss_shannox : public CreatureScript
             {
                 if (!UpdateVictim())
                     return;
+
+                if (bLos)
+                {
+                    if (losTimer <= diff)
+                    {
+                        bLos = false;
+                        losTimer = 5000;
+                        EnterEvadeMode();
+                    }
+                    else
+                        losTimer -= diff;
+                }
 
                 // Bucket List
                 switch (me->GetAreaId())
@@ -401,11 +439,15 @@ class npc_shannox_riplimb : public CreatureScript
             Unit* pMainTarget;
             EventMap events;
             bool bDead;
+            bool bLos;
+            uint32 losTimer;
 
             void Reset()
             {
                 bFetch = false;
                 bDead = false;
+                bLos =  false;
+                losTimer = 5000;
                 pMainTarget = NULL;
                 events.Reset();
                 if (IsHeroic())
@@ -422,6 +464,15 @@ class npc_shannox_riplimb : public CreatureScript
                 DoZoneInCombat();
                 events.ScheduleEvent(EVENT_LIMB_RIP, 6000);
                 events.ScheduleEvent(EVENT_SEPARATION_ANXIETY, 3000);
+            }
+
+            void DamageDealt(Unit* victim, uint32 &damage, DamageEffectType effect)
+            {
+                if (effect == DIRECT_DAMAGE)
+                {
+                    bLos = false;
+                    losTimer = 5000;
+                }
             }
 
             void DamageTaken(Unit* attacker, uint32 &damage)
@@ -448,6 +499,9 @@ class npc_shannox_riplimb : public CreatureScript
                 switch (action)
                 {
                     case ACTION_HURL_SPEAR:
+                        if (bDead)
+                            return;
+
                         events.Reset();
                         pMainTarget = me->getVictim();
                         me->SetReactState(REACT_PASSIVE);
@@ -456,10 +510,9 @@ class npc_shannox_riplimb : public CreatureScript
                         me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SNARE, false);
                         DoCast(me, SPELL_DOGGED_DETERMINATION, true);
                         break;
-                    case EVENT_UNIT_WITHIN_LOS:
-                        if (pInstance)
-                            if (Creature* pShannox = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_SHANNOX)))
-                                pShannox->AI()->EnterEvadeMode();
+                    case EVENT_IN_LOS:
+                        bLos = true;
+                        losTimer = 5000;
                         break;
                 }
             }
@@ -480,6 +533,20 @@ class npc_shannox_riplimb : public CreatureScript
 
             void UpdateAI(const uint32 diff)
             {
+                if (bLos)
+                {
+                    if (losTimer <= diff)
+                    {
+                        bLos = false;
+                        losTimer = 5000;
+                        if (pInstance)
+                            if (Creature* pShannox = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_SHANNOX)))
+                               pShannox->AI()->EnterEvadeMode();
+                    }
+                    else
+                        losTimer -= diff;
+                }
+
                 if (bFetch)
                 {
                     if (Creature* pShannox = me->FindNearestCreature(NPC_SHANNOX, 1.0f))
@@ -586,9 +653,13 @@ class npc_shannox_rageface : public CreatureScript
 
             InstanceScript* pInstance;
             EventMap events;
+            bool bLos;
+            uint32 losTimer;
 
             void Reset()
             {
+                bLos =  false;
+                losTimer = 5000;
                 events.Reset();
                 if (IsHeroic())
                     DoCast(me, SPELL_FEEDING_FRENZY, true);
@@ -596,10 +667,11 @@ class npc_shannox_rageface : public CreatureScript
 
             void DoAction(const int32 action)
             {
-                if (action == EVENT_UNIT_WITHIN_LOS)
-                    if (pInstance)
-                        if (Creature* pShannox = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_SHANNOX)))
-                           pShannox->AI()->EnterEvadeMode();
+                if (action == EVENT_IN_LOS)
+                {
+                    bLos = true;
+                    losTimer = 5000;
+                }
             }
 
             void EnterCombat(Unit* who)
@@ -613,6 +685,15 @@ class npc_shannox_rageface : public CreatureScript
                 events.ScheduleEvent(EVENT_FACE_RAGE, 7000);
                 events.ScheduleEvent(EVENT_CHANGE_TARGET, 5000);
                 events.ScheduleEvent(EVENT_SEPARATION_ANXIETY, 3000);
+            }
+
+            void DamageDealt(Unit* victim, uint32 &damage, DamageEffectType effect)
+            {
+                if (effect == DIRECT_DAMAGE)
+                {
+                    bLos = false;
+                    losTimer = 5000;
+                }
             }
 
             void DamageTaken(Unit* who, uint32 &damage)
@@ -648,6 +729,20 @@ class npc_shannox_rageface : public CreatureScript
             {
                 if (!UpdateVictim())
                     return;
+
+                if (bLos)
+                {
+                    if (losTimer <= diff)
+                    {
+                        bLos = false;
+                        losTimer = 5000;
+                        if (pInstance)
+                            if (Creature* pShannox = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_SHANNOX)))
+                               pShannox->AI()->EnterEvadeMode();
+                    }
+                    else
+                        losTimer -= diff;
+                }
 
                 events.Update(diff);
 
@@ -796,24 +891,30 @@ class npc_shannox_immolation_trap : public CreatureScript
                     if (Player* pPlayer = me->SelectNearestPlayer(0.1f))
                     {
                         bExplode = true;
-                        DoCast(pPlayer, SPELL_IMMOLATION_TRAP_DMG, true);
+                        pPlayer->CastSpell(pPlayer, SPELL_IMMOLATION_TRAP_DMG, true);
                         me->DespawnOrUnsummon(1000);
                     }
                     else if (Creature* pRiplimb = me->FindNearestCreature(NPC_RIPLIMB, 0.1f))
                     {
-                        if (!pRiplimb->HasAura(SPELL_WARRY))
+                        if (!pRiplimb->HasAura(SPELL_WARRY) &&
+                            !pRiplimb->HasAura(SPELL_WARRY_25) &&
+                            !pRiplimb->HasAura(SPELL_WARRY_10H) &&
+                            !pRiplimb->HasAura(SPELL_WARRY_25H))
                         {
                             bExplode = true;
-                            DoCast(pRiplimb, SPELL_IMMOLATION_TRAP_DMG, true);
+                            pRiplimb->CastSpell(pRiplimb, SPELL_IMMOLATION_TRAP_DMG, true);
                             me->DespawnOrUnsummon(500);
                         }
                     }
                     else if (Creature* pRageface = me->FindNearestCreature(NPC_RAGEFACE, 0.1f))
                     {
-                        if (!pRageface->HasAura(SPELL_WARRY))
+                        if(!pRageface->HasAura(SPELL_WARRY) &&
+                            !pRageface->HasAura(SPELL_WARRY_25) &&
+                            !pRageface->HasAura(SPELL_WARRY_10H) &&
+                            !pRageface->HasAura(SPELL_WARRY_25H))
                         {
                             bExplode = true;
-                            DoCast(pRageface, SPELL_IMMOLATION_TRAP_DMG, true);
+                            pRageface->CastSpell(pRageface, SPELL_IMMOLATION_TRAP_DMG, true);
                             me->DespawnOrUnsummon(500);
                         }
                     }
@@ -860,24 +961,30 @@ class npc_shannox_crystal_prison_trap : public CreatureScript
                     if (Player* pPlayer = me->SelectNearestPlayer(0.1f))
                     {
                         bExplode = true;
-                        DoCast(pPlayer, SPELL_CRYSTAL_PRISON_TRAP, true);
+                        pPlayer->CastSpell(pPlayer, SPELL_CRYSTAL_PRISON_TRAP, true);
                         me->DespawnOrUnsummon(500);
                     }
                     else if (Creature* pRiplimb = me->FindNearestCreature(NPC_RIPLIMB, 0.1f))
                     {
-                        if (!pRiplimb->HasAura(SPELL_WARRY))
+                        if (!pRiplimb->HasAura(SPELL_WARRY) &&
+                            !pRiplimb->HasAura(SPELL_WARRY_25) &&
+                            !pRiplimb->HasAura(SPELL_WARRY_10H) &&
+                            !pRiplimb->HasAura(SPELL_WARRY_25H))
                         {
                             bExplode = true;
-                            DoCast(pRiplimb, SPELL_CRYSTAL_PRISON_TRAP, true);
+                            pRiplimb->CastSpell(pRiplimb, SPELL_CRYSTAL_PRISON_TRAP, true);
                             me->DespawnOrUnsummon(500);
                         }
                     }
                     else if (Creature* pRageface = me->FindNearestCreature(NPC_RAGEFACE, 0.1f))
                     {
-                        if (!pRageface->HasAura(SPELL_WARRY))
+                        if (!pRageface->HasAura(SPELL_WARRY) &&
+                            !pRageface->HasAura(SPELL_WARRY_25) &&
+                            !pRageface->HasAura(SPELL_WARRY_10H) &&
+                            !pRageface->HasAura(SPELL_WARRY_25H))
                         {
                             bExplode = true;
-                            DoCast(pRageface, SPELL_CRYSTAL_PRISON_TRAP, true);
+                            pRageface->CastSpell(pRageface, SPELL_CRYSTAL_PRISON_TRAP, true);
                             me->DespawnOrUnsummon(500);
                         }
                     }

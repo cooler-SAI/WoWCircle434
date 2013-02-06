@@ -1852,7 +1852,7 @@ void Unit::AttackerStateUpdate (Unit* victim, WeaponAttackType attType, bool ext
         // Test function
         // Send event in script to prevent exploits with los
         if (IsAIEnabled && GetMap()->IsRaid())
-            GetAI()->DoAction(EVENT_UNIT_WITHIN_LOS);
+            GetAI()->DoAction(EVENT_IN_LOS);
         return;
     }
 
