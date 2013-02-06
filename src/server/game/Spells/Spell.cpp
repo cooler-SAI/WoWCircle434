@@ -6086,6 +6086,12 @@ SpellCastResult Spell::CheckCast(bool strict)
         default: break;
     }
 
+    // Shapeshift & hex/etc
+    if (m_spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT) && m_caster->HasAuraType(SPELL_AURA_TRANSFORM))
+    {
+        return SPELL_FAILED_CHARMED;
+    }
+
     // check trade slot case (last, for allow catch any another cast problems)
     if (m_targets.GetTargetMask() & TARGET_FLAG_TRADE_ITEM)
     {
