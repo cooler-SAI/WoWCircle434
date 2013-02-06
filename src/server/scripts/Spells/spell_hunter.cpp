@@ -697,6 +697,38 @@ class spell_hun_cobra_shot : public SpellScriptLoader
         }
 };
 
+class spell_hunter_pet_intervane: public SpellScriptLoader
+{
+public:
+    spell_hunter_pet_intervane(): SpellScriptLoader("spell_hunter_pet_intervane") { }
+
+    class spell_hunter_pet_intervane_AuraScript: public AuraScript
+    {
+        PrepareAuraScript(spell_hunter_pet_intervane_AuraScript);
+
+        void Absorb(AuraEffect * aurEff, DamageInfo & dmgInfo, uint32 & absorbAmount)
+        {
+            Remove(AURA_REMOVE_BY_ENEMY_SPELL);
+        }
+
+        void CalculateAmount(AuraEffect const * /*aurEff*/, int32 & amount, bool & canBeRecalculated)
+        {
+            // Set absorbtion amount to unlimited
+            amount *= GetCaster()->GetMaxHealth() / 100.0f;
+        }
+
+        void Register()
+        {
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_hunter_pet_intervane_AuraScript::Absorb, EFFECT_1);
+            DoEffectCalcAmount  += AuraEffectCalcAmountFn(spell_hunter_pet_intervane_AuraScript::CalculateAmount, EFFECT_1, SPELL_AURA_SCHOOL_ABSORB);
+        }
+    };
+    AuraScript *GetAuraScript() const
+    {
+        return new spell_hunter_pet_intervane_AuraScript();
+    }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     new spell_hun_aspect_of_the_beast();
@@ -714,4 +746,5 @@ void AddSC_hunter_spell_scripts()
     new spell_hun_tame_beast();
     new spell_hun_steady_shot();
     new spell_hun_cobra_shot();
+    new spell_hunter_pet_intervane();
 }
