@@ -6205,6 +6205,14 @@ SpellCastResult Spell::CheckCasterAuras() const
     SpellCastResult prevented_reason = SPELL_CAST_OK;
     // Have to check if there is a stun aura. Otherwise will have problems with ghost aura apply while logging out
     uint32 unitflag = m_caster->GetUInt32Value(UNIT_FIELD_FLAGS);     // Get unit state
+
+    // Intimidating Shout & Tremor Totem hack
+    if (m_caster->GetAuraEffectsByType(SPELL_AURA_MOD_STUN).size() == 1 && m_caster->HasAura(20511))
+    {
+        unitflag &= ~UNIT_FLAG_STUNNED;
+        unitflag |= UNIT_FLAG_FLEEING;
+    }
+
     if (unitflag & UNIT_FLAG_STUNNED)
     {
         // spell is usable while stunned, check if caster has only mechanic stun auras, another stun types must prevent cast spell
