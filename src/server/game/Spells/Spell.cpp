@@ -6087,7 +6087,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     }
 
     // Shapeshift & hex/etc
-    if (m_spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT) && m_caster->HasAuraType(SPELL_AURA_TRANSFORM))
+    if (m_spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT) && m_caster->HasAuraWithMechanic(1 << MECHANIC_POLYMORPH))
     {
         return SPELL_FAILED_CHARMED;
     }
