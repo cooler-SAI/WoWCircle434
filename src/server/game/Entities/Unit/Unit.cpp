@@ -9899,9 +9899,16 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     if (cooldown && GetTypeId() == TYPEID_PLAYER)
         ToPlayer()->AddSpellCooldown(trigger_spell_id, 0, time(NULL) + cooldown);
 
-    // Glyph of Lightning Shield
     if (trigger_spell_id == 26364)
     {
+        // Improved Lightning Shield - A11 4/5 set bonus
+        if (HasAura(100956) && triggeredByAura->GetBase()->GetCharges() < ((HasAura(88756) || HasAura(88764)) ? 9 : 3))
+        {
+            triggeredByAura->GetBase()->SetCharges(triggeredByAura->GetBase()->GetCharges() + 1);
+            return false;
+        }
+
+        // Glyph of Lightning Shield
         if (HasAura(55448) && triggeredByAura->GetBase()->GetCharges() <= 3)
             return false;
     }
