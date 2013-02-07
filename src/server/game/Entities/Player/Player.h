@@ -1363,6 +1363,9 @@ class Player : public Unit, public GridObject<Player>
 
         void CleanupsBeforeDelete(bool finalCleanup = true);
 
+        static UpdateMask updateVisualBits;
+        static void InitVisibleBits();
+
         void AddToWorld();
         void RemoveFromWorld();
 
@@ -1795,6 +1798,9 @@ class Player : public Unit, public GridObject<Player>
         void SendMusic(uint32 musicId, uint64 source);
         void SendSound(uint32 soundId, uint64 source);
         void SendSoundToAll(uint32 soundId, uint64 source);
+
+        void _SetCreateBits(UpdateMask* updateMask, Player* target) const;
+        void _SetUpdateBits(UpdateMask* updateMask, Player* target) const;
 
         void SaveCUFProfile(uint8 id, CUFProfile* profile) { delete _CUFProfiles[id]; _CUFProfiles[id] = profile; } ///> Replaces a CUF profile at position 0-4
         CUFProfile* GetCUFProfile(uint8 id) const { return _CUFProfiles[id]; } ///> Retrieves a CUF profile at position 0-4

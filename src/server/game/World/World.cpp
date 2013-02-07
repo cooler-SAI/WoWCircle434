@@ -1814,6 +1814,7 @@ void World::SetInitialWorldSettings()
 
     ///- Initilize static helper structures
     AIRegistry::Initialize();
+    Player::InitVisibleBits();
 
     ///- Initialize MapManager
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Starting Map System");
