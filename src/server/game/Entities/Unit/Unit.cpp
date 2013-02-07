@@ -9706,6 +9706,23 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             caster->CastSpell(caster, 54648, true);
             return true;
         }
+        // Ancestral Healing 
+        case 16176:
+        case 16235:
+        {
+            AuraEffect *aura_eff = victim->GetAuraEffect(105284, 0, this->GetGUID());
+
+            int32 basepoints_ = std::min((aura_eff ? aura_eff->GetAmount() : 0.0f) + 
+                damage * triggeredByAura->GetBase()->GetEffect(1)->GetAmount() / 100.0f, 
+                victim->GetMaxHealth()/10.0f);
+
+            CastCustomSpell(victim, 105284, &basepoints_, 0, 0, true);
+
+            if (!(procEx & PROC_EX_CRITICAL_HIT))
+                return false;
+
+            break;
+        }
         default:
             break;
     }
