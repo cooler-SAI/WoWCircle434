@@ -2500,15 +2500,16 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
         }
     }
 
+    Unit * checker = (isTotem() && GetOwner()) ? GetOwner() : this;
     switch (spell->DmgClass)
     {
         case SPELL_DAMAGE_CLASS_RANGED:
         case SPELL_DAMAGE_CLASS_MELEE:
-            return MeleeSpellHitResult(victim, spell);
+            return checker->MeleeSpellHitResult(victim, spell);
         case SPELL_DAMAGE_CLASS_NONE:
             return SPELL_MISS_NONE;
         case SPELL_DAMAGE_CLASS_MAGIC:
-            return MagicSpellHitResult(victim, spell);
+            return checker->MagicSpellHitResult(victim, spell);
     }
     return SPELL_MISS_NONE;
 }
