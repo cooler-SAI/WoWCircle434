@@ -7652,6 +7652,34 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Resurgence
+                case 16180:
+                case 16196:
+                {
+                    SpellInfo const* spellEnergize = sSpellMgr->GetSpellInfo(101033);
+                    if (!spellEnergize)
+                        return false;
+
+                    int32 bp0 = spellEnergize->Effects[EFFECT_0].CalcValue(this);
+
+                    switch (procSpell->Id)
+                    {
+                        case 8004: // Healing Surge
+                        case 61295: // Riptide
+                        case 73685: // Unleash life
+                            bp0 *= 0.6f;
+                            break;
+                        case 1064: // Chain Heal
+                            bp0 *= 0.33f;
+                            break;
+                    }
+                    if (dummySpell->Id == 16180)
+                        bp0 /= 2;
+
+                    EnergizeBySpell(this, 101033, bp0, POWER_MANA);
+
+                    break;
+                }
                 // Lava Surge
                 case 77755:
                 case 77756:
@@ -8069,24 +8097,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                     CastCustomSpell(victim, triggered_spell_id, &basepoints0, NULL, NULL, true, castItem, triggeredByAura);
                     return true;
-                }
-                // Resurgence
-                case 16180:
-                case 16196:
-                {
-                    // Default chance for Healing Wave and Riptide
-                    float freq = 1.0f;
-
-                    if (procSpell->SpellFamilyFlags[0] & 0x80)
-                        // Lesser Healing Wave - 0.6 of default
-                        freq = 0.6f;
-                    else if (procSpell->SpellFamilyFlags[0] & 0x100)
-                        // Chain heal - 0.3 of default
-                        freq = 0.3f;
-
-                    basepoints0 = triggerAmount * freq;
-                    triggered_spell_id = 101033;
-                    break;
                 }
                 // Static Shock
                 case 51525:
