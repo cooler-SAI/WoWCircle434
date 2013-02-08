@@ -3058,11 +3058,6 @@ void SpellMgr::LoadDbcDataCorrections()
             case 45524:
                 spellInfo->Effects[1].TargetA = TARGET_UNIT_TARGET_ENEMY;
                 break;
-            // Eclipse
-            case 48517:
-            case 48518:
-                spellInfo->Attributes |= SPELL_ATTR0_CANT_CANCEL;
-                break;
             // Glyph of Totemic Recall
             case 55438:
                 spellInfo->Effects[0].MiscValue= SPELLMOD_EFFECT1;
@@ -5947,6 +5942,14 @@ void SpellMgr::LoadDbcDataCorrections()
             // Prayer of Mending
             case 33110:
                 spellInfo->AttributesEx3 &= ~SPELL_ATTR3_CANT_TRIGGER_PROC;
+                break;
+            // Eclipse markers
+            case 67484:
+            case 67483:
+            case 48517:
+            case 48518:
+                spellInfo->AuraInterruptFlags = 0;
+                spellInfo->Attributes |= SPELL_ATTR0_CANT_CANCEL;
                 break;
             default:
                 break;
