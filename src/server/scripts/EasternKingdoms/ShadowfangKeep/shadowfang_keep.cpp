@@ -39,7 +39,8 @@ class npc_apothecary_hummel : public CreatureScript
             {
                 Map::PlayerList const& players = me->GetMap()->GetPlayers();
                 if (!players.isEmpty())
-                    sLFGMgr->FinishDungeon(players.begin()->getSource()->GetGroup()->GetGUID(), 288);
+                    if (players.begin()->getSource()->GetGroup()->GetGUID())
+                        sLFGMgr->FinishDungeon(players.begin()->getSource()->GetGroup()->GetGUID(), 288);
             }
         };
 };
@@ -48,7 +49,3 @@ void AddSC_shadowfang_keep()
 {
     new npc_apothecary_hummel();
 }
-
-
-
-
