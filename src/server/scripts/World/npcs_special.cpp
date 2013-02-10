@@ -3737,7 +3737,7 @@ class npc_kwee_q_peddlefeet : public CreatureScript
                     return false;
         
                 ItemPosCountVec dest;
-                uint8 msg = pPlayer->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 49278, 1);
+                uint8 msg = pPlayer->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 49661, 1);
                 if (msg == EQUIP_ERR_OK)
                 {
                     Item* item = pPlayer->StoreNewItem(dest, 49661, true);
