@@ -555,7 +555,7 @@ class ImpactTargetCheck
 
         bool operator() (Unit* unit)
         {
-            return unit == _originalTarget || !unit->isAlive();
+            return unit == _originalTarget || !unit->isAlive() || unit->isTotem();
         }
 
     private:
