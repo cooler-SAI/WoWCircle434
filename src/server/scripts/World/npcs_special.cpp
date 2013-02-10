@@ -3721,6 +3721,35 @@ class npc_burning_treant : public CreatureScript
         };
 };
 
+class npc_kwee_q_peddlefeet : public CreatureScript
+{
+    public:
+        npc_kwee_q_peddlefeet() : CreatureScript("npc_kwee_q_peddlefeet") { }
+
+        bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*sender*/, uint32 uiAction)
+        {
+            pPlayer->PlayerTalkClass->ClearMenus();
+            pPlayer->CLOSE_GOSSIP_MENU();
+            if (uiAction == 1)
+            {
+                uint32 curItemCount = pPlayer->GetItemCount(49661, false);
+                if (curItemCount >= 1)
+                    return false;
+        
+                ItemPosCountVec dest;
+                uint8 msg = pPlayer->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 49278, 1);
+                if (msg == EQUIP_ERR_OK)
+                {
+                    Item* item = pPlayer->StoreNewItem(dest, 49661, true);
+                    pPlayer->SendNewItem(item, 1, true, false);
+                }
+                else
+                    return false;
+            }
+            return true;
+        }
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3765,4 +3794,5 @@ void AddSC_npcs_special()
     new npc_metzen();
     new npc_anachronos_15192();
     new npc_burning_treant();
+    new npc_kwee_q_peddlefeet();
 }
