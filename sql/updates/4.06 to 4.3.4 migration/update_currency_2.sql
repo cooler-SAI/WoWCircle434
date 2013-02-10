@@ -39,7 +39,7 @@ WHILE done = 0 DO
             END IF
         END IF;
         UPDATE `character_currency` SET `character_currency`.`total_count`=honor WHERE `character_currency`.`guid`=guid AND `character_currency`.`currency`=392;
-        IF money > 0 AND THEN
+        IF money > 0 THEN
             UPDATE `characters` SET `characters`.`money`=`characters`.`money` + money WHERE `characters`.`guid`=guid;
         END IF;
         SET honor = 0;
@@ -58,5 +58,3 @@ delimiter ;
 CALL `temp_update_currency_2`;
 
 DROP PROCEDURE IF EXISTS `temp_update_currency_2`;
-
-UPDATE `character_currency` SET `total_count`=0 WHERE `currency`=390;
