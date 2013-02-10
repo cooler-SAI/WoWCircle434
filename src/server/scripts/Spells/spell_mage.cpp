@@ -635,7 +635,10 @@ public:
                                 aura->SetStackAmount(stack);
 
                             if (AuraEffect* _effect = aura->GetEffect(uint8((*i)->GetEffIndex())))
+                            {
                                 _effect->ChangeAmount(amount, false);
+                                _effect->GetFixedDamageInfo().SetFixedDamage(amount);
+                            }
                         }
                     }
                 }
