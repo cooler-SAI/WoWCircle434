@@ -436,7 +436,6 @@ class npc_shannox_riplimb : public CreatureScript
 
             InstanceScript* pInstance;
             bool bFetch;
-            Unit* pMainTarget;
             EventMap events;
             bool bDead;
             bool bLos;
@@ -448,7 +447,6 @@ class npc_shannox_riplimb : public CreatureScript
                 bDead = false;
                 bLos =  false;
                 losTimer = 5000;
-                pMainTarget = NULL;
                 events.Reset();
                 if (IsHeroic())
                     DoCast(me, SPELL_FEEDING_FRENZY, true);
@@ -500,10 +498,12 @@ class npc_shannox_riplimb : public CreatureScript
                 {
                     case ACTION_HURL_SPEAR:
                         if (bDead)
+                        {
+                            if (Creature* pSpear = me->FindNearestCreature(NPC_SPEAR_OF_SHANNOX_1, 300.0f))
+                                pSpear->DespawnOrUnsummon();
                             return;
-
+                        }
                         events.Reset();
-                        pMainTarget = me->getVictim();
                         me->SetReactState(REACT_PASSIVE);
                         me->AttackStop();
                         me->RemoveMovementImpairingAuras();
@@ -559,11 +559,10 @@ class npc_shannox_riplimb : public CreatureScript
                         me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SNARE, true);
                         me->SetReactState(REACT_AGGRESSIVE);
                         events.ScheduleEvent(EVENT_LIMB_RIP, 5000);
-                        if (pMainTarget && me->IsValidAttackTarget(pMainTarget))
-                            AttackStart(pMainTarget);
+                        if (me->getVictim())
+                            AttackStart(me->getVictim());
                         else
                         {
-                            pMainTarget = NULL;
                             if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0.0f, 0.0f, true))
                                 AttackStart(pTarget);
                         }
