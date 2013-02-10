@@ -4237,6 +4237,64 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Attributes = 0;
                 break;
             // ENDOF LOST CITY OF THE TOL'VIR
+            // SHADOWFANG KEEP SPELLS
+            // Baron Ashbury
+            case 93720: // Wracking Pain
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(28);
+                break;
+            case 93810: // Calamity dmg
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(28);
+                break;
+            case 93423: // Asphyxiate
+            case 93710:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(28);
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(28);
+                break;
+            case 93468: // Stay of Execution
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                break;
+            case 93706: // Stay of Execution t
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(28);
+                break;
+            // Baron Silverlaine
+            case 93956: // Cursed Veil
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(18);
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(18);
+                break;
+            // Commander Springvale
+            case 93722: // Shield of Perfidious dmg
+            case 93737:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CONE_ENEMY_24;
+                break;
+            // Lord Valden
+            case 93697: // Conjure Poisonous Mixture
+            case 93704:
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(18);
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(18);
+                break;
+            case 93505: // Conjure Frost Mixture
+            case 93702:
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(18);
+                break;
+            case 93617: // Toxic Coagulant dmg
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(12);
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(12);
+                break;
+            case 93689: // Toxic Catalyst dmg
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(12);
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(12);
+                break;
+            // Lord Godfrey
+            case 96344: // Pistol Barrage sum
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(12);
+                break;
+            // ENDOF SHADOWFANG SPELLS
             // GRIM BATOL SPELLS
             //
             // Trash
@@ -5950,6 +6008,9 @@ void SpellMgr::LoadDbcDataCorrections()
             case 48518:
                 spellInfo->AuraInterruptFlags = 0;
                 spellInfo->Attributes |= SPELL_ATTR0_CANT_CANCEL;
+                break;
+            case 69510:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_DEATH_PERSISTENT;
                 break;
             default:
                 break;

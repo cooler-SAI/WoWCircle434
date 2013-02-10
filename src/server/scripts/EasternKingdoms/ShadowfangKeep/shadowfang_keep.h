@@ -1,31 +1,45 @@
-/*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
-#ifndef DEF_SHADOWFANG_H
-#define DEF_SHADOWFANG_H
+#ifndef DEF_SHADOWFANG_KEEP_H
+#define DEF_SHADOWFANG_KEEP_H
 
 enum eData
 {
-    TYPE_FREE_NPC               = 1,
-    TYPE_RETHILGORE             = 2,
-    TYPE_FENRUS                 = 3,
-    TYPE_NANDOS                 = 4
+    DATA_TEAM                    = 0,
+    DATA_EVENT_NPC                = 1,
+    DATA_GUARDS                    = 2,
+    DATA_GUARDS2                = 3,
+    DATA_ASHBURY                = 4,
+    DATA_SILVERLAINE            = 5,
+    DATA_SPRINGVALE                = 6,
+    DATA_VALDEN                    = 7,
+    DATA_GODFREY                = 8,
+
+    DATA_COURTYARD_DOOR            = 20,
+    DATA_SORCERER_DOOR            = 21,
+    DATA_ARUGAL_DOOR            = 22,
+};
+
+enum NPCs
+{
+    NPC_BELMONT                = 47293,
+    NPC_GUARD_HORDE1        = 47030,
+    NPC_GUARD_HORDE2        = 47031,
+    NPC_GUARD_ALLY            = 47027,
+    NPC_IVAR                = 47006,
+    NPC_CROMUSH                = 47294,
+    NPC_ASHBURY                = 46962,
+    NPC_SILVERLAINE            = 3887,
+    NPC_LUPINE_SPECTRE        = 50923,
+    NPC_SPRINGVALE            = 4278,
+    NPC_VALDEN                = 46963,
+    NPC_GODFREY                = 46964,
+
+    GO_COURTYARD_DOOR       = 18895,
+    GO_SORCERER_DOOR        = 18972,  
+    GO_ARUGAL_DOOR          = 18971,
+
+    NPC_APOTHECARY_HUMMEL   = 36296,
+    NPC_APOTHECARY_FRYE     = 36272,
+    NPC_APOTHECARY_BAXTER   = 36565,
 };
 
 #endif
-
