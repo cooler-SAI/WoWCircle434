@@ -6207,7 +6207,20 @@ SpellCastResult Spell::CheckCasterAuras() const
     uint32 unitflag = m_caster->GetUInt32Value(UNIT_FIELD_FLAGS);     // Get unit state
 
     // Intimidating Shout & Tremor Totem hack
-    if (m_caster->GetAuraEffectsByType(SPELL_AURA_MOD_STUN).size() == 1 && m_caster->HasAura(20511))
+    Unit::AuraEffectList const& stunAuras = m_caster->GetAuraEffectsByType(SPELL_AURA_MOD_STUN);
+    bool has_no_stun_fear_instead = true;
+    bool entered_loop = false;
+    for (Unit::AuraEffectList::const_iterator i = stunAuras.begin(); i != stunAuras.end(); ++i)
+    {
+        entered_loop = true;
+        uint32 mask = (*i)->GetSpellInfo()->GetAllEffectsMechanicMask();
+        if (mask && !(mask & (1<<MECHANIC_STUN)) && (mask & (1<<MECHANIC_FEAR | 1<<MECHANIC_CHARM | 1<<MECHANIC_SLEEP)))
+        {
+            break;
+        }
+        has_no_stun_fear_instead = false;
+    }
+    if (has_no_stun_fear_instead && entered_loop)
     {
         unitflag &= ~UNIT_FLAG_STUNNED;
         unitflag |= UNIT_FLAG_FLEEING;
@@ -6219,7 +6232,6 @@ SpellCastResult Spell::CheckCasterAuras() const
         if (usableInStun)
         {
             bool foundNotStun = false;
-            Unit::AuraEffectList const& stunAuras = m_caster->GetAuraEffectsByType(SPELL_AURA_MOD_STUN);
             for (Unit::AuraEffectList::const_iterator i = stunAuras.begin(); i != stunAuras.end(); ++i)
             {
                 if ((*i)->GetSpellInfo()->GetAllEffectsMechanicMask() && !((*i)->GetSpellInfo()->GetAllEffectsMechanicMask() & (1<<MECHANIC_STUN)))
