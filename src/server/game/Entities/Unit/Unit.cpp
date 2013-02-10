@@ -13245,8 +13245,10 @@ void Unit::ClearInCombat()
             return;
     }
     else
+    {
         ToPlayer()->UpdatePotionCooldown();
-
+        ToPlayer()->ResetHolyPowerTimer();
+    }
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
 }
 

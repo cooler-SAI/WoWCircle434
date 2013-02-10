@@ -3128,7 +3128,7 @@ class Player : public Unit, public GridObject<Player>
                  _heal_done[i] = 0;
             }
         }
-
+        void ResetHolyPowerTimer() { m_holyPowerRegenTimerCount = 0; }
     protected:
         // Gamemaster whisper whitelist
         WhisperListContainer WhisperList;
