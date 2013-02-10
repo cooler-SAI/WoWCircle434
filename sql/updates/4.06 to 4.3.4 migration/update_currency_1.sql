@@ -18,8 +18,8 @@ DECLARE justice INT DEFAULT 0;
 DECLARE valor INT DEFAULT 0;
 DECLARE counts INT DEFAULT 0;
 DECLARE done INT DEFAULT 0;
-DECLARE money INT DEFAULT 0;
-DECLARE oldmoney INT DEFAULT 0;
+DECLARE money BIGINT DEFAULT 0;
+DECLARE oldmoney BIGINT DEFAULT 0;
 DECLARE cur CURSOR FOR SELECT `character_currency`.`guid`, `character_currency`.`currency`, `character_currency`.`total_count`, `characters`.`money` FROM `character_currency` RIGHT JOIN `characters` ON `character_currency`.`guid` = `characters`.`guid` WHERE `character_currency`.`currency` IN (395, 396) ORDER BY `character_currency`.`guid`, `character_currency`.`currency`;
 DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET done = 1; 
 -- sort rows
@@ -47,8 +47,8 @@ WHILE done = 0 DO
             SET money = (justice - 400000) * 47 * rate;
             SET justice = 400000;
             IF oldmoney + money > 9000000000 THEN
-                money = 9000000000 - oldmoney;
-            END IF
+                SET money = 9000000000 - oldmoney;
+            END IF;
         END IF;
         UPDATE `character_currency` SET `character_currency`.`total_count`=justice WHERE `character_currency`.`guid`=guid AND `character_currency`.`currency`=395;
         -- if we have money, we have to add them to the player
