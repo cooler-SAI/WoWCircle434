@@ -3429,25 +3429,24 @@ enum DiminishingGroup
 {
     DIMINISHING_NONE                = 0,
     DIMINISHING_BANISH              = 1,
-    DIMINISHING_CHARGE              = 2,
-    DIMINISHING_OPENING_STUN        = 3, // Cheap Shot and Pounce
-    DIMINISHING_CONTROLLED_STUN     = 4,
-    DIMINISHING_CONTROLLED_ROOT     = 5,
-    DIMINISHING_CYCLONE             = 6,
-    DIMINISHING_DISARM              = 7,
-    DIMINISHING_DISORIENT           = 8, // Several spells where name cant be generalized.
-    DIMINISHING_ENTRAPMENT          = 9,
-    DIMINISHING_FEAR                = 10,
-    DIMINISHING_HORROR              = 11,
-    DIMINISHING_MIND_CONTROL        = 12,
-    DIMINISHING_ROOT                = 13,
-    DIMINISHING_STUN                = 14,
-    DIMINISHING_SCATTER_SHOT        = 15,
-    DIMINISHING_SILENCE             = 16,
-    DIMINISHING_SLEEP               = 17,
-    DIMINISHING_TAUNT               = 18,
-    DIMINISHING_LIMITONLY           = 19,
-    DIMINISHING_DRAGONS_BREATH      = 20
+    DIMINISHING_OPENING_STUN        = 2, // Cheap Shot and Pounce
+    DIMINISHING_CONTROLLED_STUN     = 3,
+    DIMINISHING_CONTROLLED_ROOT     = 4,
+    DIMINISHING_CYCLONE             = 5,
+    DIMINISHING_DISARM              = 6,
+    DIMINISHING_DISORIENT           = 7, // Several spells where name cant be generalized.
+    DIMINISHING_ENTRAPMENT          = 8,
+    DIMINISHING_FEAR                = 9,
+    DIMINISHING_HORROR              = 10,
+    DIMINISHING_MIND_CONTROL        = 11,
+    DIMINISHING_ROOT                = 12,
+    DIMINISHING_STUN                = 13,
+    DIMINISHING_SCATTER_SHOT        = 14,
+    DIMINISHING_SILENCE             = 15,
+    DIMINISHING_SLEEP               = 16,
+    DIMINISHING_TAUNT               = 17,
+    DIMINISHING_DRAGONS_BREATH      = 18,
+    DIMINISHING_LIMITONLY           = 19    // has to go last
 };
 
 enum SummonCategory

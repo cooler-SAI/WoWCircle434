@@ -119,9 +119,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Hamstring - limit duration to 10s in PvP
             if (spellproto->SpellFamilyFlags[0] & 0x2)
                 return DIMINISHING_LIMITONLY;
-            // Charge Stun (own diminishing)
+            // Charge Stun (own diminishing) // not anymore 410
             else if (spellproto->SpellFamilyFlags[0] & 0x01000000)
-                return DIMINISHING_CHARGE;
+                return DIMINISHING_LIMITONLY;
             break;
         }
         case SPELLFAMILY_WARLOCK:
@@ -254,7 +254,6 @@ DiminishingReturnsType GetDiminishingReturnsGroupType(DiminishingGroup group)
         case DIMINISHING_STUN:
         case DIMINISHING_OPENING_STUN:
         case DIMINISHING_CYCLONE:
-        case DIMINISHING_CHARGE:
             return DRTYPE_ALL;
         case DIMINISHING_LIMITONLY:
         case DIMINISHING_NONE:
