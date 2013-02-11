@@ -1,0 +1,1 @@
+INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `comments`) VALUES ('78777', '0.603', 'Druid - Wild Mushroom Explosion');
