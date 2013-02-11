@@ -1312,14 +1312,15 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                     {
                         bool found = false;
                         uint8 types_i = 0;
-                        while(types[++types_i])
+                        do 
                         {
                             if ((*itr)->GetCreatureType() == types[types_i])
                             {
                                 found = true;
                                 break;
                             }
-                        }
+                        } while (types[++types_i]);
+
                         if (found)
                             itr++;
                         else
