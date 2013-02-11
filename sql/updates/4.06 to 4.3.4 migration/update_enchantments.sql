@@ -18,8 +18,8 @@ DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET done = 1;
 OPEN cur; 
 WHILE done = 0 DO
 FETCH cur INTO guid, enchant;
-SET lstr = SUBSTRING_INDEX(enchant, ' ', 24);
-SET rstr = SUBSTRING_INDEX(enchant, ' ', -19);
+SET lstr = SUBSTRING_INDEX(enchant, ' ', 27);
+SET rstr = SUBSTRING_INDEX(enchant, ' ', -16);
 SET newstr = CONCAT_WS(' ', lstr, '0', '0', '0', rstr);
 UPDATE `item_instance` SET `item_instance`.`enchantments`=newstr WHERE `item_instance`.`guid`=guid;  
 END WHILE;
