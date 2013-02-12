@@ -6011,6 +6011,9 @@ void SpellMgr::LoadDbcDataCorrections()
             case 69510:
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_DEATH_PERSISTENT;
                 break;
+            case 1856:
+                spellInfo->Effects[1].Effect = SPELL_EFFECT_SANCTUARY;
+                break;
             default:
                 break;
         }
