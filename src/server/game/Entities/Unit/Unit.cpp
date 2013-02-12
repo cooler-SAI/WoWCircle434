@@ -6750,6 +6750,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     target = victim;
                     break;
                 }
+                // Glyph of Healing Touch
+                case 54825:
+                {
+                    ToPlayer()->SpellCooldownReduction(17116, 10000);
+                    break;
+                }
                 // Glyph of Innervate
                 case 54832:
                 {
@@ -6761,6 +6767,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     target = this;
                     break;
                 }
+
                 // Glyph of Starfire
                 case 54845:
                 {
