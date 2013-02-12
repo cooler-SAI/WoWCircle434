@@ -168,9 +168,8 @@ public:
                 case SPELL_DRUID_WRATH:
                 {
                     energizeAmount = -GetSpellInfo()->Effects[effIndex].BasePoints; // -13
-                    // If we are set to fill the lunar side or we've just logged in with 0 power..
-                    if ((!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
-                        || caster->GetPower(POWER_ECLIPSE) == 0)
+
+                    if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE) && !caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE))
                     {
                         // Euphoria
                         // To do: which spell we have to use?
@@ -182,7 +181,12 @@ public:
                         // Item - Druid T12 Balance 4P Bonus
                         if (caster->HasAura(99049))
                             energizeAmount -= 3;
+                    }
 
+                    // If we are set to fill the lunar side or we've just logged in with 0 power..
+                    if ((!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
+                        || caster->GetPower(POWER_ECLIPSE) == 0)
+                    {
                         caster->CastCustomSpell(caster,SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE,&energizeAmount,0,0,true);
                         // If the energize was due to 0 power, cast the eclipse marker aura
                         if (!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
@@ -196,9 +200,8 @@ public:
                 case SPELL_DRUID_STARFIRE:
                 {
                     energizeAmount = GetSpellInfo()->Effects[effIndex].BasePoints; // 20
-                    // If we are set to fill the solar side or we've just logged in with 0 power..
-                    if ((!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
-                        || caster->GetPower(POWER_ECLIPSE) == 0)
+
+                    if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE) && !caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE))
                     {
                         // Euphoria
                         // To do: which spell we have to use?
@@ -209,8 +212,13 @@ public:
 
                         // Item - Druid T12 Balance 4P Bonus
                         if (caster->HasAura(99049))
-                            energizeAmount += 5;
+                            energizeAmount -= 3;
+                    }
 
+                    // If we are set to fill the solar side or we've just logged in with 0 power..
+                    if ((!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
+                        || caster->GetPower(POWER_ECLIPSE) == 0)
+                    {
                         caster->CastCustomSpell(caster,SPELL_DRUID_ECLIPSE_GENERAL_ENERGIZE,&energizeAmount,0,0,true);
                         // If the energize was due to 0 power, cast the eclipse marker aura
                         if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
