@@ -1,220 +1,168 @@
 #include "ScriptPCH.h"
 #include "shadowfang_keep.h"
 
-#define MAX_ENCOUNTER              5
+DoorData const doorData[] =
+{
+    {GO_COURTYARD_DOOR, DATA_ASHBURY,   DOOR_TYPE_PASSAGE,  BOUNDARY_NONE},
+    {GO_SORCERER_DOOR,  DATA_VALDEN,    DOOR_TYPE_PASSAGE,  BOUNDARY_NONE},
+    {GO_ARUGAL_DOOR,    DATA_VALDEN,    DOOR_TYPE_PASSAGE,  BOUNDARY_NONE},      
+};
 
 class instance_shadowfang_keep : public InstanceMapScript
 {
-public:
-    instance_shadowfang_keep() : InstanceMapScript("instance_shadowfang_keep", 33) { }
+    public:
+        instance_shadowfang_keep() : InstanceMapScript("instance_shadowfang_keep", 33) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
-    {
-        return new instance_shadowfang_keep_InstanceMapScript(pMap);
-    }
-
-    struct instance_shadowfang_keep_InstanceMapScript : public InstanceScript
-    {
-        instance_shadowfang_keep_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
-
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
-        std::string str_data;
-
-        uint64 uiAshburyGUID;
-        uint64 uiSilverlaineGUID;
-        uint64 uiSpringvaleGUID;
-        uint64 uiValdenGUID;
-        uint64 uiGodfreyGUID;
-
-        uint64 DoorCourtyardGUID;
-        uint64 DoorSorcererGUID;
-        uint64 DoorArugalGUID;
-
-        uint32 teamInInstance;
-
-        void Initialize()
+        InstanceScript* GetInstanceScript(InstanceMap* pMap) const
         {
-            memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-
-            uiAshburyGUID = 0;
-
-            DoorCourtyardGUID = 0;
-            DoorSorcererGUID = 0;
-            DoorArugalGUID = 0;
-
-            teamInInstance = 0;
+            return new instance_shadowfang_keep_InstanceMapScript(pMap);
         }
 
-        void OnPlayerEnter(Player* player)
+        struct instance_shadowfang_keep_InstanceMapScript : public InstanceScript
         {
-            if (!teamInInstance)
-                    teamInInstance = player->GetTeam();
-        }
-
-        void OnCreatureCreate(Creature* pCreature)
-        {
-            switch(pCreature->GetEntry())
+            instance_shadowfang_keep_InstanceMapScript(Map* pMap) : InstanceScript(pMap) 
             {
-            case NPC_BELMONT:
-                if (teamInInstance == ALLIANCE)
-                    pCreature->UpdateEntry(NPC_IVAR, ALLIANCE);
-                break;
-            case NPC_GUARD_HORDE1:
-                if (teamInInstance == ALLIANCE)
-                    pCreature->UpdateEntry(NPC_GUARD_ALLY, ALLIANCE);
-                break;
-            case NPC_GUARD_HORDE2:
-                if (teamInInstance == ALLIANCE)
-                    pCreature->UpdateEntry(NPC_GUARD_ALLY, ALLIANCE);
-                break;
-            case NPC_ASHBURY:
-                uiAshburyGUID = pCreature->GetGUID();
-                break;
-            case NPC_SILVERLAINE:
-                uiSilverlaineGUID = pCreature->GetGUID();
-                break;
-            case NPC_SPRINGVALE:
-                uiSpringvaleGUID = pCreature->GetGUID();
-                break;
-            case NPC_VALDEN:
-                uiValdenGUID = pCreature->GetGUID();
-                break;
-            case NPC_GODFREY:
-                uiGodfreyGUID = pCreature->GetGUID();
-                break;
-            }
-        }
+                SetBossNumber(EncounterCount);
+                LoadDoorData(doorData);
+                uiAshburyGUID = 0;
+                uiSilverlaineGUID = 0;
+                uiSpringvaleGUID = 0;
+                uiValdenGUID = 0;
+                uiGodfreyGUID = 0;
+                teamInInstance = 0;
+            };
 
-        void OnGameObjectCreate(GameObject* pGo)
-        {
-            switch(pGo->GetEntry())
+            void OnPlayerEnter(Player* pPlayer)
             {
-                case GO_COURTYARD_DOOR:
-                    DoorCourtyardGUID = pGo->GetGUID();
-                    if (m_auiEncounter[0] == DONE)
-                        HandleGameObject(DoorCourtyardGUID, true, pGo);
-                    break;
-                case GO_SORCERER_DOOR:
-                    DoorSorcererGUID = pGo->GetGUID();
-                    if (m_auiEncounter[3] == DONE)
-                        HandleGameObject(DoorSorcererGUID, true, pGo);
-                    break;
-                case GO_ARUGAL_DOOR:
-                    DoorArugalGUID = pGo->GetGUID();
-                    if (m_auiEncounter[3] == DONE)
-                        HandleGameObject(DoorArugalGUID, true, pGo);
-                    break;
-            }
-        }
-
-        void SetData(uint32 type, uint32 data)
-        {
-            switch(type)
-            {
-                case DATA_ASHBURY:
-                    m_auiEncounter[0] = data;
-                    if (data == DONE)
-                        if (GameObject* courtyarddoor = instance->GetGameObject(DoorCourtyardGUID))
-                            HandleGameObject(DoorCourtyardGUID, true, courtyarddoor);
-                    break;
-                case DATA_SILVERLAINE:
-                    m_auiEncounter[1] = data;
-                    break;
-                case DATA_SPRINGVALE:
-                    m_auiEncounter[2] = data;
-                    break;
-                case DATA_VALDEN:
-                    m_auiEncounter[3] = data;
-                    if (data == DONE)
-                    {
-                        if (GameObject* sorcererdoor = instance->GetGameObject(DoorSorcererGUID))
-                            HandleGameObject(DoorSorcererGUID, true, sorcererdoor);
-                        if (GameObject* arugaldoor = instance->GetGameObject(DoorArugalGUID))
-                            HandleGameObject(DoorArugalGUID, true, arugaldoor);
-                    }
-                    break;
-                case DATA_GODFREY:
-                    m_auiEncounter[4] = data;
-                    break;
+                if (!teamInInstance)
+                    teamInInstance = pPlayer->GetTeam();
             }
 
-            if (data == DONE)
+            void OnCreatureCreate(Creature* pCreature)
+            {
+                switch(pCreature->GetEntry())
+                {
+                    case NPC_BELMONT:
+                        if (teamInInstance == ALLIANCE)
+                            pCreature->UpdateEntry(NPC_IVAR, ALLIANCE);
+                        break;
+                    case NPC_GUARD_HORDE1:
+                        if (teamInInstance == ALLIANCE)
+                            pCreature->UpdateEntry(NPC_GUARD_ALLY, ALLIANCE);
+                        break;
+                    case NPC_GUARD_HORDE2:
+                        if (teamInInstance == ALLIANCE)
+                            pCreature->UpdateEntry(NPC_GUARD_ALLY, ALLIANCE);
+                        break;
+                    case NPC_ASHBURY:
+                        uiAshburyGUID = pCreature->GetGUID();
+                        break;
+                    case NPC_SILVERLAINE:
+                        uiSilverlaineGUID = pCreature->GetGUID();
+                        break;
+                    case NPC_SPRINGVALE:
+                        uiSpringvaleGUID = pCreature->GetGUID();
+                        break;
+                    case NPC_VALDEN:
+                        uiValdenGUID = pCreature->GetGUID();
+                        break;
+                    case NPC_GODFREY:
+                        uiGodfreyGUID = pCreature->GetGUID();
+                        break;
+                }
+            }
+
+            void OnGameObjectCreate(GameObject* pGo)
+            {
+                switch(pGo->GetEntry())
+                {
+                    case GO_COURTYARD_DOOR:
+                    case GO_SORCERER_DOOR:
+                    case GO_ARUGAL_DOOR:
+                        AddDoor(pGo, true);
+                        break;
+                }
+            }
+
+            bool SetBossState(uint32 type, EncounterState state)
+            {
+                if (!InstanceScript::SetBossState(type, state))
+                    return false;
+                return true;
+            }
+
+            uint32 GetData(uint32 type)
+            {
+                if (type == DATA_TEAM)
+                    return teamInInstance;
+
+                return 0;
+            }
+
+            std::string GetSaveData()
             {
                 OUT_SAVE_INST_DATA;
 
                 std::ostringstream saveStream;
-                saveStream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " " << m_auiEncounter[2] << " " << m_auiEncounter[3] << " " << m_auiEncounter[4];
+                saveStream << "S K " << GetBossSaveData();
 
-                str_data = saveStream.str();
-
-                SaveToDB();
                 OUT_SAVE_INST_DATA_COMPLETE;
+                return saveStream.str();
             }
-        }
 
-        uint32 GetData(uint32 type)
-        {
-            switch(type)
+            uint64 GetData64(uint32 type)
             {
-            case DATA_TEAM:
-                return teamInInstance;
-            case DATA_ASHBURY:
-                return m_auiEncounter[0];
-            case DATA_SILVERLAINE:
-                return m_auiEncounter[1];
-            case DATA_SPRINGVALE:
-                return m_auiEncounter[2];
-            case DATA_VALDEN:
-                return m_auiEncounter[3];
-            case DATA_GODFREY:
-                return m_auiEncounter[4];
+                switch (type)
+                {
+                    case DATA_ASHBURY: return uiAshburyGUID;
+                    case DATA_SILVERLAINE: return uiSilverlaineGUID;
+                    case DATA_SPRINGVALE: return uiSpringvaleGUID;
+                    case DATA_VALDEN: return uiValdenGUID;
+                    case DATA_GODFREY: return uiGodfreyGUID;
+                }
+                return 0;
             }
-            return 0;
-        }
 
-        uint64 GetData64(uint32 type)
-        {
-            switch (type)
+            void Load(const char* str)
             {
-            case DATA_ASHBURY: return uiAshburyGUID;
-            case DATA_SILVERLAINE: return uiSilverlaineGUID;
-            case DATA_SPRINGVALE: return uiSpringvaleGUID;
-            case DATA_VALDEN: return uiValdenGUID;
-            case DATA_GODFREY: return uiGodfreyGUID;
-            case DATA_COURTYARD_DOOR: return DoorCourtyardGUID;
-            case DATA_SORCERER_DOOR: return DoorSorcererGUID;
-            case DATA_ARUGAL_DOOR: return DoorArugalGUID;
+                if (!str)
+                {
+                    OUT_LOAD_INST_DATA_FAIL;
+                    return;
+                }
+
+                OUT_LOAD_INST_DATA(str);
+
+                char dataHead1, dataHead2;
+
+                std::istringstream loadStream(str);
+                loadStream >> dataHead1 >> dataHead2;
+
+                if (dataHead1 == 'S' && dataHead2 == 'K')
+                {
+                    for (uint32 i = 0; i < EncounterCount; ++i)
+                    {
+                        uint32 tmpState;
+                        loadStream >> tmpState;
+                        if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                            tmpState = NOT_STARTED;
+                        SetBossState(i, EncounterState(tmpState));
+                    }
+                }
+                else
+                    OUT_LOAD_INST_DATA_FAIL;
+
+                OUT_LOAD_INST_DATA_COMPLETE;
             }
-            return 0;
-        }
-
-        std::string GetSaveData()
-        {
-            return str_data;
-        }
-
-        void Load(const char* in)
-        {
-            if (!in)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(in);
-
-            std::istringstream loadStream(in);
-            loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3] >> m_auiEncounter[4];
-
-            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-            {
-                if (m_auiEncounter[i] == IN_PROGRESS)
-                    m_auiEncounter[i] = NOT_STARTED;
-            }
-
-            OUT_LOAD_INST_DATA_COMPLETE;
-        }
-    };
+        
+        private:
+            uint64 uiAshburyGUID;
+            uint64 uiSilverlaineGUID;
+            uint64 uiSpringvaleGUID;
+            uint64 uiValdenGUID;
+            uint64 uiGodfreyGUID;
+            uint32 teamInInstance;
+        };
 
 };
 

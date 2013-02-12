@@ -13,32 +13,32 @@ enum ScriptTexts
 
 enum Events
 {
-    EVENT_VEIL_OF_SHADOW         = 1,
-    EVENT_CURSED_VEIL_H             = 3,
+    EVENT_VEIL_OF_SHADOW    = 1,
+    EVENT_CURSED_VEIL_H     = 3,
 };
 
 enum Spells
 {
     SPELL_VEIL_OF_SHADOW        = 23224,
-    SPELL_CURSED_VEIL_H            = 93956,
+    SPELL_CURSED_VEIL_H         = 93956,
     SPELL_SUMMON_WORGEN_SPIRIT  = 93857,
 
-    SPELL_NANDOS_T                = 93899,
-    SPELL_ODO_T                    = 93864,
-    SPELL_RETHILGORE_T            = 93927,
-    SPELL_RAZORCLAW_T            = 93924,
+    SPELL_NANDOS_T              = 93899,
+    SPELL_ODO_T                 = 93864,
+    SPELL_RETHILGORE_T          = 93927,
+    SPELL_RAZORCLAW_T           = 93924,
 };
 
 enum Adds
 {
-    NPC_RETHILGORE_DUMMY    = 50085,
-    NPC_RAZORCLAW_DUMMY        = 51080,
-    NPC_ODO_DUMMY            = 50934,
-    NPC_NANDOS_DUMMY        = 51047,
-    NPC_ODO                    = 50857,
-    NPC_RAZORCLAW            = 50869,
-    NPC_RETHILGORE            = 50834,
-    NPC_NANDOS                = 50851,
+    NPC_RETHILGORE_DUMMY = 50085,
+    NPC_RAZORCLAW_DUMMY  = 51080,
+    NPC_ODO_DUMMY        = 50934,
+    NPC_NANDOS_DUMMY     = 51047,
+    NPC_ODO              = 50857,
+    NPC_RAZORCLAW        = 50869,
+    NPC_RETHILGORE       = 50834,
+    NPC_NANDOS           = 50851,
 };
 
 class boss_baron_silverlaine : public CreatureScript
@@ -50,96 +50,86 @@ class boss_baron_silverlaine : public CreatureScript
         {
             return new boss_baron_silverlaineAI(pCreature);
         }
-     struct boss_baron_silverlaineAI : public ScriptedAI
-     {
-        boss_baron_silverlaineAI(Creature* pCreature) : ScriptedAI(pCreature)
+        struct boss_baron_silverlaineAI : public BossAI
         {
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-            pInstance = pCreature->GetInstanceScript();
-        }
-
-        InstanceScript *pInstance;
-        EventMap events;
-        uint8 phase;
-
-        void Reset()
-        {
-            if (!pInstance)
-                return;
-
-            phase = 0;
-            events.Reset();
-            pInstance->SetData(DATA_SILVERLAINE, NOT_STARTED);
-        }
-
-        void EnterCombat(Unit* pWho)
-        {
-            if (!pInstance)
-                return;
-
-            me->MonsterYell(SAY_AGGRO, 0, 0);
-            events.ScheduleEvent(EVENT_VEIL_OF_SHADOW, 12000);
-            DoZoneInCombat();
-            pInstance->SetData(DATA_SILVERLAINE, IN_PROGRESS);
-        }
-
-        void KilledUnit(Unit* who)
-        {
-            me->MonsterYell(urand(0, 1)? SAY_KILL1: SAY_KILL2, 0, 0);
-        }
-
-        void JustDied(Unit* pWho)
-        {
-            if (!pInstance)
-                return;
-            me->MonsterYell(SAY_DEATH, 0, 0);
-            pInstance->SetData(DATA_SILVERLAINE, DONE);
-        }
-                             
-        void UpdateAI(const uint32 uiDiff)
-        {
-            if (!pInstance || !UpdateVictim())
-                return;
-
-            if (!HealthAbovePct(50) && phase == 0)
+            boss_baron_silverlaineAI(Creature* pCreature) : BossAI(pCreature, DATA_SILVERLAINE)
             {
-                phase = 1;
-                DoCast(SPELL_SUMMON_WORGEN_SPIRIT);    
-            }
-            if (!HealthAbovePct(25) && phase == 1)
-            {
-                phase = 2;
-                DoCast(SPELL_SUMMON_WORGEN_SPIRIT);
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
             }
 
-            events.Update(uiDiff);
+            uint8 phase;
 
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-                
-            while(uint32 eventId = events.ExecuteEvent())
+            void Reset()
             {
-                switch(eventId)
+                _Reset();
+                phase = 0;
+            }
+
+            void EnterCombat(Unit* pWho)
+            {
+                me->MonsterYell(SAY_AGGRO, 0, 0);
+                events.ScheduleEvent(EVENT_VEIL_OF_SHADOW, 12000);
+                DoZoneInCombat();
+                instance->SetBossState(DATA_SILVERLAINE, IN_PROGRESS);
+            }
+
+            void KilledUnit(Unit* who)
+            {
+                me->MonsterYell(urand(0, 1)? SAY_KILL1: SAY_KILL2, 0, 0);
+            }
+
+            void JustDied(Unit* pWho)
+            {
+                _JustDied();
+                me->MonsterYell(SAY_DEATH, 0, 0);
+            }
+                                 
+            void UpdateAI(const uint32 uiDiff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                if (!HealthAbovePct(50) && phase == 0)
                 {
-                case EVENT_VEIL_OF_SHADOW:
-                    DoCast(DUNGEON_MODE(SPELL_VEIL_OF_SHADOW, SPELL_CURSED_VEIL_H));
-                    events.ScheduleEvent(EVENT_VEIL_OF_SHADOW, 12000);
-                    break;
+                    phase = 1;
+                    DoCast(SPELL_SUMMON_WORGEN_SPIRIT);
+                    return;
                 }
+                if (!HealthAbovePct(25) && phase == 1)
+                {
+                    phase = 2;
+                    DoCast(SPELL_SUMMON_WORGEN_SPIRIT);
+                    return;
+                }
+
+                events.Update(uiDiff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+                    
+                while(uint32 eventId = events.ExecuteEvent())
+                {
+                    switch(eventId)
+                    {
+                        case EVENT_VEIL_OF_SHADOW:
+                            DoCast(me, SPELL_VEIL_OF_SHADOW);
+                            events.ScheduleEvent(EVENT_VEIL_OF_SHADOW, 12000);
+                            break;
+                    }
+                }
+                DoMeleeAttackIfReady();
             }
-            DoMeleeAttackIfReady();
-        }
-     };
+         };
 };
 
 class npc_silverlaine_worgen : public CreatureScript
@@ -151,33 +141,30 @@ class npc_silverlaine_worgen : public CreatureScript
         {
             return new npc_silverlaine_worgenAI(pCreature);
         }
-     struct npc_silverlaine_worgenAI : public ScriptedAI
-     {
-        npc_silverlaine_worgenAI(Creature* pCreature) : ScriptedAI(pCreature)
-        {
-            pInstance = pCreature->GetInstanceScript();
-        }
+         struct npc_silverlaine_worgenAI : public ScriptedAI
+         {
+            npc_silverlaine_worgenAI(Creature* pCreature) : ScriptedAI(pCreature)
+            {
+                pInstance = pCreature->GetInstanceScript();
+            }
 
-        InstanceScript *pInstance;
+            InstanceScript *pInstance;
 
-        void IsSummonedBy(Unit* summoner)
-        {
-            if (Creature* _silverlaine = me->FindNearestCreature(NPC_SILVERLAINE, 200.0f))
-                if (Unit* target = _silverlaine->AI()->SelectTarget(SELECT_TARGET_RANDOM))
-                    AttackStart(target);
-        }
+            void IsSummonedBy(Unit* summoner)
+            {
+                if (Creature* _silverlaine = me->FindNearestCreature(NPC_SILVERLAINE, 200.0f))
+                    if (Unit* target = _silverlaine->AI()->SelectTarget(SELECT_TARGET_RANDOM))
+                        AttackStart(target);
+            }
 
-        void UpdateAI(const uint32 diff)
-        {
-            if (!pInstance)
-                return;
+            void UpdateAI(const uint32 diff)
+            {
+                if (pInstance && pInstance->GetBossState(DATA_SILVERLAINE) != IN_PROGRESS)
+                    me->DespawnOrUnsummon();
 
-            if (pInstance->GetData(DATA_SILVERLAINE) != IN_PROGRESS)
-                me->DespawnOrUnsummon();
-
-            DoMeleeAttackIfReady();
-        }
-     };
+                DoMeleeAttackIfReady();
+            }
+         };
 };
 
 class npc_silverlaine_worgen_spirit : public CreatureScript
@@ -189,37 +176,31 @@ class npc_silverlaine_worgen_spirit : public CreatureScript
         {
             return new npc_silverlaine_worgen_spiritAI(pCreature);
         }
-     struct npc_silverlaine_worgen_spiritAI : public Scripted_NoMovementAI
-     {
-        npc_silverlaine_worgen_spiritAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
-        {
-            pInstance = pCreature->GetInstanceScript();
-        }
-
-        InstanceScript *pInstance;
-
-        void IsSummonedBy(Unit* summoner)
-        {
-            if (!pInstance)
-                return;
-
-            switch (me->GetEntry())
+         struct npc_silverlaine_worgen_spiritAI : public Scripted_NoMovementAI
+         {
+            npc_silverlaine_worgen_spiritAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
             {
-            case NPC_ODO_DUMMY:
-                DoCast(me, SPELL_ODO_T);
-                break;
-            case NPC_RETHILGORE_DUMMY:
-                DoCast(me, SPELL_RETHILGORE_T);
-                break;
-            case NPC_NANDOS_DUMMY:
-                DoCast(me, SPELL_NANDOS_T);
-                break;
-            case NPC_RAZORCLAW_DUMMY:
-                DoCast(me, SPELL_RAZORCLAW_T);
-                break;    
             }
-        }
-     };
+
+            void IsSummonedBy(Unit* summoner)
+            {
+                switch (me->GetEntry())
+                {
+                    case NPC_ODO_DUMMY:
+                        DoCast(me, SPELL_ODO_T);
+                        break;
+                    case NPC_RETHILGORE_DUMMY:
+                        DoCast(me, SPELL_RETHILGORE_T);
+                        break;
+                    case NPC_NANDOS_DUMMY:
+                        DoCast(me, SPELL_NANDOS_T);
+                        break;
+                    case NPC_RAZORCLAW_DUMMY:
+                        DoCast(me, SPELL_RAZORCLAW_T);
+                        break;    
+                }
+            }
+         };
 };
 
 class spell_silverlaine_summon_worgen_spirit : public SpellScriptLoader
