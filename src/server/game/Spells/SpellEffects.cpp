@@ -3223,6 +3223,12 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
 
+    // Hack for water elemental
+    if (m_spellInfo->Id == 31687)
+        if (m_caster->ToPlayer())
+            if (m_caster->getClass() == CLASS_MAGE && m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) != TALENT_TREE_MAGE_FROST)
+                return;
+
     uint32 entry = m_spellInfo->Effects[effIndex].MiscValue;
     if (!entry)
         return;

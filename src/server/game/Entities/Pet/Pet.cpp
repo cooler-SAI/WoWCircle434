@@ -98,6 +98,15 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
 {
     m_loading = true;
 
+    // Hack for water elemental
+    // Pet should be saved for all specs, but can be summoned only by frost mages
+    if (owner->ToPlayer())
+        if (owner->getClass() == CLASS_MAGE && owner->ToPlayer()->GetPrimaryTalentTree(owner->ToPlayer()->GetActiveSpec()) != TALENT_TREE_MAGE_FROST)
+        {
+            m_loading = false;
+            return false;
+        }
+
     if (slotID == PET_SLOT_ACTUAL_PET_SLOT)
         slotID = owner->m_currentPetSlot;
 
