@@ -682,9 +682,18 @@ void WorldSession::SendAuthWaitQue(uint32 position)
 {
     if (position == 0)
     {
-        WorldPacket packet(SMSG_AUTH_RESPONSE, 1);
+        WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1 + 4 + 1 + 1);
         packet.WriteBit(false); // has queue info
-        packet.WriteBit(false); // has account info
+        packet.WriteBit(true); // has account info
+        
+        // account info
+        packet << uint32(0);                                   // BillingTimeRemaining
+        packet << uint8(Expansion());                          // 0 - normal, 1 - TBC, 2 - WOTLK, 3 - CATA; must be set in database manually for each account
+        packet << uint32(0);
+        packet << uint8(Expansion());                          // Unknown, these two show the same
+        packet << uint32(0);                                   // BillingTimeRested
+        packet << uint8(0);                                    // BillingPlanFlags
+
         packet << uint8(AUTH_OK);
         SendPacket(&packet);
     }
@@ -694,7 +703,7 @@ void WorldSession::SendAuthWaitQue(uint32 position)
         packet.WriteBit(true); // has queue info
         packet.WriteBit(false); // unk queue bool
         packet.WriteBit(false); // has account info
-        packet << uint8(AUTH_WAIT_QUEUE);
+        packet << uint8(AUTH_OK);
         packet << uint32(position);
         SendPacket(&packet);
     }
