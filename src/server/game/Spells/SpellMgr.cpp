@@ -6014,6 +6014,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 1856:
                 spellInfo->Effects[1].Effect = SPELL_EFFECT_SANCTUARY;
                 break;
+            // Cobra Strikes
+            case 53257:
+                spellInfo->ProcCharges = 2;
+                spellInfo->StackAmount = 0;
+                break;
             default:
                 break;
         }

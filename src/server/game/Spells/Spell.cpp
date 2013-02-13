@@ -2673,6 +2673,21 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         // Used in spell scripts
         m_final_damage = damageInfo.damage;
         m_absorbed_damage = damageInfo.absorb;
+
+        // Hunter's pet special attacks
+        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && m_spellInfo->SpellFamilyFlags[0] & 0x00080000)
+            if (Unit * owner = caster->GetOwner())
+            {
+                // Cobra Strikes
+                if (Aura* pAura = owner->GetAura(53257))
+                    pAura->DropCharge();
+                // Sic 'Em Rank 1
+                if (Aura* pAura = owner->GetAura(83359))
+                    pAura->DropCharge();
+                // Sic 'Em Rank 2
+                if (Aura* pAura = owner->GetAura(89388))
+                    pAura->DropCharge();
+            }
     }
     // Passive spell hits/misses or active spells only misses (only triggers)
     else
@@ -4078,20 +4093,6 @@ void Spell::finish(bool ok)
 
     switch (m_spellInfo->Id)
     {
-        // Smack, Claw, Bite
-        case 49966:
-        case 16827:
-        case 17253:
-            if (Unit* owner = m_caster->GetOwner())
-            {
-                // Remove Cobra Strikes 
-                owner->RemoveAuraFromStack(53257);
-
-                // Remove Sic 'em!
-                owner->RemoveAurasDueToSpell(83359);
-                owner->RemoveAurasDueToSpell(89388);
-            }
-            break;
         case 30455: // Ice Lance
         case 44572: // Deep Freeze
             m_caster->RemoveAuraFromStack(44544);
