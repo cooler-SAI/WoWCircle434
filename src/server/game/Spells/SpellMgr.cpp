@@ -3994,6 +3994,10 @@ void SpellMgr::LoadDbcDataCorrections()
             // BARADIN HOLD SPELLS
             //
             // Occu'thar
+            case 96913: // Searing Shadow
+            case 101007:
+                spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
+                break;
             case 96872: // Focused Fire
                 spellInfo->MaxAffectedTargets = 1;
                 spellInfo->Effects[0].SetRadiusIndex(28);
@@ -4067,15 +4071,97 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].SetRadiusIndex(13);
                 break;
             case 79249: // Gravity Well aura dmg
-                spellInfo->Effects[0].SetRadiusIndex(28);
-                spellInfo->Effects[0].BasePoints = 3000;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                spellInfo->Effects[EFFECT_0].BasePoints = 3000;
                 break;
             case 79050: // Arcane Shield dmg
             case 92667:
-                spellInfo->Effects[2].SetRadiusIndex(8);
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(8);
                 break;
             // ENDOF STONECORE SPELLS
             //
+            // HALLS OF ORIGINATION
+            // Trash
+            case 77262: // Raging Inferno dmg
+            case 91159:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(13);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(13);
+                break;
+            case 77273: // Lava Eruption
+            case 91161:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                break;
+            // Earthrager Ptah
+            case 75540: // Flame Bolt dmg
+            case 89881:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                break;
+            case 83650: // Raging Smash
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                break;
+            // Anraphet
+            case 76094: // Alpha Beams aoe
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(30);
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 76956: // Alpha Beams dmg
+            case 91177:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(8);
+                break;
+            case 75609: // Crumbling Ruin
+            case 91206:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                break;
+            // Isiset
+            case 74374: // Arcane Barrage
+            case 89886:
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            // Setesh
+            case 76146: // Shadow Bolt Volley
+            case 89846:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                break;
+            // Ammunae
+            case 75702: // Noxious Spore
+            case 89889:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(13);
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                break;
+            case 75790: // Rampant Growth
+            case 89888:
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(28);
+                break;
+            // Rajh
+            case 73872: // Sun Strike
+            case 89887:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                break;
+            case 73874: // Sun Strike dmg
+            case 90009:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_0].TargetA = 0;
+                break;
+            case 76355: // Blessing of the Sun aura
+            case 89879:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(28);
+                break;
+            case 74108: // Solar Winds dmg
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(26);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(26);
+                break;
+            case 89130: // Solar Winds dmg H
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(26);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(26);
+                spellInfo->Effects[EFFECT_2].Effect = 0;
+                break;
+            case 89133: // Solar Fire dmg
+            case 89878:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(26);
+                break;
+            // ENDOF HALLS OF ORIGINATION SPELLS
             // LOST CITY OF THE TOL'VIR
             case 83644: // Mystic Trap N
                 spellInfo->MaxAffectedTargets = 3;
