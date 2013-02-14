@@ -4700,7 +4700,41 @@ void Spell::EffectInterruptCast(SpellEffIndex effIndex)
                 {
                     int32 duration = m_spellInfo->GetDuration();
                     unitTarget->ProhibitSpellSchool(curSpellInfo->GetSchoolMask(), unitTarget->ModSpellDuration(m_spellInfo, unitTarget, duration, false, 1 << effIndex));
+                
+                    // Seasoned Winds 
+                    if (m_spellInfo->Id == 57994)
+                    {
+                        if (AuraEffect * eff = m_caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_SHAMAN, 2016, 0))
+                        {
+                            uint32 spellid = 0;
+                            switch (GetFirstSchoolInMask(curSpellInfo->GetSchoolMask()))
+                            {
+                                case SPELL_SCHOOL_FIRE:     spellid = 97618; break;
+                                case SPELL_SCHOOL_FROST:    spellid = 97619; break;
+                                case SPELL_SCHOOL_NATURE:   spellid = 97620; break;
+                                case SPELL_SCHOOL_ARCANE:   spellid = 97621; break;
+                                case SPELL_SCHOOL_SHADOW:   spellid = 97622; break;
+                                default: break;
+                            }
+                            if (spellid)
+                            {
+                                // if Level <= 70 resist = player level
+                                int32 basepoints0 = m_caster->getLevel();
+
+                                if (basepoints0 > 70 && basepoints0 < 81)
+                                    basepoints0 += (basepoints0 - 70) * 5;
+                                else if (basepoints0 > 80)
+                                    basepoints0 += ((basepoints0 - 70) * 5 + (basepoints0 - 80) * 7);
+
+                                if (eff->GetId() == 16086)
+                                    basepoints0 /= 2;
+                                
+                                m_caster->CastCustomSpell(m_caster, spellid, &basepoints0, 0, 0, true);
+                            }
+                        }
+                    }
                 }
+
                 ExecuteLogEffectInterruptCast(effIndex, unitTarget, curSpellInfo->Id);
                 unitTarget->InterruptSpell(CurrentSpellTypes(i), false);
             }
