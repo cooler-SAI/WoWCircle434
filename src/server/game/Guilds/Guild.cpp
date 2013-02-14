@@ -1622,6 +1622,7 @@ void Guild::HandleSetRankInfo(WorldSession* session, uint32 rankId, const std::s
 
         HandleQuery(session);
         HandleRoster();                                     // Broadcast for tab rights update
+        HandleGuildRanks(session);
     }
 }
 
@@ -1917,6 +1918,7 @@ void Guild::HandleAddNewRank(WorldSession* session, std::string const& name) //,
         _CreateRank(name, GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
         HandleQuery(session);
         HandleRoster();                                             // Broadcast for tab rights update
+        HandleGuildRanks(session);
     }
 }
 
@@ -1942,10 +1944,11 @@ void Guild::HandleRemoveRank(WorldSession* session, uint32 rankId)
         stmt->setUInt8(1, rankId);
         CharacterDatabase.Execute(stmt);
 
-        m_ranks.erase(m_ranks.begin() + rankId-1);
+        m_ranks.erase(m_ranks.begin() + rankId);
 
         HandleQuery(session);
         HandleRoster();                                             // Broadcast for tab rights update
+        HandleGuildRanks(session);
     }
 }
 
