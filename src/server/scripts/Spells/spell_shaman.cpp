@@ -836,7 +836,7 @@ class spell_sha_totemic_wrath : public SpellScriptLoader
                     return; // just apply as dummy
 
                 // applied by a totem - cast the real aura if owner has the talent
-                if (Unit *caster = aurEff->GetBase()->GetCaster())
+                if (Unit *caster = aurEff->GetBase()->GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself())
                     if (caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_GENERIC, 2019, 0))
                         target->CastSpell(target, SHAMAN_TOTEM_SPELL_TOTEMIC_WRATH_AURA, true, NULL, aurEff);
             }
