@@ -1642,9 +1642,11 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
         return SPELL_FAILED_INCORRECT_AREA;
     }
 
-    // bg spell checks
+    // spell checks
     switch (Id)
     {
+        case 45614: // Shroud of the Scourge
+            return (area_id == 4125)? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         case 43820: // Charm of the Witch Doctor
         case 43822: // Charm of the Raging Defender
         case 43816: // Charm of the Bloodletter
