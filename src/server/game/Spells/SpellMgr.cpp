@@ -6105,6 +6105,9 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->ProcCharges = 2;
                 spellInfo->StackAmount = 0;
                 break;
+            case 96379:
+                spellInfo->Effects[0].BasePoints = 1;
+                break;
             default:
                 break;
         }
