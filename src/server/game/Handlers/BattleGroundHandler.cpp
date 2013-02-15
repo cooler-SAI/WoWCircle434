@@ -456,13 +456,13 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
     GroupQueueInfo ginfo;
     if (!bgQueue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
     {
-        sLog->outError(LOG_FILTER_NETWORKIO, "BattlegroundHandler: itrplayerstatus not found.");
+        sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattlegroundHandler: itrplayerstatus not found.");
         return;
     }
     // if action == 1, then instanceId is required
     if (!ginfo.IsInvitedToBGInstanceGUID && action == 1)
     {
-        sLog->outError(LOG_FILTER_NETWORKIO, "BattlegroundHandler: instance not found.");
+        sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattlegroundHandler: instance not found.");
         return;
     }
 
@@ -473,7 +473,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
         bg = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId);
     if (!bg)
     {
-        sLog->outError(LOG_FILTER_NETWORKIO, "BattlegroundHandler: bg_template not found for type id %u.", bgTypeId);
+        sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattlegroundHandler: bg_template not found for type id %u.", bgTypeId);
         return;
     }
 
