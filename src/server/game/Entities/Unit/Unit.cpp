@@ -6307,16 +6307,18 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     for (uint8 school = SPELL_SCHOOL_HOLY; school != MAX_SPELL_SCHOOL; ++school)
                     {
                         uint32 spellId = 0;
-                        uint32 var = (SpellSchoolMask(procSpell->SchoolMask) & (1 << school)) >> 1;
-                        switch(var)
+                        if (SpellSchoolMask(procSpell->SchoolMask) & (1 << school))
                         {
-                            case SPELL_SCHOOL_HOLY: spellId = 54370; break;
-                            case SPELL_SCHOOL_FIRE: spellId = 54371; break;
-                            case SPELL_SCHOOL_FROST: spellId = 54372; break;
-                            case SPELL_SCHOOL_ARCANE: spellId = 54373; break;
-                            case SPELL_SCHOOL_SHADOW: spellId = 54374; break;
-                            case SPELL_SCHOOL_NATURE: spellId = 54375; break;
-                            default: break;
+                            switch(school)
+                            {
+                                case SPELL_SCHOOL_HOLY: spellId = 54370; break;
+                                case SPELL_SCHOOL_FIRE: spellId = 54371; break;
+                                case SPELL_SCHOOL_FROST: spellId = 54372; break;
+                                case SPELL_SCHOOL_ARCANE: spellId = 54373; break;
+                                case SPELL_SCHOOL_SHADOW: spellId = 54374; break;
+                                case SPELL_SCHOOL_NATURE: spellId = 54375; break;
+                                default: break;
+                            }
                         }
                         if (spellId)
                         {
