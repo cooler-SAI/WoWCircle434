@@ -2093,7 +2093,7 @@ void World::Update(uint32 diff)
     if (m_timers[WUPDATE_RESETCAP].Passed())
     {
         m_timers[WUPDATE_RESETCAP].Reset();
-        sCurrencyMgr->UpdateEvents(uint32(m_timers[WUPDATE_WEATHERS].GetInterval()));
+        sCurrencyMgr->UpdateEvents(uint32(m_timers[WUPDATE_RESETCAP].GetInterval()));
     }
 
     /// <li> Update uptime table
