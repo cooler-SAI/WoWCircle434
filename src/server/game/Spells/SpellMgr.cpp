@@ -4091,6 +4091,13 @@ void SpellMgr::LoadDbcDataCorrections()
             case 91161:
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
                 break;
+            // Temple Guardian Anhuur
+            case 75515: // Searing Flame
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(28);
+                break;
+            case 74938: // Shield of Light
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                break;
             // Earthrager Ptah
             case 75540: // Flame Bolt dmg
             case 89881:
@@ -4098,6 +4105,14 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 83650: // Raging Smash
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                break;
+            case 75547: // Quicksand AOE
+            case 89880:
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                break;
+            case 75339: // Earthspike dmg
+            case 89882:
+                spellInfo->Effects[EFFECT_1].Effect = 0;
                 break;
             // Anraphet
             case 76094: // Alpha Beams aoe
