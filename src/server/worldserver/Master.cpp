@@ -156,9 +156,6 @@ int Master::Run()
     if (!_StartDB())
         return 1;
 
-    // set server offline (not connectable)
-    LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = (flag & ~%u) | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, REALM_FLAG_INVALID, realmID);
-
     ///- Initialize the World
     sWorld->SetInitialWorldSettings();
 
@@ -265,9 +262,6 @@ int Master::Run()
         // go down and shutdown the server
     }
 
-    // set server online (allow connecting now)
-    LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = flag & ~%u, population = 0 WHERE id = '%u'", REALM_FLAG_INVALID, realmID);
-
     sLog->outInfo(LOG_FILTER_WORLDSERVER, "%s (worldserver-daemon) ready...", _FULLVERSION);
 
     // when the main thread closes the singletons get unloaded
@@ -281,9 +275,6 @@ int Master::Run()
         soap_thread->destroy();
         delete soap_thread;
     }
-
-    // set server offline
-    LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = flag | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, realmID);
 
     ///- Clean database before leaving
     ClearOnlineAccounts();

@@ -279,6 +279,8 @@ void WorldSession::HandleGuildFinderGetApplications(WorldPacket& /*recvPacket*/)
 // Lists all recruits for a guild - Misses times
 void WorldSession::HandleGuildFinderGetRecruits(WorldPacket& recvPacket)
 {
+    return;
+
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_LF_GUILD_GET_RECRUITS");
 
     uint32 unkTime = 0;

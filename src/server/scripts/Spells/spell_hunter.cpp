@@ -713,8 +713,9 @@ public:
 
         void CalculateAmount(AuraEffect const * /*aurEff*/, int32 & amount, bool & canBeRecalculated)
         {
-            // Set absorbtion amount to unlimited
-            amount *= GetCaster()->GetMaxHealth() / 100.0f;
+            if (Unit* caster = GetCaster())
+                // Set absorbtion amount to unlimited
+                amount *= caster->GetMaxHealth() / 100.0f;
         }
 
         void Register()
@@ -747,4 +748,5 @@ void AddSC_hunter_spell_scripts()
     new spell_hun_steady_shot();
     new spell_hun_cobra_shot();
     new spell_hunter_pet_intervane();
+
 }
