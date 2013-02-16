@@ -6123,8 +6123,16 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->ProcCharges = 2;
                 spellInfo->StackAmount = 0;
                 break;
+            // Fel Armor
             case 96379:
                 spellInfo->Effects[0].BasePoints = 1;
+                break;
+            // Pandemic
+            case 85100:
+            case 85099:
+                spellInfo->Effects[0].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL;
+                spellInfo->Effects[0].TriggerSpell = 92931;
                 break;
             default:
                 break;

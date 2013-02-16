@@ -9751,6 +9751,12 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // dummy basepoints or other customs
     switch (trigger_spell_id)
     {
+        case 92931: // Pandemic
+        {
+            if (!victim || victim->GetHealthPct() > 25.0f)
+                return false;
+            break;
+        }
         case 91342: // Shadow Infusion
         {
             if (GetTypeId() != TYPEID_PLAYER)

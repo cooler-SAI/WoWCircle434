@@ -5714,8 +5714,14 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         }
         case SPELLFAMILY_WARLOCK:
         {
+            // Pandemic - Unstable Affliction refresh
+            if (m_spellInfo->Id == 92931)
+            {
+                if (Aura * aur = unitTarget->GetAura(30108, m_caster->GetGUID()))
+                    aur->RefreshDuration();
+            }
             // Fel Flame
-            if (m_spellInfo->Id == 77799)
+            else if (m_spellInfo->Id == 77799)
             {
                 Unit::AuraEffectList const &mPeriodic = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
                 for (Unit::AuraEffectList::const_iterator i = mPeriodic.begin(); i != mPeriodic.end(); ++i)
