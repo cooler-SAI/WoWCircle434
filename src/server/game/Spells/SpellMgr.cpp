@@ -132,6 +132,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Seduction
             else if (spellproto->SpellFamilyFlags[1] & 0x10000000)
                 return DIMINISHING_FEAR;
+            // Unstable Affliction
+            else if (spellproto->Id == 31117)
+                return DIMINISHING_LIMITONLY;
             break;
         }
         case SPELLFAMILY_DRUID:
