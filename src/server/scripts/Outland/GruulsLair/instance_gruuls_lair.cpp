@@ -100,7 +100,7 @@ public:
         {
             switch (go->GetEntry())
             {
-                case 184468:
+                case 183817:
                     MaulgarDoor = go->GetGUID();
                     if (m_auiEncounter[0] == DONE)
                         HandleGameObject(0, true, go);
