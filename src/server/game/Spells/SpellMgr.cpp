@@ -6023,7 +6023,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 31117:
                 spellInfo->AttributesEx6 &= ~SPELL_ATTR6_NO_DONE_PCT_DAMAGE_MODS;
                 break;
-            case 82691: // Ring of Frost
+             // Ring of Frost
+            case 82691:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
                 spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REFLECTED;
                 break;
             // Item - Druid T12 Feral 4P Bonus
