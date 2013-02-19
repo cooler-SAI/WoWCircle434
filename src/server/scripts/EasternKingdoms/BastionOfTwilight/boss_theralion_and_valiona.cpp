@@ -556,7 +556,9 @@ class boss_theralion : public CreatureScript
                      case EVENT_DAZZLING_DESTRUCTION_1:
                         events.CancelEvent(EVENT_TWILIGHT_BLAST);
                         Talk(SAY_THERALION_DAZ1);
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        events.ScheduleEvent(EVENT_THERALION_ON, 6000);
+                        
+                        /*if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                         {
                             _stalker1 = me->SummonCreature(NPC_DAZZLING_DESTRUCTION_STALKER,
                                 target->GetPositionX(),
@@ -575,7 +577,7 @@ class boss_theralion : public CreatureScript
                                 TEMPSUMMON_TIMED_DESPAWN, me->GetDistance(target)/15*1000 + 5000);
                         }
                         DoCast(me, SPELL_DAZZLING_DESTRUCTION);
-                        events.ScheduleEvent(EVENT_DAZZLING_DESTRUCTION_2, 5000);
+                        events.ScheduleEvent(EVENT_DAZZLING_DESTRUCTION_2, 5000);*/
                         break;
                     case EVENT_DAZZLING_DESTRUCTION_2:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
@@ -1253,7 +1255,7 @@ class npc_dazzling_destruction_stalker : public CreatureScript
 
             void Reset()
             {
-                DoCast(me, SPELL_DAZZLING_DESTRUCTION_STALKER_VISUAL);
+                //DoCast(me, SPELL_DAZZLING_DESTRUCTION_STALKER_VISUAL);
             }
 
             void SpellHit(Unit* caster, SpellEntry const* spell)
