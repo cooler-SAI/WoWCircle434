@@ -2023,7 +2023,7 @@ void AuraEffect::HandleModStealth(AuraApplication const* aurApp, uint8 mode, boo
 
         WorldPacket data(SMSG_CLEAR_TARGET, 8);
         data << uint64(target->GetGUID());
-        target->SendMessageToSet(&data, true);
+        target->SendMessageUnfriendlyToSetInRange(&data, true);
 
         Unit::AttackerSet const& attackers = target->getAttackers();
         for (Unit::AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end();)
@@ -6766,6 +6766,21 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
         // Spell exist but require custom code
         switch (auraId)
         {
+            // Power Word: Barrier & Glyph of Power Word: Barrier
+            case 81781:
+            {
+                // Power Word: Barrier
+                if (triggerSpellId == 81782)
+                    break;
+                
+                // Glyph of Power Word: Barrier
+                if (Unit * owner = caster->GetCharmerOrOwnerPlayerOrPlayerItself())
+                {
+                    if (owner->HasAura(55689))
+                        break;
+                }
+                return;
+            }
             // Pursuing Spikes (Anub'arak)
             case 65920:
             case 65922:

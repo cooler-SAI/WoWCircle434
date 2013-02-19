@@ -122,6 +122,34 @@ namespace Trinity
         }
     };
 
+    struct UnfriendlyMessageDistDeliverer
+    {
+        Unit* i_source;
+        WorldPacket* i_message;
+        uint32 i_phaseMask;
+        float i_distSq;
+        UnfriendlyMessageDistDeliverer(Unit* src, WorldPacket* msg, float dist)
+            : i_source(src), i_message(msg), i_phaseMask(src->GetPhaseMask()), i_distSq(dist * dist)
+        {
+        }
+        void Visit(PlayerMapType &m);
+        template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
+
+        void SendPacket(Player* player)
+        {
+            // never send packet to self
+            if (player == i_source || (player->IsFriendlyTo(i_source)))
+                return;
+
+
+            if (!player->HaveAtClient(i_source))
+                return;
+
+            if (WorldSession* session = player->GetSession())
+                session->SendPacket(i_message);
+        }
+    };
+
     struct ObjectUpdater
     {
         uint32 i_timeDiff;

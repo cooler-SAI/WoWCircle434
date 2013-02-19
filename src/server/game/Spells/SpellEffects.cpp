@@ -6497,7 +6497,7 @@ void Spell::EffectForceDeselect(SpellEffIndex /*effIndex*/)
 
     WorldPacket data(SMSG_CLEAR_TARGET, 8);
     data << uint64(m_caster->GetGUID());
-    m_caster->SendMessageToSet(&data, true);
+    m_caster->SendMessageUnfriendlyToSetInRange(&data, true);
 }
 
 void Spell::EffectSelfResurrect(SpellEffIndex effIndex)

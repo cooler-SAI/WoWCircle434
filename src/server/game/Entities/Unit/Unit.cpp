@@ -4805,6 +4805,13 @@ void Unit::SendSpellDamageImmune(Unit* target, uint32 spellId)
     SendMessageToSet(&data, true);
 }
 
+void Unit::SendMessageUnfriendlyToSetInRange(WorldPacket* data, float fist)
+{
+    Trinity::UnfriendlyMessageDistDeliverer notifier(this, data, GetVisibilityRange());
+    VisitNearbyWorldObject(GetVisibilityRange(), notifier);
+}
+
+
 void Unit::SendAttackStateUpdate(CalcDamageInfo* damageInfo)
 {
     sLog->outDebug(LOG_FILTER_UNITS, "WORLD: Sending SMSG_ATTACKERSTATEUPDATE");
