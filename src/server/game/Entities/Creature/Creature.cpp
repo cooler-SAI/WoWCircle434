@@ -437,7 +437,7 @@ bool Creature::UpdateEntry(uint32 Entry, uint32 team, const CreatureData* data)
     }
 
     // Set the movement flags if the creature is in that mode. (Only fly if actually in air, only swim if in water, etc)
-    float ground = GetPositionZ();
+    /*float ground = GetPositionZ();
     GetMap()->GetWaterOrGroundLevel(GetPositionX(), GetPositionY(), GetPositionZ(), &ground);
 
     bool isInAir = G3D::fuzzyGt(GetPositionZ(), ground + 0.05f) || G3D::fuzzyLt(GetPositionZ(), ground - 0.05f); // Can be underground too, prevent the falling
@@ -456,7 +456,16 @@ bool Creature::UpdateEntry(uint32 Entry, uint32 team, const CreatureData* data)
     if (cInfo->InhabitType & INHABIT_WATER && IsInWater())
          AddUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
     else
-        RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
+        RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);*/
+
+    if (cInfo->InhabitType & INHABIT_AIR)
+    {
+        SetCanFly(true);
+        SetDisableGravity(true);
+    }
+
+    if (cInfo->InhabitType & INHABIT_WATER)
+        AddUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
 
     return true;
 }

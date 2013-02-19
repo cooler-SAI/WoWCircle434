@@ -21618,7 +21618,7 @@ void Player::ReportedAfkBy(Player* reporter)
         {
             // cast 'Idle' spell
             //CastSpell(this, 43680, true);
-            //m_bgData.bgAfkReporter.clear();
+            m_bgData.bgAfkReporter.clear();
             LeaveBattleground();
         }
     }
