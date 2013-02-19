@@ -6470,6 +6470,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 // Glyph of Spirit Tap
                 case 63237:
                 {
+                    if (victim->GetHealth() > damage)
+                        return false;
+
                     triggered_spell_id = 81301;
                     break;
                 }
