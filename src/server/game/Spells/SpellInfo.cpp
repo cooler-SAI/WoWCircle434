@@ -3068,7 +3068,6 @@ int32 SpellInfo::GetUniqueChargeInfo(Unit* caster /* = NULL */) const
     switch (Id)
     {
         case 12654: // Ignite
-        case 77489: // Echo of Light
         case 99173: // Burning Wounds, Item - Rogue T12 2P Bonus
             return GetDuration();
         default:

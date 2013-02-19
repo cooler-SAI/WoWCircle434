@@ -2398,16 +2398,6 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
                 addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
                 break;
         }
-        
-        // Mastery Priest
-        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST)
-        {
-            if (AuraEffect const* echoOfLight = m_caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 2821, 0))
-            {
-                int32 bp0 = int32(CalculatePct(addhealth, echoOfLight->GetAmount()) / 6.0f);
-                m_caster->CastCustomSpell(unitTarget, 77489, &bp0, NULL, NULL, true);
-            }
-        }
 
         addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL);
         

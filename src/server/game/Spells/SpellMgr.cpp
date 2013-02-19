@@ -2798,6 +2798,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 2818: // Deadly Poison
             case 31803: // Censure
             case 77661: // Searing Flame
+            case 77489: // Echo of Light
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER;
                 break;
             case 60256:
@@ -5836,11 +5837,6 @@ void SpellMgr::LoadDbcDataCorrections()
             case 48438:
                 spellInfo->Effects[0].SetRadiusIndex(10);
                 spellInfo->Effects[1].SetRadiusIndex(10);
-                break;
-            // Echo of Light
-            case 77489:
-                spellInfo->StackAmount = 100; // should be inf
-                spellInfo->AttributesEx8 |= SPELL_ATTR8_DONT_RESET_PERIODIC_TIMER;
                 break;
             // Efflorescence
             // Healing Rain
