@@ -193,7 +193,7 @@ class boss_daakara : public CreatureScript
                         Talk(SAY_DRAGONHAWK);
                         me->AttackStop();
                         me->SetReactState(REACT_PASSIVE);
-                        me->NearTeleportTo(CENTER_X, CENTER_Y, CENTER_Z, 0.0f);
+                        //me->NearTeleportTo(CENTER_X, CENTER_Y, CENTER_Z, 0.0f);
                         me->RemoveAurasDueToSpell(SPELL_SHAPE_OF_THE_LYNX);
                         me->RemoveAurasDueToSpell(SPELL_SHAPE_OF_THE_BEAR);
                         DoCast(me, SPELL_SHAPE_OF_THE_DRAGONHAWK, true);
@@ -205,7 +205,7 @@ class boss_daakara : public CreatureScript
                         Talk(SAY_EAGLE);
                         me->AttackStop();
                         me->SetReactState(REACT_PASSIVE);
-                        me->NearTeleportTo(CENTER_X, CENTER_Y, CENTER_Z, 0.0f);
+                        //me->NearTeleportTo(CENTER_X, CENTER_Y, CENTER_Z, 0.0f);
                         me->RemoveAurasDueToSpell(SPELL_SHAPE_OF_THE_LYNX);
                         me->RemoveAurasDueToSpell(SPELL_SHAPE_OF_THE_BEAR);
                         DoCast(me, SPELL_SHAPE_OF_THE_EAGLE, true);
