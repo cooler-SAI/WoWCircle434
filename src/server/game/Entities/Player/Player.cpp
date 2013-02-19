@@ -21617,8 +21617,9 @@ void Player::ReportedAfkBy(Player* reporter)
         if (m_bgData.bgAfkReporter.size() >= 3)
         {
             // cast 'Idle' spell
-            CastSpell(this, 43680, true);
-            m_bgData.bgAfkReporter.clear();
+            //CastSpell(this, 43680, true);
+            //m_bgData.bgAfkReporter.clear();
+            LeaveBattleground();
         }
     }
 }
