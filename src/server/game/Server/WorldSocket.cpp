@@ -186,8 +186,6 @@ int WorldSocket::SendPacket(WorldPacket const* pct)
     if (sPacketLog->CanLogPacket())
         sPacketLog->LogPacket(*pct, SERVER_TO_CLIENT);
 
-    sScriptMgr->OnPacketSend(this, *pct);
-
     sLog->outInfo(LOG_FILTER_OPCODES, "S->C: %s", GetOpcodeNameForLogging(pct->GetOpcode()).c_str());
 
     WorldPacket compressed;
@@ -749,24 +747,19 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
                     sLog->outError(LOG_FILTER_NETWORKIO, "WorldSocket::ProcessIncoming: received duplicate CMSG_AUTH_SESSION from %s", m_Session->GetPlayerName(false).c_str());
                     return -1;
                 }
-
-                sScriptMgr->OnPacketReceive(this, WorldPacket(*new_pct));
                 return HandleAuthSession(*new_pct);
             case CMSG_KEEP_ALIVE:
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "%s", GetOpcodeNameForLogging(opcode).c_str());
-                sScriptMgr->OnPacketReceive(this, WorldPacket(*new_pct));
                 return 0;
             case CMSG_LOG_DISCONNECT:
                 new_pct->rfinish(); // contains uint32 disconnectReason;
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "%s", opcodeName.c_str());
-                sScriptMgr->OnPacketReceive(this, WorldPacket(*new_pct));
                 return 0;
             // not an opcode, client sends string "WORLD OF WARCRAFT CONNECTION - CLIENT TO SERVER" without opcode
             // first 4 bytes become the opcode (2 dropped)
             case MSG_VERIFY_CONNECTIVITY:
             {
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "%s", opcodeName.c_str());
-                sScriptMgr->OnPacketReceive(this, WorldPacket(*new_pct));
                 std::string str;
                 *new_pct >> str;
                 if (str != "D OF WARCRAFT CONNECTION - CLIENT TO SERVER")
@@ -776,7 +769,6 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
             case CMSG_ENABLE_NAGLE:
             {
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "%s", opcodeName.c_str());
-                sScriptMgr->OnPacketReceive(this, WorldPacket(*new_pct));
                 return m_Session ? m_Session->HandleEnableNagleAlgorithm() : -1;
             }
             default:

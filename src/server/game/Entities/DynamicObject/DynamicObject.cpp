@@ -136,8 +136,6 @@ void DynamicObject::Update(uint32 p_time)
 
     if (expired)
         Remove();
-    else
-        sScriptMgr->OnDynamicObjectUpdate(this, p_time);
 }
 
 void DynamicObject::Remove()

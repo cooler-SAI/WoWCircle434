@@ -177,16 +177,11 @@ bool World::IsClosed() const
 void World::SetClosed(bool val)
 {
     m_isClosed = val;
-
-    // Invert the value, for simplicity for scripters.
-    sScriptMgr->OnOpenStateChange(!val);
 }
 
 void World::SetMotd(const std::string& motd)
 {
     m_motd = motd;
-
-    sScriptMgr->OnMotdChange(m_motd);
 }
 
 const char* World::GetMotd() const
@@ -1295,9 +1290,6 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_VIP_EXCHANGE_FROST_COMMAND] = ConfigMgr::GetBoolDefault("Vip.Exchange.Frost.Command",false);
     m_int_configs[CONFIG_VIP_RATE_EXHANGE_HONOR_IN_ARENA]  = ConfigMgr::GetIntDefault("Vip.Rate.Exchange.Honor.In.Arena", 1);
     m_int_configs[CONFIG_VIP_RATE_EXHANGE_TRIUMPH_IN_FROST]  = ConfigMgr::GetIntDefault("Vip.Rate.Exchange.Triumph.In.Frost", 1);
-
-    if (reload)
-        sScriptMgr->OnConfigLoad(reload);
 }
 
 extern void LoadGameObjectModelList();
@@ -1775,7 +1767,6 @@ void World::SetInitialWorldSettings()
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Initializing Scripts...");
     sScriptMgr->Initialize();
-    sScriptMgr->OnConfigLoad(false);                                // must be done after the ScriptMgr has been properly initialized
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Validating spell scripts...");
     sObjectMgr->ValidateSpellScripts();
@@ -2189,8 +2180,6 @@ void World::Update(uint32 diff)
 
     // And last, but not least handle the issued cli commands
     ProcessCliCommands();
-
-    sScriptMgr->OnWorldUpdate(diff);
 }
 
 void World::ForceGameEventUpdate()
@@ -2628,8 +2617,6 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode)
         m_ShutdownTimer = time;
         ShutdownMsg(true);
     }
-
-    sScriptMgr->OnShutdownInitiate(ShutdownExitCode(exitcode), ShutdownMask(options));
 }
 
 /// Display a shutdown message to the user(s)
@@ -2671,8 +2658,6 @@ void World::ShutdownCancel()
     SendServerMessage(msgid);
 
     sLog->outDebug(LOG_FILTER_GENERAL, "Server %s cancelled.", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"));
-
-    sScriptMgr->OnShutdownCancel();
 }
 
 /// Send a server message to the user(s)

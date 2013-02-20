@@ -299,8 +299,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     if (!condMeets)
         sourceInfo.mLastFailedCondition = this;
 
-    bool script = sScriptMgr->OnConditionCheck(this, sourceInfo); // Returns true by default.
-    return condMeets && script;
+    return condMeets;
 }
 
 uint32 Condition::GetSearcherTypeMaskForCondition()

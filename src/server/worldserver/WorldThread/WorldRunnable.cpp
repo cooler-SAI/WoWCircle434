@@ -47,8 +47,6 @@ void WorldRunnable::run()
 
     uint32 prevSleepTime = 0;                               // used for balanced full tick time length near WORLD_SLEEP_CONST
 
-    sScriptMgr->OnStartup();
-
     ///- While we have not World::m_stopEvent, update the world
     while (!World::IsStopped())
     {
@@ -80,8 +78,6 @@ void WorldRunnable::run()
                 Sleep(1000);
         #endif
     }
-
-    sScriptMgr->OnShutdown();
 
     sWorld->KickAll();                                       // save and kick all players
     sWorld->UpdateSessions( 1 );                             // real players unload required UpdateSessions call

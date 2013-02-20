@@ -62,7 +62,6 @@ bool Weather::Update(uint32 diff)
         }
     }
 
-    sScriptMgr->OnWeatherUpdate(this, diff);
     return true;
 }
 
@@ -261,7 +260,6 @@ bool Weather::UpdateWeather()
     }
     sLog->outInfo(LOG_FILTER_GENERAL, "Change the weather of zone %u to %s.", m_zone, wthstr);
 
-    sScriptMgr->OnWeatherChange(this, state, m_grade);
     return true;
 }
 

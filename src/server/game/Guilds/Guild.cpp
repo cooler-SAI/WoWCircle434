@@ -847,10 +847,6 @@ bool Guild::MoveItemData::CloneItem(uint32 count)
 void Guild::MoveItemData::LogAction(MoveItemData* pFrom) const
 {
     ASSERT(pFrom->GetItem());
-
-    sScriptMgr->OnGuildItemMove(m_pGuild, m_pPlayer, pFrom->GetItem(),
-        pFrom->IsBank(), pFrom->GetContainer(), pFrom->GetSlotId(),
-        IsBank(), GetContainer(), GetSlotId());
 }
 
 inline void Guild::MoveItemData::CopySlots(SlotIds& ids) const
@@ -1208,9 +1204,6 @@ bool Guild::Create(Player* pLeader, const std::string& name)
     _CreateDefaultGuildRanks(pLeaderSession->GetSessionDbLocaleIndex());
     // Add guildmaster
     bool ret = AddMember(m_leaderGuid, GR_GUILDMASTER);
-    if (ret)
-        // Call scripts on successful create
-        sScriptMgr->OnGuildCreate(this, pLeader, name);
 
     _BroadcastEvent(GE_FOUNDER, m_leaderGuid);
 
@@ -1220,9 +1213,6 @@ bool Guild::Create(Player* pLeader, const std::string& name)
 // Disbands guild and deletes all related data from database
 void Guild::Disband()
 {
-    // Call scripts before guild data removed from database
-    sScriptMgr->OnGuildDisband(this);
-
     _BroadcastEvent(GE_DISBANDED, 0);
     // Remove all members
     while (!m_members.empty())
@@ -1501,8 +1491,6 @@ void Guild::HandleSetMOTD(WorldSession* session, const std::string& motd)
     {
         m_motd = motd;
 
-        sScriptMgr->OnGuildMOTDChanged(this, motd);
-
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_MOTD);
         stmt->setString(0, motd);
         stmt->setUInt32(1, m_id);
@@ -1523,8 +1511,6 @@ void Guild::HandleSetInfo(WorldSession* session, const std::string& info)
     else
     {
         m_info = info;
-
-        sScriptMgr->OnGuildInfoChanged(this, info);
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_INFO);
         stmt->setString(0, info);
@@ -1956,9 +1942,6 @@ void Guild::HandleMemberDepositMoney(WorldSession* session, uint32 amount, bool 
 {
     Player* player = session->GetPlayer();
 
-    // Call script after validation and before money transfer.
-    sScriptMgr->OnGuildMemberDepositMoney(this, player, amount);
-
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     // Add money to bank
     _ModifyBankMoney(trans, amount, true);
@@ -1996,9 +1979,6 @@ bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool
 
     if (remainingMoney < amount)
         return false;
-
-    // Call script after validation and before money transfer.
-    sScriptMgr->OnGuildMemberWitdrawMoney(this, player, amount, repair);
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     // Update remaining money amount
@@ -2591,9 +2571,6 @@ bool Guild::AddMember(uint64 guid, uint8 rankId)
 
     _UpdateAccountsNumber();
 
-    // Call scripts if member was succesfully added (and stored to database)
-    sScriptMgr->OnGuildAddMember(this, player, rankId);
-
     return true;
 }
 
@@ -2635,8 +2612,6 @@ void Guild::DeleteMember(uint64 guid, bool isDisbanding, bool isKicked)
             _BroadcastEvent(GE_LEFT, guid, oldLeader->GetName().c_str());
         }
     }
-    // Call script on remove before member is actually removed from guild (and database)
-    sScriptMgr->OnGuildRemoveMember(this, player, isDisbanding, isKicked);
 
     if (Member* member = GetMember(guid))
         delete member;
@@ -2963,8 +2938,6 @@ inline void Guild::_LogEvent(GuildEventLogTypes eventType, uint32 playerGuid1, u
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     m_eventLog->AddEvent(trans, new EventLogEntry(m_id, m_eventLog->GetNextGUID(), eventType, playerGuid1, playerGuid2, newRank));
     CharacterDatabase.CommitTransaction(trans);
-
-    sScriptMgr->OnGuildEvent(this, uint8(eventType), playerGuid1, playerGuid2, newRank);
 }
 
 // Add new bank event log record
@@ -2985,8 +2958,6 @@ void Guild::_LogBankEvent(SQLTransaction& trans, GuildBankEventLogTypes eventTyp
     }
     LogHolder* pLog = m_bankEventLog[tabId];
     pLog->AddEvent(trans, new BankEventLogEntry(m_id, pLog->GetNextGUID(), eventType, dbTabId, lowguid, itemOrMoney, itemStackCount, destTabId));
-
-    sScriptMgr->OnGuildBankEvent(this, uint8(eventType), tabId, lowguid, itemOrMoney, itemStackCount, destTabId);
 }
 
 inline Item* Guild::_GetItem(uint8 tabId, uint8 slotId) const

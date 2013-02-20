@@ -405,14 +405,11 @@ void AuctionHouseObject::AddAuction(AuctionEntry* auction)
     ASSERT(auction);
 
     AuctionsMap[auction->Id] = auction;
-    sScriptMgr->OnAuctionAdd(this, auction);
 }
 
 bool AuctionHouseObject::RemoveAuction(AuctionEntry* auction, uint32 /*itemEntry*/)
 {
     bool wasInMap = AuctionsMap.erase(auction->Id) ? true : false;
-
-    sScriptMgr->OnAuctionRemove(this, auction);
 
     // we need to delete the entry, it is not referenced any more
     delete auction;
@@ -447,7 +444,6 @@ void AuctionHouseObject::Update()
         if (auction->bidder == 0)
         {
             sAuctionMgr->SendAuctionExpiredMail(auction, trans);
-            sScriptMgr->OnAuctionExpire(this, auction);
         }
         ///- Or perform the transaction
         else
@@ -457,7 +453,6 @@ void AuctionHouseObject::Update()
             //we send the money to the seller
             sAuctionMgr->SendAuctionSuccessfulMail(auction, trans);
             sAuctionMgr->SendAuctionWonMail(auction, trans);
-            sScriptMgr->OnAuctionSuccessful(this, auction);
         }
 
         uint32 itemEntry = auction->itemEntry;
@@ -752,10 +747,6 @@ void AuctionHouseMgr::DeleteExpiredAuctionsAtStartup()
             sAuctionMgr->SendAuctionSuccessfulMail(auction, trans);
             sAuctionMgr->SendAuctionWonMail(auction, trans);
         }
-
-        // Call the appropriate AuctionHouseObject script
-        //  ** Do we need to do this while core is still loading? **
-        sScriptMgr->OnAuctionExpire(GetAuctionsMap(auction->factionTemplateId), auction);
 
         // Delete the auction from the DB
         auction->DeleteFromDB(trans);
