@@ -29,7 +29,6 @@ class GuardAI : public ScriptedAI
         explicit GuardAI(Creature* creature);
 
         static int Permissible(Creature const* creature);
-        bool CanSeeAlways(WorldObject const* obj);
 
         void EnterEvadeMode();
         void JustDied(Unit* killer);

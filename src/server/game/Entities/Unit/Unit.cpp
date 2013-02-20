@@ -275,6 +275,9 @@ Unit::Unit(bool isWorldObject): WorldObject(isWorldObject)
     _lastLiquid = NULL;
     _isWalkingBeforeCharm = false;
     _mount = NULL;
+
+    m_ownerGuid = 0;
+    m_charmerGuid = 0;
 }
 
 ////////////////////////////////////////////////////////////
@@ -10558,7 +10561,8 @@ void Unit::SetOwnerGUID(uint64 owner)
 {
     if (GetOwnerGUID() == owner)
         return;
-
+    
+    m_ownerGuid = owner;
     SetUInt64Value(UNIT_FIELD_SUMMONEDBY, owner);
     if (!owner)
         return;

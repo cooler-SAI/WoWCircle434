@@ -1662,14 +1662,14 @@ class Unit : public WorldObject
         DeathState getDeathState() { return m_deathState; };
         virtual void setDeathState(DeathState s);           // overwrited in Creature/Player/Pet
 
-        uint64 GetOwnerGUID() const { return  GetUInt64Value(UNIT_FIELD_SUMMONEDBY); }
+        uint64 GetOwnerGUID() const { return  m_ownerGuid; }
         void SetOwnerGUID(uint64 owner);
         uint64 GetCreatorGUID() const { return GetUInt64Value(UNIT_FIELD_CREATEDBY); }
         void SetCreatorGUID(uint64 creator) { SetUInt64Value(UNIT_FIELD_CREATEDBY, creator); }
         uint64 GetMinionGUID() const { return GetUInt64Value(UNIT_FIELD_SUMMON); }
         void SetMinionGUID(uint64 guid) { SetUInt64Value(UNIT_FIELD_SUMMON, guid); }
-        uint64 GetCharmerGUID() const { return GetUInt64Value(UNIT_FIELD_CHARMEDBY); }
-        void SetCharmerGUID(uint64 owner) { SetUInt64Value(UNIT_FIELD_CHARMEDBY, owner); }
+        uint64 GetCharmerGUID() const { return m_charmerGuid; }
+        void SetCharmerGUID(uint64 owner) { m_charmerGuid = owner; SetUInt64Value(UNIT_FIELD_CHARMEDBY, owner); }
         uint64 GetCharmGUID() const { return  GetUInt64Value(UNIT_FIELD_CHARM); }
         void SetPetGUID(uint64 guid) { m_SummonSlot[SUMMON_SLOT_PET] = guid; }
         uint64 GetPetGUID() const { return m_SummonSlot[SUMMON_SLOT_PET]; }
@@ -1677,12 +1677,15 @@ class Unit : public WorldObject
         uint64 GetCritterGUID() const { return GetUInt64Value(UNIT_FIELD_CRITTER); }
 
         bool IsControlledByPlayer() const { return m_ControlledByPlayer; }
-        uint64 GetCharmerOrOwnerGUID() const { return GetCharmerGUID() ? GetCharmerGUID() : GetOwnerGUID(); }
+        uint64 GetCharmerOrOwnerGUID() const { return m_charmerGuid? m_charmerGuid: m_ownerGuid; }
         uint64 GetCharmerOrOwnerOrOwnGUID() const
         {
-            if (uint64 guid = GetCharmerOrOwnerGUID())
-                return guid;
-            return GetGUID();
+            if (m_charmerGuid)
+                return m_charmerGuid;
+            else if (m_ownerGuid)
+                return m_ownerGuid;
+            else
+                return GetGUID();
         }
         bool isCharmedOwnedByPlayerOrPlayer() const { return IS_PLAYER_GUID(GetCharmerOrOwnerOrOwnGUID()); }
 
@@ -2393,6 +2396,9 @@ class Unit : public WorldObject
         class VisibilityUpdateTask;
         Position m_lastVisibilityUpdPos;
         bool m_VisibilityUpdScheduled;
+
+        uint64 m_charmerGuid;
+        uint64 m_ownerGuid;
 
         uint32 m_rootTimes;
         uint32 m_movementCounters;

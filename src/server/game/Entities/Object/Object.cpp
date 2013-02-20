@@ -2154,7 +2154,10 @@ bool WorldObject::canSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
     if (obj->IsNeverVisible() || CanNeverSee(obj))
         return false;
 
-    if (obj->IsAlwaysVisibleFor(this) || CanAlwaysSee(obj))
+    if (obj->IsAlwaysVisibleFor(this))
+        return true;
+
+    if (CanAlwaysSee(obj))
         return true;
 
     bool corpseVisibility = false;
@@ -2176,7 +2179,7 @@ bool WorldObject::canSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
             }
         }
 
-        WorldObject const* viewpoint = this;
+        /*WorldObject const* viewpoint = this;
         if (Player const* player = this->ToPlayer())
             viewpoint = player->GetViewpoint();
 
@@ -2184,6 +2187,8 @@ bool WorldObject::canSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
             viewpoint = this;
 
         if (!corpseCheck && !viewpoint->IsWithinDist(obj, GetSightRange(obj), false))
+            return false;*/
+        if (!corpseCheck && !IsWithinDist(obj, GetSightRange(obj), false))
             return false;
     }
 

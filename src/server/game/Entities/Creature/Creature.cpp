@@ -1476,14 +1476,6 @@ bool Creature::IsInvisibleDueToDespawn() const
     return true;
 }
 
-bool Creature::CanAlwaysSee(WorldObject const* obj) const
-{
-    if (IsAIEnabled && AI()->CanSeeAlways(obj))
-        return true;
-
-    return false;
-}
-
 bool Creature::canStartAttack(Unit const* who, bool force) const
 {
     if (isCivilian())

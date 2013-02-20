@@ -800,7 +800,6 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
         uint32 guid_transport;
 
         bool IsInvisibleDueToDespawn() const;
-        bool CanAlwaysSee(WorldObject const* obj) const;
     private:
         void ForcedDespawn(uint32 timeMSToDespawn = 0);
 
