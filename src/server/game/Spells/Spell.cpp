@@ -2297,6 +2297,11 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /* 
                 m_delayMoment = 100LL;
             }
         }
+        else if (m_spellInfo->Id == 24259) // Spell Lock - Silenced
+        {
+            targetInfo.timeDelay = 100LL;
+            m_delayMoment = 100LL;
+        }
     }
     // Removing Death Grip cooldown
     else if (m_spellInfo->Id == 90289)
