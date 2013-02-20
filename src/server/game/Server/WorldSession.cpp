@@ -564,9 +564,6 @@ void WorldSession::LogoutPlayer(bool Save)
         sSocialMgr->SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetGUIDLow(), true);
         sSocialMgr->RemovePlayerSocial(_player->GetGUIDLow());
 
-        //! Call script hook before deletion
-        sScriptMgr->OnPlayerLogout(_player);
-
         //! Remove the player from the world
         // the player may not be in the world when logging out
         // e.g if he got disconnected during a transfer to another map

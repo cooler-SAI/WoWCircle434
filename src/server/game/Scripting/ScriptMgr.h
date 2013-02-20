@@ -223,27 +223,6 @@ template<class TMap> class MapScript : public UpdatableScript<TMap>
 
         // Gets the MapEntry structure associated with this script. Can return NULL.
         MapEntry const* GetEntry() { return _mapEntry; }
-
-        // Called when the map is created.
-        virtual void OnCreate(TMap* /*map*/) { }
-
-        // Called just before the map is destroyed.
-        virtual void OnDestroy(TMap* /*map*/) { }
-
-        // Called when a grid map is loaded.
-        virtual void OnLoadGridMap(TMap* /*map*/, GridMap* /*gmap*/, uint32 /*gx*/, uint32 /*gy*/) { }
-
-        // Called when a grid map is unloaded.
-        virtual void OnUnloadGridMap(TMap* /*map*/, GridMap* /*gmap*/, uint32 /*gx*/, uint32 /*gy*/)  { }
-
-        // Called when a player enters the map.
-        virtual void OnPlayerEnter(TMap* /*map*/, Player* /*player*/) { }
-
-        // Called when a player leaves the map.
-        virtual void OnPlayerLeave(TMap* /*map*/, Player* /*player*/) { }
-
-        // Called on every map update tick.
-        virtual void OnUpdate(TMap* /*map*/, uint32 /*diff*/) { }
 };
 
 class WorldMapScript : public ScriptObject, public MapScript<Map>
@@ -499,32 +478,8 @@ class PlayerScript : public ScriptObject
 
     public:
 
-        // Called when a player kills another player
-        virtual void OnPVPKill(Player* /*killer*/, Player* /*killed*/) { }
-
-        // Called when a player kills a creature
-        virtual void OnCreatureKill(Player* /*killer*/, Creature* /*killed*/) { }
-
-        // Called when a player is killed by a creature
-        virtual void OnPlayerKilledByCreature(Creature* /*killer*/, Player* /*killed*/) { }
-
         // Called when a player's level changes (right before the level is applied)
         virtual void OnLevelChanged(Player* /*player*/, uint8 /*newLevel*/) { }
-
-        // Called when a player's free talent points change (right before the change is applied)
-        virtual void OnFreeTalentPointsChanged(Player* /*player*/, uint32 /*points*/) { }
-
-        // Called when a player's talent points are reset (right before the reset is done)
-        virtual void OnTalentsReset(Player* /*player*/, bool /*noCost*/) { }
-
-        // Called when a player's money is modified (before the modification is done)
-        virtual void OnMoneyChanged(Player* /*player*/, int64& /*amount*/) { }
-
-        // Called when a player gains XP (before anything is given)
-        virtual void OnGiveXP(Player* /*player*/, uint32& /*amount*/, Unit* /*victim*/) { }
-
-        // Called when a player's reputation changes (before it is actually changed)
-        virtual void OnReputationChange(Player* /*player*/, uint32 /*factionId*/, int32& /*standing*/, bool /*incremental*/) { }
 
         // Called when a duel is requested
         virtual void OnDuelRequest(Player* /*target*/, Player* /*challenger*/) { }
@@ -554,24 +509,6 @@ class PlayerScript : public ScriptObject
 
         // Called in Spell::Cast.
         virtual void OnSpellCast(Player* /*player*/, Spell* /*spell*/, bool /*skipCheck*/) { }
-
-        // Called when a player logs in.
-        virtual void OnLogin(Player* /*player*/) { }
-
-        // Called when a player logs out.
-        virtual void OnLogout(Player* /*player*/) { }
-
-        // Called when a player is created.
-        virtual void OnCreate(Player* /*player*/) { }
-
-        // Called when a player is deleted.
-        virtual void OnDelete(uint64 /*guid*/) { }
-
-        // Called when a player is bound to an instance
-        virtual void OnBindToInstance(Player* /*player*/, Difficulty /*difficulty*/, uint32 /*mapId*/, bool /*permanent*/) { }
-
-        // Called when a player switches to a new zone
-        virtual void OnUpdateZone(Player* /*player*/, uint32 /*newZone*/, uint32 /*newArea*/) { }
 };
 
 
@@ -635,16 +572,6 @@ class ScriptMgr
         void CreateSpellScripts(uint32 spellId, std::list<SpellScript*>& scriptVector);
         void CreateAuraScripts(uint32 spellId, std::list<AuraScript*>& scriptVector);
         void CreateSpellScriptLoaders(uint32 spellId, std::vector<std::pair<SpellScriptLoader*, std::multimap<uint32, uint32>::iterator> >& scriptVector);
-
-    public: /* MapScript */
-
-        void OnCreateMap(Map* map);
-        void OnDestroyMap(Map* map);
-        void OnLoadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy);
-        void OnUnloadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy);
-        void OnPlayerEnterMap(Map* map, Player* player);
-        void OnPlayerLeaveMap(Map* map, Player* player);
-        void OnMapUpdate(Map* map, uint32 diff);
 
     public: /* InstanceMapScript */
 
@@ -722,15 +649,7 @@ class ScriptMgr
 
     public: /* PlayerScript */
 
-        void OnPVPKill(Player* killer, Player* killed);
-        void OnCreatureKill(Player* killer, Creature* killed);
-        void OnPlayerKilledByCreature(Creature* killer, Player* killed);
         void OnPlayerLevelChanged(Player* player, uint8 oldLevel);
-        void OnPlayerFreeTalentPointsChanged(Player* player, uint32 newPoints);
-        void OnPlayerTalentsReset(Player* player, bool noCost);
-        void OnPlayerMoneyChanged(Player* player, int64& amount);
-        void OnGivePlayerXP(Player* player, uint32& amount, Unit* victim);
-        void OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
         void OnPlayerDuelRequest(Player* target, Player* challenger);
         void OnPlayerDuelStart(Player* player1, Player* player2);
         void OnPlayerDuelEnd(Player* winner, Player* loser, DuelCompleteType type);
@@ -742,12 +661,6 @@ class ScriptMgr
         void OnPlayerEmote(Player* player, uint32 emote);
         void OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, uint64 guid);
         void OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck);
-        void OnPlayerLogin(Player* player);
-        void OnPlayerLogout(Player* player);
-        void OnPlayerCreate(Player* player);
-        void OnPlayerDelete(uint64 guid);
-        void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
-        void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea);
 
     public: /* GroupScript */
 

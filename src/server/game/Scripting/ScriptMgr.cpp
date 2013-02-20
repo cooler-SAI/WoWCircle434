@@ -443,149 +443,6 @@ void ScriptMgr::CreateSpellScriptLoaders(uint32 spellId, std::vector<std::pair<S
     }
 }
 
-#define SCR_MAP_BGN(M, V, I, E, C, T) \
-    if (V->GetEntry()->T()) \
-    { \
-        FOR_SCRIPTS(M, I, E) \
-        { \
-            MapEntry const* C = I->second->GetEntry(); \
-            if (!C) \
-                continue; \
-            if (entry->MapID == V->GetId()) \
-            {
-
-#define SCR_MAP_END \
-                return; \
-            } \
-        } \
-    }
-
-void ScriptMgr::OnCreateMap(Map* map)
-{
-    ASSERT(map);
-
-    SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
-        itr->second->OnCreate(map);
-    SCR_MAP_END;
-
-    SCR_MAP_BGN(InstanceMapScript, map, itr, end, entry, IsDungeon);
-        itr->second->OnCreate((InstanceMap*)map);
-    SCR_MAP_END;
-
-    SCR_MAP_BGN(BattlegroundMapScript, map, itr, end, entry, IsBattleground);
-        itr->second->OnCreate((BattlegroundMap*)map);
-    SCR_MAP_END;
-}
-
-void ScriptMgr::OnDestroyMap(Map* map)
-{
-    ASSERT(map);
-
-    SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
-        itr->second->OnDestroy(map);
-    SCR_MAP_END;
-
-    SCR_MAP_BGN(InstanceMapScript, map, itr, end, entry, IsDungeon);
-        itr->second->OnDestroy((InstanceMap*)map);
-    SCR_MAP_END;
-
-    SCR_MAP_BGN(BattlegroundMapScript, map, itr, end, entry, IsBattleground);
-        itr->second->OnDestroy((BattlegroundMap*)map);
-    SCR_MAP_END;
-}
-
-void ScriptMgr::OnLoadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy)
-{
-    ASSERT(map);
-    ASSERT(gmap);
-
-    SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
-        itr->second->OnLoadGridMap(map, gmap, gx, gy);
-    SCR_MAP_END;
-
-    SCR_MAP_BGN(InstanceMapScript, map, itr, end, entry, IsDungeon);
-        itr->second->OnLoadGridMap((InstanceMap*)map, gmap, gx, gy);
-    SCR_MAP_END;
-
-    SCR_MAP_BGN(BattlegroundMapScript, map, itr, end, entry, IsBattleground);
-        itr->second->OnLoadGridMap((BattlegroundMap*)map, gmap, gx, gy);
-    SCR_MAP_END;
-}
-
-void ScriptMgr::OnUnloadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy)
-{
-    ASSERT(map);
-    ASSERT(gmap);
-
-    SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
-        itr->second->OnUnloadGridMap(map, gmap, gx, gy);
-    SCR_MAP_END;
-
-    SCR_MAP_BGN(InstanceMapScript, map, itr, end, entry, IsDungeon);
-        itr->second->OnUnloadGridMap((InstanceMap*)map, gmap, gx, gy);
-    SCR_MAP_END;
-
-    SCR_MAP_BGN(BattlegroundMapScript, map, itr, end, entry, IsBattleground);
-        itr->second->OnUnloadGridMap((BattlegroundMap*)map, gmap, gx, gy);
-    SCR_MAP_END;
-}
-
-void ScriptMgr::OnPlayerEnterMap(Map* map, Player* player)
-{
-    ASSERT(map);
-    ASSERT(player);
-
-    SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
-        itr->second->OnPlayerEnter(map, player);
-    SCR_MAP_END;
-
-    SCR_MAP_BGN(InstanceMapScript, map, itr, end, entry, IsDungeon);
-        itr->second->OnPlayerEnter((InstanceMap*)map, player);
-    SCR_MAP_END;
-
-    SCR_MAP_BGN(BattlegroundMapScript, map, itr, end, entry, IsBattleground);
-        itr->second->OnPlayerEnter((BattlegroundMap*)map, player);
-    SCR_MAP_END;
-}
-
-void ScriptMgr::OnPlayerLeaveMap(Map* map, Player* player)
-{
-    ASSERT(map);
-    ASSERT(player);
-
-    SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
-        itr->second->OnPlayerLeave(map, player);
-    SCR_MAP_END;
-
-    SCR_MAP_BGN(InstanceMapScript, map, itr, end, entry, IsDungeon);
-        itr->second->OnPlayerLeave((InstanceMap*)map, player);
-    SCR_MAP_END;
-
-    SCR_MAP_BGN(BattlegroundMapScript, map, itr, end, entry, IsBattleground);
-        itr->second->OnPlayerLeave((BattlegroundMap*)map, player);
-    SCR_MAP_END;
-}
-
-void ScriptMgr::OnMapUpdate(Map* map, uint32 diff)
-{
-    ASSERT(map);
-
-    SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
-        itr->second->OnUpdate(map, diff);
-    SCR_MAP_END;
-
-    SCR_MAP_BGN(InstanceMapScript, map, itr, end, entry, IsDungeon);
-        itr->second->OnUpdate((InstanceMap*)map, diff);
-    SCR_MAP_END;
-
-    SCR_MAP_BGN(BattlegroundMapScript, map, itr, end, entry, IsBattleground);
-        itr->second->OnUpdate((BattlegroundMap*)map, diff);
-    SCR_MAP_END;
-}
-
-#undef SCR_MAP_BGN
-#undef SCR_MAP_END
-
 InstanceScript* ScriptMgr::CreateInstanceData(InstanceMap* map)
 {
     ASSERT(map);
@@ -964,49 +821,10 @@ bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target)
 }
 
 // Player
-void ScriptMgr::OnPVPKill(Player* killer, Player* killed)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnPVPKill(killer, killed);
-}
-
-void ScriptMgr::OnCreatureKill(Player* killer, Creature* killed)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnCreatureKill(killer, killed);
-}
-
-void ScriptMgr::OnPlayerKilledByCreature(Creature* killer, Player* killed)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnPlayerKilledByCreature(killer, killed);
-}
 
 void ScriptMgr::OnPlayerLevelChanged(Player* player, uint8 oldLevel)
 {
     FOREACH_SCRIPT(PlayerScript)->OnLevelChanged(player, oldLevel);
-}
-
-void ScriptMgr::OnPlayerFreeTalentPointsChanged(Player* player, uint32 points)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnFreeTalentPointsChanged(player, points);
-}
-
-void ScriptMgr::OnPlayerTalentsReset(Player* player, bool noCost)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnTalentsReset(player, noCost);
-}
-
-void ScriptMgr::OnPlayerMoneyChanged(Player* player, int64& amount)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnMoneyChanged(player, amount);
-}
-
-void ScriptMgr::OnGivePlayerXP(Player* player, uint32& amount, Unit* victim)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnGiveXP(player, amount, victim);
-}
-
-void ScriptMgr::OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnReputationChange(player, factionID, standing, incremental);
 }
 
 void ScriptMgr::OnPlayerDuelRequest(Player* target, Player* challenger)
@@ -1062,36 +880,6 @@ void ScriptMgr::OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emote
 void ScriptMgr::OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck)
 {
     FOREACH_SCRIPT(PlayerScript)->OnSpellCast(player, spell, skipCheck);
-}
-
-void ScriptMgr::OnPlayerLogin(Player* player)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnLogin(player);
-}
-
-void ScriptMgr::OnPlayerLogout(Player* player)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnLogout(player);
-}
-
-void ScriptMgr::OnPlayerCreate(Player* player)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnCreate(player);
-}
-
-void ScriptMgr::OnPlayerDelete(uint64 guid)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnDelete(guid);
-}
-
-void ScriptMgr::OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnBindToInstance(player, difficulty, mapid, permanent);
-}
-
-void ScriptMgr::OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea)
-{
-    FOREACH_SCRIPT(PlayerScript)->OnUpdateZone(player, newZone, newArea);
 }
 
 // Group

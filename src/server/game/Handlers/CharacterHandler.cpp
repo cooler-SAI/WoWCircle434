@@ -696,7 +696,6 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
 
             std::string IP_str = GetRemoteAddress();
             sLog->outInfo(LOG_FILTER_CHARACTER, "Account: %d (IP: %s) Create Character:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), createInfo->Name.c_str(), newChar.GetGUIDLow());
-            sScriptMgr->OnPlayerCreate(&newChar);
             sWorld->AddCharacterNameData(newChar.GetGUIDLow(), std::string(newChar.GetName()), newChar.getGender(), newChar.getRace(), newChar.getClass(), newChar.getLevel());
 
             newChar.CleanupsBeforeDelete();
@@ -751,7 +750,6 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket & recvData)
 
     std::string IP_str = GetRemoteAddress();
     sLog->outInfo(LOG_FILTER_CHARACTER, "Account: %d (IP: %s) Delete Character:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), GUID_LOPART(guid));
-    sScriptMgr->OnPlayerDelete(guid);
     sWorld->DeleteCharacterNameData(GUID_LOPART(guid));
 
     if (sLog->ShouldLog(LOG_FILTER_PLAYER_DUMP, LOG_LEVEL_INFO)) // optimize GetPlayerDump call
@@ -1104,7 +1102,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     pCurrChar->StopCastingCharm();
     pCurrChar->RemoveAurasByType(SPELL_AURA_BIND_SIGHT);
 
-    sScriptMgr->OnPlayerLogin(pCurrChar);
     delete holder;
 }
 

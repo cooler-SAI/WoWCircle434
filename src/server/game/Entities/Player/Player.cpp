@@ -3103,8 +3103,6 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate)
 
     uint8 level = getLevel();
 
-    sScriptMgr->OnGivePlayerXP(this, xp, victim);
-
     // Favored experience increase START
     uint32 zone = GetZoneId();
     float favored_exp_mult = 0;
@@ -4539,8 +4537,6 @@ uint32 Player::GetNextResetTalentsCost() const
 
 bool Player::ResetTalents(bool no_cost)
 {
-    sScriptMgr->OnPlayerTalentsReset(this, no_cost);
-
     // not need after this call
     if (HasAtLoginFlag(AT_LOGIN_RESET_TALENTS))
         RemoveAtLoginFlag(AT_LOGIN_RESET_TALENTS, true);
@@ -7497,8 +7493,6 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
             }
         }
     }
-
-    sScriptMgr->OnPlayerUpdateZone(this, newZone, newArea);
 
     // in PvP, any not controlled zone (except zone->team == 6, default case)
     // in PvE, only opposition team capital
@@ -18243,7 +18237,6 @@ InstancePlayerBind* Player::BindToInstance(InstanceSave* save, bool permanent, b
         bind.perm = permanent;
         if (!load)
             sLog->outDebug(LOG_FILTER_MAPS, "Player::BindToInstance: %s(%d) is now bound to map %d, instance %d, difficulty %d", GetName(), GetGUIDLow(), save->GetMapId(), save->GetInstanceId(), save->GetDifficulty());
-        sScriptMgr->OnPlayerBindToInstance(this, save->GetDifficulty(), save->GetMapId(), permanent);
         return &bind;
     }
     else
@@ -21864,8 +21857,6 @@ void Player::InitPrimaryProfessions()
 
 void Player::ModifyMoney(int64 d)
 {
-    sScriptMgr->OnPlayerMoneyChanged(this, d);
-
     if (d < 0)
         SetMoney (GetMoney() > uint64(-d) ? GetMoney() + d : 0);
     else

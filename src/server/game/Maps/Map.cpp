@@ -55,8 +55,6 @@ GridState* si_GridStates[MAX_GRID_STATE];
 
 Map::~Map()
 {
-    sScriptMgr->OnDestroyMap(this);
-
     UnloadAll();
 
     while (!i_worldObjects.empty())
@@ -159,7 +157,6 @@ void Map::LoadMap(int gx, int gy, bool reload)
     if (GridMaps[gx][gy])
     {
         sLog->outInfo(LOG_FILTER_MAPS, "Unloading previously loaded map %u before reloading.", GetId());
-        sScriptMgr->OnUnloadGridMap(this, GridMaps[gx][gy], gx, gy);
 
         delete (GridMaps[gx][gy]);
         GridMaps[gx][gy]=NULL;
@@ -178,8 +175,6 @@ void Map::LoadMap(int gx, int gy, bool reload)
         sLog->outError(LOG_FILTER_MAPS, "Error loading map file: \n %s\n", tmp);
     }
     delete [] tmp;
-
-    sScriptMgr->OnLoadGridMap(this, GridMaps[gx][gy], gx, gy);
 }
 
 void Map::LoadMapAndVMap(int gx, int gy)
@@ -225,8 +220,6 @@ i_scriptLock(false)
 
     //lets initialize visibility distance for map
     Map::InitVisibilityDistance();
-
-    sScriptMgr->OnCreateMap(this);
 }
 
 void Map::InitVisibilityDistance()
@@ -407,7 +400,6 @@ bool Map::AddPlayerToMap(Player* player)
     player->m_clientGUIDs.clear();
     player->UpdateObjectVisibility(false);
 
-    sScriptMgr->OnPlayerEnterMap(this, player);
     return true;
 }
 
@@ -561,8 +553,6 @@ void Map::Update(const uint32 t_diff)
     }
 
     MoveAllCreaturesInMoveList();
-
-    sScriptMgr->OnMapUpdate(this, t_diff);
 }
 
 void Map::RemovePlayerFromMap(Player* player, bool remove)
@@ -577,11 +567,7 @@ void Map::RemovePlayerFromMap(Player* player, bool remove)
         ASSERT(remove); //maybe deleted in logoutplayer when player is not in a map
 
     if (remove)
-    {
         DeleteFromWorld(player);
-
-        sScriptMgr->OnPlayerLeaveMap(this, player);
-    }
 }
 
 template<class T>
