@@ -882,6 +882,21 @@ void ScriptMgr::OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck)
     FOREACH_SCRIPT(PlayerScript)->OnSpellCast(player, spell, skipCheck);
 }
 
+void ScriptMgr::OnPlayerLogin(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnLogin(player);
+}
+
+void ScriptMgr::OnPlayerLogout(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnLogout(player);
+}
+
+void ScriptMgr::OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBindToInstance(player, difficulty, mapid, permanent);
+}
+
 // Group
 void ScriptMgr::OnGroupAddMember(Group* group, uint64 guid)
 {

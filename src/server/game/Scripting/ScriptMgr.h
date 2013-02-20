@@ -509,6 +509,16 @@ class PlayerScript : public ScriptObject
 
         // Called in Spell::Cast.
         virtual void OnSpellCast(Player* /*player*/, Spell* /*spell*/, bool /*skipCheck*/) { }
+
+        // Called when a player logs in.
+        virtual void OnLogin(Player* /*player*/) { }
+
+        // Called when a player logs out.
+        virtual void OnLogout(Player* /*player*/) { }
+
+        // Called when a player is bound to an instance
+        virtual void OnBindToInstance(Player* /*player*/, Difficulty /*difficulty*/, uint32 /*mapId*/, bool /*permanent*/) { }
+
 };
 
 
@@ -661,6 +671,9 @@ class ScriptMgr
         void OnPlayerEmote(Player* player, uint32 emote);
         void OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, uint64 guid);
         void OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck);
+        void OnPlayerLogin(Player* player);
+        void OnPlayerLogout(Player* player);
+        void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
 
     public: /* GroupScript */
 
