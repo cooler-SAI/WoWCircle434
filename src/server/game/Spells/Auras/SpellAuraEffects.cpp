@@ -940,9 +940,18 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 // Revelations
                 case 81206:
                 case 81208:
+                {
                     if (!caster->HasAura(88627))
                         return 88625;
                     break;
+                }
+                case 687:   // Demonic Armor
+                case 28176: // Fel Armor
+                {
+                    if (!caster->HasAura(91713)) // Nether Ward
+                        return 6229;
+                    break;
+                }
                 default: break;
             }
             break;
