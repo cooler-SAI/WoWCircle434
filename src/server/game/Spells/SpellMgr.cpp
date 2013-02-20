@@ -3455,6 +3455,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 78674: // Starsurge
                 spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_DUMMY;
                 spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_1].Mechanic = MECHANIC_NONE;
                 break;
             case 70728: // Exploit Weakness (needs target selection script)
             case 70840: // Devious Minds (needs target selection script)
