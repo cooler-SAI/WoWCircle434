@@ -480,7 +480,7 @@ void Creature::Update(uint32 diff)
             m_vehicleKit->Reset();
     }
 
-    if (IsInWater())
+    /*if (IsInWater())
     {
         if (canSwim())
             AddUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
@@ -506,7 +506,7 @@ void Creature::Update(uint32 diff)
     {
         SetCanFly(false);
         SetDisableGravity(false);
-    }
+    }*/
 
     switch (m_deathState)
     {
