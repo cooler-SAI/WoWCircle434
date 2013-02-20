@@ -455,8 +455,6 @@ void AchievementMgr<Guild>::RemoveCriteriaProgress(const AchievementCriteriaEntr
 template<class T>
 void AchievementMgr<T>::ResetAchievementCriteria(AchievementCriteriaTypes type, uint64 miscValue1, uint64 miscValue2, bool evenIfCriteriaComplete)
 {
-    sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "ResetAchievementCriteria(%u, " UI64FMTD ", " UI64FMTD ")", type, miscValue1, miscValue2);
-
     // disable for gamemasters with GM-mode enabled
     if (GetOwner()->isGameMaster())
         return;
@@ -896,8 +894,6 @@ void AchievementMgr<T>::SendAchievementEarned(AchievementEntry const* achievemen
     if (achievement && achievement->flags & ACHIEVEMENT_FLAG_HIDDEN)
         return;
 
-    sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::SendAchievementEarned(%u)", achievement->ID);
-
     if (Guild* guild = sGuildMgr->GetGuildById(GetOwner()->GetGuildId()))
     {
         Trinity::AchievementChatBuilder say_builder(*GetOwner(), CHAT_MSG_GUILD_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
@@ -1081,27 +1077,14 @@ template<class T>
 void AchievementMgr<T>::UpdateAchievementCriteria(AchievementCriteriaTypes type, uint64 miscValue1 /*= 0*/, uint64 miscValue2 /*= 0*/, uint64 miscValue3 /*= 0*/, Unit const* unit /*= NULL*/, Player* referencePlayer /*= NULL*/)
 {
     if (type >= ACHIEVEMENT_CRITERIA_TYPE_TOTAL)
-    {
-        sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "UpdateAchievementCriteria: Wrong criteria type %u", type);
         return;
-    }
 
     if (!referencePlayer)
-    {
-        sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "UpdateAchievementCriteria: Player is NULL! Cant update criteria");
         return;
-    }
 
     // disable for gamemasters with GM-mode enabled
     if (referencePlayer && referencePlayer->isGameMaster())
-    {
-        sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "UpdateAchievementCriteria: [Player %s GM mode on] %s, %s (%u), " UI64FMTD ", " UI64FMTD ", " UI64FMTD
-            , referencePlayer->GetName(), GetLogNameForGuid(GetOwner()->GetGUID()), AchievementGlobalMgr::GetCriteriaTypeString(type), type, miscValue1, miscValue2, miscValue3);
         return;
-    }
-
-    sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "UpdateAchievementCriteria: %s, %s (%u), " UI64FMTD ", " UI64FMTD ", " UI64FMTD
-        , GetLogNameForGuid(GetOwner()->GetGUID()), AchievementGlobalMgr::GetCriteriaTypeString(type), type, miscValue1, miscValue2, miscValue3);
 
     // Lua_GetGuildLevelEnabled() is checked in achievement UI to display guild tab
     if (IsGuild<T>() && !sWorld->getBoolConfig(CONFIG_GUILD_LEVELING_ENABLED))
@@ -1798,9 +1781,6 @@ void AchievementMgr<T>::SetCriteriaProgress(AchievementCriteriaEntry const* entr
     if (entry->timeLimit && timedIter == m_timedAchievements.end())
         return;
 
-    sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "SetCriteriaProgress(%u, " UI64FMTD ") for (%s GUID: %u)",
-                   entry->ID, changeValue, GetLogNameForGuid(GetOwner()->GetGUID()), GUID_LOPART(GetOwner()->GetGUID()));
-
     CriteriaProgress* progress = GetCriteriaProgress(entry);
     if (!progress)
     {
@@ -1939,8 +1919,6 @@ void AchievementMgr<T>::RemoveTimedAchievement(AchievementCriteriaTimedTypes typ
 template<>
 void AchievementMgr<Player>::CompletedAchievement(AchievementEntry const* achievement, Player* referencePlayer)
 {
-    sLog->outInfo(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::CompletedAchievement(%u)", achievement->ID);
-
     // disable for gamemasters with GM-mode enabled
     if (GetOwner()->isGameMaster())
         return;
@@ -2024,8 +2002,6 @@ void AchievementMgr<Player>::CompletedAchievement(AchievementEntry const* achiev
 template<>
 void AchievementMgr<Guild>::CompletedAchievement(AchievementEntry const* achievement, Player* referencePlayer)
 {
-    sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr<Guild>::CompletedAchievement(%u)", achievement->ID);
-
     if (achievement->flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
         return;
 
@@ -2343,54 +2319,26 @@ template<class T>
 bool AchievementMgr<T>::CanUpdateCriteria(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement, uint64 miscValue1, uint64 miscValue2, uint64 miscValue3, Unit const* unit, Player* referencePlayer)
 {
     if (DisableMgr::IsDisabledFor(DISABLE_TYPE_ACHIEVEMENT_CRITERIA, criteria->ID, NULL))
-    {
-        sLog->outTrace(LOG_FILTER_ACHIEVEMENTSYS, "CanUpdateCriteria: %s (Id: %u Type %s) Disabled",
-            criteria->name, criteria->ID, AchievementGlobalMgr::GetCriteriaTypeString(criteria->type));
         return false;
-    }
 
     if (achievement->mapID != -1 && referencePlayer->GetMapId() != uint32(achievement->mapID))
-    {
-        sLog->outTrace(LOG_FILTER_ACHIEVEMENTSYS, "CanUpdateCriteria: %s (Id: %u Type %s) Wrong map",
-            criteria->name, criteria->ID, AchievementGlobalMgr::GetCriteriaTypeString(criteria->type));
         return false;
-    }
 
     if ((achievement->requiredFaction == ACHIEVEMENT_FACTION_HORDE    && referencePlayer->GetTeam() != HORDE) ||
         (achievement->requiredFaction == ACHIEVEMENT_FACTION_ALLIANCE && referencePlayer->GetTeam() != ALLIANCE))
-    {
-        sLog->outTrace(LOG_FILTER_ACHIEVEMENTSYS, "CanUpdateCriteria: %s (Id: %u Type %s) Wrong faction",
-            criteria->name, criteria->ID, AchievementGlobalMgr::GetCriteriaTypeString(criteria->type));
         return false;
-    }
 
     if (IsCompletedCriteria(criteria, achievement))
-    {
-        sLog->outTrace(LOG_FILTER_ACHIEVEMENTSYS, "CanUpdateCriteria: %s (Id: %u Type %s) Is Completed",
-            criteria->name, criteria->ID, AchievementGlobalMgr::GetCriteriaTypeString(criteria->type));
         return false;
-    }
 
     if (!RequirementsSatisfied(criteria, miscValue1, miscValue2, miscValue3, unit, referencePlayer))
-    {
-        sLog->outTrace(LOG_FILTER_ACHIEVEMENTSYS, "CanUpdateCriteria: %s (Id: %u Type %s) Requirements not satisfied",
-            criteria->name, criteria->ID, AchievementGlobalMgr::GetCriteriaTypeString(criteria->type));
         return false;
-    }
 
     if (!AdditionalRequirementsSatisfied(criteria, miscValue1, miscValue2, unit, referencePlayer))
-    {
-        sLog->outTrace(LOG_FILTER_ACHIEVEMENTSYS, "CanUpdateCriteria: %s (Id: %u Type %s) Additional requirements not satisfied",
-            criteria->name, criteria->ID, AchievementGlobalMgr::GetCriteriaTypeString(criteria->type));
         return false;
-    }
 
     if (!ConditionsSatisfied(criteria, referencePlayer))
-    {
-        sLog->outTrace(LOG_FILTER_ACHIEVEMENTSYS, "CanUpdateCriteria: %s (Id: %u Type %s) Conditions not satisfied",
-            criteria->name, criteria->ID, AchievementGlobalMgr::GetCriteriaTypeString(criteria->type));
         return false;
-    }
 
     return true;
 }
