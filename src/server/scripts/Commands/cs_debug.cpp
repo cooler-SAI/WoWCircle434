@@ -1491,7 +1491,7 @@ public:
 
     static bool HandleDebugCapResetCommand(ChatHandler* handler, char const* /*args*/)
     {
-        sCurrencyMgr->ResetCurrencyCapToAllPlayers();
+        sWorld->ResetCurrencyWeekCap();
         handler->PSendSysMessage("Cap resetting was started...");
         return true;
     }
