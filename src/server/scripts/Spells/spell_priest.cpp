@@ -354,14 +354,14 @@ class spell_pri_vampiric_touch : public SpellScriptLoader
                 return true;
             }
 
-            void HandleDispel(DispelInfo* /*dispelInfo*/)
+            void HandleDispel(DispelInfo* dispelInfo)
             {
-                if (!GetCaster() || !GetUnitOwner())
+                if (!GetCaster() || dispelInfo->GetDispeller())
                     return;
 
                 if (AuraEffect const* aurEff = GetCaster()->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PRIEST, 1869, EFFECT_1))
                     if (roll_chance_i(aurEff->GetSpellInfo()->Effects[EFFECT_0].BasePoints))
-                        GetUnitOwner()->CastSpell(GetUnitOwner(), PRIEST_SPELL_VAMPIRIC_TOUCH_DISPEL, true);
+                        dispelInfo->GetDispeller()->CastSpell(dispelInfo->GetDispeller(), PRIEST_SPELL_VAMPIRIC_TOUCH_DISPEL, true);
 
             }
 
