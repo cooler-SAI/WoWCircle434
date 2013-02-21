@@ -4813,7 +4813,7 @@ void Spell::TakePower()
     bool hit = true;
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
     {
-        if (powerType == POWER_RAGE || powerType == POWER_ENERGY || powerType == POWER_RUNES)
+        if (powerType == POWER_ENERGY || powerType == POWER_RUNES)
         {
             if (uint64 targetGUID = m_targets.GetUnitTargetGUID())
             {
