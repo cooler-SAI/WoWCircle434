@@ -825,6 +825,7 @@ class World
         void   ResetEventSeasonalQuests(uint16 event_id);
 
         void UpdatePhaseDefinitions();
+        void ResetCurrencyWeekCap();
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
@@ -838,7 +839,6 @@ class World
         void ResetDailyQuests();
         void ResetWeeklyQuests();
         void ResetRandomBG();
-        void ResetCurrencyWeekCap();
         void AutoRestartServer();
     private:
         static ACE_Atomic_Op<ACE_Thread_Mutex, bool> m_stopEvent;
