@@ -7238,6 +7238,11 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
                     return;
 
                 target->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DOT, damage);
+
+                // Unshackled Fury
+                if (AuraEffect const* aurEff = target->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_WARRIOR, 1962, EFFECT_0))
+                    AddPct(damage, aurEff->GetAmount());
+
                 break;
             default:
                 break;
