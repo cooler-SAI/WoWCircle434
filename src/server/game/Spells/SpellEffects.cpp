@@ -6813,7 +6813,10 @@ void Spell::EffectSummonDeadPet(SpellEffIndex /*effIndex*/)
         return;
 
     Pet* pet = player->GetPet();
-    if (pet && pet->isAlive())
+    if (!pet)
+        return;
+
+    if (pet->isAlive())
         return;
 
     if (damage < 0)
@@ -6821,13 +6824,6 @@ void Spell::EffectSummonDeadPet(SpellEffIndex /*effIndex*/)
 
     float x, y, z;
     player->GetPosition(x, y, z);
-    if (!pet)
-    {
-        player->SummonPet(0, x, y, z, player->GetOrientation(), SUMMON_PET, 0);
-        pet = player->GetPet();
-    }
-    if (!pet)
-        return;
 
     player->GetMap()->CreatureRelocation(pet, x, y, z, player->GetOrientation());
 
