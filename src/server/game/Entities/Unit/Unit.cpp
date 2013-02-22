@@ -9413,6 +9413,8 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
         case 92236: // Item - Proc Mastery Below 35%, Symbiotic Worm
         case 92356: // Item - Proc Mastery Below 35%, Symbiotic Worm (H)
         case 92234: // Item - Proc Dodge Below 35%, Bedrock Talisman
+        case 96947: // Loom of Fate, Spediersilk Spindle
+        case 97130: // Loom of Fate, Spediersilk Spindle (H)
             if (!HealthBelowPct(35) && !HealthBelowPctDamaged(35, damage))
                 return false;
             break;
