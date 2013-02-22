@@ -10893,6 +10893,8 @@ void Unit::SetCharm(Unit* charm, bool apply)
 
         if (!charm->AddUInt64Value(UNIT_FIELD_CHARMEDBY, GetGUID()))
             sLog->outFatal(LOG_FILTER_UNITS, "Unit %u is being charmed, but it already has a charmer " UI64FMTD "", charm->GetEntry(), charm->GetCharmerGUID());
+        else
+            charm->m_charmerGuid = GetGUID();
 
         _isWalkingBeforeCharm = charm->IsWalking();
         if (_isWalkingBeforeCharm)
@@ -10913,6 +10915,8 @@ void Unit::SetCharm(Unit* charm, bool apply)
 
         if (!charm->RemoveUInt64Value(UNIT_FIELD_CHARMEDBY, GetGUID()))
             sLog->outFatal(LOG_FILTER_UNITS, "Unit %u is being uncharmed, but it has another charmer " UI64FMTD "", charm->GetEntry(), charm->GetCharmerGUID());
+        else
+            charm->m_charmerGuid = 0;
 
         if (charm->GetTypeId() == TYPEID_PLAYER)
         {

@@ -1662,6 +1662,8 @@ class Unit : public WorldObject
         DeathState getDeathState() { return m_deathState; };
         virtual void setDeathState(DeathState s);           // overwrited in Creature/Player/Pet
 
+        uint64 m_charmerGuid;
+        uint64 m_ownerGuid;
         uint64 GetOwnerGUID() const { return  m_ownerGuid; }
         void SetOwnerGUID(uint64 owner);
         uint64 GetCreatorGUID() const { return GetUInt64Value(UNIT_FIELD_CREATEDBY); }
@@ -2396,9 +2398,6 @@ class Unit : public WorldObject
         class VisibilityUpdateTask;
         Position m_lastVisibilityUpdPos;
         bool m_VisibilityUpdScheduled;
-
-        uint64 m_charmerGuid;
-        uint64 m_ownerGuid;
 
         uint32 m_rootTimes;
         uint32 m_movementCounters;
