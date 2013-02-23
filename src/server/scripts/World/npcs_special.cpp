@@ -3421,10 +3421,10 @@ public:
             }
 
             x = me->GetPositionX();
-            y = me->GetPositionY();
-            z = me->GetOwner()->GetPositionZ()+2;
+            y = me->GetPositionY() + 2;
+            z = me->GetOwner()->GetPositionZ() + 5;
             o = me->GetOrientation();
-            me->NearTeleportTo(x, y, z, o, true);
+//             me->NearTeleportTo(x, y, z, o, true);
             angle = me->GetOwner()->GetAngle(me);
             newx = me->GetPositionX() + FLAME_ORB_DISTANCE/2 * cos(angle);
             newy = me->GetPositionY() + FLAME_ORB_DISTANCE/2 * sin(angle);
