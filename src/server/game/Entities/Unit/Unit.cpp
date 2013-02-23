@@ -6777,7 +6777,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (procSpell->SpellIconID != 62 || victim == this)
                         return false;
 
-                    basepoints0 = int32(CalculatePct(GetCreatePowers(POWER_MANA), triggerAmount) / 5);
                     triggered_spell_id = 54833;
                     target = this;
                     break;
