@@ -3517,7 +3517,7 @@ public:
 
         void Reset()
         {
-            DoCast(me, 81781);
+            DoCast(me, 81781, true);
         }
 
         void InitializeAI()
