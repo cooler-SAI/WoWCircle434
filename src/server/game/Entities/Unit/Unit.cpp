@@ -591,10 +591,6 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
             victim->ToPlayer()->SetDamageForSecond<true>(damage);
     }
 
-    // For ground totem
-    if (victim && victim->isTotem() && victim->HasAuraType(SPELL_AURA_SPELL_MAGNET))
-        damage = 0;
-
     if (damagetype != NODAMAGE)
     {
         // interrupting auras with AURA_INTERRUPT_FLAG_DAMAGE before checking !damage (absorbed damage breaks that type of auras)
