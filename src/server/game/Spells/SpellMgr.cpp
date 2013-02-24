@@ -4980,6 +4980,22 @@ void SpellMgr::LoadDbcDataCorrections()
             case 101220:
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
                 break;
+            // Baleroc
+            case 99351: // Inferno Blade
+                spellInfo->Attributes &= ~SPELL_ATTR0_ON_NEXT_SWING;
+                break;
+            case 99262: // Vital Spark
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
+                break;
+            case 99515: // Final Countdown
+                spellInfo->MaxAffectedTargets = 2;
+                break;
+            case 99256: // Torment
+            case 100230:
+            case 100231:
+            case 100232:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
             // ENDOF FIRELANDS
             // BASTION OF TWILIGHT SPELLS
             //
@@ -6133,6 +6149,10 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].Effect = SPELL_EFFECT_APPLY_AURA;
                 spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL;
                 spellInfo->Effects[0].TriggerSpell = 92931;
+                break;
+            // Arest, Sturdy Manacles, Seize the Ambassador
+            case 78628:
+                spellInfo->Effects[EFFECT_0].Effect = 0;
                 break;
             default:
                 break;
