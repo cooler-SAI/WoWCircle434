@@ -357,6 +357,22 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                 switch (m_spellInfo->Id)                     // better way to check unknown
                 {
+                    // Decimation Blade, Baleroc
+                    case 99353:
+                    {
+                        uint32 mindmg = 250000;
+                        uint32 maxdmg = CalculatePct(unitTarget->GetMaxHealth(), 90);
+                        damage = std::max(mindmg, maxdmg);
+                        break;
+                    }
+                    // Torment, Baleroc
+                    case 99256:
+                    case 100230:
+                    case 100231:
+                    case 100232:
+                        if (Aura* const aur = unitTarget->GetAura(m_spellInfo->Id, m_caster->GetGUID()))
+                            damage *= aur->GetStackAmount();
+                        break;
                     // Rocket Barrage, Goblin racial
                     case 69041:
                     {
@@ -3205,10 +3221,24 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
         return;
 
     // Hack for water elemental
-    if (m_spellInfo->Id == 31687)
-        if (m_caster->ToPlayer())
-            if (m_caster->getClass() == CLASS_MAGE && m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) != TALENT_TREE_MAGE_FROST)
-                return;
+    switch(m_spellInfo->Id)
+    {
+        case 31687: // Summon Water Elemental
+            if (m_caster->ToPlayer())
+                if (m_caster->getClass() == CLASS_MAGE && m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) != TALENT_TREE_MAGE_FROST)
+                    return;
+            break;
+        case 52150: // Raise Dead
+            if (m_caster->ToPlayer())
+                if (m_caster->getClass() == CLASS_DEATH_KNIGHT && m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) != TALENT_TREE_DEATH_KNIGHT_UNHOLY)
+                    return;
+            break;
+        case 30146: // Summon Felguard
+            if (m_caster->ToPlayer())
+                if (m_caster->getClass() == CLASS_WARLOCK && m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) != TALENT_TREE_WARLOCK_DEMONOLOGY)
+                    return;
+            break;
+    }
 
     uint32 entry = m_spellInfo->Effects[effIndex].MiscValue;
     if (!entry)

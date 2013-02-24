@@ -136,6 +136,17 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     if (!petentry)
         return false;
 
+    if (petentry == 26125) // Raise Dead
+    {
+        if (owner->getClass() == CLASS_DEATH_KNIGHT && owner->ToPlayer()->GetPrimaryTalentTree(owner->ToPlayer()->GetActiveSpec()) != TALENT_TREE_DEATH_KNIGHT_UNHOLY)
+            return false;
+    }
+    else if (petentry == 17252) // Summon Felguard
+    {
+        if (owner->getClass() == CLASS_WARLOCK && owner->ToPlayer()->GetPrimaryTalentTree(owner->ToPlayer()->GetActiveSpec()) != TALENT_TREE_WARLOCK_DEMONOLOGY)
+            return false;
+    }
+
     uint32 summon_spell_id = fields[14].GetUInt32();
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(summon_spell_id);
 
