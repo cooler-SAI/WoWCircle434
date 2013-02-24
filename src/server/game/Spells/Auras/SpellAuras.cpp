@@ -36,6 +36,7 @@
 #include "ScriptMgr.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
+//#include "InstanceScript.h"
 
 AuraApplication::AuraApplication(Unit* target, Unit* caster, Aura* aura, uint8 effMask):
 _target(target), _base(aura), _removeMode(AURA_REMOVE_NONE), _slot(MAX_AURAS),
@@ -1449,30 +1450,47 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (target->HasAura(58039)) // Glyph of Blurred Speed
                         target->CastSpell(target, 61922, true); // Sprint (waterwalk)
                 }
-                // Blind
-                else if (GetId() == 2094)
+                
+                switch (GetId())
                 {
-                    // Glyph of Blind
-                    if (caster && caster->HasAura(91299))
+                    // Blind
+                    case  2094:
                     {
-                        target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, 0, 32409);
-                        target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-                        target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                        // Glyph of Blind
+                        if (caster && caster->HasAura(91299))
+                        {
+                            target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, 0, 32409);
+                            target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
+                            target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                        }
+                        break;
+                    }
+                    // Sap
+                    case 6770:
+                    {
+                        // Remove stealth from target
+                        target->RemoveAurasByType(SPELL_AURA_MOD_STEALTH, 0, 0, 11327);
+                        break;
+                    }
+                    // Deadly Momentum
+                    case 84590:
+                    {
+                        if (Aura* snd = target->GetAura(5171))
+                            snd->RefreshDuration();
+                        if (Aura* rec = target->GetAura(73651))
+                            rec->RefreshDuration();
+                        break;
                     }
                 }
-                // Sap
-                else if (GetId() == 6770)
+                break;
+            case SPELLFAMILY_SHAMAN:
+                // Maelstorm Weapon
+                if (GetId() == 53817)
                 {
-                    // Remove stealth from target
-                    target->RemoveAurasByType(SPELL_AURA_MOD_STEALTH, 0, 0, 11327);
-                }
-                // Deadly Momentum
-                else if (GetId() == 84590)
-                {
-                    if (Aura* snd = target->GetAura(5171))
-                        snd->RefreshDuration();
-                    if (Aura* rec = target->GetAura(73651))
-                        rec->RefreshDuration();
+                    // Item - Shaman T13 Enhancement 2P Bonus
+                    if (target->HasAura(105866))
+                        target->CastSpell(target, 105869, true);
+                    break;
                 }
                 break;
             case SPELLFAMILY_WARRIOR:
@@ -1581,6 +1599,31 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_GENERIC:
                 switch (GetId())
                 {
+                    // Final Countdown dmg, Baleroc
+                    case 99516:
+                        if (target)
+                        {
+                            target->RemoveAura(99519);
+                            if (removeMode == AURA_REMOVE_BY_EXPIRE)
+                                target->CastSpell(target, 99518, true);
+                        }
+                        break;
+                    // Torment, Baleroc
+                    case 99256:
+                    case 100230:
+                    case 100231:
+                    case 100232:
+                        if (removeMode == AURA_REMOVE_BY_EXPIRE)
+                            target->CastSpell(target, 99257, true);
+                        break;
+                    // Vital Flame, Baleroc
+                    case 99263:
+                    {//if (InstanceScript* pInstance = target->GetInstanceScript())
+                            //if (pInstance->GetBossState(4) == IN_PROGRESS)
+                                uint8 stacks = GetEffect(EFFECT_0)->GetAmount() / 5;
+                                target->CastCustomSpell(99262, SPELLVALUE_AURA_STACK, stacks? stacks: 1, target, true);
+                        break;
+                    }
                     // Finkle's Mixture, Chimaeron
                     case 82705:
                         target->RemoveAurasDueToSpell(89084);                            
