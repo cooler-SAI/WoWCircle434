@@ -3176,6 +3176,17 @@ bool SpellInfo::IsBreakingStealth(Unit* m_caster) const
     return true;
 }
 
+bool SpellInfo::IsPeriodicHeal() const
+{
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (Effects[i].ApplyAuraName == SPELL_AURA_PERIODIC_HEAL)
+            return true;
+    }
+
+    return false;
+}
+
 bool SpellInfo::IsBreakingCamouflageAfterHit() const
 {
     // Traps

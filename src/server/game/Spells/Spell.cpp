@@ -4306,6 +4306,11 @@ void Spell::SendSpellStart()
         castFlags |= CAST_FLAG_UNKNOWN_19;                   // same as in SMSG_SPELL_GO
     }
 
+    if ( m_casttime && ( m_spellInfo->HasEffect( SPELL_EFFECT_HEAL ) || m_spellInfo->HasEffect( SPELL_EFFECT_HEAL_PCT ) ) 
+        || m_spellInfo->IsPeriodicHeal() ) {
+        castFlags |= CAST_FLAG_HEAL_PREDICTION;
+        }
+
     WorldPacket data(SMSG_SPELL_START, (8+8+4+4+2));
     if (m_CastItem)
         data.append(m_CastItem->GetPackGUID());
@@ -4362,10 +4367,36 @@ void Spell::SendSpellStart()
 
     if (castFlags & CAST_FLAG_HEAL_PREDICTION)
     {
-        data << uint32(0);
-        data << uint8(0); // unkByte
-        // if (unkByte == 2)
-            // data.append(0);
+        uint32 heal_pred = 0;
+        bool directHeal = false;
+        int i = 0;
+        for ( ; i < 3; ++i )
+        {
+            if ( m_spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL ||  m_spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL_PCT ) {
+                directHeal = true;
+                break;
+            }
+        }
+
+        Unit *target = m_targets.GetUnitTarget();
+        if (!target)
+            target = m_caster;
+
+        if ( directHeal ) {
+            heal_pred = CalculateDamage( i, target );
+            heal_pred = m_caster->SpellDamageBonusDone( target, m_spellInfo, heal_pred, HEAL );
+
+        // something about hots
+        // client gets guid from packguid and counting tick amount from caster spd
+        // so, just dont send anything for hots
+        } else {
+            heal_pred = 0;
+        }
+
+        data << uint32(heal_pred);
+        data << uint8(directHeal ? 0 : DOT); // isDot
+        if (!directHeal)
+            data.append(m_caster->GetPackGUID());
     }
 
     m_caster->SendMessageToSet(&data, true);
