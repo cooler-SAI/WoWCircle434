@@ -1850,14 +1850,9 @@ void Unit::AttackerStateUpdate (Unit* victim, WeaponAttackType attType, bool ext
     if (!victim->isAlive())
         return;
 
-    if ((attType == BASE_ATTACK || attType == OFF_ATTACK) && !IsWithinLOSInMap(victim))
-    {
-        // Test function
-        // Send event in script to prevent exploits with los
-        if (IsAIEnabled && GetMap()->IsRaid())
-            GetAI()->DoAction(EVENT_IN_LOS);
-        return;
-    }
+    if (!IsAIEnabled || !GetMap()->Instanceable())
+        if ((attType == BASE_ATTACK || attType == OFF_ATTACK) && !IsWithinLOSInMap(victim))
+            return;
 
     CombatStart(victim);
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MELEE_ATTACK);
@@ -5224,6 +5219,54 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Vital Spark, Baleroc
+                case 99262:
+                {
+                    if (!victim || !victim->HasAura(99252))
+                        return false;
+                    
+                    if (Aura* aur = GetAura(99262))
+                    {
+                        int32 bp = aur->GetStackAmount() * 5;
+                        CastCustomSpell(this, 99263, &bp, 0, 0, true);
+                        aur->Remove();
+                    }
+                    break;
+                }
+                case 99256: // Torment, Baleroc (normal)
+                case 100230:
+                {
+                    if (!victim || HasAura(99252) || victim->HasAura(99263))
+                        return false;
+
+                    if (Aura* aur = GetAura(dummySpell->Id))
+                    {
+                        uint8 stacks = aur->GetStackAmount();
+                        if (stacks < 3)
+                            return false;
+
+                        int32 bp = int32(stacks / 3);
+                        victim->CastCustomSpell(99262, SPELLVALUE_AURA_STACK, bp, victim, true);
+                    }
+                    break;
+                }
+                case 100231: // Torment, Baleroc (heroic)
+                case 100232:
+                {
+                    if (!victim || HasAura(99252) || victim->HasAura(99263))
+                        return false;
+
+                    if (Aura* aur = GetAura(dummySpell->Id))
+                    {
+                        uint8 stacks = aur->GetStackAmount();
+                        if (stacks < 5)
+                            return false;
+
+                        int32 bp = int32(stacks / 5);
+                        victim->CastCustomSpell(99262, SPELLVALUE_AURA_STACK, bp, victim, true);
+                    }
+                    break;
+                }
                 case 107786: // Item - Dragon Soul - Proc - Agi Melee 1H Axe
                 case 109873: // Item - Dragon Soul - Proc - Agi Melee 1H Axe Heroic
                 case 109866: // Item - Dragon Soul - Proc - Agi Melee 1H Axe LFR
@@ -12216,6 +12259,12 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
         if (spellProto->Effects[i].Effect == SPELL_EFFECT_HEALTH_LEECH)
             DoneTotal = 0;
     }
+
+    // Vital Flame, Baleroc
+    // Need to fix 359 auras
+    if (victim->HasAura(99252))
+        if (AuraEffect const* aurEff = GetAuraEffect(99263, EFFECT_0))
+            AddPct(DoneTotalMod, aurEff->GetAmount());
 
     // use float as more appropriate for negative values and percent applying
     float heal = float(int32(healamount) + DoneTotal) * DoneTotalMod;
