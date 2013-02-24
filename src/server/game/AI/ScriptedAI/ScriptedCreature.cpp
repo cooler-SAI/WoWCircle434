@@ -460,6 +460,7 @@ BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
     _boundary(instance ? instance->GetBossBoundary(bossId) : NULL),
     _bossId(bossId)
 {
+    _checkareaTimer = 1000;
 }
 
 void BossAI::_Reset()

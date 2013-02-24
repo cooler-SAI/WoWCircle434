@@ -450,13 +450,7 @@ bool Creature::UpdateEntry(uint32 Entry, uint32 team, const CreatureData* data)
     {
         SetCanFly(false);
         SetDisableGravity(false);
-    }
-
-    // TODO: Shouldn't we check whether or not the creature is in water first?
-    if (cInfo->InhabitType & INHABIT_WATER && IsInWater())
-         AddUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
-    else
-        RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);*/
+    }*/
 
     if (cInfo->InhabitType & INHABIT_AIR)
     {
@@ -464,8 +458,11 @@ bool Creature::UpdateEntry(uint32 Entry, uint32 team, const CreatureData* data)
         SetDisableGravity(true);
     }
 
-    if (cInfo->InhabitType & INHABIT_WATER)
-        AddUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
+    // TODO: Shouldn't we check whether or not the creature is in water first?
+    if (cInfo->InhabitType & INHABIT_WATER && IsInWater())
+         AddUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
+    else
+        RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
 
     return true;
 }
@@ -480,7 +477,7 @@ void Creature::Update(uint32 diff)
             m_vehicleKit->Reset();
     }
 
-    /*if (IsInWater())
+    if (IsInWater())
     {
         if (canSwim())
             AddUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
@@ -491,7 +488,7 @@ void Creature::Update(uint32 diff)
             RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
     }
 
-    // Set the movement flags if the creature is in that mode. (Only fly if actually in air, only swim if in water, etc)
+    /*// Set the movement flags if the creature is in that mode. (Only fly if actually in air, only swim if in water, etc)
     float ground = GetPositionZ();
     GetMap()->GetWaterOrGroundLevel(GetPositionX(), GetPositionY(), GetPositionZ(), &ground);
 
