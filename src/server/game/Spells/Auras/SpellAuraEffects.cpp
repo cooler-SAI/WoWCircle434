@@ -810,8 +810,8 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 case 59543:
                 case 59544:
                 case 59545:
-                case 59546:
                 case 59547:
+                case 59548:
                     amount = int32(CalculatePct(GetBase()->GetUnitOwner()->GetMaxHealth(), 4));
                     break;
                 // Lightwell Renew
