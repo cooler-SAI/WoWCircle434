@@ -4316,13 +4316,6 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                     fixed_bonus += (aur->GetStackAmount() - 1) * CalculateDamage(1, unitTarget);
                 }
             }
-            // Raging Blow
-            else if (m_spellInfo->Id == 85384 || m_spellInfo->Id == 96103)
-            {
-                // Unshackled Fury
-                if (AuraEffect const* aurEff = m_caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_WARRIOR, 1962, EFFECT_0))
-                    AddPct(totalDamagePercentMod, aurEff->GetAmount());
-            }
             break;
         }
         case SPELLFAMILY_ROGUE:
