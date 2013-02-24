@@ -6513,6 +6513,17 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             switch (dummySpell->Id)
             {
+                // Echo of Light
+                case 77485:
+                {
+                    if (effIndex != 0)
+                        return false;
+
+                    basepoints0 = CalculatePct(damage, triggerAmount);
+                    triggered_spell_id = 77489;
+                    basepoints0 += victim->GetRemainingPeriodicAmount(GetGUID(), triggered_spell_id, SPELL_AURA_PERIODIC_HEAL);
+                    break;
+                }
                 // Phantasm
                 case 47570:
                 case 47569:
