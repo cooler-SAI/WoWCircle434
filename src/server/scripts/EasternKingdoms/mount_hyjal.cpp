@@ -197,9 +197,57 @@ class npc_lycanthoth : public CreatureScript
         };
 };
 
+class npc_marion_wormswing : public CreatureScript
+{
+    public:
+        npc_marion_wormswing() : CreatureScript("npc_marion_wormswing") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_marion_wormswingAI(pCreature);
+        }
+
+        struct npc_marion_wormswingAI : public ScriptedAI
+        {
+            npc_marion_wormswingAI(Creature* pCreature) : ScriptedAI(pCreature)
+            {
+            }
+
+            void DamageTaken(Unit* attacker, uint32 &damage)
+            {
+                if (damage > me->GetHealth() || me->HealthBelowPct(50) || me->HealthBelowPctDamaged(50, damage))
+                {
+                    if (Player* owner = attacker->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        if (owner->GetQuestStatus(25731) == QUEST_STATUS_INCOMPLETE)
+                        {
+                            owner->KilledMonsterCredit(41169, 0);
+                            owner->KilledMonsterCredit(41170, 0);
+                        }
+                    me->setFaction(35);
+                    me->DespawnOrUnsummon(5000);
+                }
+            }
+        };
+};
+
+class go_harpy_signal_fire : public GameObjectScript
+{
+    public:
+        go_harpy_signal_fire() : GameObjectScript("go_harpy_signal_fire") {}
+
+        bool OnGossipHello(Player* pPlayer, GameObject* pGo)
+        {
+            if (!pGo->FindNearestCreature(41112, 100.0f) && pPlayer->GetQuestStatus(25731) == QUEST_STATUS_INCOMPLETE)
+                pGo->SummonCreature(41112, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 60000);
+            return false;
+        }
+};
+
 void AddSC_mount_hyjal()
 {
     new npc_garr();
     new npc_garr_firesworn();
     new npc_lycanthoth();
+    new npc_marion_wormswing();
+    new go_harpy_signal_fire();
 }
