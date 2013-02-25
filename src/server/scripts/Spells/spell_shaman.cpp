@@ -69,6 +69,8 @@ enum ShamanSpells
     SHAMAN_TOTEM_SPELL_TOTEMIC_WRATH_AURA  = 77747,
 
     SHAMAN_SPELL_THUNDERSTORM_SLOW         = 100955,
+
+    SHAMAN_SPELL_STORMSTRIKE               = 17364
 };
 
 // 1535 Fire Nova
@@ -521,6 +523,46 @@ class spell_sha_flame_shock : public SpellScriptLoader
         }
 };
 
+// 17364 Stormstrike
+class spell_sha_stormstrike: public SpellScriptLoader
+{
+public:
+    spell_sha_stormstrike(): SpellScriptLoader("spell_sha_stormstrike") { }
+
+    class spell_sha_stormstrike_SpellScript: public SpellScript
+    {
+        PrepareSpellScript(spell_sha_stormstrike_SpellScript)
+        bool Validate(SpellInfo const* spellEntry)
+        {
+            if (!sSpellStore.LookupEntry(SHAMAN_SPELL_STORMSTRIKE))
+                return false;
+
+            return true;
+        }
+
+        void HandleApplyAura(SpellEffIndex effIndex)
+        {
+            if (effIndex == 0)
+            {
+                if (Unit* minion = ObjectAccessor::GetUnit(*GetCaster(), GetCaster()->m_SummonSlot[SUMMON_SLOT_TOTEM]))
+                    if (minion->isTotem() && minion->GetEntry() == 2523) // Searing Totem
+                    {
+                        static_cast<TotemAI*>(minion->GetAI())->SetVictim(GetHitUnit()->GetGUID());
+                    }
+            }    
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_sha_stormstrike_SpellScript::HandleApplyAura, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+        }
+    };
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_sha_stormstrike_SpellScript();
+    }
+};
+
 // 73680 Unleash Elements
 class spell_sha_unleash_elements : public SpellScriptLoader
 {
@@ -529,7 +571,7 @@ public:
 
     class spell_sha_unleash_elements_SpellScript : public SpellScript
     {
-        PrepareSpellScript(spell_sha_unleash_elements_SpellScript)
+        PrepareSpellScript(spell_sha_unleash_elements_SpellScript);
         bool Validate(SpellEntry const * spellEntry)
         {
             if (!sSpellStore.LookupEntry(SHAMAN_SPELL_UNLEASH_ELEMENTS))
@@ -899,4 +941,5 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_fulmination();
     new spell_sha_totemic_wrath();
     new spell_sha_thunderstorm();
+    new spell_sha_stormstrike();
 }
