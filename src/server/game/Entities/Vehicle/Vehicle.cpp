@@ -196,6 +196,14 @@ void Vehicle::RemoveAllPassengers()
     // We don't need to iterate over Seats
     _me->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE);
 
+    for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
+        if (itr->second.Passenger)
+        {
+            sLog->outError(LOG_FILTER_PLAYER, "Passenger in %u vehicle is here yet, trying to remove.", GetBase()->GetEntry());
+            if (Unit* passenger = ObjectAccessor::GetUnit(*_me, itr->second.Passenger))
+                RemovePassenger(passenger);
+        }
+
     // Following the above logic, this assertion should NEVER fail.
     // Even in 'hacky' cases, there should at least be VEHICLE_SPELL_RIDE_HARDCODED on us.
     // SeatMap::const_iterator itr;
