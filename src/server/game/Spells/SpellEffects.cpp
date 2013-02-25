@@ -3454,20 +3454,6 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
     // Create dispel mask by dispel type
     uint32 dispel_type = m_spellInfo->Effects[effIndex].MiscValue;
     uint32 dispelMask  = SpellInfo::GetDispelMask(DispelType(dispel_type));
-    
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
-    {
-        // Dispel Magic
-        if (m_spellInfo->Id == 97690)
-        {
-            if (m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_PRIEST_HOLY ||
-                m_caster->ToPlayer()->GetPrimaryTalentTree(m_caster->ToPlayer()->GetActiveSpec()) == TALENT_TREE_PRIEST_DISCIPLINE)
-
-                damage = 2;
-            else
-                damage = 1;
-        }
-    }
 
     // Acts of Sacrifice
     if (m_spellInfo->SpellIconID == 300 && effIndex == 0 && unitTarget == m_caster)
