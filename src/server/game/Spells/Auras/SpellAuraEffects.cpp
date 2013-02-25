@@ -2289,7 +2289,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
 
                 // remove movement affects
                 uint32 mechanicMask = (1 << MECHANIC_SNARE);
-                if (target->HasAura(96429))
+                if (target->HasAura(96429) || form == FORM_MOONKIN)
                     mechanicMask |= (1 << MECHANIC_ROOT);
 
                 target->RemoveAurasWithMechanic(mechanicMask);
