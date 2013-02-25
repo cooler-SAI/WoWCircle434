@@ -7384,6 +7384,35 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Illuminated Healing
+                case 76669:
+                {
+                    if (!victim || !procSpell || effIndex != 0)
+                        return false;
+
+                    switch (procSpell->Id)
+                    {
+                        case 635:
+                        case 85673:
+                        case 19750:
+                        case 82326:
+                        case 20473:
+                        case 25914:
+                        {
+                            basepoints0 = int32(damage * float(triggerAmount / 100.0f));
+                            triggered_spell_id = 86273;
+
+                            if (AuraEffect const* aurShield = victim->GetAuraEffect(triggered_spell_id, EFFECT_0, GetGUID()))
+                                basepoints0 += aurShield->GetAmount();
+
+                            int32 maxHealth = CountPctFromMaxHealth(33);
+                            std::min(basepoints0, maxHealth);
+
+                            break;
+                        }
+                    }
+                    break;
+                }
                 // Item - Paladin T12 Protection 2P Bonus
                 case 99074:
                     basepoints0 = int32(CalculatePct(damage, triggerAmount));

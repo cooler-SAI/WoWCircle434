@@ -1105,6 +1105,18 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
                     gObjTargets.push_back(gObjTarget);
             }
 
+            // Light of Dawn
+            if (m_spellInfo->Id == 85222) 
+            {
+                uint8 maxSize = m_caster->HasAura(54940) ? 4 : 6; // Glyph of Light of Dawn
+                unitTargets.push_back(m_caster);
+                if (unitTargets.size() > maxSize)
+                {
+                    unitTargets.sort(Trinity::HealthPctOrderPred());
+                    unitTargets.resize(maxSize);
+                }
+            }
+
             for (std::list<Unit*>::iterator itr = unitTargets.begin(); itr != unitTargets.end(); ++itr)
                 AddUnitTarget(*itr, effMask, false);
 
@@ -1326,12 +1338,6 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                         else
                             itr = unitTargets.erase(itr);
                     }
-                }
-                else if (m_spellInfo->Id == 85222) // Light of Dawn
-                {
-                    maxSize = m_caster->HasAura(54940) ? 6 : 5; // Glyph of Light of Dawn
-                    unitTargets.push_back(m_caster);
-                    power = POWER_HEALTH;
                 }
                 break;
             case SPELLFAMILY_DRUID:

@@ -2420,45 +2420,19 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
         if (m_spellInfo->Id == 85222)
             addhealth *= GetPowerCost();
 
-        // Illuminated Healing (Mastery Holy Paladin)
-        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN)
-            if (Aura* aur = m_caster->GetAura(76669))
-                switch (m_spellInfo->Id)
-                {
-                    case 635:
-                    case 85673:
-                    case 19750:
-                    case 82326:
-                    case 20473:
-                    case 25914:
-                    {
-                        Unit* target = unitTarget ? unitTarget : m_caster;
-                        int32 bp0 = int32(addhealth * float(aur->GetEffect(0)->GetAmount() / 100.0f));
-                        if (Aura* aurShield = target->GetAura(86273))
-                            bp0 += aurShield->GetEffect(0)->GetAmount();
-                        if (bp0 > int32(m_caster->CountPctFromMaxHealth(33)))
-                            bp0 = int32(m_caster->CountPctFromMaxHealth(33));
-                        m_caster->CastCustomSpell(target, 86273, &bp0, NULL, NULL, true);
-                        break;
-                    }
-                }
+        // Mastery DeathKnight
+        if (m_spellInfo->Id == 45470 && m_caster->HasAura(48263))
+            if (Aura* aur = m_caster->GetAura(77513))
+            {    
+                int32 bp0 = int32(addhealth * float(aur->GetEffect(0)->GetAmount() / 100.0f));
+                if (Aura* aurShield = m_caster->GetAura(77535))
+                    bp0 += aurShield->GetEffect(0)->GetAmount();
 
-            // Mastery DeathKnight
-            if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
-                if (Aura* aur = m_caster->GetAura(77513))
-                    if (m_spellInfo->Id == 45470 && m_caster->HasAura(48263))
-                    {
-                        int32 bp0 = int32(addhealth * float(aur->GetEffect(0)->GetAmount() / 100.0f));
-                        if (Aura* aurShield = m_caster->GetAura(77535))
-                            bp0 += aurShield->GetEffect(0)->GetAmount();
-                        if (bp0 > int32(m_caster->GetMaxHealth()))
-                            bp0 = int32(m_caster->GetMaxHealth());
-                        m_caster->CastCustomSpell(m_caster, 77535, &bp0, NULL, NULL, true);
-                    }
+                if (bp0 > int32(m_caster->GetMaxHealth()))
+                    bp0 = int32(m_caster->GetMaxHealth());
 
-        // Divine Purpose
-        if (m_spellInfo->Id == 85222)
-            addhealth *= GetPowerCost();
+                m_caster->CastCustomSpell(m_caster, 77535, &bp0, NULL, NULL, true);
+            }
 
         // Atonement
         if (m_spellInfo->Id == 81751)
