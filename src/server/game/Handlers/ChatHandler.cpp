@@ -311,7 +311,15 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             if (type == CHAT_MSG_SAY)
                 sender->Say(msg, lang);
             else if (type == CHAT_MSG_EMOTE)
+            {
+                if (!sender->CanSpeak())
+                {
+                    std::string timeStr = secsToTimeString(m_muteTime - time(NULL));
+                    SendNotification(GetTrinityString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
+                    return;
+                }
                 sender->TextEmote(msg);
+            }
             else if (type == CHAT_MSG_YELL)
                 sender->Yell(msg, lang);
         } break;
