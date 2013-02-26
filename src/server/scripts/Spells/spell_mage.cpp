@@ -522,6 +522,7 @@ public:
 
         void RemoveInvalidTargets(std::list<WorldObject*>& targets)
         {
+            targets.remove_if(Trinity::UnitAuraCheck(true, SHAMAN_SPELL_SATED));
             targets.remove_if(Trinity::UnitAuraCheck(true, SHAMAN_SPELL_EXHAUSTION));
             targets.remove_if(Trinity::UnitAuraCheck(true, HUNTER_SPELL_INSANITY));
             targets.remove_if(Trinity::UnitAuraCheck(true, SPELL_MAGE_TEMPORAL_DISPLACEMENT));

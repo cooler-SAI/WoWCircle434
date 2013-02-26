@@ -1,4 +1,4 @@
-/*
+/*  
  * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -42,6 +42,15 @@ enum HunterSpells
     HUNTER_SPELL_INVIGORATION_TRIGGERED          = 53398,
     HUNTER_SPELL_MASTERS_CALL_TRIGGERED          = 62305,
     HUNTER_SPELL_ASPECT_OF_THE_BEAST_PET         = 61669,
+    HUNTER_SPELL_ANCIENT_HYSTERIA                = 90355,
+    HUNTER_SPELL_INSANITY                        = 95809,
+};
+
+enum OtherSpells
+{
+    SHAMAN_SPELL_SATED                           = 57724,
+    SHAMAN_SPELL_EXHAUSTION                      = 57723,
+    MAGE_SPELL_TEMPORAL_DISPLACEMENT             = 80354,
 };
 
 // 13161 Aspect of the Beast
@@ -730,6 +739,52 @@ public:
     }
 };
 
+class spell_hunter_ancient_hysteria : public SpellScriptLoader
+{
+public:
+    spell_hunter_ancient_hysteria() : SpellScriptLoader("spell_hunter_ancient_hysteria") { }
+
+    class spell_hunter_ancient_hysteria_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hunter_ancient_hysteria_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellEntry*/)
+        {
+            if (!sSpellMgr->GetSpellInfo(HUNTER_SPELL_ANCIENT_HYSTERIA))
+                return false;
+
+            return true;
+        }
+
+        void RemoveInvalidTargets(std::list<WorldObject*>& targets)
+        {
+            targets.remove_if(Trinity::UnitAuraCheck(true, SHAMAN_SPELL_SATED));
+            targets.remove_if(Trinity::UnitAuraCheck(true, SHAMAN_SPELL_EXHAUSTION));
+            targets.remove_if(Trinity::UnitAuraCheck(true, HUNTER_SPELL_INSANITY));
+            targets.remove_if(Trinity::UnitAuraCheck(true, MAGE_SPELL_TEMPORAL_DISPLACEMENT));
+        }
+
+        void ApplyDebuff()
+        {
+            if (Unit* target = GetHitUnit())
+                target->CastSpell(target, HUNTER_SPELL_INSANITY, true);
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hunter_ancient_hysteria_SpellScript::RemoveInvalidTargets, EFFECT_0, TARGET_UNIT_CASTER_AREA_RAID);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hunter_ancient_hysteria_SpellScript::RemoveInvalidTargets, EFFECT_1, TARGET_UNIT_CASTER_AREA_RAID);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hunter_ancient_hysteria_SpellScript::RemoveInvalidTargets, EFFECT_2, TARGET_UNIT_CASTER_AREA_RAID);
+            AfterHit += SpellHitFn(spell_hunter_ancient_hysteria_SpellScript::ApplyDebuff);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_hunter_ancient_hysteria_SpellScript();
+    }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     new spell_hun_aspect_of_the_beast();
@@ -748,5 +803,5 @@ void AddSC_hunter_spell_scripts()
     new spell_hun_steady_shot();
     new spell_hun_cobra_shot();
     new spell_hunter_pet_intervane();
-
+    new spell_hunter_ancient_hysteria();
 }
