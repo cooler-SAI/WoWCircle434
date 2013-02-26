@@ -356,7 +356,7 @@ class spell_pri_vampiric_touch : public SpellScriptLoader
 
             void HandleDispel(DispelInfo* dispelInfo)
             {
-                if (!GetCaster() || dispelInfo->GetDispeller())
+                if (!GetCaster() || !dispelInfo->GetDispeller())
                     return;
 
                 if (AuraEffect const* aurEff = GetCaster()->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PRIEST, 1869, EFFECT_1))
