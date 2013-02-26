@@ -7406,7 +7406,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                                 basepoints0 += aurShield->GetAmount();
 
                             int32 maxHealth = CountPctFromMaxHealth(33);
-                            std::min(basepoints0, maxHealth);
+                            basepoints0 = std::min(basepoints0, maxHealth);
 
                             break;
                         }
