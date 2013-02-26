@@ -193,7 +193,7 @@ class boss_baleroc : public CreatureScript
                 
                 if (me->HasAura(SPELL_INFERNO_BLADE))
                 {
-                    if (me->isAttackReady() && me->IsWithinMeleeRange(me->getVictim()))
+                    if (!me->HasUnitState(UNIT_STATE_CASTING) && me->isAttackReady() && me->IsWithinMeleeRange(me->getVictim()))
                     {
                         DoCastVictim(SPELL_INFERNO_BLADE_DMG, true);
                         me->resetAttackTimer();
@@ -201,7 +201,7 @@ class boss_baleroc : public CreatureScript
                 }
                 else if (me->HasAura(SPELL_DECIMATION_BLADE) || me->HasAura(SPELL_DECIMATION_BLADE_25))
                 {
-                    if (me->isAttackReady() && me->IsWithinMeleeRange(me->getVictim()))
+                    if (!me->HasUnitState(UNIT_STATE_CASTING) && me->isAttackReady() && me->IsWithinMeleeRange(me->getVictim()))
                     {
                         DoCastVictim(SPELL_DECIMATION_BLADE_DMG, true);
                         me->resetAttackTimer();
@@ -334,7 +334,6 @@ class spell_baleroc_tormented_aoe : public SpellScriptLoader
 
                 GetHitUnit()->CastSpell(GetHitUnit(), SPELL_TORMENTED_25H, true);
             }
-
             void Register()
             {
                 OnEffectHitTarget += SpellEffectFn(spell_baleroc_tormented_aoe_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
