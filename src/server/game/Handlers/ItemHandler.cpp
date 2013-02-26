@@ -1715,7 +1715,7 @@ void WorldSession::HandleReforgeItemOpcode(WorldPacket& recvData)
     if (!reforgeEntry)
     {
         // Reset the item
-        if (item->IsEquipped())
+        if (item->IsEquipped() && !item->IsBroken())
             player->ApplyReforgeEnchantment(item, false);
         item->ClearEnchantment(REFORGE_ENCHANTMENT_SLOT);
         SendReforgeResult(true);
@@ -1748,6 +1748,6 @@ void WorldSession::HandleReforgeItemOpcode(WorldPacket& recvData)
 
     SendReforgeResult(true);
 
-    if (item->IsEquipped())
+    if (item->IsEquipped() && !item->IsBroken())
         player->ApplyReforgeEnchantment(item, true);
 }
