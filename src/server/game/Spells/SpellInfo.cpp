@@ -1645,6 +1645,8 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     // spell checks
     switch (Id)
     {
+        case 99252: // Blaze of Glory, Baleroc
+            return (area_id == 5767)? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         case 45614: // Shroud of the Scourge
             return (area_id == 4125)? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         case 43820: // Charm of the Witch Doctor

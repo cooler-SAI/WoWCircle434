@@ -2460,5 +2460,20 @@ namespace Trinity
         private:
             const bool m_ascending;
     };
+
+    class DistanceOrderPred
+    {
+        public:
+            DistanceOrderPred(Unit* searcher) :  _searcher(searcher) { }
+            bool operator() (const Unit* a, const Unit* b) const
+            {
+                float rA = _searcher->GetDistance(a);
+                float rB = _searcher->GetDistance(b);
+                return rA < rB;
+            }
+        private:
+            Unit const* _searcher;
+    };
+
 }
 #endif

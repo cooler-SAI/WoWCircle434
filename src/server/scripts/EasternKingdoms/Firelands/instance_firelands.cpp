@@ -61,10 +61,12 @@ class instance_firelands : public InstanceMapScript
 
             void OnGameObjectCreate(GameObject* pGo)
             {
-		    }
-
-            void OnGameObjectRemove(GameObject* pGo)
-		    {
+                switch (pGo->GetEntry())
+                {
+                    case GO_FIRE_WALL_BALEROC:
+                        AddDoor(pGo, true);
+                        break;
+                }
 		    }
 
             void SetData(uint32 type, uint32 data)

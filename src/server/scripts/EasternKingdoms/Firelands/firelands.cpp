@@ -1,12 +1,6 @@
 #include "ScriptPCH.h"
 #include "firelands.h"
 
-enum Adds
-{    
-    NPC_MAGMAKIN        = 54144,
-    NPC_MAGMA_CONDUIT   = 54145, // 97699, 98250, 100746
-};
-
 enum Spells
 {
     // Ancient Core Hound
@@ -37,6 +31,26 @@ enum Spells
     SPELL_MELT_ARMOR            = 99532,
     SPELL_SUMMON_LAVA_JETS      = 99555,
     SPELL_SUMMON_LAVA_JET       = 99538,
+
+    // Molten Flamefather
+    SPELL_EARTHQUAKE            = 100724,
+    SPELL_MAGMA_CONDUIT         = 100728,
+
+    // Magma Conduit
+    SPELL_VOLCANO_SMOKE         = 97699,
+    SPELL_VOLCANO_BASE          = 98250,
+    SPELL_SUMMON_MAGMAKIN       = 100746,
+    SPELL_SUMMON_MAGMAKIN_DMG   = 100748,
+
+    // Magmakin
+    SPELL_ERUPTION              = 100755,
+    
+};
+
+enum Adds
+{    
+    NPC_MAGMAKIN        = 54144,
+    NPC_MAGMA_CONDUIT   = 54145, // 97699, 98250, 100746
 };
 
 enum Events
@@ -60,6 +74,10 @@ enum Events
     EVENT_MELT_ARMOR        = 8,
     EVENT_FLAME_STOMP       = 9,
     EVENT_SUMMON_LAVA_JETS  = 10,
+
+    // Molten Flamefather
+    EVENT_EARTHQUAKE        = 11,
+    EVENT_MAGMA_CONDUIT     = 12,
 };
 
 class npc_firelands_ancient_core_hound : public CreatureScript
@@ -460,6 +478,172 @@ class npc_firelands_molten_lord : public CreatureScript
         };
 };
 
+class npc_firelands_molten_flamefather : public CreatureScript
+{
+    public:
+        npc_firelands_molten_flamefather() : CreatureScript("npc_firelands_molten_flamefather") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_firelands_molten_flamefatherAI (pCreature);
+        }
+
+        struct npc_firelands_molten_flamefatherAI : public ScriptedAI
+        {
+            npc_firelands_molten_flamefatherAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
+            {
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            }
+
+            EventMap events;
+            SummonList summons;
+
+            void Reset()
+            {
+                events.Reset();
+                summons.DespawnAll();
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+                events.ScheduleEvent(EVENT_EARTHQUAKE, urand(5000, 10000));
+                events.ScheduleEvent(EVENT_MAGMA_CONDUIT, urand(6000, 7000));
+            }
+
+            void JustSummoned(Creature* summon)
+            {
+                summons.Summon(summon);
+                if (me->isInCombat())
+                    DoZoneInCombat(summon);
+            }
+
+            void SummonedCreatureDespawn(Creature* summon)
+            {
+                summons.Despawn(summon);
+            }
+
+            void UpdateAI(uint32 const diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+                
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_EARTHQUAKE:
+                            DoCastAOE(SPELL_EARTHQUAKE);
+                            events.ScheduleEvent(EVENT_EARTHQUAKE, urand(10000, 15000));
+                            break;
+                        case EVENT_MAGMA_CONDUIT:
+                            DoCastAOE(SPELL_MAGMA_CONDUIT);
+                            break;
+                    }
+                }
+                
+                DoMeleeAttackIfReady();
+            }
+        };
+};
+
+class npc_firelands_magma_conduit : public CreatureScript
+{
+    public:
+        npc_firelands_magma_conduit() : CreatureScript("npc_firelands_magma_conduit") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_firelands_magma_conduitAI (pCreature);
+        }
+
+        struct npc_firelands_magma_conduitAI : public Scripted_NoMovementAI
+        {
+            npc_firelands_magma_conduitAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature), summons(me)
+            {
+                me->SetReactState(REACT_PASSIVE);
+            }
+
+            SummonList summons;
+
+            void Reset()
+            {
+                summons.DespawnAll();
+            }
+
+            void JustSummoned(Creature* summon)
+            {
+                summons.Summon(summon);
+                if (me->isInCombat())
+                    DoZoneInCombat(summon);
+            }
+
+            void SummonedCreatureDespawn(Creature* summon)
+            {
+                summons.Despawn(summon);
+            }
+
+            void JustDied(Unit* killer)
+            {
+                me->DespawnOrUnsummon();
+            }
+
+            void UpdateAI(uint32 const diff)
+            {
+                if (!UpdateVictim())
+                {
+                    me->DespawnOrUnsummon();
+                    return;
+                }
+            }
+        };
+};
+
+class npc_firelands_magmakin : public CreatureScript
+{
+    public:
+        npc_firelands_magmakin() : CreatureScript("npc_firelands_magmakin") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_firelands_magmakinAI (pCreature);
+        }
+
+        struct npc_firelands_magmakinAI : public ScriptedAI
+        {
+            npc_firelands_magmakinAI(Creature* pCreature) : ScriptedAI(pCreature)
+            {
+                me->SetSpeed(MOVE_RUN, 2.0f);
+            }
+
+            void UpdateAI(uint32 const diff)
+            {
+                if (!UpdateVictim())
+                {
+                    me->DespawnOrUnsummon();
+                    return;
+                }
+
+                if (me->GetDistance(me->getVictim()) < 2.0f)
+                    DoCastAOE(SPELL_ERUPTION, true);                
+            }
+        };
+};
+
 class spell_firelands_ancient_core_hound_dinner_time : public SpellScriptLoader
 {
     public:
@@ -694,6 +878,9 @@ void AddSC_firelands()
     new npc_firelands_fire_turtle_hatchling();
     new npc_firelands_flame_archon();
     new npc_firelands_molten_lord();
+    new npc_firelands_molten_flamefather();
+    new npc_firelands_magma_conduit();
+    new npc_firelands_magmakin();
     new spell_firelands_ancient_core_hound_dinner_time();
     new spell_firelands_ancient_core_hound_flame_breath();
     new spell_firelands_ancient_lava_dweller_lava_shower();
