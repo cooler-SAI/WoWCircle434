@@ -323,11 +323,11 @@ class BossAI : public ScriptedAI
         bool CheckInArea(const uint32 diff, uint32 areaId)
         {
             if (_checkareaTimer <= diff)
-                _checkareaTimer = 300;
+                _checkareaTimer = 3000;
             else
             {
                 _checkareaTimer -= diff;
-                return false;
+                return true;
             }
 
             if (me->GetAreaId() != areaId)

@@ -4994,6 +4994,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 100230:
             case 100231:
             case 100232:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
                 break;
             // ENDOF FIRELANDS
