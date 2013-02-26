@@ -180,8 +180,6 @@ class boss_maloriak : public CreatureScript
 
             bool bExecute;
             bool bDark;
-            bool bLos;
-            uint32 losTimer;
 
             void InitializeAI()
             {
@@ -197,8 +195,6 @@ class boss_maloriak : public CreatureScript
 
                 bExecute = false;
                 bDark = false;
-                bLos = false;
-                losTimer = 5000;
 
                 me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 7);
                 me->SetFloatValue(UNIT_FIELD_COMBATREACH, 7);
@@ -226,24 +222,6 @@ class boss_maloriak : public CreatureScript
                     if (Creature* pNefarius = me->SummonCreature(NPC_LORD_VICTOR_NEFARIUS_HEROIC, maloriaknefariusspawnPos))
                         pNefarius->AI()->DoAction(ACTION_MALORIAK_INTRO);
                 instance->SetBossState(DATA_MALORIAK, IN_PROGRESS);
-            }
-
-            void DoAction(const int32 action)
-            {
-                if (action == EVENT_IN_LOS)
-                {
-                    bLos = true;
-                    losTimer = 5000;
-                }
-            }
-
-            void DamageDealt(Unit* victim, uint32 &damage, DamageEffectType effect)
-            {
-                if (effect == DIRECT_DAMAGE)
-                {
-                    bLos = false;
-                    losTimer = 5000;
-                }
             }
 
             void JustReachedHome()
@@ -327,18 +305,6 @@ class boss_maloriak : public CreatureScript
             {
                 if (!UpdateVictim())
                     return;
-
-                if (bLos)
-                {
-                    if (losTimer <= diff)
-                    {
-                        bLos = false;
-                        losTimer = 5000;
-                        EnterEvadeMode();
-                    }
-                    else
-                        losTimer -= diff;
-                }
 
                 if (me->HealthBelowPct(25) && !bExecute)
                 {

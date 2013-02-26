@@ -228,6 +228,7 @@ set(scripts_STAT_SRCS
   EasternKingdoms/Firelands/boss_lord_rhyolith.cpp
   EasternKingdoms/Firelands/boss_bethtilac.cpp
   EasternKingdoms/Firelands/boss_alysrazor.cpp
+  EasternKingdoms/Firelands/boss_baleroc.cpp
   EasternKingdoms/Firelands/instance_firelands.cpp
   EasternKingdoms/Firelands/firelands.cpp
   EasternKingdoms/Firelands/firelands.h

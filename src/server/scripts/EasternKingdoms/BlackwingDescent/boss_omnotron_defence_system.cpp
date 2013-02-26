@@ -335,8 +335,6 @@ class boss_arcanotron : public CreatureScript
             }
 
             uint8 stage;
-            bool bLos;
-            uint32 losTimer;
 
             void InitializeAI()
             {
@@ -351,8 +349,6 @@ class boss_arcanotron : public CreatureScript
                 _Reset();
                 
                 stage = 0;
-                bLos = false;
-                losTimer = 5000;
 
                 me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 5);
                 me->SetFloatValue(UNIT_FIELD_COMBATREACH, 5);
@@ -393,19 +389,6 @@ class boss_arcanotron : public CreatureScript
                         stage = 1;
                         me->RemoveAurasDueToSpell(SPELL_RECHARGE_PURPLE);
                         break;
-                    case EVENT_IN_LOS:
-                        bLos = true;
-                        losTimer = 5000;
-                        break;
-                }
-            }
-
-            void DamageDealt(Unit* victim, uint32 &damage, DamageEffectType effect)
-            {
-                if (effect == DIRECT_DAMAGE)
-                {
-                    bLos = false;
-                    losTimer = 5000;
                 }
             }
 
@@ -460,20 +443,6 @@ class boss_arcanotron : public CreatureScript
             {
                 if (!UpdateVictim())
                     return;
-
-                if (bLos)
-                {
-                    if (losTimer <= diff)
-                    {
-                        bLos = false;
-                        losTimer = 5000;
-                        if (Creature* omnotron = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_OMNOTRON)))
-                            if (omnotron->IsAIEnabled)
-                                omnotron->GetAI()->DoAction(ACTION_EVADE_ALL);
-                    }
-                    else
-                        losTimer -= diff;
-                }
 
                 if (instance->GetData(DATA_HEALTH_OMNOTRON_SHARED) != 0)
                     me->SetHealth(instance->GetData(DATA_HEALTH_OMNOTRON_SHARED));        
@@ -591,8 +560,6 @@ class boss_electron : public CreatureScript
             }
 
             uint8 stage;
-            bool bLos;
-            uint32 losTimer;
 
             void InitializeAI()
             {
@@ -607,8 +574,6 @@ class boss_electron : public CreatureScript
                 _Reset();
                 
                 stage = 0;
-                bLos = false;
-                losTimer = 5000;
 
                 me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 5);
                 me->SetFloatValue(UNIT_FIELD_COMBATREACH, 5);
@@ -638,19 +603,6 @@ class boss_electron : public CreatureScript
                         stage = 1;
                         me->RemoveAurasDueToSpell(SPELL_RECHARGE_BLUE);
                         break;
-                    case EVENT_IN_LOS:
-                        bLos = true;
-                        losTimer = 5000;
-                        break;
-                }
-            }
-
-            void DamageDealt(Unit* victim, uint32 &damage, DamageEffectType effect)
-            {
-                if (effect == DIRECT_DAMAGE)
-                {
-                    bLos = false;
-                    losTimer = 5000;
                 }
             }
 
@@ -690,20 +642,6 @@ class boss_electron : public CreatureScript
             {
                 if (!UpdateVictim())
                     return;
-
-                if (bLos)
-                {
-                    if (losTimer <= diff)
-                    {
-                        bLos = false;
-                        losTimer = 5000;
-                        if (Creature* omnotron = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_OMNOTRON)))
-                            if (omnotron->IsAIEnabled)
-                                omnotron->GetAI()->DoAction(ACTION_EVADE_ALL);
-                    }
-                    else
-                        losTimer -= diff;
-                }
 
                 if (instance->GetData(DATA_HEALTH_OMNOTRON_SHARED) != 0)
                     me->SetHealth(instance->GetData(DATA_HEALTH_OMNOTRON_SHARED));        
@@ -805,8 +743,6 @@ class boss_magmatron : public CreatureScript
             }
 
             uint8 stage;
-            bool bLos;
-            uint32 losTimer;
 
             void InitializeAI()
             {
@@ -821,8 +757,6 @@ class boss_magmatron : public CreatureScript
                 _Reset();
 
                 stage = 0;
-                bLos = false;
-                losTimer = 5000;
 
                 me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 5);
                 me->SetFloatValue(UNIT_FIELD_COMBATREACH, 5);
@@ -852,19 +786,6 @@ class boss_magmatron : public CreatureScript
                         stage = 1;
                         me->RemoveAurasDueToSpell(SPELL_RECHARGE_ORANGE);
                         break;
-                    case EVENT_IN_LOS:
-                        bLos = true;
-                        losTimer = 5000;
-                        break;
-                }
-            }
-
-            void DamageDealt(Unit* victim, uint32 &damage, DamageEffectType effect)
-            {
-                if (effect == DIRECT_DAMAGE)
-                {
-                    bLos = false;
-                    losTimer = 5000;
                 }
             }
 
@@ -904,20 +825,6 @@ class boss_magmatron : public CreatureScript
             {
                 if (!UpdateVictim())
                     return;
-
-                if (bLos)
-                {
-                    if (losTimer <= diff)
-                    {
-                        bLos = false;
-                        losTimer = 5000;
-                        if (Creature* omnotron = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_OMNOTRON)))
-                            if (omnotron->IsAIEnabled)
-                                omnotron->GetAI()->DoAction(ACTION_EVADE_ALL);
-                    }
-                    else
-                        losTimer -= diff;
-                }
 
                 if (instance->GetData(DATA_HEALTH_OMNOTRON_SHARED) != 0)
                     me->SetHealth(instance->GetData(DATA_HEALTH_OMNOTRON_SHARED));        
@@ -1029,8 +936,6 @@ class boss_toxitron : public CreatureScript
             }
 
             uint8 stage;
-            bool bLos;
-            uint32 losTimer;
 
             void InitializeAI()
             {
@@ -1045,8 +950,6 @@ class boss_toxitron : public CreatureScript
                 _Reset();
 
                 stage = 0;
-                bLos = false;
-                losTimer = 5000;
 
                 me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 5);
                 me->SetFloatValue(UNIT_FIELD_COMBATREACH, 5);
@@ -1076,19 +979,6 @@ class boss_toxitron : public CreatureScript
                         stage = 1;
                         me->RemoveAurasDueToSpell(SPELL_RECHARGE_GREEN);
                         break;
-                    case EVENT_IN_LOS:
-                        bLos = true;
-                        losTimer = 5000;
-                        break;
-                }
-            }
-
-            void DamageDealt(Unit* victim, uint32 &damage, DamageEffectType effect)
-            {
-                if (effect == DIRECT_DAMAGE)
-                {
-                    bLos = false;
-                    losTimer = 5000;
                 }
             }
 
@@ -1143,20 +1033,6 @@ class boss_toxitron : public CreatureScript
             {
                 if (!UpdateVictim())
                     return;
-
-                if (bLos)
-                {
-                    if (losTimer <= diff)
-                    {
-                        bLos = false;
-                        losTimer = 5000;
-                        if (Creature* omnotron = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_OMNOTRON)))
-                            if (omnotron->IsAIEnabled)
-                                omnotron->GetAI()->DoAction(ACTION_EVADE_ALL);
-                    }
-                    else
-                        losTimer -= diff;
-                }
 
                 if (instance->GetData(DATA_HEALTH_OMNOTRON_SHARED) != 0)
                     me->SetHealth(instance->GetData(DATA_HEALTH_OMNOTRON_SHARED));        

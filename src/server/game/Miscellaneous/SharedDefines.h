@@ -3483,8 +3483,6 @@ enum EventId
     EVENT_SPELLCLICK        = 1001,
     EVENT_CHARGE            = 1003,
     EVENT_JUMP              = 1004,
-    EVENT_IN_LOS            = 1005,
-    EVENT_OUT_LOS           = 1006,
 };
 
 enum ResponseCodes

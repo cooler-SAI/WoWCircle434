@@ -140,8 +140,6 @@ class boss_shannox : public CreatureScript
             bool bRiplimbDead;
             bool bRagefaceDead;
             bool bFrenzy;
-            bool bLos;
-            uint32 losTimer;
 
             void InitializeAI()
             {
@@ -169,8 +167,6 @@ class boss_shannox : public CreatureScript
                 bRagefaceDead = false;
                 bFrenzy = false;
                 memset(areas, false, sizeof(areas));
-                bLos = false;
-                losTimer = 5000;
             }
 
             void DamageTaken(Unit* attacker, uint32 &damage)
@@ -196,10 +192,6 @@ class boss_shannox : public CreatureScript
                         bRiplimbDead = false;
                         events.CancelEvent(EVENT_MAGMA_RUPTURE);
                         events.ScheduleEvent(EVENT_HURL_SPEAR, urand(5000, 10000));
-                        break;
-                    case EVENT_IN_LOS:
-                        bLos = true;
-                        losTimer = 5000;
                         break;
                 }
             }
@@ -235,8 +227,6 @@ class boss_shannox : public CreatureScript
                 bRagefaceDead = false;
                 bFrenzy = false;
                 memset(areas, false, sizeof(areas));
-                bLos = false;
-                losTimer = 5000;
 
                 Talk(SAY_AGGRO);
                 events.ScheduleEvent(EVENT_BERSERK, 60 * MINUTE * IN_MILLISECONDS);
@@ -260,15 +250,6 @@ class boss_shannox : public CreatureScript
                 Talk(SAY_KILL);
             }
 
-            void DamageDealt(Unit* victim, uint32 &damage, DamageEffectType effect)
-            {
-                if (effect == DIRECT_DAMAGE)
-                {
-                    bLos = false;
-                    losTimer = 5000;
-                }
-            }
-
             void JustSummoned(Creature* summon)
             {
                 summons.Summon(summon);
@@ -286,18 +267,6 @@ class boss_shannox : public CreatureScript
             {
                 if (!UpdateVictim())
                     return;
-
-                if (bLos)
-                {
-                    if (losTimer <= diff)
-                    {
-                        bLos = false;
-                        losTimer = 5000;
-                        EnterEvadeMode();
-                    }
-                    else
-                        losTimer -= diff;
-                }
 
                 // Bucket List
                 switch (me->GetAreaId())
@@ -438,15 +407,11 @@ class npc_shannox_riplimb : public CreatureScript
             bool bFetch;
             EventMap events;
             bool bDead;
-            bool bLos;
-            uint32 losTimer;
 
             void Reset()
             {
                 bFetch = false;
                 bDead = false;
-                bLos =  false;
-                losTimer = 5000;
                 events.Reset();
                 if (IsHeroic())
                     DoCast(me, SPELL_FEEDING_FRENZY, true);
@@ -462,15 +427,6 @@ class npc_shannox_riplimb : public CreatureScript
                 DoZoneInCombat();
                 events.ScheduleEvent(EVENT_LIMB_RIP, 6000);
                 events.ScheduleEvent(EVENT_SEPARATION_ANXIETY, 3000);
-            }
-
-            void DamageDealt(Unit* victim, uint32 &damage, DamageEffectType effect)
-            {
-                if (effect == DIRECT_DAMAGE)
-                {
-                    bLos = false;
-                    losTimer = 5000;
-                }
             }
 
             void DamageTaken(Unit* attacker, uint32 &damage)
@@ -510,10 +466,6 @@ class npc_shannox_riplimb : public CreatureScript
                         me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SNARE, false);
                         DoCast(me, SPELL_DOGGED_DETERMINATION, true);
                         break;
-                    case EVENT_IN_LOS:
-                        bLos = true;
-                        losTimer = 5000;
-                        break;
                 }
             }
 
@@ -533,20 +485,6 @@ class npc_shannox_riplimb : public CreatureScript
 
             void UpdateAI(const uint32 diff)
             {
-                if (bLos)
-                {
-                    if (losTimer <= diff)
-                    {
-                        bLos = false;
-                        losTimer = 5000;
-                        if (pInstance)
-                            if (Creature* pShannox = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_SHANNOX)))
-                               pShannox->AI()->EnterEvadeMode();
-                    }
-                    else
-                        losTimer -= diff;
-                }
-
                 if (bFetch)
                 {
                     if (Creature* pShannox = me->FindNearestCreature(NPC_SHANNOX, 1.0f))
@@ -652,25 +590,12 @@ class npc_shannox_rageface : public CreatureScript
 
             InstanceScript* pInstance;
             EventMap events;
-            bool bLos;
-            uint32 losTimer;
 
             void Reset()
             {
-                bLos =  false;
-                losTimer = 5000;
                 events.Reset();
                 if (IsHeroic())
                     DoCast(me, SPELL_FEEDING_FRENZY, true);
-            }
-
-            void DoAction(const int32 action)
-            {
-                if (action == EVENT_IN_LOS)
-                {
-                    bLos = true;
-                    losTimer = 5000;
-                }
             }
 
             void EnterCombat(Unit* who)
@@ -684,15 +609,6 @@ class npc_shannox_rageface : public CreatureScript
                 events.ScheduleEvent(EVENT_FACE_RAGE, 7000);
                 events.ScheduleEvent(EVENT_CHANGE_TARGET, 5000);
                 events.ScheduleEvent(EVENT_SEPARATION_ANXIETY, 3000);
-            }
-
-            void DamageDealt(Unit* victim, uint32 &damage, DamageEffectType effect)
-            {
-                if (effect == DIRECT_DAMAGE)
-                {
-                    bLos = false;
-                    losTimer = 5000;
-                }
             }
 
             void DamageTaken(Unit* who, uint32 &damage)
@@ -728,20 +644,6 @@ class npc_shannox_rageface : public CreatureScript
             {
                 if (!UpdateVictim())
                     return;
-
-                if (bLos)
-                {
-                    if (losTimer <= diff)
-                    {
-                        bLos = false;
-                        losTimer = 5000;
-                        if (pInstance)
-                            if (Creature* pShannox = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_SHANNOX)))
-                               pShannox->AI()->EnterEvadeMode();
-                    }
-                    else
-                        losTimer -= diff;
-                }
 
                 events.Update(diff);
 
