@@ -70,7 +70,9 @@ enum ShamanSpells
 
     SHAMAN_SPELL_THUNDERSTORM_SLOW         = 100955,
 
-    SHAMAN_SPELL_STORMSTRIKE               = 17364
+    SHAMAN_SPELL_STORMSTRIKE               = 17364,
+
+    SHAMAN_SPELL_HEALING_RAIN              = 73920
 };
 
 // 1535 Fire Nova
@@ -924,6 +926,37 @@ class spell_sha_thunderstorm : public SpellScriptLoader
         }
 };
 
+class spell_sha_healing_rain : public SpellScriptLoader
+{
+public:
+    spell_sha_healing_rain() : SpellScriptLoader("spell_sha_healing_rain") { }
+
+    class spell_sha_healing_rain_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_sha_healing_rain_SpellScript);
+
+        void HandleAppyAura(SpellEffIndex /*effIndex*/)
+        {
+            // search for Focused Insight talent
+            if (AuraEffect * eff = GetCaster()->GetAuraEffect(77800, 1))
+            {
+                int32 basepoints = eff->GetAmount();
+                GetCaster()->CastCustomSpell(GetCaster(), 96300, &basepoints, 0, 0, true);
+            }
+        }
+
+        void Register()
+        {
+            OnEffectLaunch += SpellEffectFn(spell_sha_healing_rain_SpellScript::HandleAppyAura, EFFECT_0, SPELL_EFFECT_PERSISTENT_AREA_AURA);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_sha_healing_rain_SpellScript();
+    }
+};
+
 void AddSC_shaman_spell_scripts()
 {
     new spell_sha_fire_nova();
@@ -942,4 +975,5 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_totemic_wrath();
     new spell_sha_thunderstorm();
     new spell_sha_stormstrike();
+    new spell_sha_healing_rain();
 }
