@@ -137,6 +137,13 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
                 return DIMINISHING_LIMITONLY;
             break;
         }
+        case SPELLFAMILY_PRIEST:
+        {
+            // Sin and Punishment
+            if (spellproto->Id == 87204)
+                return DIMINISHING_LIMITONLY;
+            break;
+        }
         case SPELLFAMILY_DRUID:
         {
             // Pounce
