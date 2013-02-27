@@ -2540,9 +2540,12 @@ bool Aura::CanStackWith(Aura const* existingAura) const
                 m_spellInfo->Effects[i].ApplyAuraName == existingSpellInfo->Effects[i].ApplyAuraName)
                 switch (m_spellInfo->Effects[i].ApplyAuraName)
                 {
+                    case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:
+                        // warsong flags
+                        if (m_spellInfo->Id == 23333 || m_spellInfo->Id == 23335 || existingSpellInfo->Id == 23335 || existingSpellInfo->Id == 23333)
+                            break;
                     case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
                     case SPELL_AURA_MOD_STAT:
-                    case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:
                         if (m_spellInfo->Effects[i].MiscValue == existingSpellInfo->Effects[i].MiscValue || (m_spellInfo->Effects[i].MiscValueB != 0 && 
                             m_spellInfo->Effects[i].MiscValueB == existingSpellInfo->Effects[i].MiscValueB))
                             return false;
