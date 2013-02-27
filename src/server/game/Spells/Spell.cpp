@@ -2180,7 +2180,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /* 
     if (!effectMask)
         return;
 
-    if (checkIfValid)
+    if (checkIfValid && !IsTriggered())
         if (m_spellInfo->CheckTarget(m_caster, target, implicit) != SPELL_CAST_OK)
             return;
 
@@ -5364,41 +5364,44 @@ SpellCastResult Spell::CheckCast(bool strict)
     // those spells may have incorrect target entries or not filled at all (for example 15332)
     // such spells when learned are not targeting anyone using targeting system, they should apply directly to caster instead
     // also, such casts shouldn't be sent to client
-    if (!((m_spellInfo->Attributes & SPELL_ATTR0_PASSIVE) && (!m_targets.GetUnitTarget() || m_targets.GetUnitTarget() == m_caster)))
+    if (!IsTriggered())
     {
-        // Check explicit target for m_originalCaster - todo: get rid of such workarounds
-        SpellCastResult castResult = m_spellInfo->CheckExplicitTarget(m_originalCaster ? m_originalCaster : m_caster, m_targets.GetObjectTarget(), m_targets.GetItemTarget());
-        if (castResult != SPELL_CAST_OK)
-            return castResult;
-    }
-
-    if (Unit* target = m_targets.GetUnitTarget())
-    {
-        SpellCastResult castResult = m_spellInfo->CheckTarget(m_caster, target, false);
-        if (castResult != SPELL_CAST_OK)
-            return castResult;
-
-        if (strict && IsMorePowerfulAura(target))
-            return IsTriggered() ? SPELL_FAILED_DONT_REPORT: SPELL_FAILED_AURA_BOUNCED;
-
-        if (target != m_caster)
+        if (!((m_spellInfo->Attributes & SPELL_ATTR0_PASSIVE) && (!m_targets.GetUnitTarget() || m_targets.GetUnitTarget() == m_caster)))
         {
-            // Must be behind the target
-            if ((m_spellInfo->AttributesCu & SPELL_ATTR0_CU_REQ_CASTER_BEHIND_TARGET) && target->HasInArc(static_cast<float>(M_PI), m_caster))
-                return SPELL_FAILED_NOT_BEHIND;
+            // Check explicit target for m_originalCaster - todo: get rid of such workarounds
+            SpellCastResult castResult = m_spellInfo->CheckExplicitTarget(m_originalCaster ? m_originalCaster : m_caster, m_targets.GetObjectTarget(), m_targets.GetItemTarget());
+            if (castResult != SPELL_CAST_OK)
+                return castResult;
+        }
 
-            // Target must be facing you
-            if ((m_spellInfo->AttributesCu & SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER) && !target->HasInArc(static_cast<float>(M_PI), m_caster)
-                && !(m_spellInfo->Id == 1776 && m_caster->HasAura(56809))) // Hack for Glyph of Gouge
-                return SPELL_FAILED_NOT_INFRONT;
+        if (Unit* target = m_targets.GetUnitTarget())
+        {
+            SpellCastResult castResult = m_spellInfo->CheckTarget(m_caster, target, false);
+            if (castResult != SPELL_CAST_OK)
+                return castResult;
 
-            if (m_caster->GetEntry() != WORLD_TRIGGER) // Ignore LOS for gameobjects casts (wrongly casted by a trigger)
-                if (m_caster->GetTypeId() != TYPEID_UNIT || (m_caster->GetTypeId() == TYPEID_UNIT && !m_caster->GetTransport()))
-                    if (!IsTriggered() && !(m_spellInfo->AttributesEx2 & SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && VMAP::VMapFactory::checkSpellForLoS(m_spellInfo->Id) && !m_caster->IsWithinLOSInMap(target))
-                        return SPELL_FAILED_LINE_OF_SIGHT;
+            if (strict && IsMorePowerfulAura(target))
+                return IsTriggered() ? SPELL_FAILED_DONT_REPORT: SPELL_FAILED_AURA_BOUNCED;
 
-            if (m_caster->IsVisionObscured(target))
-                return SPELL_FAILED_VISION_OBSCURED; // smoke bomb, camouflage...
+            if (target != m_caster)
+            {
+                // Must be behind the target
+                if ((m_spellInfo->AttributesCu & SPELL_ATTR0_CU_REQ_CASTER_BEHIND_TARGET) && target->HasInArc(static_cast<float>(M_PI), m_caster))
+                    return SPELL_FAILED_NOT_BEHIND;
+
+                // Target must be facing you
+                if ((m_spellInfo->AttributesCu & SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER) && !target->HasInArc(static_cast<float>(M_PI), m_caster)
+                    && !(m_spellInfo->Id == 1776 && m_caster->HasAura(56809))) // Hack for Glyph of Gouge
+                    return SPELL_FAILED_NOT_INFRONT;
+
+                if (m_caster->GetEntry() != WORLD_TRIGGER) // Ignore LOS for gameobjects casts (wrongly casted by a trigger)
+                    if (m_caster->GetTypeId() != TYPEID_UNIT || (m_caster->GetTypeId() == TYPEID_UNIT && !m_caster->GetTransport()))
+                        if (!IsTriggered() && !(m_spellInfo->AttributesEx2 & SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && VMAP::VMapFactory::checkSpellForLoS(m_spellInfo->Id) && !m_caster->IsWithinLOSInMap(target))
+                            return SPELL_FAILED_LINE_OF_SIGHT;
+
+                if (m_caster->IsVisionObscured(target))
+                    return SPELL_FAILED_VISION_OBSCURED; // smoke bomb, camouflage...
+            }
         }
     }
 
