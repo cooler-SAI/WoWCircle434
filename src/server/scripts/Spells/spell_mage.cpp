@@ -638,7 +638,8 @@ public:
                             if (AuraEffect* _effect = aura->GetEffect(uint8((*i)->GetEffIndex())))
                             {
                                 _effect->ChangeAmount(amount, false);
-                                _effect->GetFixedDamageInfo().SetFixedDamage(amount);
+                                if (_effect->GetId() == 83853)
+                                    _effect->GetFixedDamageInfo().SetFixedDamage(amount);
                             }
                         }
                     }
