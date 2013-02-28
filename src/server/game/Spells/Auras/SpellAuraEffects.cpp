@@ -6529,6 +6529,7 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                 case 50034:
                 case 54637:
                 case 56835:
+                {
                     if (target->GetTypeId() != TYPEID_PLAYER)
                         break;
                     if (target->ToPlayer()->getClass() != CLASS_DEATH_KNIGHT)
@@ -6537,6 +6538,16 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                     // timer expired - remove death runes
                     target->ToPlayer()->RemoveRunesBySpell(GetId());
                     break;
+                }
+                // Death's Advance
+                case 96268:
+                {
+                    if (caster->ToPlayer()->GetRuneCooldown(RUNE_UNHOLY*2) && caster->ToPlayer()->GetRuneCooldown(RUNE_UNHOLY*2+1))
+                        GetBase()->RefreshDuration();
+                    else caster->RemoveAurasDueToSpell(96268);
+                    break;
+                }
+                default: break;
             }
             // Death and Decay
             if (GetSpellInfo()->SpellFamilyFlags[0] & 0x20)
