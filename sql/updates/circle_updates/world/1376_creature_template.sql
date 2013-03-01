@@ -1,0 +1,1 @@
+UPDATE `creature_template` SET `ScriptName`='npc_moonwell_chalice' WHERE `entry`=53883;

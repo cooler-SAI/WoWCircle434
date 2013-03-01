@@ -3751,6 +3751,53 @@ class npc_kwee_q_peddlefeet : public CreatureScript
         }
 };
 
+class npc_moonwell_chalice : public CreatureScript
+{
+    public:
+        npc_moonwell_chalice() : CreatureScript("npc_moonwell_chalice") {}
+
+        CreatureAI *GetAI(Creature *creature) const
+        {
+            return new npc_moonwell_chaliceAI(creature);
+        }
+
+        struct npc_moonwell_chaliceAI : public Scripted_NoMovementAI
+        {
+            npc_moonwell_chaliceAI(Creature *c) : Scripted_NoMovementAI(c)
+            {
+                me->SetReactState(REACT_PASSIVE);
+                uiTimer = 500;
+                bReady = false;
+                owner = NULL;
+            }
+
+            uint32 uiTimer;
+            bool bReady;
+            Unit* owner;
+
+            void IsSummonedBy(Unit* who)
+            {
+                if (who)
+                    owner = who;
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if (!bReady)
+                {
+                    if (uiTimer <= diff)
+                    {
+                        bReady = true;
+                        if (owner)
+                            DoCast(owner, 100403);
+                    }
+                    else
+                        uiTimer -= diff;
+                }
+            }
+        }; 
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3796,4 +3843,5 @@ void AddSC_npcs_special()
     new npc_anachronos_15192();
     new npc_burning_treant();
     new npc_kwee_q_peddlefeet();
+    new npc_moonwell_chalice();
 }

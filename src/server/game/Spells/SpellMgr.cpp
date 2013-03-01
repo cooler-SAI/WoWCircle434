@@ -6162,6 +6162,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 78628:
                 spellInfo->Effects[EFFECT_0].Effect = 0;
                 break;
+            // Moonwell Chalice
+            case 100403:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
             default:
                 break;
         }
