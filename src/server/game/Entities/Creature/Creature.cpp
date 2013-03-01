@@ -2202,8 +2202,8 @@ bool Creature::LoadCreaturesAddon(bool reload)
             // skip already applied aura
             if (HasAura(*itr))
             {
-                if (!reload)
-                    sLog->outError(LOG_FILTER_SQL, "Creature (GUID: %u Entry: %u) has duplicate aura (spell %u) in `auras` field.", GetGUIDLow(), GetEntry(), *itr);
+                //if (!reload)
+                //    sLog->outError(LOG_FILTER_SQL, "Creature (GUID: %u Entry: %u) has duplicate aura (spell %u) in `auras` field.", GetGUIDLow(), GetEntry(), *itr);
 
                 continue;
             }

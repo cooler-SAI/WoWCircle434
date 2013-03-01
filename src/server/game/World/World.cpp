@@ -2035,8 +2035,8 @@ void World::Update(uint32 diff)
     if (m_gameTime > m_NextRandomBGReset)
         ResetRandomBG();
 
-    if (m_gameTime > m_NextCurrencyReset)
-        ResetCurrencyWeekCap();
+    //if (m_gameTime > m_NextCurrencyReset)
+    //    ResetCurrencyWeekCap();
 
     if (m_gameTime > m_NextServerRestart)
         AutoRestartServer();
@@ -2640,6 +2640,13 @@ void World::ShutdownMsg(bool show, Player* player)
 
         SendServerMessage(msgid, str.c_str(), player);
         sLog->outDebug(LOG_FILTER_GENERAL, "Server is %s in %s", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"), str.c_str());
+    }
+
+    if (m_ShutdownTimer == 2)
+    {
+        sWorld->KickAll(); // save and kick all players
+        sLog->outError(LOG_FILTER_SERVER_LOADING, "Automatic scheduled server restart!");
+        ASSERT(false);
     }
 }
 
