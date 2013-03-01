@@ -45,6 +45,7 @@ enum Creatures
     NPC_BALEFLAME                = 50387,
 };
 
+// 94350 summon red drake
 enum Spells
 {
     //ascended flameseeker
