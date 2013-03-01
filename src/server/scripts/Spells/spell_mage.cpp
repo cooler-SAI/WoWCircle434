@@ -601,8 +601,8 @@ public:
             const float range = 12.0f;
             std::list<Unit*> targets;
             {
-                Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(target, caster, range);
-                Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(target, targets, u_check);
+                Trinity::AnyUnfriendlyNoTotemUnitInObjectRangeCheck u_check(target, caster, range);
+                Trinity::UnitListSearcher<Trinity::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(target, targets, u_check);
                 target->VisitNearbyObject(range, searcher);
 
                 targets.remove_if(ImpactTargetCheck(target));
