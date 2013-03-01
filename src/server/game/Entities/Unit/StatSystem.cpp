@@ -786,7 +786,12 @@ void Player::UpdateAllRunesRegen()
         if (uint32 cooldown = GetRuneTypeBaseCooldown(RuneType(i)))
         {
             float regen = float(1 * IN_MILLISECONDS) / float(cooldown);
-            ASSERT(regen > 0.0099999998f);
+            if (regen < 0.0099999998f)
+            {
+                sLog->outError(LOG_FILTER_PLAYER, "Player %s has regen lesser than client value, setted as 0.01", GetName());
+                regen = 0.01f;
+            }
+            //ASSERT(regen > 0.0099999998f);
             SetFloatValue(PLAYER_RUNE_REGEN_1 + i, regen);
         }
     }
