@@ -271,7 +271,10 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
             Player::BuildEnumData(result, &buffer);
 
             sLog->outInfo(LOG_FILTER_NETWORKIO, "Loading char guid %u from account %u.", guidLow, GetAccountId());
-
+            
+            if (!sWorld->HasCharacterNameData(guidLow)) // This can happen if characters are inserted into the database manually. Core hasn't loaded name data yet.
+                   sWorld->AddCharacterNameData(guidLow, (*result)[1].GetString(), (*result)[4].GetUInt8(), (*result)[2].GetUInt8(), (*result)[3].GetUInt8(), (*result)[7].GetUInt8());
+            
             _allowedCharsToLogin.insert(guidLow);
 
         } while (result->NextRow());
@@ -1675,6 +1678,14 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
 
     // get the players old (at this moment current) race
     CharacterNameData const* nameData = sWorld->GetCharacterNameData(lowGuid);
+    if (!nameData)	
+    {
+        WorldPacket data(SMSG_CHAR_FACTION_CHANGE, 1);
+        data << uint8(CHAR_CREATE_ERROR);
+        SendPacket(&data);
+        return;
+    }
+
     uint8 oldRace = nameData->m_race;
     uint8 playerClass = nameData->m_class;
     uint8 level = nameData->m_level;
