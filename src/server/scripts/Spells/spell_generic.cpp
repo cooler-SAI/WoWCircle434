@@ -2828,56 +2828,6 @@ public:
     }
 };
 
-enum GenericBandage
-{
-    SPELL_RECENTLY_BANDAGED = 11196,
-};
-
-class spell_gen_bandage : public SpellScriptLoader
-{
-    public:
-        spell_gen_bandage() : SpellScriptLoader("spell_gen_bandage") { }
-
-        class spell_gen_bandage_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_gen_bandage_SpellScript);
-
-            bool Validate(SpellInfo const* /*spell*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_RECENTLY_BANDAGED))
-                    return false;
-                return true;
-            }
-
-            SpellCastResult CheckCast()
-            {
-                if (Unit* target = GetExplTargetUnit())
-                {
-                    if (target->HasAura(SPELL_RECENTLY_BANDAGED))
-                        return SPELL_FAILED_TARGET_AURASTATE;
-                }
-                return SPELL_CAST_OK;
-            }
-
-            void HandleScript()
-            {
-                if (Unit* target = GetHitUnit())
-                    GetCaster()->CastSpell(target, SPELL_RECENTLY_BANDAGED, true);
-            }
-
-            void Register()
-            {
-                OnCheckCast += SpellCheckCastFn(spell_gen_bandage_SpellScript::CheckCast);
-                AfterHit += SpellHitFn(spell_gen_bandage_SpellScript::HandleScript);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_gen_bandage_SpellScript();
-        }
-};
-
 enum GenericLifebloom
 {
     SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL        = 43422,
@@ -3313,7 +3263,6 @@ void AddSC_generic_spell_scripts()
     new spell_gen_despawn_self();
     new spell_gen_touch_the_nightmare();
     new spell_gen_dream_funnel();
-    new spell_gen_bandage();
     new spell_gen_lifebloom("spell_hexlord_lifebloom", SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_tur_ragepaw_lifebloom", SPELL_TUR_RAGEPAW_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_cenarion_scout_lifebloom", SPELL_CENARION_SCOUT_LIFEBLOOM_FINAL_HEAL);

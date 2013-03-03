@@ -1308,6 +1308,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         break;
                     }
                 }
+
+                // Recently Bandaged
+                if (m_spellInfo->Mechanic == MECHANIC_BANDAGE)
+                    caster->CastSpell(caster, 11196, true);
+
                 break;
             case SPELLFAMILY_DRUID:
                 if (!caster)

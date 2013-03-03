@@ -1,0 +1,1 @@
+INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES ('34471', '70029', '2', 'The Beast Within - Immunity');
