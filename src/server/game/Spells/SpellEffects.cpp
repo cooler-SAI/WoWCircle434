@@ -2282,6 +2282,14 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
 
         switch (m_spellInfo->Id)
         {
+            // Bloodthrist
+            case 23880:
+                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(23881))
+                    addhealth = GetCaster()->CountPctFromMaxHealth(spellInfo->Effects[EFFECT_1].CalcValue(GetCaster())) / 1000;
+                
+                if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                    m_caster->ToPlayer()->ApplySpellMod(23880, SPELLMOD_DAMAGE, addhealth);
+                break;
             // Spirit Mend
             case 90361:
             {

@@ -38,7 +38,6 @@ enum WarriorSpells
     SPELL_CHARGE                            = 34846,
     SPELL_SLAM                              = 50782,
     ICON_ID_SUDDEN_DEATH                    = 1989,
-    SPELL_BLOODTHIRST_DAMAGE = 23881,
     SPELL_BLOODTHIRST = 23885,
 };
 
@@ -301,34 +300,6 @@ class spell_warr_bloodthirst : public SpellScriptLoader
         }
 };
 
-/// Updated 4.3.4
-class spell_warr_bloodthirst_heal : public SpellScriptLoader
-{
-    public:
-        spell_warr_bloodthirst_heal() : SpellScriptLoader("spell_warr_bloodthirst_heal") { }
-
-        class spell_warr_bloodthirst_heal_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_warr_bloodthirst_heal_SpellScript);
-
-            void HandleHeal(SpellEffIndex /*effIndex*/)
-            {
-                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_BLOODTHIRST_DAMAGE))
-                    SetHitHeal(GetCaster()->CountPctFromMaxHealth(spellInfo->Effects[EFFECT_1].CalcValue(GetCaster())) / 1000);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_warr_bloodthirst_heal_SpellScript::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_warr_bloodthirst_heal_SpellScript();
-        }
-};
-
 class spell_warr_whirlwind: public SpellScriptLoader
 {
     public:
@@ -365,6 +336,5 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_slam();
     new spell_warr_concussion_blow();
     new spell_warr_bloodthirst();
-    new spell_warr_bloodthirst_heal();
     new spell_warr_whirlwind();
 }

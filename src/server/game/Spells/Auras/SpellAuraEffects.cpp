@@ -7245,6 +7245,7 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
                     return;
 
                 damage = uint32(damage / 2.0f / (m_spellInfo->GetMaxDuration() / 1000));
+                
                 // Field Dressing
                 target->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DOT, damage);
             }
@@ -7254,18 +7255,16 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
                     return;
 
                 damage = int32(damage / (m_spellInfo->GetMaxDuration() / 2000)); 
+                
+                // Field Dressing
                 target->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DOT, damage);
                 break;
             case 55694: // Enraged Regeneration
                 if (!target->ToPlayer() || !target->IsInWorld())
                     return;
 
+                // Field Dressing
                 target->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DOT, damage);
-
-                // Unshackled Fury
-                if (AuraEffect const* aurEff = target->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_WARRIOR, 1962, EFFECT_0))
-                    AddPct(damage, aurEff->GetAmount());
-
                 break;
             default:
                 break;
