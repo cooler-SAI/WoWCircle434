@@ -4987,6 +4987,19 @@ void SpellMgr::LoadDbcDataCorrections()
             case 101220:
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
                 break;
+            // Bethtilac
+            case 98471: // Burning Acid
+            case 100826:
+            case 100827:
+            case 100828:
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 97202: // Fiery Web Spin
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 98997: // Clear Spiderweb Filament
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                break;
             // Baleroc
             case 99351: // Inferno Blade
                 spellInfo->Attributes &= ~SPELL_ATTR0_ON_NEXT_SWING;

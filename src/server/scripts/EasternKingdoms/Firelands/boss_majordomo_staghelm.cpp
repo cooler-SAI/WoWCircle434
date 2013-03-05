@@ -1,3 +1,5 @@
+
+// 570,227 -61,8299 90,4227
 /*
  * WowCircle 4.3.4
  * Dev: Ramusik
@@ -68,6 +70,11 @@ class boss_majordomo_staghelm : public CreatureScript
 {
     public:
         boss_majordomo_staghelm() : CreatureScript("boss_majordomo_staghelm") { }
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new boss_majordomo_staghelmAI(creature);
+        }
 
         struct boss_majordomo_staghelmAI : public BossAI
         {
@@ -141,7 +148,7 @@ class boss_majordomo_staghelm : public CreatureScript
 
             void UpdateAI(const uint32 diff)
             {
-                if (!UpdateVictim())
+                if (!UpdateVictim() || !CheckInArea(diff, 5769))
                     return;
 
                 events.Update(diff);
@@ -226,7 +233,7 @@ class boss_majordomo_staghelm : public CreatureScript
                             if (me->GetPower(POWER_ENERGY) == 100)
                             {
                                 DoCast(me, SPELL_LEAPING_FLAMES_SUMMON);
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
+                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
                                 {
                                     DoCast(target, SPELL_LEAPING_FLAMES);
                                     me->CastSpell(target, SPELL_LEAPING_FLAMES_PERSISTENT, true); // doesn't work as trigger spell of 98476
@@ -249,11 +256,6 @@ class boss_majordomo_staghelm : public CreatureScript
                 uint8 _currentPhase;
                 uint32 _changePhaseNum;
         };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new boss_majordomo_staghelmAI(creature);
-        }
 };
 
 class spell_staghelm_searing_seeds_aura : public SpellScriptLoader
