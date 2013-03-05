@@ -5000,6 +5000,13 @@ void SpellMgr::LoadDbcDataCorrections()
             case 98997: // Clear Spiderweb Filament
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
                 break;
+            case 99304: // Consume (drone)
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            case 99476: // The Widow Kiss
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 99506;
+                break;
             // Baleroc
             case 99351: // Inferno Blade
                 spellInfo->Attributes &= ~SPELL_ATTR0_ON_NEXT_SWING;

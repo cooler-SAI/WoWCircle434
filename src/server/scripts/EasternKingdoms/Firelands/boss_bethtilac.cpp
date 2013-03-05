@@ -24,7 +24,7 @@ enum Spells
     SPELL_THE_WIDOW_KISS            = 99506,
     SPELL_FRENZY                    = 99497,
     SPELL_ZERO_POWER                = 96301,
-    SPELL_CONSUME                   = 99304, // Drone
+    SPELL_CONSUME_DRONE             = 99304,
     SPELL_ENERGIZE                  = 99211, // Drone
 };
 
@@ -92,15 +92,19 @@ struct PositionSelector : public std::unary_function<Unit*, bool>
 {
     public:
         
-        PositionSelector(bool b) : _b(b){}
+        PositionSelector(bool b, uint32 spellId) : _b(b), _spellId(spellId) {}
 
         bool operator()(Unit const* target) const
         {
+            if (_spellId && target->HasAura(_spellId))
+                return false;
+
             return _b? (target->GetPositionZ() < 100.0f): (target->GetPositionZ() > 100.0f); 
         }
 
     private:
         bool _b;
+        uint32 _spellId;
 
 };
 
@@ -206,7 +210,7 @@ class boss_bethtilac : public CreatureScript
             
             void UpdateAI(const uint32 diff)
             {
-                if (!UpdateVictim())
+                if (!UpdateVictim() || !CheckInArea(diff, 5764))
                     return;
 
                 events.Update(diff);
@@ -251,11 +255,12 @@ class boss_bethtilac : public CreatureScript
                             for (uint8 i = 0; i < 2; i++)
                                 if (Creature* pFilament = me->SummonCreature(NPC_SPIDERWEB_FILAMENT, addsPos[4].GetPositionX() + irand(-5, 5), addsPos[4].GetPositionY() + irand(-5, 5), addsPos[4].GetPositionZ(), 0.0f))
                                     pFilament->SetCanFly(true);
+                            events.ScheduleEvent(EVENT_FILAMENT, urand(10000, 15000));
                             break;
                         case EVENT_SUMMON_DRONE:
                             if (Creature* pDrone = me->SummonCreature(NPC_CINDERWEB_DRONE, addsPos[3]))
                                 //pDrone->GetMotionMaster()->MovePoint(0, addsPos[5]);
-                                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true)))
+                                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true, 0)))
                                     pDrone->GetMotionMaster()->MoveChase(pTarget);
                             events.ScheduleEvent(EVENT_SUMMON_DRONE, 60000);
                             break;
@@ -280,7 +285,7 @@ class boss_bethtilac : public CreatureScript
                             if ((energy - 100) == 0)
                             {
                                 uiCount++;
-                                if (uiCount < 3)
+                                if (uiCount < 1)
                                 {
                                     events.RescheduleEvent(EVENT_FILAMENT, 23000);
                                     events.RescheduleEvent(EVENT_CHECK_HIGH, 12000);
@@ -310,6 +315,14 @@ class boss_bethtilac : public CreatureScript
                             me->GetMotionMaster()->MoveJump(addsPos[5].GetPositionX(), addsPos[5].GetPositionY(), addsPos[5].GetPositionZ(), 40.0f, 40.0f);
                             events.ScheduleEvent(EVENT_FRENZY, 10000);
                             events.ScheduleEvent(EVENT_THE_WIDOW_KISS, 32000);
+                            break;
+                        case EVENT_FRENZY:
+                            DoCast(me, SPELL_FRENZY);
+                            events.ScheduleEvent(EVENT_FRENZY, 7000);
+                            break;
+                        case EVENT_THE_WIDOW_KISS:
+                            DoCastVictim(SPELL_THE_WIDOW_KISS);
+                            events.ScheduleEvent(EVENT_THE_WIDOW_KISS, 34000);
                             break;
                     }
                 }
@@ -519,8 +532,8 @@ class npc_bethtilac_cinderweb_spinner : public CreatureScript
                             events.ScheduleEvent(EVENT_BURNING_ACID, urand(7000, 15000));
                             break;
                         case EVENT_FIERY_WEB_SPIN:
-                            //if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true)))
-                                //DoCast(pTarget, SPELL_FIERY_WEB_SPIN);
+                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true, SPELL_FIERY_WEB_SPIN)))
+                                DoCast(pTarget, SPELL_FIERY_WEB_SPIN);
                             events.ScheduleEvent(EVENT_FIERY_WEB_SPIN, urand(25000, 30000));
                             break;
                     }
@@ -575,6 +588,7 @@ class npc_bethtilac_cinderweb_drone : public CreatureScript
                 events.ScheduleEvent(EVENT_BURNING_ACID, urand(7000, 15000));
                 events.ScheduleEvent(EVENT_BOILING_SPATTER, urand(14000, 20000));
                 events.ScheduleEvent(EVENT_CHECK_TARGET, 2000);
+                events.ScheduleEvent(EVENT_CHECK_SPIDERLING, 3000);
             }
 
             void UpdateAI(const uint32 diff)
@@ -602,10 +616,15 @@ class npc_bethtilac_cinderweb_drone : public CreatureScript
                         case EVENT_CHECK_TARGET:
                             if (me->getVictim())
                                 if (me->getVictim()->GetPositionZ() > 100.0f)
-                                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true)))
+                                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true, 0)))
                                         AttackStart(pTarget);
 
                             events.ScheduleEvent(EVENT_CHECK_TARGET, 2000);
+                            break;
+                        case EVENT_CHECK_SPIDERLING:
+                            if (Creature* pSpiderling = me->FindNearestCreature(NPC_CINDERWEB_SPIDERLING, 8.0f))
+                                DoCast(pSpiderling, SPELL_CONSUME_DRONE, true);
+                            events.ScheduleEvent(EVENT_CHECK_SPIDERLING, 3000);
                             break;
                     }
                 }
