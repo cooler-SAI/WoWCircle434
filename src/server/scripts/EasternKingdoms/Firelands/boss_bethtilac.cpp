@@ -21,7 +21,7 @@ enum Spells
     SPELL_FIXATE                    = 99526,
     SPELL_LEECH_VENOM               = 99411,
     SPELL_VOLATILE_BURST            = 99990,
-    SPELL_THE_WIDOW_KISS            = 99506,
+    SPELL_THE_WIDOW_KISS            = 99476,
     SPELL_FRENZY                    = 99497,
     SPELL_ZERO_POWER                = 96301,
     SPELL_CONSUME_DRONE             = 99304,
