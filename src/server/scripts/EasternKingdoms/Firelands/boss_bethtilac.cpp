@@ -474,7 +474,7 @@ class npc_bethtilac_cinderweb_spinner : public CreatureScript
             {
                 me->SetCanFly(false);
 
-                if (bTaunted)
+                /*if (bTaunted)
                     return;
 
                 bTaunted = true;
@@ -484,7 +484,7 @@ class npc_bethtilac_cinderweb_spinner : public CreatureScript
                     {
                         pFilament->SetCanFly(true);
                         owner->CastSpell(pFilament, SPELL_SPIDERWEB_FILAMENT_ANY, true);
-                    }
+                    }*/
             }
 
             void SpellHit(Unit* who, const SpellInfo* spellInfo)
