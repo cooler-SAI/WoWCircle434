@@ -7025,12 +7025,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     basepoints0 = ToPlayer()->GetComboPoints();
                     break;
                 }
-                // Honor Amoung Thieves
+                // Honor Among Thieves
                 case 51698:
                 case 51700:
                 case 51701:
                 {
-                    if (!ToPlayer())
+                    if (!ToPlayer() || ToPlayer()->HasSpellCooldown(51699))
                         return false;
 
                     if (Unit* caster = triggeredByAura->GetCaster())
@@ -7042,14 +7042,15 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             return false;
 
                         target = NULL;
-                        if (Unit* target2 = caster->ToPlayer()->GetSelectedUnit())
-                        {
-                            if (target2->IsHostileTo(caster))
+                        if (caster->ToPlayer()->GetComboPoints())
+                            if (Unit* target2 = ObjectAccessor::GetUnit(*caster, caster->ToPlayer()->GetComboTarget()))
                                 target = target2;
-                        }
                         if (!target)
-                            if (Unit* target3 = ObjectAccessor::GetUnit(*caster, caster->ToPlayer()->GetComboTarget()))
-                                target = target3;
+                            if (Unit* target3 = caster->ToPlayer()->GetSelectedUnit())
+                            {
+                                if (target3->IsHostileTo(caster))
+                                    target = target3;
+                            }
 
                         caster->CastSpell(target? target: victim, 51699, true);
 
