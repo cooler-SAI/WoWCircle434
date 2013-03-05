@@ -8,9 +8,10 @@
 
 static const DoorData doordata[] = 
 {
-    {GO_BRIDGE_OF_RHYOLITH, DATA_RHYOLITH,  DOOR_TYPE_ROOM, BOUNDARY_NONE},
-    {GO_FIRE_WALL_BALEROC,  DATA_BALEROC,   DOOR_TYPE_ROOM, BOUNDARY_NONE},
-    {GO_STICKY_WEB,         DATA_BETHTILAC, DOOR_TYPE_ROOM, BOUNDARY_NONE},
+    {GO_BRIDGE_OF_RHYOLITH,  DATA_RHYOLITH,  DOOR_TYPE_ROOM,    BOUNDARY_NONE},
+    {GO_FIRE_WALL_BALEROC,   DATA_BALEROC,   DOOR_TYPE_ROOM,    BOUNDARY_NONE},
+    {GO_RAID_BRIDGE_FORMING, DATA_BALEROC,   DOOR_TYPE_PASSAGE, BOUNDARY_NONE},
+    {GO_STICKY_WEB,          DATA_BETHTILAC, DOOR_TYPE_ROOM,    BOUNDARY_NONE},
     {0, 0, DOOR_TYPE_ROOM, BOUNDARY_NONE},
 };
 
@@ -64,6 +65,8 @@ class instance_firelands : public InstanceMapScript
                 switch (pGo->GetEntry())
                 {
                     case GO_FIRE_WALL_BALEROC:
+                    case GO_STICKY_WEB:
+                    case GO_RAID_BRIDGE_FORMING:
                         AddDoor(pGo, true);
                         break;
                 }
