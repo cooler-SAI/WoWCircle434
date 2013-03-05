@@ -5650,7 +5650,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         break;
 
-                    bool is_shadow = m_caster->HasAura(15473);
+                    bool is_shadow = m_caster->HasAura(87117) || m_caster->HasAura(87118);
                     Aura* aur = NULL;
                     if ((is_shadow && ((aur = m_caster->GetAura(87117)) || (aur = m_caster->GetAura(87118))))
                         || (!is_shadow && ((aur = m_caster->GetAura(81660)) || (aur = m_caster->GetAura(81661)))))
