@@ -2930,6 +2930,10 @@ void SpellMgr::LoadSpellCustomAttr()
             case 92968: // Scorching Blast
             case 92969: // Scorching Blast
             case 92970: // Scorching Blast
+            case 98474: // Flame Scythe
+            case 100212: // Flame Scythe
+            case 100213: // Flame Scythe
+            case 100214: // Flame Scythe
                 // ONLY SPELLS WITH SPELLFAMILY_GENERIC and EFFECT_SCHOOL_DAMAGE
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 break;
