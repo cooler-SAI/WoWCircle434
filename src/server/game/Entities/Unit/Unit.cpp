@@ -664,6 +664,21 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
                 break;
         }
     }
+    if (damagetype != NODAMAGE)
+    {
+        if (victim != this && victim->GetTypeId() == TYPEID_PLAYER) // does not support creature push_back
+        {
+            if (damagetype != DOT)
+                if (Spell* spell = victim->m_currentSpells[CURRENT_GENERIC_SPELL])
+                    if (spell->getState() == SPELL_STATE_PREPARING)
+                    {
+                        uint32 interruptFlags = spell->m_spellInfo->InterruptFlags;
+                        if (interruptFlags & SPELL_INTERRUPT_FLAG_ABORT_ON_DMG)
+                            victim->InterruptNonMeleeSpells(false);
+                    }
+        }
+    }
+
 
     if (!damage)
     {
@@ -3677,15 +3692,11 @@ void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase)
     AuraList& scAuras = GetSingleCastAuras();
     for (AuraList::iterator iter = scAuras.begin(); iter != scAuras.end();)
     {
-        if (Aura* aura = *iter)
+        Aura* aura = *iter;
+        if (aura->GetUnitOwner() != this && !aura->GetUnitOwner()->InSamePhase(newPhase))
         {
-            if (aura->GetUnitOwner() != this && !aura->GetUnitOwner()->InSamePhase(newPhase))
-            {
-                aura->Remove();
-                iter = scAuras.begin();
-            }
-            else
-                ++iter;
+            aura->Remove();
+            iter = scAuras.begin();
         }
         else
             ++iter;
