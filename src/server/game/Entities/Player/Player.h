@@ -3288,6 +3288,14 @@ class Player : public Unit, public GridObject<Player>
         uint32 m_lastPotionId;                              // last used health/mana potion in combat, that block next potion use
 
         GlobalCooldownMgr m_GlobalCooldownMgr;
+        struct prohibited_struct
+        {
+            prohibited_struct(uint32 _time): m_time_prohibited_until(getMSTime() + _time) { }
+            prohibited_struct(): m_time_prohibited_until(0) { }
+            uint32 m_time_prohibited_until;
+        };
+
+        prohibited_struct prohibited[MAX_SPELL_SCHOOL];
 
         PlayerTalentInfo* _talentMgr;
 

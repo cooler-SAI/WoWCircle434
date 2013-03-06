@@ -907,6 +907,10 @@ Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_rep
     memset(_heal_done, 0, SAVE_FOR_SECONDS * sizeof(uint32));
     memset(_damage_done, 0, SAVE_FOR_SECONDS * sizeof(uint32));
     memset(_damage_taken, 0, SAVE_FOR_SECONDS * sizeof(uint32));
+    for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
+    {
+        prohibited[i] = prohibited_struct();
+    }
 }
 
 Player::~Player()
@@ -20596,12 +20600,17 @@ void Player::ContinueTaxiFlight()
 }
 
 void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
-{
-                                                            // last check 2.0.10
+{                            
+    for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
+        if (idSchoolMask & (1 << i))
+            prohibited[i] = prohibited_struct(unTimeMs);
+
+                              // last check 2.0.10
     WorldPacket data(SMSG_SPELL_COOLDOWN, 8+1+m_spells.size()*8);
     data << uint64(GetGUID());
     data << uint8(0x0);                                     // flags (0x1, 0x2)
     time_t curTime = time(NULL);
+    uint32 curMsTime = getMSTime();
     for (PlayerSpellMap::const_iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
     {
         if (itr->second->state == PLAYERSPELL_REMOVED)
@@ -20618,11 +20627,41 @@ void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
         if (spellInfo->PreventionType != SPELL_PREVENTION_TYPE_SILENCE)
             continue;
 
-        if ((idSchoolMask & spellInfo->GetSchoolMask()) && GetSpellCooldownDelay(unSpellId) < unTimeMs)
+        for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
         {
-            data << uint32(unSpellId);
-            data << uint32(unTimeMs);                       // in m.secs
-            AddSpellCooldown(unSpellId, 0, curTime + unTimeMs/IN_MILLISECONDS);
+            if (idSchoolMask & (1 << i))
+            {
+                if (((1 << i) & spellInfo->GetSchoolMask()) && GetSpellCooldownDelay(unSpellId) < unTimeMs)
+                {
+                    SpellSchools school = GetFirstSchoolInMask(spellInfo->GetSchoolMask());
+                    if ((1 << school) != spellInfo->GetSchoolMask())
+                    {
+                        SpellSchoolMask d_mask = SpellSchoolMask((1 << i) ^ spellInfo->GetSchoolMask());
+                        bool do_break = false;
+                        for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
+                        {
+                            if (d_mask & (1 << i))
+                            {
+                                if (prohibited[i].m_time_prohibited_until < curMsTime)
+                                {
+                                    do_break = true;
+                                    break;
+                                }
+                                else
+                                {
+                                    unTimeMs = std::max(unTimeMs, prohibited[i].m_time_prohibited_until - curMsTime);
+                                }
+                            }
+                        }
+
+                        if (do_break)
+                            continue;
+                    }
+                    data << uint32(unSpellId);
+                    data << uint32(unTimeMs);                       // in m.secs
+                    AddSpellCooldown(unSpellId, 0, curTime + unTimeMs/IN_MILLISECONDS);
+                }
+            }
         }
     }
     GetSession()->SendPacket(&data);
