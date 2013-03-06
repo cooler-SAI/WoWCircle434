@@ -230,10 +230,15 @@ class boss_majordomo_staghelm : public CreatureScript
                             events.ScheduleEvent(EVENT_FLAME_SCYTHE, 2000);
                             break;
                         case EVENT_LEAPING_FLAMES:
+                        {
                             if (me->GetPower(POWER_ENERGY) == 100)
                             {
                                 DoCast(me, SPELL_LEAPING_FLAMES_SUMMON);
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                                Unit* target = NULL;
+                                target = SelectTarget(SELECT_TARGET_RANDOM, 1, -20.0f, true);
+                                if (!target)
+                                    target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
+                                if (target)
                                 {
                                     DoCast(target, SPELL_LEAPING_FLAMES);
                                     me->CastSpell(target, SPELL_LEAPING_FLAMES_PERSISTENT, true); // doesn't work as trigger spell of 98476
@@ -241,6 +246,7 @@ class boss_majordomo_staghelm : public CreatureScript
                             }
                             events.ScheduleEvent(EVENT_LEAPING_FLAMES, 1000);
                             break;
+                        }
                         case EVENT_BERSERK:
                             DoCast(me, SPELL_BERSERK);
                             break;
