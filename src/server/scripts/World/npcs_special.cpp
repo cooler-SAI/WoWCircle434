@@ -1934,6 +1934,8 @@ public:
                 }
         }
 
+        void EnterEvadeMode() { }
+
         void JustDied(Unit* /*killer*/)
         {
             // Stop Feeding Gargoyle when it dies

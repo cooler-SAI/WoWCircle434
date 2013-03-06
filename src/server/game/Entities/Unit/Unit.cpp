@@ -9435,6 +9435,11 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Glyph of Dark Succor
+        case 96279:
+            if (victim && victim->GetEntry() == 26125)
+                return false;
+            break;
         // Tamed Pet Passive 07 (DND)
         case 20784:
             if (Aura* aur = GetAura(trigger_spell_id))

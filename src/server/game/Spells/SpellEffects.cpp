@@ -7567,6 +7567,15 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
         TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, caster, m_spellInfo->Id);
         if (!summon)
             return;
+
+        // summon gargoyle shouldn't be initialized twice
+        if (summon->GetEntry() == 27829)
+        {
+            summon->setFaction(caster->getFaction());
+            ExecuteLogEffectSummonObject(i, summon);
+            return;
+        }
+
         if (summon->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
             ((Guardian*)summon)->InitStatsForLevel(level);
 
