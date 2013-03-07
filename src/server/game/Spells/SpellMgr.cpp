@@ -3416,7 +3416,7 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 65142: // Ebon Plague
                 spellInfo->Effects[1].Effect = SPELL_EFFECT_APPLY_AURA;
-                spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_DUMMY;
+                spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
                 spellInfo->Effects[1].MiscValue = SPELL_SCHOOL_MASK_MAGIC;
                 break;
             case 41913: // Parasitic Shadowfiend Passive
