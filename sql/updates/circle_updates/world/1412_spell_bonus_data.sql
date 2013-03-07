@@ -1,0 +1,1 @@
+INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES ('51945', '0', '0.058', '0', '0', 'Shaman - Earthliving Weapon');
