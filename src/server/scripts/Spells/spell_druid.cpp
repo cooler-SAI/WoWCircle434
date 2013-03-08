@@ -609,39 +609,6 @@ class spell_dru_savage_roar : public SpellScriptLoader
         }
 };
 
-class spell_dru_starfall_aoe : public SpellScriptLoader
-{
-    public:
-        spell_dru_starfall_aoe() : SpellScriptLoader("spell_dru_starfall_aoe") { }
-
-        class spell_dru_starfall_aoe_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_dru_starfall_aoe_SpellScript);
-
-            void FilterTargets(std::list<WorldObject*>& targets)
-            {
-                targets.remove(GetExplTargetUnit());
-                for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); )
-                {
-                    if (!(*itr)->ToUnit()->IsHostileTo(GetCaster()))
-                        itr = targets.erase(itr);
-                    else
-                        ++itr;
-                }
-            }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dru_starfall_aoe_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_dru_starfall_aoe_SpellScript();
-        }
-};
-
 class spell_dru_starfall_dummy : public SpellScriptLoader
 {
     public:
@@ -667,10 +634,22 @@ class spell_dru_starfall_dummy : public SpellScriptLoader
 
                 caster->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
             }
+            void FilterTargets(std::list<WorldObject*>& targets)
+            {
+                targets.remove(GetExplTargetUnit());
+                for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); )
+                {
+                    if (!(*itr)->ToUnit()->IsHostileTo(GetCaster()) || !(*itr)->ToUnit()->isInCombat() || !(*itr)->IsWithinLOSInMap(GetCaster()))
+                        itr = targets.erase(itr);
+                    else
+                        ++itr;
+                }
+            }
 
             void Register()
             {
                 OnEffectHitTarget += SpellEffectFn(spell_dru_starfall_dummy_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dru_starfall_dummy_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
             }
         };
 
@@ -868,7 +847,6 @@ void AddSC_druid_spell_scripts()
     new spell_dru_predatory_strikes();
     new spell_dru_primal_tenacity();
     new spell_dru_savage_roar();
-    new spell_dru_starfall_aoe();
     new spell_dru_starfall_dummy();
     new spell_dru_swift_flight_passive();
     new spell_dru_t10_restoration_4p_bonus();
