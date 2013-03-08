@@ -3105,7 +3105,7 @@ void UnitAura::FillTargetMap(std::map<Unit*, uint8> & targets, Unit* caster)
             else
                 radius = GetSpellInfo()->Effects[effIndex].CalcRadius(caster, NULL, true);
 
-            if (!GetUnitOwner()->HasUnitState(UNIT_STATE_ISOLATED))
+            if (!GetUnitOwner()->HasUnitState(UNIT_STATE_ISOLATED) || GetSpellInfo()->IsPassive())
             {
                 switch (GetSpellInfo()->Effects[effIndex].Effect)
                 {

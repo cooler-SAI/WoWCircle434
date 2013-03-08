@@ -266,7 +266,7 @@ void World::AddSession_(WorldSession* s)
     if (decrease_session)
         --Sessions;
 
-    if (pLimit > 0 && Sessions >= pLimit && AccountMgr::IsPlayerAccount(s->GetSecurity()) && !HasRecentlyDisconnected(s) && !s->IsPremium())
+    if (pLimit > 0 && Sessions >= pLimit && (AccountMgr::IsPlayerAccount(s->GetSecurity()) && s->GetSecurity() != SEC_MODERATOR) && !HasRecentlyDisconnected(s) && !s->IsPremium())
     {
         AddQueuedPlayer (s);
         UpdateMaxSessionCounters();

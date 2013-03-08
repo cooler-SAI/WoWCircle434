@@ -299,10 +299,13 @@ class spell_gen_pet_summoned : public SpellScriptLoader
                     {
                         if (newPet->LoadPetFromDB(player, 0, player->GetLastPetNumber(), true))
                         {
+                            newPet->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
+                            newPet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
                             // revive the pet if it is dead
-                            if (newPet->getDeathState() == DEAD)
+                            if (newPet->getDeathState() == DEAD || newPet->getDeathState() == CORPSE)
                                 newPet->setDeathState(ALIVE);
 
+                            newPet->ClearUnitState(uint32(UNIT_STATE_ALL_STATE));
                             newPet->SetFullHealth();
                             newPet->SetPower(newPet->getPowerType(), newPet->GetMaxPower(newPet->getPowerType()));
 

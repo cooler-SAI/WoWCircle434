@@ -95,6 +95,10 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
+    // prevent reset talents if player has immunity auras (possible exploits)
+    if (GetPlayer()->HasAuraType(SPELL_AURA_SCHOOL_IMMUNITY))
+        return;
+
     if (!_player->ResetTalents())
     {
         WorldPacket data(MSG_TALENT_WIPE_CONFIRM, 8+4);    //you have not any talent
