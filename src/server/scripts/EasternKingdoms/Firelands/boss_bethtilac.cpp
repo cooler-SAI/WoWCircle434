@@ -19,6 +19,8 @@ enum Spells
     SPELL_FIERY_WEB_SPIN            = 97202,
     SPELL_BOILING_SPATTER           = 99463,
     SPELL_FIXATE                    = 99526,
+    SPELL_FIXATE_SELF               = 99599,
+    SPELL_FIXATE_BROODLING          = 99999,
     SPELL_LEECH_VENOM               = 99411,
     SPELL_VOLATILE_BURST            = 99990,
     SPELL_THE_WIDOW_KISS            = 99476,
@@ -26,6 +28,7 @@ enum Spells
     SPELL_ZERO_POWER                = 96301,
     SPELL_CONSUME_DRONE             = 99304,
     SPELL_ENERGIZE                  = 99211, // Drone
+    SPELL_VOLATILE_POISON           = 99276,
 };
 
 enum Adds
@@ -58,10 +61,13 @@ enum Events
     EVENT_BOILING_SPATTER       = 11,
     EVENT_SUMMON_DRONE          = 12,
     EVENT_SUMMON_SPIDERLING     = 13,
-    EVENT_SUMMON_SPIDERLING_1   = 14,
-    EVENT_CHECK_DRONE           = 15,
-    EVENT_CHECK_SPIDERLING      = 16,
-    EVENT_CHECK_TARGET          = 17,
+    EVENT_SUMMON_BROODLING_1    = 14,
+    EVENT_SUMMON_SPIDERLING_1   = 15,
+    EVENT_CHECK_DRONE           = 16,
+    EVENT_CHECK_SPIDERLING      = 17,
+    EVENT_CHECK_TARGET          = 18,
+    EVENT_FIXATE                = 19,
+    EVENT_FIXATE_OFF            = 20,
 };
 
 enum Other
@@ -224,7 +230,7 @@ class boss_bethtilac : public CreatureScript
                     {
                         case EVENT_CHECK_HIGH:
                         {
-                                //if (!me->getVictim() || !me->IsWithinMeleeRange(me->getVictim()))
+                            //if (!me->getVictim() || !me->IsWithinMeleeRange(me->getVictim()))
                             std::list<Player*> PlayerList;
                             PlayerPositionCheck checker(true);
                             Trinity::PlayerListSearcher<PlayerPositionCheck> searcher(me, PlayerList, checker);
@@ -252,10 +258,10 @@ class boss_bethtilac : public CreatureScript
                             events.ScheduleEvent(EVENT_EMBER_FLARE, urand(6000, 7000)); 
                             break;
                         case EVENT_FILAMENT:
-                            for (uint8 i = 0; i < 2; i++)
-                                if (Creature* pFilament = me->SummonCreature(NPC_SPIDERWEB_FILAMENT, addsPos[4].GetPositionX() + irand(-5, 5), addsPos[4].GetPositionY() + irand(-5, 5), addsPos[4].GetPositionZ(), 0.0f))
+                            for (uint8 i = 0; i < RAID_MODE(2, 4, 2, 4); i++)
+                                if (Creature* pFilament = me->SummonCreature(NPC_SPIDERWEB_FILAMENT, addsPos[4].GetPositionX() + irand(-8, 8), addsPos[4].GetPositionY() + irand(-8, 8), addsPos[4].GetPositionZ(), 0.0f))
                                     pFilament->SetCanFly(true);
-                            events.ScheduleEvent(EVENT_FILAMENT, urand(10000, 15000));
+                            events.ScheduleEvent(EVENT_FILAMENT, urand(20000, 25000));
                             break;
                         case EVENT_SUMMON_DRONE:
                             if (Creature* pDrone = me->SummonCreature(NPC_CINDERWEB_DRONE, addsPos[3]))
@@ -268,11 +274,23 @@ class boss_bethtilac : public CreatureScript
                             uiSide = urand(0, 2);
                             for (uint8 i = 0; i < 8; i++)
                                 events.ScheduleEvent(EVENT_SUMMON_SPIDERLING_1, i * 500);
+                            if (IsHeroic())
+                                for (uint8 i = 0; i < RAID_MODE(1, 2, 1, 2); ++i)
+                                    events.ScheduleEvent(EVENT_SUMMON_BROODLING_1, i * 1000);
                             events.ScheduleEvent(EVENT_SUMMON_SPIDERLING, 30000);
                             break;
                         case EVENT_SUMMON_SPIDERLING_1:
                             if (Creature* pSpiderling = me->SummonCreature(NPC_CINDERWEB_SPIDERLING, addsPos[uiSide]))
                                 pSpiderling->GetMotionMaster()->MovePoint(0, addsPos[5]);
+                            break;
+                        case EVENT_SUMMON_BROODLING_1:
+                            if (Creature* pBroodling = me->SummonCreature(NPC_ENGORGED_BROODLING, addsPos[uiSide]))
+                                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true, 0)))
+                                {
+                                    pBroodling->CastSpell(pTarget, SPELL_FIXATE_BROODLING, true);
+                                    pBroodling->ClearUnitState(UNIT_STATE_CASTING);
+                                    pBroodling->GetMotionMaster()->MoveFollow(pTarget, 0.0f, 0.0f);
+                                }
                             break;
                         case EVENT_ENERGY_2:
                             //me->SetPower(POWER_MANA, 9000);
@@ -285,7 +303,7 @@ class boss_bethtilac : public CreatureScript
                             if ((energy - 100) == 0)
                             {
                                 uiCount++;
-                                if (uiCount < 1)
+                                if (uiCount < 3)
                                 {
                                     events.RescheduleEvent(EVENT_FILAMENT, 23000);
                                     events.RescheduleEvent(EVENT_CHECK_HIGH, 12000);
@@ -589,6 +607,8 @@ class npc_bethtilac_cinderweb_drone : public CreatureScript
                 events.ScheduleEvent(EVENT_BOILING_SPATTER, urand(14000, 20000));
                 events.ScheduleEvent(EVENT_CHECK_TARGET, 2000);
                 events.ScheduleEvent(EVENT_CHECK_SPIDERLING, 3000);
+                if (IsHeroic())
+                    events.ScheduleEvent(EVENT_FIXATE, urand(12000, 15000));
             }
 
             void UpdateAI(const uint32 diff)
@@ -605,6 +625,24 @@ class npc_bethtilac_cinderweb_drone : public CreatureScript
                 {
                     switch (eventId)
                     {
+                        case EVENT_FIXATE:
+                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true, 0)))
+                            {
+                                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
+                                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
+                                DoResetThreat();
+                                DoCast(me, SPELL_FIXATE_SELF, true);
+                                DoCast(pTarget, SPELL_FIXATE, true);
+                                me->AddThreat(pTarget, 1000000.0f);
+                                AttackStart(pTarget);
+                                events.ScheduleEvent(EVENT_FIXATE_OFF, 10000);
+                            }
+                            break;
+                        case EVENT_FIXATE_OFF:
+                            DoResetThreat();
+                            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
+                            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
+                            break;
                         case EVENT_BOILING_SPATTER:
                             DoCast(me, SPELL_BOILING_SPATTER);
                             events.ScheduleEvent(EVENT_BOILING_SPATTER, urand(15000, 20000));
@@ -711,12 +749,40 @@ class npc_bethtilac_engorged_broodling : public CreatureScript
         {
             npc_bethtilac_engorged_broodlingAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
+                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
+                me->SetReactState(REACT_PASSIVE);
+                me->SetSpeed(MOVE_RUN, 2.0f);
+            }
+
+            bool bBurst;
+
+            void EnterCombat(Unit* who)
+            {
+                bBurst = false;
             }
 
             void UpdateAI(const uint32 diff)
             {
-                if (!UpdateVictim())
-                    return;
+                if (!bBurst && me->SelectNearestPlayer(3.0f))
+                {
+                    bBurst = true;
+                    DoCastAOE(SPELL_VOLATILE_BURST);
+                    DoCast(me, SPELL_VOLATILE_POISON, true);
+                    me->DespawnOrUnsummon(30000);
+                }
             }
         };
 };
