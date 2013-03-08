@@ -5011,6 +5011,15 @@ void SpellMgr::LoadDbcDataCorrections()
             case 99476: // The Widow Kiss
                 spellInfo->Effects[EFFECT_0].TriggerSpell = 99506;
                 break;
+            case 99526: // Fixate
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                break;
+            case 99999: // Fixate (broodling)
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                break;
             // Baleroc
             case 99351: // Inferno Blade
                 spellInfo->Attributes &= ~SPELL_ATTR0_ON_NEXT_SWING;
@@ -6196,6 +6205,16 @@ void SpellMgr::LoadDbcDataCorrections()
             case 70029:
                 spellInfo->SetDurationIndex(1);
                 spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
+                break;
+            // Gift of Naaru
+            case 28880:
+            case 59542:
+            case 59543:
+            case 59544:
+            case 59545:
+            case 59547:
+            case 59548:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
                 break;
             default:
                 break;
