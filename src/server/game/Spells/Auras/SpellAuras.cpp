@@ -2157,6 +2157,19 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
         case SPELLFAMILY_HUNTER:
             switch (GetId())
             {
+                // Resistance is Futile - Hunter's mark apply
+                case 1130:
+                case 88691:
+                    if (apply)
+                    {
+                        if (AuraEffect const * aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_HUNTER, 5119, 0))
+                            caster->CastSpell(target, 83676, true);
+                    }
+                    else
+                    {
+                        target->RemoveAura(83676);
+                    }
+                    break;
                 case 19574: // Bestial Wrath
                     // The Beast Within cast on owner if talent present
                     if (Unit* owner = target->GetOwner())

@@ -6640,6 +6640,18 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                         }
                         return;
                     }
+                    // Resistance is Futile
+                    case 83676:
+                    {
+                        if (!target->isMoving() || (!target->HasAura(1130, caster->GetGUID()) && !target->HasAura(88691, caster->GetGUID())))
+                            return;
+                        if (AuraEffect const * aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_HUNTER, 5119, 0))
+                        {
+                            if (roll_chance_i(aurEff->GetAmount()))
+                                caster->CastSpell(caster, 82897, true, NULL, this);
+                        }
+                        return;
+                    }
                     // Nitrous Boost
                     case 27746:
                         if (caster && target->GetPower(POWER_MANA) >= 10)
