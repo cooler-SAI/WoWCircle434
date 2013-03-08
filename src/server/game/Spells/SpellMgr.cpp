@@ -6216,6 +6216,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 59548:
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
                 break;
+            // Spirit Link
+            case 98020:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+                break;
             default:
                 break;
         }
