@@ -2160,6 +2160,9 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Resistance is Futile - Hunter's mark apply
                 case 1130:
                 case 88691:
+                    if (!caster)
+                        break;
+
                     if (apply)
                     {
                         if (AuraEffect const * aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_HUNTER, 5119, 0))
