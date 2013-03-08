@@ -557,6 +557,7 @@ public:
 
     bool IsShouldProcOnOwner() const;
     bool IsCanBeStolen() const;
+    bool IsNeedAdditionalLosChecks() const;
 
     // loading helpers
     uint32 _GetExplicitTargetMask() const;

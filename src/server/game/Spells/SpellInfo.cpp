@@ -3065,6 +3065,22 @@ bool SpellInfo::IsCanBeStolen() const
     return true;
 }
 
+bool SpellInfo::IsNeedAdditionalLosChecks() const
+{
+    switch(Id)
+    {
+        case 3600:  // Earthbind Totem
+        case 50622: 
+        case 44949: // Whirlwind from bladestorm
+            return true;
+        default:break;
+    }
+    // Typhoon
+    if(SpellFamilyFlags[1] == 0x01000000 && SpellFamilyName == SPELLFAMILY_DRUID)
+        return true;
+    return false;
+}
+
 int32 SpellInfo::GetUniqueChargeInfo(Unit* caster /* = NULL */) const
 {
     switch (Id)
