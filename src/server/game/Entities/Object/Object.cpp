@@ -2179,7 +2179,7 @@ bool WorldObject::canSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
             }
         }
 
-        /*WorldObject const* viewpoint = this;
+        WorldObject const* viewpoint = this;
         if (Player const* player = this->ToPlayer())
             viewpoint = player->GetViewpoint();
 
@@ -2187,8 +2187,6 @@ bool WorldObject::canSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
             viewpoint = this;
 
         if (!corpseCheck && !viewpoint->IsWithinDist(obj, GetSightRange(obj), false))
-            return false;*/
-        if (!corpseCheck && !IsWithinDist(obj, GetSightRange(obj), false))
             return false;
     }
 
