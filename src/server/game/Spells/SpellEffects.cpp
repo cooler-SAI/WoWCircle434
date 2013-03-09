@@ -5595,6 +5595,15 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     m_caster->CastSpell(m_caster, 53353, true);
                     break;
                 }
+                // Invigoration
+                case 53412:
+                {
+                    if (Player* owner = m_caster->GetOwner()->ToPlayer())
+                        if (AuraEffect const *aurEff = owner->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_HUNTER, 3487, 0))
+                            owner->EnergizeBySpell(owner, 53412, aurEff->GetAmount(), POWER_FOCUS);
+                    break;
+                }
+
             }
             break;
         }

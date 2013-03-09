@@ -9506,7 +9506,11 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                     _chance = aurEff->GetAmount();
                 if (!_chance || !roll_chance_i(_chance))
                     return false;
+
+                
             }
+            if (GetTypeId() == TYPEID_PLAYER)
+                ToPlayer()->RemoveSpellCooldown(53301, true);
             break;
         }
         // Item - Warrior T12 DPS 4P Bonus
