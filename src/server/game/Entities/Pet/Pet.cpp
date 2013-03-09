@@ -1506,7 +1506,7 @@ void Pet::InitLevelupSpellsForLevel()
         }
     }
 
-    int32 petSpellsId = GetCreatureTemplate()->PetSpellDataId ? -(int32)GetCreatureTemplate()->PetSpellDataId : GetEntry();
+    /*int32 petSpellsId = GetCreatureTemplate()->PetSpellDataId ? -(int32)GetCreatureTemplate()->PetSpellDataId : GetEntry();
 
     // default spells (can be not learned if pet level (as owner level decrease result for example) less first possible in normal game)
     if (PetDefaultSpellsEntry const* defSpells = sSpellMgr->GetPetDefaultSpellsEntry(petSpellsId))
@@ -1524,7 +1524,7 @@ void Pet::InitLevelupSpellsForLevel()
             else
                 learnSpell(spellEntry->Id);
         }
-    }
+    }*/
 }
 
 bool Pet::unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
