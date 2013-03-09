@@ -6540,7 +6540,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (effIndex != 0)
                         return false;
 
-                    basepoints0 = CalculatePct(damage, triggerAmount);
+                    basepoints0 = int32(CalculatePct(damage, triggerAmount) / 6.0f);
                     triggered_spell_id = 77489;
                     basepoints0 += victim->GetRemainingPeriodicAmount(GetGUID(), triggered_spell_id, SPELL_AURA_PERIODIC_HEAL);
                     break;
