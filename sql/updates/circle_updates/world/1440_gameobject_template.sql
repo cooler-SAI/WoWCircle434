@@ -1,0 +1,1 @@
+﻿UPDATE `gameobject_template` SET `flags`=32 WHERE `entry` IN (184632, 184322);
