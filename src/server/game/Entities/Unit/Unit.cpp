@@ -7355,6 +7355,19 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
             switch (dummySpell->Id)
             {
+                // Aspect of the Fox
+                case 82661:     
+                {
+                    target = this;
+                    basepoints0 = triggerAmount;
+
+                    // One with Nature
+                    if (AuraEffect * aurEff = GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_HUNTER, 5080, 1))
+                        basepoints0 += aurEff->GetAmount();
+
+                    triggered_spell_id = 82716;
+                    break;
+                }
                 // Misdirection
                 case 34477:
                 {

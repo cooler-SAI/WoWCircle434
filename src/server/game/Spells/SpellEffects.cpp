@@ -5591,8 +5591,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     if (Aura * aur = unitTarget->GetAura(1978, m_caster->GetGUID()))
                         aur->RefreshDuration();
 
-                    // Chimera Shot - Healing
-                    m_caster->CastSpell(m_caster, 53353, true);
                     break;
                 }
                 // Invigoration
