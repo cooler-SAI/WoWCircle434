@@ -147,6 +147,9 @@ namespace Trinity
 
             if (WorldSession* session = player->GetSession())
                 session->SendPacket(i_message);
+            
+            if (i_message->GetOpcode() == SMSG_CLEAR_TARGET)
+                player->CastStop();
         }
     };
 
