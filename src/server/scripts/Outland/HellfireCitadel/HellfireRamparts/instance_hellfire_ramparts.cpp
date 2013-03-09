@@ -42,6 +42,7 @@ class instance_ramparts : public InstanceMapScript
             uint32 m_auiEncounter[MAX_ENCOUNTER];
             uint64 m_uiChestNGUID;
             uint64 m_uiChestHGUID;
+            uint32 uiTeam;
             bool spawned;
 
             void Initialize()
@@ -50,6 +51,28 @@ class instance_ramparts : public InstanceMapScript
 
                 m_uiChestNGUID = 0;
                 m_uiChestHGUID = 0;
+                uiTeam = 0;
+            }
+            
+            void OnPlayerEnter(Player* player)
+            {
+                if (!uiTeam)
+                    uiTeam = player->GetTeam();
+            }
+
+            void OnCreatureCreate(Creature* creature)
+            {
+                switch (creature->GetEntry())
+                {
+                    case NPC_HONOR_HOLD_REKON:
+                        if (uiTeam == TEAM_HORDE)
+                            creature->UpdateEntry(NPC_TRALLMAR_INVADER);
+                        break;
+                    case NPC_ADVANCE_SCOUT_CHADWICK:
+                        if (uiTeam == TEAM_HORDE)
+                            creature->UpdateEntry(NPC_STONE_GUARD_STOCKTON);
+                        break;
+                }
             }
 
             void OnGameObjectCreate(GameObject* go)

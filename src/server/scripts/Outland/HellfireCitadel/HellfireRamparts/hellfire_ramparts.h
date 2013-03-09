@@ -21,6 +21,14 @@
 
 #define MAX_ENCOUNTER  2
 
+enum Creatures
+{
+    NPC_HONOR_HOLD_REKON        = 54746, // aliance
+    NPC_ADVANCE_SCOUT_CHADWICK  = 54603, // aliance
+    NPC_TRALLMAR_INVADER        = 54607, // horde
+    NPC_STONE_GUARD_STOCKTON    = 54606, // horde
+};
+
 enum eTypes
 {
     TYPE_VAZRUDEN       = 1,

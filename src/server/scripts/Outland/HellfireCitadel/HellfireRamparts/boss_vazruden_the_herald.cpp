@@ -141,7 +141,7 @@ class boss_nazan : public CreatureScript
                 if (flight) // phase 1 - the flight
                 {
                     Creature* Vazruden = Unit::GetCreature(*me, VazrudenGUID);
-                    if (Fly_Timer < diff || !(Vazruden && Vazruden->isAlive() && Vazruden->HealthAbovePct(20)))
+                    if (Fly_Timer < diff || !(Vazruden && Vazruden->isAlive() && Vazruden->HealthAbovePct(50)))
                     {
                         flight = false;
                         BellowingRoar_Timer = 6000;
@@ -297,6 +297,7 @@ class boss_vazruden_the_herald : public CreatureScript
                 lootSpawned = false;
                 NazanGUID = 0;
                 VazrudenGUID = 0;
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             }
 
             uint32 phase;
@@ -365,24 +366,22 @@ class boss_vazruden_the_herald : public CreatureScript
                     check = 0;
                     DoScriptText(SAY_INTRO, me);
                 }
+                DoZoneInCombat();
             }
 
-            void JustSummoned(Creature* summoned)
+            void JustSummoned(Creature* summon)
             {
-                if (!summoned)
+                if (!summon)
                     return;
-                Unit* victim = me->getVictim();
-                if (summoned->GetEntry() == ENTRY_NAZAN)
+
+                if (summon->GetEntry() == ENTRY_NAZAN)
                 {
-                    CAST_AI(boss_nazan::boss_nazanAI, summoned->AI())->VazrudenGUID = VazrudenGUID;
-                    summoned->SetDisableGravity(true);
-                    summoned->SetSpeed(MOVE_FLIGHT, 2.5f);
-                    if (victim)
-                        AttackStartNoMove(victim);
+                    CAST_AI(boss_nazan::boss_nazanAI, summon->AI())->VazrudenGUID = VazrudenGUID;
+                    summon->SetDisableGravity(true);
+                    summon->SetSpeed(MOVE_FLIGHT, 2.5f);
                 }
-                else
-                    if (victim)
-                        summoned->AI()->AttackStart(victim);
+                if (me->isInCombat())
+                    DoZoneInCombat(summon);
             }
 
             void SentryDownBy(Unit* killer)
@@ -442,7 +441,7 @@ class boss_vazruden_the_herald : public CreatureScript
                         {
                             me->SummonGameObject(DUNGEON_MODE(ENTRY_REINFORCED_FEL_IRON_CHEST, ENTRY_REINFORCED_FEL_IRON_CHEST_H), VazrudenMiddle[0], VazrudenMiddle[1], VazrudenMiddle[2], 0, 0, 0, 0, 0, 0);
                             me->SetLootRecipient(NULL); // don't think this is necessary..
-                            //me->Kill(me);
+                            me->Kill(me);
                             lootSpawned = true;
                         }
                         check = 2000;
