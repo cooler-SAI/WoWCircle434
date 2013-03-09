@@ -1706,7 +1706,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         target->RemoveAurasDueToSpell(44544);
                         break;
                     case 118: // Improved Polymorph
-                        if (removeMode == AURA_REMOVE_BY_EXPIRE || removeMode == AURA_REMOVE_BY_CANCEL)
+                        if (removeMode == AURA_REMOVE_BY_EXPIRE || removeMode == AURA_REMOVE_BY_CANCEL || removeMode == AURA_REMOVE_NONE)
                             break;
 
                         if (caster->HasAura(11210) && !target->HasAura(87515))
