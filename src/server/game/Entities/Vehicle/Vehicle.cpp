@@ -50,7 +50,11 @@ Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) 
 Vehicle::~Vehicle()
 {
     for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
+    {
+        sLog->outInfo(LOG_FILTER_WORLDSERVER, "VEHICLE ERROR: cannot delete passengers from vehicle - %u", GetVehicleInfo()->m_ID);
+        sLog->outInfo(LOG_FILTER_WORLDSERVER, "VEHICLE ERROR: cannot delete passengers from creature - %u", GetBase()->GetEntry());
         ASSERT(!itr->second.Passenger);
+    }
 }
 
 void Vehicle::Install()
@@ -195,12 +199,6 @@ void Vehicle::RemoveAllPassengers()
     // We just remove the aura and the unapply handler will make the target leave the vehicle.
     // We don't need to iterate over Seats
     _me->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE);
-
-    if (!Seats.empty())
-        for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
-            if (itr->second.Passenger)
-                if (Unit* passenger = ObjectAccessor::GetUnit(*_me, itr->second.Passenger))
-                    RemovePassenger(passenger);
 
     // Following the above logic, this assertion should NEVER fail.
     // Even in 'hacky' cases, there should at least be VEHICLE_SPELL_RIDE_HARDCODED on us.
