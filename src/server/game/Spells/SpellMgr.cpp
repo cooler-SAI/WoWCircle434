@@ -5037,6 +5037,14 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
                 break;
+            // Majordomo Staghelm
+            case 98565: // Burning Orbs summon
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
+            case 98229: // Concentration
+                spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_DUMMY;
+                break;
             // ENDOF FIRELANDS
             // BASTION OF TWILIGHT SPELLS
             //

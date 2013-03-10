@@ -80,7 +80,7 @@ enum Other
 #define LEVEL_HEIGHT 100.0f
 #define GROUND_HEIGHT 74.05f
 
-const Position highPos = {75.68f, 397.199f, 109.84f, 3.63f};
+const Position highPos = {75.68f, 397.199f, 110.0f, 3.63f};
 const Position addsPos[9] = 
 {
     {24.691f, 298.297f, 81.54f, 0.0f}, // spiderling
@@ -126,7 +126,7 @@ class boss_bethtilac : public CreatureScript
 
         struct boss_bethtilacAI : public BossAI
         {
-            boss_bethtilacAI(Creature* pCreature) : BossAI(pCreature, DATA_BALEROC)
+            boss_bethtilacAI(Creature* pCreature) : BossAI(pCreature, DATA_BETHTILAC)
             {
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -164,8 +164,8 @@ class boss_bethtilac : public CreatureScript
             {
                 DoCast(me, SPELL_ZERO_POWER, true);
                 me->SetReactState(REACT_PASSIVE);
-                me->SetUInt32Value(UNIT_FIELD_BYTES_1, 50331648);
-                me->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
+                //me->SetUInt32Value(UNIT_FIELD_BYTES_1, 50331648);
+                //me->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
                 uiPhase = 0;
                 uiCount = 0;
                 uiSide = 0;
@@ -189,8 +189,8 @@ class boss_bethtilac : public CreatureScript
                 if (type = POINT_MOTION_TYPE)
                     if (id == POINT_HIGH)
                     {
-                        me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                        me->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
+                        //me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+                        //me->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
                         me->SetReactState(REACT_AGGRESSIVE);
                         events.ScheduleEvent(EVENT_CHECK_HIGH, 5000);
                         events.ScheduleEvent(EVENT_FILAMENT, 6000);

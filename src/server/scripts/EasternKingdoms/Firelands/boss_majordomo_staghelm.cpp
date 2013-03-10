@@ -28,6 +28,13 @@ enum Spells
 
     // Burning Orb
     SPELL_BURNING_ORB_PERIODIC      = 98583, // Visual. Inflicts 7650 Fire damage every 2 sec. Stacks.
+
+    SPELL_CONCENTRATION             = 98256,
+    SPELL_CONCENTRATION_AURA        = 98229,
+    SPELL_LEGENDARY_CONCENTRATION   = 98245,
+    SPELL_EPIC_CONCENTRATION        = 98252,
+    SPELL_RARE_CONCENTRATION        = 98253,
+    SPELL_UNCOMMON_CONCENTRATION    = 98254,
 };
 
 enum Events
@@ -66,6 +73,15 @@ enum CreatureEncounterIds
     NPC_BURNING_ORB     = 53216,
 };
 
+const Position orbsPos[5] = 
+{
+    {468.600f, -20.167f, 78.950f, 0.0f},
+    {434.693f, -14.543f, 79.000f, 0.0f},
+    {384.831f, -64.045f, 79.000f, 0.0f},
+    {411.289f, -101.455f, 79.00f, 0.0f},
+    {451.879f, -104.702f, 79.00f, 0.0f}
+};
+
 class boss_majordomo_staghelm : public CreatureScript
 {
     public:
@@ -80,6 +96,19 @@ class boss_majordomo_staghelm : public CreatureScript
         {
             boss_majordomo_staghelmAI(Creature* creature) : BossAI(creature, DATA_STAGHELM)
             {
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
+                me->setActive(true);
             }
 
             void InitializeAI()
@@ -95,9 +124,12 @@ class boss_majordomo_staghelm : public CreatureScript
                 _Reset();
                 me->SetMaxPower(POWER_ENERGY, 100);
                 me->SetPower(POWER_ENERGY, 0);
-                events.ScheduleEvent(EVENT_BERSERK, 600000);    // 10 min
-                events.ScheduleEvent(EVENT_CHECK_PHASE, 2000);
-
+                
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CONCENTRATION_AURA);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_LEGENDARY_CONCENTRATION);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_EPIC_CONCENTRATION);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RARE_CONCENTRATION);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_UNCOMMON_CONCENTRATION);
                 instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
 
                 _currentPhase = PHASE_HUMANOID;
@@ -106,12 +138,23 @@ class boss_majordomo_staghelm : public CreatureScript
 
             void EnterCombat(Unit* attacker)
             {
+                if (IsHeroic())
+                    DoCast(me, SPELL_CONCENTRATION, true);
+
+                events.ScheduleEvent(EVENT_BERSERK, 600000);    // 10 min
+                events.ScheduleEvent(EVENT_CHECK_PHASE, 2000);
+
                 instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
                 DoZoneInCombat();
             }
 
             void JustDied(Unit* /*killer*/)
             {
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CONCENTRATION_AURA);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_LEGENDARY_CONCENTRATION);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_EPIC_CONCENTRATION);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RARE_CONCENTRATION);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_UNCOMMON_CONCENTRATION);
                 instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
                 Talk(SAY_DEATH);
                 _JustDied();
@@ -156,6 +199,29 @@ class boss_majordomo_staghelm : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
+                if (me->GetPower(POWER_ENERGY) == 100)
+                {
+                    if (_currentPhase == PHASE_CAT)
+                    {
+                        DoCast(me, SPELL_LEAPING_FLAMES_SUMMON);
+                        Unit* target = NULL;
+                        target = SelectTarget(SELECT_TARGET_RANDOM, 1, -20.0f, true);
+                        if (!target)
+                            target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
+                        if (target)
+                        {
+                            DoCast(target, SPELL_LEAPING_FLAMES);
+                            me->CastSpell(target, SPELL_LEAPING_FLAMES_PERSISTENT, true); // doesn't work as trigger spell of 98476
+                        }
+                        else
+                            me->SetPower(POWER_ENERGY, 0);
+                    }
+                    else if (_currentPhase == PHASE_SCORPION)
+                    {
+                        DoCastVictim(SPELL_FLAME_SCYTHE);
+                    }
+                }
+
                 while (uint32 eventId = events.ExecuteEvent())
                 {
                     switch (eventId)
@@ -163,94 +229,76 @@ class boss_majordomo_staghelm : public CreatureScript
                         case EVENT_CHECK_PHASE:
                         {
                             uint8 _phase = PHASE_CAT;
-                            std::list<Unit*> targetList;
+                            if (Unit* target = me->getVictim())
                             {
-                                const std::list<HostileReference*>& threatlist = me->getThreatManager().getThreatList();
-                                for (std::list<HostileReference*>::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-                                {
-                                    if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER)
-                                    {
-                                        std::list<Player*> PlayerList;
-                                        Trinity::AnyPlayerInObjectRangeCheck checker((*itr)->getTarget(), 5.0f);
-                                        Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher((*itr)->getTarget(), PlayerList, checker);
-                                        (*itr)->getTarget()->VisitNearbyWorldObject(5.0f, searcher);
-
-                                        uint8 const minTargets = Is25ManRaid() ? 18 : 7;
-                                        if (PlayerList.size() >= minTargets)
-                                        {
-                                            _phase = PHASE_SCORPION;
-                                            break;
-                                        }
-                                    }
-                                }
+                                std::list<Player*> PlayerList;
+                                Trinity::AnyPlayerInObjectRangeCheck checker(target, 10.0f);
+                                Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(target, PlayerList, checker);
+                                target->VisitNearbyWorldObject(5.0f, searcher);
+                                uint8 const minTargets = Is25ManRaid() ? 18 : 7;
+                                if (PlayerList.size() >= minTargets)
+                                    _phase = PHASE_SCORPION;
                             }
 
                             if (_currentPhase != _phase)
                             {
-                                events.CancelEvent(EVENT_LEAPING_FLAMES);
-                                events.CancelEvent(EVENT_FLAME_SCYTHE);
+                                me->SetPower(POWER_ENERGY, 0);
                                 me->RemoveAurasDueToSpell(SPELL_ADRENALINE);
-                                if (_changePhaseNum % 3 == 2)
-                                    events.ScheduleEvent(EVENT_HUMANOID_PHASE, 1000);
-                                events.ScheduleEvent(_phase == PHASE_CAT ? EVENT_CAT_FORM : EVENT_SCORPION_FORM, 5000);
-
                                 _changePhaseNum++;
+                                if (_changePhaseNum % 3 == 0)
+                                {
+                                    me->RemoveAurasDueToSpell(SPELL_CAT_FORM);
+                                    me->RemoveAurasDueToSpell(SPELL_SCORPION_FORM);
+                                    Talk(_currentPhase == PHASE_CAT ? SAY_HUMANOID_1 : SAY_HUMANOID_2);
+                                    DoCastAOE(SPELL_FIERY_CYCLONE, true);
+                                    DoCastAOE(_currentPhase == PHASE_CAT ? SPELL_SEARING_SEEDS : SPELL_BURNING_ORBS);
+                                    // Delayed Transmormation
+                                    events.ScheduleEvent(_currentPhase == PHASE_CAT ? EVENT_SCORPION_FORM : EVENT_CAT_FORM, 4500);
+                                    events.ScheduleEvent(EVENT_CHECK_PHASE, 6000);
+                                    return;
+                                }
+                                else
+                                {
+                                    // Normal Transformation
+                                    if (_phase == PHASE_CAT)
+                                    {
+                                        _currentPhase = PHASE_CAT;
+                                        Talk(SAY_TRANSFORM_2);
+                                        me->SetPower(POWER_ENERGY, 0);
+                                        DoCast(me, SPELL_CAT_FORM, true);
+                                        DoCast(me, SPELL_FURY, true);
+                                        
+                                    }
+                                    else if (_phase == PHASE_SCORPION)
+                                    {
+                                        _currentPhase = PHASE_SCORPION;
+                                        Talk(SAY_TRANSFORM_1);
+                                        me->SetPower(POWER_ENERGY, 0);
+                                        DoCast(me, SPELL_SCORPION_FORM, true);
+                                        DoCast(me, SPELL_FURY, true);
+                                    }
+                                }                                
                             }
 
-                            events.ScheduleEvent(EVENT_CHECK_PHASE, 6000);
+                            events.ScheduleEvent(EVENT_CHECK_PHASE, 1000);
                             break;
                         }
-                        case EVENT_HUMANOID_PHASE:
-                            Talk(_currentPhase == PHASE_CAT ? SAY_HUMANOID_1 : SAY_HUMANOID_2);
-                            me->RemoveAurasDueToSpell(SPELL_CAT_FORM);
-                            me->RemoveAurasDueToSpell(SPELL_SCORPION_FORM);
-                            DoCastAOE(SPELL_FIERY_CYCLONE);
-                            DoCastAOE(_currentPhase == PHASE_CAT ? SPELL_SEARING_SEEDS : SPELL_BURNING_ORBS);
-                            break;
                         case EVENT_CAT_FORM:
+                            _currentPhase = PHASE_CAT;
                             Talk(SAY_TRANSFORM_2);
                             me->SetPower(POWER_ENERGY, 0);
-                            DoCast(me, SPELL_CAT_FORM);
-                            if (_currentPhase != PHASE_HUMANOID)
-                                DoCast(me, SPELL_FURY);
-                            _currentPhase = PHASE_CAT;
-                            events.ScheduleEvent(EVENT_LEAPING_FLAMES, 10000);
+                            DoCast(me, SPELL_CAT_FORM, true);
+                            DoCast(me, SPELL_FURY, true);
                             break;
                         case EVENT_SCORPION_FORM:
+                            _currentPhase = PHASE_SCORPION;
                             Talk(SAY_TRANSFORM_1);
                             me->SetPower(POWER_ENERGY, 0);
-                            DoCast(me, SPELL_SCORPION_FORM);
-                            if (_currentPhase != PHASE_HUMANOID)
-                                DoCast(me, SPELL_FURY);
-                            _currentPhase = PHASE_SCORPION;
-                            events.ScheduleEvent(EVENT_FLAME_SCYTHE, 10000);
+                            DoCast(me, SPELL_SCORPION_FORM, true);
+                            DoCast(me, SPELL_FURY, true);
                             break;
-                        case EVENT_FLAME_SCYTHE:
-                            DoCastVictim(SPELL_FLAME_SCYTHE);
-                            events.ScheduleEvent(EVENT_FLAME_SCYTHE, 2000);
-                            break;
-                        case EVENT_LEAPING_FLAMES:
-                        {
-                            if (me->GetPower(POWER_ENERGY) == 100)
-                            {
-                                DoCast(me, SPELL_LEAPING_FLAMES_SUMMON);
-                                Unit* target = NULL;
-                                target = SelectTarget(SELECT_TARGET_RANDOM, 1, -20.0f, true);
-                                if (!target)
-                                    target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
-                                if (target)
-                                {
-                                    DoCast(target, SPELL_LEAPING_FLAMES);
-                                    me->CastSpell(target, SPELL_LEAPING_FLAMES_PERSISTENT, true); // doesn't work as trigger spell of 98476
-                                }
-                            }
-                            events.ScheduleEvent(EVENT_LEAPING_FLAMES, 1000);
-                            break;
-                        }
                         case EVENT_BERSERK:
                             DoCast(me, SPELL_BERSERK);
-                            break;
-                        default:
                             break;
                     }
                 }
@@ -312,8 +360,8 @@ class spell_staghelm_burning_orbs : public SpellScriptLoader
             {
                 Unit* caster = GetCaster();
                 uint8 const orbsCount = (GetCaster()->GetMap()->GetSpawnMode() & 1) ? 5 : 2;
-                for (uint8 itr = 0; itr < orbsCount; ++itr)
-                    caster->CastSpell(caster, SPELL_BURNING_ORBS_SUMMON, true);
+                for (uint8 i = 0; i < orbsCount; ++i)
+                    caster->CastSpell(orbsPos[i].GetPositionX(), orbsPos[i].GetPositionY(), orbsPos[i].GetPositionZ(), SPELL_BURNING_ORBS_SUMMON, true);
             }
 
             void Register()
@@ -328,9 +376,75 @@ class spell_staghelm_burning_orbs : public SpellScriptLoader
         }
 };
 
+class spell_staghelm_concentration_aura : public SpellScriptLoader
+{
+    public:
+        spell_staghelm_concentration_aura() : SpellScriptLoader("spell_staghelm_concentration_aura") { }
+
+        class spell_staghelm_concentration_aura_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_staghelm_concentration_aura_AuraScript);
+
+            void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
+            {
+                if (!GetUnitOwner())
+                    return;
+
+                if (AuraEffect* aurEff = GetAura()->GetEffect(EFFECT_0))
+                {
+                    int32 oldamount = aurEff->GetAmount();
+                    int32 newamount = oldamount + 1;
+                    if (newamount > 100)
+                        newamount = 100;
+                    if (newamount == oldamount)
+                        return;
+
+                    if (oldamount < 100 && newamount == 100)
+                    {
+                        GetUnitOwner()->RemoveAura(SPELL_EPIC_CONCENTRATION);
+                        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_LEGENDARY_CONCENTRATION, true);
+                    }
+                    else if (oldamount < 75 && newamount >= 75)
+                    {
+                        GetUnitOwner()->RemoveAura(SPELL_RARE_CONCENTRATION);
+                        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_EPIC_CONCENTRATION, true);
+                    }
+                    else if (oldamount < 50 && newamount >= 50)
+                    {
+                        GetUnitOwner()->RemoveAura(SPELL_UNCOMMON_CONCENTRATION);
+                        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_RARE_CONCENTRATION, true);
+                    }
+                    else if (oldamount < 25 && newamount >= 25)
+                    {
+                        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_UNCOMMON_CONCENTRATION, true);
+                    }
+                    else if (newamount < 25)
+                    {
+                        GetUnitOwner()->RemoveAura(SPELL_LEGENDARY_CONCENTRATION);
+                        GetUnitOwner()->RemoveAura(SPELL_EPIC_CONCENTRATION);
+                        GetUnitOwner()->RemoveAura(SPELL_RARE_CONCENTRATION);
+                        GetUnitOwner()->RemoveAura(SPELL_UNCOMMON_CONCENTRATION);
+                    }
+                    aurEff->SetAmount(newamount);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_staghelm_concentration_aura_AuraScript::HandlePeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_staghelm_concentration_aura_AuraScript();
+        }
+};
+
 void AddSC_boss_majordomo_staghelm()
 {
     new boss_majordomo_staghelm();
     new spell_staghelm_searing_seeds_aura();
     new spell_staghelm_burning_orbs();
+    new spell_staghelm_concentration_aura();
 }

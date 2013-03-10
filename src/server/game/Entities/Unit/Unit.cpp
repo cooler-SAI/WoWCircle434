@@ -5240,6 +5240,11 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Concentration, Majordomo Staghelm
+                case 98229:
+                    if (AuraEffect* aurEff = triggeredByAura->GetBase()->GetEffect(EFFECT_0))
+                        aurEff->SetAmount(0);
+                    break;
                 // Vital Spark, Baleroc
                 case 99262:
                 {
@@ -11494,6 +11499,22 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     // Custom scripted damage
     switch (spellProto->SpellFamilyName)
     {
+        case SPELLFAMILY_GENERIC:
+        {
+            switch (spellProto->Id)
+            {
+                case 98535: // Leaping Flames, Majordomo Staghelm
+                case 98474: // Flame Scythe, Majordomo Staghelm
+                case 100212:
+                case 100213:
+                case 100214:
+                    // Fury, SPELL_AURA_276
+                    if (Aura const* aur = GetAura(97235))
+                        AddPct(DoneTotalMod, aur->GetStackAmount() * 8);
+                    break;
+            }
+            break;
+        }
         case SPELLFAMILY_ROGUE:
         {
             // Revealing Strike for direct damage abilities
