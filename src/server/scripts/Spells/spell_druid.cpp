@@ -639,7 +639,7 @@ class spell_dru_starfall_dummy : public SpellScriptLoader
                 targets.remove(GetExplTargetUnit());
                 for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); )
                 {
-                    if (!(*itr)->ToUnit()->IsHostileTo(GetCaster()) || !(*itr)->ToUnit()->isInCombat() || !(*itr)->IsWithinLOSInMap(GetCaster()))
+                    if (!(*itr)->ToUnit()->isInCombat() || !(*itr)->IsWithinLOSInMap(GetCaster()))
                         itr = targets.erase(itr);
                     else
                         ++itr;
