@@ -51,8 +51,11 @@ Vehicle::~Vehicle()
 {
     for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
     {
-        sLog->outInfo(LOG_FILTER_WORLDSERVER, "VEHICLE ERROR: cannot delete passengers from vehicle - %u", GetVehicleInfo()->m_ID);
-        sLog->outInfo(LOG_FILTER_WORLDSERVER, "VEHICLE ERROR: cannot delete passengers from creature - %u", GetBase()->GetEntry());
+        if (itr->second.Passenger)
+        {
+            sLog->outInfo(LOG_FILTER_WORLDSERVER, "VEHICLE ERROR: cannot delete passengers from vehicle - %u", GetVehicleInfo()->m_ID);
+            sLog->outInfo(LOG_FILTER_WORLDSERVER, "VEHICLE ERROR: cannot delete passengers from creature - %u", GetBase()->GetEntry());
+        }
         ASSERT(!itr->second.Passenger);
     }
 }
