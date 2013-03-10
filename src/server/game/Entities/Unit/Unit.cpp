@@ -5240,6 +5240,28 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Bane of Havoc
+                case 85466:
+                {
+                    bool found = false;
+                    // find target of bane
+                    AuraList & scAuras = GetSingleCastAuras();
+                    for (AuraList::iterator iter = scAuras.begin(); iter != scAuras.end(); ++iter)
+                        if( (*iter)->GetId() == 80240)
+                        {
+                            if (target == (*iter)->GetUnitOwner())
+                                return false;
+                            target = (*iter)->GetUnitOwner();
+                            basepoints0 = int32(CalculatePct(damage, (*iter)->GetEffect(0)->GetAmount()));
+                            found = true;
+                        }
+                    // no target found, break
+                    if (!found)
+                        return false;
+
+                    triggered_spell_id = 85455;
+                    break;
+                }
                 // Concentration, Majordomo Staghelm
                 case 98229:
                     if (AuraEffect* aurEff = triggeredByAura->GetBase()->GetEffect(EFFECT_0))
@@ -8597,11 +8619,6 @@ bool Unit::HandleModifierAuraProc(Unit* victim, uint32 damage, AuraEffect* trigg
                     this->ToPlayer()->SpellCooldownReduction(47241, 15000);
                     break;
                 }
-                // Empowered Imp
-                case 47220:
-                case 47221:
-                    triggered_spell_id = 47283;
-                    break;
                 // Soul Burn
                 case 74434:
                 {

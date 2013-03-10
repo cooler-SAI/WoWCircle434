@@ -497,6 +497,16 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             {
                 switch (m_spellInfo->Id)
                 {
+                    // Firebolt
+                    case 3110:
+                    {
+                        if (Unit* owner = m_caster->GetOwner())
+                        {
+                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
+                            damage += spd * 0.33f;
+                        }
+                        break;
+                    }
                     // Whiplash
                     case 6360:
                     {
