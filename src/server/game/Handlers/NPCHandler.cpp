@@ -37,6 +37,8 @@
 #include "ScriptMgr.h"
 #include "CreatureAI.h"
 #include "SpellInfo.h"
+#include "GridNotifiersImpl.h"
+#include "CellImpl.h"
 
 enum StableResultCode
 {
@@ -568,7 +570,7 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
 
     size_t wpos = data.wpos();
     data << uint8(0);                                       // place holder for slot show number
-    data << uint8(0);
+    data << uint8(20);
 
     uint8 num = 0;
 
@@ -610,12 +612,27 @@ void WorldSession::HandleStableChangeSlot(WorldPacket & recv_data)
     uint64 npcGUID;
     uint8 new_slot;
 
-    recv_data >> new_slot >> pet_number >> npcGUID;
+    recv_data >> pet_number >> new_slot >> npcGUID;
 
+    // We cannot get tru guid now
+    // So just search for stable master
     if (!CheckStableMaster(npcGUID))
     {
-        SendStableResult(STABLE_ERR_STABLE);
-        return;
+        Creature* _master = NULL;
+        //CellCoord p(Trinity::ComputeCellCoord(_player->GetPositionX(), _player->GetPositionY()));
+        //Cell cell(p);
+        Trinity::FriendlyStableMasterCheck check(_player);
+        Trinity::CreatureSearcher<Trinity::FriendlyStableMasterCheck> searcher(_player, _master, check);
+        
+        //TypeContainerVisitor<Trinity::CreatureSearcher <Trinity::FriendlyStableMasterCheck>, GridTypeMapContainer > unit_checker(searcher);
+        //cell.Visit(p, unit_checker, *_player->GetMap(), *_player, _player->GetGridActivationRange());
+        _player->VisitNearbyObject(5.0f, searcher);
+
+        if (!_master)
+        {
+            SendStableResult(STABLE_ERR_STABLE);
+            return;
+        }
     }
 
     if (new_slot > MAX_PET_STABLES)
@@ -642,7 +659,7 @@ void WorldSession::HandleStableChangeSlot(WorldPacket & recv_data)
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOTS_CHANGE);
 
     stmt->setUInt32(0, _player->GetGUIDLow());
-    stmt->setUInt32(1, PET_SLOT_HUNTER_FIRST);
+    stmt->setUInt32(1, pet_number);
 
     _stableChangeSlotCallback.SetParam(new_slot);
     _stableChangeSlotCallback.SetFutureResult(CharacterDatabase.AsyncQuery(stmt));
