@@ -1108,7 +1108,7 @@ namespace Trinity
             if (!me->canSeeOrDetect(u))
                 return false;
 
-            if (!me->IsValidAttackTarget(u))
+            if (u->HasCrowdControlAura())
                 return false;
 
             if (u->HasAuraType(SPELL_AURA_MOD_CONFUSE))
