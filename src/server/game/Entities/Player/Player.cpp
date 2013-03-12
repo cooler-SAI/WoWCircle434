@@ -6136,7 +6136,11 @@ bool Player::UpdateCraftSkill(uint32 spellid)
                     learnSpell(discoveredSpell, false);
             }
 
-            uint32 craft_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_CRAFTING);
+            int32 rate = sWorld->getIntConfig(CONFIG_SKILL_GAIN_CRAFTING);
+            uint32 craft_skill_gain = rate;
+            uint32 points = _spell_idx->second->rewardSkillPoints;
+            if (rate == 1 && points > 0)
+                craft_skill_gain = points;
 
             return UpdateSkillPro(_spell_idx->second->skillId, SkillGainChance(SkillValue,
                 _spell_idx->second->max_value,
