@@ -7781,6 +7781,9 @@ void Spell::PrepareTriggersExecutedOnHit()
         }
     }
 
+    if (m_spellInfo->IsPassive())
+        return;
+
     // handle SPELL_AURA_ADD_TARGET_TRIGGER auras:
     // save auras which were present on spell caster on cast, to prevent triggered auras from affecting caster
     // and to correctly calculate proc chance when combopoints are present
