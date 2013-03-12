@@ -1208,7 +1208,17 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 // Soul Link
                 case 19028:
                 {
-                    unitTarget->CastSpell(unitTarget, 25228, true);
+                    // Glyph of Soul Link
+                    if (!m_caster || !m_caster->HasAura(63312)) 
+                    {
+                        unitTarget->CastSpell(unitTarget, 25228, true);
+                    }
+                    else
+                    {
+                        int32 basepoints0 = 25;
+                        unitTarget->CastCustomSpell(unitTarget, 25228, &basepoints0, 0, 0, true);
+                    }
+
                     return;
                 }
             }
