@@ -804,7 +804,7 @@ void LoadDBCStores(const std::string& dataPath)
                 spellEntry->SpellCategoriesId = id;
             }
             else
-                spellEntry->SpellCategoriesId = 22;
+                spellEntry->SpellCategoriesId = 0;
 
             uint32 areaGroupId = fields[++index].GetInt32();
             //ASSERT(!areaGroupId && "areaGroupId not implemented");
