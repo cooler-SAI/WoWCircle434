@@ -11997,7 +11997,8 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
             }
         case SPELL_DAMAGE_CLASS_MAGIC:
         {
-            if (schoolMask & SPELL_SCHOOL_MASK_NORMAL)
+            // exeption is healthstone and heal potions
+            if (schoolMask & SPELL_SCHOOL_MASK_NORMAL && spellProto->SpellIconID != 284 && spellProto->SpellFamilyName != SPELLFAMILY_POTION)
                 crit_chance = 0.0f;
             // For other schools
             else if (GetTypeId() == TYPEID_PLAYER)
