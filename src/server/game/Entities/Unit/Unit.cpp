@@ -12920,7 +12920,17 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
         if (spellProto->SpellFamilyName == SPELLFAMILY_DRUID && spellProto->SpellFamilyFlags[0] & 0x00008800)
             mechanicMask |= (1<<MECHANIC_BLEED);
 
-        AddPct(TakenTotalMod, GetMaxPositiveAuraModifierByMiscMask(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT, mechanicMask));
+        if (mechanicMask)
+        {
+            int32 maxval = 0;
+            AuraEffectList const& mDamageDoneMechanic = GetAuraEffectsByType(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT);
+            for (AuraEffectList::const_iterator i = mDamageDoneMechanic.begin(); i != mDamageDoneMechanic.end(); ++i)
+                if (mechanicMask & uint32(1<<((*i)->GetMiscValue())))
+                    maxval = std::max(maxval, (*i)->GetAmount());
+
+            if (maxval)
+                AddPct(TakenTotalMod, maxval); 
+        }
     }
 
     // .. taken pct: dummy auras
