@@ -928,7 +928,9 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             if (GetSpellInfo()->Id == 16191)
             {
                 if (Unit* owner = GetCaster()->GetOwner())
+                {
                     amount = CalculatePct(owner->GetStat(STAT_SPIRIT), amount);
+                }
             }
 
             break;
@@ -7173,7 +7175,7 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
     {
         float gainMultiplier = GetSpellInfo()->Effects[GetEffIndex()].CalcValueMultiplier(caster);
 
-        uint32 heal = uint32(caster->SpellHealingBonusDone(caster, GetSpellInfo(), uint32(new_damage * gainMultiplier), DOT, GetBase()->GetStackAmount()));
+        uint32 heal = uint32(caster->SpellHealingBonusDone(caster, GetSpellInfo(), uint32(damage * gainMultiplier), DOT, GetBase()->GetStackAmount()));
         heal = uint32(caster->SpellHealingBonusTaken(caster, GetSpellInfo(), heal, DOT, GetBase()->GetStackAmount()));
 
         int32 gain = caster->HealBySpell(caster, GetSpellInfo(), heal);
