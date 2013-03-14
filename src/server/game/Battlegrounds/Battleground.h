@@ -637,6 +637,8 @@ class Battleground
 
         // Player lists, those need to be accessible by inherited classes
         BattlegroundPlayerMap  m_Players;
+        // List of players who left from bg
+        BattlegroundPlayerMap  _Leavers;
         // Spirit Guide guid + Player list GUIDS
         std::map<uint64, std::vector<uint64> >  m_ReviveQueue;
 

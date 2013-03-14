@@ -951,6 +951,7 @@ void Battleground::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
     if (itr != m_Players.end())
     {
         UpdatePlayersCountByTeam(team, true);               // -1 player
+        _Leavers[guid] = itr->second;
         m_Players.erase(itr);
         // check if the player was a participant of the match, or only entered through gm command (goname)
         participant = true;
@@ -1991,8 +1992,14 @@ void Battleground::HandleAreaTrigger(Player* player, uint32 trigger)
 
 void Battleground::CalculatingMatchmakingRating(ArenaTeam* winnerTeam, ArenaTeam* loserTeam, uint32 winnerMatchmaking, uint32 loserMatchmaking, uint32 winner)
 {
-    for (BattlegroundPlayerMap::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    for (BattlegroundPlayerMap::iterator itr = m_Players.begin(); ; ++itr)
     {
+        // double list cycle break
+        if (itr == m_Players.end())
+            itr = _Leavers.begin();
+        if (itr == _Leavers.end())
+            break;
+
         uint32 team = itr->second.Team;
         if (itr->second.OfflineRemoveTime)
         {
