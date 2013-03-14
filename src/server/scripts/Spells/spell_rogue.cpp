@@ -171,7 +171,7 @@ class spell_rog_preparation : public SpellScriptLoader
 
                 if (caster->HasAura(ROGUE_SPELL_GLYPH_OF_PREPARATION))
                 {
-                    caster->RemoveSpellCooldown(1756, true, true); // Kick
+                    caster->RemoveSpellCooldown(1766, true, true); // Kick
                     caster->RemoveSpellCooldown(51722, true, true); // Dismantle
                     caster->RemoveSpellCooldown(76577, true, true); // Smoke Bomb
                 }
