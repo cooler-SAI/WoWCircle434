@@ -2318,8 +2318,26 @@ bool AchievementMgr<T>::HasAchieved(uint32 achievementId) const
 template<class T>
 bool AchievementMgr<T>::CanUpdateCriteria(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement, uint64 miscValue1, uint64 miscValue2, uint64 miscValue3, Unit const* unit, Player* referencePlayer)
 {
-    if (DisableMgr::IsDisabledFor(DISABLE_TYPE_ACHIEVEMENT_CRITERIA, criteria->ID, NULL))
-        return false;
+    // Temporary hack for optimization
+    /*if (DisableMgr::IsDisabledFor(DISABLE_TYPE_ACHIEVEMENT_CRITERIA, criteria->ID, NULL))
+        return false;*/
+    switch (criteria->ID)
+    {
+        case 10279: // 1st, yogg-saron
+        case 8839:  // arena honnorable kills
+        case 9161:  // arena honnorable kills
+        case 9162:  // arena honnorable kills
+        case 9163:  // arena honnorable kills
+        case 9164:  // arena honnorable kills
+        case 4961:  // arena honnorable kills 5 vs 5
+        case 4960:  // arena honnorable kills 3 vs 3
+        case 4959:  // arena honnorable kills 2 vs 2
+        case 16025: // 1st sinestra
+        case 15472: // I cant hear you... sinestra
+        case 15427: // 1st 25lvl guild
+            return false;
+         break;
+    }
 
     if (achievement->mapID != -1 && referencePlayer->GetMapId() != uint32(achievement->mapID))
         return false;
