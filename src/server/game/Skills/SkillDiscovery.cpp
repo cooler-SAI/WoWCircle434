@@ -169,27 +169,34 @@ uint32 GetExplicitDiscoverySpell(uint32 spellId, Player* player)
     SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
     uint32 skillvalue = bounds.first != bounds.second ? player->GetSkillValue(bounds.first->second->skillId) : uint32(0);
 
-    float full_chance = 0;
-    for (SkillDiscoveryList::const_iterator item_iter = tab->second.begin(); item_iter != tab->second.end(); ++item_iter)
-        if (item_iter->reqSkillValue <= skillvalue)
-            if (!player->HasSpell(item_iter->spellId))
-                full_chance += item_iter->chance;
-
-    float rate = full_chance / 100.0f;
-    float roll = (float)rand_chance() * rate;                      // roll now in range 0..full_chance
-
-    for (SkillDiscoveryList::const_iterator item_iter = tab->second.begin(); item_iter != tab->second.end(); ++item_iter)
+    if (tab != SkillDiscoveryStore.end())
     {
-        if (item_iter->reqSkillValue > skillvalue)
-            continue;
+        uint32 weight = 0;
+        std::map<uint32 /*spellid*/, uint32 /*chance*/> tempWeight;
+        for (SkillDiscoveryList::const_iterator item_iter = tab->second.begin(); item_iter != tab->second.end(); ++item_iter)
+        {
+            if (item_iter->reqSkillValue <= skillvalue &&
+                item_iter->chance > 0 &&
+                !player->HasSpell(item_iter->spellId))
+            {
+                weight += item_iter->chance;
+                tempWeight[item_iter->spellId] = item_iter->chance;
+            }
+        }
 
-        if (player->HasSpell(item_iter->spellId))
-            continue;
-
-        if (item_iter->chance > roll)
-            return item_iter->spellId;
-
-        roll -= item_iter->chance;
+        if (weight)
+        {
+            uint32 selectedWeight = urand(0, weight - 1);
+            weight = 0;
+            for (std::map<uint32, uint32>::const_iterator itr = tempWeight.begin(); itr != tempWeight.end(); ++itr)
+            {
+                weight += itr->second;
+                if (selectedWeight < weight)
+                    return itr->first;
+            }
+        }
+    
+        return 0;
     }
 
     return 0;
@@ -215,53 +222,16 @@ uint32 GetSkillDiscoverySpell(uint32 skillId, uint32 spellId, Player* player)
     // check spell case
     SkillDiscoveryMap::const_iterator tab = SkillDiscoveryStore.find(int32(spellId));
 
-    if (spellId == 61177 || // Northrend Inscription Research
-        spellId == 61288 || // Minor Inscription Research
-        spellId == 64323) // Book of Glyph Mastery
+    if (tab != SkillDiscoveryStore.end())
     {
-        if (tab != SkillDiscoveryStore.end())
+        for (SkillDiscoveryList::const_iterator item_iter = tab->second.begin(); item_iter != tab->second.end(); ++item_iter)
         {
-            uint32 weight = 0;
-            std::map<uint32 /*spellid*/, uint32 /*chance*/> tempWeight;
-            for (SkillDiscoveryList::const_iterator item_iter = tab->second.begin(); item_iter != tab->second.end(); ++item_iter)
-            {
-                if (item_iter->reqSkillValue <= skillvalue &&
-                    item_iter->chance > 0 &&
-                    !player->HasSpell(item_iter->spellId))
-                {
-                    weight += item_iter->chance;
-                    tempWeight[item_iter->spellId] = item_iter->chance;
-                }
-            }
-
-            if (weight)
-            {
-                uint32 selectedWeight = urand(0, weight - 1);
-                weight = 0;
-                for (std::map<uint32, uint32>::const_iterator itr = tempWeight.begin(); itr != tempWeight.end(); ++itr)
-                {
-                    weight += itr->second;
-                    if (selectedWeight < weight)
-                        return itr->first;
-                }
-            }
-
-            return 0;
+            if (roll_chance_f(item_iter->chance * sWorld->getRate(RATE_SKILL_DISCOVERY)) && 
+                item_iter->reqSkillValue <= skillvalue &&
+                !player->HasSpell(item_iter->spellId))
+                return item_iter->spellId;
         }
-    }
-    else
-    {
-        if (tab != SkillDiscoveryStore.end())
-        {
-            for (SkillDiscoveryList::const_iterator item_iter = tab->second.begin(); item_iter != tab->second.end(); ++item_iter)
-            {
-                if (roll_chance_f(item_iter->chance * sWorld->getRate(RATE_SKILL_DISCOVERY)) && 
-                    item_iter->reqSkillValue <= skillvalue &&
-                    !player->HasSpell(item_iter->spellId))
-                    return item_iter->spellId;
-            }
-            return 0;
-        }
+        return 0;
     }
 
     if (!skillId)
