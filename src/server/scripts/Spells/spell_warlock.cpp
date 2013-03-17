@@ -38,7 +38,6 @@ enum WarlockSpells
     WARLOCK_HAUNT                           = 48181,
     WARLOCK_HAUNT_HEAL                      = 48210,
     WARLOCK_UNSTABLE_AFFLICTION_DISPEL      = 31117,
-    WARLOCK_BANE_OF_DOOM_EFFECT             = 18662,
     WARLOCK_IMPROVED_HEALTH_FUNNEL_R1       = 18703,
     WARLOCK_IMPROVED_HEALTH_FUNNEL_R2       = 18704,
     WARLOCK_IMPROVED_HEALTH_FUNNEL_BUFF_R1  = 60955,
@@ -548,54 +547,6 @@ class spell_warl_unstable_affliction : public SpellScriptLoader
         }
 };
 
-// 603 Bane of Doom
-/// Updated 4.3.4
-class spell_warl_bane_of_doom : public SpellScriptLoader
-{
-    public:
-        spell_warl_bane_of_doom() : SpellScriptLoader("spell_warl_bane_of_doom") { }
-
-        class spell_warl_curse_of_doom_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_warl_curse_of_doom_AuraScript);
-
-            bool Validate(SpellInfo const* /*spell*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(WARLOCK_BANE_OF_DOOM_EFFECT))
-                    return false;
-                return true;
-            }
-
-            bool Load()
-            {
-                return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
-            }
-
-            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-            {
-                if (!GetCaster())
-                    return;
-
-                AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
-                if (removeMode != AURA_REMOVE_BY_DEATH || !IsExpired())
-                    return;
-
-                if (GetCaster()->ToPlayer()->isHonorOrXPTarget(GetTarget()))
-                    GetCaster()->CastSpell(GetTarget(), WARLOCK_BANE_OF_DOOM_EFFECT, true, NULL, aurEff);
-            }
-
-            void Register()
-            {
-                 AfterEffectRemove += AuraEffectRemoveFn(spell_warl_curse_of_doom_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_warl_curse_of_doom_AuraScript();
-        }
-};
-
 // 755 Health Funnel
 /// Updated 4.3.4
 class spell_warl_health_funnel : public SpellScriptLoader
@@ -687,7 +638,6 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_demonic_circle_teleport();
     new spell_warl_haunt();
     new spell_warl_unstable_affliction();
-    new spell_warl_bane_of_doom();
     new spell_warl_health_funnel();
     new spell_warlock_dark_intent();
 }
