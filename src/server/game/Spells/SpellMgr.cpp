@@ -6224,6 +6224,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 98020:
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
                 break;
+            // Glyph of Exorcism
+            case 54934:
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_CASTER;
+                break;
             default:
                 break;
         }
