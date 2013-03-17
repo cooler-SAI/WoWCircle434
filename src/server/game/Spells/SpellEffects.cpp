@@ -4169,8 +4169,7 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
 
     // this effect use before aura Taunt apply for prevent taunt already attacking target
     // for spell as marked "non effective at already attacking target"
-    if (!unitTarget || !unitTarget->CanHaveThreatList()
-        || unitTarget->getVictim() == m_caster)
+    if (!unitTarget || unitTarget->getVictim() == m_caster)
     {
         SendCastResult(SPELL_FAILED_DONT_REPORT);
         return;
@@ -4190,7 +4189,7 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
         if (HostileReference* forcedVictim = unitTarget->getThreatManager().getOnlineContainer().getReferenceByTarget(m_caster))
             unitTarget->getThreatManager().setCurrentVictim(forcedVictim);
 
-    if (unitTarget->ToCreature()->IsAIEnabled && !unitTarget->ToCreature()->HasReactState(REACT_PASSIVE))
+    if (unitTarget->ToCreature()->IsAIEnabled)
         unitTarget->ToCreature()->AI()->AttackStart(m_caster);
 }
 
