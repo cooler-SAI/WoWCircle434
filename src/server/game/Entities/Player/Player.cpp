@@ -3695,6 +3695,17 @@ bool Player::addSpell(uint32 spellId, bool active, bool learning, bool dependent
         return false;
     }
 
+    // Validate profession
+    SkillLineAbilityMapBounds spellBounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellInfo->Id);
+    for (SkillLineAbilityMap::const_iterator spell_idx = spellBounds.first; spell_idx != spellBounds.second; ++spell_idx)
+    {
+        if (!IsProfessionSkill(spell_idx->second->skillId))
+            continue;
+
+        if (!HasSkill(spell_idx->second->skillId))
+            return false;
+    }
+
     PlayerSpellState state = learning ? PLAYERSPELL_NEW : PLAYERSPELL_UNCHANGED;
 
     bool dependent_set = false;
@@ -14715,6 +14726,9 @@ bool Player::CanRewardQuest(Quest const* quest, bool msg)
     if (GetQuestRewardStatus(quest->GetQuestId()))
         return false;
 
+    if (!SatisfyQuestSkill(quest, msg))
+        return false;
+
     // prevent receive reward with quest items in bank
     if (quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_DELIVER))
     {
@@ -15105,8 +15119,12 @@ bool Player::SatisfyQuestSkill(Quest const* qInfo, bool msg) const
     if (skill == 0)
         return true;
 
+    uint32 skill_value = qInfo->GetRequiredSkillValue();
+    if (skill_value == 0)
+        skill_value = 1;
+
     // check skill value
-    if (GetSkillValue(skill) < qInfo->GetRequiredSkillValue())
+    if (GetSkillValue(skill) < skill_value)
     {
         if (msg)
             SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
