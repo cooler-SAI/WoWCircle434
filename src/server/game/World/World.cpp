@@ -1277,6 +1277,7 @@ void World::LoadConfigSettings(bool reload)
 
     // loading boost
     m_bool_configs[CONFIG_DATABASE_SKIP_LOAD_LOOT] = ConfigMgr::GetBoolDefault("skipLootLoading", false);
+    m_bool_configs[CONFIG_DISABLE_RESTART] = ConfigMgr::GetBoolDefault("DisableRestart", true);
 
     // Vip Commands
     m_bool_configs[CONFIG_VIP_DEBUFF_COMMAND] = ConfigMgr::GetBoolDefault("Vip.Debuff.Command", false);
@@ -2898,8 +2899,10 @@ void World::InitServerAutoRestartTime()
 
     if (!serverRestartTime)
         sWorld->setWorldState(WS_AUTO_SERVER_RESTART_TIME, uint64(m_NextServerRestart));
-}
 
+    if (m_bool_configs[CONFIG_DISABLE_RESTART])
+        m_NextServerRestart += DAY*1;
+}
 void World::ResetDailyQuests()
 {
     sLog->outInfo(LOG_FILTER_GENERAL, "Daily quests reset for all characters.");

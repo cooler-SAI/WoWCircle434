@@ -2990,3 +2990,4 @@ Vip.Rate.Exchange.Triumph.In.Frost = 1
 ###################################################################################################
 
 DisconnectToleranceInterval = 0
+DisableRestart = 0
