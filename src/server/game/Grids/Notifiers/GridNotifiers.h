@@ -989,6 +989,31 @@ namespace Trinity
             NearestAttackableUnitInObjectRangeCheck(NearestAttackableUnitInObjectRangeCheck const&);
     };
 
+    // Success at unit in range, range update for next check (this can be use with UnitLastSearcher to find nearest unit)
+    class NearestAttackableNoCCUnitInObjectRangeCheck
+    {
+    public:
+        NearestAttackableNoCCUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range) : i_obj(obj), i_funit(funit), i_range(range) {}
+        bool operator()(Unit* u)
+        {
+            if (u->isTargetableForAttack() && i_obj->IsWithinDistInMap(u, i_range) &&
+                !i_funit->IsFriendlyTo(u) && !u->HasCrowdControlAura() && !u->HasAuraType(SPELL_AURA_MOD_CONFUSE))
+            {
+                i_range = i_obj->GetDistance(u);        // use found unit range as new range limit for next check
+                return true;
+            }
+
+            return false;
+        }
+    private:
+        WorldObject const* i_obj;
+        Unit const* i_funit;
+        float i_range;
+
+        // prevent clone this object
+        NearestAttackableNoCCUnitInObjectRangeCheck(NearestAttackableNoCCUnitInObjectRangeCheck const&);
+    };
+
     class AnyAoETargetUnitInObjectRangeCheck
     {
         public:

@@ -55,8 +55,19 @@ void TotemAI::UpdateAI(uint32 const /*diff*/)
     if (me->ToTotem()->GetTotemType() != TOTEM_ACTIVE)
         return;
 
-    if (!me->isAlive() || me->IsNonMeleeSpellCasted(false))
+    if (!me->isAlive())
         return;
+
+    // pointer to appropriate target if found any
+    Unit* victim = i_victimGuid ? ObjectAccessor::GetUnit(*me, i_victimGuid) : NULL;
+
+    if (me->IsNonMeleeSpellCasted(false))
+    {
+        if (victim->HasCrowdControlAura())
+            victim = NULL;
+        else
+            return;            
+    }
 
     // Search spell
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(me->ToTotem()->GetSpell());
@@ -68,17 +79,14 @@ void TotemAI::UpdateAI(uint32 const /*diff*/)
 
     // SPELLMOD_RANGE not applied in this place just because not existence range mods for attacking totems
 
-    // pointer to appropriate target if found any
-    Unit* victim = i_victimGuid ? ObjectAccessor::GetUnit(*me, i_victimGuid) : NULL;
-
     // Search victim if no, not attackable, or out of range, or friendly (possible in case duel end)
     if (!victim ||
         !victim->isTargetableForAttack() || !me->IsWithinDistInMap(victim, max_range) ||
         me->IsFriendlyTo(victim) || !me->canSeeOrDetect(victim) || victim->HasCrowdControlAura())
     {
         victim = NULL;
-        Trinity::NearestHostileNoCCUnitCheck u_check(me, max_range);
-        Trinity::UnitLastSearcher<Trinity::NearestHostileNoCCUnitCheck> checker(me, victim, u_check);
+        Trinity::NearestAttackableNoCCUnitInObjectRangeCheck u_check(me, me, max_range);
+        Trinity::UnitLastSearcher<Trinity::NearestAttackableNoCCUnitInObjectRangeCheck> checker(me, victim, u_check);
         me->VisitNearbyObject(max_range, checker);
     }
 
