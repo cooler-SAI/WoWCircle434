@@ -3917,6 +3917,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // ENDOF THRONE OF THE TIDES SPELLS
             //
+            // DEADMINES SPELLS
+            // Captain Cookie
+            case 89250: // Summon Cauldron
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                break;
+            // ENDOF DEADMINES
             // BLACKROCK CAVERNS SPELLS
             //
             // Rom'ogg Bonecrusher 
@@ -3959,6 +3965,15 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].SetRadiusIndex(28);
                 spellInfo->Effects[1].SetRadiusIndex(28);
                 break;
+            case 86911: // Unstable Grounding Field
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->InterruptFlags = 0;
+                break;
+            case 87517: // Grounding Field Visual Beams
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
             // Altairus
             case 88276: // Call of Wind Dummy
                 spellInfo->Effects[0].SetRadiusIndex(28);
@@ -3969,7 +3984,7 @@ void SpellMgr::LoadDbcDataCorrections()
             // Trash
             case 87854: // Arcane Barrage
             case 92756:
-                spellInfo->Effects[0].SetRadiusIndex(13);
+                spellInfo->Effects[0].SetRadiusIndex(12);
                 spellInfo->MaxAffectedTargets = 1;
                 break;
             case 88073: // Starfall
