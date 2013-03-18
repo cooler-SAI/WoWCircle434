@@ -245,6 +245,12 @@ class boss_lady_nazjar : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
+                if (me->GetPositionX() < 117.0f)
+                {
+                    EnterEvadeMode();
+                    return;
+                }
+
                 if ((uiPhase == 1 || uiPhase == 3) && uiSpawnCount == 0)
                 {
                     WaterspoutEnd();

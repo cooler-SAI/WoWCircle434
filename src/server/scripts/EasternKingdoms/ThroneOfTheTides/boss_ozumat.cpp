@@ -148,6 +148,7 @@ class npc_neptulon : public CreatureScript
             npc_neptulonAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
             {
                 pInstance = pCreature->GetInstanceScript();
+                me->SetReactState(REACT_PASSIVE);
             }
 
             InstanceScript* pInstance;
