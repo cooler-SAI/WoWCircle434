@@ -6243,6 +6243,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 54934:
                 spellInfo->Effects[0].TargetA = TARGET_UNIT_CASTER;
                 break;
+            // Magic Barrier, Lady Vashj
+            case 38112:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
             default:
                 break;
         }
