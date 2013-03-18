@@ -1,12 +1,13 @@
 #ifndef DEF_VORTEX_PINNACLE_H
 #define DEF_VORTEX_PINNACLE_H
 
+#define VPScriptName "instance_the_vortex_pinnacle"
+
 enum Data
 {
-    DATA_GRAND_VIZIER_ERTAN,
-    DATA_ALTAIRUS,
-    DATA_ASAAD,
-    DATA_TEAM_IN_INSTANCE,
+    DATA_ERTAN      = 1,
+    DATA_ALTAIRUS   = 2,
+    DATA_ASAAD      = 3,
 };
 
 
