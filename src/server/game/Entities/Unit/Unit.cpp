@@ -18705,6 +18705,10 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form) const
         switch (form)
         {
             case FORM_CAT:
+                // Hack for Druid of the Flame, Fandral's Flamescythe
+                if (HasAura(99245))
+                    return 38150;
+
                 // Based on Hair color
                 if (getRace() == RACE_NIGHTELF)
                 {
