@@ -169,6 +169,9 @@ public:
                 {
                     energizeAmount = -GetSpellInfo()->Effects[effIndex].BasePoints; // -13
 
+                    if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER) && !caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
+                        caster->CastSpell(caster, SPELL_DRUID_LUNAR_ECLIPSE_MARKER, true);
+
                     if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE) && !caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE))
                     {
                         // Euphoria
@@ -201,6 +204,9 @@ public:
                 {
                     energizeAmount = GetSpellInfo()->Effects[effIndex].BasePoints; // 20
 
+                    if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER) && !caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
+                        caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE_MARKER, true);
+
                     if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE) && !caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE))
                     {
                         // Euphoria
@@ -212,7 +218,7 @@ public:
 
                         // Item - Druid T12 Balance 4P Bonus
                         if (caster->HasAura(99049))
-                            energizeAmount -= 3;
+                            energizeAmount += 5;
                     }
 
                     // If we are set to fill the solar side or we've just logged in with 0 power..
@@ -315,6 +321,10 @@ public:
                 case SPELL_DRUID_SUNFIRE:
                 {
                     int32 energizeAmount = -8;
+                    
+                    if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER) && !caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
+                        caster->CastSpell(caster, SPELL_DRUID_LUNAR_ECLIPSE_MARKER, true);
+                    
                     // If we are set to fill the lunar side or we've just logged in with 0 power..
                     if ((!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
                         || caster->GetPower(POWER_ECLIPSE) == 0)
@@ -332,6 +342,10 @@ public:
                 case SPELL_DRUID_MOONFIRE:
                 {
                     int32 energizeAmount = 8;
+                    
+                    if (!caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER) && !caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER))
+                        caster->CastSpell(caster, SPELL_DRUID_SOLAR_ECLIPSE_MARKER, true);
+                    
                     // If we are set to fill the solar side or we've just logged in with 0 power..
                     if ((!caster->HasAura(SPELL_DRUID_LUNAR_ECLIPSE_MARKER) && caster->HasAura(SPELL_DRUID_SOLAR_ECLIPSE_MARKER))
                         || caster->GetPower(POWER_ECLIPSE) == 0)
