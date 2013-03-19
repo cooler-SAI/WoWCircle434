@@ -67,7 +67,8 @@ void Totem::InitStats(uint32 duration)
         m_owner->ToPlayer()->SendDirectMessage(&data);
 
         // set display id depending on caster's race
-        SetDisplayId(m_owner->GetModelForTotem(PlayerTotemType(m_Properties->Id)));
+        if (m_owner->getClass() == CLASS_SHAMAN)
+            SetDisplayId(m_owner->GetModelForTotem(PlayerTotemType(m_Properties->Id)));
     }
 
     Minion::InitStats(duration);
