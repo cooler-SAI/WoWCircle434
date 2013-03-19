@@ -110,7 +110,6 @@ public:
             { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "", NULL },
             { "phase",          SEC_MODERATOR,      false, &HandleDebugPhaseCommand,           "", NULL },
             { "currencycap",    SEC_ADMINISTRATOR,  false, NULL,          "", debugResetCapCommandTable },
-            { "damagedone",     SEC_ADMINISTRATOR,  false, &HandleDebugDamageDoneCommand,      "", NULL },
 
             // stats debug
             { "spellpower",     SEC_ADMINISTRATOR,  false, &HandleDebugModifySpellpowerCommand,     "", NULL },
@@ -1479,13 +1478,6 @@ public:
             player = unit->ToPlayer();
 
         player->GetPhaseMgr().SendDebugReportToPlayer(handler->GetSession()->GetPlayer());
-        return true;
-    }
-
-    static bool HandleDebugDamageDoneCommand(ChatHandler* handler, char const* /*args*/)
-    {
-        Player* player = handler->GetSession()->GetPlayer();
-        handler->PSendSysMessage("Damage done in past 120 seconds is %u", player->GetDamageInPastSecs<false>(120));
         return true;
     }
 

@@ -3073,62 +3073,38 @@ class Player : public Unit, public GridObject<Player>
         VoidStorageItem* GetVoidStorageItem(uint8 slot) const;
         VoidStorageItem* GetVoidStorageItem(uint64 id, uint8& slot) const;
 
-        void SetHealingDoneForSecond(uint32 value)
+        void SetDamageTakenForSecond(uint32 value)
         {
-            _heal_done[CurrentSecond] += value;
+            _damage_taken[0] += value;
         }
 
-        template<bool taken>
-        void SetDamageForSecond(uint32 value)
+        uint32 GetDamageTakenInPastSecs(uint8 seconds)
         {
-            (taken ? _damage_taken : _damage_done)[CurrentSecond] += value;
-        }
-
-        uint32 GetHealingDoneInPastSecs(uint8 seconds)
-        {
-            ASSERT(seconds <= SAVE_FOR_SECONDS);
-
             uint32 value = 0;
+
+            if (seconds > SAVE_FOR_SECONDS)
+                seconds = SAVE_FOR_SECONDS;
+
             for (uint8 i = 0; i < seconds; ++i)
-            {
-                 value += _heal_done[i];
-            }
+                 value += _damage_taken[i];
+
+            if (value < 0)
+                return 0;
 
             return value;
         }
 
-        template<bool taken>
-        uint32 GetDamageInPastSecs(uint8 seconds)
+        void ResetDamageTakenInPastSecs()
         {
-            ASSERT(seconds <= SAVE_FOR_SECONDS);
-
-            uint32 value = 0;
-            for (uint8 i = 0; i < seconds; ++i)
+            for (uint8 i = SAVE_FOR_SECONDS - 1;  i > 0; i--)
             {
-                 value += (taken ? _damage_taken : _damage_done)[i];
+                _damage_taken[i] = _damage_taken[i-1];
             }
-            return value;
+            _damage_taken[0] = 0;
         }
 
-        template<bool taken>
-        void ResetDamageInPastSecs(uint8 seconds)
-        {
-            ASSERT(seconds <= SAVE_FOR_SECONDS);
-            for (uint8 i = 0; i < seconds; ++i)
-            {
-                 (taken ? _damage_taken : _damage_done)[i] = 0;
-            }
-        }
-
-        void ResetHealingDoneInPastSecs(uint8 seconds)
-        {
-            ASSERT(seconds <= SAVE_FOR_SECONDS);
-            for (uint8 i = 0; i < seconds; ++i)
-            {
-                 _heal_done[i] = 0;
-            }
-        }
         void ResetHolyPowerTimer() { m_holyPowerRegenTimerCount = 0; }
+
     protected:
         // Gamemaster whisper whitelist
         WhisperListContainer WhisperList;

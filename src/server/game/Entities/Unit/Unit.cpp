@@ -585,10 +585,8 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
 
     if (damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
     {
-        if (GetTypeId() == TYPEID_PLAYER)
-            ToPlayer()->SetDamageForSecond<false>(damage);
         if (victim->GetTypeId() == TYPEID_PLAYER)
-            victim->ToPlayer()->SetDamageForSecond<true>(damage);
+            victim->ToPlayer()->SetDamageTakenForSecond(damage);
     }
 
     if (damagetype != NODAMAGE)
@@ -11130,9 +11128,6 @@ int32 Unit::DealHeal(Unit* victim, uint32 addhealth)
 
     if (GetTypeId() == TYPEID_UNIT && ToCreature()->isTotem())
         unit = GetOwner();
-
-    if (GetTypeId() == TYPEID_PLAYER)
-        ToPlayer()->SetHealingDoneForSecond(addhealth);
 
     if (Player* player = unit->ToPlayer())
     {

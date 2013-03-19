@@ -1585,15 +1585,7 @@ void Player::Update(uint32 p_time)
 
     if (DmgandHealDoneTimer <= 0)
     {
-        if (CurrentSecond++ == (SAVE_FOR_SECONDS-1))
-        {
-            CurrentSecond = 0;
-
-            ResetDamageInPastSecs<true>(SAVE_FOR_SECONDS);
-            ResetDamageInPastSecs<false>(SAVE_FOR_SECONDS);
-            ResetHealingDoneInPastSecs(SAVE_FOR_SECONDS);
-        }
-
+        ResetDamageTakenInPastSecs();
         DmgandHealDoneTimer = 1000;
     }
 

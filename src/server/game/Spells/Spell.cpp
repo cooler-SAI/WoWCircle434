@@ -3594,7 +3594,7 @@ void Spell::cast(bool skipCheck)
                 }
 
                 int32 minimumHp = int32(m_caster->CountPctFromMaxHealth(healthPct));
-                int32 takenDamage = int32(m_caster->ToPlayer()->GetDamageInPastSecs<true>(5) * 0.2f);
+                int32 takenDamage = int32(m_caster->ToPlayer()->GetDamageTakenInPastSecs(5) * 0.2f);
 
                 int32 bp = std::max(takenDamage, minimumHp);
 
