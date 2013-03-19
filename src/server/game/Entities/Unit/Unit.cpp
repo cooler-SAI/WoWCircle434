@@ -9488,6 +9488,11 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Nature's Grasp reapply handling
+        case 16689:
+            if (victim && victim->HasAura(19975))
+                return false;
+            break;
         // Glyph of Dark Succor
         case 96279:
             if (victim && victim->GetEntry() == 26125)
