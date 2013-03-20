@@ -3688,14 +3688,17 @@ bool Player::addSpell(uint32 spellId, bool active, bool learning, bool dependent
     }
 
     // Validate profession
-    SkillLineAbilityMapBounds spellBounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellInfo->Id);
-    for (SkillLineAbilityMap::const_iterator spell_idx = spellBounds.first; spell_idx != spellBounds.second; ++spell_idx)
+    if (loading)
     {
-        if (!IsProfessionSkill(spell_idx->second->skillId))
-            continue;
+        SkillLineAbilityMapBounds spellBounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellInfo->Id);
+        for (SkillLineAbilityMap::const_iterator spell_idx = spellBounds.first; spell_idx != spellBounds.second; ++spell_idx)
+        {
+            if (!IsProfessionSkill(spell_idx->second->skillId))
+                continue;
 
-        if (!HasSkill(spell_idx->second->skillId))
-            return false;
+            if (!HasSkill(spell_idx->second->skillId))
+                return false;
+        }
     }
 
     PlayerSpellState state = learning ? PLAYERSPELL_NEW : PLAYERSPELL_UNCHANGED;
