@@ -17152,6 +17152,18 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, SpellInfo const
     // If in spellProcEvent exist custom chance, chance = spellProcEvent->customChance;
     if (spellProcEvent && spellProcEvent->customChance)
         chance = spellProcEvent->customChance;
+
+    // Earthliving Weapon
+    if (spellProto->SpellFamilyFlags[1] == 0x00100000 && spellProto->SpellFamilyName == SPELLFAMILY_SHAMAN)
+        // Blessing of the Eternals
+        if (victim && victim->HealthBelowPct(35))
+        {
+            if (ToPlayer()->HasAuraEffect(51554, EFFECT_1))
+                chance += 40;
+            else if (ToPlayer()->HasAuraEffect(51555, EFFECT_1))
+                chance += 80;
+        }
+
     // If PPM exist calculate chance from PPM
     if (spellProcEvent && spellProcEvent->ppmRate != 0)
     {
