@@ -2437,7 +2437,6 @@ bool Aura::CanStackWith(Aura const* existingAura) const
     }
 
     bool casterIsPet = false;
-    bool petSpell = false;
     if (GetCaster() && existingAura->GetCaster())
     {
         if (GetCaster()->isPet() || existingAura->GetCaster()->isPet())
@@ -2534,19 +2533,7 @@ bool Aura::CanStackWith(Aura const* existingAura) const
             return true;
     }
 
-    if (!petSpell && casterIsPet)
-    {
-        for (uint16 type = SKILL_PET_SPIDER; type < SKILL_RACIAL_UNDED; type++)
-        {
-            if (m_spellInfo->IsAbilityOfSkillType(SkillType(type)) || existingSpellInfo->IsAbilityOfSkillType(SkillType(type)))
-            {
-                petSpell = true;
-                break;
-            }
-        }
-    }
-
-    if (!petSpell && m_spellInfo->SpellIconID != existingSpellInfo->SpellIconID &&
+    if (m_spellInfo->SpellIconID != existingSpellInfo->SpellIconID &&
         ((m_spellInfo->GetMaxDuration() <= 60*IN_MILLISECONDS && m_spellInfo->GetMaxDuration() != -1) || 
         (existingSpellInfo->GetMaxDuration() <= 60*IN_MILLISECONDS && existingSpellInfo->GetMaxDuration() != -1)))
         return true;
@@ -3228,6 +3215,7 @@ bool Aura::IsUniqueVisibleAuraBuff() const
             case 2825: // Bloodlust
             case 32182: // Heroism
             case 80353: // Time Warp
+            case 90355: // Ancient Hysteria
                 return false;
         }
 
@@ -3241,6 +3229,21 @@ bool Aura::IsUniqueVisibleAuraBuff() const
                 return true;
             default:
                 break;
+        }
+
+        // These player's negative debuffs should not stack
+        if ((GetSpellInfo()->SpellFamilyName >= SPELLFAMILY_MAGE && 
+            GetSpellInfo()->SpellFamilyName <= SPELLFAMILY_SHAMAN) ||
+            GetSpellInfo()->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
+        {
+            if (GetSpellInfo()->Effects[i].ApplyAuraName == SPELL_AURA_MOD_MELEE_RANGED_HASTE_2 ||
+                GetSpellInfo()->Effects[i].ApplyAuraName == SPELL_AURA_MOD_DAMAGE_PERCENT_DONE ||
+                GetSpellInfo()->Effects[i].ApplyAuraName == SPELL_AURA_HASTE_SPELLS)
+            {
+                if (GetSpellInfo()->Effects[i].BasePoints < 0)
+                    return true;
+            }
+
         }
     }
     return false;

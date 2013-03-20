@@ -1242,7 +1242,8 @@ void AuraEffect::HandleEffect(AuraApplication * aurApp, uint8 mode, bool apply)
         AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModRangedAttackPowerPercent || AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModDamagePercentDone ||
         AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModCastingSpeed || AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModCritPct ||
         AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModMeleeSpeedPct || AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModAttackSpeed ||
-        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModRangedHaste))
+        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModRangedHaste || AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModMeleeRangedSpeedPct ||
+        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModIncreaseEnergy))
     {
         DoUniqueStackAura(aurApp, mode, apply);
     }
