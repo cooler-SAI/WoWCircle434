@@ -42,6 +42,8 @@ enum PriestSpells
     PRIEST_SHADOWFORM_VISUAL_WITHOUT_GLYPH      = 107903,
     PRIEST_SHADOWFORM_VISUAL_WITH_GLYPH         = 107904,
     PRIEST_GLYPH_OF_SHADOW                      = 107906,
+    PRIEST_IMPROVED_DEVOURING_PLAGUE_DAMAGE     = 63675,
+    PRIEST_IMPROVED_DEVOURING_PLAGUE_HEAL       = 75999
 };
 
 // Guardian Spirit
@@ -493,6 +495,41 @@ class spell_pri_shadowform : public SpellScriptLoader
         }
 };
 
+// Improved Devouring Plague healing part
+class spell_pri_improved_devouring_plague : public SpellScriptLoader
+{
+    public:
+    spell_pri_improved_devouring_plague() : SpellScriptLoader("spell_pri_improved_devouring_plague") {}
+
+    class spell_pri_improved_devouring_plague_SpellScript : public SpellScript
+    {
+            PrepareSpellScript(spell_pri_improved_devouring_plague_SpellScript);
+
+        bool Validate(SpellEntry * entry)
+        {
+            if (entry->Id == PRIEST_IMPROVED_DEVOURING_PLAGUE_DAMAGE)
+                return true;
+            return false;
+        }
+
+        void HandleDamage()
+        {
+            int32 damage = GetHitDamage();
+            int32 heal = int32(CalculatePct(damage, 15));
+            GetCaster()->CastCustomSpell(GetCaster(), PRIEST_IMPROVED_DEVOURING_PLAGUE_HEAL, &heal, 0, 0, true);
+        }
+        void Register()
+        {
+            AfterHit += SpellHitFn(spell_pri_improved_devouring_plague_SpellScript::HandleDamage);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_pri_improved_devouring_plague_SpellScript();
+    }
+};
+
 void AddSC_priest_spell_scripts()
 {
     new spell_pri_guardian_spirit();
@@ -506,4 +543,5 @@ void AddSC_priest_spell_scripts()
     new spell_priest_renew();
     new spell_pri_shadow_word_death();
     new spell_pri_shadowform();
+    new spell_pri_improved_devouring_plague();
 }
