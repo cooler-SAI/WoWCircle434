@@ -1958,6 +1958,18 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
         case SPELLFAMILY_GENERIC:
             switch (GetId())
             {
+                // Path of Frost - Glyph of Path of Frost
+                case 3714:
+                {
+                    if (apply)
+                    {
+                        if (target == caster && caster->HasAura(59307))
+                            caster->CastSpell(caster, 93061, true);
+                    }
+                    else
+                        caster->RemoveAurasDueToSpell(93061);
+                    break;
+                }
                 case 50720: // Vigilance
                     if (apply)
                         target->CastSpell(caster, 59665, true, 0, 0, caster->GetGUID());
