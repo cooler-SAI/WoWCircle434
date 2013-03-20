@@ -3695,6 +3695,18 @@ void SpellMgr::LoadDbcDataCorrections()
             case 72890: // Swarming Shadows
                 spellInfo->AreaGroupId = 0; // originally, these require area 4522, which is... outside of Icecrown Citadel
                 break;
+            case 26022: // Pursuit of Justice (Rank 1)
+                spellInfo->Effects[1].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[1].BasePoints = 7;
+                spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_MOD_MOUNTED_SPEED_NOT_STACK;
+                spellInfo->Effects[1].TargetA = TARGET_UNIT_CASTER;
+                break;
+            case 26023: // Pursuit of Justice (Rank 1)
+                spellInfo->Effects[1].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[1].BasePoints = 14;
+                spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_MOD_MOUNTED_SPEED_NOT_STACK;
+                spellInfo->Effects[1].TargetA = TARGET_UNIT_CASTER;
+                break;
             case 70602: // Corruption
             case 48278: // Paralyze
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;

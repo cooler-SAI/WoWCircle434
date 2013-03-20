@@ -15926,6 +15926,7 @@ bool InitTriggerAuraData()
     isTriggerAura[SPELL_AURA_PROC_TRIGGER_SPELL_COPY] = true;
     isTriggerAura[SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS_2] = true;
     isTriggerAura[SPELL_AURA_MELEE_SLOW] = true;
+    isTriggerAura[SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK] = true;
 
     isNonTriggerAura[SPELL_AURA_MOD_POWER_REGEN] = true;
     isNonTriggerAura[SPELL_AURA_REDUCE_PUSHBACK] = true;
@@ -16201,6 +16202,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     case SPELL_AURA_MANA_SHIELD:
                     case SPELL_AURA_DUMMY:
                     case SPELL_AURA_PROC_TRIGGER_SPELL_COPY:
+                    case SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK:
                     {
                         sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "ProcDamageAndSpell: casting spell id %u (triggered by %s dummy aura of spell %u)", spellInfo->Id, (isVictim?"a victim's":"an attacker's"), triggeredByAura->GetId());
                         if (HandleDummyAuraProc(target, damage, triggeredByAura, procSpell, procFlag, procExtra, cooldown))
