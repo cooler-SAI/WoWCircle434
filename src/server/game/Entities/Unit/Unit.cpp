@@ -8209,9 +8209,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     target = this;
                     basepoints0 = triggerAmount;
 
-                    // Glyph of Earth Shield
-                    if (AuraEffect* aur = GetAuraEffect(63279, 0))
-                        AddPct(basepoints0, aur->GetAmount());
                     triggered_spell_id = 379;
                     break;
                 }
@@ -12396,6 +12393,11 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
     if (victim->HasAura(99252))
         if (AuraEffect const* aurEff = GetAuraEffect(99263, EFFECT_0))
             AddPct(DoneTotalMod, aurEff->GetAmount());
+
+    // Glyph of Earth Shield
+    if (spellProto->Id == 379)
+        if (AuraEffect* aur = GetAuraEffect(63279, 0))
+            AddPct(DoneTotalMod, aur->GetAmount());
 
     // use float as more appropriate for negative values and percent applying
     float heal = float(int32(healamount) + DoneTotal) * DoneTotalMod;
