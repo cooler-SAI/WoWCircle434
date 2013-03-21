@@ -2138,6 +2138,19 @@ class npc_shadowfiend : public CreatureScript
         {
             npc_shadowfiendAI(Creature* creature) : PetAI(creature) {}
 
+            void IsSummonedBy(Unit* owner)
+            {
+                me->SetReactState(REACT_AGGRESSIVE);
+                Unit* target = NULL;
+                if (owner->GetTypeId() == TYPEID_PLAYER)
+                    target = owner->ToPlayer()->GetSelectedUnit();
+                else
+                    target = owner->getVictim();
+
+                if (target && me->IsValidAttackTarget(target))
+                    AttackStart(target);                
+            }
+
             void JustDied(Unit* /*killer*/)
             {
                 if (me->isSummon())

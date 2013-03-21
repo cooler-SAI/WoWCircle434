@@ -26343,18 +26343,18 @@ void Player::SendPetitionTurnInResult(uint32 result)
 
 Stats Player::GetMaxStatType() const
 {
-    Stats type = STAT_STRENGTH;
-    float value = 0.0f;
-    float temp = 0.0f;
-    for (uint8 i = STAT_STRENGTH; i < MAX_STATS; ++i)
-    {
-        if ((temp = GetStat(Stats(i))) > value)
-        {
-            type = Stats(i);
-            value = temp;
-        }
-    }
-    return type;
+    float stat_str = GetStat(STAT_STRENGTH);
+    float stat_agi = GetStat(STAT_AGILITY);
+    float stat_int = GetStat(STAT_INTELLECT);
+
+    if (stat_str > stat_agi && stat_str > stat_int)
+        return STAT_STRENGTH;
+    else if (stat_agi > stat_str && stat_agi > stat_int)
+        return STAT_AGILITY;
+    else if (stat_int > stat_agi && stat_int > stat_str)
+        return STAT_INTELLECT;
+    else
+        return STAT_STRENGTH;
 }
 
 PlayerRole Player::GetRole() const

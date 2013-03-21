@@ -4324,17 +4324,6 @@ void AuraEffect::HandleAuraModStat(AuraApplication const* aurApp, uint8 mode, bo
         return;
     }
 
-    switch (GetBase()->GetId())
-    {
-        case 87545: // Well Fed
-        case 87556: // Well Fed
-            if (target->ToPlayer() && GetEffIndex() == EFFECT_0)
-                statType = int32(target->ToPlayer()->GetMaxStatType());
-            break;
-        default:
-            break;
-    }
-
     for (int32 i = STAT_STRENGTH; i < MAX_STATS; i++)
     {
         // -1 or -2 is all stats (misc < -2 checked in function beginning)

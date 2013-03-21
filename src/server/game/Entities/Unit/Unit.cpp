@@ -6558,6 +6558,20 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             switch (dummySpell->Id)
             {
+                // Shadowflame, Item - Priest T12 Shadow 2P Bonus
+                case 99155:
+                {
+                    if (!GetOwner())
+                        return false;
+
+                    if (!(GetOwner()->GetShapeshiftForm() == FORM_SHADOW) || !GetOwner()->HasAura(99154))
+                        return false;
+
+                    target = victim;
+                    basepoints0 = int32(CalculatePct(damage, 20));
+                    triggered_spell_id = 99156;
+                    break;
+                }
                 // Echo of Light
                 case 77485:
                 {
@@ -6819,9 +6833,35 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 }
                 // Item  Druid T12 Restoration 4P Bonus
                 case 99015:
-                    // need to fix, it shouldn't be casted on caster
-                    //CastSpell(GetPositionX(), GetPositionY(), GetPositionZ(), 99017, true);
-                    break;
+                {
+                    if (!victim || !victim->ToPlayer())
+                        return false;
+                    
+                    Player* plr = victim->ToPlayer();
+                    if (!plr)
+                        return false;
+
+                    
+                    std::list<Player*> plrList;
+                    Trinity::AnyFriendlyUnitInObjectRangeCheck check(this, this, 15.0f);
+                    Trinity::PlayerListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(this, plrList, check);
+                    VisitNearbyObject(15.0f, searcher);
+                    if (plrList.empty())
+                        return false;
+
+                    plrList.remove(plr);
+
+                    if (plrList.empty())
+                        return false;
+
+                    plrList.sort(Trinity::HealthPctOrderPred());
+                    plrList.resize(1);
+
+                    int32 bp0 = damage;
+
+                    CastCustomSpell(plrList.front(), 99017, &bp0, 0, 0, true);
+                    return true;
+                }
                 // Item - Druid T12 Feral 4P Bonus
                 case 99009:
                 {
@@ -7258,7 +7298,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         uint32 spellIds[3] = {99186, 99187, 99188}; 
                         uint32 crIds[3] = {CR_HASTE_MELEE, CR_CRIT_MELEE, CR_MASTERY};
                         uint32 i = urand(0, 2);
-                        int32 bp0 = int32(CalculatePct(GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + crIds[i]), triggerAmount));
+                        int32 bp0 = int32(CalculatePct(GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + crIds[i]), 25));
                         CastCustomSpell(this, spellIds[i], &bp0, 0, 0, true);
                     }
 
@@ -7447,6 +7487,37 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Item - Paladin T12 Holy 4P Bonus
+                case 99070:
+                {
+                    if (!victim || !victim->ToPlayer())
+                        return false;
+                    
+                    Player* plr = victim->ToPlayer();
+                    if (!plr)
+                        return false;
+
+                    
+                    std::list<Player*> plrList;
+                    Trinity::AnyFriendlyUnitInObjectRangeCheck check(this, this, 15.0f);
+                    Trinity::PlayerListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(this, plrList, check);
+                    VisitNearbyObject(15.0f, searcher);
+                    if (plrList.empty())
+                        return false;
+
+                    plrList.remove(plr);
+
+                    if (plrList.empty())
+                        return false;
+
+                    plrList.sort(Trinity::HealthPctOrderPred());
+                    plrList.resize(1);
+
+                    int32 bp0 = int32(CalculatePct(damage, 10));
+
+                    CastCustomSpell(plrList.front(), 99017, &bp0, 0, 0, true);
+                    return true;
+                }
                 // Illuminated Healing
                 case 76669:
                 {
@@ -7484,6 +7555,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     break;
                 // Item - Paladin T12 Retribution 2P Bonus
                 case 99093:
+                    if (!victim || GetGUID() == victim->GetGUID())
+                        return false;
                     basepoints0 = int32(CalculatePct(damage, triggerAmount / 2)); // 2 ticks
                     triggered_spell_id = 99092;
                     target = victim;
@@ -9483,6 +9556,11 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Item - Hunter T12 2P Bonus
+        case 99057:
+            if (!victim || GetGUID() == victim->GetGUID())
+                return false;
+            break;
         // Nature's Grasp reapply handling
         case 16689:
             if (victim && victim->HasAura(19975))

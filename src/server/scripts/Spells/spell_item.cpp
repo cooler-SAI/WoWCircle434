@@ -2097,20 +2097,16 @@ class spell_item_flask_of_battle : public SpellScriptLoader
                     {
                         case ROLE_HEALER:
                         case ROLE_DAMAGE_INTELLECT:
-                            player->CastSpell(player, 79470, true); 
-                            //pPlayer->CastSpell(pPlayer, 92730, true);
+                            player->CastSpell(player, 92730, true);
                             break;
                         case ROLE_DAMAGE_AGILITY:
-                            player->CastSpell(player, 79471, true);
-                            //pPlayer->CastSpell(pPlayer, 92725, true);
+                            player->CastSpell(player, 92725, true);
                             break;
                         case ROLE_TANK:
-                            player->CastSpell(player, 79469, true);
-                            //pPlayer->CastSpell(pPlayer, 92729, true);
+                            player->CastSpell(player, 92729, true);
                             break;
                         case ROLE_DAMAGE_STRENGTH:
-                            player->CastSpell(player, 79472, true);
-                            //pPlayer->CastSpell(pPlayer, 92731, true);
+                            player->CastSpell(player, 92731, true);
                             break;
                     }
                 }

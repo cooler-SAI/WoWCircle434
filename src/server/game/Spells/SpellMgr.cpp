@@ -6065,10 +6065,6 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
                 spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
-            // Shadow Fiend
-            case 34433:
-                spellInfo->Effects[EFFECT_0].MiscValueB = 1561;
-                break;
             // Inflate Air Balloon, Undersea Inflation quest
             case 75346:
                 spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_KILL_CREDIT;
@@ -6258,6 +6254,11 @@ void SpellMgr::LoadDbcDataCorrections()
             // Magic Barrier, Lady Vashj
             case 38112:
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            // Firebloom
+            case 99017:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ALLY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
                 break;
             default:
                 break;

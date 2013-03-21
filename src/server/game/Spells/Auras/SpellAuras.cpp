@@ -1012,6 +1012,8 @@ bool Aura::CanBeSaved() const
         case 83582:
         // Nature's Bounty
         case 96206:
+        // Dark Flames
+        case 99158:
             return false;
     }
 
@@ -1388,6 +1390,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_PRIEST:
                 if (!caster)
                     break;
+
                 switch (GetSpellInfo()->Id)
                 {
                     // Inner Focus
@@ -1980,14 +1983,14 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             }
             break;
         case SPELLFAMILY_PRIEST:
+            if (!caster)
+                break;
+
             switch(GetSpellInfo()->Id)
             {
                 // Inner Fire
                 case 588:
                 {
-                    if (!caster)
-                        break;
-
                     // Inner Sanctum
                     if (apply)
                     {
@@ -2000,6 +2003,19 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     else
                     {
                         caster->RemoveAurasDueToSpell(91724);
+                    }
+                    break;
+                }
+                // Devouring Plague
+                case 2944:
+                {
+                    // Item - Priest T12 Shadow 4P Bonus
+                    if (caster->HasAura(99157))
+                    {
+                        if (target->HasAura(589) && target->HasAura(2944) && target->HasAura(34914))
+                            caster->CastSpell(caster, 99158, true);
+                        else
+                            caster->RemoveAurasDueToSpell(99158);
                     }
                     break;
                 }
