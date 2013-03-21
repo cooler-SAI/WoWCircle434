@@ -2305,7 +2305,7 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj) const
     if (distance < combatReach)
         return true;
 
-    if (!HasInArc(M_PI, obj))
+    if (!HasInArc(2 * M_PI, obj))
         return false;
 
     for (uint32 i = 0; i < TOTAL_STEALTH_TYPES; ++i)
@@ -2318,14 +2318,7 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj) const
                 return true;
 
         // Starting points
-        int32 detectionValue = 15;
-        if (isType(TYPEMASK_PLAYER) && ToPlayer())
-        {
-            Player const* _plr = ToPlayer();
-            uint8 _class = _plr->getClass();
-            if (_class == CLASS_ROGUE || (_class == CLASS_DRUID && _plr->GetPrimaryTalentTreeForCurrentSpec() == TALENT_TREE_DRUID_FERAL_COMBAT))
-                detectionValue = 50;
-        }
+        int32 detectionValue = ((i == STEALTH_TRAP) ? 70: 50);
 
         // Level difference: 5 point / level, starting from level 1.
         // There may be spells for this and the starting points too, but
