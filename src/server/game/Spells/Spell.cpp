@@ -5437,7 +5437,14 @@ SpellCastResult Spell::CheckCast(bool strict)
             return SPELL_FAILED_ONLY_BATTLEGROUNDS;
 
     // do not allow spells to be cast in arenas or rated battlegrounds
-    if (Player * player = m_caster->ToPlayer())
+    // Ancient Hysteria can be casted by hunter's pet
+    Player* player = NULL;
+    if (m_spellInfo->Id == 90355 && m_caster->GetOwner())
+        player = m_caster->GetOwner()->ToPlayer();
+    else
+        player = m_caster->ToPlayer();
+
+    if (player)
         if (player->InArena()/* || player->InRatedBattleGround() NYI*/)
         {
             SpellCastResult castResult = CheckArenaAndRatedBattlegroundCastRules();
