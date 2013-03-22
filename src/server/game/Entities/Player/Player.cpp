@@ -2761,7 +2761,7 @@ void Player::RegenerateHealth()
     else if (!isInCombat() || HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT))
     {
         addvalue = HealthIncreaseRate;
-        if (!isInCombat())
+        if (!isInCombat() || HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT))
         {
             if (getLevel() < 15)
                 addvalue = (0.20f*((float)GetMaxHealth())/getLevel()*HealthIncreaseRate);
@@ -2773,10 +2773,11 @@ void Player::RegenerateHealth()
                 AddPct(addvalue, (*i)->GetAmount());
 
             addvalue += GetTotalAuraModifier(SPELL_AURA_MOD_REGEN) * 2 * IN_MILLISECONDS / (5 * IN_MILLISECONDS);
+            if (isInCombat())
+            {
+                ApplyPct(addvalue, GetTotalAuraModifier(SPELL_AURA_MOD_REGEN_DURING_COMBAT));
+            }
         }
-        else if (HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT))
-            ApplyPct(addvalue, GetTotalAuraModifier(SPELL_AURA_MOD_REGEN_DURING_COMBAT));
-
         if (!IsStandState())
             addvalue *= 1.5f;
     }
