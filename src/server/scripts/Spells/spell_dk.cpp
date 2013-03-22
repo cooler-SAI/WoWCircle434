@@ -723,14 +723,19 @@ class spell_dk_death_grip : public SpellScriptLoader
         class spell_dk_death_grip_SpellScript : public SpellScript
         {
             PrepareSpellScript(spell_dk_death_grip_SpellScript);
-
+            const SpellInfo *info;
+            bool Load()
+            {
+                info = sSpellMgr->GetSpellInfo(49575);
+                return true;
+            }
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
                 int32 damage = GetEffectValue();
                 Position const* pos = GetExplTargetDest();
                 if (Unit* target = GetHitUnit())
                 {
-                    if (!target->HasAuraType(SPELL_AURA_DEFLECT_SPELLS)) // Deterrence
+                    if (!target->HasAuraType(SPELL_AURA_DEFLECT_SPELLS) && !target->IsImmunedToSpell(info)) // Deterrence
                         target->CastSpell(pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), damage, true);
                 }
             }

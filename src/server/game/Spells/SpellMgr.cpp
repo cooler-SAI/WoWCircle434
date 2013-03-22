@@ -6267,6 +6267,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[1].SpellClassMask[1] = 0x00000020;
                 spellInfo->Effects[0].SpellClassMask[2] = 0x00000040;
                 break;
+            // Death Grip
+            case 49560:
+            case 49576:
+                spellInfo->Mechanic = MECHANIC_NONE;
+                spellInfo->Effects[0].Mechanic = MECHANIC_NONE;
+                break;
             default:
                 break;
         }
