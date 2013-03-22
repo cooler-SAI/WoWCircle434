@@ -5183,8 +5183,8 @@ void AuraEffect::HandleShieldBlockValue(AuraApplication const* aurApp, uint8 mod
     Unit* target = aurApp->GetTarget();
 
     BaseModType modType = FLAT_MOD;
-    if (GetAuraType() == SPELL_AURA_MOD_SHIELD_BLOCKVALUE_PCT)
-        modType = PCT_MOD;
+//     if (GetAuraType() == SPELL_AURA_MOD_SHIELD_BLOCKVALUE_PCT)
+//         modType = PCT_MOD;
 
     if (target->GetTypeId() == TYPEID_PLAYER)
         target->ToPlayer()->HandleBaseModValue(SHIELD_BLOCK_VALUE, modType, float(GetAmount()), apply);
