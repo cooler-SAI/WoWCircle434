@@ -1481,8 +1481,8 @@ bool SpellInfo::IsSingleTargetWith(SpellInfo const* spellInfo) const
 
 bool SpellInfo::IsAuraExclusiveBySpecificWith(SpellInfo const* spellInfo) const
 {
-    SpellSpecificType spellSpec1 = GetSpellSpecific();
-    SpellSpecificType spellSpec2 = spellInfo->GetSpellSpecific();
+    SpellSpecificType spellSpec1 = GetFirstRankSpell()->GetSpellSpecific();
+    SpellSpecificType spellSpec2 = spellInfo->GetFirstRankSpell()->GetSpellSpecific();
     switch (spellSpec1)
     {
         case SPELL_SPECIFIC_TRACKER:
@@ -2120,9 +2120,6 @@ SpellSpecificType SpellInfo::GetSpellSpecific() const
                     case 8115: // Agility
                     case 8091: // Armor
                         return SPELL_SPECIFIC_SCROLL;
-                    case 12880: // Enrage (Enrage)
-                    case 57518: // Enrage (Wrecking Crew)
-                        return SPELL_SPECIFIC_WARRIOR_ENRAGE;
                 }
             }
             break;
@@ -2144,9 +2141,15 @@ SpellSpecificType SpellInfo::GetSpellSpecific() const
         }
         case SPELLFAMILY_WARRIOR:
         {
-            if (Id == 12292) // Death Wish
-                return SPELL_SPECIFIC_WARRIOR_ENRAGE;
-
+            switch (Id)
+            {
+                case 12292: // Death Wish
+                case 12880: // Enrage (Enrage)
+                case 57518: // Enrage (Wrecking Crew)
+                    return SPELL_SPECIFIC_WARRIOR_ENRAGE;
+                default:
+                    break;
+            }
             break;
         }
         case SPELLFAMILY_WARLOCK:
