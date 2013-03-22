@@ -955,6 +955,11 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
         // hack for use final damage
         switch (m_spellInfo->Id)
         {
+            // Howling Blast AoE
+            case 49184:
+                if (unitTarget != m_targets.GetUnitTarget())
+                    damage*=0.6f;
+                break;
             // Glyph of Frostfire
             case 44614:
                 if (m_caster->HasAura(61205))
