@@ -6260,6 +6260,13 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ALLY;
                 spellInfo->Effects[EFFECT_0].TargetB = 0;
                 break;
+            // Improved Shields 
+            case 16261:
+            case 16290:
+            case 51881:
+                spellInfo->Effects[1].SpellClassMask[1] = 0x00000020;
+                spellInfo->Effects[0].SpellClassMask[2] = 0x00000040;
+                break;
             default:
                 break;
         }
