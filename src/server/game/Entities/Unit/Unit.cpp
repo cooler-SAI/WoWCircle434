@@ -16665,7 +16665,7 @@ bool Unit::IsPolymorphed() const
     if (!spellInfo)
         return false;
 
-    return spellInfo->GetSpellSpecific() == SPELL_SPECIFIC_MAGE_POLYMORPH;
+    return spellInfo->GetSpellSpecific() == SPELL_SPECIFIC_MAGE_POLYMORPH || spellInfo->Id == 51514;
 }
 
 void Unit::SetDisplayId(uint32 modelId)
