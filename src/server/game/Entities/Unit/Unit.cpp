@@ -12970,7 +12970,8 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
     float TakenTotalMod = 1.0f;
 
     // ..taken
-    TakenTotalMod *= GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, GetMeleeDamageSchoolMask());
+    TakenTotalMod *= GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, 
+    spellProto ? spellProto->GetSchoolMask() : GetMeleeDamageSchoolMask());
 
     // .. taken pct (special attacks)
     if (spellProto)
