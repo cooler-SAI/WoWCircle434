@@ -1,0 +1,1 @@
+UPDATE `spell_proc_event` SET `SchoolMask`='84' WHERE (`entry`='29074' or `entry` = '29075');
