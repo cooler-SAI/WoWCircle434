@@ -1,0 +1,2 @@
+REPLACE INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES ('86961', '0.141', '0', '0', '0', 'Shaman - Cleansing Waters rank 1');
+REPLACE INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES ('86958', '0.282', '0', '0', '0', 'Shaman - Cleansing Waters rank 2');
