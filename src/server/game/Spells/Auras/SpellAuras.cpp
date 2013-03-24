@@ -1692,10 +1692,14 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             target->CastSpell(target, 83239, true);
                         break;
                     case 66: // Invisibility
+                        // Invisibility - Glyph of Invisibility - Removal
+                        caster->RemoveAurasDueToSpell(87833);   
                         if (removeMode != AURA_REMOVE_BY_EXPIRE)
                             break;
                         target->CastSpell(target, 32612, true, NULL, GetEffect(1));
                         target->CombatStop();
+                        // Invisibility - Glyph of Invisibility
+                        target->CastSpell(target, 87833, true);
                         break;
                     // Ring of Frost - 3 sec immune
                     case 82691:
@@ -2271,6 +2275,15 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         caster->RemoveAura(83582);
                 }
                 break;
+            }
+            // Invisibility - Glyph of Invisibility
+            if (GetId() == 66 && apply && caster->HasAura(56366))
+            {
+                caster->CastSpell(caster, 87833, true);
+            }
+            else if (GetId() == 32612 && !apply)
+            {
+                caster->RemoveAurasDueToSpell(87833);
             }
             break;
         case SPELLFAMILY_SHAMAN:
