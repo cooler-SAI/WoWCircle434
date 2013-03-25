@@ -15445,7 +15445,13 @@ bool Player::SatisfyQuestDay(Quest const* qInfo, bool msg)
     if (qInfo->IsDFQuest())
     {
         if (!m_DFQuests.empty())
+        {
+            DFQuestsDoneList::iterator itr = m_DFQuests.find(qInfo->GetQuestId());
+            if (itr == m_DFQuests.end())
+                return true;
+
             return false;
+        }
 
         return true;
     }
@@ -18487,6 +18493,14 @@ bool Player::CheckInstanceLoginValid()
         // cannot be in normal instance without a group and more players than 1 in instance
         if (!GetGroup() && GetMap()->GetPlayersCountExceptGMs() > 1)
             return false;
+    }
+
+    // and do one more check before InstanceMap::CanEnter
+    // CanPlayerEnter don't checks if instance full due ignore of login case
+    if (GetMap()->GetPlayersCountExceptGMs() > ((InstanceMap*)GetMap())->GetMaxPlayers())
+    {
+        SendTransferAborted(GetMap()->GetId(), TRANSFER_ABORT_MAX_PLAYERS);
+        return false;
     }
 
     // do checks for satisfy accessreqs, instance full, encounter in progress (raid), perm bind group != perm bind player
@@ -21753,7 +21767,7 @@ template<>
 inline void UpdateVisibilityOf_helper(std::set<uint64>& s64, GameObject* target, std::set<Unit*>& /*v*/)
 {
     // Don't update only GAMEOBJECT_TYPE_TRANSPORT (or all transports and destructible buildings?)
-    if ((target->GetGOInfo()->type != GAMEOBJECT_TYPE_TRANSPORT))
+    if (!target->IsTransport() && !target->IsDestructibleBuilding())
         s64.insert(target->GetGUID());
 }
 

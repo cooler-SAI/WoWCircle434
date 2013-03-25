@@ -3510,7 +3510,10 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T &bas
         DropModCharge(mod, spell);
     }
     float diff = (float)basevalue * (totalmul - 1.0f) + (float)totalflat;
-    basevalue = T((float)basevalue + diff);
+    if (op == SPELLMOD_CASTING_TIME || op == SPELLMOD_DURATION)
+        basevalue = T(((float)basevalue + (float)totalflat) * totalmul);
+    else
+        basevalue = T((float)basevalue + diff);
     return T(diff);
 }
 #endif
