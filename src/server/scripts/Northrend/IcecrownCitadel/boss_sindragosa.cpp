@@ -265,6 +265,7 @@ class boss_sindragosa : public CreatureScript
                 instance->SetBossState(DATA_SINDRAGOSA, FAIL);
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
+                me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
             }
 
             void KilledUnit(Unit* victim)
@@ -287,6 +288,7 @@ class boss_sindragosa : public CreatureScript
                     if (me->isDead())
                         return;
 
+                    me->SetReactState(REACT_DEFENSIVE);
                     me->setActive(true);
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
@@ -378,7 +380,7 @@ class boss_sindragosa : public CreatureScript
                 switch (summon->GetEntry())
                 {
                     case NPC_ICE_TOMB:
-                        if (_isThirdPhase)
+                        if (_isThirdPhase && !_isInAirPhase)
                             summon->AI()->SetData(DATA_ENABLE_ASPHYXIATION, 0);
                         break;
                     case NPC_FROST_BOMB:

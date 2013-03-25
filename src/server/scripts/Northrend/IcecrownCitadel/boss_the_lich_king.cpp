@@ -59,6 +59,7 @@ enum Texts
     SAY_TIRION_INTRO_2              = 1,
     SAY_TIRION_OUTRO_1              = 2,
     SAY_TIRION_OUTRO_2              = 3,
+    SAY_TIRION_OUTRO_3              = 4,
 
     // Terenas Menethil (outro)
     SAY_TERENAS_OUTRO_1             = 0,
@@ -250,6 +251,8 @@ enum Events
     EVENT_OUTRO_TERENAS_TALK_2      = 55,
     EVENT_OUTRO_TALK_7              = 56,
     EVENT_OUTRO_TALK_8              = 57,
+    EVENT_TIRION_KNOCKBACK          = 70,
+    EVENT_TIRION_OUTRO_3            = 71,
 
     // Shambling Horror
     EVENT_SHOCKWAVE                 = 58,
@@ -529,10 +532,12 @@ class boss_the_lich_king : public CreatureScript
             void JustDied(Unit* /*killer*/)
             {
                 _JustDied();
-                DoCastAOE(SPELL_PLAY_MOVIE, false);
+                me->RemoveAurasDueToSpell(SPELL_SOUL_BARRAGE);
+                
                 me->SetDisableGravity(false);
                 me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
                 me->GetMotionMaster()->MoveFall();
+                DoCastAOE(SPELL_PLAY_MOVIE, false);
                 if (Creature* frostmourne = me->FindNearestCreature(NPC_FROSTMOURNE_TRIGGER, 50.0f))
                     frostmourne->DespawnOrUnsummon();
             }
@@ -932,8 +937,7 @@ class boss_the_lich_king : public CreatureScript
                 events.Update(diff);
 
                 // during Remorseless Winter phases The Lich King is channeling a spell, but we must continue casting other spells
-                if ((me->HasUnitState(UNIT_STATE_CASTING) && !events.IsInPhase(PHASE_TRANSITION)) || events.IsInPhase(PHASE_OUTRO) || events.IsInPhase(PHASE_FROSTMOURNE)) 
-                    return;
+                if (me->HasUnitState(UNIT_STATE_CASTING) && !(events.IsInPhase(PHASE_TRANSITION) || events.IsInPhase(PHASE_OUTRO) || events.IsInPhase(PHASE_FROSTMOURNE)))                    return;
 
                 while (uint32 eventId = events.ExecuteEvent())
                 {
@@ -983,15 +987,15 @@ class boss_the_lich_king : public CreatureScript
                             DoCast(me, SPELL_SUMMON_SHAMBLING_HORROR);
                             SendMusicToPlayers(MUSIC_SPECIAL);
                             events.ScheduleEvent(EVENT_SUMMON_SHAMBLING_HORROR, 60000, 0, PHASE_ONE);
-                            break;
+                            return;
                         case EVENT_SUMMON_DRUDGE_GHOUL:
                             DoCast(me, SPELL_SUMMON_DRUDGE_GHOULS);
                             events.ScheduleEvent(EVENT_SUMMON_DRUDGE_GHOUL, 30000, 0, PHASE_ONE);
-                            break;
+                            return;
                         case EVENT_INFEST:
                             DoCast(me, SPELL_INFEST);
                             events.ScheduleEvent(EVENT_INFEST, urand(21000, 24000), 0, events.IsInPhase(PHASE_ONE) ? PHASE_ONE : PHASE_TWO);
-                            break;
+                            return;
                         case EVENT_NECROTIC_PLAGUE:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100.0f, true, -EVENT_NECROTIC_PLAGUE))
                             {
@@ -1026,13 +1030,13 @@ class boss_the_lich_king : public CreatureScript
                                 DoCast(target, SPELL_DEFILE);
                             }
                             events.ScheduleEvent(EVENT_DEFILE, urand(32000, 35000), 0, PHASE_TWO_THREE);
-                            break;
+                            return;
                         case EVENT_HARVEST_SOUL:
                             Talk(SAY_LK_HARVEST_SOUL);
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, SpellTargetSelector(me, SPELL_HARVEST_SOUL)))
                                 DoCast(target, SPELL_HARVEST_SOUL);
                             events.ScheduleEvent(EVENT_HARVEST_SOUL, 75000, 0, PHASE_THREE);
-                            break;
+                            return;
                         case EVENT_PAIN_AND_SUFFERING:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                                 me->CastSpell(target, SPELL_PAIN_AND_SUFFERING, TRIGGERED_NONE);
@@ -1090,7 +1094,7 @@ class boss_the_lich_king : public CreatureScript
                             SendMusicToPlayers(MUSIC_SPECIAL);
                             DoCastAOE(SPELL_VILE_SPIRITS);
                             events.ScheduleEvent(EVENT_VILE_SPIRITS, urand(35000, 40000), EVENT_GROUP_VILE_SPIRITS, PHASE_THREE);
-                            break;
+                            return;
                         case EVENT_HARVEST_SOULS:
                             for (SummonList::iterator i = summons.begin(); i != summons.end(); ++i)
                             {
@@ -1124,7 +1128,7 @@ class boss_the_lich_king : public CreatureScript
                             events.RescheduleEvent(EVENT_SOUL_REAPER, urand(57000, 62000), 0, PHASE_THREE);
                             events.ScheduleEvent(EVENT_START_ATTACK, 49000);
                             events.ScheduleEvent(EVENT_FROSTMOURNE_HEROIC, 6500);
-                            break;
+                            return;
                         case EVENT_FROSTMOURNE_HEROIC:
                             if (TempSummon* terenas = me->GetMap()->SummonCreature(NPC_TERENAS_MENETHIL_FROSTMOURNE_H, TerenasSpawnHeroic, NULL, 50000))
                             {
@@ -1323,6 +1327,9 @@ class npc_tirion_fordring_tft : public CreatureScript
 
             void sGossipSelect(Player* /*player*/, uint32 sender, uint32 action)
             {
+                if (_instance->GetBossState(DATA_THE_LICH_KING) == IN_PROGRESS)
+                    return;
+
                 if (me->GetCreatureTemplate()->GossipMenuId == sender && !action)
                 {
                     _events.SetPhase(PHASE_INTRO);
@@ -1387,7 +1394,17 @@ class npc_tirion_fordring_tft : public CreatureScript
                             me->GetMotionMaster()->MovePoint(POINT_TIRION_OUTRO_1, OutroPosition1);
                             break;
                         case EVENT_OUTRO_JUMP:
-                            DoCastAOE(SPELL_JUMP);
+                            //DoCastAOE(SPELL_JUMP);
+                            me->GetMotionMaster()->MoveJump(517.482f, -2124.91f, 845.0f, 10.0f, 15.0f);
+                            _events.ScheduleEvent(EVENT_TIRION_KNOCKBACK, 600, 0, PHASE_OUTRO);
+                            break;
+                        case EVENT_TIRION_KNOCKBACK:
+                            DoCast(me, SPELL_JUMP_TRIGGERED, true);
+                            me->GetMotionMaster()->MoveJump(529.413f, -2124.94f, 840.8569f, 11.0f, 9.0f);
+                            _events.ScheduleEvent(EVENT_TIRION_OUTRO_3, 28000, 0, PHASE_OUTRO);
+                            break;
+                        case EVENT_TIRION_OUTRO_3:
+                            Talk(SAY_TIRION_OUTRO_3);
                             break;
                         default:
                             break;

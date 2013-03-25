@@ -90,6 +90,7 @@ enum Spells
     // Gluttonous Abomination
     SPELL_GUT_SPRAY                     = 70633,
     SPELL_ROT_WORM_SPAWNER              = 70675,
+    SPELL_ROT_WORM_SPAWN                = 70668,
 
     // Dream Cloud
     SPELL_EMERALD_VIGOR                 = 70873,
@@ -976,9 +977,17 @@ class npc_gluttonous_abomination : public CreatureScript
                 _events.ScheduleEvent(EVENT_GUT_SPRAY, urand(10000, 13000));
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* killer)
             {
+                if (killer->GetTypeId() == TYPEID_UNIT && killer->GetEntry() == NPC_VALITHRIA_DREAMWALKER)
+                    return;
+
                 DoCast(me, SPELL_ROT_WORM_SPAWNER, true);
+            }
+
+            void JustSummoned(Creature* summon)
+            {
+                summon->CastSpell(summon, SPELL_ROT_WORM_SPAWN, false);
             }
 
             void UpdateAI(uint32 const diff)
