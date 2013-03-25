@@ -1461,27 +1461,6 @@ void AuraEffect::UpdatePeriodic(Unit* caster)
                         case 59911: // Tenacity (vehicle)
                            GetBase()->RefreshDuration();
                            break;
-                        case 76691: // Vengeance tank mastery - loss ap
-                            if (AuraEffect* aurEff = GetBase()->GetEffect(2))
-                            {
-                                if (GetCaster()->ToPlayer())
-                                {
-                                    switch (GetCaster()->ToPlayer()->GetActiveTalentTree())
-                                    {
-                                        case TALENT_TREE_WARRIOR_PROTECTION:
-                                        case TALENT_TREE_DEATH_KNIGHT_BLOOD:
-                                        case TALENT_TREE_DRUID_FERAL_COMBAT:
-                                        case TALENT_TREE_PALADIN_PROTECTION:
-                                            if (GetBase()->GetEffect(1)->GetAmount() >= 10)
-                                                aurEff->ChangeAmount(GetBase()->GetEffect(1)->GetAmount() / 10);
-                                            break;
-                                        default:
-                                            GetCaster()->RemoveAurasDueToSpell(GetId());
-                                            break;
-                                    }
-                                }
-                                break;
-                            }
                         case 66823: case 67618: case 67619: case 67620: // Paralytic Toxin
                             // Get 0 effect aura
                             if (AuraEffect* slow = GetBase()->GetEffect(0))
@@ -6315,20 +6294,46 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                     break;
                 case 76691: // Vengeance tank mastery
                 {
-                    if (!GetCaster())
+                    if (!GetCaster() || GetCaster()->GetTypeId() != TYPEID_PLAYER)
                         break;
 
-                    int32 basepoints0 = GetBase()->GetEffect(0)->GetAmount() - GetAmount();
-                    if (basepoints0 < 0)
-                    {
+                    int32 basepoints0 = 0;
+
+                    // taken damage
+                    int32 takendamage = GetCaster()->ToPlayer()->GetDamageTakenInPastSecs(3);
+                    
+                    // player will loase 5% if has taken damage
+                    int32 curr_amount = GetBase()->GetEffect(EFFECT_0)->GetAmount(); 
+                    
+                    // player will lose 10% if has no taken damage
+                    int32 max_amount = GetAmount();
+                    
+                    // if has no max amount we set it to max vengeance cap
+                    if (!max_amount)
+                        max_amount = (GetCaster()->GetCreateHealth() + (GetCaster()->GetStat(STAT_STAMINA) * 14) / 10);
+                    
+                    int32 lost = 0;
+
+                    if (takendamage > 0)
+                        lost = int32(CalculatePct(curr_amount, 5));
+                    else
+                        lost = CalculatePct(max_amount, 10);
+
+                    if (lost >= curr_amount || !curr_amount)
                         caster->RemoveAura(GetBase());
-                        break;
+                    else
+                    {
+                        // save at least 33% of taken damage
+                        if (takendamage)
+                            basepoints0 = std::max((curr_amount - lost), int32(CalculatePct(takendamage, 33)));
+                        else
+                            basepoints0 = curr_amount - lost;
                     }
-                    else if (GetCaster()->isInCombat() && basepoints0 < int32((GetAmount() * 5 * 33) / 100))
-                        break;
 
-                    int32 basepoints1 = GetAmount();
-                    caster->CastCustomSpell(caster, 76691, &basepoints0, &basepoints0, &basepoints1, true);
+                    if (AuraEffect* eff1 = GetBase()->GetEffect(EFFECT_0))
+                        eff1->ChangeAmount(basepoints0);
+                    if (AuraEffect* eff2 = GetBase()->GetEffect(EFFECT_1))
+                        eff2->ChangeAmount(basepoints0);
                     break;
                 }
                 case 41955: // No Man's Land

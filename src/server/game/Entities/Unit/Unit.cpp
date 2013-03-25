@@ -5741,6 +5741,13 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     triggered_spell_id = (procFlag & PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS) ? 69734 : 69730;
                     break;
                 }
+                // Vampiric Might (Lady Deathwisper)
+                case 70674:
+                {
+                    basepoints0 = CalculatePct(damage, triggerAmount);
+                    triggered_spell_id = 70677;
+                    break;
+                }
                 case 71519: // Deathbringer's Will Normal
                 {
                     if (GetTypeId() != TYPEID_PLAYER)
@@ -5897,7 +5904,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 70871:
                 {
                     basepoints0 = CalculatePct(int32(damage), triggerAmount);
-                    CastCustomSpell(70872, SPELLVALUE_BASE_POINT0, basepoints0, this);
+                    CastCustomSpell(70872, SPELLVALUE_BASE_POINT0, basepoints0, this, true);
                     return true;
                 }
                 case 65032: // Boom aura (321 Boombot)
@@ -8585,26 +8592,54 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
     }
 
     // Vengeance tank mastery
-    if (dummySpell->SpellIconID == 3031 && victim->GetTypeId() != TYPEID_PLAYER)
+    switch (dummySpell->Id)
     {
-        int32 aviableBasepoints = 0;
-        // There's aura modify amount
-        if (AuraEffect* vengeance = GetAuraEffect(triggered_spell_id, 0, GetGUID()))
-            aviableBasepoints += vengeance->GetAmount();
+        case 84839:
+        case 84840:
+        case 93098:
+        case 93099:
+        {
+            if (!victim || victim->GetTypeId() == TYPEID_PLAYER)
+                return false;
 
-        // The first melee attack taken by the tank generates Vengeance equal to 33% of the damage taken by that attack.
-        if (!aviableBasepoints && (procFlag & (PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK)))
-            triggerAmount = 33;
+            if (victim->GetOwner() && victim->GetOwner()->GetTypeId() == TYPEID_PLAYER)
+                return false;
 
-        triggered_spell_id = 76691;
-        int32 cap = (GetCreateHealth() + GetStat(STAT_STAMINA) * 14) / 10;
-        basepoints0 = int32(damage * triggerAmount / 100);
-        basepoints0 += aviableBasepoints;
-        basepoints0 = std::min(cap, basepoints0);
+            if (GetTypeId() != TYPEID_PLAYER)
+                return false;
 
-        int32 basepoints1 = basepoints0 / 5;
-        CastCustomSpell(this, triggered_spell_id, &basepoints0, &basepoints0, &basepoints1, true, castItem,triggeredByAura, originalCaster );
-        return true;
+            if (!isInCombat())
+                return false;
+
+            int32 aviableBasepoints = 0;
+            int32 max_amount = 0;
+
+            triggered_spell_id = 76691;
+            
+            if (Aura const* aur = GetAura(triggered_spell_id, GetGUID()))
+            {
+                aviableBasepoints += aur->GetEffect(EFFECT_0)->GetAmount();
+                max_amount += aur->GetEffect(EFFECT_2)->GetAmount();
+            }
+
+            // The first melee attack taken by the tank generates Vengeance equal to 33% of the damage taken by that attack.
+            if (!aviableBasepoints && (procFlag & (PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK)))
+                triggerAmount = 33;
+
+            
+            int32 cap = (GetCreateHealth() + GetStat(STAT_STAMINA) * 14) / 10;
+            basepoints0 = int32(damage * triggerAmount / 100);
+            basepoints0 += aviableBasepoints;
+            basepoints0 = std::min(cap, basepoints0);
+
+            // calculate max amount player's had durind the fight
+            int32 basepoints1 = std::max(basepoints0, max_amount);
+
+            CastCustomSpell(this, triggered_spell_id, &basepoints0, &basepoints0, &basepoints1, true, castItem,triggeredByAura, originalCaster );
+            return true;
+        }
+        default:
+            break;
     }
 
     // if not handled by custom case, get triggered spell from dummySpell proto
@@ -9568,7 +9603,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             break;
         // Glyph of Dark Succor
         case 96279:
-            if (victim && victim->GetEntry() == 26125)
+            if (victim && victim->GetOwner() && victim->GetGUID() == GetGUID())
                 return false;
             break;
         // Tamed Pet Passive 07 (DND)
@@ -11898,10 +11933,14 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
     // Mod damage from spell mechanic
     if (uint32 mechanicMask = spellProto->GetAllEffectsMechanicMask())
     {
+        int32 maxval = 0;
         AuraEffectList const& mDamageDoneMechanic = GetAuraEffectsByType(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT);
         for (AuraEffectList::const_iterator i = mDamageDoneMechanic.begin(); i != mDamageDoneMechanic.end(); ++i)
             if (mechanicMask & uint32(1<<((*i)->GetMiscValue())))
-                AddPct(TakenTotalMod, (*i)->GetAmount());
+                maxval = std::max(maxval, (*i)->GetAmount());
+        
+        if (maxval)
+            AddPct(TakenTotalMod, maxval);
     }
 
     int32 TakenAdvertisedBenefit = SpellBaseDamageBonusTaken(spellProto->GetSchoolMask());
@@ -16236,19 +16275,13 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                 switch(triggeredByAura->GetId())
                 {
                     case 76672: // Hand of Light (Mastery Retribution Paladin)
-                        damage += absorb;
-                        break;
                     case 48965: // Shadow Infusion
                     case 49571:
                     case 49572:
-                        damage += absorb;
                         break;
                     default:
                         break; 
                 }
-                // venegance don't get lowered koz absorbs
-                if (triggeredByAura->GetSpellInfo()->SpellIconID == 3031)
-                    damage += absorb;
 
                 switch (triggeredByAura->GetAuraType())
                 {
@@ -19409,7 +19442,16 @@ void Unit::_EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* a
         WorldPacket data(SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA, 0);
         player->GetSession()->SendPacket(&data);
 
-        player->UnsummonPetTemporaryIfAny();
+        switch (vehicle->GetVehicleInfo()->m_ID)
+        {
+            case 533: // Bone Spike
+            case 647: // Bone Spike
+            case 648: // Bone Spike
+                break;
+            default:
+                player->UnsummonPetTemporaryIfAny();
+                break;
+        }
     }
 
     ASSERT(!m_vehicle);
@@ -19465,9 +19507,9 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     if (!m_vehicle)
         return;
 
-    bool playerOnTransport = false;
     m_vehicle->RemovePassenger(this);
 
+    bool playerOnTransport = false;
     Player* player = ToPlayer();
     if (player && player->GetTransport())
         playerOnTransport = true;
