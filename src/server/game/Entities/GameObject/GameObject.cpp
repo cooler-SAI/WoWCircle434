@@ -1558,6 +1558,7 @@ void GameObject::Use(Unit* user)
 
                 player->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
                 player->RemoveAurasByType(SPELL_AURA_MOD_INVISIBILITY);
+                player->RemoveAurasByType(SPELL_AURA_MOD_CAMOUFLAGE);
                 // BG flag click
                 // AB:
                 // 15001
@@ -1968,8 +1969,12 @@ void GameObject::SetDestructibleState(GameObjectDestructibleState state, Player*
 void GameObject::SetLootState(LootState state, Unit* unit)
 {
     m_lootState = state;
-    AI()->OnStateChanged(state, unit);
+    
+    if (AI() && (state || unit))
+        AI()->OnStateChanged(state, unit);
+    
     sScriptMgr->OnGameObjectLootStateChanged(this, state, unit);
+    
     if (m_model)
     {
         bool collision = false;
