@@ -135,9 +135,15 @@ void AddSC_boss_flamegor();
 void AddSC_boss_chromaggus();
 void AddSC_boss_nefarian();
 void AddSC_boss_victor_nefarius();
-void AddSC_boss_mr_smite();
-void AddSC_deadmines();                      //Deadmines
-void AddSC_instance_deadmines();
+
+void AddSC_instance_deadmines(); // Deadmines
+void AddSC_deadmines();
+void AddSC_boss_glubtok();
+void AddSC_boss_helix_gearbreaker();
+void AddSC_boss_foereaper5000();
+void AddSC_boss_admiral_ripsnarl();
+void AddSC_boss_captain_cookie();
+void AddSC_boss_vanessa_vancleef();
 void AddSC_gnomeregan();                     //Gnomeregan
 void AddSC_instance_gnomeregan();
 void AddSC_boss_attumen();                   //Karazhan
@@ -491,8 +497,12 @@ void AddSC_instance_halls_of_reflection();   // Halls of Reflection
 void AddSC_halls_of_reflection();
 void AddSC_boss_falric();
 void AddSC_boss_marwyn();
-void AddSC_boss_lord_marrowgar();       // Icecrown Citadel
+void AddSC_instance_icecrown_citadel(); // Icecrown Citadel
+void AddSC_icecrown_citadel();
+void AddSC_icecrown_citadel_teleport();
+void AddSC_boss_lord_marrowgar();       
 void AddSC_boss_lady_deathwhisper();
+void AddSC_boss_gunship_battle();
 void AddSC_boss_deathbringer_saurfang();
 void AddSC_boss_festergut();
 void AddSC_boss_rotface();
@@ -502,9 +512,6 @@ void AddSC_boss_blood_queen_lana_thel();
 void AddSC_boss_valithria_dreamwalker();
 void AddSC_boss_sindragosa();
 void AddSC_boss_the_lich_king();
-void AddSC_icecrown_citadel_teleport();
-void AddSC_instance_icecrown_citadel();
-void AddSC_icecrown_citadel();
 void AddSC_instance_ruby_sanctum();      // Ruby Sanctum
 void AddSC_ruby_sanctum();
 void AddSC_boss_baltharus_the_warborn();
@@ -846,9 +853,14 @@ void AddEasternKingdomsScripts()
     AddSC_boss_chromaggus();
     AddSC_boss_nefarian();
     AddSC_boss_victor_nefarius();
-    AddSC_boss_mr_smite();
-    AddSC_deadmines();                      //Deadmines
-    AddSC_instance_deadmines();
+    AddSC_instance_deadmines(); // Deadmines
+    AddSC_deadmines();
+    AddSC_boss_glubtok();
+    AddSC_boss_helix_gearbreaker();
+    AddSC_boss_foereaper5000();
+    AddSC_boss_admiral_ripsnarl();
+    AddSC_boss_captain_cookie();
+    AddSC_boss_vanessa_vancleef();
     AddSC_gnomeregan();                     //Gnomeregan
     AddSC_instance_gnomeregan();
     AddSC_boss_attumen();                   //Karazhan
@@ -1298,8 +1310,12 @@ void AddNorthrendScripts()
     AddSC_halls_of_reflection();
     AddSC_boss_falric();
     AddSC_boss_marwyn();
-    AddSC_boss_lord_marrowgar();        // Icecrown Citadel
+    AddSC_instance_icecrown_citadel(); // Icecrown Citadel
+    AddSC_icecrown_citadel();
+    AddSC_icecrown_citadel_teleport();
+    AddSC_boss_lord_marrowgar();       
     AddSC_boss_lady_deathwhisper();
+    AddSC_boss_gunship_battle();
     AddSC_boss_deathbringer_saurfang();
     AddSC_boss_festergut();
     AddSC_boss_rotface();
@@ -1309,9 +1325,6 @@ void AddNorthrendScripts()
     AddSC_boss_valithria_dreamwalker();
     AddSC_boss_sindragosa();
     AddSC_boss_the_lich_king();
-    AddSC_icecrown_citadel_teleport();
-    AddSC_instance_icecrown_citadel();
-    AddSC_icecrown_citadel();
     AddSC_instance_ruby_sanctum();      // Ruby Sanctum
     AddSC_ruby_sanctum();
     AddSC_boss_baltharus_the_warborn();

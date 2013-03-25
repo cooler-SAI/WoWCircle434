@@ -33,6 +33,7 @@
 #include "BattlegroundIC.h"
 #include "BattlefieldWG.h"
 #include "BattlefieldMgr.h"
+#include "InstanceScript.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
 {
@@ -1199,6 +1200,20 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
 
             if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId()))
                 return bf->IsWarTime();
+            break;
+        }
+        case 73822: // Hellscream's Warsong
+        case 73828: // Strength of Wrynn
+        {
+            if (!player)
+                return false;
+
+            InstanceScript* instanceScript = ((Player*)player)->GetInstanceScript();
+            if (!instanceScript)
+                return false;
+
+            if (instanceScript->GetData(41) == 3) // 41 - DATA_BUFF_REMOVED
+                return false;
             break;
         }
 
@@ -3658,8 +3673,14 @@ void SpellMgr::LoadDbcDataCorrections()
             case 71159: // Awaken Plagued Zombies
                 spellInfo->SetDurationIndex(21);
                 break;
+            case 71127: // Mortal Wound  
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+                break;
             case 70530: // Volatile Ooze Beam Protection (Professor Putricide)
                 spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA; // for an unknown reason this was SPELL_EFFECT_APPLY_AREA_AURA_RAID
+                break;
+            case 69508: // Slime Spray
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
             // THIS IS HERE BECAUSE COOLDOWN ON CREATURE PROCS IS NOT IMPLEMENTED
             case 71604: // Mutated Strength (Professor Putricide)
@@ -3804,6 +3825,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 72350: // Fury of Frostmourne
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_50000_YARDS); // 50000yd
                 spellInfo->Effects[EFFECT_1].SetRadiusIndex(EFFECT_RADIUS_50000_YARDS); // 50000yd
+                spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_INSTAKILL;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_SRC_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                spellInfo->Effects[EFFECT_0].Amplitude = 50000;
                 break;
             case 75127: // Kill Frostmourne Players
             case 72351: // Fury of Frostmourne
@@ -6228,6 +6253,11 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].TargetB = 0;
                 spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
+            // The Beast Within - Immunity
+            case 70029:
+                spellInfo->SetDurationIndex(1);
+                spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
+                break;
             // Gift of Naaru
             case 28880:
             case 59542:
@@ -6254,6 +6284,13 @@ void SpellMgr::LoadDbcDataCorrections()
             case 99017:
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ALLY;
                 spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
+            // Rocket Pack
+            case 68645:
+                spellInfo->SetRangeIndex(6);
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_KNOCK_BACK_DEST;
+                spellInfo->Effects[EFFECT_0].MiscValue = -250;
+                spellInfo->Effects[EFFECT_0].BasePoints = 150;
                 break;
             // Improved Shields 
             case 16261:

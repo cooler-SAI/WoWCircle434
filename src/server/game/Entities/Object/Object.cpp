@@ -1800,6 +1800,12 @@ bool WorldObject::IsWithinLOSInMap(const WorldObject* obj) const
 
     float ox, oy, oz;
     obj->GetPosition(ox, oy, oz);
+
+    // Hack fix for Ice Tombs (Sindragosa encounter)
+    if (obj->GetTypeId() == TYPEID_UNIT)
+        if (obj->GetEntry() == 36980 || obj->GetEntry() == 38320 || obj->GetEntry() == 38321 || obj->GetEntry() == 38322)
+            return true;
+
     return IsWithinLOS(ox, oy, oz);
 }
 
@@ -2974,6 +2980,15 @@ GameObject* WorldObject::FindNearestGameObjectOfType(GameobjectTypes type, float
     Trinity::GameObjectLastSearcher<Trinity::NearestGameObjectTypeInObjectRangeCheck> searcher(this, go, checker);
     VisitNearbyGridObject(range, searcher);
     return go;
+}
+
+Player* WorldObject::FindNearestPlayer(float range, bool alive)
+{
+  Player* player = NULL;
+  Trinity::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange());
+  Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, player, check);
+  VisitNearbyWorldObject(range, searcher);
+  return player;
 }
 
 void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& gameobjectList, uint32 entry, float maxSearchRange) const

@@ -1794,6 +1794,9 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
         // check if someone in party is using dungeon system
         if (member->isUsingLfg())
             return ERR_LFG_CANT_USE_BATTLEGROUND;
+        // check is someone in party is loading or teleporting
+        if (member->GetSession()->PlayerLoading() || member->IsBeingTeleported())
+            return ERR_BATTLEGROUND_JOIN_FAILED;
     }
 
     // only check for MinPlayerCount since MinPlayerCount == MaxPlayerCount for arenas...

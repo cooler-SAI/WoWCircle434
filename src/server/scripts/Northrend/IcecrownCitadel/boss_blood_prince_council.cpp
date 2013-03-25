@@ -883,6 +883,9 @@ class boss_prince_valanar_icc : public CreatureScript
                         break;
                     case NPC_KINETIC_BOMB:
                     {
+                        summon->SetSpeed(MOVE_WALK, IsHeroic()? 0.3f: 0.15f, true);
+                        summon->SetSpeed(MOVE_RUN, IsHeroic()? 0.3f: 0.15f, true);
+                        summon->SetSpeed(MOVE_FLIGHT, IsHeroic()? 0.3f: 0.15f, true);
                         float x, y, z;
                         summon->GetPosition(x, y, z);
                         float ground_Z = summon->GetMap()->GetHeight(summon->GetPhaseMask(), x, y, z, true, 500.0f);
@@ -1243,7 +1246,7 @@ class npc_kinetic_bomb : public CreatureScript
                 {
                     if (!me->HasAura(SPELL_KINETIC_BOMB_KNOCKBACK))
                         me->GetMotionMaster()->MoveCharge(_x, _y, me->GetPositionZ() + 100.0f, me->GetSpeed(MOVE_RUN), 0);
-                    _events.RescheduleEvent(EVENT_CONTINUE_FALLING, 3000);
+                    _events.RescheduleEvent(EVENT_CONTINUE_FALLING, 5000);
                 }
             }
 
@@ -1260,7 +1263,9 @@ class npc_kinetic_bomb : public CreatureScript
                             me->DespawnOrUnsummon(5000);
                             break;
                         case EVENT_CONTINUE_FALLING:
-                            me->GetMotionMaster()->MoveCharge(_x, _y, _groundZ, me->GetSpeed(MOVE_WALK), POINT_KINETIC_BOMB_IMPACT);
+                            me->GetMotionMaster()->Clear();
+                            me->GetMotionMaster()->MovePoint(POINT_KINETIC_BOMB_IMPACT, _x, _y, _groundZ);
+                            //me->GetMotionMaster()->MoveCharge(_x, _y, _groundZ, me->GetSpeed(MOVE_WALK), POINT_KINETIC_BOMB_IMPACT);
                             break;
                         default:
                             break;
@@ -1290,8 +1295,8 @@ class npc_dark_nucleus : public CreatureScript
         {
             npc_dark_nucleusAI(Creature* creature) : ScriptedAI(creature)
             {
-                _lockedTarget = false;
-                _targetAuraCheck = 0;
+                lockedTarget = false;
+                targetAuraCheck = 0;
             }
 
             void Reset()
@@ -1302,7 +1307,7 @@ class npc_dark_nucleus : public CreatureScript
 
             void EnterCombat(Unit* who)
             {
-                _targetAuraCheck = 1000;
+                targetAuraCheck = 1000;
                 if (me->GetDistance(who) >= 15.0f)
                 {
                     DoStartMovement(who);
@@ -1323,20 +1328,20 @@ class npc_dark_nucleus : public CreatureScript
                 if (attacker == me)
                     return;
 
-                me->DeleteThreatList();
-                me->AddThreat(attacker, 500000000.0f);
+                if (!lockedTarget)
+                    if (me->getVictim() == attacker)
+                        lockedTarget = true;
             }
 
-            void UpdateAI(uint32 const diff)
+            void UpdateAI(const uint32 diff)
             {
-                if (!UpdateVictim())
+                if (!me->isInCombat())
                     return;
 
-                if (_targetAuraCheck <= diff)
+                if (targetAuraCheck <= diff)
                 {
-                    _targetAuraCheck = 1000;
+                    targetAuraCheck = 1000;
                     if (Unit* victim = me->getVictim())
-                    {
                         if (me->GetDistance(victim) < 15.0f &&
                             !victim->HasAura(SPELL_SHADOW_RESONANCE_RESIST, me->GetGUID()))
                         {
@@ -1345,15 +1350,31 @@ class npc_dark_nucleus : public CreatureScript
                         }
                         else
                             MoveInLineOfSight(me->getVictim());
-                    }
                 }
                 else
-                    _targetAuraCheck -= diff;
+                    targetAuraCheck -= diff;
+
+                if (!lockedTarget)
+                {
+                    if (Unit* victim = me->SelectVictim())
+                    {
+                        if (me->getVictim() && me->getVictim() != victim)
+                        {
+                            me->getVictim()->RemoveAurasDueToSpell(SPELL_SHADOW_RESONANCE_RESIST, me->GetGUID());
+                            lockedTarget = true;
+                        }
+
+                        lockedTarget = true;
+                        AttackStart(victim);
+                        DoCast(victim, SPELL_SHADOW_RESONANCE_RESIST);
+                        me->ClearUnitState(UNIT_STATE_CASTING);
+                    }
+                }
             }
 
         private:
-            uint32 _targetAuraCheck;
-            bool _lockedTarget;
+            uint32 targetAuraCheck; // no point for EventMap with only one timer
+            bool lockedTarget;
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -1499,7 +1520,7 @@ class spell_valanar_kinetic_bomb : public SpellScriptLoader
             void ChangeSummonPos(SpellEffIndex /*effIndex*/)
             {
                 WorldLocation summonPos = *GetExplTargetDest();
-                Position offset = {0.0f, 0.0f, 20.0f, 0.0f};
+                Position offset = {0.0f, 0.0f, 30.0f, 0.0f};
                 summonPos.RelocateOffset(offset);
                 SetExplTargetDest(summonPos);
                 GetHitDest()->RelocateOffset(offset);
@@ -1613,7 +1634,7 @@ class spell_blood_council_shadow_prison : public SpellScriptLoader
 
             void HandleDummyTick(AuraEffect const* aurEff)
             {
-                if (GetTarget()->isMoving())
+                if (GetTarget()->GetTypeId() == TYPEID_PLAYER && GetTarget()->isMoving())
                     GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_PRISON_DAMAGE, true, NULL, aurEff);
             }
 

@@ -5514,6 +5514,17 @@ SpellCastResult Spell::CheckCast(bool strict)
         // for effects of spells that have only one target
         switch (m_spellInfo->Effects[i].Effect)
         {
+            case SPELL_EFFECT_KNOCK_BACK_DEST:
+            {
+                switch (m_spellInfo->Id)
+                {
+                    case 68645: // Rocket Pack
+                        if (!m_caster->GetTransport())
+                            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+                        break;
+                }
+                break;
+            }
             case SPELL_EFFECT_JUMP_DEST:
             {
                 // Heroic Leap
@@ -7145,6 +7156,11 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
 
     if (!m_spellInfo->IsNeedAdditionalLosChecks() && (IsTriggered() || m_spellInfo->AttributesEx2 & SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS))
         return true;
+
+    // Hack fix for Ice Tombs (Sindragosa encounter)
+    if (target->GetTypeId() == TYPEID_UNIT)
+        if (target->GetEntry() == 36980 || target->GetEntry() == 38320 || target->GetEntry() == 38321 || target->GetEntry() == 38322)
+            return true;
 
     // todo: shit below shouldn't be here, but it's temporary
     //Check targets for LOS visibility (except spells without range limitations)

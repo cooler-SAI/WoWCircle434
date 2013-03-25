@@ -1606,6 +1606,16 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_GENERIC:
                 switch (GetId())
                 {
+                    case 69674: // Mutated Infection (Rotface)
+                    case 71224: // Mutated Infection (Rotface)
+                    case 73022: // Mutated Infection (Rotface)
+                    case 73023: // Mutated Infection (Rotface)
+                    {
+                        AuraRemoveMode removeMode = aurApp->GetRemoveMode();
+                        if (removeMode == AURA_REMOVE_BY_EXPIRE || removeMode == AURA_REMOVE_BY_ENEMY_SPELL)
+                            target->CastSpell(target, 69706, true);
+                        break;
+                    }
                     // Final Countdown dmg, Baleroc
                     case 99516:
                         if (target)
@@ -1651,6 +1661,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // Remove the immunity shield marker on Avenging Wrath removal if Forbearance is not present
                         if (target->HasAura(61988) && !target->HasAura(25771))
                             target->RemoveAura(61988);
+                        break;
+                    case 69483: // Dark Reckoning (ICC)
+                        if (caster)
+                            caster->CastSpell(target, 69482, false);
                         break;
                     case 72368: // Shared Suffering
                     case 72369:
@@ -1980,6 +1994,9 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         target->CastSpell(caster, 59665, true, 0, 0, caster->GetGUID());
                     else
                         target->SetReducedThreatPercent(0, 0);
+                    break;
+                case 71289: // Mind Control (Lady Deathwisper)
+                    target->ApplyPercentModFloatValue(OBJECT_FIELD_SCALE_X, 100.0f, apply);
                     break;
                 case 91838: // Huddle
                     target->SetControlled(apply, UNIT_STATE_STUNNED);

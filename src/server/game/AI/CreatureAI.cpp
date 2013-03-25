@@ -41,7 +41,7 @@ AISpellInfoType* GetAISpellInfo(uint32 i) { return &CreatureAI::AISpellInfo[i]; 
 
 void CreatureAI::Talk(uint8 id, uint64 WhisperGuid)
 {
-    sCreatureTextMgr->SendChat(me, id, WhisperGuid);
+    sCreatureTextMgr->SendChat(me, id, WhisperGuid, CHAT_MSG_ADDON, LANG_ADDON, me->GetMap()->IsDungeon() ? TEXT_RANGE_AREA : TEXT_RANGE_NORMAL);
 }
 
 void CreatureAI::DoZoneInCombat(Creature* creature /*= NULL*/, float maxRangeToNearestTarget /* = 50.0f*/)

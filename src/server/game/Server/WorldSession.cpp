@@ -488,6 +488,12 @@ void WorldSession::LogoutPlayer(bool Save)
             _player->RepopAtGraveyard();
             _player->SetPendingBind(0, 0);
         }
+        else if (_player->GetVehicleBase() && _player->isInCombat())
+        {
+            _player->KillPlayer();
+            _player->BuildPlayerRepop();
+            _player->RepopAtGraveyard();
+        }
 
         //drop a flag if player is carrying it
         if (Battleground* bg = _player->GetBattleground())

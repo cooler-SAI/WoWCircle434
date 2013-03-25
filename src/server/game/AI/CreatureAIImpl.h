@@ -501,6 +501,20 @@ class EventMap
             return 0;
         }
 
+        /**
+        * @name IsInPhase
+        * @brief Returns wether event map is in specified phase or not.
+        * @param phase Wanted phase.
+        * @return True, if phase of event map contains specified phase.
+        */
+        bool IsInPhase(uint8 phase)
+        {
+            if (phase > 8)
+                return false;
+
+            return (!phase || GetPhaseMask() & (1 << phase));
+        }
+
     private:
         uint32 _time;
         uint32 _phase;

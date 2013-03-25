@@ -393,7 +393,8 @@ enum eNPCs
     NPC_VOID_REAVER = 19516,
     NPC_JAN_ALAI    = 23578,
     NPC_SARTHARION  = 28860,
-    NPC_GARFROST    = 36494
+    NPC_BLOOD_QUEEN = 37955,
+    NPC_GARFROST    = 36494,
 };
 
 // Hacklike storage used for misc creatures that are expected to evade of outside of a certain area.
@@ -417,6 +418,10 @@ bool ScriptedAI::EnterEvadeIfOutOfCombatArea(uint32 const diff)
 
     switch (me->GetEntry())
     {
+        case NPC_BLOOD_QUEEN:
+            if (z > 390.0f)
+                return false;
+            break;
         case NPC_GARFROST:
             if (me->GetDistance2d(688.93f, -197.52f) < 66.0f)
                 return false;

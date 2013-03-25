@@ -90,11 +90,10 @@ class boss_festergut : public CreatureScript
             void Reset()
             {
                 _Reset();
-                me->SetReactState(REACT_DEFENSIVE);
                 events.ScheduleEvent(EVENT_BERSERK, 300000);
-                events.ScheduleEvent(EVENT_INHALE_BLIGHT, urand(25000, 30000));
-                events.ScheduleEvent(EVENT_GAS_SPORE, urand(20000, 25000));
-                events.ScheduleEvent(EVENT_GASTRIC_BLOAT, urand(12500, 15000));
+                events.ScheduleEvent(EVENT_INHALE_BLIGHT, 34000);
+                events.ScheduleEvent(EVENT_GAS_SPORE, 20000);
+                events.ScheduleEvent(EVENT_GASTRIC_BLOAT, 11000);
                 _maxInoculatedStack = 0;
                 _inhaleCounter = 0;
                 me->RemoveAurasDueToSpell(SPELL_BERSERK2);
@@ -224,7 +223,7 @@ class boss_festergut : public CreatureScript
                             break;
                         case EVENT_GASTRIC_BLOAT:
                             DoCastVictim(SPELL_GASTRIC_BLOAT);
-                            events.ScheduleEvent(EVENT_GASTRIC_BLOAT, urand(15000, 17500));
+                            events.ScheduleEvent(EVENT_GASTRIC_BLOAT, urand(12000, 12500));
                             break;
                         case EVENT_BERSERK:
                             DoCast(me, SPELL_BERSERK2);
@@ -284,6 +283,8 @@ class npc_stinky_icc : public CreatureScript
             npc_stinky_iccAI(Creature* creature) : ScriptedAI(creature)
             {
                 _instance = creature->GetInstanceScript();
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
             }
 
             void Reset()
@@ -318,7 +319,7 @@ class npc_stinky_icc : public CreatureScript
                             break;
                         case EVENT_MORTAL_WOUND:
                             DoCastVictim(SPELL_MORTAL_WOUND);
-                            _events.ScheduleEvent(EVENT_MORTAL_WOUND, urand(10000, 12500));
+                            _events.ScheduleEvent(EVENT_MORTAL_WOUND, urand(5000, 7000));
                             break;
                         default:
                             break;
@@ -436,17 +437,21 @@ class spell_festergut_blighted_spores : public SpellScriptLoader
                 return true;
             }
 
-            void ExtraEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
+                if (GetDuration())
+                    return;
+
                 GetTarget()->CastSpell(GetTarget(), SPELL_INOCULATED, true);
                 if (InstanceScript* instance = GetTarget()->GetInstanceScript())
                     if (Creature* festergut = ObjectAccessor::GetCreature(*GetTarget(), instance->GetData64(DATA_FESTERGUT)))
-                        festergut->AI()->SetData(DATA_INOCULATED_STACK, GetStackAmount());
+                        if (AuraEffect* aurEff1 = GetTarget()->GetAuraEffect(SPELL_AURA_MOD_AOE_DAMAGE_AVOIDANCE, SPELLFAMILY_GENERIC, 1614, EFFECT_0))
+                            festergut->AI()->SetData(DATA_INOCULATED_STACK, aurEff1->GetBase()->GetStackAmount());
             }
 
             void Register()
             {
-                AfterEffectApply += AuraEffectApplyFn(spell_festergut_blighted_spores_AuraScript::ExtraEffect, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+                OnEffectRemove += AuraEffectRemoveFn(spell_festergut_blighted_spores_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
             }
         };
 

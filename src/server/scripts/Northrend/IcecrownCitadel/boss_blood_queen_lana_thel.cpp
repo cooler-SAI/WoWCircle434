@@ -48,6 +48,7 @@ enum Spells
     SPELL_FRENZIED_BLOODTHIRST              = 70877,
     SPELL_UNCONTROLLABLE_FRENZY             = 70923,
     SPELL_PRESENCE_OF_THE_DARKFALLEN        = 71952,
+    SPELL_PRESENCE_OF_THE_DARKFALLEN_TRIG   = 70995,
     SPELL_BLOOD_MIRROR_DAMAGE               = 70821,
     SPELL_BLOOD_MIRROR_VISUAL               = 71510,
     SPELL_BLOOD_MIRROR_DUMMY                = 70838,
@@ -283,7 +284,7 @@ class boss_blood_queen_lana_thel : public CreatureScript
 
             void MovementInform(uint32 type, uint32 id)
             {
-                if (type != POINT_MOTION_TYPE)
+                if (type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE)
                     return;
 
                 switch (id)
@@ -348,6 +349,8 @@ class boss_blood_queen_lana_thel : public CreatureScript
                             {
                                 Unit* target = targets.front();
                                 DoCast(target, SPELL_VAMPIRIC_BITE);
+                                if (IsHeroic())
+                                    me->AddAura(SPELL_PRESENCE_OF_THE_DARKFALLEN_TRIG, me);
                                 Talk(SAY_VAMPIRIC_BITE);
                                 _vampires.insert(target->GetGUID());
                             }
@@ -379,7 +382,7 @@ class boss_blood_queen_lana_thel : public CreatureScript
                             break;
                         }
                         case EVENT_DELIRIOUS_SLASH:
-                            if (_offtank && !me->HasByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER))
+                            if (_offtank && !me->HasByteFlag(UNIT_FIELD_BYTES_1, 3, 0x03))
                                 DoCast(_offtank, SPELL_DELIRIOUS_SLASH);
                             events.ScheduleEvent(EVENT_DELIRIOUS_SLASH, urand(20000, 24000), EVENT_GROUP_NORMAL);
                             break;
@@ -393,7 +396,7 @@ class boss_blood_queen_lana_thel : public CreatureScript
                                 ++targetCount;
                             if (Is25ManRaid())
                                 ++targetCount;
-                            Trinity::Containers::RandomResizeList<Player*>(targets, targetCount);
+                            Trinity::RandomResizeList<Player*>(targets, targetCount);
                             if (targets.size() > 1)
                             {
                                 Talk(SAY_PACT_OF_THE_DARKFALLEN);
@@ -416,7 +419,7 @@ class boss_blood_queen_lana_thel : public CreatureScript
                         {
                             std::list<Player*> targets;
                             SelectRandomTarget(false, &targets);
-                            Trinity::Containers::RandomResizeList<Player*>(targets, uint32(Is25ManRaid() ? 4 : 2));
+                            Trinity::RandomResizeList<Player*>(targets, uint32(Is25ManRaid() ? 4 : 2));
                             for (std::list<Player*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
                                 DoCast(*itr, SPELL_TWILIGHT_BLOODBOLT);
                             DoCast(me, SPELL_TWILIGHT_BLOODBOLT_TARGET);
@@ -435,10 +438,10 @@ class boss_blood_queen_lana_thel : public CreatureScript
                             me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND);
                             me->SetCanFly(true);
                             me->SendMovementFlagUpdate();
-                            me->GetMotionMaster()->MovePoint(POINT_AIR, airPos);
+                            me->GetMotionMaster()->MoveTakeoff(POINT_AIR, airPos);
                             break;
                         case EVENT_AIR_FLY_DOWN:
-                            me->GetMotionMaster()->MovePoint(POINT_GROUND, centerPos);
+                            me->GetMotionMaster()->MoveLand(POINT_GROUND, centerPos);
                             break;
                         default:
                             break;
@@ -446,6 +449,8 @@ class boss_blood_queen_lana_thel : public CreatureScript
                 }
 
                 DoMeleeAttackIfReady();
+
+                EnterEvadeIfOutOfCombatArea(diff);
             }
 
             bool WasVampire(uint64 guid)
@@ -522,7 +527,7 @@ class spell_blood_queen_vampiric_bite : public SpellScriptLoader
                     return false;
                 if (!sSpellMgr->GetSpellInfo(SPELL_FRENZIED_BLOODTHIRST))
                     return false;
-                if (!sSpellMgr->GetSpellInfo(SPELL_PRESENCE_OF_THE_DARKFALLEN))
+                if (!sSpellMgr->GetSpellInfo(SPELL_PRESENCE_OF_THE_DARKFALLEN_TRIG))
                     return false;
                 return true;
             }
@@ -543,29 +548,39 @@ class spell_blood_queen_vampiric_bite : public SpellScriptLoader
                 if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
                     return;
 
+                InstanceScript* instance = GetCaster()->GetInstanceScript();
+                if (!instance)
+                    return;
+
                 uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_FRENZIED_BLOODTHIRST, GetCaster());
                 GetCaster()->RemoveAura(spellId, 0, 0, AURA_REMOVE_BY_ENEMY_SPELL);
                 GetCaster()->CastSpell(GetCaster(), SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR, true);
-                // Presence of the Darkfallen buff on Blood-Queen
-                if (GetCaster()->GetMap()->IsHeroic())
-                    GetCaster()->CastSpell(GetCaster(), SPELL_PRESENCE_OF_THE_DARKFALLEN, true);
+
                 // Shadowmourne questline
-                if (GetCaster()->ToPlayer()->GetQuestStatus(QUEST_BLOOD_INFUSION) == QUEST_STATUS_INCOMPLETE)
+                if (GetCaster()->ToPlayer()->GetMap()->Is25ManRaid())
                 {
-                    if (Aura* aura = GetCaster()->GetAura(SPELL_GUSHING_WOUND))
+                    if (GetCaster()->ToPlayer()->GetQuestStatus(QUEST_BLOOD_INFUSION) == QUEST_STATUS_INCOMPLETE)
                     {
-                        if (aura->GetStackAmount() == 3)
+                        if (Aura* aura = GetCaster()->GetAura(SPELL_GUSHING_WOUND))
                         {
-                            GetCaster()->CastSpell(GetCaster(), SPELL_THIRST_QUENCHED, true);
-                            GetCaster()->RemoveAura(aura);
+                            if (aura->GetStackAmount() == 3)
+                            {
+                                GetCaster()->CastSpell(GetCaster(), SPELL_THIRST_QUENCHED, true, NULL, NULL, instance->GetData64(DATA_BLOOD_QUEEN_LANA_THEL));
+                                GetCaster()->RemoveAura(aura);
+                            }
+                            else
+                                GetCaster()->CastSpell(GetCaster(), SPELL_GUSHING_WOUND, true);
                         }
-                        else
-                            GetCaster()->CastSpell(GetCaster(), SPELL_GUSHING_WOUND, true);
                     }
                 }
-                if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                    if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(DATA_BLOOD_QUEEN_LANA_THEL)))
-                        bloodQueen->AI()->SetGUID(GetHitUnit()->GetGUID(), GUID_VAMPIRE);
+
+                if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(DATA_BLOOD_QUEEN_LANA_THEL)))
+                {
+                    bloodQueen->AI()->SetGUID(GetHitUnit()->GetGUID(), GUID_VAMPIRE);
+                    // Presence of the Darkfallen buff on Blood-Queen
+                    if (GetCaster()->GetMap()->IsHeroic())
+                        bloodQueen->AddAura(SPELL_PRESENCE_OF_THE_DARKFALLEN_TRIG, bloodQueen);
+                }
             }
 
             void Register()
@@ -665,7 +680,7 @@ class spell_blood_queen_bloodbolt : public SpellScriptLoader
             {
                 uint32 targetCount = (targets.size() + 2) / 3;
                 targets.remove_if(BloodboltHitCheck(static_cast<LanaThelAI*>(GetCaster()->GetAI())));
-                Trinity::Containers::RandomResizeList(targets, targetCount);
+                Trinity::RandomResizeList(targets, targetCount);
                 // mark targets now, effect hook has missile travel time delay (might cast next in that time)
                 for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                     GetCaster()->GetAI()->SetGUID((*itr)->GetGUID(), GUID_BLOODBOLT);
@@ -814,7 +829,9 @@ class achievement_once_bitten_twice_shy_n : public AchievementCriteriaScript
                 return false;
 
             if (LanaThelAI* lanaThelAI = CAST_AI(LanaThelAI, target->GetAI()))
-                return !lanaThelAI->WasVampire(source->GetGUID());
+                if (lanaThelAI->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL || lanaThelAI->GetDifficulty() == RAID_DIFFICULTY_10MAN_HEROIC)
+                    return !lanaThelAI->WasVampire(source->GetGUID());
+
             return false;
         }
 };
@@ -830,8 +847,46 @@ class achievement_once_bitten_twice_shy_v : public AchievementCriteriaScript
                 return false;
 
             if (LanaThelAI* lanaThelAI = CAST_AI(LanaThelAI, target->GetAI()))
-                return lanaThelAI->WasVampire(source->GetGUID());
+                if (lanaThelAI->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL || lanaThelAI->GetDifficulty() == RAID_DIFFICULTY_10MAN_HEROIC)
+                    return lanaThelAI->WasVampire(source->GetGUID());
+
             return false;
+        }
+};
+
+class achievement_once_bitten_twice_shy_n25 : public AchievementCriteriaScript
+{
+    public:
+        achievement_once_bitten_twice_shy_n25() : AchievementCriteriaScript("achievement_once_bitten_twice_shy_n25") { }
+
+        bool OnCheck(Player* source, Unit* target)
+        {
+            if (!target)
+                return false;
+
+            if (LanaThelAI* lanaThelAI = CAST_AI(LanaThelAI, target->GetAI()))
+                if (lanaThelAI->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL || lanaThelAI->GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC)
+                    return !lanaThelAI->WasVampire(source->GetGUID());
+
+            return false;
+        }
+};
+
+class achievement_once_bitten_twice_shy_v25 : public AchievementCriteriaScript
+{
+    public:
+        achievement_once_bitten_twice_shy_v25() : AchievementCriteriaScript("achievement_once_bitten_twice_shy_v25") { }
+
+        bool OnCheck(Player* source, Unit* target)
+        {
+            if (!target)
+                return false;
+
+            if (LanaThelAI* lanaThelAI = CAST_AI(LanaThelAI, target->GetAI()))
+                if (lanaThelAI->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL || lanaThelAI->GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC)
+                    return lanaThelAI->WasVampire(source->GetGUID());
+
+             return false;
         }
 };
 
@@ -846,4 +901,6 @@ void AddSC_boss_blood_queen_lana_thel()
     new spell_blood_queen_pact_of_the_darkfallen_dmg_target();
     new achievement_once_bitten_twice_shy_n();
     new achievement_once_bitten_twice_shy_v();
+    new achievement_once_bitten_twice_shy_n25();
+    new achievement_once_bitten_twice_shy_v25();
 }
