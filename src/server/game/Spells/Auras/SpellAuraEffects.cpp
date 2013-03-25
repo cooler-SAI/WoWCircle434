@@ -1462,6 +1462,8 @@ void AuraEffect::UpdatePeriodic(Unit* caster)
                            GetBase()->RefreshDuration();
                            break;
                         case 76691: // Vengeance tank mastery - loss ap
+                            if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+                                return;
                             if (AuraEffect* aurEff = GetBase()->GetEffect(2))
                             {
                                 if (GetCaster()->ToPlayer())
