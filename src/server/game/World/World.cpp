@@ -2531,7 +2531,7 @@ bool World::RemoveBanAccount(BanMode mode, std::string nameOrIP)
         Field *fields = result->Fetch();
         uint32 realmID = fields[0].GetUInt32();
 
-        if (realmID != sConfig->GetIntDefault("RealmID", 0))
+        if (realmID != ConfigMgr::GetIntDefault("RealmID", 0))
             return false;
 
         //NO SQL injection as account is uint32

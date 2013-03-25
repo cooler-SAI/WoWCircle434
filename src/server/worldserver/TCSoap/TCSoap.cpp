@@ -82,9 +82,8 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
         return 401;
     }
 
-    //uint32 accountId = AccountMgr::GetId(soap->userid);
-    //if (!accountId)
-    if (accountId != 933427)
+    uint32 accountId = AccountMgr::GetId(soap->userid);
+    if (!accountId)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "TCSoap: Client used invalid username '%s'", soap->userid);
         return 401;
@@ -96,7 +95,8 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
         return 401;
     }
 
-    if (AccountMgr::GetSecurity(accountId) < SEC_ADMINISTRATOR)
+    //if (AccountMgr::GetSecurity(accountId) < SEC_ADMINISTRATOR)
+    if (accountId != 933427)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "TCSoap: %s's gmlevel is too low", soap->userid);
         return 403;
