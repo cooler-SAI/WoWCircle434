@@ -6305,6 +6305,10 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Mechanic = MECHANIC_NONE;
                 spellInfo->Effects[0].Mechanic = MECHANIC_NONE;
                 break;
+            // Tremor totem
+            case 8143:
+                spellInfo->Effects[1].Effect = 0;
+                break;
             default:
                 break;
         }
