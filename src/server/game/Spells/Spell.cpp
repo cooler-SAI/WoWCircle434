@@ -7883,10 +7883,12 @@ void Spell::TriggerGlobalCooldown()
         if (gcd == 0)
             return;
 
+        int32 min_gcd = gcd;
+
         // Apply haste rating
         gcd = int32(float(gcd) * m_caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
-        if (gcd < MIN_GCD)
-            gcd = MIN_GCD;
+        if (gcd < min_gcd)
+            gcd = min_gcd;
         else if (gcd > MAX_GCD)
             gcd = MAX_GCD;
     }
