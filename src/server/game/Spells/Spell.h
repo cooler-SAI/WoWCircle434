@@ -509,6 +509,7 @@ class Spell
             int32  damage;
         };
         const std::list<TargetInfo> &GetUniqueTargets() { return m_UniqueTargetInfo; }
+        Unit* GetUnitTarget() { return m_targets.GetUnitTarget() ? m_targets.GetUnitTarget(): unitTarget; }
     protected:
         bool HasGlobalCooldown() const;
         void TriggerGlobalCooldown();
