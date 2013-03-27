@@ -1560,7 +1560,7 @@ class Unit : public WorldObject
         bool HasInvisibilityAura() const { return HasAuraType(SPELL_AURA_MOD_INVISIBILITY); }
         bool isFeared()  const { return HasAuraType(SPELL_AURA_MOD_FEAR); }
         bool isInRoots() const { return HasAuraType(SPELL_AURA_MOD_ROOT); }
-        bool IsPolymorphed() const;
+        bool IsPolymorphed(bool forMount = false) const;
 
         bool isFrozen() const;
 

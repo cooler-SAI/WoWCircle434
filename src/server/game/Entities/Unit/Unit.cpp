@@ -16689,7 +16689,7 @@ void Unit::SetStandState(uint8 state)
     }
 }
 
-bool Unit::IsPolymorphed() const
+bool Unit::IsPolymorphed(bool forMount) const
 {
     uint32 transformId = getTransForm();
     if (!transformId)
@@ -16699,7 +16699,7 @@ bool Unit::IsPolymorphed() const
     if (!spellInfo)
         return false;
 
-    return spellInfo->GetSpellSpecific() == SPELL_SPECIFIC_MAGE_POLYMORPH || spellInfo->Id == 51514;
+    return spellInfo->GetSpellSpecific() == SPELL_SPECIFIC_MAGE_POLYMORPH || (forMount ? spellInfo->Id == 51514: false);
 }
 
 void Unit::SetDisplayId(uint32 modelId)
