@@ -896,7 +896,6 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 {
                     case 20043: // Aspect of the Wild
                     case 8185:  // Elemental Resistance
-                    case 19891: // Resistance Aura
                     case 79106: // Shadow Protection
                     case 79107: // Shadow Protection
                         amount = resist;
@@ -907,6 +906,9 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                     case 79063: // Blessing of Kings
                     case 90363: // Embrace of the Shale Spider
                         amount = resist / 2;
+                        break;
+                    case 19891: // Resistance Aura
+                        amount = this->GetCaster()->HasAura(31821) ? resist*2: resist;
                         break;
                 }
                 break;
