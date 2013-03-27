@@ -6021,6 +6021,39 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
             switch (dummySpell->Id)
             {
+                // Piercing Chill
+                case 83156:
+                case 83157:
+                {
+                    UnitList targets;
+                    {
+                        CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
+                        Cell cell(p);
+
+                        Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck u_check(this, 100.0f);
+                        Trinity::UnitListSearcher<Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck> checker(this, targets, u_check);
+
+                        TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck>, GridTypeMapContainer > grid_object_checker(checker);
+                        TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck>, WorldTypeMapContainer > world_object_checker(checker);
+
+                        cell.Visit(p, grid_object_checker,  *GetMap(), *this, 30.0f);
+                        cell.Visit(p, world_object_checker, *GetMap(), *this, 30.0f);
+                    }
+
+                    if (targets.empty())
+                        return true;
+                    uint8 count = dummySpell->Id == 83156 ? 1: 2;
+                    for (UnitList::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
+                    {
+                        if ((*itr)->GetGUID() == victim->GetGUID() || !(*itr)->IsWithinLOSInMap(this))
+                            continue;
+                        if (!count)
+                            break;
+                        CastSpell((*itr), 83154, true);
+                        --count;
+                    }
+                    return true;
+                }
                 // Improved Cone of Cold (Rank 1)
                 case 11190:
                     target = victim;
