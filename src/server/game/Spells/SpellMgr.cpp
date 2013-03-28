@@ -6357,6 +6357,14 @@ void SpellMgr::LoadDbcDataCorrections()
             case 8143:
                 spellInfo->Effects[1].Effect = 0;
                 break;
+                // Bandit's Guile
+            case 84652:
+            case 84653:
+            case 84654:
+                spellInfo->Effects[2].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[2].ApplyAuraName = SPELL_AURA_DUMMY;
+                spellInfo->Effects[2].TargetA = TARGET_UNIT_CASTER;
+                break;
             default:
                 break;
         }

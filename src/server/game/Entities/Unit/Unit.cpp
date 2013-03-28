@@ -7213,19 +7213,23 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 84653:
                 case 84654:
                 {
+                    if (effIndex != 0)
+                        return false;
+
                     static const uint32 spells[] = {84745, 84746, 84747};
-                    int32 basepoints1 = 1; // Sinister Strike/Revealing Strike count
                     int32 basepoints00 = 0; // damage modifier
+                    AuraEffect* banditsGuile = 0;
 
                     // read last count
-                    AuraEffect* banditsGuile = 0;
+                    int32 count = 1; // Sinister Strike/Revealing Strike count
                     if (banditsGuile = victim->GetAuraEffect(84748, 1, GetGUID()))
-                        basepoints1 = banditsGuile->GetAmount() + 1;
+                        count += triggeredByAura->GetBase()->GetEffect(2)->GetAmount();
 
                     if (!banditsGuile)
                     {
                         for (int x = 0; x < 3; ++x)
                             RemoveAurasDueToSpell(spells[x]);
+                        count = 0;
                     }
                     else
                     {
@@ -7238,11 +7242,11 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                                 break;
                             }
                             // "upgrade" Insight aura
-                            if (basepoints1 >= 4)
+                            if (count >= 4)
                             {
                                 if (i == 2)
                                     return false;
-                                basepoints1 = 0;
+                                count = 0;
                                 basepoints00 += 10;
                                 if (i == 3)
                                     triggered_spell_id = spells[0];
@@ -7253,7 +7257,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                                 }
                             }
                     }
-                    CastCustomSpell(target, 84748, &basepoints00, &basepoints1, 0, true);
+                    triggeredByAura->GetBase()->GetEffect(2)->SetAmount(count);
+                    CastCustomSpell(target, 84748, &basepoints00, &basepoints00, 0, true);
                     break;
                 }
                 // Restless Blades
@@ -13084,6 +13089,15 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
 
             if (maxval)
                 AddPct(TakenTotalMod, maxval); 
+        }
+    }
+    else
+    {
+        AuraEffectList const& mOwnerTaken = GetAuraEffectsByType(SPELL_AURA_MOD_AUTOATTACK_DAMAGE_TARGET);
+        for (AuraEffectList::const_iterator i = mOwnerTaken.begin(); i != mOwnerTaken.end(); ++i)   
+        {
+            if ((*i)->GetCaster() == attacker)
+                AddPct(TakenTotalMod, (*i)->GetAmount());
         }
     }
 
