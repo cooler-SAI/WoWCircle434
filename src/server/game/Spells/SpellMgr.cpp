@@ -6357,7 +6357,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 8143:
                 spellInfo->Effects[1].Effect = 0;
                 break;
-                // Bandit's Guile
+            // Bandit's Guile
             case 84652:
             case 84653:
             case 84654:
