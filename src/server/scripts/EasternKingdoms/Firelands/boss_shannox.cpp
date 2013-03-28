@@ -70,6 +70,7 @@ enum Events
     EVENT_RESURRECT             = 12,
     EVENT_MAGMA_RUPTURE_2       = 13,
     EVENT_UNIT_IN_LOS           = 14,
+    EVENT_CHECK_COMBAT          = 15,
 };
 
 enum Adds
@@ -229,12 +230,13 @@ class boss_shannox : public CreatureScript
                 memset(areas, false, sizeof(areas));
 
                 Talk(SAY_AGGRO);
-                events.ScheduleEvent(EVENT_BERSERK, 60 * MINUTE * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_BERSERK, 6 * MINUTE * IN_MILLISECONDS);
                 events.ScheduleEvent(EVENT_HURL_SPEAR, 15000);
                 events.ScheduleEvent(EVENT_SEPARATION_ANXIETY, 2000);
                 events.ScheduleEvent(EVENT_IMMOLATION_TRAP, urand(10000, 20000));
                 events.ScheduleEvent(EVENT_CRYSTAL_PRISON_TRAP, urand(10000, 25500));
                 events.ScheduleEvent(EVENT_ARCING_SLASH, urand(10000, 12000));
+                events.ScheduleEvent(EVENT_CHECK_COMBAT, 5000);
                 DoZoneInCombat();
                 instance->SetBossState(DATA_SHANNOX, IN_PROGRESS);
             }
@@ -315,6 +317,20 @@ class boss_shannox : public CreatureScript
                 {
                     switch (eventId)
                     {
+                        case EVENT_CHECK_COMBAT:
+                            if (me->isInCombat())
+                            {
+                                if (Creature* pRiplimb = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_RIPLIMB)))
+                                    if (!pRiplimb->isInCombat() && !pRiplimb->IsInEvadeMode())
+                                        if (pRiplimb->isAlive())
+                                            DoZoneInCombat(pRiplimb);
+
+                                if (Creature* pRageface = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_RAGEFACE)))
+                                    if (!pRageface->isInCombat() && !pRageface->IsInEvadeMode())
+                                        if (pRageface->isAlive())
+                                            DoZoneInCombat(pRageface);
+                            }
+                            events.ScheduleEvent(EVENT_CHECK_COMBAT, 5000);
                         case EVENT_SEPARATION_ANXIETY:
                             if (Creature* pRiplimb = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_RIPLIMB)))
                                 if (pRiplimb->isAlive() && !me->IsWithinDist(pRiplimb, 80.0f) && !me->HasAura(SPELL_SEPARATION_ANXIETY))
@@ -427,6 +443,7 @@ class npc_shannox_riplimb : public CreatureScript
                 DoZoneInCombat();
                 events.ScheduleEvent(EVENT_LIMB_RIP, 6000);
                 events.ScheduleEvent(EVENT_SEPARATION_ANXIETY, 3000);
+                events.ScheduleEvent(EVENT_CHECK_COMBAT, 5000);
             }
 
             void DamageTaken(Unit* attacker, uint32 &damage)
@@ -520,6 +537,21 @@ class npc_shannox_riplimb : public CreatureScript
                 {
                     switch (eventId)
                     {
+                        case EVENT_CHECK_COMBAT:
+                            if (me->isInCombat())
+                            {
+                                if (Creature* pRageface = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_RAGEFACE)))
+                                    if (!pRageface->isInCombat() && !pRageface->IsInEvadeMode())
+                                        if (pRageface->isAlive())
+                                            DoZoneInCombat(pRageface);
+
+                                if (Creature* pShannox = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_SHANNOX)))
+                                    if (!pShannox->isInCombat() && !pShannox->IsInEvadeMode())
+                                        if (pShannox->isAlive())
+                                            DoZoneInCombat(pShannox);
+                            }
+                            events.ScheduleEvent(EVENT_CHECK_COMBAT, 5000);
+                            break;
                         case EVENT_SEPARATION_ANXIETY:
                             if (!me->FindNearestCreature(NPC_SHANNOX, 80.0f) && !me->HasAura(SPELL_SEPARATION_ANXIETY))
                                 DoCast(me, SPELL_SEPARATION_ANXIETY, true);
@@ -609,6 +641,7 @@ class npc_shannox_rageface : public CreatureScript
                 events.ScheduleEvent(EVENT_FACE_RAGE, 7000);
                 events.ScheduleEvent(EVENT_CHANGE_TARGET, 5000);
                 events.ScheduleEvent(EVENT_SEPARATION_ANXIETY, 3000);
+                events.ScheduleEvent(EVENT_CHECK_COMBAT, 5000);
             }
 
             void DamageTaken(Unit* who, uint32 &damage)
@@ -654,6 +687,21 @@ class npc_shannox_rageface : public CreatureScript
                 {
                     switch (eventId)
                     {
+                        case EVENT_CHECK_COMBAT:
+                            if (me->isInCombat())
+                            {
+                                if (Creature* pRiplimb = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_RIPLIMB)))
+                                    if (!pRiplimb->isInCombat() && !pRiplimb->IsInEvadeMode())
+                                        if (pRiplimb->isAlive())
+                                            DoZoneInCombat(pRiplimb);
+
+                                if (Creature* pShannox = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_SHANNOX)))
+                                    if (!pShannox->isInCombat() && !pShannox->IsInEvadeMode())
+                                        if (pShannox->isAlive())
+                                            DoZoneInCombat(pShannox);
+                            }
+                            events.ScheduleEvent(EVENT_CHECK_COMBAT, 5000);
+                            break;
                         case EVENT_SEPARATION_ANXIETY:
                             if (!me->FindNearestCreature(NPC_SHANNOX, 80.0f) && !me->HasAura(SPELL_SEPARATION_ANXIETY))
                                 DoCast(me, SPELL_SEPARATION_ANXIETY, true);

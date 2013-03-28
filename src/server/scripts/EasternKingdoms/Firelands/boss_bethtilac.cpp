@@ -329,11 +329,21 @@ class boss_bethtilac : public CreatureScript
                             break;
                         }
                         case EVENT_GO_DOWN:
+                        {
                             uiPhase = 1;
                             me->GetMotionMaster()->MoveJump(addsPos[5].GetPositionX(), addsPos[5].GetPositionY(), addsPos[5].GetPositionZ(), 40.0f, 40.0f);
                             events.ScheduleEvent(EVENT_FRENZY, 10000);
                             events.ScheduleEvent(EVENT_THE_WIDOW_KISS, 32000);
+                            Map::PlayerList const &PlayerList = instance->instance->GetPlayers();
+                            if (!PlayerList.isEmpty())
+                            {
+                                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                                    if (Player* player = i->getSource())
+                                        if (player->GetPositionZ() > 100.0f)
+                                            player->NearTeleportTo(addsPos[5].GetPositionX(), addsPos[5].GetPositionY(), addsPos[5].GetPositionZ(), 0.0f);
+                            }
                             break;
+                        }
                         case EVENT_FRENZY:
                             DoCast(me, SPELL_FRENZY);
                             events.ScheduleEvent(EVENT_FRENZY, 7000);
@@ -410,7 +420,7 @@ class npc_bethtilac_spiderweb_filament : public CreatureScript
 
                 if (owner->GetEntry() == NPC_BETHTILAC)
                 {
-                    if (Creature* pSpinner = me->SummonCreature(NPC_CINDERWEB_SPINNER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
+                    if (Creature* pSpinner = owner->SummonCreature(NPC_CINDERWEB_SPINNER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
                     {
                         pSpinner->SetCanFly(true);
                         DoCast(pSpinner, SPELL_SPIDERWEB_FILAMENT_ANY, true);
@@ -521,6 +531,8 @@ class npc_bethtilac_cinderweb_spinner : public CreatureScript
                             owner->CastSpell(pFilament, SPELL_SPIDERWEB_FILAMENT_ANY, true);
                         }
 
+                    events.CancelEvent(EVENT_FIERY_WEB_SPIN);
+                    me->InterruptNonMeleeSpells(false);
                     me->RemoveAura(SPELL_SPIDERWEB_FILAMENT_ANY);
                     //me->RemoveAura(SPELL_CREEPER);
                     me->RemoveAura(SPELL_TEMPERAMENT);

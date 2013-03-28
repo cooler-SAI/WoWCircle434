@@ -5048,6 +5048,7 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 97202: // Fiery Web Spin
                 spellInfo->MaxAffectedTargets = 1;
+                spellInfo->ChannelInterruptFlags |= CHANNEL_INTERRUPT_FLAG_INTERRUPT;
                 break;
             case 98997: // Clear Spiderweb Filament
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
@@ -5067,6 +5068,53 @@ void SpellMgr::LoadDbcDataCorrections()
             case 99999: // Fixate (broodling)
                 spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
                 spellInfo->Effects[EFFECT_1].TargetB = 0;
+                break;
+            // Alysrazor
+            case 99844: // Blazing Claw dmg
+            case 101729:
+            case 101730:
+            case 101731:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CONE_ENEMY_104;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CONE_ENEMY_104;
+                break;
+            case 99794: // Fiery Vortex dmg
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 100640: // Harsh Winds
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 99816: // Fiery Tornado dmg
+            case 100733:
+            case 100734:
+            case 100735:
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 99747: // Blazing Buffet dmg
+            case 100739:
+            case 100740:
+            case 100741:
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 99461: // Blazing Power dmg
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                spellInfo->Effects[EFFECT_1].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 99427: // Incindiary Cloud dmg
+            case 100729:
+            case 100730:
+            case 100731:
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                spellInfo->Effects[EFFECT_1].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 98885: // Brashfire
+            case 100715:
+            case 100716:
+            case 100717:
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                spellInfo->Effects[EFFECT_1].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 99919: // Ignition
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
             // Baleroc
             case 99351: // Inferno Blade
