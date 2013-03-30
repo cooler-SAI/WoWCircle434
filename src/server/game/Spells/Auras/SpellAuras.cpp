@@ -1898,6 +1898,9 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 break;
             case SPELLFAMILY_PALADIN:
+                if (!caster)
+                    break;
+
                 // Avenging Wrath
                 if (m_spellInfo->Id == 31884)
                     target->RemoveAura(57318);
@@ -1907,7 +1910,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Divine Protection
                 else if (m_spellInfo->Id == 498)
                     // Item - Paladin T12 Protection 4P Bonus
-                    if (caster && caster->HasAura(99091) && (removeMode == AURA_REMOVE_BY_EXPIRE))
+                    if (caster->HasAura(99091) && (removeMode == AURA_REMOVE_BY_EXPIRE))
                         caster->CastSpell(caster, 99090, true);
                 break;
             case SPELLFAMILY_DEATHKNIGHT:

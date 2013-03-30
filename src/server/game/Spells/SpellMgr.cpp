@@ -5116,6 +5116,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 99919: // Ignition
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
+            case 99529: // Incindiary Cloud sum
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                break;
+            case 99528: // Blazing Power sum
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
+                break;
             // Baleroc
             case 99351: // Inferno Blade
                 spellInfo->Attributes &= ~SPELL_ATTR0_ON_NEXT_SWING;
