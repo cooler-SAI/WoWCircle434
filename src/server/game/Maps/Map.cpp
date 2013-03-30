@@ -2375,15 +2375,6 @@ bool InstanceMap::AddPlayerToMap(Player* player)
                 mapSave = sInstanceSaveMgr->AddInstanceSave(GetId(), GetInstanceId(), Difficulty(GetSpawnMode()), 0, true);
             }
 
-            // check for count players in instance
-            uint32 maxPlayers = GetMaxPlayers();
-            if (GetPlayersCountExceptGMs() > maxPlayers)
-            {
-                sLog->outError(LOG_FILTER_MAPS, "InstanceMap::Add: player %s(%d) tried enter in full instance %u", player->GetName(), player->GetGUIDLow(), GetId());
-                player->SendTransferAborted(GetId(), TRANSFER_ABORT_MAX_PLAYERS);
-                return false;
-            }
-
             // check for existing instance binds
             InstancePlayerBind* playerBind = player->GetBoundInstance(GetId(), Difficulty(GetSpawnMode()));
             if (playerBind && playerBind->perm)

@@ -227,6 +227,13 @@ void WorldSession::HandleChannelUnmute(WorldPacket& recvPacket)
 void WorldSession::HandleChannelInvite(WorldPacket& recvPacket)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Opcode %u", recvPacket.GetOpcode());
+
+    time_t now = time(NULL);
+    if (now - timeLastChannelInviteCommand < 5)
+        return;
+    else
+       timeLastChannelInviteCommand = now;
+
     std::string otp;
     std::string channelname;
     uint32 channelLength = recvPacket.ReadBits(7);

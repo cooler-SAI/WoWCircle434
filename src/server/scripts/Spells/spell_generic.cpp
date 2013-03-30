@@ -1439,11 +1439,19 @@ class spell_gen_vehicle_scaling : public SpellScriptLoader
                 amount = uint16((avgILvl - baseItemLevel) * factor);
             }
 
+            bool CanApply(Unit* target)
+            {
+                if (target->GetTypeId() == TYPEID_PLAYER)
+                    return false;
+                return true;
+            }
+
             void Register()
             {
                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_vehicle_scaling_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT);
                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_vehicle_scaling_AuraScript::CalculateAmount, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_vehicle_scaling_AuraScript::CalculateAmount, EFFECT_2, SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT);
+                DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_gen_vehicle_scaling_AuraScript::CanApply);
             }
         };
 

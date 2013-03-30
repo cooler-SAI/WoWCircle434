@@ -312,6 +312,9 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     uint32 timediff = uint32(time(NULL) - fields[13].GetUInt32());
     _LoadAuras(timediff);
 
+    if (owner->GetTypeId() == TYPEID_PLAYER && owner->ToPlayer()->InArena())
+        RemoveArenaAuras();
+
     // load action bar, if data broken will fill later by default spells.
     if (!is_temporary_summoned)
     {

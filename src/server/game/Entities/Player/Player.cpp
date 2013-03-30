@@ -5539,6 +5539,7 @@ void Player::RepopAtGraveyard()
     if (ClosestGrave)
     {
         TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, GetOrientation());
+        UpdateObjectVisibility();
         if (isDead())                                        // not send if alive, because it used in TeleportTo()
         {
             WorldPacket data(SMSG_DEATH_RELEASE_LOC, 4*4);  // show spirit healer position on minimap
@@ -19808,6 +19809,12 @@ void Player::Whisper(const std::string& text, uint32 language, uint64 receiver)
 
     std::string _text(text);
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_WHISPER, language, _text, rPlayer);
+
+    if (!rPlayer->isAcceptWhispers() && !isGameMaster())
+    {
+        ChatHandler(this).SendSysMessage(LANG_COMMAND_WHISPEROFF);
+        return;
+    }
 
     WorldPacket data(SMSG_MESSAGECHAT, 200);
     BuildPlayerChat(&data, CHAT_MSG_WHISPER, _text, language);
