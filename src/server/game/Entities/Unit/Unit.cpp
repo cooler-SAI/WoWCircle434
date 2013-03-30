@@ -7465,6 +7465,16 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
             switch (dummySpell->Id)
             {
+                // Roar of Sacrifice
+                case 53480:
+                {
+                    target = triggeredByAura->GetCaster();
+                    if (!target || !damage)
+                        return false;
+                    basepoints0 = damage / 10;
+                    triggered_spell_id = 67481;
+                    break;
+                }
                 // Aspect of the Fox
                 case 82661:     
                 {
