@@ -2157,7 +2157,7 @@ void SpellMgr::LoadEnchantCustomAttr()
             continue;
 
         // TODO: find a better check
-        if (spellInfo->SpellFamilyName == SPELLFAMILY_GENERIC || spellInfo->SpellFamilyName == SPELLFAMILY_POTION)
+        if (!spellInfo->HasAttribute( SPELL_ATTR2_UNK3 ) || !spellInfo->HasAttribute( SPELL_ATTR2_PRESERVE_ENCHANT_IN_ARENA ))
             continue;
 
         for (uint32 j = 0; j < MAX_SPELL_EFFECTS; ++j)
