@@ -2459,7 +2459,7 @@ bool Aura::CanStackWith(Aura const* existingAura) const
     // Can stack with self
     if (this == existingAura)
         return true;
-
+    
     // Dynobj auras always stack
     if (existingAura->GetType() == DYNOBJ_AURA_TYPE)
         return true;

@@ -6307,11 +6307,6 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].TargetB = 0;
                 spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
-            // The Beast Within - Immunity
-            case 70029:
-                spellInfo->SetDurationIndex(1);
-                spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
-                break;
             // Gift of Naaru
             case 28880:
             case 59542:
