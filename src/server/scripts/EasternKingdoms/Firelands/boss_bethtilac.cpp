@@ -182,7 +182,7 @@ class boss_bethtilac : public CreatureScript
                 instance->SetBossState(DATA_BETHTILAC, IN_PROGRESS);
                 me->GetMotionMaster()->MovePoint(POINT_HIGH, highPos);
                 DoZoneInCombat();
-                me->RemoveAllAuras();
+                me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
             }
 
             void MovementInform(uint32 type, uint32 id)
@@ -190,7 +190,7 @@ class boss_bethtilac : public CreatureScript
                 if (type = POINT_MOTION_TYPE)
                     if (id == POINT_HIGH)
                     {
-                        me->RemoveAllAuras();
+                        me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
                         //me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
                         //me->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
                         me->SetReactState(REACT_AGGRESSIVE);
