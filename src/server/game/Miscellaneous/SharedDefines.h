@@ -3446,7 +3446,9 @@ enum DiminishingGroup
     DIMINISHING_SLEEP               = 16,
     DIMINISHING_TAUNT               = 17,
     DIMINISHING_DRAGONS_BREATH      = 18,
-    DIMINISHING_LIMITONLY           = 19    // has to go last
+    DIMINISHING_DEEP_FREEZE         = 19,
+    DIMINISHING_RING_OF_FROST       = 20,
+    DIMINISHING_LIMITONLY           = 21    // has to go last
 };
 
 enum SummonCategory
