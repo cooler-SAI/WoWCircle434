@@ -6384,7 +6384,7 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // Spore Cloud
             case 50274:
-                spellInfo->Effects[EFFECT_0].Effect = SPEL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA;
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_SRC_CASTER;
                 spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
                 break;
