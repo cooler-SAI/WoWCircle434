@@ -5122,6 +5122,22 @@ void SpellMgr::LoadDbcDataCorrections()
             case 99528: // Blazing Power sum
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(8);
                 break;
+            case 99605: // Firestorm
+            case 101658:
+            case 101659:
+            case 101660:
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                spellInfo->Effects[EFFECT_2].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 99606: // Firestorm dot
+            case 101661:
+            case 101662:
+            case 101663:
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 101410: // Molten Feather bar
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
             // Baleroc
             case 99351: // Inferno Blade
                 spellInfo->Attributes &= ~SPELL_ATTR0_ON_NEXT_SWING;
@@ -6365,6 +6381,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[2].Effect = SPELL_EFFECT_APPLY_AURA;
                 spellInfo->Effects[2].ApplyAuraName = SPELL_AURA_DUMMY;
                 spellInfo->Effects[2].TargetA = TARGET_UNIT_CASTER;
+                break;
+            // Spore Cloud
+            case 50274:
+                spellInfo->Effects[EFFECT_0].Effect = SPEL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_SRC_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
                 break;
             default:
                 break;
