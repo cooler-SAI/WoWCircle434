@@ -2323,8 +2323,14 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj) const
             if (((Unit*)this)->HasAuraTypeWithMiscvalue(SPELL_AURA_DETECT_STEALTH, i))
                 return true;
 
-        // Starting points
-        int32 detectionValue = ((i == STEALTH_TRAP) ? 70: 50);
+        int32 detectionValue = 15;
+        if (isType(TYPEMASK_PLAYER) && ToPlayer())
+        {
+            Player const* _plr = ToPlayer();
+            uint8 _class = _plr->getClass();
+            if (_class == CLASS_ROGUE || (_class == CLASS_DRUID && _plr->GetPrimaryTalentTreeForCurrentSpec() == TALENT_TREE_DRUID_FERAL_COMBAT))
+                detectionValue = 50;
+        }
 
         // Level difference: 5 point / level, starting from level 1.
         // There may be spells for this and the starting points too, but
