@@ -459,7 +459,6 @@ class spell_warl_demonic_circle_teleport : public SpellScriptLoader
                     if (GameObject* circle = player->GetGameObject(WARLOCK_DEMONIC_CIRCLE_SUMMON))
                     {
                         player->NearTeleportTo(circle->GetPositionX(), circle->GetPositionY(), circle->GetPositionZ(), circle->GetOrientation());
-                        player->RemoveMovementImpairingAuras();
                     }
                 }
             }
