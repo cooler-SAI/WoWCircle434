@@ -12179,10 +12179,6 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
                     int32 modChance = 0;
                     switch ((*i)->GetMiscValue())
                     {
-                        case 7917: // Glyph of Shadowburn
-                            if (victim->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, spellProto, this))
-                                crit_chance+=(*i)->GetAmount();
-                            break;
                         case 7997: // Renewed Hope
                         case 7998:
                             if (victim->HasAura(6788))
