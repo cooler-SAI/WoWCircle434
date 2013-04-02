@@ -1526,6 +1526,17 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         }
                         break;
                     }
+                    // Rapid Killing - Rapid Recuperation
+                    case 35098:
+                    case 35099:
+                    {
+                        if (AuraEffect * eff = caster->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 3560, 1))
+                        {
+                            int32 basepoints0 = CalculatePct(caster->GetMaxPower(POWER_FOCUS), eff->GetAmount());
+                            caster->CastCustomSpell(caster, 58883, &basepoints0, 0, 0, true);
+                        }
+                        break;
+                    }
                 }
                 break;
             case SPELLFAMILY_PALADIN:

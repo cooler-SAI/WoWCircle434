@@ -7397,17 +7397,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     triggered_spell_id = 34720;
                     break;
                 }
-                case 3560: // Rapid Recuperation
-                {
-                    // This effect only from Rapid Killing (focus regen)
-                    if (!(procSpell->Id == 35098 || procSpell->Id == 35099))
-                        return false;
-
-                    target = this;
-                    triggered_spell_id = 58883;
-                    basepoints0 = CalculatePct(GetMaxPower(POWER_FOCUS), triggerAmount);
-                    break;
-                }
                 // Crouching Tiger, Hidden Chimera
                 case 4752:
                 {
