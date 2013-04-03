@@ -346,7 +346,8 @@ class AuraEffect
         void HandleAuraModMastery(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleAuraOverrideSpellPowerByPctAp(AuraApplication const* aurApp, uint8 mode, bool apply) const;
         void HandleModCategoryCooldown(AuraApplication const* aurApp, uint8 mode, bool apply) const;
-
+        void HandleAuraProgressBar(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+        
         // aura effect periodic tick handlers
         void HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const;
         void HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) const;

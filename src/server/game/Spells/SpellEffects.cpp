@@ -4853,10 +4853,8 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                 case 97985:
                 {
                     int chance = 0;
-                    if (AuraEffect * AuraEff = m_caster->GetAuraEffect(SPELL_AURA_MOD_INCREASE_SPEED, SPELLFAMILY_DRUID, 67, 0))
-                    {
-                        chance = AuraEff->GetAmount()*100/15; // 15 for ammount, 100% for 2nd rank val
-                    }
+                    if (AuraEffect const* AuraEff = m_caster->GetAuraEffect(SPELL_AURA_MOD_DODGE_PERCENT, SPELLFAMILY_DRUID, 67, EFFECT_0))
+                        chance = AuraEff->GetAmount() * 25;
 
                     if (roll_chance_i(chance))
                         unitTarget->RemoveMovementImpairingAuras();

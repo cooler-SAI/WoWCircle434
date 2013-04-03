@@ -6079,10 +6079,19 @@ void SpellMgr::LoadDbcDataCorrections()
             case 51698:
                 spellInfo->SpellFamilyName = SPELLFAMILY_ROGUE;
                 break;
-            // Stampeding Roar
-            case 77761: // Bear
-            case 77764: // Cat
+            // Stampeding Roar (Bear)
+            case 77761: 
+                spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_TRIGGER_SPELL;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_SRC_CASTER;
+                spellInfo->Effects[EFFECT_1].TargetB = TARGET_UNIT_SRC_AREA_ALLY;
+                spellInfo->Effects[EFFECT_1].TriggerSpell = 97985;
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(13);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(13);
+                break;
+            // Stampeding Roar (Cat)
+            case 77764:
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(13);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(13);
                 break;
             // Cheat Death
             case 45182:

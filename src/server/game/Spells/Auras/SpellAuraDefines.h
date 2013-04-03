@@ -406,7 +406,7 @@ enum AuraType
     SPELL_AURA_MOD_AUTOATTACK_DAMAGE_TARGET                 = 343,
     SPELL_AURA_MOD_AUTOATTACK_DAMAGE                        = 344,
     SPELL_AURA_BYPASS_ARMOR_FOR_CASTER                      = 345,
-    SPELL_AURA_ENABLE_ALT_POWER                             = 346,  // NYI
+    SPELL_AURA_PROGRESS_BAR                                 = 346,  
     SPELL_AURA_MOD_SPELL_COOLDOWN_BY_HASTE                  = 347,  // NYI
     SPELL_AURA_DEPOSIT_BONUS_MONEY_IN_GUILD_BANK_ON_LOOT    = 348,  // NYI
     SPELL_AURA_MOD_CURRENCY_GAIN                            = 349,

@@ -403,7 +403,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleNoImmediateEffect,                         //343 SPELL_AURA_MOD_AUTOATTACK_DAMAGE_TARGET implemented in Unit::MeleeDamageBonusTaken
     &AuraEffect::HandleNoImmediateEffect,                         //344 SPELL_AURA_MOD_AUTOATTACK_DAMAGE implemented in Unit::MeleeDamageBonusTaken
     &AuraEffect::HandleNoImmediateEffect,                         //345 SPELL_AURA_BYPASS_ARMOR_FOR_CASTER
-    &AuraEffect::HandleNULL,                                      //346 SPELL_AURA_ENABLE_ALT_POWER
+    &AuraEffect::HandleAuraProgressBar,                           //346 SPELL_AURA_PROGRESS_BAR
     &AuraEffect::HandleNULL,                                      //347 SPELL_AURA_MOD_SPELL_COOLDOWN_BY_HASTE
     &AuraEffect::HandleNoImmediateEffect,                         //348 SPELL_AURA_DEPOSIT_BONUS_MONEY_IN_GUILD_BANK_ON_LOOT implemented in WorldSession::HandleLootMoneyOpcode
     &AuraEffect::HandleNoImmediateEffect,                         //349 SPELL_AURA_MOD_CURRENCY_GAIN implemented in Player::ModifyCurrency
@@ -661,7 +661,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
 
                         // Savage Defender, Feral Druid Mastery
                         if (AuraEffect const* aurEff = caster->GetAuraEffect(77494, 0))
-                            ap_mod += aurEff->GetAmount();
+                            AddPct(ap_mod, aurEff->GetAmount());
 
                         amount = int32(CalculatePct(caster->GetTotalAttackPowerValue(BASE_ATTACK), ap_mod));
                     }
@@ -715,8 +715,10 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 uint8 cp = caster->ToPlayer()->GetComboPoints();
 
                 amount += int32(0.0207f * caster->GetTotalAttackPowerValue(BASE_ATTACK) * cp);
-                amount *= 8;
-                amount /= GetTotalTicks();
+                
+                // Total ticks equals 8 always, so * 8 / 8 = * 1
+                //amount *= 8;
+                //amount /= GetTotalTicks();
             }
             // Exorcism 
             else if (GetId() == 879)
@@ -7012,6 +7014,20 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
                 if (caster && roll_chance_i(20))
                     caster->CastSpell(caster, 18662, true);
                 break;
+            // Lacerate
+            case 33745:
+                if (caster && caster->GetTypeId() == TYPEID_PLAYER)
+                {
+                    if (caster->HasSpell(50334))
+                    {
+                        if (roll_chance_i(50))
+                        {
+                            caster->ToPlayer()->RemoveSpellCooldown(33878, true);
+                            caster->CastSpell(caster, 93622, true);
+                        }
+                    }
+                }
+                break;
         }
     }
 
@@ -7848,4 +7864,68 @@ mod_pair AuraEffect::GetUniqueVisibleAuraBuff(Unit* target, int8 x) const
     }
 
     return mod_pair();
+}
+
+void AuraEffect::HandleAuraProgressBar(AuraApplication const* aurApp, uint8 mode, bool apply) const
+{
+    Unit* target = aurApp->GetTarget();
+
+    Unit* caster = GetCaster();
+
+    Aura const* aura = GetBase();
+
+    if (!target)
+        return;
+
+    if (apply)
+    {
+        switch (GetSpellInfo()->Id)
+        {
+            case 88824: // Sound Bar Atramedes (HandlePeriodicDummyAuraTick for movement add?).
+            case 93103: //Cho'gall Corruption
+            case 78949: // Onyxia Discharge - target is same as caster.
+            case 98229: // Majordomo Heroic Concentration
+            {
+                target->SetPower(POWER_ALTERNATE_POWER, 0);
+                target->SetMaxPower(POWER_ALTERNATE_POWER, 100);
+
+                break;
+            }
+            case 98226: // Rhyolith Balance - Orientation: - power goes to left, + power goes to right.
+            {
+                target->SetPower(POWER_ALTERNATE_POWER, 25);
+                target->SetMaxPower(POWER_ALTERNATE_POWER, 50);
+
+                break;
+            }
+            case 101410: // Molten Feather Bar - Alysrazor - 98734 is spell to give 1 power, 97128 needs script and triggers it. 99464 (Molting) is Alys aura.
+            {
+                target->SetPower(POWER_ALTERNATE_POWER, 0);
+                target->SetMaxPower(POWER_ALTERNATE_POWER, 3);
+
+                 break;
+            }
+            default:
+            {
+                target->SetPower(POWER_ALTERNATE_POWER, 0);
+                target->SetMaxPower(POWER_ALTERNATE_POWER, 100);
+
+                break;
+            }
+
+            //Deathwing Corrupted Blood meter 106843 - 100 power
+            //Sands of Time End Time Meter 102668 - 5 power
+            //Hideous Amalgamation Absorb Blood bar - 109329. starts 25 - max 50 power.
+            //Thrall Bar - 100439, Elemental Bonds - Destroy totems to free Thrall. 100 power...Firelands.
+            //Thrall Bar - 99961, Elemental Bonds - Destroy Forces.100 power...Deepholm.
+            //Thrall Bar - 99642, Elemental Bonds - Destroy Elementals.100 power...Vasjh'ir.
+            //Thrall Bar - 99358, Elemental Bonds - Destroy Elementals.100 power...Uldum.
+            //Warden Stillwater - 35000 power, 92598.
+            //Waves like map treasure, 7 power - 92597.
+            //Waves like map treasure, 5 power - 91651.
+            //Heroic Will Ultraxion - Needs no stuff. No power, puts you in shadow realm 5 sec.
+            //Enter the Dream - Ysera - 106464 - Needs no stuff. No power, decreases damage by 50%.
+            //DeathWingBack? (Roll Control?)
+        }
+    }
 }
