@@ -303,7 +303,7 @@ class Map : public GridRefManager<NGridType>
         static void InitStateMachine();
         static void DeleteStateMachine();
 
-        Map const* GetParent() const { return m_parentMap; }
+        Map const* GetParent() const { return (m_parentMap? m_parentMap : this); }
 
         // some calls like isInWater should not use vmaps due to processor power
         // can return INVALID_HEIGHT if under z+2 z coord not found height
