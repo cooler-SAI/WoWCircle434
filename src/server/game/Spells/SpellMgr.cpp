@@ -5070,6 +5070,19 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_1].TargetB = 0;
                 break;
             // Alysrazor
+            case 102111: // Cataclysm
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_SCRIPT_EFFECT;
+                break;
+            case 99208: // Ritual of the Flame dmg
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 99558: // Meteoric Impact
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 99274: // Molten Meteor dmg
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                spellInfo->Effects[EFFECT_1].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
             case 99844: // Blazing Claw dmg
             case 101729:
             case 101730:
@@ -6387,6 +6400,10 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA;
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_SRC_CASTER;
                 spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            // Storm Strike
+            case 17364:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
                 break;
             default:
                 break;
