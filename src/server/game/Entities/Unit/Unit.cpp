@@ -1390,6 +1390,10 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
         ToPlayer()->CastItemCombatSpell(victim, damageInfo->attackType, damageInfo->procVictim, damageInfo->procEx);
 
     // Do effect if any damage done to target
+
+    if (isTotem())
+        return;
+
     if (damageInfo->damage)
     {
         // We're going to call functions which can modify content of the list during iteration over it's elements
@@ -6095,6 +6099,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // Mastery should affect damage
                     if (AuraEffect const* aurEff = GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_MAGE, 37, EFFECT_0))
                         AddPct<int32>(basepoints0, aurEff->GetAmount());
+
                     triggered_spell_id = 12654;
                     basepoints0 += victim->GetRemainingPeriodicAmount(GetGUID(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE);
                     break;
@@ -9608,6 +9613,20 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        case 324: // Lightning Shield
+        case 30482: // Molten Armor
+            if (victim && victim->isTotem())
+                return false;
+        break;
+        // Invigoration
+        case 53397:
+            if (!procSpell)
+                return false;
+
+            if (procSpell->Id != 49966 && procSpell->Id != 16827 && procSpell->Id != 17253)
+                return false;
+
+            break;
         // Item - Hunter T12 2P Bonus
         case 99057:
             if (!victim || GetGUID() == victim->GetGUID())
@@ -9620,16 +9639,24 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             break;
         // Glyph of Dark Succor
         case 96279:
-            if (victim && victim->GetOwner() && victim->GetGUID() == GetGUID())
+            if (victim && victim->GetOwner() && victim->GetOwner()->GetGUID() == GetGUID())
                 return false;
             break;
         // Tamed Pet Passive 07 (DND)
         case 20784:
+        {
+            if (!procSpell)
+                return false;
+
+            if (procSpell->Id != 49966 && procSpell->Id != 16827 && procSpell->Id != 17253)
+                return false;
+
             if (Aura* aur = GetAura(trigger_spell_id))
                 if (aur->GetStackAmount() >= 4)
                     if (Unit* owner = GetOwner())
                         owner->CastSpell(owner, 88843, true);
             break;
+        }
         // Impact
         case 11103:
         case 12355:
@@ -10022,7 +10049,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
         case 16176:
         case 16235:
         {
-            AuraEffect *aura_eff = victim->GetAuraEffect(105284, 0, this->GetGUID());
+            AuraEffect *aura_eff = victim->GetAuraEffect(105284, EFFECT_0);
 
             int32 basepoints_ = std::min((aura_eff ? aura_eff->GetAmount() : 0.0f) + 
                 damage * triggeredByAura->GetBase()->GetEffect(1)->GetAmount() / 100.0f, 

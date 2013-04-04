@@ -280,6 +280,9 @@ class spell_pri_reflective_shield_trigger : public SpellScriptLoader
                 if (dmgInfo.GetAttacker() == target)
                     return;
 
+                if (dmgInfo.GetAttacker()->isTotem())
+                    return;
+
                 if (GetCaster())
                     if (AuraEffect* talentAurEff = target->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PRIEST, 4880, 0))
                     {
