@@ -6418,6 +6418,26 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
         }
 
+        switch (spellInfo->Id)
+        {
+            case 19386: // Wyvern Sting
+            case 2637: // Hibernate
+            case 339: // Entangling Roots
+            case 335: // Freezing Trap
+            case 118: // Polymorph
+            case 20066: // Repentance
+            case 9484: // Shackle Undead
+            case 2094: // Blind
+            case 51514: // Hex
+            case 76780: // Shackle Elemental
+            case 710: // Banish
+            case 6358: // Seduction
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+                break;
+            default:
+                break;
+        }
+
         switch (spellInfo->SpellFamilyName)
         {
             case SPELLFAMILY_PALADIN:
