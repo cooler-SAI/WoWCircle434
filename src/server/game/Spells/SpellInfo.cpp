@@ -3007,8 +3007,6 @@ bool SpellInfo::IsIgnoringCombat() const
         case 12654:
         // Resistance is Futile
         case 83676:
-        // Living Bomb Explode
-        case 44461:
         // Vendeta
         case 79140:
         // Earth shield

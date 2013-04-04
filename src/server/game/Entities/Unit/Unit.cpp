@@ -6086,6 +6086,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 11120:
                 case 12846:
                 {
+                    if (AuraEffect const *aurEff = GetAuraEffect(12654, EFFECT_0, GetGUID()))
+                        if (!aurEff->GetTickNumber())
+                            return false;
                     // Trigger amount should be divided by ticks count. Assumed that player can't change ticks count
                     triggerAmount /= 2;
                     basepoints0 = CalculatePct(damage, triggerAmount);
