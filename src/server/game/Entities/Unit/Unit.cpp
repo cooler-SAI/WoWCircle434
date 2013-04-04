@@ -11780,11 +11780,25 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
                     AddPct(DoneTotalMod, 30 * count);
             break;
         case SPELLFAMILY_DEATHKNIGHT:
+        {
             // Sigil of the Vengeful Heart
             if (spellProto->SpellFamilyFlags[0] & 0x2000)
+            {
                 if (AuraEffect* aurEff = GetAuraEffect(64962, EFFECT_1))
                     DoneTotal += aurEff->GetAmount();
+            }
+            // Icy Touch, Howling Blast
+            else if ((spellProto->SpellFamilyFlags[0] & 0x00000002) || (spellProto->SpellFamilyFlags[1] & 0x2))
+            {
+                // Merciless Combat
+                if (AuraEffect * eff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 2656, 0))
+                {
+                    if (victim->HealthBelowPct(35))
+                        AddPct(DoneTotalMod, eff->GetAmount());
+                }
+            }
             break;
+        }
         case SPELLFAMILY_HUNTER:
             // Serpent Sting Damage
             if (spellProto->SpellFamilyFlags[0] & 0x4000 && damagetype == DOT)
@@ -11806,6 +11820,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
                 }
             }
         case SPELLFAMILY_PALADIN:
+        {
             // Judgement of Truth
             if (spellProto->Id == 31804)
             {
@@ -11815,6 +11830,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
                 AddPct(DoneTotalMod, 20 * stacks);                
             }
             break;
+        }
     }
 
     // Frostburn (Mage Frost Mastery)
@@ -12962,6 +12978,12 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
     // Add SPELL_AURA_MOD_DAMAGE_DONE_FOR_MECHANIC percent bonus
     if (spellProto)
         AddPct(DoneTotalMod, GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_DAMAGE_DONE_FOR_MECHANIC, spellProto->Mechanic));
+
+    // Frost Strike - Merciless Combat
+    if (spellProto && spellProto->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && spellProto->SpellFamilyFlags[1] & 0x4)
+        if (victim->HealthBelowPct(35))
+            if (AuraEffect const * eff = GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 2656, EFFECT_0))
+                AddPct(DoneTotalMod, eff->GetAmount());
 
     // done scripted mod (take it from owner)
     // Unit* owner = GetOwner() ? GetOwner() : this;

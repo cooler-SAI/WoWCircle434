@@ -4515,6 +4515,13 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 // Death Knight T8 Melee 4P Bonus
                 if (AuraEffect const* aurEff = m_caster->GetAuraEffect(64736, EFFECT_0))
                     AddPct(bonusPct, aurEff->GetAmount());
+
+                // Merciless Combat
+                if (AuraEffect * eff = m_caster->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 2656, 0))
+                {
+                    if (unitTarget->HealthBelowPct(35))
+                        AddPct(bonusPct, eff->GetAmount());
+                }
                 AddPct(totalDamagePercentMod, bonusPct);
                 break;
             }
