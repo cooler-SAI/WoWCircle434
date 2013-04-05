@@ -10252,6 +10252,17 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                 return false;
             break;
         }
+        case 12880: // Enrage (Enrage)
+        case 14201:
+        case 14202:
+        case 57518: // Enrage (Wrecking Crew)
+        case 57519:
+        case 57520:
+        {
+            if (HasAura(12292)) // Death Wish
+                return false;
+            break;
+        }
     }
 
     if (cooldown && GetTypeId() == TYPEID_PLAYER && ToPlayer()->HasSpellCooldown(trigger_spell_id))
