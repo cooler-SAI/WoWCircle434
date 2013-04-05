@@ -6414,6 +6414,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 17364:
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
                 break;
+            // Silencing Shot
+            case 34490:
+                spellInfo->Speed = 0;
+                break;
             default:
                 break;
         }
