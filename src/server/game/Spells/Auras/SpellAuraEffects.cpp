@@ -6416,6 +6416,10 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                     if (rage == 0)
                         break;
 
+                    // Glyph of Frenzied Regeneration
+                    if (target->HasAura(54810))
+                        break;
+
                     int32 mod = std::min(rage, 100);
                     float points = float(target->CalculateSpellDamage(target, GetSpellInfo(), 1)) / 100.0f;
                     

@@ -3367,14 +3367,27 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                         {
                             numSummons = 1;
                             std::list<Creature*> summons;
-                            uint32 num = 0;
-                            m_originalCaster->GetCreatureListWithEntryInGrid(summons, 47649, 50.f);
+                            m_originalCaster->GetCreatureListWithEntryInGrid(summons, 47649, 300.f);
                             if (summons.size() > 0)
-                                for (std::list<Creature*>::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                                    if ((*itr)->GetOwnerGUID() == m_originalCaster->GetGUID())
-                                        num++;
-                            if (num >= 3)
-                                return;
+                                for (std::list<Creature*>::iterator itr = summons.begin(); itr != summons.end();)
+                                {
+                                    if ((*itr)->GetOwnerGUID() != m_originalCaster->GetGUID())
+                                        summons.erase(itr);
+                                    else
+                                        ++itr;
+                                }
+
+                            if (summons.size() >= 3)
+                            {
+                                summons.sort(Trinity::SummonTimerOrderPred(false));
+                                summons.pop_front();
+                                summons.pop_front();
+                                for (std::list<Creature*>::iterator itr = summons.begin(); itr != summons.end();)
+                                {
+                                    (*itr)->DespawnOrUnsummon();
+                                    itr = summons.erase(itr);
+                                }
+                            }
 
                             break;
                         }

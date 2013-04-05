@@ -5266,8 +5266,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 }
                 // Concentration, Majordomo Staghelm
                 case 98229:
-                    if (AuraEffect* aurEff = triggeredByAura->GetBase()->GetEffect(EFFECT_0))
-                        aurEff->SetAmount(0);
+                    SetPower(POWER_ALTERNATE_POWER, 0);
                     break;
                 // Vital Spark, Baleroc
                 case 99262:
@@ -19242,7 +19241,13 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form) const
                     default: // RACE_NIGHTELF
                         return 15374;
                 }
-
+                break;
+            case FORM_TREE:
+                if (HasAura(95212))
+                    return 864;
+                else
+                    return 37165;
+                break;
             default:
                 break;
         }
