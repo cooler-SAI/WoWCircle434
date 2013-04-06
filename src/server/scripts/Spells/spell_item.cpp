@@ -2296,6 +2296,40 @@ class spell_item_flameseers_staff_flamebreaker : public SpellScriptLoader
         }
 };
 
+class spell_item_stardust_no_2 : public SpellScriptLoader
+{
+    public:
+        spell_item_stardust_no_2() : SpellScriptLoader("spell_item_stardust_no_2") { }
+
+        class spell_item_stardust_no_2_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_item_stardust_no_2_AuraScript);
+
+            void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            { 
+                if (!GetCaster() || !GetTarget())
+                    return;
+
+                if (Player* player = GetCaster()->ToPlayer())
+                {
+                    if ((player->GetQuestStatus(25157) == QUEST_STATUS_INCOMPLETE) ||
+                        player->GetQuestStatus(25159) == QUEST_STATUS_INCOMPLETE)
+                        player->KilledMonsterCredit(39237, 0);
+                }
+            }
+
+            void Register()
+            {
+                 OnEffectApply += AuraEffectApplyFn(spell_item_stardust_no_2_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_item_stardust_no_2_AuraScript();
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     // 23074 Arcanite Dragonling
@@ -2355,4 +2389,5 @@ void AddSC_item_spell_scripts()
     new spell_item_flameseers_staff_weakening();
     new spell_item_stay_of_execution();
     new spell_item_flameseers_staff_flamebreaker();
+    new spell_item_stardust_no_2();
 }
