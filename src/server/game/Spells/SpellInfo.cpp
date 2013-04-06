@@ -1481,8 +1481,8 @@ bool SpellInfo::IsSingleTargetWith(SpellInfo const* spellInfo) const
 
 bool SpellInfo::IsAuraExclusiveBySpecificWith(SpellInfo const* spellInfo) const
 {
-    SpellSpecificType spellSpec1 = GetFirstRankSpell()->GetSpellSpecific();
-    SpellSpecificType spellSpec2 = spellInfo->GetFirstRankSpell()->GetSpellSpecific();
+    SpellSpecificType spellSpec1 = GetSpellSpecific();
+    SpellSpecificType spellSpec2 = spellInfo->GetSpellSpecific();
     switch (spellSpec1)
     {
         case SPELL_SPECIFIC_TRACKER:
