@@ -11985,6 +11985,7 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
     // From caster spells
     AuraEffectList const& mOwnerTaken = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_FROM_CASTER);
     for (AuraEffectList::const_iterator i = mOwnerTaken.begin(); i != mOwnerTaken.end(); ++i)
+    {
         if ((*i)->GetCasterGUID() == caster->GetGUID())
         {
             switch ((*i)->GetId())
@@ -11999,10 +12000,19 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
                     break;
             }
         }
+    }
 
     // Mod damage from spell mechanic
-    if (uint32 mechanicMask = spellProto->GetAllEffectsMechanicMask())
+    uint32 mechanicMask = spellProto->GetAllEffectsMechanicMask();
+    
+    // Shred - "Effects which increase Bleed damage also increase Shred damage"
+    if (spellProto->Id == 6807)
+        mechanicMask |= (1<<MECHANIC_BLEED);
+
+    if (mechanicMask)
     {
+        
+
         int32 maxval = 0;
         AuraEffectList const& mDamageDoneMechanic = GetAuraEffectsByType(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT);
         for (AuraEffectList::const_iterator i = mDamageDoneMechanic.begin(); i != mDamageDoneMechanic.end(); ++i)
@@ -13109,8 +13119,8 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
         // Mod damage from spell mechanic
         uint32 mechanicMask = spellProto->GetAllEffectsMechanicMask();
 
-        // Shred, Maul - "Effects which increase Bleed damage also increase Shred damage"
-        if (spellProto->SpellFamilyName == SPELLFAMILY_DRUID && spellProto->SpellFamilyFlags[0] & 0x00008800)
+        // Shred - "Effects which increase Bleed damage also increase Shred damage"
+        if (spellProto->Id == 5221)
             mechanicMask |= (1<<MECHANIC_BLEED);
 
         if (mechanicMask)
