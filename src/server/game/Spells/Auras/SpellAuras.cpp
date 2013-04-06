@@ -1721,6 +1721,12 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         caster->RemoveAurasDueToSpell(87833);   
                         if (removeMode != AURA_REMOVE_BY_EXPIRE)
                             break;
+
+                        // Mage water elemental gains invisibility as mage
+                        if (target->GetTypeId() == TYPEID_PLAYER)
+                            if (Pet * pet = target->ToPlayer()->GetPet())
+                                pet->CastSpell(pet, 32612, true, NULL, GetEffect(1));
+
                         target->CastSpell(target, 32612, true, NULL, GetEffect(1));
                         target->CombatStop();
                         // Invisibility - Glyph of Invisibility

@@ -3560,7 +3560,7 @@ void Spell::cast(bool skipCheck)
                                     fingersOfFrost->SetStackAmount(2);
                             }
                         }
-                        pOwner->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
+                        m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
                     }
                     break;
                 }
