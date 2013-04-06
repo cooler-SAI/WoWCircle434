@@ -824,7 +824,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     case 53508:
                     {
                         if (Player* player = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself())
-                            damage += int32((player->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.4f) * 0.1f);
+                            damage += int32((player->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.04f);
                         break;
                     }
                     // Smack, Claw, Bite
@@ -834,7 +834,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     {
                         if (Player* player = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself())
                         {
-                            damage += int32((player->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.4f) * 0.2f);
+                            damage += int32(player->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.08f);
                             if (m_caster->ToPet()->HasSpell(62758)) // Wild Hunt (rank 1)
                             {
                                 if (m_caster->getPowerType() == POWER_FOCUS
