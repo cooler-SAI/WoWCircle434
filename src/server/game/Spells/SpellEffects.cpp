@@ -824,7 +824,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     case 53508:
                     {
                         if (Player* player = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself())
-                            damage += int32((player->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.04f);
+                            damage += int32(player->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.04f);
                         break;
                     }
                     // Smack, Claw, Bite

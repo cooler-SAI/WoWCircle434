@@ -3045,7 +3045,13 @@ void AuraEffect::HandleAuraTrackCreatures(AuraApplication const* aurApp, uint8 m
     if (target->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    target->SetUInt32Value(PLAYER_TRACK_CREATURES, (apply) ? ((uint32)1)<<(GetMiscValue()-1) : 0);
+    uint32 tracks = target->GetUInt32Value(PLAYER_TRACK_CREATURES);
+    if (apply)
+        tracks |= 1 << (GetMiscValue()-1);
+    else 
+        tracks&= ~1 << (GetMiscValue()-1);
+
+    target->SetUInt32Value(PLAYER_TRACK_CREATURES, tracks);
 }
 
 void AuraEffect::HandleAuraTrackResources(AuraApplication const* aurApp, uint8 mode, bool apply) const
