@@ -549,114 +549,158 @@ public:
     }
 };
 
-class ImpactTargetCheck
-{
-    public:
-        ImpactTargetCheck(Unit* originalTarget) : _originalTarget(originalTarget) { }
-
-        bool operator() (Unit* unit)
-        {
-            return unit == _originalTarget || !unit->isAlive() || unit->isTotem();
-        }
-
-    private:
-        Unit* _originalTarget;
-};
-
-class ImpactAuraCheck
-{
-    public:
-        ImpactAuraCheck(uint64 guid) : _guid(guid) { }
-
-        bool operator() (AuraEffect* effect)
-        {
-            if (!(effect->GetSpellInfo()->SchoolMask & SPELL_SCHOOL_MASK_FIRE))
-                return true;
-
-            return _guid != effect->GetCasterGUID();
-        }
-
-    private:
-        uint64 _guid;
-};
-
 // 12355 - Impact
 class spell_mage_impact : public SpellScriptLoader
 {
-public:
-    spell_mage_impact() : SpellScriptLoader("spell_mage_impact") { }
+    public:
+        spell_mage_impact() : SpellScriptLoader("spell_mage_impact") { }
 
-    class spell_mage_impact_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_mage_impact_SpellScript);
-
-        void HandleScript(SpellEffIndex /*effIndex*/)
+        class spell_mage_impact_SpellScript : public SpellScript
         {
-            Unit* caster = GetCaster();
-            Unit* target = GetExplTargetUnit();
-            if (!caster || !target || !target->isAlive())
-                return;
+            PrepareSpellScript(spell_mage_impact_SpellScript);
 
-            // Build target list
-            const float range = 12.0f;
-            std::list<Unit*> targets;
+            bool Load()
             {
-                Trinity::AnyUnfriendlyNoTotemUnitInObjectRangeCheck u_check(target, caster, range);
-                Trinity::UnitListSearcher<Trinity::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(target, targets, u_check);
-                target->VisitNearbyObject(range, searcher);
-
-                targets.remove_if(ImpactTargetCheck(target));
+                bombs = 0;
+                impactAuras.clear();
+                return true;
             }
 
-            if (targets.empty())
-                return;
-
-            static const AuraType periodicDamageAuraTypes[] =
+            void FilterTargets(std::list<WorldObject*>& targets)
             {
-                SPELL_AURA_PERIODIC_DAMAGE,
-                SPELL_AURA_PERIODIC_DAMAGE_PERCENT,
-                SPELL_AURA_NONE
-            };
+                Unit* caster = GetCaster();
+                Unit* target = GetExplTargetUnit();
+                if (!target || !caster)
+                    return;
 
-            std::list<AuraEffect*> aurasPeriodic;
-            for (AuraType const* auraType = &periodicDamageAuraTypes[0]; auraType && auraType[0] != SPELL_AURA_NONE; ++auraType)
-            {
-                aurasPeriodic = target->GetAuraEffectsByType(*auraType);
+                targets.remove(target);
+
+                std::list<AuraEffect*> aurasPeriodic = target->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
                 aurasPeriodic.remove_if(ImpactAuraCheck(caster->GetGUID()));
-                for (std::list<AuraEffect*>::const_iterator i = aurasPeriodic.begin(); i != aurasPeriodic.end(); ++i)
+                if (aurasPeriodic.empty())
+                    return;
+
+                for (std::list<AuraEffect*>::const_iterator itr = aurasPeriodic.begin(); itr != aurasPeriodic.end(); ++itr)
                 {
-                    int32 amount = (*i)->GetAmount();
-                    uint8 stack = (*i)->GetBase()->GetStackAmount();
-
-                    for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+                    switch ((*itr)->GetId())
                     {
-                        if (Aura* aura = caster->AddAura((*i)->GetSpellInfo(), (*i)->GetBase()->GetEffectMask(), (*iter)))
+                        case 44457: // Living Bomb
+                        case 83853: // Combustion
+                        case 11366: // Pyroblast
+                        case 92315: // Pyroblast!
+                        case 12654: // Ignite
                         {
-                            if (stack)
-                                aura->SetStackAmount(stack);
-
-                            if (AuraEffect* _effect = aura->GetEffect(uint8((*i)->GetEffIndex())))
-                            {
-                                _effect->ChangeAmount(amount, false);
-                                if (_effect->GetId() == 83853)
-                                    _effect->GetFixedDamageInfo().SetFixedDamage(amount);
-                            }
+                            impactAuraData aura;
+                            aura.spellId = (*itr)->GetId();
+                            aura.effMask = (*itr)->GetBase()->GetEffectMask();
+                            aura.effIndex = uint8((*itr)->GetEffIndex());
+                            aura.damage = (*itr)->GetFixedDamageInfo().GetFixedDamage();
+                            aura.duration = (*itr)->GetBase()->GetDuration();
+                            impactAuras.push_back(aura); 
+                            break;
                         }
+                        default:
+                            break;
+                    }
+
+                    // temporary hack
+                    if ((*itr)->GetId() == 44457)
+                    {
+                        (*itr)->GetBase()->RefreshDuration();
+                        (*itr)->RecalculateAmount();
                     }
                 }
             }
-        }
 
-        void Register()
+            void HandleScript(SpellEffIndex /*effIndex*/)
+            {
+                Unit* caster = GetCaster();
+                Unit* target = GetExplTargetUnit();
+                Unit* newTarget = GetHitUnit();
+                if (!caster || !target)
+                    return;
+
+                if (!newTarget || newTarget->GetGUID() == target->GetGUID())
+                    return;
+
+                if (impactAuras.empty())
+                    return;
+
+                for (std::vector<impactAuraData>::const_iterator itr = impactAuras.begin(); itr != impactAuras.end(); ++itr)
+                {
+                    if ((*itr).spellId == 44457)
+                        if (bombs >= 2)
+                            continue;
+
+                    if (Aura* aur = caster->AddAura(sSpellMgr->GetSpellInfo((*itr).spellId), (*itr).effMask, newTarget))
+                    {
+                        if ((*itr).spellId == 44457)
+                            bombs++;
+
+                        aur->SetMaxDuration((*itr).duration);
+                        aur->SetDuration((*itr).duration);
+                        if (AuraEffect* aurEff = aur->GetEffect((*itr).effIndex))
+                            aurEff->GetFixedDamageInfo().SetFixedDamage((*itr).damage);
+
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mage_impact_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
+                OnEffectHitTarget += SpellEffectFn(spell_mage_impact_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
+
+        private:
+
+            struct impactAuraData
+            {
+                uint32 spellId;
+                int32 damage;
+                uint32 duration;
+                uint8 effMask;
+                uint8 effIndex;
+            };
+            std::vector<impactAuraData> impactAuras;
+            uint8 bombs;
+
+            class ImpactTargetCheck
+            {
+                public:
+                    ImpactTargetCheck(Unit* originalTarget) : _originalTarget(originalTarget) { }
+
+                    bool operator() (WorldObject* unit)
+                    {
+                        return unit->GetGUID() == _originalTarget->GetGUID();
+                    }
+
+                private:
+                    Unit* _originalTarget;
+            };
+
+            class ImpactAuraCheck
+            {
+                public:
+                    ImpactAuraCheck(uint64 guid) : _guid(guid) { }
+
+                    bool operator() (AuraEffect* effect)
+                    {
+                        if (!(effect->GetSpellInfo()->SchoolMask & SPELL_SCHOOL_MASK_FIRE))
+                            return true;
+
+                        return _guid != effect->GetCasterGUID();
+                    }
+
+                private:
+                    uint64 _guid;
+            };
+        };
+
+        SpellScript* GetSpellScript() const
         {
-            OnEffectHit += SpellEffectFn(spell_mage_impact_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+            return new spell_mage_impact_SpellScript();
         }
-    };
-
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_mage_impact_SpellScript();
-    }
 };
 
 void AddSC_mage_spell_scripts()

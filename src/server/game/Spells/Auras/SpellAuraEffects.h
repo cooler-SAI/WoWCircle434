@@ -425,5 +425,19 @@ namespace Trinity
                 return false;
             }
     };
+
+    class DurationOrderPred
+    {
+        public:
+            DurationOrderPred(bool ascending = true) : m_ascending(ascending) {}
+            bool operator() (const Aura* a, const Aura* b) const
+            {
+                uint32 rA = a->GetDuration();
+                uint32 rB = b->GetDuration();
+                return m_ascending ? rA < rB : rA > rB;
+            }
+        private:
+            const bool m_ascending;
+    };
 }
 #endif

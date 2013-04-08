@@ -1358,6 +1358,35 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 switch (GetId())
                 {
+                    // Living Bomb
+                    case 44457:
+                    {
+                        UnitList targets;
+                        Trinity::AnyUnitHavingBuffInObjectRangeCheck u_check(caster, caster, 300.0f, 44457, false);
+                        Trinity::UnitListSearcher<Trinity::AnyUnitHavingBuffInObjectRangeCheck> searcher(caster, targets, u_check);
+                        caster->VisitNearbyObject(300.0f, searcher);
+                        if (targets.size() >= 4)
+                        {
+                            std::list<Aura*> auras;
+                            for (UnitList::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
+                                if (Aura* aur = (*itr)->GetAura(44457, caster->GetGUID()))
+                                    auras.push_back(aur);
+
+                            if(auras.size() >= 4)
+                            {
+                                auras.sort(Trinity::DurationOrderPred(false));
+                                auras.pop_front();
+                                auras.pop_front();
+                                auras.pop_front();
+                                for (std::list<Aura*>::iterator itr = auras.begin(); itr != auras.end();)
+                                {
+                                    (*itr)->Remove();
+                                    itr = auras.erase(itr);
+                                }
+                            }
+                        }
+                        break;
+                    }
                     case 12536: // Clearcasting
                     case 12043: // Presence of Mind
                         // Arcane Potency
