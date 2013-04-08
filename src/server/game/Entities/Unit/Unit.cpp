@@ -3200,7 +3200,6 @@ void Unit::_ApplyAura(AuraApplication * aurApp, uint8 effMask)
         return;
 
     aura->HandleAuraSpecificMods(aurApp, caster, true, false);
-    aura->CreateChargesStore();
 
     // apply effects of the aura
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -8269,7 +8268,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!roll_chance_i(triggeredByAura->GetAmount()))
                         return false;
 
-                    basepoints0 = int32(damage * 0.75f);
                     switch (procSpell->Id)
                     {
                         case 403: triggered_spell_id = 45284; break;
