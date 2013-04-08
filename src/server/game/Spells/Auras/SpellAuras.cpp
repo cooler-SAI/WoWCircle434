@@ -1950,6 +1950,13 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     if (target->HasAura(98966)  && (removeMode == AURA_REMOVE_BY_EXPIRE))
                         target->CastSpell(target, 101162, true);
                 }
+                // Frost Fever - Chilblains removal
+                else if (GetId() == 55095)
+                {
+                    if (GetCaster())
+                        if (AuraEffect * eff = GetCaster()->GetAuraEffect(SPELL_AURA_ADD_TARGET_TRIGGER, SPELLFAMILY_DEATHKNIGHT, 143, 0))
+                            target->RemoveAurasDueToSpell(eff->GetSpellInfo()->Effects[0].TriggerSpell, m_casterGuid);
+                }
                 break;
             case SPELLFAMILY_HUNTER:
                 // Glyph of Freezing Trap
