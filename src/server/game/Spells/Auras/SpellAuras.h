@@ -82,8 +82,6 @@ class AuraApplication
         void ClientUpdate(bool remove = false);
 };
 
-typedef std::list<int32> ChargeStoreList;
-
 class Aura
 {
     friend Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8 effMask, Unit* caster, int32 *baseAmount, Item* castItem, uint64 casterGUID);
@@ -144,10 +142,6 @@ class Aura
         uint8 CalcMaxCharges() const { return CalcMaxCharges(GetCaster()); }
         bool ModCharges(int32 num, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
         bool DropCharge(AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT) { return ModCharges(-1, removeMode); }
-
-        void CreateChargesStore();
-        void UpdateChargesStore();
-        bool m_haveStacks:1;
 
         uint8 GetStackAmount() const { return m_stackAmount; }
         void SetStackAmount(uint8 num);
@@ -253,7 +247,6 @@ class Aura
         bool m_isSingleTarget:1;                        // true if it's a single target spell and registered at caster - can change at spell steal for example
         bool m_isUsingCharges:1;
 
-        ChargeStoreList _chargeStoreList;
     private:
         Unit::AuraApplicationList m_removedApplications;
 };

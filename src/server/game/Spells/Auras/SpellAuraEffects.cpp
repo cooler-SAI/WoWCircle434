@@ -433,7 +433,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32 *baseAmount, Unit* caster):
 m_base(base), m_spellInfo(base->GetSpellInfo()),
 m_baseAmount(baseAmount ? *baseAmount : m_spellInfo->Effects[effIndex].BasePoints),
-m_spellmod(NULL), m_periodicTimer(0), m_tickNumber(0), m_chargePeriodicTimer(0),
+m_spellmod(NULL), m_periodicTimer(0), m_tickNumber(0),
 m_effIndex(effIndex), m_canBeRecalculated(true), m_isPeriodic(false), hasFixedPeriodic(false)
 {
     m_fixed_periodic.Clear();
@@ -1088,24 +1088,19 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool resetPeriodicTimer /*= tru
             // Start periodic on next tick or at aura apply
             if (m_amplitude && !(m_spellInfo->AttributesEx5 & SPELL_ATTR5_START_PERIODIC_AT_APPLY))
             {
-                if (m_spellInfo->IsPassive() || GetId() == 32409)
+                m_periodicTimer += m_amplitude;
+                /*if (m_spellInfo->IsPassive() || GetId() == 32409)
                     m_periodicTimer += m_amplitude;
                 else
                 {
                     bool hasteaffected = caster &&
-                        (caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) ||
                         m_spellInfo->AttributesEx5 & SPELL_ATTR5_HASTE_AFFECT_DURATION);
 
                     m_periodicTimer += hasteaffected ? m_amplitude/2: m_amplitude;
-                }
+                }*/
             }
         }
     }
-
-    if (GetSpellInfo()->GetUniqueChargeInfo())
-        m_chargePeriodicTimer = 500;
-    else
-        m_chargePeriodicTimer = 0;
 }
 
 void AuraEffect::CalculateSpellMod()
@@ -1346,13 +1341,6 @@ void AuraEffect::Update(uint32 diff, Unit* caster)
 {
     if (m_isPeriodic && (GetBase()->GetDuration() >=0 || GetBase()->IsPassive() || GetBase()->IsPermanent()))
     {
-        if (GetBase()->m_haveStacks)
-        {
-            m_chargePeriodicTimer -= diff;
-            if (m_chargePeriodicTimer < 0)
-                UpdateChargeTick();
-        }
-
         if (m_periodicTimer > int32(diff))
             m_periodicTimer -= diff;
         else // tick also at m_periodicTimer == 0 to prevent lost last tick in case max m_duration == (max m_periodicTimer)*N
@@ -1369,6 +1357,44 @@ void AuraEffect::Update(uint32 diff, Unit* caster)
             for (std::list<AuraApplication*>::const_iterator apptItr = effectApplications.begin(); apptItr != effectApplications.end(); ++apptItr)
                 if ((*apptItr)->HasEffect(GetEffIndex()))
                     PeriodicTick(*apptItr, caster);
+
+            // TEMPORARY HACKS FOR PERIODIC HANDLERS OF DYNAMIC OBJECT AURAS
+            if (GetBase()->GetType() == DYNOBJ_AURA_TYPE)
+            {
+                if (DynamicObject const* d_owner = GetBase()->GetDynobjOwner())
+                {
+                    switch (GetSpellInfo()->Id)
+                    {
+                        // Earthquake
+                        case 61882:
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 77478, true);
+                            break;
+                        // Healing Rain
+                        case 73920:
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 73921, true);
+                            break;
+                        // Holy Word: Sanctuary
+                        case 88685:
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 88686, true);
+                            break;
+                        // Efflorescence
+                        case 81262:
+                        {
+                            SpellCastTargets targets;
+                            CustomSpellValues values;
+                            targets.SetDst(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), GetCaster()->GetOrientation());
+                            int32 bp = GetBase()->GetEffect(EFFECT_0)->GetAmount();
+                            values.AddSpellMod(SPELLVALUE_BASE_POINT0, bp);
+                            GetCaster()->CastSpell(targets, sSpellMgr->GetSpellInfo(81269), &values, TRIGGERED_FULL_MASK, NULL, NULL, NULL);
+                            break;
+                        }
+                        // Solar beam
+                        case 78675:
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 81261, true);
+                            break;
+                    }
+                }
+            }
         }
     }
 }
@@ -1581,16 +1607,6 @@ void AuraEffect::PeriodicTick(AuraApplication * aurApp, Unit* caster) const
         default:
             break;
     }
-}
-
-void AuraEffect::UpdateChargeTick()
-{
-    if (GetBase()->IsRemoved() || GetBase()->IsExpired())
-        return;
-
-    GetBase()->UpdateChargesStore();
-
-    m_chargePeriodicTimer += 500;
 }
 
 void AuraEffect::HandleProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
@@ -6397,19 +6413,6 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
         {
             switch (GetSpellInfo()->Id)
             {
-                // Solar beam
-                case 78675:
-                {
-                    caster->CastSpell(target, 81261, true);
-                    break;
-                }
-                // Efflorescence
-                case 81262:
-                {
-                    int32 bp = GetAmount();
-                    caster->CastCustomSpell(target, 81269, &bp, 0, 0, true, 0, this);
-                    break;
-                }
                 // Frenzied Regeneration
                 case 22842:
                 {
@@ -6518,11 +6521,6 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
 
             switch (GetId())
             {
-                // Healing Rain
-                case 73920:
-                    if (target->HasAuraEffect(73920, 0, caster->GetGUID()))
-                        caster->CastSpell(target, 73921, true, 0, this);
-                    break;
                 // Astral Shift
                 case 52179:
                     // Periodic need for remove visual on stun/fear/silence lost
@@ -6599,18 +6597,6 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                     }
                     break;
                 }
-            }
-            break;
-        case SPELLFAMILY_PRIEST:
-            switch (GetId())
-            {
-                // Holy Word: Sanctuary
-                case 88685:
-                    if (caster)
-                        caster->CastSpell(target, 88686, true);
-                    break;
-                default:
-                    break;
             }
             break;
         default:

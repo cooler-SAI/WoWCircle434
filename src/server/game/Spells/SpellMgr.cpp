@@ -6022,39 +6022,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 80319:
                 spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL;
                 break;
-            // Solar Beam
-            case 78675:
-                spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
-                spellInfo->Effects[1].Amplitude = 500;
-                spellInfo->Effects[1].SetRadiusIndex(8);
-                spellInfo->Effects[2].ApplyAuraName = 0;
-                spellInfo->Effects[2].Effect = 0;
-                break;
             // Wild Growth
             case 48438:
                 spellInfo->Effects[0].SetRadiusIndex(10);
                 spellInfo->Effects[1].SetRadiusIndex(10);
-                break;
-            // Efflorescence
-            // Healing Rain
-            // Holy Word: Sanctuary
-            case 81262:
-            case 88685:
-            case 73920:
-                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
-                spellInfo->Effects[EFFECT_1].ApplyAuraName = 0;
-                spellInfo->Effects[EFFECT_1].Effect = 0;
-                spellInfo->Effects[EFFECT_0].Amplitude = spellInfo->Id == 81262 ? 1000 : 2000;
-                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ALLY;
-                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_DEST_AREA_ALLY;
-                spellInfo->AttributesEx5 &= ~SPELL_ATTR5_START_PERIODIC_AT_APPLY;
-                break;
-            // Healing Rain
-            // Holy Word: Sanctuary
-            case 73921:
-            case 88686:
-                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ALLY;
-                spellInfo->Effects[EFFECT_0].TargetB = 0;
                 break;
             // Relentless Strikes
             case 14179:
@@ -6205,15 +6176,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 42223: // Rain of Fire
             case 42231: // Hurricane
             case 52212: // Death and Decay
-            case 81269: // Efflorescence
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ENEMY;
                 spellInfo->Effects[EFFECT_0].TargetB = 0;
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(0);
 
-                if (spellInfo->Id == 81269) // Death and Decay
-                    spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ALLY;
-
-                if (spellInfo->Id == 52212) // Efflorescence
+                if (spellInfo->Id == 52212)
                     spellInfo->Effects[0].SetRadiusIndex(13);
 
                 break;
@@ -6417,6 +6384,11 @@ void SpellMgr::LoadDbcDataCorrections()
             // Silencing Shot
             case 34490:
                 spellInfo->Speed = 0;
+                break;
+            case 81262: // Efflorensence
+            case 88685: // Holy World: Sanctuary
+            case 73920: // Healing Rain
+                spellInfo->AttributesEx5 &= ~SPELL_ATTR5_START_PERIODIC_AT_APPLY;
                 break;
             default:
                 break;

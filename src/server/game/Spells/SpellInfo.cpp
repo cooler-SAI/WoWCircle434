@@ -3090,20 +3090,6 @@ bool SpellInfo::IsNeedAdditionalLosChecks() const
     return false;
 }
 
-int32 SpellInfo::GetUniqueChargeInfo(Unit* caster /* = NULL */) const
-{
-    switch (Id)
-    {
-        case 12654: // Ignite
-        case 99173: // Burning Wounds, Item - Rogue T12 2P Bonus
-            return GetDuration();
-        default:
-            break;
-    }
-
-    return 0;
-}
-
 bool SpellInfo::IsRequireAdditionalTargetCheck() const
 {
     switch (Id)

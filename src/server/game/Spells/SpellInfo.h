@@ -441,8 +441,6 @@ public:
 
     bool HasPersistenAura() const;
 
-    int32 GetUniqueChargeInfo(Unit* caster = NULL) const;
-
     bool IsExplicitDiscovery() const;
     bool IsLootCrafting() const;
     bool IsQuestTame() const;

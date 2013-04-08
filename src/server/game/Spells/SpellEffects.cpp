@@ -5821,6 +5821,11 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                // Earthquake (stun effect)
+                case 77478:
+                    if (roll_chance_i(10))
+                        m_caster->CastSpell(unitTarget, 77505, true);
+                    break;
                 // Taming the Flames, Item - Shaman T12 Elemental 2P Bonus
                 case 99202:
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)

@@ -1341,30 +1341,37 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                 }
                 break;
             case SPELLFAMILY_DRUID:
-                if (m_spellInfo->SpellFamilyFlags[1] == 0x04000000) // Wild Growth
+                switch(m_spellInfo->Id) 
                 {
-                    maxSize = 5;
-                    if (m_caster->HasAura(62970)) // Glyph of Wild Growth
-                        maxSize++;
-                    if (m_caster->HasAura(33891)) // Tree of Life
-                        maxSize += 2;
+                    // Wild Growth
+                    case 48438:
+                        maxSize = 5;
+                        if (m_caster->HasAura(62970)) // Glyph of Wild Growth
+                            maxSize++;
+                        if (m_caster->HasAura(33891)) // Tree of Life
+                            maxSize += 2;
 
-                    power = POWER_HEALTH;
+                        power = POWER_HEALTH;
 
-                    // Remove targets outside caster's raid
-                    for (std::list<Unit*>::iterator itr = unitTargets.begin(); itr != unitTargets.end();)
-                    {
-                        if (!(*itr)->IsInRaidWith(m_caster))
-                            itr = unitTargets.erase(itr);
-                        else
-                            ++itr;
-                    }
-                }
-                // Firebloom, Item  Druid T12 Restoration 4P Bonus
-                else if (m_spellInfo->Id == 99017)
-                {
-                    maxSize = 1;
-                    power = POWER_HEALTH;
+                        // Remove targets outside caster's raid
+                        for (std::list<Unit*>::iterator itr = unitTargets.begin(); itr != unitTargets.end();)
+                        {
+                            if (!(*itr)->IsInRaidWith(m_caster))
+                                itr = unitTargets.erase(itr);
+                            else
+                                ++itr;
+                        }
+                        break;
+                    // Firebloom, Item  Druid T12 Restoration 4P Bonus
+                    case 99017:
+                        maxSize = 1;
+                        power = POWER_HEALTH;
+                        break;
+                    // Efflorescence
+                    case 81269:
+                        maxSize = 3;
+                        power = POWER_HEALTH;
+                        break;
                 }
                 break;
             default:
@@ -7447,7 +7454,20 @@ void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier)
                     {
                         uint32 targetAmount = m_UniqueTargetInfo.size();
                         if (targetAmount > 10)
-                            m_damage = m_damage * 10/targetAmount;
+                            m_damage = int32(m_damage * float (10 / targetAmount));
+                    }
+                }
+            }
+            else if (m_damage < 0)
+            {
+                if (m_spellInfo->Id == 88686 || // Holy Word: Sanctuary
+                    m_spellInfo->Id == 73921) // Healing Rain
+                {
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        uint32 targetAmount = m_UniqueTargetInfo.size();
+                        if (targetAmount > 6)
+                            m_damage = int32(m_damage * float(6 / targetAmount));
                     }
                 }
             }

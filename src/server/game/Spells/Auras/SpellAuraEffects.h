@@ -147,7 +147,6 @@ class AuraEffect
         SpellModifier* m_spellmod;
 
         int32 m_periodicTimer;
-        int32 m_chargePeriodicTimer;
         int32 m_amplitude;
         uint32 m_tickNumber;
 
