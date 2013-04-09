@@ -4900,6 +4900,15 @@ void Spell::TakePower()
         TakeRunePower(hit);
         return;
     }
+    // Kill Command - Resistance is Futile! - energy refund
+    else if (powerType == POWER_FOCUS)
+    {
+        if (m_spellInfo->Id == 34026 && m_caster->HasAura(82894))
+        {
+            m_caster->RemoveAurasDueToSpell(82894);
+            return;
+        }
+    }
 
     // In Spell::HandleHolyPower
     if (m_spellInfo->PowerType == POWER_HOLY_POWER)
