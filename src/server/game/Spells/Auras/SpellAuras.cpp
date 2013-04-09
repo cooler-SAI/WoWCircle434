@@ -1939,6 +1939,16 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     else if (caster && caster->HasAura(79123)) // rank 1
                         caster->CastSpell(target, 79124, true);
                 }
+                // Venomous Wounds power regain on death with Rupture
+                else if (GetId() == 1943)
+                {
+                    if (removeMode == AURA_REMOVE_BY_DEATH && caster && caster->GetDummyAuraEffect(SPELLFAMILY_ROGUE, 4888, 0))
+                    { 
+                        int32 val = 25 * GetDuration() / GetMaxDuration();
+                        caster->CastCustomSpell(caster, 51637, &val, 0, 0, true);
+                    }
+                    break;
+                }
                 break;
             case SPELLFAMILY_PALADIN:
                 if (!caster)
