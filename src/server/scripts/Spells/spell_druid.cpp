@@ -813,7 +813,7 @@ class spell_dru_primal_madness : public SpellScriptLoader
         }
 };
 
-// Feral Agression - Faerie Fire
+// Feral Aggression - Faerie Fire
 class spell_dru_faerie_fire : public SpellScriptLoader
 {
 public:
@@ -835,7 +835,13 @@ public:
                 if (GetHitUnit() && GetCaster()->IsInFeralForm())
                 {
                     if (Aura* faerieFire = GetHitUnit()->GetAura(DRUID_FAERIE_FIRE, GetCaster()->GetGUID()))
-                        faerieFire->SetStackAmount(aurEff->GetAmount());
+                    {
+                        uint8 stacks = faerieFire->GetStackAmount() + aurEff->GetAmount() - 1;
+                        if (stacks > 3)
+                            stacks = 3;
+
+                        faerieFire->SetStackAmount(stacks);
+                    }
                 }
             }
         }
