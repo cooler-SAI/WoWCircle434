@@ -302,7 +302,45 @@ Creature* BattlegroundAV::AddAVCreature(uint16 cinfoid, uint16 type)
     }
 
     if (level != 0)
-        level += m_MaxLevel - 60; //maybe we can do this more generic for custom level-range.. actually it's blizzlike
+    {
+        uint32 minLevel = GetMinLevel() < 85 ? GetMinLevel() : 81;
+        uint32 diff = level - 45;
+        level = minLevel + diff;
+
+        CreatureTemplate const* cInfo = creature->GetCreatureTemplate();
+        CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(level, cInfo->unit_class);
+        float healthmod = 1.0f;
+        
+        switch (cInfo->rank)                                           // define rates for each elite rank
+        {
+            case CREATURE_ELITE_NORMAL:
+                healthmod = sWorld->getRate(RATE_CREATURE_NORMAL_HP);
+                break;
+            case CREATURE_ELITE_ELITE:
+                healthmod = sWorld->getRate(RATE_CREATURE_ELITE_ELITE_HP);
+                break;
+            case CREATURE_ELITE_RAREELITE:
+                healthmod = sWorld->getRate(RATE_CREATURE_ELITE_RAREELITE_HP);
+                break;
+            case CREATURE_ELITE_WORLDBOSS:
+                healthmod = sWorld->getRate(RATE_CREATURE_ELITE_WORLDBOSS_HP);
+                break;
+            case CREATURE_ELITE_RARE:
+                healthmod = sWorld->getRate(RATE_CREATURE_ELITE_RARE_HP);
+                break;
+            default:
+                healthmod = sWorld->getRate(RATE_CREATURE_ELITE_ELITE_HP);
+                break;
+        }
+
+        uint32 basehp = stats->GenerateHealth(cInfo);
+        uint32 health = uint32(basehp * healthmod);
+
+        creature->SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, (float)health);
+        creature->SetCreateHealth(health);
+        creature->SetMaxHealth(health);
+        creature->SetHealth(health);
+    }
     creature->SetLevel(level);
 
     uint32 triggerSpawnID = 0;
