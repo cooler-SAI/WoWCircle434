@@ -2020,12 +2020,7 @@ class npc_lightwell : public CreatureScript
 
             void EnterEvadeMode()
             {
-                if (!me->isAlive())
-                    return;
-
-                me->DeleteThreatList();
-                me->CombatStop(true);
-                me->ResetPlayerDamageReq();
+                return;
             }
         };
 
