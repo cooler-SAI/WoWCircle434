@@ -1229,12 +1229,15 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
     std::list<GameObject*> gObjTargets;
     // for compability with older code - add only unit and go targets
     // TODO: remove this
-    for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
+    if (!targets.empty())
     {
-        if (Unit* unitTarget = (*itr)->ToUnit())
-            unitTargets.push_back(unitTarget);
-        else if (GameObject* gObjTarget = (*itr)->ToGameObject())
-            gObjTargets.push_back(gObjTarget);
+        for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
+        {
+            if (Unit* unitTarget = (*itr)->ToUnit())
+                unitTargets.push_back(unitTarget);
+            else if (GameObject* gObjTarget = (*itr)->ToGameObject())
+                gObjTargets.push_back(gObjTarget);
+        }
     }
 
     if (!unitTargets.empty())

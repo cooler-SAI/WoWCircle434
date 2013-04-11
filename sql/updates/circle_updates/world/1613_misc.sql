@@ -51,7 +51,7 @@ REPLACE INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (100640, 'spell_alysrazor_harsh_winds'),
 (97128, 'spell_alysrazor_molten_feather'),
 (97734, 'spell_alysrazor_molten_feather_script'),
-{102111, 'spell_alysrazor_cataclysm');
+(102111, 'spell_alysrazor_cataclysm');
 
 DELETE FROM `creature_text` WHERE `entry` = 52530;
 INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`language`,`probability`,`emote`,`duration`,`sound`,`comment`) VALUES
