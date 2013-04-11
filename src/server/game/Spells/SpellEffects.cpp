@@ -356,6 +356,26 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                 switch (m_spellInfo->Id)                     // better way to check unknown
                 {
+                    // Shaman, Fire Elemental, Fire Nova
+                    case 13376:
+                    {
+                        if (Unit* owner = m_caster->GetOwner())
+                        {
+                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
+                            damage += spd;
+                        }
+                        break;
+                    }
+                    // Shaman, Fire Elemental, Fire Shield
+                    case 12740:
+                    {
+                        if (Unit* owner = m_caster->GetOwner())
+                        {
+                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
+                            damage += spd * 0.032f;
+                        }
+                        break;
+                    }
                     // Decimation Blade, Baleroc
                     case 99353:
                     {
@@ -885,6 +905,16 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             {
                 switch (m_spellInfo->Id)
                 {
+                    // Shaman, Fire Elemental, Fire Blast
+                    case 57984:
+                    {
+                        if (Unit* owner = m_caster->GetOwner())
+                        {
+                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
+                            damage += spd * 0.429f;
+                        }
+                        break;
+                    }
                     case 71757: // Deep Freeze should deal damage to permanently stun-immune targets.
                         if (unitTarget->GetTypeId() != TYPEID_UNIT || !(unitTarget->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(44572), 0)))
                             return;

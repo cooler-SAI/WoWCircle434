@@ -2169,9 +2169,12 @@ class npc_shadowfiend : public CreatureScript
 /*######
 # npc_fire_elemental
 ######*/
-#define SPELL_FIRENOVA        12470
-#define SPELL_FIRESHIELD      13376
-#define SPELL_FIREBLAST       57984
+enum FireElemental
+{
+    SPELL_FIRENOVA      = 12470,
+    SPELL_FIRESHIELD    = 13376,
+    SPELL_FIREBLAST     = 57984,
+};
 
 class npc_fire_elemental : public CreatureScript
 {
