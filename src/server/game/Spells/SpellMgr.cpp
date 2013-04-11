@@ -6393,6 +6393,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 6770:  // Sap
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_CANT_TRIGGER_PROC;
                 break;
+            // Cauterizing Flame
+            case 99152:
+                spellInfo->AttributesEx |= SPELL_ATTR1_CANT_TARGET_SELF;
+                break;
             default:
                 break;
         }
