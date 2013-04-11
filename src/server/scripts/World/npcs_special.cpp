@@ -3813,6 +3813,84 @@ class npc_moonwell_chalice : public CreatureScript
         }; 
 };
 
+enum DoomGuard
+{
+    EVENT_DOOM_BOLT  = 1,
+
+    SPELL_DOOM_BOLT  = 85692,
+};
+
+class npc_warlock_doom_guard : public CreatureScript
+{
+    public:
+        npc_warlock_doom_guard() : CreatureScript("npc_warlock_doom_guard") { }
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_warlock_doom_guardAI(creature);
+        }
+
+        struct npc_warlock_doom_guardAI : CasterAI
+        {
+            npc_warlock_doom_guardAI(Creature* creature) : CasterAI(creature) 
+            {
+                curTarget = NULL;
+            }
+
+            Unit* curTarget;
+
+            void EnterCombat(Unit* who)
+            {
+                events.ScheduleEvent(EVENT_DOOM_BOLT, 500);
+            }
+
+            void OwnerAttacked(Unit* target)
+            {
+                if (!curTarget)
+                    if (target && (target->HasAura(603) || target->HasAura(980)))
+                        curTarget = target;
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->getVictim()->HasCrowdControlAura(me))
+                {
+                    me->InterruptNonMeleeSpells(false);
+                    return;
+                }
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                if (curTarget && (me->getVictim() != curTarget))
+                    AttackStart(curTarget);
+
+                if (uint32 event_id = events.ExecuteEvent())
+                {
+                    float const maxRange = 40.0f;
+                    float normalRange = maxRange / 1.2f;
+
+                    if (Unit* victim = me->getVictim())
+                    {
+                        if (maxRange && !me->IsWithinDistInMap(victim, maxRange))
+                            me->GetMotionMaster()->MoveChase(victim, normalRange);
+
+                        if (maxRange && !me->IsWithinLOSInMap(victim))
+                            me->GetMotionMaster()->MoveChase(victim, MELEE_RANGE);
+                    }
+
+                    DoCastVictim(SPELL_DOOM_BOLT);
+                    events.ScheduleEvent(EVENT_DOOM_BOLT, 3500);
+                }
+            }
+        };
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3859,4 +3937,5 @@ void AddSC_npcs_special()
     new npc_burning_treant();
     new npc_kwee_q_peddlefeet();
     new npc_moonwell_chalice();
+    new npc_warlock_doom_guard();
 }

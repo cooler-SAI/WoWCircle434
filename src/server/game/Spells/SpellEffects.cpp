@@ -497,6 +497,16 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             {
                 switch (m_spellInfo->Id)
                 {
+                    // Doom Bolt
+                    case 85692:
+                    {
+                        if (Unit* owner = m_caster->GetOwner())
+                        {
+                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
+                            damage += spd * 1.36f;
+                        }
+                        break;
+                    }
                     // Firebolt
                     case 3110:
                     {

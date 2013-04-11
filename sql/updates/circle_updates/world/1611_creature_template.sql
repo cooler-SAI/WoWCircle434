@@ -1,0 +1,1 @@
+UPDATE `creature_template` SET `ScriptName`='npc_warlock_doom_guard' WHERE `entry`=11859;
