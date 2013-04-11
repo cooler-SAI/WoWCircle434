@@ -6030,15 +6030,21 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (AuraEffect const *aurEff = GetAuraEffect(12654, EFFECT_0, GetGUID()))
                         if (!aurEff->GetTickNumber())
                             return false;
+
+                    Unit* original_caster = GetProcOwner();
+                    if (!original_caster)
+                        return false;
+
                     // Trigger amount should be divided by ticks count. Assumed that player can't change ticks count
                     triggerAmount /= 2;
                     basepoints0 = CalculatePct(damage, triggerAmount);
                     // Mastery should affect damage
-                    if (AuraEffect const* aurEff = GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_MAGE, 37, EFFECT_0))
+                    if (AuraEffect const* aurEff = original_caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_MAGE, 37, EFFECT_0))
                         AddPct<int32>(basepoints0, aurEff->GetAmount());
 
                     triggered_spell_id = 12654;
-                    basepoints0 += victim->GetRemainingPeriodicAmount(GetGUID(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE);
+                    basepoints0 += victim->GetRemainingPeriodicAmount(original_caster->GetGUID(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE);
+                    originalCaster = original_caster->GetGUID();
                     break;
                 }
                 // Glyph of Ice Block
@@ -9551,6 +9557,13 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Fingers of Frost
+        case 44543:
+        case 44545:
+        case 83074:
+            if (Unit* original_caster = GetProcOwner())
+                original_caster->CastSpell(original_caster, 44544, true);
+            return true;
         case 324: // Lightning Shield
         case 30482: // Molten Armor
             if (victim && victim->isTotem())

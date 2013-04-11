@@ -3418,108 +3418,186 @@ enum eFlameOrb
 {
     SPELL_FIRE_POWER                    = 83619,
     SPELL_FLAME_ORB_DAMAGE              = 86719,
-    SPELL_FROSTFIRE_ORB_DAMAGE          = 95969,
+    SPELL_FROSTFIRE_ORB_DAMAGE_RANK1    = 95969,
     SPELL_FROSTFIRE_ORB_DAMAGE_RANK2    = 84721,
+    SPELL_FROSTFIRE_ORB_RANK1           = 84726,
+    SPELL_FROSTFIRE_ORB_RANK2           = 84727,
     FLAME_ORB_DISTANCE                  = 120
 };
 
-class npc_flame_orb : public CreatureScript
+class npc_flame_orb: public CreatureScript
 {
-public:
-    npc_flame_orb() : CreatureScript("npc_flame_orb") {}
+    public:
+        npc_flame_orb () : CreatureScript("npc_flame_orb") { }
 
-    struct npc_flame_orbAI : public ScriptedAI
-    {
-        npc_flame_orbAI(Creature *c) : ScriptedAI(c)
+        CreatureAI *GetAI (Creature* pCreature) const
         {
-            if (!me->GetOwner())
+            return new npc_flame_orbAI(pCreature);
+        }
+
+        struct npc_flame_orbAI: public ScriptedAI
+        {
+            npc_flame_orbAI (Creature* pCreature) : ScriptedAI(pCreature)
             {
-                me->DespawnOrUnsummon();
-                return;
+                x = me->GetPositionX();
+                y = me->GetPositionY();
+                z = me->GetOwner()->GetPositionZ() + 3;
+                o = me->GetOrientation();
+                me->NearTeleportTo(x, y, z, o, true);
+                angle = me->GetOwner()->GetAngle(me);
+                newx = me->GetPositionX() + FLAME_ORB_DISTANCE / 2 * cos(angle);
+                newy = me->GetPositionY() + FLAME_ORB_DISTANCE / 2 * sin(angle);
+                CombatCheck = false;
+                bDespawn = false;
             }
 
-            x = me->GetPositionX();
-            y = me->GetPositionY() + 2;
-            z = me->GetOwner()->GetPositionZ() + 5;
-            o = me->GetOrientation();
-//             me->NearTeleportTo(x, y, z, o, true);
-            angle = me->GetOwner()->GetAngle(me);
-            newx = me->GetPositionX() + FLAME_ORB_DISTANCE/2 * cos(angle);
-            newy = me->GetPositionY() + FLAME_ORB_DISTANCE/2 * sin(angle);
-            InCombat = false;
-        }
+            float x, y, z, o, newx, newy, angle;
+            bool CombatCheck;
+            uint32 uiDespawnTimer;
+            uint32 uiDespawnCheckTimer;
+            uint32 uiDamageTimer;
+            bool bDespawn;
 
-        float x, y, z, o, newx, newy, angle;
-        bool InCombat;
-        uint32 uiDespawnTimer;
-        uint32 uiDamageTimer;
-
-        void Reset()
-        {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_NON_ATTACKABLE);
-            me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
-            me->SetReactState(REACT_PASSIVE);
-            uiDamageTimer = 1*IN_MILLISECONDS;
-            me->GetMotionMaster()->MovePoint(0, newx, newy, z);
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if (uiDespawnTimer <= diff)
+            void EnterCombat (Unit* /*target*/)
             {
-                if (Unit* owner = me->GetOwner())
+                me->GetMotionMaster()->MoveCharge(newx, newy, z, 1.14286f);          // Normal speed
+                uiDespawnTimer = 15 * IN_MILLISECONDS;
+                CombatCheck = true;
+            }
+
+            void Reset ()
+            {
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+                me->SetReactState(REACT_PASSIVE);
+                if (CombatCheck == true)
+                    uiDespawnTimer = 15 * IN_MILLISECONDS;
+                else
+                    uiDespawnTimer = 4 * IN_MILLISECONDS;
+                uiDamageTimer = 1 * IN_MILLISECONDS;
+                me->GetMotionMaster()->MovePoint(0, newx, newy, z);
+            }
+
+            void UpdateAI (const uint32 diff)
+            {
+                if (!me->isInCombat() && CombatCheck == false)
                 {
-                    Aura* aura = NULL;
-                    if ((aura = owner->GetAura(54734)) ||
-                        (aura = owner->GetAura(18460)) ||
-                        (aura = owner->GetAura(18459)))
-                        if (roll_chance_i(aura->GetSpellInfo()->ProcChance))
-                            me->CastSpell(me, SPELL_FIRE_POWER, true);
+                    me->SetSpeed(MOVE_RUN, 2, true);
+                    me->SetSpeed(MOVE_FLIGHT, 2, true);
                 }
-                me->DespawnOrUnsummon(800);
-            }
-            else
-                uiDespawnTimer -= diff;
 
-            if (uiDamageTimer <= diff)
-            {
-                if (Unit* target = me->SelectNearestTargetNoCC(20))
+                if (uiDespawnTimer <= diff)
                 {
-                    if (!InCombat)
+                    if (!bDespawn)
                     {
-                        InCombat = true;
-                        me->SetSpeed(MOVE_RUN, 0.1f, true);
-                        me->SetSpeed(MOVE_FLIGHT, 0.1f, true);
-                    }
-                    if (me->GetEntry() == 44214)
-                        DoCast(target, SPELL_FLAME_ORB_DAMAGE);
-                    else if (Unit* owner = me->GetOwner())
-                    {
-                        if (owner->HasAura(84726))
-                            DoCast(target, SPELL_FROSTFIRE_ORB_DAMAGE);
-                        else if (owner->HasAura(84727))
-                            DoCast(target, SPELL_FROSTFIRE_ORB_DAMAGE_RANK2);
+                        bDespawn = true;
+                        if (me->GetOwner()->HasAura(18459) && roll_chance_i(33) || me->GetOwner()->HasAura(18460) && roll_chance_i(66) || me->GetOwner()->HasAura(54734))
+                            DoCast(me, SPELL_FIRE_POWER);
+
+                        me->DespawnOrUnsummon(500);
                     }
                 }
                 else
-                    if (InCombat)
+                    uiDespawnTimer -= diff;
+
+                if (uiDamageTimer <= diff)
+                {
+                    if (Unit* target = me->SelectNearestTarget(15))
+                        DoCast(target, SPELL_FLAME_ORB_DAMAGE);
+
+                    uiDamageTimer = 1 * IN_MILLISECONDS;
+                }
+                else
+                    uiDamageTimer -= diff;
+            }
+        };
+};
+
+class npc_frostfire_orb: public CreatureScript
+{
+    public:
+        npc_frostfire_orb () : CreatureScript("npc_frostfire_orb") { }
+
+        CreatureAI *GetAI (Creature* pCreature) const
+        {
+            return new npc_frostfire_orbAI(pCreature);
+        }
+
+        struct npc_frostfire_orbAI: public ScriptedAI
+        {
+            npc_frostfire_orbAI (Creature* pCreature) : ScriptedAI(pCreature)
+            {
+                x = me->GetPositionX();
+                y = me->GetPositionY();
+                z = me->GetOwner()->GetPositionZ() + 3;
+                o = me->GetOrientation();
+                me->NearTeleportTo(x, y, z, o, true);
+                angle = me->GetOwner()->GetAngle(me);
+                newx = me->GetPositionX() + FLAME_ORB_DISTANCE / 2 * cos(angle);
+                newy = me->GetPositionY() + FLAME_ORB_DISTANCE / 2 * sin(angle);
+                CombatCheck = false;
+                if (me->GetOwner()->HasAura(84727))
+                    spellId_dmg = SPELL_FROSTFIRE_ORB_DAMAGE_RANK2;
+                else
+                    spellId_dmg = SPELL_FROSTFIRE_ORB_DAMAGE_RANK1;
+            }
+
+            float x, y, z, o, newx, newy, angle;
+            bool CombatCheck;
+            uint32 uiDespawnTimer;
+            uint32 uiDespawnCheckTimer;
+            uint32 uiDamageTimer;
+            uint32 spellId_dmg;
+
+            void EnterCombat (Unit* /*target*/)
+            {
+                me->GetMotionMaster()->MoveCharge(newx, newy, z, 1.14286f);          // Normal speed
+                uiDespawnTimer = 15 * IN_MILLISECONDS;
+                CombatCheck = true;
+            }
+
+            void Reset ()
+            {
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+                me->SetReactState(REACT_PASSIVE);
+                if (CombatCheck == true)
+                    uiDespawnTimer = 15 * IN_MILLISECONDS;
+                else
+                    uiDespawnTimer = 4 * IN_MILLISECONDS;
+                uiDamageTimer = 1 * IN_MILLISECONDS;
+                me->GetMotionMaster()->MovePoint(0, newx, newy, z);
+            }
+
+            void UpdateAI (const uint32 diff)
+            {
+                if (!me->isInCombat() && CombatCheck == false)
+                {
+                    me->SetSpeed(MOVE_RUN, 2, true);
+                    me->SetSpeed(MOVE_FLIGHT, 2, true);
+                }
+
+                if (uiDespawnTimer <= diff)
+                {
+                    me->SetVisible(false);
+                    me->DisappearAndDie();
+                }
+                else
+                    uiDespawnTimer -= diff;
+
+                if (uiDamageTimer <= diff)
+                {
+                    if (Unit* target = me->SelectNearestTarget(15))
                     {
-                        InCombat = false;
-                        me->SetSpeed(MOVE_RUN, 0.5f, true);
-                        me->SetSpeed(MOVE_FLIGHT, 0.5f, true);
+                        DoCast(target, spellId_dmg);
                     }
 
-                uiDamageTimer = 1*IN_MILLISECONDS;
+                    uiDamageTimer = 1 * IN_MILLISECONDS;
+                }
+                else
+                    uiDamageTimer -= diff;
             }
-            else
-                uiDamageTimer -= diff;
-        }
-    };
-
-    CreatureAI *GetAI(Creature *creature) const
-    {
-        return new npc_flame_orbAI(creature);
-    }
+        };
 };
 
 /* Power Word Barrier */
@@ -3933,6 +4011,7 @@ void AddSC_npcs_special()
     new npc_ring_of_frost();
     new npc_bloodworm();
     new npc_flame_orb();
+    new npc_frostfire_orb();
     new npc_power_word_barrier();
     new npc_wild_mushroom();
     new npc_metzen();

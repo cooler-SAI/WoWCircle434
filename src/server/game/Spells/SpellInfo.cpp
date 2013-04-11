@@ -3123,10 +3123,9 @@ bool SpellInfo::IsShouldProcOnOwner() const
     {
         case 6358:  // Seduction -> Glyph of Seduction
         case 82739: // Fire Orb -> Ignite
-        case 86719:
         case 83381: // Kill Command! -> Improved Kill Command
-        case 95969: // Frostfire Orb -> Fingers of Frost
-        case 84721:
+        case 95969: // Frostfire Orb rank 1 -> Fingers of Frost
+        case 84721: // Frostfire Orb rank 2 -> Fingers of Frost
         case 3606: // Searing Arrow -> Searing Flames
             return true;
     }

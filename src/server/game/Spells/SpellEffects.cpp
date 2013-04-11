@@ -920,6 +920,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             return;
                         break;
                     case 82739: // Flame Orb
+                    case 83619: // Fire Power
                     case 95969: // Frostfire Orb R1
                     case 84721: // Frostfire Orb R2
                         if (Unit* owner = m_caster->GetOwner())
