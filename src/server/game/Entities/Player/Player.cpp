@@ -2810,6 +2810,9 @@ void Player::ResetAllPowers()
         case POWER_ECLIPSE:
             SetPower(POWER_ECLIPSE, 0);
             break;
+        case POWER_ALTERNATE_POWER:
+            SetPower(POWER_ALTERNATE_POWER, 0);
+            break;
         default:
             break;
     }
@@ -24060,6 +24063,10 @@ bool Player::IsKnowHowFlyIn(uint32 mapid, uint32 zone, uint32 spellId) const
         return true;
     // Eye of the Storm is always allowed in Throne of the Four Winds
     if (zone == 5638 && spellId == 82724)
+        return true;
+
+    // Wings of Flame is always allowed in Firelands
+    if (zone == 5723 && spellId == 98619)
         return true;
 
     // continent checked in SpellMgr::GetSpellAllowedInLocationError at cast and area update

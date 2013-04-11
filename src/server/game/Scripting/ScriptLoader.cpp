@@ -692,6 +692,7 @@ void AddSC_instance_firelands(); // Firelands
 void AddSC_firelands();
 void AddSC_boss_shannox();
 void AddSC_boss_bethtilac();
+void AddSC_boss_alysrazor();
 void AddSC_boss_baleroc();
 void AddSC_boss_majordomo_staghelm();
 
@@ -1422,6 +1423,7 @@ void AddNorthrendScripts()
     AddSC_firelands();
     AddSC_boss_shannox();
     AddSC_boss_bethtilac();
+    AddSC_boss_alysrazor();
     AddSC_boss_baleroc();
     AddSC_boss_majordomo_staghelm();
 

@@ -18,15 +18,23 @@ enum Data
 
 enum CreatureIds
 {
-    NPC_SHANNOX     = 53691,
-    NPC_RAGEFACE    = 53695, 
-    NPC_RIPLIMB     = 53694,
-    NPC_RHYOLITH    = 52558,
-    NPC_BETHTILAC   = 52498,
-    NPC_ALYSRAZOR   = 52530, 
-    NPC_BALEROC     = 53494,
-    NPC_STAGHELM    = 52571,
-    NPC_RAGNAROS    = 52409,
+    NPC_SHANNOX                     = 53691,
+    NPC_RAGEFACE                    = 53695, 
+    NPC_RIPLIMB                     = 53694,
+    NPC_RHYOLITH                    = 52558,
+    NPC_BETHTILAC                   = 52498,
+    NPC_ALYSRAZOR                   = 52530, 
+    NPC_BALEROC                     = 53494,
+    NPC_STAGHELM                    = 52571,
+    NPC_RAGNAROS                    = 52409,
+    
+    // alysrazor event
+    NPC_BLAZING_MONSTROSITY_LEFT    = 53786,
+    NPC_BLAZING_MONSTROSITY_RIGHT   = 53791,
+    NPC_EGG_PILE                    = 53795,
+    NPC_HARBINGER_OF_FLAME          = 53793,
+    NPC_MOLTEN_EGG_TRASH            = 53914,
+    NPC_SMOULDERING_HATCHLING       = 53794, 
 };
 
 enum GameobjectIds
@@ -39,6 +47,7 @@ enum GameobjectIds
     GO_RAID_BRIDGE_FORMING      = 209277,
     GO_RAGNAROS_FLOOR           = 208835,
     GO_STICKY_WEB               = 208877,
+    GO_MOLTEN_METEOR            = 208966,
     GO_FIRE_WALL_FENDRAL        = 208906,
     GO_CACHE_OF_THE_FIRELORD    = 208967,
     GO_CACHE_OF_THE_FIRELORD_H  = 209261,
