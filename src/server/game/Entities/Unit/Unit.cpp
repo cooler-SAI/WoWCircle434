@@ -2186,7 +2186,7 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spell)
 {
     // Spells with SPELL_ATTR3_IGNORE_HIT_RESULT will additionally fully ignore
     // resist and deflect chances
-    if (spell->AttributesEx3 & SPELL_ATTR3_IGNORE_HIT_RESULT)
+    if (spell->AttributesEx3 & SPELL_ATTR3_IGNORE_HIT_RESULT || spell->IsInterruptSpell())
         return SPELL_MISS_NONE;
 
     WeaponAttackType attType = BASE_ATTACK;
@@ -2352,6 +2352,9 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spell)
 {
     // Can`t miss on dead target (on skinning for example)
     if (!victim->isAlive() && victim->GetTypeId() != TYPEID_PLAYER)
+        return SPELL_MISS_NONE;
+
+    if (spell->IsInterruptSpell())
         return SPELL_MISS_NONE;
 
     SpellSchoolMask schoolMask = spell->GetSchoolMask();

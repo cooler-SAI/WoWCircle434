@@ -552,6 +552,7 @@ public:
     bool IsBreakingCamouflageAfterHit() const;
     bool IsBreakingStealth(Unit* m_caster = NULL) const;
     bool IsPeriodicHeal() const;
+    bool IsInterruptSpell() const;
 
     bool IsShouldProcOnOwner() const;
     bool IsCanBeStolen() const;

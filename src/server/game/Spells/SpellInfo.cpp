@@ -3195,6 +3195,23 @@ bool SpellInfo::IsPeriodicHeal() const
     return false;
 }
 
+bool SpellInfo::IsInterruptSpell() const
+{
+    switch (Id)
+    {
+        case 78675: 
+        case 97547: // Solar Beam
+        case 80964:
+        case 93985: // Skull Bash
+            return true;
+    default:
+        break;
+    }
+    if (HasEffect(SPELL_EFFECT_INTERRUPT_CAST) || HasAura(SPELL_AURA_MOD_SILENCE))
+        return true;
+    return false;
+}
+
 bool SpellInfo::IsBreakingCamouflageAfterHit() const
 {
     // Traps
