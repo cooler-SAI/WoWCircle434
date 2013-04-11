@@ -7460,6 +7460,30 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
             switch (dummySpell->Id)
             {
+                // Killing Streak
+                case 82748:
+                case 82749:
+                {
+                    if (effIndex != 0)
+                        return false;
+
+                    if (procEx & PROC_EX_CRITICAL_HIT)
+                    {
+                        if (triggeredByAura->GetBase()->GetCharges() <= 1)
+                        {
+                            triggeredByAura->GetBase()->SetCharges(2);
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        triggeredByAura->GetBase()->SetCharges(0);
+                        return false;
+                    }
+                    triggeredByAura->GetBase()->SetCharges(0);
+                    GetProcOwner()->CastSpell(GetProcOwner(), (dummySpell->Id == 82748 ? 94006 : 94007), true);
+                    return true;
+                }
                 // Roar of Sacrifice
                 case 53480:
                 {
