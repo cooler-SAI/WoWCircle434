@@ -6397,6 +6397,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 99152:
                 spellInfo->AttributesEx |= SPELL_ATTR1_CANT_TARGET_SELF;
                 break;
+            // Lifebloom
+            case 33778:
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_TARGET_ALLY;
+                break;
             default:
                 break;
         }

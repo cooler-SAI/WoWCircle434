@@ -400,13 +400,7 @@ class spell_dru_lifebloom : public SpellScriptLoader
                 // final heal
                 int32 stack = GetStackAmount();
                 int32 healAmount = aurEff->GetAmount();
-                if (Unit* caster = GetCaster())
-                {
-                    GetTarget()->CastCustomSpell(GetTarget(), DRUID_LIFEBLOOM_FINAL_HEAL, &healAmount, &stack, NULL, true, NULL, aurEff, GetCasterGUID());
-                    return;
-                }
-
-                GetTarget()->CastCustomSpell(GetTarget(), DRUID_LIFEBLOOM_FINAL_HEAL, &healAmount, NULL, NULL, true, NULL, aurEff, GetCasterGUID());
+                (GetCaster() ? GetCaster(): GetTarget())->CastCustomSpell(GetTarget(), DRUID_LIFEBLOOM_FINAL_HEAL, &healAmount, &stack, NULL, true, NULL, aurEff, GetCasterGUID());
             }
 
             void HandleDispel(DispelInfo* dispelInfo)
