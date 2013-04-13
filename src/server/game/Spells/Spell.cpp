@@ -3213,7 +3213,7 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     if ((_triggeredCastFlags & TRIGGERED_IGNORE_COMBO_POINTS) || m_CastItem || !m_caster->m_movedPlayer)
         m_needComboPoints = false;
 
-    if (IsDarkSimulacrum())
+    if (IsDarkSimulacrum() || (m_triggeredByAuraSpell && m_triggeredByAuraSpell->Id == 101056))
         isStolen = true;
 
     SpellCastResult result = SPELL_CAST_OK;

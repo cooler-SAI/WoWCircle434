@@ -5335,11 +5335,26 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 // Wrath of Tarecgosa
                 case 101056:
                 {
-                    if (!roll_chance_i(4))
+                    if (!procSpell)
                         return false;
 
-                    basepoints0 = damage;
-                    triggered_spell_id = 101085;
+                    if (procFlag & PROC_FLAG_DONE_PERIODIC)
+                    {
+                        if (!roll_chance_i(10))
+                            return false;
+
+                        basepoints0 = damage;
+                        triggered_spell_id = 101085;
+                        break;
+                    }
+                    else
+                    {
+                        if (!roll_chance_i(5))
+                            return false;
+
+                        triggered_spell_id = procSpell->Id;
+                        break;
+                    }
                     break;
                 }
                 // Eye for an Eye
