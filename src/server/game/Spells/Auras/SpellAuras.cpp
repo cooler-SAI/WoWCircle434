@@ -1819,7 +1819,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     break;
                 switch (GetSpellInfo()->Id)
                 {
-                    //Fear
+                    // Fear
                     case 5782:
                     {
                         // Improved Fear
@@ -1878,6 +1878,13 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                 target->CastCustomSpell(caster, 48210, &bp0, 0, 0, true, NULL, aurEff, GetCasterGUID());
                             }
                         }
+                        break;
+                    }
+                    case 86211:
+                    {
+                        // Send glyphed cooldown to player
+                        if (caster->HasAura(56226))
+                            caster->CastSpell(caster, 94229, false);
                         break;
                     }
                 }

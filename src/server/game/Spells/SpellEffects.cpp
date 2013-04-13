@@ -663,11 +663,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                             }
                         }
                         unitTarget->CastSpell(m_caster, 92795, true);
-
-                        // Send glyphed cooldown to player
-                        if (m_caster->HasAura(56226))
-                            m_caster->CastSpell(m_caster, 94229, false);
-
                         break;
                     }
                     case 86213:
@@ -681,8 +676,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                             m_caster->m_BufferAuras.clear();
                             m_caster->CastSpell(unitTarget, 92795, true);
-                            if (m_caster->HasAura(56226))
-                                m_caster->ToPlayer()->AddSpellCooldown(86121, 0, time(NULL) + 10);
                         }
                         break;
                     }
