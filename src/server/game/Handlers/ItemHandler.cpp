@@ -1712,6 +1712,12 @@ void WorldSession::HandleReforgeItemOpcode(WorldPacket& recvData)
         return;
     }
 
+    if (item->GetEnchantmentId(REFORGE_ENCHANTMENT_SLOT) && reforgeEntry)
+    {
+        SendReforgeResult(false);
+        return;
+    }
+
     if (!reforgeEntry)
     {
         // Reset the item
