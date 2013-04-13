@@ -6120,7 +6120,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         return false;
 
                     float crit = GetSpellCrit(victim, procSpell, SpellSchoolMask(procSpell->SchoolMask), BASE_ATTACK) / 100.0f;
-                    float f_chance = -1.7106f * crit + 0.7893f;
+                    float f_chance = (-1.7106f * crit + 0.7893f) * 100.0f;
 
                     if (f_chance < 0 || !f_chance || !roll_chance_f(f_chance))
                         return false;
