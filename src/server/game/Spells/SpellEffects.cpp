@@ -3370,7 +3370,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                                 for (std::list<Creature*>::iterator itr = summons.begin(); itr != summons.end();)
                                 {
                                     if ((*itr)->GetOwnerGUID() != m_originalCaster->GetGUID())
-                                        summons.erase(itr);
+                                        itr = summons.erase(itr);
                                     else
                                         ++itr;
                                 }
