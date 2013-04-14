@@ -1052,6 +1052,17 @@ class WorldSession
         ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> _recvQueue;
         time_t timeLastWhoCommand;
         time_t timeLastChannelInviteCommand;
+        time_t timeLastChannelPassCommand;
+        time_t timeLastChannelMuteCommand;
+        time_t timeLastChannelBanCommand;
+        time_t timeLastChannelUnbanCommand;
+        time_t timeLastChannelAnnounceCommand;
+        time_t timeLastChannelModerCommand;
+        time_t timeLastChannelOwnerCommand;
+        time_t timeLastChannelSetownerCommand;
+        time_t timeLastChannelUnmoderCommand;
+        time_t timeLastChannelUnmuteCommand;
+        time_t timeLastChannelKickCommand;
         time_t timeLastGroupInviteCommand;
         time_t timeLastGuildInviteCommand;
 };

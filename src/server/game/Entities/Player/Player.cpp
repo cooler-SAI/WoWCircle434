@@ -10378,9 +10378,9 @@ void Player::UpdateArmorSpecializations(uint8 Slot)
         RemoveAurasDueToSpell(spellId);
 
 
-        if ((ArmorSpecializationTree[i].Tree == 0 && GetPrimaryTalentTree(GetActiveSpec()) == 0) ||
-            (ArmorSpecializationTree[i].Tree && ArmorSpecializationTree[i].Tree != GetPrimaryTalentTree(GetActiveSpec())) ||
-            (ArmorSpecializationTree[i].Form && ArmorSpecializationTree[i].Form != GetShapeshiftForm()))
+        if (!ArmorSpecializationTree[i].Tree && GetPrimaryTalentTree(GetActiveSpec()) == 0 ||
+            ArmorSpecializationTree[i].Tree && ArmorSpecializationTree[i].Tree != GetPrimaryTalentTree(GetActiveSpec()) ||
+            ArmorSpecializationTree[i].Form && this->GetShapeshiftForm() != ArmorSpecializationTree[i].Form)
             continue;
 
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
