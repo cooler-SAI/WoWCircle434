@@ -143,14 +143,14 @@ set(scripts_STAT_SRCS
   Kalimdor/HallsOfOrigination/instance_halls_of_origination.cpp
   Kalimdor/HallsOfOrigination/halls_of_origination.cpp
   Kalimdor/HallsOfOrigination/halls_of_origination.h
-  Kalimdor/EndTime/boss_echo_of_tyrande.cpp
-  Kalimdor/EndTime/boss_echo_of_baine.cpp
-  Kalimdor/EndTime/boss_echo_of_sylvanas.cpp
-  Kalimdor/EndTime/boss_echo_of_jaina.cpp
-  Kalimdor/EndTime/boss_murozond.cpp
-  Kalimdor/EndTime/end_time_teleport.cpp
-  Kalimdor/EndTime/instance_end_time.cpp
-  Kalimdor/EndTime/end_time.h
+  Kalimdor/CavernsOfTime/EndTime/boss_echo_of_tyrande.cpp
+  Kalimdor/CavernsOfTime/EndTime/boss_echo_of_baine.cpp
+  Kalimdor/CavernsOfTime/EndTime/boss_echo_of_sylvanas.cpp
+  Kalimdor/CavernsOfTime/EndTime/boss_echo_of_jaina.cpp
+  Kalimdor/CavernsOfTime/EndTime/boss_murozond.cpp
+  Kalimdor/CavernsOfTime/EndTime/end_time_teleport.cpp
+  Kalimdor/CavernsOfTime/EndTime/instance_end_time.cpp
+  Kalimdor/CavernsOfTime/EndTime/end_time.h
 )
 
 message("  -> Prepared: Kalimdor")
