@@ -11971,8 +11971,6 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
 
     if (mechanicMask)
     {
-        
-
         int32 maxval = 0;
         AuraEffectList const& mDamageDoneMechanic = GetAuraEffectsByType(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT);
         for (AuraEffectList::const_iterator i = mDamageDoneMechanic.begin(); i != mDamageDoneMechanic.end(); ++i)
@@ -11981,6 +11979,17 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
         
         if (maxval)
             AddPct(TakenTotalMod, maxval);
+    }
+
+    if (spellProto->IsTargetingArea())
+    {
+        int32 mult = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_AOE_DAMAGE_AVOIDANCE, m_spellProto->SchoolMask));
+        AddPct(TakenTotalMod, mult);
+        if (m_caster->GetTypeId() == TYPEID_UNIT)
+        {
+            float u_mult = unit->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CREATURE_AOE_DAMAGE_AVOIDANCE, m_spellProto->SchoolMask));
+            AddPct(TakenTotalMod, u_mult);
+        }
     }
 
     int32 TakenAdvertisedBenefit = SpellBaseDamageBonusTaken(spellProto->GetSchoolMask());
@@ -13138,6 +13147,17 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
         AuraEffectList const& mModRangedDamageTakenPercent = GetAuraEffectsByType(SPELL_AURA_MOD_RANGED_DAMAGE_TAKEN_PCT);
         for (AuraEffectList::const_iterator i = mModRangedDamageTakenPercent.begin(); i != mModRangedDamageTakenPercent.end(); ++i)
             AddPct(TakenTotalMod, (*i)->GetAmount());
+    }
+    
+    if (spellProto && spellProto->IsTargetingArea())
+    {
+        int32 mult = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_AOE_DAMAGE_AVOIDANCE, m_spellProto->SchoolMask));
+        AddPct(TakenTotalMod, mult);
+        if (m_caster->GetTypeId() == TYPEID_UNIT)
+        {
+            int32 u_mult = unit->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CREATURE_AOE_DAMAGE_AVOIDANCE, m_spellProto->SchoolMask));
+            AddPct(TakenTotalMod, u_mult);
+        }
     }
 
     float tmpDamage = 0.0f;
