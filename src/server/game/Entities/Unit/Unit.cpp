@@ -11983,11 +11983,11 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
 
     if (spellProto->IsTargetingArea())
     {
-        int32 mult = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_AOE_DAMAGE_AVOIDANCE, m_spellProto->SchoolMask));
+        int32 mult = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_AOE_DAMAGE_AVOIDANCE, spellProto->SchoolMask);
         AddPct(TakenTotalMod, mult);
-        if (m_caster->GetTypeId() == TYPEID_UNIT)
+        if (GetTypeId() == TYPEID_UNIT)
         {
-            float u_mult = unit->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CREATURE_AOE_DAMAGE_AVOIDANCE, m_spellProto->SchoolMask));
+            float u_mult = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CREATURE_AOE_DAMAGE_AVOIDANCE, spellProto->SchoolMask);
             AddPct(TakenTotalMod, u_mult);
         }
     }
@@ -13151,11 +13151,11 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
     
     if (spellProto && spellProto->IsTargetingArea())
     {
-        int32 mult = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_AOE_DAMAGE_AVOIDANCE, m_spellProto->SchoolMask));
+        int32 mult = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_AOE_DAMAGE_AVOIDANCE, spellProto->SchoolMask);
         AddPct(TakenTotalMod, mult);
-        if (m_caster->GetTypeId() == TYPEID_UNIT)
+        if (GetTypeId() == TYPEID_UNIT)
         {
-            int32 u_mult = unit->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CREATURE_AOE_DAMAGE_AVOIDANCE, m_spellProto->SchoolMask));
+            int32 u_mult = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CREATURE_AOE_DAMAGE_AVOIDANCE, spellProto->SchoolMask);
             AddPct(TakenTotalMod, u_mult);
         }
     }
