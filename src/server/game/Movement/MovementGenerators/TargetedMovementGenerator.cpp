@@ -43,8 +43,12 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T &owner)
     {
         case 52498: // Beth'tilac
             if ((&owner)->GetMapId() == 720)
+            {
                 if ((&owner)->GetAI()->GetData(2) == 0 && i_target->GetPositionZ() < 100.0f)
                     return;
+                else if (i_target->IsPetGuardianStuff())
+                    return;
+            }
             break;
         case 52581: // Cinderweb Drone
         case 52447: // Cinderweb Spiderling

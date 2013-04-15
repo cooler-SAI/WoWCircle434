@@ -18,6 +18,7 @@ enum Spells
     SPELL_INCENDIARY_SOUL           = 99369,
     SPELL_SHARDS_OF_TORMENT_AOE     = 99259,
     SPELL_SHARDS_OF_TORMENT         = 99260,
+    SPELL_TORMENT_VISUAL            = 99254,
     SPELL_TORMENT                   = 99255,
     SPELL_TORMENT_DMG               = 99256,
     SPELL_TORMENTED                 = 99257,
@@ -48,6 +49,7 @@ enum Events
     EVENT_INFERNO_BLADE     = 5,
     EVENT_DECIMATION_BLADE  = 6,
     EVENT_FINAL_COUNTDOWN   = 7,
+    EVENT_CHECK_PLAYERS     = 8,
 };
 
 enum Adds
@@ -130,6 +132,7 @@ class boss_baleroc : public CreatureScript
                 events.ScheduleEvent(EVENT_SHARDS_OF_TORMENT, 34000);
                 if (IsHeroic())
                     events.ScheduleEvent(EVENT_FINAL_COUNTDOWN, 25000);
+                events.ScheduleEvent(EVENT_CHECK_PLAYERS, 5000);
                 instance->SetBossState(DATA_BALEROC, IN_PROGRESS);
             }
 
@@ -159,6 +162,21 @@ class boss_baleroc : public CreatureScript
                 {
                     switch (eventId)
                     {
+                        case EVENT_CHECK_PLAYERS:
+                        {
+                            Map::PlayerList const &PlayerList = instance->instance->GetPlayers();
+                            if (!PlayerList.isEmpty())
+                            {
+                                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                                {
+                                    if (Player* pPlayer = i->getSource())
+                                        if (pPlayer->GetPositionZ() > 70.0f)
+                                            pPlayer->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
+                                }
+                            }
+                            events.ScheduleEvent(EVENT_CHECK_PLAYERS, 5000);
+                            break;
+                        }
                         case EVENT_BERSERK:
                             Talk(SAY_BERSERK);
                             DoCast(me, SPELL_BERSERK);
@@ -243,6 +261,7 @@ class npc_baleroc_shard_of_torment : public CreatureScript
                 uiReadyTimer = 3000;
                 uiSelectTargetTimer = 1000;
                 curVictim = NULL;
+                DoCast(me, SPELL_TORMENT_VISUAL, true);
             }
 
             void UpdateAI(const uint32 diff)

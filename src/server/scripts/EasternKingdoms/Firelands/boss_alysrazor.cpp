@@ -325,7 +325,7 @@ class boss_alysrazor : public CreatureScript
                 if (data == 13)
                 {
                     circle += 2;
-                    if (circle >= 2)
+                    if (circle >= 6)
                     {
                         me->GetMotionMaster()->MovementExpired(false);
                         me->GetMotionMaster()->Clear();
@@ -336,6 +336,9 @@ class boss_alysrazor : public CreatureScript
                             pVortex->CastSpell(pVortex, SPELL_FIERY_VORTEX);
                         events.ScheduleEvent(EVENT_BURN, 30000);
                         events.ScheduleEvent(EVENT_REMOVE_WINGS, 2000);
+                        events.CancelEvent(EVENT_BLAZING_POWER);
+                        events.CancelEvent(EVENT_INCINDIARY_CLOUD);
+                        events.CancelEvent(EVENT_INITIATE);
                         return;
                     }
                 }
@@ -388,6 +391,9 @@ class boss_alysrazor : public CreatureScript
                 DoCastAOE(SPELL_FIRESTORM, true);
 
                 events.ScheduleEvent(EVENT_FLIGHT, 1);
+                events.ScheduleEvent(EVENT_INITIATE, urand(10000, 15000));
+                events.ScheduleEvent(EVENT_SUMMON_WORMS, urand(20000, 30000));
+                events.ScheduleEvent(EVENT_BROODMOTHER, 50000);
 
                 DoZoneInCombat();
                 instance->SetBossState(DATA_ALYSRAZOR, IN_PROGRESS);
@@ -432,6 +438,7 @@ class boss_alysrazor : public CreatureScript
                 else if (phase == 4 && me->GetPower(POWER_MANA) >= 100)
                 {
                     phase = 0;
+                    summons.DespawnEntry(NPC_PLUMP_LAVA_WORM);
                     me->RemoveAura(SPELL_BLAZING_CLAW);
                     me->RemoveAura(SPELL_IGNITED);
                     summons.DespawnEntry(NPC_PLUMP_LAVA_WORM);
@@ -443,6 +450,8 @@ class boss_alysrazor : public CreatureScript
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
                     events.ScheduleEvent(EVENT_FLIGHT, 2000);
+                    events.ScheduleEvent(EVENT_INITIATE, 5000);
+                    events.ScheduleEvent(EVENT_BROODMOTHER, 50000);
                     return;
                 }
 
@@ -474,6 +483,7 @@ class boss_alysrazor : public CreatureScript
                             break;
                         case EVENT_INITIATE:
                             me->SummonCreature(NPC_BLAZING_TALON_INITIATE, initiatePos[urand(0, 3)]);
+                            events.ScheduleEvent(EVENT_INITIATE, 30000);
                             break;
                         case EVENT_BROODMOTHER:
                             me->SummonCreature(NPC_BLAZING_BROODMOTHER_1, broodmotherPos[0]);

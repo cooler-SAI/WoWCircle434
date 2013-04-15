@@ -392,8 +392,8 @@ class spell_staghelm_concentration_aura : public SpellScriptLoader
 
                 if (AuraEffect* aurEff = GetAura()->GetEffect(EFFECT_0))
                 {
-                    int32 oldamount = aurEff->GetAmount();
-                    int32 newamount = oldamount + 1;
+                    int32 oldamount = GetUnitOwner()->GetPower(POWER_ALTERNATE_POWER);
+                    int32 newamount = oldamount + 5;
                     if (newamount > 100)
                         newamount = 100;
                     if (newamount == oldamount)
@@ -425,7 +425,7 @@ class spell_staghelm_concentration_aura : public SpellScriptLoader
                         GetUnitOwner()->RemoveAura(SPELL_RARE_CONCENTRATION);
                         GetUnitOwner()->RemoveAura(SPELL_UNCOMMON_CONCENTRATION);
                     }
-                    aurEff->SetAmount(newamount);
+                    GetUnitOwner()->SetPower(POWER_ALTERNATE_POWER, newamount);
                 }
             }
 

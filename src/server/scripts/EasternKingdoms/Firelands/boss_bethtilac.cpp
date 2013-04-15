@@ -410,7 +410,7 @@ class npc_bethtilac_spiderweb_filament : public CreatureScript
                     uint32 i = urand(6, 8);
                     who->NearTeleportTo(addsPos[i].GetPositionX(), addsPos[i].GetPositionY(), addsPos[i].GetPositionZ(), addsPos[i].GetOrientation());
                 }
-                if (me->GetOwner() && me->GetOwner()->GetEntry() == NPC_SPIDERWEB_FILAMENT)
+                if (me->GetOwner() && (me->GetOwner()->GetEntry() == NPC_SPIDERWEB_FILAMENT || me->GetOwner()->GetEntry() == NPC_BETHTILAC))
                     me->GetOwner()->ToCreature()->DespawnOrUnsummon();
                 me->DespawnOrUnsummon();
             }
@@ -526,7 +526,7 @@ class npc_bethtilac_cinderweb_spinner : public CreatureScript
                 {
                     bTaunted = true;
                     me->SetReactState(REACT_AGGRESSIVE);
-                    if (owner && owner->GetEntry() == NPC_SPIDERWEB_FILAMENT)
+                    if (owner && (owner->GetEntry() == NPC_SPIDERWEB_FILAMENT || owner->GetEntry() == NPC_BETHTILAC))
                         if (Creature* pFilament = owner->SummonCreature(NPC_SPIDERWEB_FILAMENT, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 15000))
                         {
                             pFilament->SetCanFly(true);
