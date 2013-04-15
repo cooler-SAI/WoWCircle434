@@ -6431,6 +6431,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 33778:
                 spellInfo->Effects[0].TargetA = TARGET_UNIT_TARGET_ALLY;
                 break;
+            // Burn Hay, Braizer Torch
+            case 88646:
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                spellInfo->Effects[EFFECT_1].TargetA = 0;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                break;
             default:
                 break;
         }
