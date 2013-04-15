@@ -5161,6 +5161,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 99515: // Final Countdown
                 spellInfo->MaxAffectedTargets = 2;
                 break;
+            case 99254: // Torment visual
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+                spellInfo->Effects[EFFECT_0].Amplitude = 0;
+                break;
             case 99256: // Torment
             case 100230:
             case 100231:
@@ -5717,6 +5722,31 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // ENDOF ZUL'AMAN SPELLS
             //
+            // END TIME SPELLS
+            //
+            // Echo of Tyrande
+            case 102193: // Moonbolt
+                spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
+                break;
+            case 102149: // Moonlance dmg
+                spellInfo->ExcludeTargetAuraSpell = 102149;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                spellInfo->Effects[EFFECT_1].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 102414: // Dark Moonlight
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                spellInfo->Effects[EFFECT_1].TriggerSpell = 0;
+                break;
+            case 102173: // Stardust
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 102242: // Tears of Elune script aoe
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 102151: // Moonlance summon 1
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_5_YARDS);
+                break;
+            // ENDOF END TIME SPELLS
             // Camouflage
             case 80325:
                 spellInfo->Effects[EFFECT_1].Effect = 0;
