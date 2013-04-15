@@ -12888,7 +12888,7 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) cons
                 return true;
     }
 
-    if (spellInfo->IsNeedToCheckSchoolImmune() || !spellInfo->IsPositiveEffect(index))
+    if (!spellInfo->IsPositiveEffect(index))
     {
         uint32 shoolMask = spellInfo->GetSchoolMask();
 
