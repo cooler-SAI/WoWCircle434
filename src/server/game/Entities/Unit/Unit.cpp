@@ -6406,10 +6406,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!procSpell)
                         return false;
 
-                    // Check Shadow Ward or Nether Ward
-                    if (!HasAura(6229) && !HasAura(91711))
-                        return false;
-
                     for (uint8 school = SPELL_SCHOOL_HOLY; school != MAX_SPELL_SCHOOL; ++school)
                     {
                         uint32 spellId = 0;
