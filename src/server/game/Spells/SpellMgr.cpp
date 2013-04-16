@@ -6437,6 +6437,17 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_1].TargetA = 0;
                 spellInfo->Effects[EFFECT_1].TargetB = 0;
                 break;
+            // Sudden Eclipse - PVP Druid Set Bonus
+            case 46832:
+                spellInfo->Effects[0].SpellClassMask = 0;
+                break;
+            case 95746:
+                spellInfo->Attributes |= SPELL_ATTR0_NEGATIVE_1;
+                spellInfo->Effects[0].BasePoints = 20;
+                break;
+            case 79577:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED;
+                break;
             default:
                 break;
         }

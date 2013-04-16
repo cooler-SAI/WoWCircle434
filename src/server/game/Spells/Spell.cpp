@@ -7795,6 +7795,10 @@ bool Spell::CanExecuteTriggersOnHit(uint8 effMask, SpellInfo const* triggeredByA
 
 bool Spell::CanProcOnTarget(Unit *target) const
 {
+    // Sudden Eclipse - PVP Druid Set Bonus
+    if (m_spellInfo->Id == 95746)
+        return true;
+
     // swd for priest, for other it does bugs
     if (m_spellInfo->SpellFamilyName != SPELLFAMILY_PRIEST && !m_spellInfo->IsPositive() && m_caster->IsFriendlyTo(target))
         return false;

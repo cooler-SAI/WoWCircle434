@@ -5107,7 +5107,7 @@ bool Unit::HandleAuraProcOnPowerAmount(Unit* victim, uint32 /*damage*/, AuraEffe
                     {
                         // Can proc if proc spell is starfire and starsurge
                         if (procSpell->Id != 2912 && procSpell->Id != 78674 &&
-                            procSpell->Id != 8921 && procSpell->Id != 93402)
+                            procSpell->Id != 8921 && procSpell->Id != 93402 && procSpell->Id != 95746)
                             return false;
 
                         // Can proc if spell is moonfire or sunfire with lunar shower
@@ -5126,7 +5126,7 @@ bool Unit::HandleAuraProcOnPowerAmount(Unit* victim, uint32 /*damage*/, AuraEffe
                     case 1:
                     {
                         // Do not proc if proc spell isnt wrath and starsurge
-                        if (procSpell->Id != 5176 && procSpell->Id != 78674)
+                        if (procSpell->Id != 5176 && procSpell->Id != 78674 && procSpell->Id != 95746)
                             return false;
 
                         if (!HasAura(lunarEclipseMarker))
@@ -6821,6 +6821,22 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Sudden Eclipse - PVP Druid Set Bonus
+                case 46832:
+                {
+                    triggered_spell_id = 95746;
+                    if ((!HasAura(67484) && HasAura(67483))
+                        || GetPower(POWER_ECLIPSE) == 0)
+                        {
+                            basepoints0 = 20;
+                        }
+                        else
+                        {
+                            basepoints0 = -13;
+                        }
+                    target = victim;
+                    break;
+                }
                 // Item - Shaman T12 Enhancement 4P Bonus
                 case 99213:
                     triggered_spell_id = 99212;
