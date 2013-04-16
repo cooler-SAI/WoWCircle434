@@ -7433,7 +7433,7 @@ void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier)
                     {
                         uint32 targetAmount = m_UniqueTargetInfo.size();
                         if (targetAmount > 10)
-                            m_damage = int32((m_damage * 10) / targetAmount);
+                            m_damage = (m_damage * 10) / int32(targetAmount);
                     }
                 }
             }
@@ -7446,7 +7446,7 @@ void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier)
                     {
                         uint32 targetAmount = m_UniqueTargetInfo.size();
                         if (targetAmount > 6)
-                            m_damage = int32((m_damage * 6) / targetAmount);
+                            m_damage = (m_damage * 6) / int32(targetAmount);
                     }
                 }
             }
