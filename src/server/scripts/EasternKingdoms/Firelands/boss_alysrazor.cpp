@@ -7,8 +7,9 @@ enum ScriptTexts
     SAY_DEATH       = 1,
     SAY_KILL        = 2,
     SAY_SKIES       = 3,
-    SAY_BURN        = 4,
-    SAY_BURN_OUT    = 5,
+    SAY_FIRESTORM   = 4,
+    SAY_BURN        = 5,
+    SAY_BURN_OUT    = 6,
 };
 // emote 337598
 enum Spells
@@ -121,6 +122,8 @@ enum Adds
     NPC_BLAZING_BROODMOTHER_1       = 53900,
     NPC_BLAZING_BROODMOTHER_2       = 53680,
 
+    NPC_ALYSRAZOR_TIMING_BUNNY      = 53723,
+
     NPC_CAPTIVE_DRUID_OF_THE_TALON  = 54019, // spawnmask 0
     NPC_FANDRAL                     = 54015, // spawnmask 0
 };
@@ -154,6 +157,10 @@ enum Events
     EVENT_SUMMON_WORMS      = 25,
     EVENT_HERALD            = 26,
     EVENT_CATACLYSM         = 27,
+    EVENT_FIRESTORM         = 28,
+    EVENT_FIRESTORM_1       = 29,
+    EVENT_FIRESTORM_END     = 30,
+    EVENT_VORTEX            = 31,
 };
 
 enum Misc
@@ -165,6 +172,8 @@ enum Misc
     POINT_BROODMOTHER_1 = 5,
     POINT_BROODMOTHER_2 = 6,
     POINT_METEOR        = 7,
+    DATA_INITIATE       = 8,
+    ACTION_SHIELD       = 9,
 };
 
 const Position volcanofirePos[11] =
@@ -235,6 +244,12 @@ const Position broodmotherPos[6] =
     {-28.813f, -378.088f, 90.371f, 0.0f} //right bird point to despawn
 };
 
+const Position eggPos[2] = 
+{
+    {-28.71f, -280.05f, 48.6f, 5.52f},
+    {-48.13f, -307.21f, 51.0f, 5.76f}
+};
+
 const Position meteorPos[8] = 
 {
     {11.45f, -278.35f, 53.f, 0.0f},
@@ -273,13 +288,16 @@ class boss_alysrazor : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
                 me->setActive(true);
-                me->SetSpeed(MOVE_RUN, 1.0f, true);
+                me->SetSpeed(MOVE_RUN, 2.0f, true);
                 me->SetSpeed(MOVE_FLIGHT, 2.0f, true);
+                bFireStorm = false;
             }
 
             int8 phase;
             uint8 circle;
             uint8 curPoint;
+            bool bFireStorm;
+            bool bSpawnCloud;
 
             void InitializeAI()
             {
@@ -298,6 +316,8 @@ class boss_alysrazor : public CreatureScript
                 curPoint = 0;
                 phase = 0;
                 circle = 0;
+                bFireStorm = false;
+                bSpawnCloud = false;
                 me->SetMaxPower(POWER_MANA, 100);
                 me->SetPower(POWER_MANA, 100);
                 RemoveEncounterAuras();
@@ -317,53 +337,75 @@ class boss_alysrazor : public CreatureScript
                 instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
             }
 
+            void DoVortex()
+            {
+                me->GetMotionMaster()->MovementExpired(false);
+                me->GetMotionMaster()->Clear();
+                phase = 2;
+                circle = 0;
+                Talk(SAY_SKIES);
+                if (Unit* pVortex = me->SummonCreature(NPC_FIERY_VORTEX, centerPos))
+                    pVortex->CastSpell(pVortex, SPELL_FIERY_VORTEX);
+                events.CancelEvent(EVENT_FLIGHT);
+                events.CancelEvent(EVENT_BLAZING_POWER);
+                events.CancelEvent(EVENT_INCINDIARY_CLOUD);
+                events.CancelEvent(EVENT_INITIATE);
+                events.ScheduleEvent(EVENT_BURN, 30000);
+                events.ScheduleEvent(EVENT_REMOVE_WINGS, 2000);
+            }
+
             void MovementInform(uint32 type, uint32 data)
             {
-                if (type != POINT_MOTION_TYPE || !data)
+                if (type != POINT_MOTION_TYPE || !data || bFireStorm)
                     return;
 
-                if (data == 13)
+                if (!IsHeroic())
                 {
-                    circle += 2;
-                    if (circle >= 6)
+                    switch (data)
                     {
-                        me->GetMotionMaster()->MovementExpired(false);
-                        me->GetMotionMaster()->Clear();
-                        phase = 2;
-                        circle = 0;
-                        Talk(SAY_SKIES);
-                        if (Unit* pVortex = me->SummonCreature(NPC_FIERY_VORTEX, centerPos))
-                            pVortex->CastSpell(pVortex, SPELL_FIERY_VORTEX);
-                        events.ScheduleEvent(EVENT_BURN, 30000);
-                        events.ScheduleEvent(EVENT_REMOVE_WINGS, 2000);
-                        events.CancelEvent(EVENT_BLAZING_POWER);
-                        events.CancelEvent(EVENT_INCINDIARY_CLOUD);
-                        events.CancelEvent(EVENT_INITIATE);
-                        return;
+                        case 1:
+                            events.CancelEvent(EVENT_BLAZING_POWER);
+                            events.CancelEvent(EVENT_INCINDIARY_CLOUD);
+                            break;
+                        case 2:
+                            DoCast(me, SPELL_BLAZING_CLAW, true);
+                            DoCast(me, SPELL_MOLTING_1, true);
+                            break;
+                        case 3:
+                            me->RemoveAura(SPELL_BLAZING_CLAW);
+                            break;
+                        case 4:
+                            events.RescheduleEvent(EVENT_BLAZING_POWER, urand(2000, 5000));
+                            events.RescheduleEvent(EVENT_INCINDIARY_CLOUD, urand(3000, 5000));
+                            break;
+                        case 13:
+                        {
+                            circle += 2;
+                            if (circle >= 6)
+                            {
+                                DoVortex();
+                                return;
+                            }
+                            break;
+                        }
+                        default:
+                            break;
+
+                    }
+                }
+                else
+                {
+                    if (data == 1)
+                    {
+                        curPoint = 7;
+                        DoCast(me, SPELL_MOLTING_2, true);
                     }
                 }
 
-                switch (data)
-                {
-                    case 1:
-                        events.CancelEvent(EVENT_BLAZING_POWER);
-                        events.CancelEvent(EVENT_INCINDIARY_CLOUD);
-                        break;
-                    case 2:
-                        DoCast(me, SPELL_BLAZING_CLAW, true);
-                        DoCast(me, SPELL_MOLTING_1, true);
-                        break;
-                    case 3:
-                        me->RemoveAura(SPELL_BLAZING_CLAW);
-                        break;
-                    case 4:
-                        events.RescheduleEvent(EVENT_BLAZING_POWER, urand(2000, 5000));
-                        events.RescheduleEvent(EVENT_INCINDIARY_CLOUD, urand(3000, 5000));
-                        break;
-                }
                 if (curPoint >= 13)
                     curPoint = 1;
                 curPoint++;
+
                 events.ScheduleEvent(EVENT_FLIGHT, 1);
             }
 
@@ -384,6 +426,7 @@ class boss_alysrazor : public CreatureScript
 
                 phase = 1;
                 curPoint = 1;
+                bFireStorm = false;
 
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
@@ -392,8 +435,18 @@ class boss_alysrazor : public CreatureScript
 
                 events.ScheduleEvent(EVENT_FLIGHT, 1);
                 events.ScheduleEvent(EVENT_INITIATE, urand(10000, 15000));
-                events.ScheduleEvent(EVENT_SUMMON_WORMS, urand(20000, 30000));
+                events.ScheduleEvent(EVENT_SUMMON_WORMS, urand(25000, 40000));
                 events.ScheduleEvent(EVENT_BROODMOTHER, 50000);
+                if (IsHeroic())
+                {
+                    events.ScheduleEvent(EVENT_BLAZING_POWER, 10000);
+                    events.ScheduleEvent(EVENT_INCINDIARY_CLOUD, 10000);
+
+                    events.ScheduleEvent(EVENT_HERALD, urand(20000, 30000));
+                    events.ScheduleEvent(EVENT_HERALD, urand(50000, 60000));
+                    events.ScheduleEvent(EVENT_FIRESTORM, 80000);
+                    events.ScheduleEvent(EVENT_VORTEX, 180000);
+                }
 
                 DoZoneInCombat();
                 instance->SetBossState(DATA_ALYSRAZOR, IN_PROGRESS);
@@ -429,6 +482,7 @@ class boss_alysrazor : public CreatureScript
                 {
                     phase = 4;
                     me->RemoveAura(SPELL_BURNOUT);
+                    me->RemoveAura(SPELL_SPARK);
                     DoCast(me, SPELL_IGNITED, true);
                     DoCast(me, SPELL_BLAZING_CLAW, true);
                     me->SetReactState(REACT_AGGRESSIVE);
@@ -452,6 +506,15 @@ class boss_alysrazor : public CreatureScript
                     events.ScheduleEvent(EVENT_FLIGHT, 2000);
                     events.ScheduleEvent(EVENT_INITIATE, 5000);
                     events.ScheduleEvent(EVENT_BROODMOTHER, 50000);
+                    if (IsHeroic())
+                    {
+                        events.ScheduleEvent(EVENT_BLAZING_POWER, 10000);
+                        events.ScheduleEvent(EVENT_INCINDIARY_CLOUD, 10000);
+                        events.ScheduleEvent(EVENT_HERALD, urand(20000, 30000));
+                        events.ScheduleEvent(EVENT_HERALD, urand(50000, 60000));
+                        events.ScheduleEvent(EVENT_FIRESTORM, 80000);
+                        events.ScheduleEvent(EVENT_VORTEX, 180000);
+                    }
                     return;
                 }
 
@@ -470,21 +533,43 @@ class boss_alysrazor : public CreatureScript
                             me->GetMotionMaster()->MovePoint(curPoint, flyPos[curPoint-1]);
                             break;
                         case EVENT_BLAZING_POWER:
-                            DoCast(me, SPELL_BLAZING_POWER_SUM, true);
+                        {
+                            Position pos;
+                            int32 offset = (bSpawnCloud ? 8 : -8);
+                            me->GetPosition(&pos);
+                            pos.m_positionX = pos.m_positionX + offset;
+                            pos.m_positionY = pos.m_positionY + offset;
+                            //DoCast(me, SPELL_BLAZING_POWER_SUM, true);
+                            me->SummonCreature(NPC_BLAZING_POWER, pos, TEMPSUMMON_TIMED_DESPAWN, 5000);
+                            bSpawnCloud = !bSpawnCloud;
                             events.ScheduleEvent(EVENT_BLAZING_POWER, urand(2000, 4000));
                             break;
+                        }
                         case EVENT_INCINDIARY_CLOUD:
-                            DoCast(me, SPELL_INCINDIARY_CLOUD_SUM, true);
+                        {
+                            Position pos;
+                            int32 offset = (bSpawnCloud ? 8 : -8);
+                            me->GetPosition(&pos);
+                            pos.m_positionX = pos.m_positionX + offset;
+                            pos.m_positionY = pos.m_positionY + offset;
+                            //DoCast(me, SPELL_INCINDIARY_CLOUD_SUM, true);
+                            me->SummonCreature(NPC_INCINDIARY_CLOUD, pos, TEMPSUMMON_TIMED_DESPAWN, 5000);
+                            bSpawnCloud = !bSpawnCloud;
                             events.ScheduleEvent(EVENT_INCINDIARY_CLOUD, urand(2000, 4000));
                             break;
+                        }
                         case EVENT_SUMMON_WORMS:
                             for (uint8 i = 0; i < 4; ++i)
                                 me->SummonCreature(NPC_PLUMP_LAVA_WORM, wormPos[i]);
                             break;
                         case EVENT_INITIATE:
-                            me->SummonCreature(NPC_BLAZING_TALON_INITIATE, initiatePos[urand(0, 3)]);
+                        {
+                            uint32 i = urand(0, 3);
+                            if (Creature* pInitiate = me->SummonCreature(NPC_BLAZING_TALON_INITIATE, initiatePos[i]))
+                                pInitiate->GetAI()->SetData(DATA_INITIATE, i);
                             events.ScheduleEvent(EVENT_INITIATE, 30000);
                             break;
+                        } 
                         case EVENT_BROODMOTHER:
                             me->SummonCreature(NPC_BLAZING_BROODMOTHER_1, broodmotherPos[0]);
                             me->SummonCreature(NPC_BLAZING_BROODMOTHER_2, broodmotherPos[1]);
@@ -514,6 +599,38 @@ class boss_alysrazor : public CreatureScript
                             break;
                         case EVENT_HERALD:
                             me->SummonCreature(NPC_HERALD_OF_THE_BURNING_END, centerPos);
+                            break;
+                        case EVENT_FIRESTORM:
+                        {
+                            bFireStorm = true;
+                            events.CancelEvent(EVENT_FLIGHT);
+                            events.CancelEvent(EVENT_INITIATE);
+                            events.CancelEvent(EVENT_INCINDIARY_CLOUD);
+                            events.CancelEvent(EVENT_BLAZING_POWER);
+                            events.ScheduleEvent(EVENT_REMOVE_WINGS, 1000);
+                            me->StopMoving();
+                            me->SetFacingTo(me->GetAngle(centerPos.GetPositionX(), centerPos.GetPositionY()));
+                            Talk(SAY_FIRESTORM);
+                            EntryCheckPredicate pred(NPC_BLAZING_TALON_INITIATE);
+                            summons.DoAction(ACTION_SHIELD, pred);
+                            events.ScheduleEvent(EVENT_FIRESTORM_1, 1000);
+                            break;
+                        }
+                        case EVENT_FIRESTORM_1:
+                            events.ScheduleEvent(EVENT_FIRESTORM_END, 11000);
+                            if (Unit* pTarget = me->FindNearestCreature(NPC_ALYSRAZOR_TIMING_BUNNY, 300.0f, true))
+                                DoCast(pTarget, SPELL_FIRESTORM_H);
+                            break;
+                        case EVENT_FIRESTORM_END:
+                            bFireStorm = false;
+                            DoCast(me, SPELL_MOLTING_2, true);
+                            events.ScheduleEvent(EVENT_INITIATE, urand(1000, 15000));
+                            events.RescheduleEvent(EVENT_BLAZING_POWER, urand(2000, 5000));
+                            events.RescheduleEvent(EVENT_INCINDIARY_CLOUD, urand(3000, 5000));
+                            events.ScheduleEvent(EVENT_FLIGHT, 1);
+                            break;
+                        case EVENT_VORTEX:
+                            DoVortex();
                             break;
                     }
                 }
@@ -720,14 +837,25 @@ class npc_alysrazor_blazing_talon_initiate : public CreatureScript
                 me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, 0x02);
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
+            }
 
-                for (uint8 i = 0; i < 4; ++i)
+            void SetData(uint32 type, uint32 data)
+            {
+                if (type = DATA_INITIATE)
                 {
-                    if (initiatePos[i].GetPositionX() == me->GetPositionX())
-                        waypoint = ++i;
+                    waypoint = data;
+                    me->GetMotionMaster()->MovePoint(POINT_INITIATE_1, initiatePos[4 + waypoint]);
                 }
-                
-                me->GetMotionMaster()->MovePoint(POINT_INITIATE_1, initiatePos[4 + waypoint]);
+            }
+
+            void DoAction(const int32 action)
+            {
+                if (action == ACTION_SHIELD)
+                {
+                    me->InterruptNonMeleeSpells(false);
+                    events.RescheduleEvent(EVENT_FIEROBLAST, urand(20000, 25000));
+                    DoCast(me, SPELL_BLAZING_SHIELD, true);
+                }
             }
 
             void MovementInform(uint32 type, uint32 data)
@@ -762,12 +890,14 @@ class npc_alysrazor_blazing_talon_initiate : public CreatureScript
                     switch (eventId)
                     {
                         case EVENT_START_COMBAT:
-                            events.ScheduleEvent((urand(0, 1) ? EVENT_FIEROBLAST : EVENT_BRASHFIRE), 500);
+                            //events.ScheduleEvent((urand(0, 1) ? EVENT_FIEROBLAST : EVENT_BRASHFIRE), 500);
+                            events.ScheduleEvent(EVENT_FIEROBLAST, 500);
                             break;
                         case EVENT_FIEROBLAST:
                             if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                                 DoCast(pTarget, SPELL_FIEROBLAST);
-                            events.ScheduleEvent(EVENT_BRASHFIRE, 3000);
+                            //events.ScheduleEvent(EVENT_BRASHFIRE, 3000);
+                            events.ScheduleEvent(EVENT_FIEROBLAST, 7000);
                             break;
                         case EVENT_BRASHFIRE:
                             if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
@@ -873,7 +1003,7 @@ class npc_alysrazor_blazing_talon_clawshaper : public CreatureScript
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
                 bLeft = (me->GetPositionX() > -35.0f);
-                me->GetMotionMaster()->MovePoint(POINT_CLAWSHAPER_2, initiatePos[(bLeft ? 4 : 5)]);
+                me->GetMotionMaster()->MovePoint(POINT_CLAWSHAPER_1, initiatePos[(bLeft ? 4 : 5)]);
             }
 
             void MovementInform(uint32 type, uint32 data)
@@ -987,7 +1117,7 @@ class npc_alysrazor_blazing_broodmother : public CreatureScript
 
                 if (data == POINT_BROODMOTHER_1)
                 {
-                    me->SummonCreature(NPC_MOLTEN_EGG, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+                    me->SummonCreature(NPC_MOLTEN_EGG, eggPos[bLeft ? 0 : 1].GetPositionX(), eggPos[bLeft ? 0 : 1].GetPositionY(), eggPos[bLeft ? 0 : 1].GetPositionZ());
                     events.ScheduleEvent(EVENT_FLY_OUT, 1000);
                 }
                 else if (data == POINT_BROODMOTHER_2)
@@ -1073,7 +1203,7 @@ class npc_alysrazor_molten_egg : public CreatureScript
 class npc_alysrazor_voracious_hatchling : public CreatureScript // 53509
 {
     public:
-        npc_alysrazor_voracious_hatchling() : CreatureScript("npc_voracious_hatchling") { }
+        npc_alysrazor_voracious_hatchling() : CreatureScript("npc_alysrazor_voracious_hatchling") { }
 
         CreatureAI* GetAI(Creature* pCreature) const
         {
@@ -1084,9 +1214,27 @@ class npc_alysrazor_voracious_hatchling : public CreatureScript // 53509
         {
             npc_alysrazor_voracious_hatchlingAI(Creature* pCreature) : ScriptedAI(pCreature) 
             {
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
+                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
+                pInstance = me->GetInstanceScript();
+                bDespawn = false;
             }
 
             EventMap events;
+            InstanceScript* pInstance;
+            bool bDespawn;
 
             void IsSummonedBy(Unit* summoner)
             {
@@ -1107,6 +1255,20 @@ class npc_alysrazor_voracious_hatchling : public CreatureScript // 53509
                 if (!UpdateVictim())
                     return;
 
+                if (bDespawn)
+                    return;
+
+                if (!bDespawn)
+                {
+                    if (pInstance)
+                        if (pInstance->GetBossState(DATA_ALYSRAZOR) != IN_PROGRESS)
+                        {
+                            bDespawn = true;
+                            me->DespawnOrUnsummon(500);
+                            return;
+                        }
+                }
+
                 events.Update(diff);
 
                 while (uint32 eventId = events.ExecuteEvent())
@@ -1114,7 +1276,7 @@ class npc_alysrazor_voracious_hatchling : public CreatureScript // 53509
                     switch (eventId)
                     {
                         case EVENT_GUSHING_WOUND:
-                            DoCast(me->getVictim(), SPELL_GUSHING_WOUND);
+                            //DoCast(me->getVictim(), SPELL_GUSHING_WOUND);
                             events.ScheduleEvent(EVENT_GUSHING_WOUND, 60000);
                         case EVENT_EAT_WORM:
                             if (Creature* pWorm = me->FindNearestCreature(NPC_PLUMP_LAVA_WORM, 5.0f, true))
@@ -1173,7 +1335,7 @@ class npc_alysrazor_plump_lava_worm : public CreatureScript
             void EnterCombat(Unit* who)
             {
                 DoCast(me, SPELL_LAVA_SPEW);
-                events.ScheduleEvent(EVENT_ROTATE, 4000);
+                //events.ScheduleEvent(EVENT_ROTATE, 4000);
             }
 
             void UpdateAI(const uint32 diff)
@@ -1225,13 +1387,13 @@ class npc_alysrazor_molten_feather : public CreatureScript
                 return true;
 
             pPlayer->CastSpell(pPlayer, SPELL_MOLTEN_FEATHER, true);          
-            pPlayer->SetPower(POWER_ALTERNATE_POWER, stacks + 1);
+            //pPlayer->SetPower(POWER_ALTERNATE_POWER, stacks + 1);
 
             if (stacks >= 2)
             {
                 pPlayer->RemoveAura(SPELL_MOLTEN_FEATHER);
                 pPlayer->CastSpell(pPlayer, SPELL_WINGS_OF_FLAME, true);
-                pPlayer->SetPower(POWER_ALTERNATE_POWER, 0);
+                //pPlayer->SetPower(POWER_ALTERNATE_POWER, 0);
             }
 
             pCreature->DespawnOrUnsummon();
@@ -1284,7 +1446,10 @@ class npc_alysrazor_molten_meteor : public CreatureScript
             {
                 me->SetReactState(REACT_PASSIVE);
                 if (me->GetEntry() == NPC_MOLTEN_METEOR_2)
+                {
+                    me->AddAura(SPELL_MOLTER_METEOR_AURA_2, me);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                }
             }
 
             void IsSummonedBy(Unit* /*owner*/)
@@ -1409,7 +1574,7 @@ class spell_alysrazor_molten_feather : public SpellScriptLoader
                 if (!GetTarget())
                     return;
 
-				GetTarget()->SetPower(POWER_ALTERNATE_POWER, 0);
+				//GetTarget()->SetPower(POWER_ALTERNATE_POWER, 0);
 
 				if (GetTarget()->HasAura(SPELL_MOLTEN_FEATHER_PRI))
                     GetTarget()->RemoveAura(SPELL_MOLTEN_FEATHER_PRI);
@@ -1454,8 +1619,6 @@ class spell_alysrazor_molten_feather_script : public SpellScriptLoader
         class spell_alysrazor_molten_feather_script_SpellScript : public SpellScript
         {
             PrepareSpellScript(spell_alysrazor_molten_feather_script_SpellScript);
-
-            
 
             void HandleScript(SpellEffIndex effIndex)
             {
@@ -1513,7 +1676,8 @@ class spell_alysrazor_cataclysm : public SpellScriptLoader
                     return;
 
                 GetCaster()->CastSpell(GetCaster(), SPELL_MOLTEN_METEOR_MISSILE, true);
-                GetCaster()->Kill(GetCaster(), false);
+                if (GetCaster()->ToCreature())
+                    GetCaster()->ToCreature()->DespawnOrUnsummon(1000);
             }
 
             void Register()
@@ -1525,6 +1689,23 @@ class spell_alysrazor_cataclysm : public SpellScriptLoader
         SpellScript* GetSpellScript() const
         {
             return new spell_alysrazor_cataclysm_SpellScript();
+        }
+};
+
+class achievement_do_a_barrel_roll : public AchievementCriteriaScript
+{
+    public:
+        achievement_do_a_barrel_roll() : AchievementCriteriaScript("achievement_do_a_barrel_roll") { }
+
+        bool OnCheck(Player* source, Unit* target)
+        {
+            if (!target)
+                return false;
+
+            if (boss_alysrazor::boss_alysrazorAI* alysrazorAI = CAST_AI(boss_alysrazor::boss_alysrazorAI, target->GetAI()))
+                return alysrazorAI->AllowAchieve();
+
+            return false;
         }
 };
 
@@ -1543,10 +1724,12 @@ void AddSC_boss_alysrazor()
     new npc_alysrazor_molten_egg();
     new npc_alysrazor_voracious_hatchling();
     new npc_alysrazor_plump_lava_worm();
+    new npc_alysrazor_herald_of_the_burning_end();
     new npc_alysrazor_molten_meteor();
     new spell_alysrazor_fieroblast();
     new spell_alysrazor_harsh_winds();
     new spell_alysrazor_molten_feather();
     new spell_alysrazor_molten_feather_script();
     new spell_alysrazor_cataclysm();
+    new achievement_do_a_barrel_roll();
 }

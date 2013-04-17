@@ -1245,6 +1245,15 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         SetDuration(max_duration);
                         break;
                     }
+                    // Blazing Power, Alysrazor
+                    case 99461:
+                        if (Aura* aur = target->GetAura(98619))
+                            aur->RefreshDuration();
+
+                        if (!target->HasAura(100029) && aurApp->GetBase()->GetStackAmount() >= 25)
+                            target->CastSpell(target, 100029, true);    
+
+                        break;
                     // Arion - Swirling Winds
                     case 83500:
                         target->RemoveAurasDueToSpell(83581);

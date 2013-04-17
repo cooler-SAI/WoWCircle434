@@ -5111,6 +5111,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 99461: // Blazing Power dmg
                 spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
                 spellInfo->Effects[EFFECT_1].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
                 break;
             case 99427: // Incindiary Cloud dmg
             case 100729:
@@ -5149,6 +5150,15 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
                 break;
             case 101410: // Molten Feather bar
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 100744: // Firestorm heroic
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            case 100745: // Firestorm heroic dmg
+            case 101664:
+            case 101665:
+            case 101666:
                 spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
                 break;
             // Baleroc

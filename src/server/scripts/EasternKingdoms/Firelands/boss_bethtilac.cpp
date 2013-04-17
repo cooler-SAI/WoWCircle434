@@ -433,7 +433,7 @@ class npc_bethtilac_spiderweb_filament : public CreatureScript
                         pSpinner->GetMotionMaster()->MovePoint(0, pSpinner->GetPositionX(), pSpinner->GetPositionY(), z + 5.0f); 
                     }
                 }
-                else if (owner->GetEntry() == NPC_SPIDERWEB_FILAMENT)
+                else if (owner->GetEntry() == NPC_CINDERWEB_SPINNER)
                 {
                     DoCast(me, SPELL_SPIDERWEB_FILAMENT_DOWN, true);
                     //float z = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, 100.0f);
@@ -526,8 +526,8 @@ class npc_bethtilac_cinderweb_spinner : public CreatureScript
                 {
                     bTaunted = true;
                     me->SetReactState(REACT_AGGRESSIVE);
-                    if (owner && (owner->GetEntry() == NPC_SPIDERWEB_FILAMENT || owner->GetEntry() == NPC_BETHTILAC))
-                        if (Creature* pFilament = owner->SummonCreature(NPC_SPIDERWEB_FILAMENT, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 15000))
+                    if (owner && owner->GetEntry() == NPC_BETHTILAC)
+                        if (Creature* pFilament = me->SummonCreature(NPC_SPIDERWEB_FILAMENT, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 15000))
                         {
                             pFilament->SetCanFly(true);
                             owner->CastSpell(pFilament, SPELL_SPIDERWEB_FILAMENT_ANY, true);

@@ -3359,7 +3359,7 @@ Aura* Unit::GetOwnedAura(uint32 spellId, uint64 casterGUID, uint64 itemCasterGUI
     for (AuraMap::const_iterator itr = range.first; itr != range.second; ++itr)
     {
         if (((itr->second->GetEffectMask() & reqEffMask) == reqEffMask)
-                && (!casterGUID || itr->second->GetCasterGUID() == casterGUID)
+                && (!casterGUID || itr->second->GetSpellInfo()->HasCustomAttribute(SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS) || itr->second->GetCasterGUID() == casterGUID)
                 && (!itemCasterGUID || itr->second->GetCastItemGUID() == itemCasterGUID)
                 && (!except || except != itr->second))
         {

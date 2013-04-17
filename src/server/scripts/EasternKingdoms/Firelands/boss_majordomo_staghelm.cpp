@@ -138,8 +138,8 @@ class boss_majordomo_staghelm : public CreatureScript
 
             void EnterCombat(Unit* attacker)
             {
-                if (IsHeroic())
-                    DoCast(me, SPELL_CONCENTRATION, true);
+                //if (IsHeroic())
+                    //DoCast(me, SPELL_CONCENTRATION, true);
 
                 events.ScheduleEvent(EVENT_BERSERK, 600000);    // 10 min
                 events.ScheduleEvent(EVENT_CHECK_PHASE, 2000);
