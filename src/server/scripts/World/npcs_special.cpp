@@ -3713,42 +3713,6 @@ class npc_metzen : public CreatureScript
     }
 };
 
-/*######
-## npc_anachronos
-## entry 15192
-######*/
-
-#define GOSSIP_A_WRINKIE_IN_TIME "Yes, Anachronos. I am ready to witness your vision of the future."
-#define ACTION_A_WRINKIE_IN_TIME 1001
-
-class npc_anachronos_15192 : public CreatureScript
-{
-public:
-    npc_anachronos_15192() : CreatureScript("npc_anachronos_15192") { }
-
-    bool OnGossipHello(Player* player, Creature* creature)
-    {
-        if (creature->isQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(29134) == QUEST_STATUS_INCOMPLETE)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_A_WRINKIE_IN_TIME, GOSSIP_SENDER_MAIN, ACTION_A_WRINKIE_IN_TIME);
-        
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
-    {
-        player->PlayerTalkClass->ClearMenus();
-        if (action == ACTION_A_WRINKIE_IN_TIME)
-            player->KilledMonsterCredit(52605, 0);
-
-        return true;
-    }
-};
-
 enum BurningTreant
 {
     EVENT_FIRESEED  = 1,
@@ -4010,7 +3974,6 @@ void AddSC_npcs_special()
     new npc_power_word_barrier();
     new npc_wild_mushroom();
     new npc_metzen();
-    new npc_anachronos_15192();
     new npc_burning_treant();
     new npc_kwee_q_peddlefeet();
     new npc_moonwell_chalice();

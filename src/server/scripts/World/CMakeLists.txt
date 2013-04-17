@@ -23,6 +23,7 @@ set(scripts_STAT_SRCS
   World/npc_taxi.cpp
   World/npc_companions.cpp
   World/npcs_special.cpp
+  World/tarecgosa_scripts.cpp
 )
 
 message("  -> Prepared: World")
