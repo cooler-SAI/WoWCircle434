@@ -624,6 +624,59 @@ public:
     }
 };
 
+
+// Nether Protection
+class spell_warlock_nether_protection_trigger : public SpellScriptLoader
+{
+public:
+	spell_warlock_nether_protection_trigger() : SpellScriptLoader("spell_warlock_nether_protection_trigger") { }
+
+	class spell_warlock_nether_protection_trigger_AuraScript : public AuraScript
+	{
+		PrepareAuraScript(spell_warlock_nether_protection_trigger_AuraScript);
+
+		void Absorb(AuraEffect* aurEff, DamageInfo & dmgInfo, uint32 & absorbAmount)
+		{
+			Unit * target = GetTarget();
+			if (AuraEffect * eff = target->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_WARLOCK, 1985, 0))
+			{
+				for (uint8 school = SPELL_SCHOOL_HOLY; school != MAX_SPELL_SCHOOL; ++school)
+				{
+					uint32 spellId = 0;
+					if (SpellSchoolMask(dmgInfo.GetSchoolMask()) & (1 << school))
+					{
+						switch(school)
+						{
+						case SPELL_SCHOOL_HOLY: spellId = 54370; break;
+						case SPELL_SCHOOL_FIRE: spellId = 54371; break;
+						case SPELL_SCHOOL_FROST: spellId = 54372; break;
+						case SPELL_SCHOOL_ARCANE: spellId = 54373; break;
+						case SPELL_SCHOOL_SHADOW: spellId = 54374; break;
+						case SPELL_SCHOOL_NATURE: spellId = 54375; break;
+						default: break;
+						}
+					}
+					if (spellId)
+					{
+						int32 bp0 = -eff->GetAmount();
+						target->CastCustomSpell(target, spellId, &bp0, 0, 0, true);
+					}
+				}
+			}
+		}
+
+		void Register()
+		{
+			OnEffectAbsorb += AuraEffectAbsorbFn(spell_warlock_nether_protection_trigger_AuraScript::Absorb, EFFECT_0);
+		}
+	};
+
+	AuraScript* GetAuraScript() const
+	{
+		return new spell_warlock_nether_protection_trigger_AuraScript();
+	}
+};
+
 void AddSC_warlock_spell_scripts()
 {
     new spell_warl_banish();
@@ -639,4 +692,5 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_unstable_affliction();
     new spell_warl_health_funnel();
     new spell_warlock_dark_intent();
+	new spell_warlock_nether_protection_trigger();
 }
