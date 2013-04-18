@@ -1369,6 +1369,24 @@ bool SpellInfo::IsRessurrect() const
     return false;
 }
 
+bool SpellInfo::CanTriggerPoisonAdditional() const
+{
+    if (SpellFamilyName == SPELLFAMILY_ROGUE)
+    {
+        switch (Id)
+        {
+            case 1766:  // Kick
+            case 1943:  // Rupture
+            case 51722: // Dismantle
+            case 703:   // Garrote
+                return true;
+            default:
+                break;
+        }
+    }
+    return false;
+}
+
 bool SpellInfo::IsAffectedBySpellMods() const
 {
     return !(AttributesEx3 & SPELL_ATTR3_NO_DONE_BONUS);

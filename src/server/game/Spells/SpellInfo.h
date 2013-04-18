@@ -474,6 +474,7 @@ public:
     bool IsAutoRepeatRangedSpell() const;
     bool IsPeriodic() const;
     bool IsRessurrect() const;
+    bool CanTriggerPoisonAdditional() const;
 
     bool IsAffectedBySpellMods() const;
     bool IsAffectedBySpellMod(SpellModifier const* mod) const;
