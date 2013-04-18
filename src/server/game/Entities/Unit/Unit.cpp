@@ -12251,6 +12251,13 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
                             break;
                         }
                         break;
+                    case SPELLFAMILY_WARLOCK:
+                    {
+                        // Searing Pain - Soulburn
+                        if (spellProto->Id == 5676 && HasAura(74434))
+                            return 100.0f;
+                        break;
+                    }
                 }
             }
             break;
