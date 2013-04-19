@@ -15559,7 +15559,7 @@ void Unit::SetPower(Powers power, int32 val)
         WorldPacket data(SMSG_POWER_UPDATE, 8 + 4 + 1 + 4);
         data.append(GetPackGUID());
         data << uint32(1); //power count
-        data << uint8(powerIndex);
+        data << uint8((power == POWER_ALTERNATE_POWER ? POWER_ALTERNATE_POWER : powerIndex));
         data << int32(val);
         SendMessageToSet(&data, GetTypeId() == TYPEID_PLAYER ? true : false);
     }
@@ -19617,7 +19617,7 @@ void Unit::NearTeleportTo(float x, float y, float z, float orientation, bool cas
         //SendTeleportPacket(pos);
         DestroyForNearbyPlayers();
         UpdatePosition(x, y, z, orientation, true);
-        //UpdateObjectVisibility();
+        UpdateObjectVisibility();
         //SendMovementFlagUpdate();
     }
 }
