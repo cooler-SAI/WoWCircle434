@@ -677,6 +677,31 @@ public:
     }
 };
 
+// Flee (Special Ability)
+class spell_warlock_flee: public SpellScriptLoader
+{
+public:
+    spell_warlock_flee() : SpellScriptLoader("spell_warlock_flee") {}
+    class spell_warlock_flee_SpellScript: public SpellScript
+    {
+        PrepareSpellScript(spell_warlock_flee_SpellScript);
+
+        void Trigger()
+        {
+            if (Unit * target = GetCaster()->GetOwner())
+                GetCaster()->CastSpell(target, 93282, false);
+        }
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_warlock_flee_SpellScript::Trigger);
+        }
+    };
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_warlock_flee_SpellScript();
+    }
+};
+
 void AddSC_warlock_spell_scripts()
 {
     new spell_warl_banish();
@@ -693,4 +718,5 @@ void AddSC_warlock_spell_scripts()
     new spell_warl_health_funnel();
     new spell_warlock_dark_intent();
     new spell_warlock_nether_protection_trigger();
+    new spell_warlock_flee();
 }

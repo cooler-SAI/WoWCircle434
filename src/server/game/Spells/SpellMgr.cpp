@@ -6458,6 +6458,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 79577:
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED;
                 break;
+            // Flee (Special Ability) - imp
+            case 89792:
+                spellInfo->Effects[EFFECT_2].Effect = 0;
+                break;
             default:
                 break;
         }
