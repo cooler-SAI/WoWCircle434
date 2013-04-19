@@ -969,7 +969,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     case 879:
                     {
                         float attackPower = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
-                        int32 spellPower = m_caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->ScalingClass));
+                        int32 spellPower = m_caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->SchoolMask));
                         uint32 maxdmg = attackPower > spellPower ? (attackPower * 0.344f) : (spellPower * 0.344f);
                         damage += int32(maxdmg);
                         break;
@@ -4784,6 +4784,10 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
 
     Map* map = target->GetMap();
 
+    // Molten Meteor
+    if (gameobject_id == 208966)
+        z = map->GetHeight(target->GetPhaseMask(), x, y, z, true);
+
     if (!pGameObj->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), gameobject_id, map,
         m_caster->GetPhaseMask(), x, y, z, target->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 100, GO_STATE_READY))
     {
@@ -7589,6 +7593,10 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
         else
             // randomize position for multiple summons
             m_caster->GetRandomPoint(*destTarget, radius, pos);
+
+        // Molten Meteor
+        if (entry == 53784)
+            pos.m_positionZ = map->GetHeight(caster->GetPhaseMask(), pos.m_positionX, pos.m_positionY, pos.m_positionZ, true);
 
         TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, caster, m_spellInfo->Id);
         if (!summon)
