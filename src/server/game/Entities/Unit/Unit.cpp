@@ -11562,15 +11562,20 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
             case 6928:
             {
                 // Health at 25% or less (25% stored at effect 2 of the spell)
-                if (victim->HealthBelowPct(CalculateSpellDamage(this, (*i)->GetSpellInfo(), EFFECT_2)))
+                int32 pct = 25;   // CalculateSpellDamage(this, (*i)->GetSpellInfo(), EFFECT_2); - doesn't work
+                if (victim->HealthBelowPct(pct))
                     AddPct(DoneTotalMod, (*i)->GetAmount());
+                break;
             }
             case 6916: // Death's Embrace heal effect
             case 6925:
             case 6927:
-                if (HealthBelowPct(CalculateSpellDamage(this, (*i)->GetSpellInfo(), EFFECT_2)))
+            {
+                int32 pct = 25; // CalculateSpellDamage(this, (*i)->GetSpellInfo(), EFFECT_2); - doesn't work
+                if (HealthBelowPct(pct))
                     AddPct(DoneTotalMod, (*i)->GetAmount());
                 break;
+            }
             // Soul Siphon
             case 4992:
             case 4993:
