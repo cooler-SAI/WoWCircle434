@@ -365,7 +365,7 @@ class spell_mage_living_bomb : public SpellScriptLoader
             void AfterRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
                 AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
-                if (removeMode != AURA_REMOVE_BY_ENEMY_SPELL && removeMode != AURA_REMOVE_BY_EXPIRE)
+                if (removeMode!= AURA_REMOVE_BY_DEATH && removeMode != AURA_REMOVE_BY_ENEMY_SPELL && removeMode != AURA_REMOVE_BY_EXPIRE)
                     return;
 
                 if (Unit* caster = GetCaster())
@@ -573,7 +573,7 @@ class spell_mage_impact : public SpellScriptLoader
                 if (!target || !caster)
                     return;
 
-                targets.remove(target);
+                targets.remove_if(ImpactTargetCheck(target));
 
                 std::list<AuraEffect*> aurasPeriodic = target->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
                 aurasPeriodic.remove_if(ImpactAuraCheck(caster->GetGUID()));
@@ -672,7 +672,8 @@ class spell_mage_impact : public SpellScriptLoader
 
                     bool operator() (WorldObject* unit)
                     {
-                        return unit->GetGUID() == _originalTarget->GetGUID();
+                        
+                        return ((unit->GetGUID() == _originalTarget->GetGUID()) || (unit->ToUnit() && unit->ToUnit()->isInCombat()));
                     }
 
                 private:
