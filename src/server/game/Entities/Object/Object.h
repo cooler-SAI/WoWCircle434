@@ -901,6 +901,7 @@ class WorldObject : public Object, public WorldLocation
         void MonsterTextEmote(const char* text, uint64 TargetGuid, bool IsBossEmote = false);
         void MonsterWhisper(const char* text, uint64 receiver, bool IsBossWhisper = false);
         void MonsterSay(int32 textId, uint32 language, uint64 TargetGuid);
+        void DebugMonsterSay(const char* msg, ...);
         void MonsterYell(int32 textId, uint32 language, uint64 TargetGuid);
         void MonsterTextEmote(int32 textId, uint64 TargetGuid, bool IsBossEmote = false);
         void MonsterWhisper(int32 textId, uint64 receiver, bool IsBossWhisper = false);

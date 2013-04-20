@@ -2439,6 +2439,15 @@ void WorldObject::MonsterSay(const char* text, uint32 language, uint64 TargetGui
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
 }
 
+void WorldObject::DebugMonsterSay(const char* msg, ...)
+{
+    va_list ap;
+    char text[MAX_QUERY_LEN];
+    va_start(ap, msg);
+    vsnprintf(text, MAX_QUERY_LEN, msg, ap);
+    MonsterSay(text, 0, 0);
+}
+
 void WorldObject::MonsterSay(int32 textId, uint32 language, uint64 TargetGuid)
 {
     CellCoord p = Trinity::ComputeCellCoord(GetPositionX(), GetPositionY());
