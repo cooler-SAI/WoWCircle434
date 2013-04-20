@@ -1007,6 +1007,15 @@ bool Aura::CanBeSaved() const
         case 96206:
         // Dark Flames
         case 99158:
+        // Don't save special liquid auras
+        case 101619: // Magma, Fall of Azeroth
+        case 97151: // Magma, Firelands
+        case 81114: // Magma, Blackwing Descent
+        case 57634: // Magma, CoA Black / Chamber
+        case 42201: // Water, Hyjal Past
+        case 37025: // Water, Coilfang Raid
+        case 36444: // Water, Lake Wintergrasp
+        case 28801: // Slime, Naxxramas
             return false;
     }
 

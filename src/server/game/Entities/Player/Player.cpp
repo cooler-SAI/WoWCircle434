@@ -6746,6 +6746,11 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation, bool t
     if (GetGroup())
         SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
 
+    // code block for underwater state update
+    // Unit::SetPosition() checks for validity and update our coordinates
+    // so we re-fetch them instead of using "raw" coordinates from function params
+    UpdateUnderwaterState(GetMap(), GetPositionX(), GetPositionY(), GetPositionZ());
+
     if (GetTrader() && !IsWithinDistInMap(GetTrader(), INTERACTION_DISTANCE))
         GetSession()->SendCancelTrade();
 
@@ -23479,7 +23484,11 @@ void Player::UpdateUnderwaterState(Map* m, float x, float y, float z)
         if (liquid && liquid->SpellId)
         {
             if (res & (LIQUID_MAP_UNDER_WATER | LIQUID_MAP_IN_WATER))
-                CastSpell(this, liquid->SpellId, true);
+            {
+                // There are only auras, so check if it's already applied
+                if (!HasAura(liquid->SpellId))
+                    CastSpell(this, liquid->SpellId, true);
+            }
             else
                 RemoveAurasDueToSpell(liquid->SpellId);
         }
