@@ -689,7 +689,22 @@ public:
         void Trigger()
         {
             if (Unit * target = GetCaster()->GetOwner())
+            {
+                Pet * pet = GetCaster()->ToPet();
+                CharmInfo *charmInfo = pet->GetCharmInfo();
+                pet->AttackStop();
+                pet->InterruptNonMeleeSpells(false);
+                pet->GetMotionMaster()->MoveFollow(target, PET_FOLLOW_DIST, pet->GetFollowAngle());
+                charmInfo->SetCommandState(COMMAND_FOLLOW);
+
+                charmInfo->SetIsCommandAttack(false);
+                charmInfo->SetIsAtStay(false);
+                charmInfo->SetIsReturning(true);
+                charmInfo->SetIsCommandFollow(true);
+                charmInfo->SetIsFollowing(false);
+
                 GetCaster()->CastSpell(target, 93282, false);
+            }
         }
         void Register()
         {
