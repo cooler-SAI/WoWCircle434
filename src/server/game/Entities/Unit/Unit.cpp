@@ -7484,6 +7484,14 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     basepoints0 = 0;
                     break;
                 }
+                // Kill Command - Resistance is Futile! - energy refund
+                case 82897:
+                {
+                    if (Unit * owner = GetProcOwner())
+                        owner->CastSpell(owner, 86316, true);
+
+                    return true;
+                }
                 // Sic 'Em! (Rank 1)
                 case 83340:
                 {
