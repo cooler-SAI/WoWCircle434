@@ -2920,6 +2920,7 @@ bool SpellInfo::_IsNeedDelay() const
         case 70802: // Mayhem (Rogue)
         case 70157: // Ice Tomb (Sindragosa, ICC)
         case 79128: // Improved Expose Armor
+        case 36032: // Arcane Blast
             return true;
     }
 
