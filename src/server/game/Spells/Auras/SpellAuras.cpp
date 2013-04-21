@@ -1898,10 +1898,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         }
                         break;
                     }
+                    // Soul Swap
                     case 86211:
                     {
                         // Send glyphed cooldown to player
-                        if (caster->HasAura(56226))
+                        if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEFAULT && caster->HasAura(56226))
                             caster->CastSpell(caster, 94229, false);
                         break;
                     }
