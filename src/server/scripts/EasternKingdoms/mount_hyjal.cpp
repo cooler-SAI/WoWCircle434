@@ -192,7 +192,9 @@ class npc_lycanthoth : public CreatureScript
 
             void JustDied(Unit* killer)
             {
-                killer->CastSpell(killer, 74077, true);
+                Unit* originalKiller = killer->GetCharmerOrOwnerOrSelf();
+                if (originalKiller && (originalKiller->GetTypeId() == TYPEID_PLAYER))
+                    killer->CastSpell(killer, (originalKiller->ToPlayer()->GetTeam() == TEAM_HORDE ? 74077 : 74078), true);
             } 
         };
 };
