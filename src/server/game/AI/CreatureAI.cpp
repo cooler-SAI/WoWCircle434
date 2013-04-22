@@ -39,9 +39,12 @@ void CreatureAI::OnCharmed(bool /*apply*/)
 AISpellInfoType* UnitAI::AISpellInfo;
 AISpellInfoType* GetAISpellInfo(uint32 i) { return &CreatureAI::AISpellInfo[i]; }
 
-void CreatureAI::Talk(uint8 id, uint64 WhisperGuid)
+void CreatureAI::Talk(uint8 id, uint64 WhisperGuid, uint32 range)
 {
-    sCreatureTextMgr->SendChat(me, id, WhisperGuid, CHAT_MSG_ADDON, LANG_ADDON, me->GetMap()->IsDungeon() ? TEXT_RANGE_AREA : TEXT_RANGE_NORMAL);
+    TextRange _range = TextRange(range);
+    if (range == TEXT_RANGE_NORMAL)
+        _range = (me->GetMap()->IsDungeon() ? TEXT_RANGE_AREA : TEXT_RANGE_NORMAL);
+    sCreatureTextMgr->SendChat(me, id, WhisperGuid, CHAT_MSG_ADDON, LANG_ADDON, _range);
 }
 
 void CreatureAI::DoZoneInCombat(Creature* creature /*= NULL*/, float maxRangeToNearestTarget /* = 50.0f*/)
