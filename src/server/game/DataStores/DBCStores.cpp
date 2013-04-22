@@ -453,6 +453,26 @@ void LoadDBCStores(const std::string& dataPath)
     LoadDBC(availableDbcLocales, bad_dbc_files, sItemDisenchantLootStore,     dbcPath, "ItemDisenchantLoot.dbc");
 
     LoadDBC(availableDbcLocales, bad_dbc_files, sLFGDungeonStore,             dbcPath, "LFGDungeons.dbc");
+    
+    for (uint32 i = 0; i < sLFGDungeonStore.GetNumRows(); ++i)
+    {
+        LFGDungeonEntry* dungeon = sLFGDungeonStore.LookupEntryNoConst(i);
+        if (!dungeon)
+            continue;
+
+        // Correct group id
+        switch (dungeon->ID)
+        {
+            case 435: // End Time
+            case 437: // Well of Enermity
+            case 439: // Hour of Twilight
+                dungeon->grouptype = 33;
+                break;
+            default:
+                break;
+        }
+    }
+    
     LoadDBC(availableDbcLocales, bad_dbc_files, sLiquidTypeStore,             dbcPath, "LiquidType.dbc");
     LoadDBC(availableDbcLocales, bad_dbc_files, sLockStore,                   dbcPath, "Lock.dbc");
     LoadDBC(availableDbcLocales, bad_dbc_files, sPhaseStore,                  dbcPath, "Phase.dbc");

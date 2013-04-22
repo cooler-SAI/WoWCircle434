@@ -83,6 +83,10 @@ class DBCStorage
         {
             return (id >= nCount) ? NULL : indexTable.asT[id];
         }
+        T* LookupEntryNoConst(uint32 id) const
+        {
+            return (id >= nCount) ? NULL : indexTable.asT[id];
+        }
         uint32  GetNumRows() const { return nCount; }
         char const* GetFormat() const { return fmt; }
         uint32 GetFieldCount() const { return fieldCount; }
