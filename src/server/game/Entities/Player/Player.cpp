@@ -17559,6 +17559,17 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
 
                 }
 
+                // Correct randomproperty for bagged items
+                if (item->GetItemRandomPropertyId() == 0 && (item->GetTemplate()->RandomProperty > 0 || item->GetTemplate()->RandomSuffix > 0))
+                {
+                    item->SetItemRandomProperties(item->GenerateItemRandomPropertyId(item->GetEntry()), false);
+                    
+                    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+                    item->SaveToDB(trans);
+                    CharacterDatabase.CommitTransaction(trans);
+                }
+
+
                 // Item's state may have changed after storing
                 if (err == EQUIP_ERR_OK)
                     item->SetState(ITEM_UNCHANGED, this);

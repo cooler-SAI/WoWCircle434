@@ -26,20 +26,9 @@
 #include <list>
 #include <vector>
 #include "Util.h"
+#include "Containers.h"
 
-struct EnchStoreItem
-{
-    uint32  ench;
-    float   chance;
-
-    EnchStoreItem()
-        : ench(0), chance(0) {}
-
-    EnchStoreItem(uint32 _ench, float _chance)
-        : ench(_ench), chance(_chance) {}
-};
-
-typedef std::vector<EnchStoreItem> EnchStoreList;
+typedef std::vector<uint32> EnchStoreList;
 typedef UNORDERED_MAP<uint32, EnchStoreList> EnchantmentStore;
 
 static EnchantmentStore RandomItemEnch;
@@ -50,23 +39,29 @@ void LoadRandomEnchantmentsTable()
 
     RandomItemEnch.clear();                                 // for reload case
 
-    //                                                 0      1      2
-    QueryResult result = WorldDatabase.Query("SELECT entry, ench, chance FROM item_enchantment_template");
+    //                                                 0      1       
+    QueryResult result = WorldDatabase.Query("SELECT entry, ench FROM item_enchantment_template");
 
     if (result)
     {
         uint32 count = 0;
-
+        ItemTemplateContainer const* item_store = sObjectMgr->GetItemTemplateStore();
         do
         {
             Field* fields = result->Fetch();
 
             uint32 entry = fields[0].GetUInt32();
             uint32 ench = fields[1].GetUInt32();
-            float chance = fields[2].GetFloat();
 
-            if (chance > 0.000001f && chance <= 100.0f)
-                RandomItemEnch[entry].push_back(EnchStoreItem(ench, chance));
+            ItemRandomSuffixEntry const* random_suf = sItemRandomSuffixStore.LookupEntry(ench);
+            ItemRandomPropertiesEntry const* random_prop = sItemRandomPropertiesStore.LookupEntry(ench);
+            if (!random_suf && !random_prop)
+            {
+                sLog->outError(LOG_FILTER_SQL, "Enchantment id %u has no records in sItemRandomPropertiesStore and sItemRandomSuffixStore, skip.", ench);
+                continue;
+            }
+
+            RandomItemEnch[entry].push_back(ench);
 
             ++count;
         } while (result->NextRow());
@@ -77,7 +72,7 @@ void LoadRandomEnchantmentsTable()
         sLog->outError(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 Item Enchantment definitions. DB table `item_enchantment_template` is empty.");
 }
 
-uint32 GetItemEnchantMod(int32 entry)
+uint32 GetItemEnchantMod(int32 entry, bool isProperty)
 {
     if (!entry)
         return 0;
@@ -92,28 +87,24 @@ uint32 GetItemEnchantMod(int32 entry)
         return 0;
     }
 
-    double dRoll = rand_chance();
-    float fCount = 0;
+    EnchStoreList tempList;
 
-    for (EnchStoreList::const_iterator ench_iter = tab->second.begin(); ench_iter != tab->second.end(); ++ench_iter)
-    {
-        fCount += ench_iter->chance;
-
-        if (fCount > dRoll)
-            return ench_iter->ench;
+    for (EnchStoreList::const_iterator itr = tab->second.begin(); itr != tab->second.end(); ++itr)
+    { 
+        if (isProperty)
+        {
+            if (sItemRandomPropertiesStore.LookupEntry((*itr)))
+                tempList.push_back((*itr));
+        }
+        else
+        {
+           if (sItemRandomSuffixStore.LookupEntry((*itr)))
+                tempList.push_back((*itr));
+        }
     }
 
-    //we could get here only if sum of all enchantment chances is lower than 100%
-    dRoll = (irand(0, (int)floor(fCount * 100) + 1)) / 100;
-    fCount = 0;
-
-    for (EnchStoreList::const_iterator ench_iter = tab->second.begin(); ench_iter != tab->second.end(); ++ench_iter)
-    {
-        fCount += ench_iter->chance;
-
-        if (fCount > dRoll)
-            return ench_iter->ench;
-    }
+    if (!tempList.empty())
+        return Trinity::Containers::SelectRandomContainerElement(tempList);
 
     return 0;
 }
