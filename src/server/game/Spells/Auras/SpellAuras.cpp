@@ -1240,6 +1240,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_GENERIC:
                 switch (GetId())
                 {
+                    // Magma, Echo of Baine
+                    case 101619:
+                        if (target && target->GetTypeId() == TYPEID_PLAYER && !target->HasAura(101866))
+                            target->CastSpell(target, 101866, true);
+                        break;
                     // Burning Rage, Item - Warrior T12 DPS 2P Bonus
                     case 99233:
                     {

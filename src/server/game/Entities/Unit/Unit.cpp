@@ -9565,6 +9565,18 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Molten Axe, Echo of Baine
+        case 101836:
+            if (!victim)
+                return false;
+            target = victim;
+            break;
+        // Molten Fists, Echo of Baine
+        case 101866:
+            if (!victim)
+                return false;
+            target = victim;
+            break;
         // Fingers of Frost
         case 44543:
         case 44545:

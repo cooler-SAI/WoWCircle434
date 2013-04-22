@@ -7822,36 +7822,27 @@ void AuraEffect::HandleAuraProgressBar(AuraApplication const* aurApp, uint8 mode
             case 93103: //Cho'gall Corruption
             case 78949: // Onyxia Discharge - target is same as caster.
             case 98229: // Majordomo Heroic Concentration
-            {
                 target->SetPower(POWER_ALTERNATE_POWER, 0);
                 target->SetMaxPower(POWER_ALTERNATE_POWER, 100);
-
                 break;
-            }
             case 98226: // Rhyolith Balance - Orientation: - power goes to left, + power goes to right.
-            {
                 target->SetPower(POWER_ALTERNATE_POWER, 25);
                 target->SetMaxPower(POWER_ALTERNATE_POWER, 50);
-
                 break;
-            }
             case 101410: // Molten Feather Bar - Alysrazor - 98734 is spell to give 1 power, 97128 needs script and triggers it. 99464 (Molting) is Alys aura.
-            {
                 target->SetPower(POWER_ALTERNATE_POWER, 0);
                 target->SetMaxPower(POWER_ALTERNATE_POWER, 3);
-
-                 break;
-            }
+                break;
+            case 102668: // Sands of the Hourglass, Murozond, End Time
+                target->SetPower(POWER_ALTERNATE_POWER, 5);
+                target->SetMaxPower(POWER_ALTERNATE_POWER, 5);
+                break;
             default:
-            {
                 target->SetPower(POWER_ALTERNATE_POWER, 0);
                 target->SetMaxPower(POWER_ALTERNATE_POWER, 100);
-
                 break;
-            }
 
             //Deathwing Corrupted Blood meter 106843 - 100 power
-            //Sands of Time End Time Meter 102668 - 5 power
             //Hideous Amalgamation Absorb Blood bar - 109329. starts 25 - max 50 power.
             //Thrall Bar - 100439, Elemental Bonds - Destroy totems to free Thrall. 100 power...Firelands.
             //Thrall Bar - 99961, Elemental Bonds - Destroy Forces.100 power...Deepholm.

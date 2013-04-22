@@ -1529,8 +1529,8 @@ class npc_alysrazor_molten_meteor : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-                me->SetSpeed(MOVE_RUN, 0.5f, true);
-                me->SetSpeed(MOVE_WALK, 0.5f, true);
+                me->SetSpeed(MOVE_RUN, 0.2f, true);
+                me->SetSpeed(MOVE_WALK, 0.2f, true);
                 me->SetReactState(REACT_PASSIVE);
                 if (me->GetEntry() == NPC_MOLTEN_METEOR_2)
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);

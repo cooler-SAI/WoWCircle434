@@ -1661,6 +1661,8 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     // spell checks
     switch (Id)
     {
+        case 102668: // Sands of the Hourglass, Murozond, End Time
+            return (area_id == 5795)? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         case 98229: // Concentration, Majordomo Staghelm
         case 98245:
         case 98252:

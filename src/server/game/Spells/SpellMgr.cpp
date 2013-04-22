@@ -2813,6 +2813,10 @@ void SpellMgr::LoadSpellCustomAttr()
 
         switch (spellInfo->Id)
         {
+            case 101840: // Molten Axe, Echo of Baine
+            case 101867: // Molten Fists, Echo of Baine
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
+                break;
             case 2818: // Deadly Poison
             case 31803: // Censure
             case 77661: // Searing Flame
@@ -2986,6 +2990,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 72445: // Mark of the Fallen Champion (Deathbringer Saurfang)
             case 72446: // Mark of the Fallen Champion (Deathbringer Saurfang)
             case 62775: // Tympanic Tantrum (XT-002 encounter)
+            case 102598: // Void Strike, Infinite Warden
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
             case 64422: // Sonic Screech (Auriaya)
@@ -5734,7 +5739,27 @@ void SpellMgr::LoadDbcDataCorrections()
             //
             // END TIME SPELLS
             //
+            // Trash
+            case 109952: // Cadaver Toss
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 102066: // Flesh Rip
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
             // Echo of Tyrande
+            case 102242: // Tears of Elune script
+                spellInfo->MaxAffectedTargets = 2;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 102244: // Tears of Elune dmg
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_2_YARDS);
+                break;
+            case 102542: // Achievement
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            case 102002: // Shrink
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                break;
             case 102193: // Moonbolt
                 spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
                 break;
@@ -5744,17 +5769,57 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_1].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
                 break;
             case 102414: // Dark Moonlight
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_DEST_AREA_ENEMY;
                 spellInfo->Effects[EFFECT_1].Effect = 0;
                 spellInfo->Effects[EFFECT_1].TriggerSpell = 0;
                 break;
             case 102173: // Stardust
                 spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
                 break;
-            case 102242: // Tears of Elune script aoe
-                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
-                break;
             case 102151: // Moonlance summon 1
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_5_YARDS);
+                break;
+            // Echo of Sylvanas
+            case 101397: // Death Grip aoe
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+                break;
+            case 101200: // Summon Ghoul
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_100_YARDS);
+                break;
+            case 100865: // Wracking Pain target aura
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_100_YARDS);
+                break;
+            case 101257: // Wracking Pain dmg
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_SRC_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_100_YARDS);
+                break;
+            // Echo of Baine
+            case 101619: // Magma
+                spellInfo->AttributesEx3 &= ~SPELL_ATTR3_NO_DONE_BONUS;
+                break;
+            case 107837: // Throw Totem aura
+                spellInfo->Effects[EFFECT_0].Amplitude = 11000;
+                break;
+            case 101625: // Pulverize aoe
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+                break;
+            case 101815: // Pulverize gobject
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_10_YARDS);
+                break;
+            // Echo of Jaina
+            case 101812: // Blink
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
+            // Murozond
+            case 102364: // Blessing of Bronze Dragons
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
                 break;
             // ENDOF END TIME SPELLS
             // Camouflage

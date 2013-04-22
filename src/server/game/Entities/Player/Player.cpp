@@ -9530,6 +9530,16 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
                 data << uint32(4131) << uint32(0);              // 10 WORLDSTATE_CRATES_REVEALED
             }
             break;
+        // End Time, Echo of Jaina
+        case 5789:
+            if (instance && mapid == 938)
+                instance->FillInitialWorldStates(data);
+            else
+            {
+                data << uint32(6046) << uint32(0); // WORLDSTATE_FRAGMENTS_COLLECTED 
+                data << uint32(6025) << uint32(0); // WORLDSTATE_SHOW_FRAGMENTS
+            }
+            break;
         // Twin Peaks
         case 5031:
             if (bg && bg->GetTypeID(true) == BATTLEGROUND_TP)

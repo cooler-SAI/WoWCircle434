@@ -1172,7 +1172,6 @@ class spell_howling_gale_howling_gale : public SpellScriptLoader
                 if (!GetCaster())
                     return;
 
-                GetCaster()->MonsterSay("ok", 0, 0);
                 //GetCaster()->CastSpell(GetCaster(), SPELL_HOWLING_GALE_1, true);
                 //GetCaster()->CastSpell(GetCaster(), SPELL_HOWLING_GALE_2, true);
                 //GetCaster()->CastSpell(GetCaster(), SPELL_HOWLING_GALE_3, true);

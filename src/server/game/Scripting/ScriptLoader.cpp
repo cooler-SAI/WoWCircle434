@@ -698,9 +698,12 @@ void AddSC_boss_baleroc();
 void AddSC_boss_majordomo_staghelm();
 
 void AddSC_instance_end_time(); // End Time
+void AddSC_end_time();
 void AddSC_end_time_teleport();
 void AddSC_boss_echo_of_tyrande();
 void AddSC_boss_echo_of_sylvanas();
+void AddSC_boss_echo_of_baine();
+void AddSC_boss_echo_of_jaina();
 void AddSC_boss_murozond();
 
 
@@ -1437,9 +1440,12 @@ void AddNorthrendScripts()
     AddSC_boss_majordomo_staghelm();
 
     AddSC_instance_end_time(); // End Time
+    AddSC_end_time();
     AddSC_end_time_teleport();
     AddSC_boss_echo_of_tyrande();
     AddSC_boss_echo_of_sylvanas();
+    AddSC_boss_echo_of_baine();
+    AddSC_boss_echo_of_jaina();
     AddSC_boss_murozond();
 
 #endif
