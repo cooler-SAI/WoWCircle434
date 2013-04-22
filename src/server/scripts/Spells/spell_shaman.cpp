@@ -52,6 +52,7 @@ enum ShamanSpells
     SHAMAN_SPELL_ANCESTRAL_AWAKENING_PROC  = 52752,
     
     ICON_ID_SOOTHING_RAIN                  = 2011,
+    ICON_ID_PURIFICATION                   = 133, 
     SPELL_HEALING_STREAM_TOTEM_HEAL        = 52042,
 
     SHAMAN_SPELL_UNLEASH_ELEMENTS          = 73680,
@@ -367,6 +368,10 @@ class spell_sha_healing_stream_totem : public SpellScriptLoader
                             // Soothing Rains
                             if (AuraEffect* dummy = owner->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_SHAMAN, ICON_ID_SOOTHING_RAIN, EFFECT_0))
                                 AddPct(damage, dummy->GetAmount());
+
+                            // Purification (Passive)
+                            if (AuraEffect* purify = owner->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_SHAMAN, ICON_ID_PURIFICATION, 0))
+                                AddPct(damage, purify->GetAmount());                               
 
                             damage = int32(target->SpellHealingBonusTaken(owner, triggeringSpell, damage, HEAL));
                         }
