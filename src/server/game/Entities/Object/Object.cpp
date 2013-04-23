@@ -2320,8 +2320,14 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj) const
             continue;
 
         if (isType(TYPEMASK_UNIT))
+        {
             if (((Unit*)this)->HasAuraTypeWithMiscvalue(SPELL_AURA_DETECT_STEALTH, i))
                 return true;
+
+            if (obj->isType(TYPEMASK_UNIT))
+                if (obj->ToUnit()->HasAuraTypeWithCaster(SPELL_AURA_MOD_STALKED, GetGUID()))
+                    return true;
+        }
 
         int32 detectionValue = 15;
         if (isType(TYPEMASK_PLAYER) && ToPlayer())
