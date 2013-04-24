@@ -3813,8 +3813,9 @@ void Unit::RemoveArenaAuras()
     {
         AuraApplication const* aurApp = iter->second;
         Aura const* aura = aurApp->GetBase();
-        if (!(aura->GetSpellInfo()->AttributesEx4 & SPELL_ATTR4_UNK21) // don't remove stances, shadowform, pally/hunter auras
-            && !aura->IsPassive()                               // don't remove passive auras
+        if (!(aura->GetSpellInfo()->AttributesEx4 & SPELL_ATTR4_UNK21)  // don't remove stances, shadowform, pally/hunter auras
+            && !aura->IsPassive()                                       // don't remove passive auras
+            && !aura->HasEffectType(SPELL_AURA_MOD_INVISIBILITY)        // don't remove Invisibility
             && (aurApp->IsPositive() || !(aura->GetSpellInfo()->AttributesEx3 & SPELL_ATTR3_DEATH_PERSISTENT))) // not negative death persistent auras
             RemoveAura(iter);
         else
@@ -4165,7 +4166,7 @@ bool Unit::HasNegativeAuraWithAttribute(uint32 flag, uint64 guid)
     return false;
 }
 
-bool Unit::HasAuraTypeMoreThanDuration(AuraType auratype, uint32 duration)
+bool Unit::HasAuraTypeMoreThanDuration(AuraType auratype, int32 duration)
 {
     AuraEffectList const& auras = GetAuraEffectsByType(auratype);
 
