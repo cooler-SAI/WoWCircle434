@@ -1667,6 +1667,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
             case 11327:
             {
                 unitTarget->RemoveMovementImpairingAuras();
+                unitTarget->RemoveAurasByType(SPELL_AURA_MOD_STALKED);
                 break;
             }
             // Demonic Empowerment -- succubus
