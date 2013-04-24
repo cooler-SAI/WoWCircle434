@@ -1953,19 +1953,20 @@ void AuraEffect::HandleModInvisibility(AuraApplication const* aurApp, uint8 mode
     if (apply)
     {
         // apply glow vision
-        if (target->GetTypeId() == TYPEID_PLAYER)
+        if (target->GetTypeId() == TYPEID_PLAYER && GetSpellInfo()->GetMaxDuration() != -1)
+        {
             target->SetByteFlag(PLAYER_FIELD_BYTES2, 3, PLAYER_FIELD_BYTE2_INVISIBILITY_GLOW);
-
+        }
         target->m_invisibility.AddFlag(type);
         target->m_invisibility.AddValue(type, GetAmount());
     }
     else
     {
-        if (!target->HasAuraType(SPELL_AURA_MOD_INVISIBILITY))
+        if (!target->HasAuraTypeWithMiscvalue(SPELL_AURA_MOD_INVISIBILITY, type))
         {
             // if not have different invisibility auras.
             // remove glow vision
-            if (target->GetTypeId() == TYPEID_PLAYER)
+            if (target->GetTypeId() == TYPEID_PLAYER && !target->HasAuraTypeMoreThanDuration(SPELL_AURA_MOD_INVISIBILITY, 0))
                 target->RemoveByteFlag(PLAYER_FIELD_BYTES2, 3, PLAYER_FIELD_BYTE2_INVISIBILITY_GLOW);
 
             target->m_invisibility.DelFlag(type);

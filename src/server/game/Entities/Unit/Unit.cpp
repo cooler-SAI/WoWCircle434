@@ -4165,6 +4165,22 @@ bool Unit::HasNegativeAuraWithAttribute(uint32 flag, uint64 guid)
     return false;
 }
 
+bool Unit::HasAuraTypeMoreThanDuration(AuraType auratype, uint32 duration)
+{
+    AuraEffectList const& auras = GetAuraEffectsByType(auratype);
+
+    if (duration == -1 && auras.size())
+        return true;
+
+    for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end(); ++iter)
+    {
+        Aura const* aura = iter->second->GetBase();
+        if (aura->GetMaxDuration() != -1 && aura->GetMaxDuration() < duration)
+            return true;
+    }
+    return false;
+}
+
 bool Unit::HasAuraWithMechanic(uint32 mechanicMask)
 {
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end(); ++iter)
