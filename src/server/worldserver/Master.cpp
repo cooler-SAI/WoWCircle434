@@ -436,7 +436,7 @@ bool Master::_StartDB()
     ClearOnlineAccounts();
 
     ///- Insert version info into DB
-    WorldDatabase.PExecute("UPDATE version SET core_version = '%s', core_revision = '%s'", _FULLVERSION, _REVISION);        // One-time query
+    WorldDatabase.PExecute("UPDATE version SET core_version = '%s', core_HASH = '%s'", _FULLVERSION, _HASH);        // One-time query
 
     sWorld->LoadDBVersion();
 

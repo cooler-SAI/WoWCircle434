@@ -115,7 +115,7 @@ public:
      if(playersNum > 50)
         playersNum = (playersNum * 1.33);
 
-    handler->PSendSysMessage("-=Isengard.ru=- " REV_DATE " |cffff0000Version - " _REVISION); //antoma
+    handler->PSendSysMessage("-=Isengard.ru=- " _DATE " |cffff0000Version - " _HASH); //antoma
     handler->PSendSysMessage(LANG_CONNECTED_USERS, playersNum, maxActiveClientsNum, queuedClientsNum, maxQueuedClientsNum);
     handler->PSendSysMessage(LANG_UPTIME, uptime.c_str());
 

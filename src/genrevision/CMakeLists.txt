@@ -1,4 +1,4 @@
-# Copyright (C) 2008-2010 Trinity <http://www.trinitycore.org/>
+# Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -8,30 +8,8 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-set(GENREV_SRC
-  genrevision.cpp
+# Need to pass old ${CMAKE_BINARY_DIR} as param because its different at build stage
+add_custom_target(revision.h ALL
+  COMMAND ${CMAKE_COMMAND} -DBUILDDIR=${CMAKE_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/cmake/genrev.cmake
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
-add_executable(genrev
-  ${GENREV_SRC}
-)
-
-if( CMAKE_GENERATOR MATCHES "Visual Studio" )
-  add_custom_target(revision.h ALL
-    COMMAND ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/genrev -m $(ConfigurationName) ${CMAKE_SOURCE_DIR}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    DEPENDS genrev
-  )
-elseif( CMAKE_GENERATOR MATCHES "Xcode" )
-  add_custom_command(revision.h ALL
-    COMMAND ${CMAKE_BINARY_DIR}/src/genrevision/$(CONFIGURATION)/genrev -m ${CMAKE_BUILD_TYPE} ${CMAKE_SOURCE_DIR}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    DEPENDS genrev
-  )
-else()
-  add_custom_target(revision.h ALL
-    COMMAND ${CMAKE_BINARY_DIR}/src/genrevision/genrev -m ${CMAKE_BUILD_TYPE} ${CMAKE_SOURCE_DIR}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    DEPENDS genrev
-  )
-endif()
-
