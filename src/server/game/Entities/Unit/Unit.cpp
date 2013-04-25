@@ -5806,15 +5806,15 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         default:
                             return false;
                     }
-                    if (RandomSpells.empty()) // shouldn't happen
+                    if (RandomSpells.empty()) //shouldn't happen
                         return false;
 
-                    uint8 rand_spell = irand(0, (RandomSpells.size() - 1));
-                    CastSpell(target, RandomSpells[rand_spell], true, castItem, triggeredByAura, originalCaster);
+                    uint8 rand_spell = irand(0,(RandomSpells.size() - 1));
+                    CastSpell(target,RandomSpells[rand_spell],true,castItem,triggeredByAura, originalCaster);
                     for (std::vector<uint32>::iterator itr = RandomSpells.begin(); itr != RandomSpells.end(); ++itr)
                     {
                         if (!ToPlayer()->HasSpellCooldown(*itr))
-                            ToPlayer()->AddSpellCooldown(*itr, 0, time(NULL) + cooldown);
+                            ToPlayer()->AddSpellCooldown(*itr,0,time(NULL) + cooldown);
                     }
                     break;
                 }
@@ -8754,6 +8754,8 @@ bool Unit::HandleModifierAuraProc(Unit* victim, uint32 damage, AuraEffect* trigg
                 case 85107:
                 case 85108:
                 {
+ 	    if (!this || !this->ToPlayer()) // shit things morph over morph
+	        break;
                     this->ToPlayer()->SpellCooldownReduction(47241, 15000);
                     break;
                 }

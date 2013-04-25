@@ -28,7 +28,7 @@ static SFMTRandTSS sfmtRand;
 
 int32 irand(int32 min, int32 max)
 {
-    assert(max >= min);
+    //assert(max >= min);
     return int32(sfmtRand->IRandom(min, max));
 }
 
@@ -40,7 +40,7 @@ uint32 urand(uint32 min, uint32 max)
 
 float frand(float min, float max)
 {
-    assert(max >= min);
+    //assert(max >= min);
     return float(sfmtRand->Random() * (max - min) + min);
 }
 

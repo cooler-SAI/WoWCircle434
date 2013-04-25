@@ -1986,6 +1986,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     target->RemoveAura(57318);
                 // Comunion
                 else if (m_spellInfo->SpellFamilyFlags[2] & 0x20)
+                if (caster)
                     caster->RemoveAurasDueToSpell(63531);
                 // Divine Protection
                 else if (m_spellInfo->Id == 498)
