@@ -3026,11 +3026,16 @@ bool SpellInfo::IsIgnoringCombat() const
         case 83676:
         // Vendeta
         case 79140:
-        // Earth shield
+        // Earth Shield
         case 379:
             return true;
-        default: return false;
+        default: break;
     }
+    
+    // Dark Intent
+    if (SpellFamilyName == SPELLFAMILY_WARLOCK && (SpellFamilyFlags[2] & 0x00800000))
+        return true;
+    
     return false;
 }
 
