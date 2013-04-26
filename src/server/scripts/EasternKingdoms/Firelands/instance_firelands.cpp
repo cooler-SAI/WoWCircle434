@@ -12,6 +12,8 @@ static const DoorData doordata[] =
     {GO_FIRE_WALL_BALEROC,   DATA_BALEROC,   DOOR_TYPE_ROOM,    BOUNDARY_NONE},
     {GO_RAID_BRIDGE_FORMING, DATA_BALEROC,   DOOR_TYPE_PASSAGE, BOUNDARY_NONE},
     {GO_STICKY_WEB,          DATA_BETHTILAC, DOOR_TYPE_ROOM,    BOUNDARY_NONE},
+    {GO_FIRE_WALL_FENDRAL,   DATA_STAGHELM,  DOOR_TYPE_PASSAGE, BOUNDARY_NONE},
+    {GO_FIRE_WALL_SULFURON,  DATA_STAGHELM,  DOOR_TYPE_PASSAGE, BOUNDARY_NONE},
     {0, 0, DOOR_TYPE_ROOM, BOUNDARY_NONE},
 };
 
@@ -67,6 +69,8 @@ class instance_firelands : public InstanceMapScript
                     case GO_FIRE_WALL_BALEROC:
                     case GO_STICKY_WEB:
                     case GO_RAID_BRIDGE_FORMING:
+                    case GO_FIRE_WALL_FENDRAL:
+                    case GO_FIRE_WALL_SULFURON:
                         AddDoor(pGo, true);
                         break;
                 }

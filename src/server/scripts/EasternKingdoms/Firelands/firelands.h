@@ -73,6 +73,7 @@ enum GameobjectIds
     GO_STICKY_WEB               = 208877,
     GO_MOLTEN_METEOR            = 208966,
     GO_FIRE_WALL_FENDRAL        = 208906,
+    GO_FIRE_WALL_SULFURON       = 208873,
     GO_CACHE_OF_THE_FIRELORD    = 208967,
     GO_CACHE_OF_THE_FIRELORD_H  = 209261,
 
