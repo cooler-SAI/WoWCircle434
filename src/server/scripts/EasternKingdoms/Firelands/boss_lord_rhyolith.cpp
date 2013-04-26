@@ -137,7 +137,7 @@ class boss_lord_rhyolith : public CreatureScript
                 curMove = 0;
                 phase = 0;
                 bAchieve = true;
-                players = 0;
+                players_count = 0;
             }
 
             void InitializeAI()
@@ -171,7 +171,7 @@ class boss_lord_rhyolith : public CreatureScript
                 curMove = 0;
                 bAchieve = true;
                 phase = 0;
-                players = 0;
+                players_count = 0;
 
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BALANCE_BAR);
                 instance->SetData(DATA_RHYOLITH_HEALTH_SHARED, me->GetMaxHealth());
@@ -203,7 +203,7 @@ class boss_lord_rhyolith : public CreatureScript
                 curMove = 0;
                 phase = 0;
                 bAchieve = true;
-                players = instance->instance->GetPlayers();
+                players_count = instance->instance->GetPlayers().getSize();
 
                 pController = me->SummonCreature(NPC_MOVEMENT_CONTROLLER, movePos[curMove]);
                 pRightFoot = me->FindNearestCreature(NPC_RIGHT_FOOT, 100.0f);
@@ -481,7 +481,7 @@ class boss_lord_rhyolith : public CreatureScript
             int32 curMove;
             uint8 phase;
             bool bAchieve;
-            uint8 players;
+            uint8 players_count;
 
             int32 CalculateNextMove(int32 cur, int32 left, int32 right)
             {
