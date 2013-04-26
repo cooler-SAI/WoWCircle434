@@ -458,9 +458,12 @@ class boss_alysrazor : public CreatureScript
 
             void JustDied(Unit* /*killer*/)
             {
-                me->SetCanFly(false);
-                me->SetDisableGravity(false);
-                me->GetMotionMaster()->MoveFall();
+                if (me->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY))
+                {
+                    me->SetCanFly(false);
+                    me->SetDisableGravity(false);
+                    me->GetMotionMaster()->MoveFall();
+                }
                 _JustDied();
                 Talk(SAY_DEATH);
                 RemoveEncounterAuras();
@@ -613,6 +616,7 @@ class boss_alysrazor : public CreatureScript
                             break;
                         case EVENT_HERALD:
                             me->SummonCreature(NPC_HERALD_OF_THE_BURNING_END, centerPos);
+                            events.ScheduleEvent(EVENT_HERALD, 30000);
                             break;
                         case EVENT_FIRESTORM:
                         {
