@@ -235,6 +235,7 @@ set(scripts_STAT_SRCS
   EasternKingdoms/Firelands/boss_alysrazor.cpp
   EasternKingdoms/Firelands/boss_baleroc.cpp
   EasternKingdoms/Firelands/boss_majordomo_staghelm.cpp
+  EasternKingdoms/Firelands/boss_ragnaros.cpp
   EasternKingdoms/Firelands/instance_firelands.cpp
   EasternKingdoms/Firelands/firelands.cpp
   EasternKingdoms/Firelands/firelands.h
