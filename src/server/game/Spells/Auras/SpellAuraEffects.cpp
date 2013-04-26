@@ -6789,6 +6789,21 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
         // Spell exist but require custom code
         switch (auraId)
         {
+            // Meltdown, Fragment of Rhyolith
+            case 98646:
+            {
+                if (!caster || !caster->ToCreature())
+                    return;
+
+                float mod = 1.0f;
+                if (triggerSpellId == 101646 || triggerSpellId == 101648)
+                    mod = 0.5f;
+
+                int32 bp0 = mod * caster->GetHealth();
+                if (Unit* pTarget = caster->ToCreature()->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    caster->CastCustomSpell(pTarget, triggerSpellId, &bp0, NULL, NULL, true);
+                return;
+            }
             // Power Word: Barrier & Glyph of Power Word: Barrier
             case 81781:
             {

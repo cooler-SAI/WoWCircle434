@@ -694,6 +694,7 @@ void AddSC_firelands();
 void AddSC_boss_shannox();
 void AddSC_boss_bethtilac();
 void AddSC_boss_alysrazor();
+void AddSC_boss_lord_rhyolith();
 void AddSC_boss_baleroc();
 void AddSC_boss_majordomo_staghelm();
 
@@ -1436,6 +1437,7 @@ void AddNorthrendScripts()
     AddSC_boss_shannox();
     AddSC_boss_bethtilac();
     AddSC_boss_alysrazor();
+    AddSC_boss_lord_rhyolith();
     AddSC_boss_baleroc();
     AddSC_boss_majordomo_staghelm();
 

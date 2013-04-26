@@ -124,6 +124,7 @@ class boss_majordomo_staghelm : public CreatureScript
                 _Reset();
                 me->SetMaxPower(POWER_ENERGY, 100);
                 me->SetPower(POWER_ENERGY, 0);
+                me->SetHealth(me->GetMaxHealth());
                 
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CONCENTRATION_AURA);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_LEGENDARY_CONCENTRATION);
@@ -138,8 +139,8 @@ class boss_majordomo_staghelm : public CreatureScript
 
             void EnterCombat(Unit* attacker)
             {
-                //if (IsHeroic())
-                    //DoCast(me, SPELL_CONCENTRATION, true);
+                if (IsHeroic())
+                    DoCast(me, SPELL_CONCENTRATION, true);
 
                 events.ScheduleEvent(EVENT_BERSERK, 600000);    // 10 min
                 events.ScheduleEvent(EVENT_CHECK_PHASE, 2000);

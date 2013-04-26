@@ -5,15 +5,16 @@
 
 enum Data
 {
-    DATA_SHANNOX    = 0,
-    DATA_RHYOLITH   = 1,
-    DATA_BETHTILAC  = 2,
-    DATA_ALYSRAZOR  = 3,
-    DATA_BALEROC    = 4,
-    DATA_STAGHELM   = 5,
-    DATA_RAGNAROS   = 6,
-    DATA_RIPLIMB    = 7,
-    DATA_RAGEFACE   = 8,
+    DATA_SHANNOX                = 0,
+    DATA_RHYOLITH               = 1,
+    DATA_BETHTILAC              = 2,
+    DATA_ALYSRAZOR              = 3,
+    DATA_BALEROC                = 4,
+    DATA_STAGHELM               = 5,
+    DATA_RAGNAROS               = 6,
+    DATA_RIPLIMB                = 7,
+    DATA_RAGEFACE               = 8,
+    DATA_RHYOLITH_HEALTH_SHARED = 9,
 };
 
 enum CreatureIds

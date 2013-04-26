@@ -5054,6 +5054,9 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
                 break;
             // Bethtilac
+            case 99052: // Smoldering Devastation
+                spellInfo->InterruptFlags = 0;
+                break;
             case 98471: // Burning Acid
             case 100826:
             case 100827:
@@ -5174,6 +5177,62 @@ void SpellMgr::LoadDbcDataCorrections()
             case 101665:
             case 101666:
                 spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+                break;
+            // Lord Rhyolith
+            case 98843: // Ride Vehicle
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 98010: // Volcanic Birth
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                break;
+            case 98493: // Heated Volcano
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
+            case 98255: // Molten Armor
+            case 101157:
+            case 101158:
+            case 101159:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = 0;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                spellInfo->Effects[EFFECT_2].Effect = 0;
+                spellInfo->Effects[EFFECT_2].ApplyAuraName = 0;
+                spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_2].TargetB = 0;
+                break;
+            case 97230: // Magma Flow area
+                spellInfo->SetDurationIndex(1); // 10 seconds
+                break;
+            case 99875: // Fuse
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_2].TargetB = 0;
+                break;
+            case 98135: // Summon Fragment of Rhyolith
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                break;
+            case 98553: // Summon Spark of Rhyolith
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                break;
+            case 98136: // Summon Fragment of Rhyolith sum
+            case 100392:
+            case 98552:
+                spellInfo->SetDurationIndex(21);
+                break;
+            case 98649: // Meltdown dmg
+            case 101646:
+            case 101647:
+            case 101648:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
                 break;
             // Baleroc
             case 99351: // Inferno Blade

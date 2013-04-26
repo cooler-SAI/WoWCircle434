@@ -12,6 +12,7 @@ static const DoorData doordata[] =
     {GO_FIRE_WALL_BALEROC,   DATA_BALEROC,   DOOR_TYPE_ROOM,    BOUNDARY_NONE},
     {GO_RAID_BRIDGE_FORMING, DATA_BALEROC,   DOOR_TYPE_PASSAGE, BOUNDARY_NONE},
     {GO_STICKY_WEB,          DATA_BETHTILAC, DOOR_TYPE_ROOM,    BOUNDARY_NONE},
+    {GO_BRIDGE_OF_RHYOLITH,  DATA_RHYOLITH,  DOOR_TYPE_ROOM,    BOUNDARY_NONE},
     {0, 0, DOOR_TYPE_ROOM, BOUNDARY_NONE},
 };
 
@@ -34,6 +35,7 @@ class instance_firelands : public InstanceMapScript
                 uiShannoxGUID = 0;
                 uiRiplimbGUID = 0;
                 uiRagefaceGUID = 0;
+                uiRhyolithHealth = 0;
             }
 
             void OnPlayerEnter(Player* pPlayer)
@@ -67,6 +69,7 @@ class instance_firelands : public InstanceMapScript
                     case GO_FIRE_WALL_BALEROC:
                     case GO_STICKY_WEB:
                     case GO_RAID_BRIDGE_FORMING:
+                    case GO_BRIDGE_OF_RHYOLITH:
                         AddDoor(pGo, true);
                         break;
                 }
@@ -74,10 +77,14 @@ class instance_firelands : public InstanceMapScript
 
             void SetData(uint32 type, uint32 data)
             {
+                if (type == DATA_RHYOLITH_HEALTH_SHARED)
+                    uiRhyolithHealth = data;
 		    }
 
             uint32 GetData(uint32 type)
             {
+                if (type == DATA_RHYOLITH_HEALTH_SHARED)
+                    return uiRhyolithHealth;
 			    return 0;
             }
 
@@ -147,6 +154,7 @@ class instance_firelands : public InstanceMapScript
 
             private:
                 uint32 uiTeamInInstance;
+                uint32 uiRhyolithHealth;
                 uint64 uiShannoxGUID;
                 uint64 uiRiplimbGUID;
                 uint64 uiRagefaceGUID;

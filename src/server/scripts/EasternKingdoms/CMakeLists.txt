@@ -231,6 +231,7 @@ set(scripts_STAT_SRCS
   EasternKingdoms/BaradinHold/baradin_hold.h
   EasternKingdoms/Firelands/boss_shannox.cpp
   EasternKingdoms/Firelands/boss_lord_rhyolith.cpp
+  EasternKingdoms/Firelands/boss_lord_rhyolith.h
   EasternKingdoms/Firelands/boss_bethtilac.cpp
   EasternKingdoms/Firelands/boss_alysrazor.cpp
   EasternKingdoms/Firelands/boss_baleroc.cpp
