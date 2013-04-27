@@ -19232,6 +19232,12 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form) const
                 else
                     return 37165;
                 break;
+            case FORM_GHOSTWOLF:
+                if (HasAura(58135)) // Glyph of the Arctic Wolf
+                    return 27312;
+                else
+                    return 4613;
+                break;
             default:
                 break;
         }
