@@ -1,5 +1,8 @@
 #include "ScriptPCH.h"
 
+//101037 - borean beam
+//101053 Orb Staff Fusion
+
 /*######
 ## npc_anachronos
 ## entry 15192
@@ -95,7 +98,7 @@ class npc_tarecgosa_52835 : public CreatureScript
                 if (!who || who->GetTypeId() != TYPEID_PLAYER)
                     return;
 
-                if (me->GetDistance(who) >= 20.0f)
+                if (!me->IsWithinDistInMap(who, 20.0f))
                     return;
 
                 if (who->ToPlayer()->GetQuestStatus(29193) == QUEST_STATUS_INCOMPLETE)
@@ -103,6 +106,65 @@ class npc_tarecgosa_52835 : public CreatureScript
                     who->ToPlayer()->KilledMonsterCredit(52832, 0);
                     who->ToPlayer()->CompleteQuest(29193);
                 }
+            }
+        };
+};
+
+class npc_tarecgosa_53098 : public CreatureScript
+{
+    public:
+        npc_tarecgosa_53098() : CreatureScript("npc_tarecgosa_53098") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_tarecgosa_53098AI(pCreature);
+        }
+
+        struct npc_tarecgosa_53098AI : ScriptedAI
+        {
+            npc_tarecgosa_53098AI(Creature* pCreature) : ScriptedAI(pCreature) 
+            {
+                me->SetStandState(UNIT_STAND_STATE_DEAD);
+            }
+
+            void MoveInLineOfSight(Unit* who)
+            {
+                if (!who || who->GetTypeId() != TYPEID_PLAYER)
+                    return;
+
+                if (!me->IsWithinDistInMap(who, 20.0f))
+                    return;
+
+                if (who->ToPlayer()->GetQuestStatus(29240) == QUEST_STATUS_INCOMPLETE)
+                {
+                    who->ToPlayer()->KilledMonsterCredit(53047, 0);
+                    who->ToPlayer()->CompleteQuest(29240);
+                }
+
+                if (who->ToPlayer()->GetQuestStatus(29269) == QUEST_STATUS_INCOMPLETE)
+                {
+                    who->ToPlayer()->KilledMonsterCredit(53182, 0);
+                    who->ToPlayer()->CompleteQuest(29269);
+                }
+            }
+        };
+};
+
+class npc_kalecgos_53149 : public CreatureScript
+{
+    public:
+        npc_kalecgos_53149() : CreatureScript("npc_kalecgos_53149") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_kalecgos_53149AI(pCreature);
+        }
+
+        struct npc_kalecgos_53149AI : ScriptedAI
+        {
+            npc_kalecgos_53149AI(Creature* pCreature) : ScriptedAI(pCreature) 
+            {
+                me->SetStandState(UNIT_STAND_STATE_KNEEL);
             }
         };
 };
@@ -156,4 +218,6 @@ void AddSC_tarecgosa_scripts()
     new npc_anachronos_15192();
     new npc_tarecgosa_52835();
     new npc_thyrinar();
+    new npc_tarecgosa_53098();
+    new npc_kalecgos_53149();
 };

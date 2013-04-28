@@ -6602,6 +6602,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 101069:
                 spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_CASTER;
                 break;
+            // Summon Kalecgos
+            case 98069:
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_1].MiscValue = 256;
+                break;
             default:
                 break;
         }
