@@ -530,9 +530,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recvData)
 
         // special case at auto sell (sell all)
         if (count == 0)
-        {
             count = pItem->GetCount();
-        }
         else
         {
             // prevent sell more items that exist in stack (possible only not from client)
@@ -778,6 +776,13 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
                 if (leftInStock == 0)
                     continue;
 
+                ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(vendor->GetEntry(), vendorItem->item);
+                if (!sConditionMgr->IsObjectMeetToConditions(_player, vendor, conditions))
+                {
+                    sLog->outError(LOG_FILTER_CONDITIONSYS, "SendListInventory: conditions not met for creature entry %u item %u", vendor->GetEntry(), vendorItem->item);
+                    continue;
+                }
+					
                 if (GuildReward const* pReward = sGuildMgr->FindGuildReward(itemTemplate->ItemId))
                 {
                     Guild* pGuild = sGuildMgr->GetGuildById(_player->GetGuildId());
@@ -792,7 +797,7 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
                         continue;
                 }
             }
-
+			
             int32 price = vendorItem->IsGoldRequired(itemTemplate) ? uint32(floor(itemTemplate->BuyPrice * discountMod)) : 0;
 
             if (int32 priceMod = _player->GetTotalAuraModifier(SPELL_AURA_MOD_VENDOR_ITEMS_PRICES))
