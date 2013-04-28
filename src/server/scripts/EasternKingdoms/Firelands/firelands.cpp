@@ -1440,6 +1440,8 @@ class npc_firelands_volcanus : public CreatureScript
 
             void Reset()
             {
+                me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 7);
+                me->SetFloatValue(UNIT_FIELD_COMBATREACH, 7);
                 events.Reset();
             }
 
@@ -1450,10 +1452,10 @@ class npc_firelands_volcanus : public CreatureScript
 
             void JustDied(Unit* /*killer*/)
             {
-                if (Creature* pStalker = me->SummonCreature(NPC_STALKER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000))
+                if (Creature* pStalker = me->SummonCreature(NPC_STALKER, me->GetHomePosition(), TEMPSUMMON_TIMED_DESPAWN, 10000))
                 {
                     pStalker->RemoveAllAuras();
-                    pStalker->CastSpell(pStalker, SPELL_BRANCH_OF_NORDRASSIL_WIN_COSMETIC, true);
+                    pStalker->CastSpell(pStalker, SPELL_BRANCH_OF_NORDRASSIL_WIN_COSMETIC);
                 }
                 me->DespawnOrUnsummon(500);
             }

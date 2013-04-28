@@ -1,5 +1,6 @@
 #include "ScriptPCH.h"
 #include "firelands.h"
+#include "MoveSplineInit.h"
 
 enum ScriptTexts
 {
@@ -165,15 +166,16 @@ enum Events
 
 enum Misc
 {
-    POINT_TORNADO       = 1,
-    POINT_CLAWSHAPER_1  = 2,
-    POINT_CLAWSHAPER_2  = 3,
-    POINT_INITIATE_1    = 4,
-    POINT_BROODMOTHER_1 = 5,
-    POINT_BROODMOTHER_2 = 6,
-    POINT_METEOR        = 7,
-    DATA_INITIATE       = 8,
-    ACTION_SHIELD       = 9,
+    POINT_TORNADO_1     = 1,
+    POINT_TORNADO_2     = 2,
+    POINT_CLAWSHAPER_1  = 3,
+    POINT_CLAWSHAPER_2  = 4,
+    POINT_INITIATE_1    = 5,
+    POINT_BROODMOTHER_1 = 6,
+    POINT_BROODMOTHER_2 = 7,
+    POINT_METEOR        = 8,
+    DATA_INITIATE       = 9,
+    ACTION_SHIELD       = 10,
 };
 
 const Position volcanofirePos[11] =
@@ -447,7 +449,8 @@ class boss_alysrazor : public CreatureScript
                 {
                     events.ScheduleEvent(EVENT_SUMMON_WORMS, 60000);
                     events.ScheduleEvent(EVENT_BROODMOTHER, 60000);
-                    events.ScheduleEvent(EVENT_VORTEX, 200000);
+                    //events.ScheduleEvent(EVENT_VORTEX, 200000);
+                    events.ScheduleEvent(EVENT_VORTEX, 30000);
                 }
                 
 
@@ -622,6 +625,7 @@ class boss_alysrazor : public CreatureScript
                             me->NearTeleportTo(centerPos.GetPositionX(), centerPos.GetPositionY(), centerPos.GetPositionZ(), centerPos.GetOrientation(), true);
                             me->UpdateObjectVisibility();
                             summons.DespawnEntry(NPC_FIERY_VORTEX);
+                            summons.DespawnEntry(NPC_FIERY_TORNADO);
                             DoCast(me, SPELL_BURNOUT, true);
                             DoCast(me, SPELL_SPARK, true);
                             events.ScheduleEvent(EVENT_CLAWSHAPER, 2000);
@@ -838,8 +842,24 @@ class npc_alysrazor_fiery_vortex : public CreatureScript
                     {
                         case EVENT_HARSH_WIND:
                         {
+                            if (Creature* pAlysrazor = me->FindNearestCreature(NPC_ALYSRAZOR, 200.0f))
+                            {
+                                bool bClock = false;
+                                for (uint8 i = 1; i < 5; ++i)
+                                {
+                                    if (Creature* pTornado = pAlysrazor->SummonCreature(NPC_FIERY_TORNADO, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()))
+                                    {
+                                        pTornado->CastSpell(pTornado, SPELL_FIERY_TORNADO);
+                                        pTornado->ClearUnitState(UNIT_STATE_CASTING);
+                                        Position pos;
+                                        me->GetNearPosition(pos, 5.0f + 12.0f * i, (float(i) * M_PI / 2));
+                                        pTornado->SetSpeed(MOVE_RUN, 2.0f, true);
+                                        pTornado->GetMotionMaster()->MovePoint((bClock ? POINT_TORNADO_1 : POINT_TORNADO_2), pos);
+                                        bClock = !bClock;
+                                    }
+                                }
+                            }
                             DoCastAOE(SPELL_HARSH_WINDS, true);
-                            events.ScheduleEvent(EVENT_HARSH_WIND, 5000);
                             break;
                         }
                     }
@@ -867,19 +887,40 @@ class npc_alysrazor_fiery_tornado : public CreatureScript
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             }
 
-            EventMap events;
-
             void Reset()
             {
-                //DoCast(me, SPELL_FIERY_TORNADO, true);
-                me->AddAura(SPELL_FIERY_TORNADO, me);
+                events.Reset();
+                bClock = true;
             }
 
             void MovementInform(uint32 type, uint32 data)
             {
                 if (type == POINT_MOTION_TYPE)
-                    if (data == POINT_TORNADO)
+                {
+                    if (data == POINT_TORNADO_1)
                         events.ScheduleEvent(EVENT_MOVE_TORNADO, 1000);
+                    else
+                    {
+                        bClock = false;
+                        events.ScheduleEvent(EVENT_MOVE_TORNADO, 1000);
+                    }
+                }
+            }
+
+            void FillCirclePath(Position const& centerPos, float radius, float z, Movement::PointsArray& path, bool clockwise)
+            {
+                float step = clockwise ? -M_PI / 8.0f : M_PI / 8.0f;
+                float angle = centerPos.GetAngle(me->GetPositionX(), me->GetPositionY());
+
+                for (uint8 i = 0; i < 16; angle += step, ++i)
+                {
+                    G3D::Vector3 point;
+                    point.x = centerPos.GetPositionX() + radius * cosf(angle);
+                    point.y = centerPos.GetPositionY() + radius * sinf(angle);
+                    z = me->GetMap()->GetHeight(point.x, point.y, z);
+                    point.z = z;
+                    path.push_back(point);
+                }
             }
 
             void UpdateAI(const uint32 diff)
@@ -892,12 +933,21 @@ class npc_alysrazor_fiery_tornado : public CreatureScript
                     {
                         case EVENT_MOVE_TORNADO:
                         {
-                            //me->GetMotionMaster()->MoveCircle(addsPos[0], 6 * MINUTE * IN_MILLISECONDS, (roll_chance_i(50) ? ROTATE_DIRECTION_LEFT : ROTATE_DIRECTION_RIGHT));
+                            me->SetSpeed(MOVE_RUN, 4.0f, true);
+                            Movement::MoveSplineInit init(*me);
+                            FillCirclePath(centerPos, me->GetDistance2d(centerPos.GetPositionX(), centerPos.GetPositionY()), me->GetPositionZ(), init.Path(), bClock);
+                            init.SetCyclic();
+                            init.SetWalk(false);
+                            init.SetVelocity(4.0f);
+                            init.Launch();
                             break;
                         }
                     }
                 }
             }
+        private:
+            EventMap events;
+            bool bClock;
         };
 };
 

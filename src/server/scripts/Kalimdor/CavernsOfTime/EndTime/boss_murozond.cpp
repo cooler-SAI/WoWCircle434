@@ -307,7 +307,8 @@ class boss_murozond : public CreatureScript
                                 pNozdormu->AI()->DoAction(ACTION_NOZDORMU);
                             instance->SetBossState(DATA_MUROZOND, DONE);
                             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SANDS_OF_THE_HOURGLASS);
-                            me->Kill(me, false);
+                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                                pTarget->Kill(me);
                             break;
                         default:
                             break;
