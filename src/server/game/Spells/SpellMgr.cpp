@@ -827,17 +827,8 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const* spellPr
                 return false;
         }
         else if (procExtra & PROC_EX_INTERNAL_HOT)
-        {
-            if (!(EventProcFlag & PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS))
-                procExtra |= PROC_EX_INTERNAL_REQ_FAMILY;
-        }
+            procExtra |= PROC_EX_INTERNAL_REQ_FAMILY;
         else if (EventProcFlag & PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS)
-            return false;
-    }
-    else if (EventProcFlag & (PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS | PROC_EX_INTERNAL_HOT))
-    {
-        EventProcFlag &= ~PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS;
-        if ((procFlags & EventProcFlag) == 0)
             return false;
     }
 
