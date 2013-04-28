@@ -1888,7 +1888,7 @@ class spell_alysrazor_firestorm : public SpellScriptLoader
                     {
                         for (std::list<GameObject*>::const_iterator itr = _blockList.begin(); itr != _blockList.end(); ++itr)
                             if (!(*itr)->IsInvisibleDueToDespawn())
-                                if ((*itr)->IsInBetween(_caster, unit, 8.0f))
+                                if ((*itr)->IsInBetween(_caster, unit, 12.0f))
                                     return true;
 
                         return false;
