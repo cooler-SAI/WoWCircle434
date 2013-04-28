@@ -230,7 +230,7 @@ class boss_shannox : public CreatureScript
                 memset(areas, false, sizeof(areas));
 
                 Talk(SAY_AGGRO);
-                events.ScheduleEvent(EVENT_BERSERK, 6 * MINUTE * IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_BERSERK, 10 * MINUTE * IN_MILLISECONDS);
                 events.ScheduleEvent(EVENT_HURL_SPEAR, 15000);
                 events.ScheduleEvent(EVENT_SEPARATION_ANXIETY, 2000);
                 events.ScheduleEvent(EVENT_IMMOLATION_TRAP, urand(10000, 20000));
