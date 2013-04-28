@@ -149,7 +149,6 @@ set(scripts_STAT_SRCS
   Kalimdor/CavernsOfTime/EndTime/boss_echo_of_jaina.cpp
   Kalimdor/CavernsOfTime/EndTime/boss_murozond.cpp
   Kalimdor/CavernsOfTime/EndTime/end_time_teleport.cpp
-  Kalimdor/CavernsOfTime/EndTime/instance_end_time.cpp
   Kalimdor/CavernsOfTime/EndTime/end_time.cpp
   Kalimdor/CavernsOfTime/EndTime/end_time.h
 )
