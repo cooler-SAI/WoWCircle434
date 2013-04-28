@@ -26,6 +26,7 @@
 #include "Player.h"
 #include "SpellInfo.h"
 #include <map>
+#include "Containers.h"
 
 struct SkillDiscoveryEntry
 {
@@ -172,31 +173,13 @@ uint32 GetExplicitDiscoverySpell(uint32 spellId, Player* player)
     if (tab != SkillDiscoveryStore.end())
     {
         uint32 weight = 0;
-        std::map<uint32 /*spellid*/, uint32 /*chance*/> tempWeight;
+        std::list<uint32> spellIds;
         for (SkillDiscoveryList::const_iterator item_iter = tab->second.begin(); item_iter != tab->second.end(); ++item_iter)
-        {
-            if (item_iter->reqSkillValue <= skillvalue &&
-                item_iter->chance > 0 &&
-                !player->HasSpell(item_iter->spellId))
-            {
-                weight += item_iter->chance;
-                tempWeight[item_iter->spellId] = item_iter->chance;
-            }
-        }
-
-        if (weight)
-        {
-            uint32 selectedWeight = urand(0, weight - 1);
-            weight = 0;
-            for (std::map<uint32, uint32>::const_iterator itr = tempWeight.begin(); itr != tempWeight.end(); ++itr)
-            {
-                weight += itr->second;
-                if (selectedWeight < weight)
-                    return itr->first;
-            }
-        }
-    
-        return 0;
+            if (item_iter->reqSkillValue <= skillvalue && item_iter->chance > 0 && !player->HasSpell(item_iter->spellId))
+                spellIds.push_back(item_iter->spellId);
+        
+        if (!spellIds.empty())
+            return Trinity::Containers::SelectRandomContainerElement(spellIds);
     }
 
     return 0;
