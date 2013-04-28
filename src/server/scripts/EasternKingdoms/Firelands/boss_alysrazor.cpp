@@ -375,7 +375,7 @@ class boss_alysrazor : public CreatureScript
                             me->RemoveAura(SPELL_BLAZING_CLAW);
                             break;
                         case 4:
-                            bMolting = true;
+                            bMolting = false;
                             events.RescheduleEvent(EVENT_BLAZING_POWER, urand(2000, 5000));
                             events.RescheduleEvent(EVENT_INCINDIARY_CLOUD, urand(3000, 5000));
                             break;
@@ -505,7 +505,23 @@ class boss_alysrazor : public CreatureScript
                     DoCast(me, SPELL_MOLTING_2, true);
                     me->AttackStop();
                     me->SetReactState(REACT_PASSIVE);
-                    DoCastAOE(SPELL_FIRESTORM, true);
+                    DoCastAOE(SPELL_FULL_POWER, true);
+                    
+                    std::list<Creature*> creatureList;
+                    me->GetCreatureListWithEntryInGrid(creatureList, NPC_DULL_PYRESHELL_FOCUS, 300.0f);
+                    if (!creatureList.empty())
+                    {
+                        for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+                        {
+                            if (Creature* pFocus = (*itr)->ToCreature())
+                            {
+                                pFocus->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                                pFocus->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                                pFocus->CastSpell(pFocus, SPELL_TRANSFORM_CHARGED_PYRESHELL_FOCUS, true);
+                            }
+                        }
+                    }
+
                     curPoint = 4;
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
@@ -604,6 +620,7 @@ class boss_alysrazor : public CreatureScript
                             me->SetCanFly(false);
                             me->SetDisableGravity(false);
                             me->NearTeleportTo(centerPos.GetPositionX(), centerPos.GetPositionY(), centerPos.GetPositionZ(), centerPos.GetOrientation(), true);
+                            me->UpdateObjectVisibility();
                             summons.DespawnEntry(NPC_FIERY_VORTEX);
                             DoCast(me, SPELL_BURNOUT, true);
                             DoCast(me, SPELL_SPARK, true);
@@ -1269,6 +1286,8 @@ class npc_alysrazor_molten_egg : public CreatureScript
                             events.ScheduleEvent(EVENT_SUMMON_HATCHLING, 5000);
                             break;
                         case EVENT_SUMMON_HATCHLING:
+                            for (uint8 i = 0; i < urand(2, 3); ++i)
+                                DoCast(me, SPELL_CREATE_PYRESHELL_FRAGMENT, true);
                             DoCast(me, SPELL_SUMMON_HATCHLING);
                             me->DespawnOrUnsummon(500);
                             break;

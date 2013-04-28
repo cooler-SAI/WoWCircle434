@@ -87,12 +87,17 @@ enum Spells
     SPELL_MOLTEN_EGG_TRASH_CALL_L               = 100097,
     SPELL_MOLTEN_EGG_TRASH_CALL_R               = 100098,
     SPELL_ALYSRAZOR_COSMETIC_EGG_XPLOSION       = 100099,
+
+    // Volcanus
+    SPELL_FLAMEWAKE                             = 100191,
 };
 
 enum Adds
 {    
     NPC_MAGMAKIN        = 54144,
     NPC_MAGMA_CONDUIT   = 54145, // 97699, 98250, 100746
+
+    NPC_STALKER         = 45979,
 };
 
 enum Events
@@ -131,6 +136,9 @@ enum Events
 
     // Egg Pile
     EVENT_SUMMON_SMOULDERING_HATCHLING  = 17,
+
+    // Volcanus
+    EVENT_FLAMEWAKE                     = 18,
 };
 
 enum MiscData
@@ -1335,6 +1343,153 @@ class npc_egg_pile : public CreatureScript
         }
 };
 
+class npc_firelands_dull_focus : public CreatureScript
+{
+    public:
+
+        npc_firelands_dull_focus() : CreatureScript("npc_firelands_dull_focus") { }
+
+        bool OnGossipHello(Player* pPlayer, Creature* pCreature)
+        {
+            InstanceScript* pInstance = pCreature->GetInstanceScript();
+            if (!pInstance)
+                return true;
+
+            if (!pPlayer)
+                return true;
+
+            if (pPlayer->GetQuestStatus(29234) != QUEST_STATUS_INCOMPLETE)
+                return true;
+
+            uint32 spellId = 0;
+
+            switch (pCreature->GetEntry())
+            {
+                case NPC_DULL_RHYOLITH_FOCUS: spellId = SPELL_CHARGED_RHYOLITH_FOCUS; break;
+                case NPC_DULL_EMBERSTONE_FOCUS: spellId = SPELL_CHARGED_EMBERSTONE_FOCUS; break;
+                case NPC_DULL_CHITINOUS_FOCUS: spellId = SPELL_CHARGED_CHITINOUS_FOCUS; break;
+                case NPC_DULL_PYRESHELL_FOCUS: spellId = SPELL_CHARGED_PYRESHELL_FOCUS; break;
+                default: break;
+            }
+
+            if (spellId)
+            {
+                pPlayer->CastSpell(pPlayer, spellId, true);
+                pCreature->DespawnOrUnsummon();
+            }
+            return true;
+        }
+};
+
+class npc_firelands_circle_of_thorns_portal : public CreatureScript
+{
+    public:
+
+        npc_firelands_circle_of_thorns_portal() : CreatureScript("npc_firelands_circle_of_thorns_portal") { }
+
+        bool OnGossipHello(Player* pPlayer, Creature* pCreature)
+        {
+            InstanceScript* pInstance = pCreature->GetInstanceScript();
+            if (!pInstance)
+                return true;
+
+            if (!pPlayer)
+                return true;
+
+            if (pInstance->GetData(DATA_EVENT) != DONE)
+                return true;
+
+            bool bIn = (pCreature->GetPositionZ() <= 100.0f);
+
+            if (bIn)
+                pPlayer->NearTeleportTo(504.063416f, 476.256317f, 246.745483f, 2.30f, false);
+            else
+                pPlayer->NearTeleportTo(173.153091f, 283.155334f, 84.603622f, 3.69f, false); 
+
+            return true;
+        }
+};
+
+class npc_firelands_volcanus : public CreatureScript
+{
+    public:
+        npc_firelands_volcanus() : CreatureScript("npc_firelands_volcanus") { }
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_firelands_volcanusAI(creature);
+        }
+
+        struct npc_firelands_volcanusAI : public CreatureAI
+        {
+            npc_firelands_volcanusAI(Creature* creature) : CreatureAI(creature)
+            {
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
+            }
+
+            void Reset()
+            {
+                events.Reset();
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+                events.ScheduleEvent(EVENT_FLAMEWAKE, 3000);
+            }
+
+            void JustDied(Unit* /*killer*/)
+            {
+                if (Creature* pStalker = me->SummonCreature(NPC_STALKER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000))
+                {
+                    pStalker->RemoveAllAuras();
+                    pStalker->CastSpell(pStalker, SPELL_BRANCH_OF_NORDRASSIL_WIN_COSMETIC, true);
+                }
+                me->DespawnOrUnsummon(500);
+            }
+
+            void UpdateAI(uint32 const diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_FLAMEWAKE:
+                            DoCastAOE(SPELL_FLAMEWAKE);
+                            DoCast(me, SPELL_FIRE_IT_UP, true);
+                            events.ScheduleEvent(EVENT_FLAMEWAKE, 10000);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                DoMeleeAttackIfReady();
+            }
+
+        private:
+            EventMap events;
+        };
+};
+
 class spell_alysrazor_cosmetic_egg_xplosion : public SpellScriptLoader
 {
     public:
@@ -1511,6 +1666,7 @@ void AddSC_firelands()
     new npc_firelands_molten_flamefather();
     new npc_firelands_magma_conduit();
     new npc_firelands_magmakin();
+
     new spell_firelands_ancient_core_hound_dinner_time();
     new spell_firelands_ancient_core_hound_flame_breath();
     new spell_firelands_ancient_lava_dweller_lava_shower();
@@ -1526,4 +1682,8 @@ void AddSC_firelands()
     new spell_alysrazor_cosmetic_egg_xplosion();
     new spell_alysrazor_turn_monstrosity();
     new spell_alysrazor_aggro_closest();
+
+    new npc_firelands_dull_focus();
+    new npc_firelands_circle_of_thorns_portal();
+    new npc_firelands_volcanus();
 }

@@ -625,6 +625,12 @@ class npc_bethtilac_cinderweb_drone : public CreatureScript
                     events.ScheduleEvent(EVENT_FIXATE, urand(12000, 15000));
             }
 
+            void JustDied(Unit* /*who*/)
+            {
+                for (uint8 i = 0; i < 3; ++i)
+                    DoCast(me, SPELL_CREATE_CHITINOUS_FRAGMENT, true);
+            }
+
             void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
@@ -849,13 +855,32 @@ class spell_bethtilac_smoldering_devastation : public SpellScriptLoader
                 targets.remove_if(PositionCheck(false));
             }
 
+            void HandleAfterCast()
+            {
+                if (!GetCaster())
+                    return;
+
+                std::list<Creature*> creatureList;
+                GetCaster()->GetCreatureListWithEntryInGrid(creatureList, NPC_DULL_CHITINOUS_FOCUS, 100.0f);
+                if (!creatureList.empty())
+                {
+                    for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+                    {
+                        if (Creature* pFocus = (*itr)->ToCreature())
+                        {
+                            pFocus->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                            pFocus->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            pFocus->CastSpell(pFocus, SPELL_TRANSFORM_CHARGED_CHITINOUS_FOCUS, true);
+                        }
+                    }
+                }
+            }
+
             void Register()
             {
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_bethtilac_smoldering_devastation_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+                AfterCast += SpellCastFn(spell_bethtilac_smoldering_devastation_SpellScript::HandleAfterCast);
             }
-
-            private:
-
         };
 
         SpellScript* GetSpellScript() const

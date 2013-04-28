@@ -233,6 +233,7 @@ class boss_echo_of_jaina : public CreatureScript
                                 if (Creature* pTarget = creatures.front())
                                     me->NearTeleportTo(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), 0.0f, true);
                             }
+                            me->UpdateObjectVisibility();
                             events.CancelEvent(EVENT_PYROBLAST);
                             events.CancelEvent(EVENT_FLARECORE);
                             events.ScheduleEvent(EVENT_FROST_BLADES, 1500);

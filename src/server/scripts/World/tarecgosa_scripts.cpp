@@ -99,7 +99,54 @@ class npc_tarecgosa_52835 : public CreatureScript
                     return;
 
                 if (who->ToPlayer()->GetQuestStatus(29193) == QUEST_STATUS_INCOMPLETE)
+                {
                     who->ToPlayer()->KilledMonsterCredit(52832, 0);
+                    who->ToPlayer()->CompleteQuest(29193);
+                }
+            }
+        };
+};
+
+class npc_thyrinar : public CreatureScript
+{
+    public:
+        npc_thyrinar() : CreatureScript("npc_thyrinar") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_thyrinarAI(pCreature);
+        }
+
+        struct npc_thyrinarAI : ScriptedAI
+        {
+            npc_thyrinarAI(Creature* pCreature) : ScriptedAI(pCreature) 
+            {
+                me->SetCanFly(true);
+                me->SetDisableGravity(true);
+                me->SetReactState(REACT_PASSIVE);
+            }
+
+            void Reset()
+            {
+                me->SetCanFly(true);
+                me->SetDisableGravity(true);
+                me->SetReactState(REACT_PASSIVE);
+            }
+
+            void JustDied(Unit* who)
+            {
+                if (!who)
+                    return;
+
+                Unit* originalKiller = who->GetCharmerOrOwnerOrSelf();
+                if (!originalKiller || originalKiller->GetTypeId() != TYPEID_PLAYER)
+                    return;
+
+                if (Creature* pTarecgosa = me->FindNearestCreature(53567, 200.0f))
+                    pTarecgosa->RemoveAura(99561);
+
+                if (originalKiller->ToPlayer()->GetQuestStatus(29194) == QUEST_STATUS_INCOMPLETE)
+                    originalKiller->ToPlayer()->KilledMonsterCredit(52867, 0);
             }
         };
 };
@@ -108,4 +155,5 @@ void AddSC_tarecgosa_scripts()
 {
     new npc_anachronos_15192();
     new npc_tarecgosa_52835();
+    new npc_thyrinar();
 };

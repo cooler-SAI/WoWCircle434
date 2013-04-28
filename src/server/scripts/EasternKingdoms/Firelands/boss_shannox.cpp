@@ -773,6 +773,22 @@ class npc_shannox_spear_of_shannox : public CreatureScript
             {
                 if (spellInfo->Id == SPELL_HURL_SPEAR_DMG)
                 {
+                     
+                    std::list<Creature*> creatureList;
+                    me->GetCreatureListWithEntryInGrid(creatureList, NPC_DULL_EMBERSTONE_FOCUS, 50.0f);
+                    if (!creatureList.empty())
+                    {
+                        for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+                        {
+                            if (Creature* pFocus = (*itr)->ToCreature())
+                            {
+                                pFocus->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                                pFocus->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                                pFocus->CastSpell(pFocus, SPELL_TRANSFORM_CHARGED_EMBERSTONE_FOCUS, true);
+                            }
+                        }
+                    }
+
                     me->RemoveAurasDueToSpell(SPELL_SPEAR_TARGET);
                     DoCast(me, SPELL_MAGMA_FLARE, true);
                     DoCast(me, SPELL_SPEAR_VISUAL, true);
@@ -984,6 +1000,8 @@ class npc_shannox_crystal_prison : public CreatureScript
 
             void JustDied(Unit* /*killer*/)
             {
+                if (!bDog)
+                    DoCast(me, SPELL_CREATE_EMBERSTONE_FRAGMENT, true);
                 bDog = false;
                 if (Unit* unit = ObjectAccessor::GetUnit(*me, trappedUnit))
                 {

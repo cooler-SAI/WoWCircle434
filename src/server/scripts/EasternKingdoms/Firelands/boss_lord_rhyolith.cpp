@@ -129,8 +129,8 @@ class boss_lord_rhyolith : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
                 me->setActive(true);
-                me->SetSpeed(MOVE_RUN, 0.4f, true);
-                me->SetSpeed(MOVE_WALK, 0.4f, true);
+                me->SetSpeed(MOVE_RUN, 0.3f, true);
+                me->SetSpeed(MOVE_WALK, 0.3f, true);
                 pController = NULL;
                 pRightFoot = NULL;
                 pLeftFoot = NULL;
@@ -211,8 +211,8 @@ class boss_lord_rhyolith : public CreatureScript
 
                 if (pController)
                 {
-                    me->SetSpeed(MOVE_RUN, 0.4f, true);
-                    me->SetSpeed(MOVE_WALK, 0.4f, true);
+                    me->SetSpeed(MOVE_RUN, 0.3f, true);
+                    me->SetSpeed(MOVE_WALK, 0.3f, true);
                     me->SetWalk(true);
                     me->GetMotionMaster()->MoveFollow(pController, 0.0f, 0.0f);
                 }
@@ -365,7 +365,7 @@ class boss_lord_rhyolith : public CreatureScript
 
                                 if (!l_dmg && !r_dmg)
                                 {
-                                    me->RemoveAura(SPELL_BURNING_FEET);
+                                    //me->RemoveAura(SPELL_BURNING_FEET);
                                     if (pLeftFoot)
                                         pLeftFoot->RemoveAura(SPELL_BURNING_FEET);
                                     if (pRightFoot)
@@ -381,7 +381,7 @@ class boss_lord_rhyolith : public CreatureScript
 
                                 if (i != curMove)
                                 {
-                                    me->RemoveAura(SPELL_BURNING_FEET);
+                                    //me->RemoveAura(SPELL_BURNING_FEET);
                                     if (pLeftFoot)
                                         pLeftFoot->RemoveAura(SPELL_BURNING_FEET);
                                     if (pRightFoot)
@@ -391,7 +391,7 @@ class boss_lord_rhyolith : public CreatureScript
                                 }
                                 else
                                 {
-                                    DoCast(me, SPELL_BURNING_FEET, true);
+                                    //DoCast(me, SPELL_BURNING_FEET, true);
                                     if (pLeftFoot)
                                         pLeftFoot->CastSpell(pLeftFoot, SPELL_BURNING_FEET, true);
                                     if (pRightFoot)
@@ -799,6 +799,9 @@ class npc_lord_rhyolith_volcano : public CreatureScript
                                 if (pRhyolith->IsInEvadeMode() || (pRhyolith->AI()->GetData(DATA_PHASE) != 0))
                                     return;
 
+                                uint32 k = urand(0, _MAX_VOLCANO - 1);
+                                pRhyolith->SummonGameObject(GO_RHYOLITH_FRAGMENT, volcanoPos[k].GetPositionX(), volcanoPos[k].GetPositionY(), volcanoPos[k].GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, MINUTE * IN_MILLISECONDS);  
+
                                 pRhyolith->AI()->DoAction(ACTION_ADD_MOLTEN_ARMOR);
                                 pRhyolith->AI()->DoAction(ACTION_REMOVE_OBSIDIAN_ARMOR);
                                 pRhyolith->SummonCreature(NPC_CRATER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
@@ -1112,9 +1115,31 @@ class spell_lord_rhyolith_conclusive_stomp : public SpellScriptLoader
                     }
             }
 
+            void HandleAfterCast()
+            {
+                if (!GetCaster())
+                    return;
+
+                std::list<Creature*> creatureList;
+                GetCaster()->GetCreatureListWithEntryInGrid(creatureList, NPC_DULL_RHYOLITH_FOCUS, 100.0f);
+                if (!creatureList.empty())
+                {
+                    for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+                    {
+                        if (Creature* pFocus = (*itr)->ToCreature())
+                        {
+                            pFocus->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                            pFocus->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            pFocus->CastSpell(pFocus, SPELL_TRANSFORM_CHARGED_RHYOLITH_FOCUS, true);
+                        }
+                    }
+                }
+            }
+
             void Register()
             {
                 OnEffectHitTarget += SpellEffectFn(spell_lord_rhyolith_conclusive_stomp_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+                AfterCast += SpellCastFn(spell_lord_rhyolith_conclusive_stomp_SpellScript::HandleAfterCast);
             }
         };
 

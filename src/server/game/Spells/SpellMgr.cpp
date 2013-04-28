@@ -6595,6 +6595,22 @@ void SpellMgr::LoadDbcDataCorrections()
             case 89792:
                 spellInfo->Effects[EFFECT_2].Effect = 0;
                 break;
+            // Nexus Phase Shift
+            case 99488:
+                spellInfo->Effects[EFFECT_0].MiscValue = 256;
+                break;
+            // Twilight Prison
+            case 99561:
+                spellInfo->Effects[EFFECT_2].Effect = 0;
+                spellInfo->Effects[EFFECT_2].ApplyAuraName = 0;
+                break;
+            // Open Fire Portal
+            case 100528:
+            case 101067:
+            case 101068:
+            case 101069:
+                spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_CASTER;
+                break;
             default:
                 break;
         }
