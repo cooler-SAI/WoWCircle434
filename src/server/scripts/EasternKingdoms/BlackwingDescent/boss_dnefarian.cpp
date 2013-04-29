@@ -111,7 +111,7 @@ public:
 
     struct boss_bd_nefarianAI : public BossAI
     {
-        boss_bd_nefarianAI(Creature* pCreature) : BossAI(pCreature, BOSS_NEFARIAN)
+        boss_bd_nefarianAI(Creature* pCreature) : BossAI(pCreature, BOSS_DNEFARIAN)
         {
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
             me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);

@@ -118,7 +118,8 @@ class instance_blackwing_descent : public InstanceMapScript
                 switch (go->GetEntry())
                 {
                 case GO_INNER_CHAMBER_DOOR:
-                case GO_NEFARIAN_FLOOR:
+                //case GO_NEFARIAN_FLOOR:
+                case GOB_ONYXIA_PLATFORM:
                     break;
                 default:
                     break;

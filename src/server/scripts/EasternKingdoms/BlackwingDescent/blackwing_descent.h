@@ -39,7 +39,7 @@ enum Creatures
     NPC_BILE_O_TRON_800             = 44418, 
 
     // Nefarian
-    NPC_NEFARIAN                    = 41376, 
+    BOSS_DNEFARIAN                    = 41376, 
     NPC_ONYXIA                      = 41270, 
     NPC_WAR_OS                      = 41918,
     NPC_PROTOTYPE                   = 41948,
