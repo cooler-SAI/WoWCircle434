@@ -3650,8 +3650,20 @@ void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase)
     }
 
     // single target auras at other targets
+    AuraList tempList;
     AuraList& scAuras = GetSingleCastAuras();
-    for (AuraList::iterator iter = scAuras.begin(); iter != scAuras.end();)
+    for (AuraList::const_iterator itr = scAuras.begin(); itr != scAuras.end(); ++itr)
+        if (Aura* aura = *itr)
+            if (aura->GetUnitOwner() != this && !aura->GetUnitOwner()->InSamePhase(newPhase))
+                tempList.push_back(aura);
+
+    if (!tempList.empty())
+        for (AuraList::const_iterator itr = scAuras.begin(); itr != scAuras.end(); ++itr)
+            if (Aura* aura = *itr)
+                aura->Remove();
+
+
+    /*for (AuraList::iterator iter = scAuras.begin(); iter != scAuras.end();)
     {
         if (Aura* aura = *iter)
         {
@@ -3665,7 +3677,7 @@ void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase)
         }
         else
             ++iter;
-    }
+    }*/
 }
 
 void Unit::RemoveAurasWithInterruptFlags(uint32 flag, uint32 except)
