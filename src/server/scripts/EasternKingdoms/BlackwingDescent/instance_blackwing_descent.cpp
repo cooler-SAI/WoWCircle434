@@ -103,9 +103,13 @@ class instance_blackwing_descent : public InstanceMapScript
                     if (GetBossState(DATA_OMNOTRON) == DONE && GetBossState(DATA_MAGMAW) == DONE)
                         HandleGameObject(NULL, true, go);
                     break;
-                case GO_NEFARIAN_FLOOR:
-                    uiNefarianFloorGUID = go->GetGUID();
-                    break;
+                //case GO_NEFARIAN_FLOOR:
+                //    uiNefarianFloorGUID = go->GetGUID();
+                //    break;
+            case GOB_ONYXIA_PLATFORM:
+                uiNefarianFloorGUID = go->GetGUID();
+                go->SetPhaseMask(GetBossState(DATA_ATRAMEDES) == DONE ? 1 : 2, true);
+                break;
                 }
             }
             
@@ -192,6 +196,8 @@ class instance_blackwing_descent : public InstanceMapScript
                 case DATA_CHIMAERON:
                     break;
                 case DATA_ATRAMEDES:
+                    if(GameObject* onyxiaPlatform = instance->GetGameObject(uiNefarianFloorGUID))
+                        onyxiaPlatform->SetPhaseMask(PHASEMASK_NORMAL, true);
                     break;
                 case DATA_NEFARIAN:
                     break;
