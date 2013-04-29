@@ -135,7 +135,6 @@ class boss_lord_rhyolith : public CreatureScript
                 pRightFoot = NULL;
                 pLeftFoot = NULL;
                 curMove = 0;
-                phase = 0;
                 bAchieve = true;
                 players_count = 0;
             }
@@ -153,36 +152,27 @@ class boss_lord_rhyolith : public CreatureScript
                 return bAchieve;
             }
 
-            uint32 GetData(uint32 type)
-            {
-                if (type == DATA_PHASE)
-                    return phase;
-                return 0;
-            }
-
             void Reset()
             {
                 _Reset();
                 
-                me->UpdateEntry(NPC_RHYOLITH);
                 me->SetHealth(me->GetMaxHealth());
                 me->SetReactState(REACT_PASSIVE);
                 me->LowerPlayerDamageReq(me->GetMaxHealth());
+                summons.DespawnEntry(NPC_VOLCANO);
+
+                if (instance->GetBossState(DATA_RHYOLITH) != DONE)
+                    me->SetVisible(true);
+                else
+                    me->DespawnOrUnsummon();
 
                 curMove = 0;
                 bAchieve = true;
-                phase = 0;
                 players_count = 0;
+                phase = 0;
 
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BALANCE_BAR);
                 instance->SetData(DATA_RHYOLITH_HEALTH_SHARED, me->GetMaxHealth() / 2);
-
-                //int32 bp0 = 2;
-                //int32 bp1 = 1;
-                //if (pRightFoot = me->SummonCreature(NPC_RIGHT_FOOT, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()))
-                //    pRightFoot->CastCustomSpell(me, SPELL_RIDE_VEHICLE, &bp0, NULL, NULL, true);
-                //if (pLeftFoot = me->SummonCreature(NPC_LEFT_FOOT, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()))
-                //    pLeftFoot->CastCustomSpell(me, SPELL_RIDE_VEHICLE, &bp1, NULL, NULL, true);
             }
 
             void EnterEvadeMode()
@@ -193,8 +183,13 @@ class boss_lord_rhyolith : public CreatureScript
 
             void DamageTaken(Unit* /*who*/, uint32 &damage)
             {
-                if (phase == 0)
-                    damage = 0;
+                damage = 0;
+            }
+
+            void JustSummoned(Creature* summon)
+            {
+                if (summon->GetEntry() != NPC_RHYOLITH_2)
+                    BossAI::JustSummoned(summon);
             }
 
             void EnterCombat(Unit* attacker)
@@ -202,8 +197,8 @@ class boss_lord_rhyolith : public CreatureScript
                 Talk(SAY_AGGRO);
                 
                 curMove = 0;
-                phase = 0;
                 bAchieve = true;
+                phase = 0;
                 players_count = instance->instance->GetPlayers().getSize();
 
                 pController = me->SummonCreature(NPC_MOVEMENT_CONTROLLER, movePos[curMove]);
@@ -231,13 +226,6 @@ class boss_lord_rhyolith : public CreatureScript
                 instance->SetBossState(DATA_RHYOLITH, IN_PROGRESS);
             }
 
-            void JustDied(Unit* /*killer*/)
-            {
-                _JustDied();
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BALANCE_BAR);
-                Talk(SAY_DEATH);
-            }
-            
             void JustReachedHome()
             {
                 me->GetVehicleKit()->InstallAllAccessories(false);
@@ -288,23 +276,30 @@ class boss_lord_rhyolith : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-                if ((instance->GetData(DATA_RHYOLITH_HEALTH_SHARED) != 0) && (phase == 0))
-                    me->SetHealth(instance->GetData(DATA_RHYOLITH_HEALTH_SHARED) / 2);
+                if ((instance->GetData(DATA_RHYOLITH_HEALTH_SHARED) != 0))
+                    me->SetHealth(instance->GetData(DATA_RHYOLITH_HEALTH_SHARED) * 2);
 
                 if (me->HealthBelowPct(25) && phase == 0)
                 {
-                    
+                    phase = 1;
                     me->StopMoving();
-                    uint32 _health = instance->GetData(instance->GetData(DATA_RHYOLITH_HEALTH_SHARED));
+                    events.Reset();
+
+                    uint32 _health = me->GetHealth();
                     
-                    me->UpdateEntry(NPC_RHYOLITH_2);
+                    if (Creature* pRhyolith = me->SummonCreature(NPC_RHYOLITH_2, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()))
+                    {
+                        pRhyolith->RemoveAllAuras();
+                        pRhyolith->SetHealth(_health);
+                        pRhyolith->LowerPlayerDamageReq(pRhyolith->GetMaxHealth());
+                        pRhyolith->CastSpell(pRhyolith, SPELL_IMMOLATION, true);
+                    }
 
                     summons.DespawnEntry(NPC_VOLCANO);
                     summons.DespawnEntry(NPC_LIQUID_OBSIDIAN);
-                    
+                    me->AttackStop();
+                    me->SetVisible(false);
                     events.Reset();
-                    phase = 1;
-                    me->LowerPlayerDamageReq(me->GetMaxHealth());
 
                     Talk(SAY_TRANS);
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ERUPTION_DMG);
@@ -324,19 +319,7 @@ class boss_lord_rhyolith : public CreatureScript
                     {
                         pRightFoot->DespawnOrUnsummon();
                         pRightFoot = NULL;
-                    }
-
-                    me->SetSpeed(MOVE_RUN, 1.0f, true);
-                    me->SetSpeed(MOVE_WALK, 1.0f, true);
-                    me->SetWalk(false);
-                    
-                    me->SetHealth(_health / 2);
-                    me->RemoveAllAuras();
-                    DoCast(me, SPELL_IMMOLATION, true);
-                    
-                    events.Reset();
-                    events.ScheduleEvent(EVENT_START_MOVE, 2000);
-                    events.RescheduleEvent(EVENT_CONCLUSIVE_STOMP, 2000);
+                    }      
                     return;
                 }
 
@@ -351,7 +334,7 @@ class boss_lord_rhyolith : public CreatureScript
                     {
                         case EVENT_CHECK_MOVE:
                         {
-                            if (pController && phase == 0)
+                            if (pController)
                             {
                                 if (me->GetDistance2d(pController) <= 0.5f)
                                 {
@@ -483,22 +466,22 @@ class boss_lord_rhyolith : public CreatureScript
             Creature* pRightFoot;
             Creature* pLeftFoot;
             int32 curMove;
-            uint8 phase;
             bool bAchieve;
             uint8 players_count;
+            uint8 phase;
 
             int32 CalculateNextMove(int32 cur, int32 left, int32 right)
             {
                 int32 diff = right - left;
                 
                 if (diff == 0)
-                    return cur;
+                    return 0;
                 else if (diff > 0 && diff < 3)
-                    return cur;
+                    return 0;
                 else if (diff < 0 && diff > -3)
-                    return cur;
+                    return 0;
 
-                diff /= 3;
+                diff /= 2;
                 if (diff > 6)
                     diff = 6;
                 else if (diff < -6)
@@ -540,6 +523,109 @@ class boss_lord_rhyolith : public CreatureScript
                 private:
                     uint32 _spellId;
             };
+        };
+};
+
+class npc_lord_rhyolith_rhyolith : public CreatureScript
+{
+    public:
+        npc_lord_rhyolith_rhyolith() : CreatureScript("npc_lord_rhyolith_rhyolith") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_lord_rhyolith_rhyolithAI(pCreature);
+        }
+
+        struct npc_lord_rhyolith_rhyolithAI : public ScriptedAI
+        {
+            npc_lord_rhyolith_rhyolithAI(Creature* pCreature) : ScriptedAI(pCreature)
+            {
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
+                me->setActive(true);
+                pInstance = me->GetInstanceScript();
+            }
+
+            void InitializeAI()
+            {
+                if (!pInstance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(FLScriptName))
+                    me->IsAIEnabled = false;
+                else if (!me->isDead())
+                    Reset();
+            }
+
+            void Reset()
+            {
+                events.Reset();
+            }
+
+            void EnterEvadeMode()
+            {
+                me->DespawnOrUnsummon();
+            }
+
+            void EnterCombat(Unit* attacker)
+            {
+                events.ScheduleEvent(EVENT_CONCLUSIVE_STOMP, 10000);
+
+                DoZoneInCombat();
+            }
+
+            void JustDied(Unit* /*killer*/)
+            {
+                if (pInstance)
+                {
+                    pInstance->SetBossState(DATA_RHYOLITH, DONE);
+                    pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BALANCE_BAR);
+                }
+                Talk(SAY_DEATH);
+            }
+
+            void KilledUnit(Unit* who)
+            {
+                if (who->GetTypeId() == TYPEID_PLAYER)
+                    Talk(SAY_KILL);
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_CONCLUSIVE_STOMP:
+                            Talk(SAY_STOMP);
+                            DoCastAOE(SPELL_CONCLUSIVE_STOMP);
+                            events.ScheduleEvent(EVENT_CONCLUSIVE_STOMP, urand(35000, 40000));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                DoMeleeAttackIfReady();
+            }
+        private:
+            InstanceScript* pInstance;
+            EventMap events;
         };
 };
 
@@ -771,7 +857,7 @@ class npc_lord_rhyolith_volcano : public CreatureScript
             void EnterCombat(Unit* /*who*/)
             {
                 DoCast(me, SPELL_VOLCANO_SMOKE, true);
-                events.ScheduleEvent(EVENT_CHECK_RHYOLITH, 3000);
+                events.ScheduleEvent(EVENT_CHECK_RHYOLITH, 3000);       
             }
 
             void SpellHit(Unit* /*who*/, const SpellInfo* spellInfo)
@@ -804,7 +890,9 @@ class npc_lord_rhyolith_volcano : public CreatureScript
                                     return;
 
                                 uint32 k = urand(0, _MAX_VOLCANO - 1);
-                                pRhyolith->SummonGameObject(GO_RHYOLITH_FRAGMENT, volcanoPos[k].GetPositionX(), volcanoPos[k].GetPositionY(), volcanoPos[k].GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, MINUTE * IN_MILLISECONDS);  
+                                if (Unit* pTarget = pRhyolith->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 300.0f, true))
+                                    if (Player* pPlayer = pTarget->ToPlayer())
+                                        pPlayer->SummonGameObject(GO_RHYOLITH_FRAGMENT, volcanoPos[k].GetPositionX(), volcanoPos[k].GetPositionY(), volcanoPos[k].GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, MINUTE * IN_MILLISECONDS);  
 
                                 pRhyolith->AI()->DoAction(ACTION_ADD_MOLTEN_ARMOR);
                                 pRhyolith->AI()->DoAction(ACTION_REMOVE_OBSIDIAN_ARMOR);
@@ -1099,7 +1187,7 @@ class spell_lord_rhyolith_conclusive_stomp : public SpellScriptLoader
                     return;
 
                 if (Creature* pCreature = GetCaster()->ToCreature())
-                    if (pCreature->AI()->GetData(DATA_PHASE) != 1)
+                    if (pCreature->GetEntry() != NPC_RHYOLITH_2)
                     {
                         std::set<uint8> posList;
                         uint8 max_size = urand(2, 3);
@@ -1216,7 +1304,6 @@ class spell_lord_rhyolith_fuse : public SpellScriptLoader
                     return;
 
                 if (Creature* pRhyolith = GetHitUnit()->ToCreature())
-                    if (pRhyolith->AI()->GetData(DATA_PHASE) == 0)
                         pRhyolith->AI()->DoAction(ACTION_ADD_OBSIDIAN_ARMOR);
             }
 
@@ -1323,6 +1410,7 @@ class achievement_not_an_ambi_turner : public AchievementCriteriaScript
 void AddSC_boss_lord_rhyolith()
 {
     new boss_lord_rhyolith();
+    new npc_lord_rhyolith_rhyolith();
     new npc_lord_rhyolith_left_foot();
     new npc_lord_rhyolith_right_foot();
     new npc_lord_rhyolith_volcano();
