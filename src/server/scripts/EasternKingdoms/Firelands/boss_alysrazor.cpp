@@ -326,6 +326,7 @@ class boss_alysrazor : public CreatureScript
             { 
                 _Reset();
                 DespawnGameObjects();
+                DespawnCreatures(NPC_MOLTEN_METEOR_2);
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
                 me->SetReactState(REACT_PASSIVE);
@@ -449,8 +450,7 @@ class boss_alysrazor : public CreatureScript
                 {
                     events.ScheduleEvent(EVENT_SUMMON_WORMS, 60000);
                     events.ScheduleEvent(EVENT_BROODMOTHER, 60000);
-                    //events.ScheduleEvent(EVENT_VORTEX, 200000);
-                    events.ScheduleEvent(EVENT_VORTEX, 30000);
+                    events.ScheduleEvent(EVENT_VORTEX, 200000);
                 }
                 
 
@@ -714,7 +714,7 @@ class boss_alysrazor : public CreatureScript
                 Talk(SAY_SKIES);
                 
                 DespawnGameObjects();
-                summons.DespawnEntry(NPC_MOLTEN_METEOR_2);
+                DespawnCreatures(NPC_MOLTEN_METEOR_2);
 
                 if (Unit* pVortex = me->SummonCreature(NPC_FIERY_VORTEX, centerPos))
                     pVortex->CastSpell(pVortex, SPELL_FIERY_VORTEX);
@@ -744,6 +744,18 @@ class boss_alysrazor : public CreatureScript
                         itr = blockList.erase(itr);
                     }
                 }
+            }
+
+            void DespawnCreatures(uint32 entry)
+            {
+            std::list<Creature*> creatures;
+            GetCreatureListWithEntryInGrid(creatures, me, entry, 1000.0f);
+
+            if (creatures.empty())
+               return;
+
+            for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
+                 (*iter)->DespawnOrUnsummon();
             }
         };
 }; 
@@ -1533,14 +1545,10 @@ class npc_alysrazor_molten_feather : public CreatureScript
             if (stacks < 3)
                 pPlayer->CastSpell(pPlayer, SPELL_MOLTEN_FEATHER, true);          
             
-            //pPlayer->SetPower(POWER_ALTERNATE_POWER, stacks + 1);
+            pPlayer->SetPower(POWER_ALTERNATE_POWER, stacks + 1);
 
             if (stacks >= 2)
-            {
-                pPlayer->RemoveAura(SPELL_MOLTEN_FEATHER);
                 pPlayer->CastSpell(pPlayer, SPELL_WINGS_OF_FLAME, true);
-                //pPlayer->SetPower(POWER_ALTERNATE_POWER, 0);
-            }
 
             pCreature->DespawnOrUnsummon();
             return true;
@@ -1602,8 +1610,9 @@ class npc_alysrazor_molten_meteor : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-                me->SetSpeed(MOVE_RUN, 0.2f, true);
-                me->SetSpeed(MOVE_WALK, 0.2f, true);
+                pInstance = me->GetInstanceScript();
+                me->SetSpeed(MOVE_RUN, 0.3f, true);
+                me->SetSpeed(MOVE_WALK, 0.3f, true);
                 me->SetReactState(REACT_PASSIVE);
                 if (me->GetEntry() == NPC_MOLTEN_METEOR_2)
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
@@ -1645,6 +1654,16 @@ class npc_alysrazor_molten_meteor : public CreatureScript
                             me->DespawnOrUnsummon(500);
                 }
             }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if (pInstance)
+                    if (pInstance->GetBossState(DATA_ALYSRAZOR) != IN_PROGRESS)
+                        me->DespawnOrUnsummon();
+            }
+
+        private:
+            InstanceScript* pInstance;
         };
 };
 

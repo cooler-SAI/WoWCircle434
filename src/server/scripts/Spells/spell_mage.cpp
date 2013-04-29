@@ -673,7 +673,7 @@ class spell_mage_impact : public SpellScriptLoader
                     bool operator() (WorldObject* unit)
                     {
                         
-                        return ((unit->GetGUID() == _originalTarget->GetGUID()) || (unit->ToUnit() && unit->ToUnit()->isInCombat()));
+                        return ((unit->GetGUID() == _originalTarget->GetGUID()) || (unit->ToUnit() && !unit->ToUnit()->isInCombat()));
                     }
 
                 private:

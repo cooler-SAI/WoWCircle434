@@ -167,6 +167,7 @@ class boss_lord_rhyolith : public CreatureScript
                 me->UpdateEntry(NPC_RHYOLITH);
                 me->SetHealth(me->GetMaxHealth());
                 me->SetReactState(REACT_PASSIVE);
+                me->LowerPlayerDamageReq(me->GetMaxHealth());
 
                 curMove = 0;
                 bAchieve = true;
@@ -174,7 +175,7 @@ class boss_lord_rhyolith : public CreatureScript
                 players_count = 0;
 
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BALANCE_BAR);
-                instance->SetData(DATA_RHYOLITH_HEALTH_SHARED, me->GetMaxHealth());
+                instance->SetData(DATA_RHYOLITH_HEALTH_SHARED, me->GetMaxHealth() / 2);
 
                 //int32 bp0 = 2;
                 //int32 bp1 = 1;
@@ -216,7 +217,7 @@ class boss_lord_rhyolith : public CreatureScript
                     me->SetWalk(true);
                     me->GetMotionMaster()->MoveFollow(pController, 0.0f, 0.0f);
                 }
-                instance->SetData(DATA_RHYOLITH_HEALTH_SHARED, me->GetMaxHealth());
+                instance->SetData(DATA_RHYOLITH_HEALTH_SHARED, me->GetMaxHealth() / 2);
 
                 events.ScheduleEvent(EVENT_CHECK_MOVE, 1000);
                 events.ScheduleEvent(EVENT_CONCLUSIVE_STOMP, 10000);
@@ -288,27 +289,27 @@ class boss_lord_rhyolith : public CreatureScript
                     return;
 
                 if ((instance->GetData(DATA_RHYOLITH_HEALTH_SHARED) != 0) && (phase == 0))
-                    me->SetHealth(instance->GetData(DATA_RHYOLITH_HEALTH_SHARED));
+                    me->SetHealth(instance->GetData(DATA_RHYOLITH_HEALTH_SHARED) / 2);
 
                 if (me->HealthBelowPct(25) && phase == 0)
                 {
-                    phase = 1;
+                    
                     me->StopMoving();
-
+                    uint32 _health = instance->GetData(instance->GetData(DATA_RHYOLITH_HEALTH_SHARED));
+                    
                     me->UpdateEntry(NPC_RHYOLITH_2);
 
                     summons.DespawnEntry(NPC_VOLCANO);
                     summons.DespawnEntry(NPC_LIQUID_OBSIDIAN);
+                    
+                    events.Reset();
+                    phase = 1;
+                    me->LowerPlayerDamageReq(me->GetMaxHealth());
 
                     Talk(SAY_TRANS);
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ERUPTION_DMG);
                     instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BALANCE_BAR);
-                    events.CancelEvent(EVENT_FRAGMENT);
-                    events.CancelEvent(EVENT_SPARK);
-                    events.CancelEvent(EVENT_CHECK_MOVE);
-                    events.CancelEvent(EVENT_ACTIVATE_VOLCANO);
-                    events.CancelEvent(EVENT_SUPERHEATED);
-
+                    
                     if (pController)
                     {
                         pController->DespawnOrUnsummon();
@@ -329,10 +330,13 @@ class boss_lord_rhyolith : public CreatureScript
                     me->SetSpeed(MOVE_WALK, 1.0f, true);
                     me->SetWalk(false);
                     
-                    me->SetHealth(instance->GetData(DATA_RHYOLITH_HEALTH_SHARED));
+                    me->SetHealth(_health / 2);
+                    me->RemoveAllAuras();
                     DoCast(me, SPELL_IMMOLATION, true);
                     
+                    events.Reset();
                     events.ScheduleEvent(EVENT_START_MOVE, 2000);
+                    events.RescheduleEvent(EVENT_CONCLUSIVE_STOMP, 2000);
                     return;
                 }
 
