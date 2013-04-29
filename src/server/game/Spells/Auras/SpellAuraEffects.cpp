@@ -784,7 +784,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                         base_amount += aurEff->GetAmount();
                 }
 
-                amount = int32(CalculatePct(caster->GetMaxPower(POWER_MANA), base_amount) / GetTotalTicks());
+                amount = int32(CalculatePct(GetBase()->GetUnitOwner()->GetMaxPower(POWER_MANA), base_amount) / GetTotalTicks());
 
                 break;
             }
