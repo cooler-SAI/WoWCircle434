@@ -9600,6 +9600,12 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Burnout, Alysrazor
+        case 99432:
+            if (!victim)
+                return false;
+            target = victim;
+            break;
         // Molten Axe, Echo of Baine
         case 101836:
             if (!victim)
