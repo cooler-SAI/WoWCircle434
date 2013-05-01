@@ -1024,7 +1024,7 @@ DELETE FROM `creature` WHERE `id`=39190;
 INSERT INTO `creature` (`id`,`map`,`spawnMask`,`phaseMask`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`MovementType`) VALUES
 (39190,631,12,1,505.1563,-2536.863,1069.598,0,10,10,1), -- Wicked Spirit
 (39190,631,12,1,502.6493,-2531.328,1069.598,0,10,10,1), -- Wicked Spirit
-(9190,631,12,1,503.8246,-2508.141,1069.598,0,10,10,1), -- Wicked Spirit
+(39190,631,12,1,503.8246,-2508.141,1069.598,0,10,10,1), -- Wicked Spirit
 (39190,631,12,1,495.3629,-2538.215,1069.598,0,10,10,1), -- Wicked Spirit
 (39190,631,12,1,506.8715,-2515.552,1069.598,0,10,10,1), -- Wicked Spirit
 (39190,631,12,1,481.3021,-2509.222,1069.598,0,10,10,1), -- Wicked Spirit

@@ -178,8 +178,8 @@ class instance_blackwing_descent : public InstanceMapScript
                 switch (type)
                 {
                 case DATA_OMNOTRON:
+                    break;
                 case DATA_MAGMAW:
-                    HandleGameObject(uiInnerChamberDoorGUID, GetBossState(DATA_MAGMAW)==DONE && GetBossState(DATA_OMNOTRON)==DONE);
                     break;
                 case DATA_MALORIAK:
                     break;
