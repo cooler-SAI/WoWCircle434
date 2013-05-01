@@ -876,6 +876,10 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         else
             scale = cFamily->minScale + float(getLevel() - cFamily->minScaleLevel) / cFamily->maxScaleLevel * (cFamily->maxScale - cFamily->minScale);
 
+        // Glyph of Lesser Proportion
+        if (m_owner->HasAura(57870))
+            scale *= 0.7f;
+
         SetObjectScale(scale);
     }
 
