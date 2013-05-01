@@ -3,6 +3,13 @@
 
 #define MAX_ENCOUNTER 6
 
+DoorData const doorData[] =
+{
+    {GO_INNER_CHAMBER_DOOR,           DATA_MAGMAW,          DOOR_TYPE_PASSAGE,       BOUNDARY_NONE},
+    {GO_INNER_CHAMBER_DOOR,           DATA_OMNOTRON,        DOOR_TYPE_PASSAGE,       BOUNDARY_NONE},
+    {0,                                      0,             DOOR_TYPE_ROOM,       BOUNDARY_NONE},
+};
+
 class instance_blackwing_descent : public InstanceMapScript
 {
     public:
@@ -18,6 +25,7 @@ class instance_blackwing_descent : public InstanceMapScript
             instance_blackwing_descent_InstanceMapScript(Map* pMap) : InstanceScript(pMap) 
             {
                 SetBossNumber(MAX_ENCOUNTER);
+                LoadDoorData(doorData);
                 omnotronHealth = 0;
                 uiBileotron800Active = 0;
                 uiMagmawGUID = 0;
@@ -94,33 +102,19 @@ class instance_blackwing_descent : public InstanceMapScript
                 }
             }
 
-            void OnGameObjectCreate(GameObject *go)
+            void OnGameObjectCreate(GameObject *pGo)
             {
-                switch (go->GetEntry())
+                switch (pGo->GetEntry())
                 {
                 case GO_INNER_CHAMBER_DOOR:
-                    uiInnerChamberDoorGUID = go->GetGUID();
-                    if (GetBossState(DATA_OMNOTRON) == DONE && GetBossState(DATA_MAGMAW) == DONE)
-                        HandleGameObject(NULL, true, go);
+                    AddDoor(pGo, true);
                     break;
                 case GO_NEFARIAN_FLOOR:
-                    uiNefarianFloorGUID = go->GetGUID();
+                    uiNefarianFloorGUID = pGo->GetGUID();
                     break;
                 }
             }
-            
-            void OnGameObjectRemove(GameObject *go, bool)
-            {
-                switch (go->GetEntry())
-                {
-                case GO_INNER_CHAMBER_DOOR:
-                case GO_NEFARIAN_FLOOR:
-                    break;
-                default:
-                    break;
-                }
-            }
-
+			
             uint64 GetData64(uint32 type)
             {
                 switch (type)
@@ -184,8 +178,8 @@ class instance_blackwing_descent : public InstanceMapScript
                 switch (type)
                 {
                 case DATA_OMNOTRON:
-                    break;
                 case DATA_MAGMAW:
+                    HandleGameObject(uiInnerChamberDoorGUID, GetBossState(DATA_MAGMAW)==DONE && GetBossState(DATA_OMNOTRON)==DONE);
                     break;
                 case DATA_MALORIAK:
                     break;
