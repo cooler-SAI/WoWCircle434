@@ -686,7 +686,6 @@ void AddSC_blackwing_descent();
 void AddSC_boss_magmaw();
 void AddSC_boss_omnotron_defence_system();
 void AddSC_boss_maloriak();
-void AddSC_boss_bd_nefarian();
 void AddSC_boss_chimaeron();
 void AddSC_boss_atramedes();
 
@@ -1430,7 +1429,6 @@ void AddNorthrendScripts()
     AddSC_boss_magmaw();
     AddSC_boss_omnotron_defence_system();
     AddSC_boss_maloriak();
-    AddSC_boss_bd_nefarian();
     AddSC_boss_chimaeron();
     AddSC_boss_atramedes();
 

@@ -38,14 +38,9 @@ enum Creatures
     NPC_CHIMAERON                   = 43296, 
     NPC_BILE_O_TRON_800             = 44418, 
 
-    // Nefarian
-    BOSS_DNEFARIAN                    = 41376, 
+    NPC_NEFARIAN                    = 41376, 
     NPC_ONYXIA                      = 41270, 
-    NPC_WAR_OS                      = 41918,
-    NPC_PROTOTYPE                   = 41948,
 
-    // Misc
-    NPC_NEFARIAN_HELPER_HEROIC      = 49427,
     NPC_LORD_VICTOR_NEFARIAN        = 41379,
     NPC_LORD_VICTOR_NEFARIUS_HEROIC = 49226,
     NPC_MALORIAK_EVENT              = 43404,
@@ -55,9 +50,7 @@ enum Creatures
 enum GOs
 {
     GO_INNER_CHAMBER_DOOR    = 205830,
-    //GO_NEFARIAN_FLOOR        = 207834,
-    GOB_ONYXIA_PLATFORM             = 207834,
-    GOB_NEFARIANS_THRONE            = 202832,
+    GO_NEFARIAN_FLOOR        = 207834,
 };
 
 enum NefariusActions

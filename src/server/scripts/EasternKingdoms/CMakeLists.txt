@@ -264,7 +264,6 @@ set(scripts_STAT_SRCS
   EasternKingdoms/BlackwingDescent/boss_magmaw.cpp
   EasternKingdoms/BlackwingDescent/boss_omnotron_defence_system.cpp
   EasternKingdoms/BlackwingDescent/boss_maloriak.cpp
-  EasternKingdoms/BlackwingDescent/boss_dnefarian.cpp
   EasternKingdoms/BlackwingDescent/boss_chimaeron.cpp
   EasternKingdoms/BlackwingDescent/boss_atramedes.cpp
   EasternKingdoms/BlackwingDescent/instance_blackwing_descent.cpp
