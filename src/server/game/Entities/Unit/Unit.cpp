@@ -3658,7 +3658,7 @@ void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase)
                 tempList.push_back(aura);
 
     if (!tempList.empty())
-        for (AuraList::const_iterator itr = scAuras.begin(); itr != scAuras.end(); ++itr)
+        for (AuraList::const_iterator itr = tempList.begin(); itr != tempList.end(); ++itr)
             if (Aura* aura = *itr)
                 aura->Remove();
 
