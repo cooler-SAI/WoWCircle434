@@ -369,16 +369,17 @@ class npc_murozond_mirror_image : public CreatureScript
                     me->AddAura(SPELL_FADING, me);
             }
 
-            void IsSummonedBy(Unit* owner)
+            void InitializeAI()
             {
-                if (owner && owner->GetTypeId() == TYPEID_PLAYER)
-                {
-                    m_owner = owner->ToPlayer();
-                    m_owner->AddAura(102284, me);
-                    m_owner->AddAura(102288, me);
-                }
-                else
-                    me->DespawnOrUnsummon();
+                if (!me->isDead())
+                    Reset();
+
+                Unit* owner = me->GetOwner();
+                if (!owner)
+                    return;
+
+                owner->CastSpell(me, 102284, true);
+                owner->CastSpell(me, 102288, true);
             }
 
             void DoAction(const int32 action)
