@@ -151,14 +151,11 @@ namespace Trinity
             if (i_message->GetOpcode() == SMSG_CLEAR_TARGET)
             {
                 for (uint32 i = CURRENT_MELEE_SPELL; i < CURRENT_AUTOREPEAT_SPELL; ++i)
-                    if (Spell * spell = player->GetCurrentSpell(i))
-                    {
-                        if (spell->GetUnitTarget() == ((Unit*)i_source))
-                        {
-                            spell->cancel();
-                            sLog->outError(LOG_FILTER_SPELLS_AURAS, "SMSG_CLEAR_TARGET interruped %i.", spell->GetSpellInfo()->Id);
-                        }
-                    }
+                {
+                    Spell * spell = player->GetCurrentSpell(i);
+                    if (spell && spell->GetUnitTarget() == ((Unit*)i_source) && spell->getState() == SPELL_STATE_CASTING)
+                        spell->cancel();
+                }
             }
         }
     };
