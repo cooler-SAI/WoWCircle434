@@ -43,12 +43,10 @@ enum eActions
 
 enum eTexts
 {
-    SAY_START_1                        = -1877011,
-    SAY_START_2                        = -1877027,
-    SAY_WAILING_WINDS_1                = -1877012,
-    SAY_WAILING_WINDS_2                = -1877026,
-    SAY_DEATH                          = -1877013,
-    SAY_KILL_PLAYER                    = -1877025,
+    SAY_AGGRO                          = 0,
+    SAY_WAILING_WINDS                 = 1,
+    SAY_DEATH                          = 3,
+    SAY_KILL_PLAYER                    = 4,
 };
 
 enum ePhases
@@ -127,7 +125,7 @@ public:
         
         void EnterCombat(Unit* /*who*/)
         {
-            DoScriptText(RAND(SAY_START_1, SAY_START_1), me);
+            Talk(SAY_AGGRO);
             events.SetPhase(PHASE_DEFLECTING_WINDS);
             events.ScheduleEvent(EVENT_STATIC_SHOCK, 2000, 0, PHASE_DEFLECTING_WINDS);
             events.ScheduleEvent(EVENT_DEFLECTING_WINDS, 5000, 0, PHASE_DEFLECTING_WINDS);
@@ -143,7 +141,7 @@ public:
         {
             if (action == ACTION_SERVANT_DEATH)
             {
-                DoScriptText(RAND(SAY_WAILING_WINDS_1, SAY_WAILING_WINDS_2), me);
+                Talk(SAY_WAILING_WINDS);
                 me->RemoveAura(SPELL_DEFLECTING_WINDS);
                 me->CastSpell(me, SPELL_WAILING_WINDS_AURA, false);
                 events.SetPhase(PHASE_WAILING_WINDS);
@@ -160,14 +158,14 @@ public:
         void KilledUnit(Unit* victim)
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
-                DoScriptText(SAY_KILL_PLAYER, me);
+            Talk(SAY_KILL_PLAYER);
         }
 
         void JustDied(Unit* /*killer*/)
         {
             events.Reset();
             lSummons.DespawnAll();
-            DoScriptText(SAY_DEATH, me);
+            Talk(SAY_DEATH);
         }
 
         void UpdateAI(const uint32 diff)
