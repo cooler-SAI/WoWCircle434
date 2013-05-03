@@ -44,9 +44,9 @@ enum eActions
 enum eTexts
 {
     SAY_AGGRO                          = 0,
-    SAY_WAILING_WINDS                 = 1,
-    SAY_DEATH                          = 3,
-    SAY_KILL_PLAYER                    = 4,
+    SAY_WAILING_WINDS                  = 1,
+    SAY_DEATH                          = 2,
+    SAY_KILL_PLAYER                    = 3,
 };
 
 enum ePhases
