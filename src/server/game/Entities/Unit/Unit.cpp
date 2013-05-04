@@ -6422,12 +6422,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 // Glyph of Shadowburn
                 case 56229:
                 {
-                    if (procSpell->ProcFlags & PROC_FLAG_KILL || ToPlayer()->HasSpellCooldown(dummySpell->Id))
+                    if (procSpell->ProcFlags & PROC_FLAG_KILL || HasAura(91001))
                         return false;
 
                     ToPlayer()->RemoveSpellCooldown(17877, true);
-                    ToPlayer()->AddSpellCooldown(dummySpell->Id, 0, time(NULL)+6);
-                    return true;
+                    triggered_spell_id = 91001;
+                    break;
                 }
                 // Glyph of Shadowflame
                 case 63310:
