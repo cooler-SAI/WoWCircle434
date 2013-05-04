@@ -3094,11 +3094,6 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_ADD_PCT_MODIFIER;
                 spellInfo->Effects[0].BasePoints = 200;
                 break;
-            case 97463: // Rallying Cry
-            case 54443: // Demonic Empowerment
-            case 79437: // Soulburn - Healthstone
-                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
-                break;
             case 69176:
                 spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_NOT_SEATED;
                 break;

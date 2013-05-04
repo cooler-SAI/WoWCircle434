@@ -876,6 +876,12 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             // Vampiric Blood
             if (GetId() == 55233)
                 amount = GetBase()->GetUnitOwner()->CountPctFromMaxHealth(amount);
+            // Soulburn - Healthstone
+            else if (m_spellInfo->Id == 79437)
+            {
+                if (GetBase()->GetUnitOwner())
+                    amount = GetBase()->GetUnitOwner()->CountPctFromMaxHealth(20);
+            }
             break;
         case SPELL_AURA_MOD_INCREASE_SPEED:
             // Dash - do not set speed if not in cat form

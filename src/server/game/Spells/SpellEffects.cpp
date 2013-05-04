@@ -1533,15 +1533,15 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             break;
         case SPELLFAMILY_WARRIOR:
         {
-            switch (m_spellInfo->Id)
+            // Rallying Cry
+            if (m_spellInfo->Id == 97462)
             {
-                // Rallying Cry
-                case 97462:
-                    if (!unitTarget)
-                        return;
+                if (!unitTarget)
+                    return;
 
-                    m_caster->CastCustomSpell(unitTarget, 97463, &damage, NULL, NULL, true, NULL);
-                    break;  
+                int32 bp0 = unitTarget->CountPctFromMaxHealth(damage);
+
+                m_caster->CastCustomSpell(unitTarget, 97463, &bp0, NULL, NULL, true, NULL);
             }
             break;
         }
