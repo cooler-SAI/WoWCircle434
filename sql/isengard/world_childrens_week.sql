@@ -261,6 +261,8 @@ INSERT INTO `creature_involvedrelation`(`id`,`quest`) VALUES
 (22817,11975),
 (22817,10963);
 
+UPDATE `quest_template` SET `SpecialFlags` = 0 WHERE `Id` = 10960;
+
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` IN (19,20) AND `SourceEntry` IN (11975,10963,10967);
 INSERT INTO `conditions`(`SourceTypeOrReferenceId`,`SourceEntry`,`ConditionTypeOrReference`,`ConditionValue1`,`comment`) VALUES
 (19,11975,8,10945,'Accept quest 11975 - Quest 10945 needs to be rewarded'),
@@ -320,9 +322,9 @@ INSERT INTO `game_event_creature_quest`(`eventEntry`,`id`,`quest`) VALUES
 (10,14305,29117),
 (10,14305,29119),
 (10,14305,29107),
-(10,14305,171),
 (10,14305,29093),
-(10,14305,29106);
+(10,14305,29106),
+(10,14305,171);
 
 DELETE FROM `creature_questrelation` WHERE `quest` = 1468;
 INSERT INTO `creature_questrelation` (`id`, `quest`) VALUES 
@@ -333,15 +335,15 @@ INSERT INTO `creature_questrelation`(`id`,`quest`) VALUES
 (14305,29117),
 (14305,29119),
 (14305,29107),
-(14305,171),
 (14305,29093),
-(14305,29106);
+(14305,29106),
+(14305,171);
 DELETE FROM `creature_involvedrelation` WHERE `id`=14305;
 INSERT INTO `creature_involvedrelation`(`id`,`quest`) VALUES
+(14305,1468),
 (14305,29117),
 (14305,29119),
 (14305,29107),
-(14305,171),
 (14305,29093),
 (14305,29106);
 
@@ -375,30 +377,30 @@ INSERT INTO `game_event_creature_quest`(`eventEntry`,`id`,`quest`) VALUES
 (10,14444,29190),
 (10,14444,29191),
 (10,14444,29167),
-(10,14444,5502),
 (10,14444,29176),
-(10,14444,29146);
+(10,14444,29146),
+(10,14444,5502);
 
 DELETE FROM `creature_questrelation` WHERE `id`=14444;
 INSERT INTO `creature_questrelation`(`id`,`quest`) VALUES
 (14444,29190),
 (14444,29191),
 (14444,29167),
-(14444,5502),
 (14444,29176),
-(14444,29146);
+(14444,29146),
+(14444,5502);
 DELETE FROM `creature_involvedrelation` WHERE `id`=14444;
 INSERT INTO `creature_involvedrelation`(`id`,`quest`) VALUES
+(14444, 172),
 (14444,29190),
 (14444,29191),
 (14444,29167),
-(14444,5502),
 (14444,29176),
 (14444,29146);
 
 UPDATE `quest_template` SET `PrevQuestId` = 29191 WHERE `Id` = 5502;
 UPDATE `quest_template` SET `Flags` = `Flags`|65536 WHERE `Id` in (29190,29191,29167,29176,29146);
-UPDATE `quest_template` SET `PrevQuestId` = 1468,`ExclusiveGroup` = -29176 WHERE `Id` in (29146,29167,29176);
+UPDATE `quest_template` SET `PrevQuestId` = 172,`ExclusiveGroup` = -29176 WHERE `Id` in (29146,29167,29176);
 UPDATE `quest_template` SET `PrevQuestId` = 29176,`ExclusiveGroup` = -29190 WHERE `Id` in (29190,29191);
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` IN (19,20) AND `SourceEntry` IN (29191,29190,5502);
@@ -425,7 +427,7 @@ SET @GUID_GRIZZLEMAW_TRIGGER_3 = 3106167;
 
 UPDATE `creature_template` SET `AIName`='',`ScriptName`='npc_grizzlemaw_cw_trigger',`flags_extra`=0 WHERE `entry`=36209;
 
-DELETE FROM `creature` WHERE `guid` IN (@GUID_GRIZZLEMAW_TRIGGER_1,@GUID_GRIZZLEMAW_TRIGGER_2,@GUID_GRIZZLEMAW_TRIGGER_3);
+DELETE FROM `creature` WHERE `guid` IN (@GUID_GRIZZLEMAW_TRIGGER_1,@GUID_GRIZZLEMAW_TRIGGER_2,@GUID_GRIZZLEMAW_TRIGGER_3) OR `id`=36209;
 INSERT INTO `creature`(`guid`,`id`,`map`,`position_x`,`position_y`,`position_z`) VALUES
 (@GUID_GRIZZLEMAW_TRIGGER_1,36209,571,4068.82,-3811,223.4),
 (@GUID_GRIZZLEMAW_TRIGGER_2,36209,571,4073.2,-3734.354,222.6634),
@@ -557,7 +559,7 @@ SET @GUID_THRONE_OF_ELEMENTS_TRIGGER = 3019830;
 
 UPDATE `creature_template` SET `InhabitType`=7,`flags_extra`=0,`unit_flags`=33554432,`ScriptName`='npc_cw_area_trigger',`AIName`='' WHERE `entry` IN (22905,22851,22838,22866,22831,22829,22872,22839);
 
-DELETE FROM `creature` WHERE `guid` IN (@GUID_SILVERMOON_TRIGGER_01,@GUID_AERIS_LANDING_TRIGGER,@GUID_AUCHINDOUN_TRIGGER,@GUID_SPOREGGAR_TRIGGER,@GUID_THRONE_OF_ELEMENTS_TRIGGER);
+DELETE FROM `creature` WHERE `guid` IN (@GUID_SILVERMOON_TRIGGER_01,@GUID_AERIS_LANDING_TRIGGER,@GUID_AUCHINDOUN_TRIGGER,@GUID_SPOREGGAR_TRIGGER,@GUID_THRONE_OF_ELEMENTS_TRIGGER) OR `id` in (22838,22866,22831,22829,22839);
 INSERT INTO `creature`(`guid`,`id`,`map`,`position_x`,`position_y`,`position_z`,`orientation`) VALUES
 (@GUID_AERIS_LANDING_TRIGGER,22838,530,-2075.759,8559.336,23.027,4.857019),
 (@GUID_SILVERMOON_TRIGGER_01,22866,530,9506.086,-7329.313,14.397272,0),
