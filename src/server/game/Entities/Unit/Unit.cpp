@@ -7432,6 +7432,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 // Marked for Death
                 case 3524:
                 {
+                    // Get old Hunter's Mark
+                    if (Aura * aura = target->GetAura(1130)) 
+                    {
+                        if (aura->GetDuration() > 15000)
+                            return false;
+                    }
                     triggered_spell_id = 88691;
                     break;
                 }
