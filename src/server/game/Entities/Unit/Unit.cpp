@@ -4256,7 +4256,10 @@ uint32 Unit::GetDiseasesByCaster(uint64 casterGUID, bool remove)
 
     // Burning Blood, Item - Death Knight T12 Blood 2P Bonus
     if (HasAura(98957, casterGUID))
-        diseases += 2;
+    {
+        uint32 _min = 2;
+        diseases = std::max(diseases, _min);
+    }
 
     return diseases;
 }
@@ -6409,7 +6412,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                     triggered_spell_id = 85421;
                     basepoints0 = int32(CalculatePct(damage, triggerAmount) / 7);
-                    int32 cap = int32(caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE) / 7);
+                    int32 cap = int32((caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE) * 1.4 + 141) / 7);
                     if (dummySpell->Id == 91986)
                         cap /= 2;
                     if (AuraEffect * aurEff = target->GetAuraEffect(triggered_spell_id, 0, caster->GetGUID()))
@@ -12170,7 +12173,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
 {
     //! Mobs can't crit with spells. Player Totems can
     //! Fire Elemental (from totem) can too - but this part is a hack and needs more research
-    if (IS_CREATURE_GUID(GetGUID()) && !(isTotem() && IS_PLAYER_GUID(GetOwnerGUID())) && GetEntry() != 15438)
+    if (IS_CREATURE_GUID(GetGUID()) && !((isTotem() || isGuardian()) && IS_PLAYER_GUID(GetOwnerGUID())) && GetEntry() != 15438)
         return false;
 
     // not critting spell
@@ -12275,12 +12278,6 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
                         }
                         break;
                     case SPELLFAMILY_DRUID:
-                        // Improved Faerie Fire
-                        if (victim->HasAuraState(AURA_STATE_FAERIE_FIRE))
-                            if (AuraEffect const* aurEff = GetDummyAuraEffect(SPELLFAMILY_DRUID, 109, 0))
-                                crit_chance += aurEff->GetAmount();
-
-                        // cumulative effect - don't break
 
                         // Starfire
                         if (spellProto->SpellFamilyFlags[0] & 0x4 && spellProto->SpellIconID == 1485)
@@ -12425,7 +12422,7 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
         modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_CRITICAL_CHANCE, crit_chance);
 
     // Curse of Gul'dan
-    if (isPet())
+    if (isPet() || isGuardian())
         if (Unit* owner = GetOwner())
             if (Aura* aur = victim->GetAura(86000, owner->GetGUID()))
                 crit_chance += float(aur->GetEffect(0)->GetAmount());
@@ -17317,6 +17314,10 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, SpellInfo const
         // Shadow Word: Death - can trigger from every kill
         if (aura->GetId() == 32409)
             allow = true;
+
+        if (victim && (victim->IsPetGuardianStuff() && !victim->isTotem()))
+            allow = true;
+
         if (!allow)
             return false;
     }
@@ -17998,6 +17999,9 @@ void Unit::SetRooted(bool apply)
         RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
 
+        if (GetTypeId() != TYPEID_PLAYER)
+            ToCreature()->StopMoving();
+
         WorldPacket data(SMSG_SPLINE_MOVE_ROOT, 8);
         {
             data
@@ -18022,8 +18026,7 @@ void Unit::SetRooted(bool apply)
 
         if (GetTypeId() == TYPEID_PLAYER)
             SendMoveRoot(m_rootTimes);
-
-        StopMoving();
+        
     }
     else
     {
