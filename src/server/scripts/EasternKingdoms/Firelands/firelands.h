@@ -31,7 +31,7 @@ enum CreatureIds
     NPC_ALYSRAZOR                   = 52530, 
     NPC_BALEROC                     = 53494,
     NPC_STAGHELM                    = 52571,
-    NPC_RAGNAROS_CATA              = 52409,
+    NPC_RAGNAROS_CATA               = 52409,
 	
     //other npc's
     NPC_SULFURAS            = 53420,    //ragnaros boss weapon
@@ -83,6 +83,9 @@ enum GameobjectIds
     GO_EMBERSTONE_FRAGMENT      = 209035,
     GO_PYRESHELL_FRAGMENT       = 209036,
     GO_OBSIDIAN_FLECKED_CHITIN  = 209037,
+	
+    GO_RAGNAROS_DOOR            = 209073,
+    GOB_SULFURON_BRIDGE         = 209251,
 };
 
 enum MovePoints
