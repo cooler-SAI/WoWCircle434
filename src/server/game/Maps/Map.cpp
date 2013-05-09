@@ -2582,6 +2582,9 @@ void InstanceMap::PermBindAllPlayers(Player* source)
     }
 
     Group* group = source->GetGroup();
+    if (group->isLFGGroup())
+        return;
+
     // group members outside the instance group don't get bound
     for (MapRefManager::iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
     {

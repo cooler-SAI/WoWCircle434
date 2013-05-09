@@ -994,6 +994,8 @@ bool Aura::CanBeSaved() const
 
     switch (GetId())
     {
+        // Silithyst
+        case 29519:
         // When a druid logins, he doesnt have either eclipse power, nor the marker auras, nor the eclipse buffs. Dont save them.
         case 67483:
         case 67484:

@@ -26,6 +26,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "blackwing_lair.h"
 
 enum Says
 {
@@ -88,6 +89,11 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
     {
         player->PlayerTalkClass->ClearMenus();
+
+        InstanceScript* pInstance = creature->GetInstanceScript();
+        if (pInstance && pInstance->GetData(DATA_NEFARIAN) == DONE)
+            return true;
+
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
@@ -109,6 +115,10 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
+        InstanceScript* pInstance = creature->GetInstanceScript();
+        if (pInstance && pInstance->GetData(DATA_NEFARIAN) == DONE)
+            return true;
+
         player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
         player->SEND_GOSSIP_MENU(7134, creature->GetGUID());
         return true;
@@ -207,18 +217,8 @@ public:
                     DrakType2 = CREATURE_RED_DRAKANOID;
                     break;
             }
+            pInstance = me->GetInstanceScript();
         }
-
-        uint32 SpawnedAdds;
-        uint32 AddSpawnTimer;
-        uint32 ShadowBoltTimer;
-        uint32 FearTimer;
-        uint32 MindControlTimer;
-        uint32 ResetTimer;
-        uint32 DrakType1;
-        uint32 DrakType2;
-        uint64 NefarianGUID;
-        uint32 NefCheckTime;
 
         void Reset()
         {
@@ -230,9 +230,13 @@ public:
             NefarianGUID = 0;
             NefCheckTime = 2000;
 
-            me->SetUInt32Value(UNIT_NPC_FLAGS, 1);
+            if (me->GetMap()->IsRaid())
+                me->SetUInt32Value(UNIT_NPC_FLAGS, 1);
             me->setFaction(35);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
+            if (pInstance)
+                pInstance->SetData(DATA_NEFARIAN, NOT_STARTED);
         }
 
         void BeginEvent(Player* target)
@@ -256,6 +260,8 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
+            if (pInstance)
+                pInstance->SetData(DATA_NEFARIAN, IN_PROGRESS);
         }
 
         void MoveInLineOfSight(Unit* who)
@@ -388,6 +394,19 @@ public:
                 } else NefCheckTime -= diff;
             }
         }
+    private:
+        uint32 SpawnedAdds;
+        uint32 AddSpawnTimer;
+        uint32 ShadowBoltTimer;
+        uint32 FearTimer;
+        uint32 MindControlTimer;
+        uint32 ResetTimer;
+        uint32 DrakType1;
+        uint32 DrakType2;
+        uint64 NefarianGUID;
+        uint32 NefCheckTime;
+        InstanceScript* pInstance;
+
     };
 };
 

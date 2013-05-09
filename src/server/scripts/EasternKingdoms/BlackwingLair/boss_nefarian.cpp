@@ -25,6 +25,7 @@ EndScriptData */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "blackwing_lair.h"
 
 enum Say
 {
@@ -72,24 +73,17 @@ class boss_nefarian : public CreatureScript
 public:
     boss_nefarian() : CreatureScript("boss_nefarian") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_nefarianAI (creature);
+        return new boss_nefarianAI (pCreature);
     }
 
     struct boss_nefarianAI : public ScriptedAI
     {
-        boss_nefarianAI(Creature* creature) : ScriptedAI(creature) {}
-
-        uint32 ShadowFlame_Timer;
-        uint32 BellowingRoar_Timer;
-        uint32 VeilOfShadow_Timer;
-        uint32 Cleave_Timer;
-        uint32 TailLash_Timer;
-        uint32 ClassCall_Timer;
-        bool Phase3;
-
-        uint32 DespawnTimer;
+        boss_nefarianAI(Creature* pCreature) : ScriptedAI(pCreature) 
+        {
+            pInstance = me->GetInstanceScript();
+        }
 
         void Reset()
         {
@@ -115,6 +109,8 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             DoScriptText(SAY_DEATH, me);
+            if (pInstance)
+                pInstance->SetData(DATA_NEFARIAN, DONE);
         }
 
         void EnterCombat(Unit* who)
@@ -233,6 +229,17 @@ public:
 
             DoMeleeAttackIfReady();
         }
+    private:
+        uint32 ShadowFlame_Timer;
+        uint32 BellowingRoar_Timer;
+        uint32 VeilOfShadow_Timer;
+        uint32 Cleave_Timer;
+        uint32 TailLash_Timer;
+        uint32 ClassCall_Timer;
+        bool Phase3;
+        uint32 DespawnTimer;
+        InstanceScript* pInstance;
+
     };
 };
 

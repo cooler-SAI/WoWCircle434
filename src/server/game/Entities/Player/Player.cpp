@@ -24099,6 +24099,10 @@ bool Player::IsKnowHowFlyIn(uint32 mapid, uint32 zone, uint32 spellId) const
     if (zone == 5723 && spellId == 98619)
         return true;
 
+    // Tol Barad
+    if (mapid == 732)
+        return false;
+
     // continent checked in SpellMgr::GetSpellAllowedInLocationError at cast and area update
     uint32 v_map = GetVirtualMapForMapAndZone(mapid, zone);
     switch (v_map)

@@ -8106,7 +8106,7 @@ WorldObjectSpellNearbyTargetCheck::WorldObjectSpellNearbyTargetCheck(float range
 bool WorldObjectSpellNearbyTargetCheck::operator()(WorldObject* target)
 {
     float dist = target->GetDistance(*_position);
-    if (dist < _range && WorldObjectSpellTargetCheck::operator ()(target))
+    if (dist < _range && WorldObjectSpellTargetCheck::operator ()(target) && _caster->GetGUID() != target->GetGUID())
     {
         _range = dist;
         return true;

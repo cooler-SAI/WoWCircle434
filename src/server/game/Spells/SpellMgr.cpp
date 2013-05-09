@@ -5250,6 +5250,33 @@ void SpellMgr::LoadDbcDataCorrections()
             case 98229: // Concentration
                 spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_DUMMY;
                 break;
+            // Ragnaros
+            case 98159: // Magma Trap aoe
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+                break;
+            case 98710: // Sulfuras Smash
+            case 100890:
+            case 100891:
+            case 100892:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            case 98708: // Sulfuras Smash
+            case 100256:
+            case 100257:
+            case 100258:
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                spellInfo->Effects[EFFECT_2].Effect = 0;
+                break;
+            case 101088: // Lavalogged
+                spellInfo->ExcludeTargetAuraSpell = 101008;
+                break;
+            case 101102: // Lavalogged
+                spellInfo->ExcludeTargetAuraSpell = 101102;
+                break;
+            case 99012: // Splitting Blow
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+                break;
             // ENDOF FIRELANDS
             // BASTION OF TWILIGHT SPELLS
             //
@@ -6602,6 +6629,11 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
                 spellInfo->Effects[EFFECT_1].MiscValue = 256;
+                break;
+            // Call Withered Ent
+            case 64306:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
             default:
                 break;

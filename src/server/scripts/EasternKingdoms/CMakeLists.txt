@@ -176,6 +176,7 @@ set(scripts_STAT_SRCS
   EasternKingdoms/BlackwingLair/boss_broodlord_lashlayer.cpp
   EasternKingdoms/BlackwingLair/boss_ebonroc.cpp
   EasternKingdoms/BlackwingLair/instance_blackwing_lair.cpp
+  EasternKingdoms/BlackwingLair/blackwing_lair.h
   EasternKingdoms/BlackwingLair/boss_vaelastrasz.cpp
   EasternKingdoms/BlackwingLair/boss_nefarian.cpp
   EasternKingdoms/BlackwingLair/boss_flamegor.cpp
