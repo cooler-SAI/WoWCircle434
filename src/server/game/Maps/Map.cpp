@@ -2582,8 +2582,7 @@ void InstanceMap::PermBindAllPlayers(Player* source)
     }
 
     Group* group = source->GetGroup();
-    if (group->isLFGGroup())
-        return;
+    bool bLfg = (source->GetGroup() && source->GetGroup()->isLFGGroup());
 
     // group members outside the instance group don't get bound
     for (MapRefManager::iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
@@ -2591,6 +2590,18 @@ void InstanceMap::PermBindAllPlayers(Player* source)
         Player* player = itr->getSource();
         // players inside an instance cannot be bound to other instances
         // some players may already be permanently bound, in this case nothing happens
+        
+        if (bLfg)
+        {
+            uint32 rDungeonId = 0;
+            const LfgDungeonSet& dungeons = sLFGMgr->GetSelectedDungeons(player->GetGUID());
+            if (!dungeons.empty())
+                rDungeonId = (*dungeons.begin());
+            LFGDungeonData const* dungeon = sLFGMgr->GetLFGDungeon(rDungeonId);
+            if (dungeon && (dungeon->type == LFG_TYPE_RANDOM || dungeon->seasonal))
+                continue;
+        }
+
         InstancePlayerBind* bind = player->GetBoundInstance(save->GetMapId(), save->GetDifficulty());
         if (!bind || !bind->perm)
         {
