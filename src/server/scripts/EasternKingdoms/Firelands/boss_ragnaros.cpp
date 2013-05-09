@@ -183,7 +183,7 @@ Position const RagnarosSummonPosition = {1075.2f,   -57.849f,   55.4243f,   3.15
 Position const SplittingTriggerNorth  = {1023.55f,  -57.158f,   55.4215f,   3.12414f    };
 Position const SplittingTriggerEast   = {1035.45f,  -25.3646f,  55.4924f,   2.49582f    };
 Position const SplittingTriggerWest   = {1036.27f,  -89.2396f,  55.5098f,   3.83972f    };
-// Position const CachePosition          = {1016.043f, -57.436f,   55.333f,    3.151f      };
+Position const CachePosition          = {1016.043f, -57.436f,   55.333f,    3.151f      };
 
 const Position HammerMiddleSummons[] =
 {
@@ -446,7 +446,7 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     me->RemoveAllAuras();
-                    // me->SummonGameObject(GO_CACHE_OF_THE_FIRELORD, 1016.043f, -57.436f, 55.333f, 3.151f, 0, 0, 0, 0, 70000);
+                    me->SummonGameObject(GO_CACHE_OF_THE_FIRELORD, 1016.043f, -57.436f, 55.333f, 3.151f, 0, 0, 0, 0, 70000);
                     instance->SetBossState(DATA_RAGNAROS, DONE);
                     events.ScheduleEvent(EVENT_DESPAWN, 2000);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE); // Temp until i got the correct animkit id
