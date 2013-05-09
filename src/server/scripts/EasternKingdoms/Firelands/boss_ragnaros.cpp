@@ -46,17 +46,19 @@ Todo:
 
 enum Texts
 {
-    SAY_ARRIVE          = 0,
-    SAY_DEATH_NORMAL    = 1,
-    SAY_DEATH_HEROIC    = 2,
-    SAY_SLAY            = 3,
-    SAY_ANNOUNCE_SPLIT  = 4,
-    SAY_SUBMERGE        = 5,
-    SAY_EMERGE_ANNOUNCE = 6,
-    SAY_EMERGE          = 7,
-    SAY_MAGMA_TRAP      = 8,
-    SAY_SULFURAS_SMASH  = 9,
-    SAY_AGRRO           = 10,
+    SAY_INTRO                 = 0,
+    SAY_AGRRO                 = 1,
+    SAY_SLAY                  = 2,
+    SAY_WRATH_OF_RAGNAROS     = 3,
+    SAY_ANN_ENGULFING_FLAMES  = 4,
+    SAY_ANNOUNCE_SPLIT        = 5,
+    SAY_SUBMERGE              = 6,
+    SAY_ADDS                  = 7,
+    SAY_EMERGE                = 8,
+    SAY_MAGMA_TRAP            = 9,
+    SAY_SULFURAS_SMASH        = 10,
+    SAY_DEATH_NORMAL          = 11,
+    SAY_DEATH_HEROIC          = 12,
 };
 
 enum Spells
@@ -494,6 +496,7 @@ public:
                                 DoCastAOE(SPELL_SPLITTING_BLOW_EAST, false);
                                 for (uint32 x = 0; x<8; ++x)
                                     me->SummonCreature(NPC_SON_OF_FLAME, HammerEastSummons[x], TEMPSUMMON_TIMED_DESPAWN, 45000);
+                                    Talk(SAY_ADDS);
                             }
                             break;
                         }
@@ -506,6 +509,7 @@ public:
                                 DoCastAOE(SPELL_SPLITTING_BLOW_WEST, false);
                                 for (uint32 x = 0; x<8; ++x)
                                     me->SummonCreature(NPC_SON_OF_FLAME, HammerWestSummons[x], TEMPSUMMON_TIMED_DESPAWN, 45000);
+                                    Talk(SAY_ADDS);
                             }
                             break;
                         }
@@ -518,6 +522,7 @@ public:
                                 DoCastAOE(SPELL_SPLITTING_BLOW_NORTH, false);
                                 for (uint32 x = 0; x<8; ++x)
                                     me->SummonCreature(NPC_SON_OF_FLAME, HammerMiddleSummons[x], TEMPSUMMON_TIMED_DESPAWN, 45000);
+                                    Talk(SAY_ADDS);
                             }
                             break;
                         }
@@ -555,6 +560,7 @@ public:
                                 DoCastAOE(SPELL_SPLITTING_BLOW_EAST, false);
                                 for (uint32 x = 0; x<8; ++x)
                                     me->SummonCreature(NPC_SON_OF_FLAME, HammerEastSummons[x], TEMPSUMMON_TIMED_DESPAWN, 45000);
+                                    Talk(SAY_ADDS);
                             }
                             break;
                         }
@@ -567,6 +573,7 @@ public:
                                 DoCastAOE(SPELL_SPLITTING_BLOW_WEST, false);
                                 for (uint32 x = 0; x<8; ++x)
                                     me->SummonCreature(NPC_SON_OF_FLAME, HammerWestSummons[x], TEMPSUMMON_TIMED_DESPAWN, 45000);
+                                    Talk(SAY_ADDS);
                             }
                             break;
                         }
@@ -579,6 +586,7 @@ public:
                                 DoCastAOE(SPELL_SPLITTING_BLOW_NORTH, false);
                                 for (uint32 x = 0; x<8; ++x)
                                     me->SummonCreature(NPC_SON_OF_FLAME, HammerMiddleSummons[x], TEMPSUMMON_TIMED_DESPAWN, 45000);
+                                    Talk(SAY_ADDS);
                             }
                             break;
                         }
@@ -608,7 +616,7 @@ public:
                     case EVENT_ARRIVE_1:
                         me->SetVisible(true);
                         me->PlayOneShotAnimKit(1467);
-                        Talk(SAY_ARRIVE);
+                        Talk(SAY_INTRO);
                         events.ScheduleEvent(EVENT_ARRIVE_2, 6500, 0, PHASE_INTRO);
                         break;
                     case EVENT_ARRIVE_2:
@@ -703,6 +711,7 @@ public:
                         events.ScheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000, 0, PHASE_1);
                         break;
                     case EVENT_WRATH_OF_RAGNAROS:
+                        Talk(SAY_WRATH_OF_RAGNAROS);					
                         DoCastAOE(SPELL_WRATH_OF_RAGNAROS);
                         events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, 36000, 0, PHASE_1);
                         break;
@@ -750,7 +759,8 @@ public:
                         if (Creature* hammer = me->FindNearestCreature(NPC_SULFURAS_HAMMER, 50.0f))
                             hammer->DespawnOrUnsummon(1);
                         break;
-                    case EVENT_ENGULFING_FLAMES:
+                    case EVENT_ENGULFING_FLAMES:	
+                        Talk(SAY_ANN_ENGULFING_FLAMES);					
                         switch (urand(0, 2))
                         {
                             case 0: // Melee

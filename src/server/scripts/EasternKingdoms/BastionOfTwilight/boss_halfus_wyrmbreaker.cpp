@@ -4,8 +4,9 @@
 
 enum HalfusScriptTexts
 {
-    SAY_AGGRO   = 0,
-    SAY_KILL    = 1,
+    SAY_AGGRO      = 0,
+    SAY_KILL       = 1,
+    SAY_DEATH_BOSS = 2,
 };
 
 enum ChogallScriptTexts
@@ -403,6 +404,8 @@ class boss_halfus_wyrmbreaker : public CreatureScript
 
             void JustDied(Unit* killer)
             {
+                Talk(SAY_DEATH_BOSS);
+
                 summons.DespawnAll();
                 if(Creature *Chogall = me->SummonCreature(NPC_CHOGALL_DLG, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 1, TEMPSUMMON_DEAD_DESPAWN, 0))
                     Chogall->AI()->DoAction(ACTION_AT_HALFUS_END);

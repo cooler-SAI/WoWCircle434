@@ -32,12 +32,7 @@ enum CreatureIds
     NPC_BALEROC                     = 53494,
     NPC_STAGHELM                    = 52571,
     NPC_RAGNAROS_CATA               = 52409,
-	
-    //other npc's
-    NPC_SULFURAS            = 53420,    //ragnaros boss weapon
-    NPC_LIVING_METEOR       = 53500,
-    NPC_MOLTEN_ELEMENTAR    = 53189,
-    
+	    
     // alysrazor event
     NPC_BLAZING_MONSTROSITY_LEFT    = 53786,
     NPC_BLAZING_MONSTROSITY_RIGHT   = 53791,
@@ -47,12 +42,14 @@ enum CreatureIds
     NPC_SMOULDERING_HATCHLING       = 53794, 
 	
     // Ragnaros from uwow
+    NPC_SULFURAS_HAMMER             = 53420,
+    NPC_LIVING_METEOR               = 53500,
+    NPC_MOLTEN_ELEMENTAR            = 53189,
     NPC_ENGULFING_FLAMES_TRIGGER    = 53485,
     NPC_SPLITTING_BLOW_TRIGGER      = 53393,
     NPC_MAGMA_POOL_TRIGGER          = 53729,
     NPC_PLATFORM_TRIGGER            = 53952,
     NPC_MAGMA_TRAP                  = 53086,
-    NPC_SULFURAS_HAMMER             = 53420,
     NPC_SULFURAS_FLAME_WALL         = 38327,
     NPC_SULFURAS_SMASH_TARGET_1     = 53268,
     NPC_LAVA_WAVE                   = 53363,
