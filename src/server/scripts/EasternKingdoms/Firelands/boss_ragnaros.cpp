@@ -338,6 +338,18 @@ public:
             Submerged = 0;
         }
 
+        void DespawnCreatures(uint32 entry, float distance)
+        {
+            std::list<Creature*> creatures;
+            GetCreatureListWithEntryInGrid(creatures, me, entry, distance);
+
+            if (creatures.empty())
+                return;
+
+            for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
+                (*iter)->DespawnOrUnsummon();
+        }
+		
         InstanceScript* instance;
         bool Arrived;
         bool Killed;
@@ -350,6 +362,11 @@ public:
                 me->AddAura(SPELL_BASE_VISUAL, me);
                 events.SetPhase(PHASE_1);
             }
+
+            DespawnCreatures(53500, 300.0f);
+            DespawnCreatures(53813, 300.0f);
+            DespawnCreatures(53814, 300.0f);
+            DespawnCreatures(53815, 300.0f);
 
             _Reset();
             instance->SetBossState(DATA_RAGNAROS, NOT_STARTED);
