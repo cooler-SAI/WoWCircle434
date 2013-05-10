@@ -1,0 +1,1 @@
+UPDATE `spell_dbc` SET `AttributesEx3`=`AttributesEx3`|0x20000 WHERE `id`=35009;
