@@ -243,7 +243,10 @@ class npc_mandokir_chained_spirit : public CreatureScript
                     return;
                 playerGUID = guid;
                 if (Unit* player = ObjectAccessor::GetUnit(*me, playerGUID))
+             {
+                 player->RemoveAura(27827);
                     me->GetMotionMaster()->MovePoint(POINT_RES, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+             }
             }
 
             void MovementInform(uint32 type, uint32 id)
