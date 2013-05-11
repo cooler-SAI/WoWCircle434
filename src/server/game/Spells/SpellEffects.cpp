@@ -1846,6 +1846,19 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
 
     // original caster guid only for GO cast
     m_caster->CastSpell(targets, spellInfo, &values, TRIGGERED_FULL_MASK, NULL, NULL, m_originalCasterGUID);
+
+    // Trap Launcher removal
+    switch (m_spellInfo->Id)
+    {
+        // Trap Launcher related spells
+        case 60192:
+        case 82939:
+        case 82941:
+            // Remove aura
+            m_caster->RemoveAurasDueToSpell(77769);
+            break;
+        default: break;
+    }
 }
 
 void Spell::EffectForceCast(SpellEffIndex effIndex)
