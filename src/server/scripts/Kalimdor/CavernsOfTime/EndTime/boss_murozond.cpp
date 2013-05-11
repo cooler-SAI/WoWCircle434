@@ -307,7 +307,8 @@ class boss_murozond : public CreatureScript
                                 pNozdormu->AI()->DoAction(ACTION_NOZDORMU);
                             instance->SetBossState(DATA_MUROZOND, DONE);
                             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SANDS_OF_THE_HOURGLASS);
-                            me->Kill(me, false);
+                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                                pTarget->Kill(me);
                             break;
                         default:
                             break;
@@ -368,28 +369,51 @@ class npc_murozond_mirror_image : public CreatureScript
                     me->AddAura(SPELL_FADING, me);
             }
 
-            void IsSummonedBy(Unit* owner)
+            void InitializeAI()
             {
-                if (owner && owner->GetTypeId() == TYPEID_PLAYER)
-                {
-                    m_owner = owner->ToPlayer();
-                    m_owner->AddAura(102284, me);
-                    m_owner->AddAura(102288, me);
-                }
-                else
-                    me->DespawnOrUnsummon();
+                if (!me->isDead())
+                    Reset();
+
+                Unit* owner = me->GetOwner();
+                if (!owner)
+                    return;
+
+                owner->CastSpell(me, 102284, true);
+                owner->CastSpell(me, 102288, true);
             }
 
             void DoAction(const int32 action)
             {
                 if (action == ACTION_HOURGLASS)
                 {
-                    if (m_owner)
+                    if (m_owner && m_owner->ToPlayer())
                     {
                         if (!m_owner->isAlive())
                             m_owner->ResurrectPlayer(1.0f, false);
 
-                        m_owner->RemoveArenaSpellCooldowns();
+                        std::list<uint32> spell_list;
+                        SpellCooldowns cd_list = m_owner->ToPlayer()->GetSpellCooldowns();
+                        if (!cd_list.empty())
+                        {
+                            for (SpellCooldowns::const_iterator itr = cd_list.begin(); itr != cd_list.end(); ++itr)
+                            {
+                                SpellInfo const* entry = sSpellMgr->GetSpellInfo(itr->first);
+                                if (entry &&
+                                    entry->RecoveryTime <= 10 * MINUTE * IN_MILLISECONDS &&
+                                    entry->CategoryRecoveryTime <= 10 * MINUTE * IN_MILLISECONDS)
+                                {
+                                    spell_list.push_back(itr->first);
+                                }
+                            }
+                        }
+
+                        if (!spell_list.empty())
+                        {
+                            for (std::list<uint32>::const_iterator itr = spell_list.begin(); itr != spell_list.end(); ++itr)
+                                m_owner->ToPlayer()->RemoveSpellCooldown((*itr), true, true);
+                            m_owner->ToPlayer()->SendClearCooldownMap(m_owner);
+                        }
+
                         m_owner->CastSpell(m_owner, SPELL_BLESSING_OF_BRONZE_DRAGONS, true);
                         m_owner->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), true);
                     }

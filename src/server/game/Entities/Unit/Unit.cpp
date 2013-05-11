@@ -667,7 +667,8 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
     {
         if (victim != this && victim->GetTypeId() == TYPEID_PLAYER) // does not support creature push_back
         {
-            if (damagetype != DOT)
+            if (damagetype != DOT || (spellProto && spellProto->IsChanneled()))
+            {
                 if (Spell* spell = victim->m_currentSpells[CURRENT_GENERIC_SPELL])
                     if (spell->getState() == SPELL_STATE_PREPARING)
                     {
@@ -675,6 +676,7 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
                         if (interruptFlags & SPELL_INTERRUPT_FLAG_ABORT_ON_DMG)
                             victim->InterruptNonMeleeSpells(false);
                     }
+            }
         }
     }
 
@@ -3457,7 +3459,7 @@ void Unit::RemoveAurasDueToSpell(uint32 spellId, uint64 casterGUID, uint8 reqEff
     }
 }
 
-void Unit::RemoveAuraFromStack(uint32 spellId, uint64 casterGUID, AuraRemoveMode removeMode)
+void Unit::RemoveAuraFromStack(uint32 spellId, uint64 casterGUID, AuraRemoveMode removeMode, int32 num)
 {
     AuraMapBoundsNonConst range = m_ownedAuras.equal_range(spellId);
     for (AuraMap::iterator iter = range.first; iter != range.second;)
@@ -3466,7 +3468,7 @@ void Unit::RemoveAuraFromStack(uint32 spellId, uint64 casterGUID, AuraRemoveMode
         if ((aura->GetType() == UNIT_AURA_TYPE)
             && (!casterGUID || aura->GetCasterGUID() == casterGUID))
         {
-            aura->ModStackAmount(-1, removeMode);
+            aura->ModStackAmount(-num, removeMode);
             return;
         }
         else
@@ -3650,8 +3652,20 @@ void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase)
     }
 
     // single target auras at other targets
+    AuraList tempList;
     AuraList& scAuras = GetSingleCastAuras();
-    for (AuraList::iterator iter = scAuras.begin(); iter != scAuras.end();)
+    for (AuraList::const_iterator itr = scAuras.begin(); itr != scAuras.end(); ++itr)
+        if (Aura* aura = *itr)
+            if (aura->GetUnitOwner() != this && !aura->GetUnitOwner()->InSamePhase(newPhase))
+                tempList.push_back(aura);
+
+    if (!tempList.empty())
+        for (AuraList::const_iterator itr = tempList.begin(); itr != tempList.end(); ++itr)
+            if (Aura* aura = *itr)
+                aura->Remove();
+
+
+    /*for (AuraList::iterator iter = scAuras.begin(); iter != scAuras.end();)
     {
         if (Aura* aura = *iter)
         {
@@ -3665,7 +3679,7 @@ void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase)
         }
         else
             ++iter;
-    }
+    }*/
 }
 
 void Unit::RemoveAurasWithInterruptFlags(uint32 flag, uint32 except)
@@ -4244,7 +4258,10 @@ uint32 Unit::GetDiseasesByCaster(uint64 casterGUID, bool remove)
 
     // Burning Blood, Item - Death Knight T12 Blood 2P Bonus
     if (HasAura(98957, casterGUID))
-        diseases += 2;
+    {
+        uint32 _min = 2;
+        diseases = std::max(diseases, _min);
+    }
 
     return diseases;
 }
@@ -6397,7 +6414,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                     triggered_spell_id = 85421;
                     basepoints0 = int32(CalculatePct(damage, triggerAmount) / 7);
-                    int32 cap = int32(caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE) / 7);
+                    int32 cap = int32((caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE) * 1.4 + 141) / 7);
                     if (dummySpell->Id == 91986)
                         cap /= 2;
                     if (AuraEffect * aurEff = target->GetAuraEffect(triggered_spell_id, 0, caster->GetGUID()))
@@ -6410,12 +6427,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 // Glyph of Shadowburn
                 case 56229:
                 {
-                    if (procSpell->ProcFlags & PROC_FLAG_KILL || ToPlayer()->HasSpellCooldown(dummySpell->Id))
+                    if (procSpell->ProcFlags & PROC_FLAG_KILL || HasAura(91001))
                         return false;
 
                     ToPlayer()->RemoveSpellCooldown(17877, true);
-                    ToPlayer()->AddSpellCooldown(dummySpell->Id, 0, time(NULL)+6);
-                    return true;
+                    triggered_spell_id = 91001;
+                    break;
                 }
                 // Glyph of Shadowflame
                 case 63310:
@@ -7420,6 +7437,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 // Marked for Death
                 case 3524:
                 {
+                    // Get old Hunter's Mark
+                    if (Aura * aura = target->GetAura(1130)) 
+                    {
+                        if (aura->GetDuration() > 15000)
+                            return false;
+                    }
                     triggered_spell_id = 88691;
                     break;
                 }
@@ -9590,6 +9613,12 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Burnout, Alysrazor
+        case 99432:
+            if (!victim)
+                return false;
+            target = victim;
+            break;
         // Molten Axe, Echo of Baine
         case 101836:
             if (!victim)
@@ -12148,7 +12177,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
 {
     //! Mobs can't crit with spells. Player Totems can
     //! Fire Elemental (from totem) can too - but this part is a hack and needs more research
-    if (IS_CREATURE_GUID(GetGUID()) && !(isTotem() && IS_PLAYER_GUID(GetOwnerGUID())) && GetEntry() != 15438)
+    if (IS_CREATURE_GUID(GetGUID()) && !((isTotem() || isGuardian()) && IS_PLAYER_GUID(GetOwnerGUID())) && GetEntry() != 15438)
         return false;
 
     // not critting spell
@@ -12218,27 +12247,19 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
                     // Modify critical chance by victim SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE
                     crit_chance += victim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE);
                 }
-                // scripted (increase crit chance ... against ... target by x%
-                AuraEffectList const& mOverrideClassScript = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-                for (AuraEffectList::const_iterator i = mOverrideClassScript.begin(); i != mOverrideClassScript.end(); ++i)
-                {
-                    if (!((*i)->IsAffectingSpell(spellProto)))
-                        continue;
-                    int32 modChance = 0;
-                    switch ((*i)->GetMiscValue())
-                    {
-                        case 7997: // Renewed Hope
-                        case 7998:
-                            if (victim->HasAura(6788))
-                                crit_chance+=(*i)->GetAmount();
-                            break;
-                        default:
-                            break;
-                    }
-                }
                 // Custom crit by class
                 switch (spellProto->SpellFamilyName)
                 {
+                    case SPELLFAMILY_PRIEST:
+                    {
+                        // Renewed Hope
+                        if (AuraEffect * eff = GetDummyAuraEffect(SPELLFAMILY_PRIEST, 329, 0))
+                        {
+                            if (eff->IsAffectingSpell(spellProto) && (victim->HasAura(6788) || victim->HasAura(77613, GetGUID())))
+                                crit_chance += eff->GetAmount();
+                        }
+                        break;
+                    }
                     case SPELLFAMILY_MAGE:
                         // Glyph of Fire Blast
                         if (spellProto->SpellFamilyFlags[0] == 0x2 && spellProto->SpellIconID == 12)
@@ -12253,12 +12274,6 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
                         }
                         break;
                     case SPELLFAMILY_DRUID:
-                        // Improved Faerie Fire
-                        if (victim->HasAuraState(AURA_STATE_FAERIE_FIRE))
-                            if (AuraEffect const* aurEff = GetDummyAuraEffect(SPELLFAMILY_DRUID, 109, 0))
-                                crit_chance += aurEff->GetAmount();
-
-                        // cumulative effect - don't break
 
                         // Starfire
                         if (spellProto->SpellFamilyFlags[0] & 0x4 && spellProto->SpellIconID == 1485)
@@ -12403,7 +12418,7 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
         modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_CRITICAL_CHANCE, crit_chance);
 
     // Curse of Gul'dan
-    if (isPet())
+    if (isPet() || isGuardian())
         if (Unit* owner = GetOwner())
             if (Aura* aur = victim->GetAura(86000, owner->GetGUID()))
                 crit_chance += float(aur->GetEffect(0)->GetAmount());
@@ -12422,9 +12437,17 @@ uint32 Unit::SpellCriticalDamageBonus(SpellInfo const* spellProto, uint32 damage
     {
         case SPELL_DAMAGE_CLASS_MELEE:                      // for melee based spells is 100%
         case SPELL_DAMAGE_CLASS_RANGED:
+        {
+            // Serpent Sting & Black Arrow
+            if (spellProto->Id == 1978 || spellProto->Id == 3674)
+            {
+                crit_bonus += damage / 2;
+                break;          
+            }
             // TODO: write here full calculation for melee/ranged spells
             crit_bonus += damage;
             break;
+        }
         default:
             crit_bonus += damage / 2;                       // for spells is 50%
             break;
@@ -13349,7 +13372,7 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
         {
             Battleground* bg = ToPlayer()->GetBattleground();
             // don't unsummon pet in arena but SetFlag UNIT_FLAG_STUNNED to disable pet's interface
-            if (bg && bg->isArena())
+            if (pet->GetEntry() == ENTRY_WATER_ELEMENTAL || (bg && bg->isArena())) // water elemental goes as exception
                 pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
             else
                 player->UnsummonPetTemporaryIfAny();
@@ -17308,6 +17331,10 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, SpellInfo const
         // Shadow Word: Death - can trigger from every kill
         if (aura->GetId() == 32409)
             allow = true;
+
+        if (victim && (victim->IsPetGuardianStuff() && !victim->isTotem()))
+            allow = true;
+
         if (!allow)
             return false;
     }
@@ -17989,6 +18016,9 @@ void Unit::SetRooted(bool apply)
         RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
 
+        if (GetTypeId() != TYPEID_PLAYER)
+            ToCreature()->StopMoving();
+
         WorldPacket data(SMSG_SPLINE_MOVE_ROOT, 8);
         {
             data
@@ -18013,8 +18043,7 @@ void Unit::SetRooted(bool apply)
 
         if (GetTypeId() == TYPEID_PLAYER)
             SendMoveRoot(m_rootTimes);
-
-        StopMoving();
+        
     }
     else
     {
@@ -19247,6 +19276,12 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form) const
                 else
                     return 37165;
                 break;
+            case FORM_GHOSTWOLF:
+                if (HasAura(58135)) // Glyph of the Arctic Wolf
+                    return 27312;
+                else
+                    return 4613;
+                break;
             default:
                 break;
         }
@@ -19678,10 +19713,14 @@ void Unit::NearTeleportTo(float x, float y, float z, float orientation, bool cas
     {
         //Position pos = {x, y, z, orientation};
         //SendTeleportPacket(pos);
-        DestroyForNearbyPlayers();
+        //DestroyForNearbyPlayers();
+        //UpdatePosition(x, y, z, orientation, true);
+        //UpdateObjectVisibility();
+        //SendMovementFlagUpdate();
+        Position pos = {x, y, z, orientation};
+        SendTeleportPacket(pos);
         UpdatePosition(x, y, z, orientation, true);
         UpdateObjectVisibility();
-        //SendMovementFlagUpdate();
     }
 }
 

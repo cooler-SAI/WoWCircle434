@@ -611,7 +611,7 @@ public:
 
                 uint32 unleashSpell = 0;
                 Unit *target = GetExplTargetUnit();
-                bool hostileTarget = !plr->IsFriendlyTo(target);
+                bool hostileTarget = plr->IsValidAttackTarget(target);
                 bool hostileSpell = true;
 
                 switch (weapons[i]->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))

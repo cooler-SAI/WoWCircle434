@@ -8,17 +8,11 @@
 
 static const DoorData doordata[] = 
 {
-    {GO_BRIDGE_OF_RHYOLITH,  DATA_RHYOLITH,  DOOR_TYPE_ROOM,    BOUNDARY_NONE},   
-    {GO_FIRE_WALL_BALEROC,   DATA_BALEROC,   DOOR_TYPE_ROOM,    BOUNDARY_NONE},	
-    //{GO_RAID_BRIDGE_FORMING, DATA_RHYOLITH,  DOOR_TYPE_PASSAGE, BOUNDARY_NONE},
-    {GO_RAID_BRIDGE_FORMING, DATA_SHANNOX,   DOOR_TYPE_PASSAGE, BOUNDARY_NONE},
-    {GO_RAID_BRIDGE_FORMING, DATA_BETHTILAC, DOOR_TYPE_PASSAGE, BOUNDARY_NONE},
-    {GO_RAID_BRIDGE_FORMING, DATA_ALYSRAZOR, DOOR_TYPE_PASSAGE, BOUNDARY_NONE},
-    {GO_RAID_BRIDGE_FORMING, DATA_BALEROC,   DOOR_TYPE_PASSAGE, BOUNDARY_NONE},
-    {GO_STICKY_WEB,          DATA_BETHTILAC, DOOR_TYPE_ROOM,    BOUNDARY_NONE},
-    {GO_FIRE_WALL_FENDRAL,   DATA_STAGHELM,  DOOR_TYPE_PASSAGE, BOUNDARY_NONE},
-    {GO_FIRE_WALL_SULFURON,  DATA_STAGHELM,  DOOR_TYPE_PASSAGE, BOUNDARY_NONE},
-    {GO_RAGNAROS_DOOR,       DATA_RAGNAROS,  DOOR_TYPE_ROOM,    BOUNDARY_NONE},
+    {GO_BRIDGE_OF_RHYOLITH,  DATA_RHYOLITH,  DOOR_TYPE_ROOM,        BOUNDARY_NONE},
+    {GO_FIRE_WALL_BALEROC,   DATA_BALEROC,   DOOR_TYPE_ROOM,        BOUNDARY_NONE},
+    {GO_RAID_BRIDGE_FORMING, DATA_BALEROC,   DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
+    {GO_STICKY_WEB,          DATA_BETHTILAC, DOOR_TYPE_ROOM,        BOUNDARY_NONE},
+    {GO_BRIDGE_OF_RHYOLITH,  DATA_RHYOLITH,  DOOR_TYPE_SPAWN_HOLE,  BOUNDARY_NONE},
     {0, 0, DOOR_TYPE_ROOM, BOUNDARY_NONE},
 };
 
@@ -41,6 +35,11 @@ class instance_firelands : public InstanceMapScript
                 uiShannoxGUID = 0;
                 uiRiplimbGUID = 0;
                 uiRagefaceGUID = 0;
+                uiRhyolithHealth = 0;
+                uiTimer = 0;
+                bEvent = false;
+                creaturePortals.clear();
+                gameobjectPortals.clear();
             }
 
             void OnPlayerEnter(Player* pPlayer)
@@ -62,6 +61,14 @@ class instance_firelands : public InstanceMapScript
                     case NPC_RAGEFACE:
                         uiRagefaceGUID = pCreature->GetGUID();
                         break;
+                    case NPC_CIRCLE_OF_THRONES_PORTAL:
+                        creaturePortals.push_back(pCreature);
+                        if (uiEvent == DONE)
+                        {
+                            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            pCreature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_SPELLCLICK);
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -71,24 +78,57 @@ class instance_firelands : public InstanceMapScript
             {
                 switch (pGo->GetEntry())
                 {
-                    // case GO_BRIDGE_OF_RHYOLITH
                     case GO_FIRE_WALL_BALEROC:
                     case GO_STICKY_WEB:
                     case GO_RAID_BRIDGE_FORMING:
-                    case GO_FIRE_WALL_FENDRAL:
-                    case GO_FIRE_WALL_SULFURON:
-                    case GO_RAGNAROS_DOOR:
+                    case GO_BRIDGE_OF_RHYOLITH:
                         AddDoor(pGo, true);
+                        break;
+                    case GO_CIRCLE_OF_THORNS_PORTAL3:
+                        gameobjectPortals.push_back(pGo);
+                        if (uiEvent == DONE)
+                            HandleGameObject(pGo->GetGUID(), true, pGo);
                         break;
                 }
 		    }
 
             void SetData(uint32 type, uint32 data)
             {
+                if (type == DATA_RHYOLITH_HEALTH_SHARED)
+                    uiRhyolithHealth = data;
+                else if (type == DATA_EVENT)
+                {
+                    uiEvent = data;
+                    if (uiEvent == DONE)
+                    {
+                        if (!gameobjectPortals.empty())
+                        {
+                            for (std::list<GameObject*>::const_iterator itr = gameobjectPortals.begin(); itr != gameobjectPortals.end(); ++itr)
+                                if (GameObject* pGo = (*itr)->ToGameObject())
+                                    HandleGameObject(pGo->GetGUID(), true, pGo);
+                        }
+
+                        if (!creaturePortals.empty())
+                        {
+                            for (std::list<Creature*>::const_iterator itr = creaturePortals.begin(); itr != creaturePortals.end(); ++itr)
+                                if (Creature* pCreature = (*itr)->ToCreature())
+                                {
+                                    pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                    pCreature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_SPELLCLICK);
+                                }
+                        }
+
+                        SaveToDB();
+                    }
+                }
 		    }
 
             uint32 GetData(uint32 type)
             {
+                if (type == DATA_RHYOLITH_HEALTH_SHARED)
+                    return uiRhyolithHealth;
+                else if (type == DATA_EVENT)
+                    return uiEvent;
 			    return 0;
             }
 
@@ -112,6 +152,37 @@ class instance_firelands : public InstanceMapScript
 			    return true;
             }
 
+            void ProcessEvent(WorldObject* /*source*/, uint32 eventId)
+            {
+                switch (eventId)
+                {
+                    case EVENT_PORTALS:
+                        if ((uiEvent == DONE) || bEvent)
+                            return;
+                        bEvent = true;
+                        uiTimer = 7000;
+                        if (!creaturePortals.empty())
+                            for (std::list<Creature*>::const_iterator itr = creaturePortals.begin(); itr != creaturePortals.end(); ++itr)
+                                if (Creature* pCreature = (*itr)->ToCreature())
+                                    pCreature->CastSpell(pCreature, SPELL_LEGENDARY_PORTAL_OPENING);
+                        break;
+                }
+            }
+
+            void Update(uint32 diff)
+            {
+                if (bEvent)
+                {
+                    if (uiTimer <= diff)
+                    {
+                        bEvent = false;
+                        SetData(DATA_EVENT, DONE);
+                    }
+                    else
+                        uiTimer -= diff;
+                }
+            }
+
             std::string GetSaveData()
             {
                 OUT_SAVE_INST_DATA;
@@ -119,7 +190,7 @@ class instance_firelands : public InstanceMapScript
                 std::string str_data;
 
                 std::ostringstream saveStream;
-                saveStream << "F L " << GetBossSaveData();
+                saveStream << "F L " << GetBossSaveData() << uiEvent << ' ';
 
                 str_data = saveStream.str();
 
@@ -151,16 +222,28 @@ class instance_firelands : public InstanceMapScript
 					    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
 						    tmpState = NOT_STARTED;
 					    SetBossState(i, EncounterState(tmpState));
-				    }} else OUT_LOAD_INST_DATA_FAIL;
+				    }
+
+                    uint32 tempEvent = 0;
+                    loadStream >> tempEvent;
+                    uiEvent = (tempEvent != DONE ? 0 : DONE);
+
+                } else OUT_LOAD_INST_DATA_FAIL;
 
                 OUT_LOAD_INST_DATA_COMPLETE;
             }
 
             private:
                 uint32 uiTeamInInstance;
+                uint32 uiRhyolithHealth;
+                uint32 uiEvent;
+                uint32 uiTimer;
+                bool bEvent;
                 uint64 uiShannoxGUID;
                 uint64 uiRiplimbGUID;
                 uint64 uiRagefaceGUID;
+                std::list<GameObject*> gameobjectPortals;
+                std::list<Creature*> creaturePortals;
         };
 };
 

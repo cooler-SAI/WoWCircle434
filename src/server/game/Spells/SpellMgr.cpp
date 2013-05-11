@@ -3094,11 +3094,6 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_ADD_PCT_MODIFIER;
                 spellInfo->Effects[0].BasePoints = 200;
                 break;
-            case 97463: // Rallying Cry
-            case 54443: // Demonic Empowerment
-            case 79437: // Soulburn - Healthstone
-                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT;
-                break;
             case 69176:
                 spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_NOT_SEATED;
                 break;
@@ -5045,6 +5040,9 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
                 break;
             // Bethtilac
+            case 99052: // Smoldering Devastation
+                spellInfo->InterruptFlags = 0;
+                break;
             case 98471: // Burning Acid
             case 100826:
             case 100827:
@@ -5166,6 +5164,62 @@ void SpellMgr::LoadDbcDataCorrections()
             case 101666:
                 spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
                 break;
+            // Lord Rhyolith
+            case 98843: // Ride Vehicle
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 98010: // Volcanic Birth
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                break;
+            case 98493: // Heated Volcano
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
+            case 98255: // Molten Armor
+            case 101157:
+            case 101158:
+            case 101159:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = 0;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                spellInfo->Effects[EFFECT_2].Effect = 0;
+                spellInfo->Effects[EFFECT_2].ApplyAuraName = 0;
+                spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_2].TargetB = 0;
+                break;
+            case 97230: // Magma Flow area
+                spellInfo->SetDurationIndex(1); // 10 seconds
+                break;
+            case 99875: // Fuse
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_2].TargetB = 0;
+                break;
+            case 98135: // Summon Fragment of Rhyolith
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                break;
+            case 98553: // Summon Spark of Rhyolith
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                break;
+            case 98136: // Summon Fragment of Rhyolith sum
+            case 100392:
+            case 98552:
+                spellInfo->SetDurationIndex(21);
+                break;
+            case 98649: // Meltdown dmg
+            case 101646:
+            case 101647:
+            case 101648:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                break;
             // Baleroc
             case 99351: // Inferno Blade
                 spellInfo->Attributes &= ~SPELL_ATTR0_ON_NEXT_SWING;
@@ -5195,6 +5249,33 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 98229: // Concentration
                 spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_DUMMY;
+                break;
+            // Ragnaros
+            case 98159: // Magma Trap aoe
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+                break;
+            case 98710: // Sulfuras Smash
+            case 100890:
+            case 100891:
+            case 100892:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            case 98708: // Sulfuras Smash
+            case 100256:
+            case 100257:
+            case 100258:
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                spellInfo->Effects[EFFECT_2].Effect = 0;
+                break;
+            case 101088: // Lavalogged
+                spellInfo->ExcludeTargetAuraSpell = 101008;
+                break;
+            case 101102: // Lavalogged
+                spellInfo->ExcludeTargetAuraSpell = 101102;
+                break;
+            case 99012: // Splitting Blow
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
                 break;
             // ENDOF FIRELANDS
             // BASTION OF TWILIGHT SPELLS
@@ -6527,6 +6608,38 @@ void SpellMgr::LoadDbcDataCorrections()
             case 89792:
                 spellInfo->Effects[EFFECT_2].Effect = 0;
                 break;
+            // Nexus Phase Shift
+            case 99488:
+                spellInfo->Effects[EFFECT_0].MiscValue = 256;
+                break;
+            // Twilight Prison
+            case 99561:
+                spellInfo->Effects[EFFECT_2].Effect = 0;
+                spellInfo->Effects[EFFECT_2].ApplyAuraName = 0;
+                break;
+            // Open Fire Portal
+            case 100528:
+            case 101067:
+            case 101068:
+            case 101069:
+                spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_CASTER;
+                break;
+            // Summon Kalecgos
+            case 98069:
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_1].MiscValue = 256;
+                break;
+            // Call Withered Ent
+            case 64306:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            // Renewed Hope
+            case 57472:
+            case 57470:
+                spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00001C00, 0x00010000, 0x0);
+                break; 
             default:
                 break;
         }

@@ -1533,15 +1533,15 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             break;
         case SPELLFAMILY_WARRIOR:
         {
-            switch (m_spellInfo->Id)
+            // Rallying Cry
+            if (m_spellInfo->Id == 97462)
             {
-                // Rallying Cry
-                case 97462:
-                    if (!unitTarget)
-                        return;
+                if (!unitTarget)
+                    return;
 
-                    m_caster->CastCustomSpell(unitTarget, 97463, &damage, NULL, NULL, true, NULL);
-                    break;  
+                int32 bp0 = unitTarget->CountPctFromMaxHealth(damage);
+
+                m_caster->CastCustomSpell(unitTarget, 97463, &bp0, NULL, NULL, true, NULL);
             }
             break;
         }
@@ -1846,6 +1846,19 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
 
     // original caster guid only for GO cast
     m_caster->CastSpell(targets, spellInfo, &values, TRIGGERED_FULL_MASK, NULL, NULL, m_originalCasterGUID);
+
+    // Trap Launcher removal
+    switch (m_spellInfo->Id)
+    {
+        // Trap Launcher related spells
+        case 60192:
+        case 82939:
+        case 82941:
+            // Remove aura
+            m_caster->RemoveAurasDueToSpell(77769);
+            break;
+        default: break;
+    }
 }
 
 void Spell::EffectForceCast(SpellEffIndex effIndex)
@@ -7611,8 +7624,9 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
             return;
         }
 
-        if (summon->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
-            ((Guardian*)summon)->InitStatsForLevel(level);
+        // That's done in ::InitStats()
+        //if (summon->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+            //((Guardian*)summon)->InitStatsForLevel(level);
 
         if (properties && properties->Category == SUMMON_CATEGORY_ALLY)
             summon->setFaction(caster->getFaction());
@@ -7631,7 +7645,8 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
                 summon->SetDisplayId(1126);
         }
 
-        summon->AI()->EnterEvadeMode();
+
+        //summon->AI()->EnterEvadeMode();
 
         ExecuteLogEffectSummonObject(i, summon);
     }

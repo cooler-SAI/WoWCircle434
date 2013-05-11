@@ -1294,6 +1294,9 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                             unitTargets.sort(Trinity::HealthPctOrderPred());
                             for (std::list<Unit*>::iterator itr = unitTargets.begin() ; itr != unitTargets.end(); ++itr)
                             {
+                                if ((*itr)->GetHealthPct() == 100)
+                                    break;
+
                                 if (m_caster != (*itr) && (*itr)->IsInRaidWith(m_caster))
                                 {
                                     aTarget = (*itr);
@@ -4996,7 +4999,12 @@ void Spell::TakeRunePower(bool didHit)
     {
         runeCost[i] = runeCostData->RuneCost[i];
         if (Player* modOwner = m_caster->GetSpellModOwner())
+        {
             modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, runeCost[i], this);
+
+            if (runeCost[i] < 0)
+                runeCost[i] = 0;
+        }
     }
 
     runeCost[RUNE_DEATH] = 0;                               // calculated later
@@ -5401,7 +5409,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!IsTriggered() && !(m_spellInfo->AttributesEx2 & SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && VMAP::VMapFactory::checkSpellForLoS(m_spellInfo->Id) && !m_caster->IsWithinLOSInMap(target))
                         return SPELL_FAILED_LINE_OF_SIGHT;
 
-            if (m_caster->IsVisionObscured(target))
+            if (!IsTriggered() && m_caster->IsVisionObscured(target))
                 return SPELL_FAILED_VISION_OBSCURED; // smoke bomb, camouflage...
         }
     }
@@ -8101,7 +8109,7 @@ WorldObjectSpellNearbyTargetCheck::WorldObjectSpellNearbyTargetCheck(float range
 bool WorldObjectSpellNearbyTargetCheck::operator()(WorldObject* target)
 {
     float dist = target->GetDistance(*_position);
-    if (dist < _range && WorldObjectSpellTargetCheck::operator ()(target))
+    if (dist < _range && WorldObjectSpellTargetCheck::operator ()(target) && _caster->GetGUID() != target->GetGUID())
     {
         _range = dist;
         return true;

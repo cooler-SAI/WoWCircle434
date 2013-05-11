@@ -994,6 +994,8 @@ bool Aura::CanBeSaved() const
 
     switch (GetId())
     {
+        // Silithyst
+        case 29519:
         // When a druid logins, he doesnt have either eclipse power, nor the marker auras, nor the eclipse buffs. Dont save them.
         case 67483:
         case 67484:
@@ -1567,7 +1569,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         {
                             // haste doesn't affect serpent sting so we can use static value for ticks
                             int32 basepoints0 = caster->SpellDamageBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), DOT);
-                            basepoints0 *= GetEffect(0)->GetTotalTicks() * aurEff->GetAmount() / 100.0f;
+                            basepoints0 *= 5 * aurEff->GetAmount() / 100.0f;
                             caster->CastCustomSpell(target, 83077, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
                         }
                         break;
@@ -2627,6 +2629,9 @@ bool Aura::CanStackWith(Aura const* existingAura) const
                     // Curse of Elements
                     if (m_spellInfo->Id == 1490)
                         break;
+                    return true;
+                // Vendetta-like auras
+                case SPELL_AURA_MOD_DAMAGE_FROM_CASTER:
                     return true;
                 default:
                     break;

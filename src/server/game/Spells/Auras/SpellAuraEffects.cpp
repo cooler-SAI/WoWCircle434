@@ -573,7 +573,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             m_canBeRecalculated = false;
             if (!m_spellInfo->ProcFlags)
                 break;
-            amount = int32(GetBase()->GetUnitOwner()->CountPctFromMaxHealth(10));
+            amount = int32(GetBase()->GetUnitOwner()->CountPctFromMaxHealth(5));
             if (caster)
             {
                 // Glyphs increasing damage cap
@@ -784,7 +784,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                         base_amount += aurEff->GetAmount();
                 }
 
-                amount = int32(CalculatePct(caster->GetMaxPower(POWER_MANA), base_amount) / GetTotalTicks());
+                amount = int32(CalculatePct(GetBase()->GetUnitOwner()->GetMaxPower(POWER_MANA), base_amount) / GetTotalTicks());
 
                 break;
             }
@@ -876,6 +876,12 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             // Vampiric Blood
             if (GetId() == 55233)
                 amount = GetBase()->GetUnitOwner()->CountPctFromMaxHealth(amount);
+            // Soulburn - Healthstone
+            else if (m_spellInfo->Id == 79437)
+            {
+                if (GetBase()->GetUnitOwner())
+                    amount = GetBase()->GetUnitOwner()->CountPctFromMaxHealth(20);
+            }
             break;
         case SPELL_AURA_MOD_INCREASE_SPEED:
             // Dash - do not set speed if not in cat form
@@ -990,7 +996,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
     // It's only for players now
     if (caster && caster->GetTypeId() == TYPEID_PLAYER)
     {
-        if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE)
+        if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE || GetAuraType() == SPELL_AURA_PERIODIC_LEECH)
         {
             if (GetBase()->GetType() == UNIT_AURA_TYPE)
             {
@@ -6791,6 +6797,21 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
         // Spell exist but require custom code
         switch (auraId)
         {
+            // Meltdown, Fragment of Rhyolith
+            case 98646:
+            {
+                if (!caster || !caster->ToCreature())
+                    return;
+
+                float mod = 1.0f;
+                if (triggerSpellId == 101646 || triggerSpellId == 101648)
+                    mod = 0.5f;
+
+                int32 bp0 = mod * caster->GetHealth();
+                if (Unit* pTarget = caster->ToCreature()->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    caster->CastCustomSpell(pTarget, triggerSpellId, &bp0, NULL, NULL, true);
+                return;
+            }
             // Power Word: Barrier & Glyph of Power Word: Barrier
             case 81781:
             {
@@ -7127,10 +7148,18 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
 
     uint32 damage = std::max(GetAmount(), 0);
 
-    damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
+    if (m_fixed_periodic.HasDamage())
+        damage = m_fixed_periodic.GetFixedDamage();
+    else
+        damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
     damage = target->SpellDamageBonusTaken(caster, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
 
-    bool crit = IsPeriodicTickCrit(target, caster);
+    bool crit = false;
+    if (m_fixed_periodic.HasCritChance())
+        crit = roll_chance_f(m_fixed_periodic.GetCriticalChance());
+    else
+        crit = IsPeriodicTickCrit(target, caster);
+
     if (crit)
         damage = caster->SpellCriticalDamageBonus(m_spellInfo, damage, target);
 

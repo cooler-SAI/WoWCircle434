@@ -725,7 +725,7 @@ public:
     {
         npc_adventurous_dwarfAI(Creature* creature) : ScriptedAI(creature)
         {
-            Talk(SAY_DWARF_OUCH);
+            DoScriptText(SAY_DWARF_OUCH, creature);
         }	
     };
 

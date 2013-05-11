@@ -608,6 +608,9 @@ class spell_hun_steady_shot : public SpellScriptLoader
                     if (GetHitUnit()->HasAuraWithMechanic(1<<MECHANIC_SNARE))
                         basepoints0 += dazzledprey->GetAmount();
 
+                // Item - Hunter T13 2P Bonus (Steady Shot and Cobra Shot)
+                if (caster->HasAura(105732))
+                    basepoints0 *= 2;
 
                 caster->CastCustomSpell(caster, spellInfo->Id, &basepoints0, NULL, NULL, true);
             }
@@ -648,6 +651,10 @@ class spell_hun_cobra_shot : public SpellScriptLoader
                 if (AuraEffect * dazzledprey = caster->GetAuraEffect(56856, 0))
                     if (GetHitUnit()->HasAuraWithMechanic(1<<MECHANIC_SNARE))
                         basepoints0 += dazzledprey->GetAmount();
+
+                // Item - Hunter T13 2P Bonus (Steady Shot and Cobra Shot)
+                if (caster->HasAura(105732))
+                    basepoints0 *= 2;
 
                 caster->CastCustomSpell(caster, spellInfo->Id, &basepoints0, NULL, NULL, true);
 

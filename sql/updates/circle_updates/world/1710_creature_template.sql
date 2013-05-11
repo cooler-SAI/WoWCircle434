@@ -1,0 +1,1 @@
+UPDATE `creature_template` SET `ScriptName`='npc_lord_rhyolith_rhyolith' WHERE `entry`=53772;

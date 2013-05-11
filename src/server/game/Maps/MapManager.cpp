@@ -156,6 +156,12 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
     if (!entry)
        return false;
 
+    // Molten Front
+    // That's not an instance, so check it here
+    if (entry->MapID == 861)
+        if (player->getLevel() < 85)
+            return false;
+
     if (!entry->IsDungeon())
         return true;
 

@@ -1,0 +1,1 @@
+DELETE FROM `item_instance` WHERE `itemEntry`=69815;

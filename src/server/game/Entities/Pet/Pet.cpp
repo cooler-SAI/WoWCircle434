@@ -822,7 +822,7 @@ void Guardian::LearnPetScalingAuras()
         if (m_owner->getClass() != iter->second || HasAura(iter->first))
             continue;
 
-        AddAura(iter->first, this);
+        CastSpell(this, iter->first, true);
     }
 }
 
@@ -875,6 +875,10 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
             scale = cFamily->minScale;
         else
             scale = cFamily->minScale + float(getLevel() - cFamily->minScaleLevel) / cFamily->maxScaleLevel * (cFamily->maxScale - cFamily->minScale);
+
+        // Glyph of Lesser Proportion
+        if (m_owner->HasAura(57870))
+            scale *= 0.7f;
 
         SetObjectScale(scale);
     }
@@ -947,6 +951,13 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         {
             switch (GetEntry())
             {
+                case 11859: // Doom Guard
+                case 89: // Infernal
+                    if (!HasAura(96101)) // Warlock Mastery
+                        CastSpell(this, 96101, true);
+
+                    LearnPetScalingAuras();
+                    break;
                 case 510: // mage Water Elemental
                 {
                     SetBonusDamage(int32(m_owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST) * 0.33f));
@@ -1059,7 +1070,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         SetCreateMana(28 + 10*petlevel);
                         SetCreateHealth(28 + 30*petlevel);
                     }
-                    SetBonusDamage(int32(m_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.5f));
+                    SetBonusDamage(int32(m_owner->GetTotalAttackPowerValue(BASE_ATTACK)));
                     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
                     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
                     LearnPetScalingAuras();
@@ -1071,6 +1082,19 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                     SetBonusDamage(int32(m_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.006f));
                     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - 30 - (petlevel / 4)));
                     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel - 30 + (petlevel / 4)));
+                    break;
+                }
+                // Guardian of Ancient Kings
+                case 46506:
+                {
+                    if (Player* pOwner = m_owner->ToPlayer())
+                    {
+                        m_modMeleeHitChance = pOwner->GetFloatValue(PLAYER_FIELD_UI_HIT_MODIFIER);
+                        m_baseSpellCritChance = pOwner->GetFloatValue(PLAYER_CRIT_PERCENTAGE);
+                    }
+
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 0.75f * m_owner->GetFloatValue(UNIT_FIELD_MINDAMAGE));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 0.75f * m_owner->GetFloatValue(UNIT_FIELD_MAXDAMAGE));
                     break;
                 }
             }

@@ -176,6 +176,7 @@ set(scripts_STAT_SRCS
   EasternKingdoms/BlackwingLair/boss_broodlord_lashlayer.cpp
   EasternKingdoms/BlackwingLair/boss_ebonroc.cpp
   EasternKingdoms/BlackwingLair/instance_blackwing_lair.cpp
+  EasternKingdoms/BlackwingLair/blackwing_lair.h
   EasternKingdoms/BlackwingLair/boss_vaelastrasz.cpp
   EasternKingdoms/BlackwingLair/boss_nefarian.cpp
   EasternKingdoms/BlackwingLair/boss_flamegor.cpp
@@ -231,11 +232,11 @@ set(scripts_STAT_SRCS
   EasternKingdoms/BaradinHold/baradin_hold.h
   EasternKingdoms/Firelands/boss_shannox.cpp
   EasternKingdoms/Firelands/boss_lord_rhyolith.cpp
+  EasternKingdoms/Firelands/boss_lord_rhyolith.h
   EasternKingdoms/Firelands/boss_bethtilac.cpp
   EasternKingdoms/Firelands/boss_alysrazor.cpp
   EasternKingdoms/Firelands/boss_baleroc.cpp
   EasternKingdoms/Firelands/boss_majordomo_staghelm.cpp
-  EasternKingdoms/Firelands/boss_ragnaros.cpp
   EasternKingdoms/Firelands/instance_firelands.cpp
   EasternKingdoms/Firelands/firelands.cpp
   EasternKingdoms/Firelands/firelands.h

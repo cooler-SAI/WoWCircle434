@@ -305,6 +305,7 @@ class boss_echo_of_tyrande : public CreatureScript
                                 case 5: Talk(SAY_LIGHT_5); break;
                                 default: break;
                             }
+                            curPool = NULL;
                             curPool = me->SummonCreature(NPC_POOL_OF_MOONLIGHT, poolPos[eventphase - 1], TEMPSUMMON_TIMED_DESPAWN, 40000);
                             if (eventphase < 5)
                             {
@@ -327,25 +328,23 @@ class boss_echo_of_tyrande : public CreatureScript
                             break;
                         case EVENT_SUMMON_ADDS:
                         {
-                            if (curPool)
+                            if (Player* pPlayer = me->FindNearestPlayer(500.0f))
                             {
-                                if (Player* pPlayer = curPool->FindNearestPlayer(300.0f))
+                                Position pos;
+                                pPlayer->GetRandomNearPosition(pos, frand(15.0f, 20.0f));
+                                uint32 entry = NPC_TIME_TWISTED_NIGHTSABER_1;
+                                switch (urand(1, eventphase))
                                 {
-                                    Position pos;
-                                    pPlayer->GetRandomNearPosition(pos, frand(15.0f, 20.0f));
-                                    uint32 entry = NPC_TIME_TWISTED_NIGHTSABER_1;
-                                    switch (urand(1, eventphase))
-                                    {
-                                        case 1: entry = NPC_TIME_TWISTED_NIGHTSABER_1; break;
-                                        case 2: entry = NPC_TIME_TWISTED_NIGHTSABER_2; break;
-                                        case 3: entry = NPC_TIME_TWISTED_NIGHTSABER_3; break;
-                                        case 4: entry = NPC_TIME_TWISTED_SENTINEL; break;
-                                        case 5: entry = NPC_TIME_TWISTED_HUNTRESS; break;
-                                    }
-                                    if (Creature* pCreature = me->SummonCreature(entry, pos))
-                                        pCreature->AI()->AttackStart(pPlayer);
+                                    case 1: entry = NPC_TIME_TWISTED_NIGHTSABER_1; break;
+                                    case 2: entry = NPC_TIME_TWISTED_NIGHTSABER_2; break;
+                                    case 3: entry = NPC_TIME_TWISTED_NIGHTSABER_3; break;
+                                    case 4: entry = NPC_TIME_TWISTED_SENTINEL; break;
+                                    case 5: entry = NPC_TIME_TWISTED_HUNTRESS; break;
                                 }
+                                if (Creature* pCreature = me->SummonCreature(entry, pos))
+                                    pCreature->AI()->AttackStart(pPlayer);
                             }
+                            
                             events.ScheduleEvent(EVENT_SUMMON_ADDS, urand(5000, 10000));
                             break;
                         }
