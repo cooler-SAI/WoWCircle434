@@ -1294,6 +1294,9 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                             unitTargets.sort(Trinity::HealthPctOrderPred());
                             for (std::list<Unit*>::iterator itr = unitTargets.begin() ; itr != unitTargets.end(); ++itr)
                             {
+                                if ((*itr)->GetHealthPct() == 100)
+                                    break;
+
                                 if (m_caster != (*itr) && (*itr)->IsInRaidWith(m_caster))
                                 {
                                     aTarget = (*itr);
