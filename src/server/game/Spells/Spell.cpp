@@ -5196,6 +5196,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         return SPELL_FAILED_CASTER_DEAD;
 
     // check cooldowns to prevent cheating
+    if (!IsTriggered() || !(_triggeredCastFlags & TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD))
     if (m_caster->GetTypeId() == TYPEID_PLAYER && !(m_spellInfo->Attributes & SPELL_ATTR0_PASSIVE))
     {
         //can cast triggered (by aura only?) spells while have this flag
