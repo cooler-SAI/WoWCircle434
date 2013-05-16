@@ -2027,11 +2027,19 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 break;
             case SPELLFAMILY_HUNTER:
+                if (!caster)
+                    break;
+
                 // Glyph of Freezing Trap
                 if (GetSpellInfo()->SpellFamilyFlags[0] & 0x00000008)
-                    if (caster && caster->HasAura(56845))
+                    if (caster->HasAura(56845))
                         caster->CastSpell(target, 61394, true);
 
+                // Glyph of Misdirection
+                if (GetId() == 34477 && caster->ToPlayer()->GetPetGUID() == caster->GetMisdirectionTargetGuid() && caster->HasAura(56829))
+                {
+                    caster->ToPlayer()->RemoveSpellCooldown(34477, true);
+                }
                 break;
             case SPELLFAMILY_SHAMAN:
                 switch(GetSpellInfo()->Id)
