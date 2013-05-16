@@ -2487,7 +2487,13 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
         case SPELL_DAMAGE_CLASS_MELEE:
             return checker->MeleeSpellHitResult(victim, spell);
         case SPELL_DAMAGE_CLASS_NONE:
+        {
+            // Warrior Charge
+            if (spell->SpellFamilyName == SPELLFAMILY_WARRIOR && (spell->SpellFamilyFlags[0] & 0x01000000))
+                return checker->MeleeSpellHitResult(victim, spell);
+
             return SPELL_MISS_NONE;
+        }
         case SPELL_DAMAGE_CLASS_MAGIC:
             return checker->MagicSpellHitResult(victim, spell);
     }
