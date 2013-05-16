@@ -2804,10 +2804,13 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
 
         if (m_caster->_IsValidAttackTarget(unit, m_spellInfo))
         {
-            unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
-            //TODO: This is a hack. But we do not know what types of stealth should be interrupted by CC
-            if (m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_AURA_CC) && unit->IsControlledByPlayer() && m_spellInfo->IsBreakingStealth())
-                unit->RemoveAurasByType(SPELL_AURA_MOD_STEALTH, NULL, NULL, 11327);
+            if (m_spellInfo->IsBreakingStealth())
+            {
+                unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
+                //TODO: This is a hack. But we do not know what types of stealth should be interrupted by CC
+                if (m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_AURA_CC) && unit->IsControlledByPlayer())
+                    unit->RemoveAurasByType(SPELL_AURA_MOD_STEALTH, NULL, NULL, 11327);
+            }
         }
         else if (m_caster->IsFriendlyTo(unit))
         {
