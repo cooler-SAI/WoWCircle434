@@ -111,6 +111,13 @@ class spell_mage_cold_snap : public SpellScriptLoader
                 caster->RemoveSpellCooldown(44572, true, true); // Deep Freeze
                 caster->RemoveSpellCooldown(45438, true, true); // Ice Block
                 caster->RemoveSpellCooldown(82676, true, true); // Ring of Frost
+
+                // Frostfire orb cooldown
+                if (caster->GetAuraEffect(SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS, SPELLFAMILY_MAGE, 4650, 1))
+                {
+                    caster->RemoveSpellCooldown(92283, true, true);
+                }
+
                 caster->SendClearCooldownMap(caster);
             }
 
