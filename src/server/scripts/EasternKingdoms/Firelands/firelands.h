@@ -16,6 +16,7 @@ enum Data
     DATA_RAGEFACE               = 8,
     DATA_RHYOLITH_HEALTH_SHARED = 9,
     DATA_EVENT                  = 10,
+    DATA_RAGNAROS_FLOOR         = 11,
 };
 
 enum CreatureIds
@@ -53,9 +54,11 @@ enum GameobjectIds
     GO_RAGNAROS_FLOOR           = 208835,
     GO_STICKY_WEB               = 208877,
     GO_MOLTEN_METEOR            = 208966,
-    GO_FIRE_WALL_FENDRAL        = 208906,
-    GO_CACHE_OF_THE_FIRELORD    = 208967,
-    GO_CACHE_OF_THE_FIRELORD_H  = 209261,
+    GO_FIRE_WALL_FANDRAL_1      = 208906,
+    GO_FIRE_WALL_FANDRAL_2      = 208873,
+    GO_SULFURON_KEEP            = 209073,
+    GO_CACHE_OF_THE_FIRELORD_10 = 208967,
+    GO_CACHE_OF_THE_FIRELORD_25 = 209261,
 };
 
 enum QuestDefines

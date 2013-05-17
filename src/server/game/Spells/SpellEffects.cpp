@@ -356,6 +356,18 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                 switch (m_spellInfo->Id)                     // better way to check unknown
                 {
+                    // Ragnaros (Firelands), Molten Inferno
+                    case 98518:
+                    case 100252:
+                    case 100253:
+                    case 100254:
+                    {
+                        int32 min_dmg = 8000;
+                        float distance = m_caster->GetDistance(unitTarget);
+                        int32 new_dmg = damage - (int32(distance * 4000));
+                        damage = std::max(min_dmg, new_dmg);
+                        break;
+                    }
                     // Shaman, Fire Elemental, Fire Nova
                     case 13376:
                     {

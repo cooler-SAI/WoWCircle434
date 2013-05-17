@@ -1658,6 +1658,10 @@ void AuraEffect::CleanupTriggeredSpells(Unit* target)
             uint32(m_spellInfo->GetDuration()) == m_spellInfo->Effects[GetEffIndex()].Amplitude)
         return;
 
+    // Hack for submerge, Ragnaros (Firelands)
+    if (m_spellInfo->Id == 100051)
+        return;
+
     target->RemoveAurasDueToSpell(tSpellId, GetCasterGUID());
 }
 

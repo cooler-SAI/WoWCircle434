@@ -9200,6 +9200,28 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             case SPELLFAMILY_GENERIC:
                 switch (auraSpellInfo->Id)
                 {
+                    case 99399: // Burning Wound
+                    case 101238:
+                    case 101239:
+                    case 101240:
+                    {
+                        uint8 stacks = triggeredByAura->GetBase()->GetStackAmount();
+                        int32 bp = urand(1950, 2050);
+                        bp *= stacks;
+                        CastCustomSpell(victim, 99400, &bp, NULL, NULL, true, NULL, triggeredByAura);
+                        return true;
+                    }
+                    case 99296: // Combustible, Ragnaros (Firelands)
+                    case 100282:
+                    case 100283:
+                    case 100284:
+                        GetMotionMaster()->MovementExpired(false);
+                        StopMoving();
+                        if (victim)
+                            CastSpell(victim, 99303, true);
+                        if (Creature* pMeteor = ToCreature())
+                            pMeteor->AI()->DoAction(4); // ACTION_COMBUSTION
+                        break;
                     case 79900: // Unstable Shield, Electron
                     case 91447:
                     case 91448:

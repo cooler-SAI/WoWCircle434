@@ -98,6 +98,12 @@ enum Adds
     NPC_MAGMA_CONDUIT   = 54145, // 97699, 98250, 100746
 
     NPC_STALKER         = 45979,
+
+    NPC_LAVA            = 53585,
+    NPC_MOLTEN_ERUPTER  = 53617,
+    NPC_MOLTEN_ERUPTION = 53621,
+    NPC_MOLTEN_SPEWER   = 53445,
+
 };
 
 enum Events

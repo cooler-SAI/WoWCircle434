@@ -1661,6 +1661,9 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     // spell checks
     switch (Id)
     {
+        case 100713: // Deluge, Ragnaros, Firelands
+        case 101015:
+            return (area_id == 5770)? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         case 98226: // Balance Bar, Lord Rhyolith, Firelands
             return (area_id == 5763)? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         case 102668: // Sands of the Hourglass, Murozond, End Time

@@ -162,6 +162,10 @@ class boss_bethtilac : public CreatureScript
 
             void Reset()
             {
+                _Reset();
+                DespawnCreatures(NPC_CINDERWEB_SPINNER);
+                DespawnCreatures(NPC_SPIDERWEB_FILAMENT);
+
                 DoCast(me, SPELL_ZERO_POWER, true);
                 me->SetReactState(REACT_PASSIVE);
                 //me->SetUInt32Value(UNIT_FIELD_BYTES_1, 50331648);
@@ -171,7 +175,6 @@ class boss_bethtilac : public CreatureScript
                 uiSide = 0;
                 me->SetMaxPower(POWER_MANA, 9000);
                 me->SetPower(POWER_MANA, 9000);
-                _Reset();
             }
 
             void EnterCombat(Unit* attacker)
@@ -214,6 +217,8 @@ class boss_bethtilac : public CreatureScript
             void JustDied(Unit* /*killer*/)
             {
                 _JustDied();
+                DespawnCreatures(NPC_CINDERWEB_SPINNER);
+                DespawnCreatures(NPC_SPIDERWEB_FILAMENT);
             }
             
             void UpdateAI(const uint32 diff)
@@ -360,6 +365,19 @@ class boss_bethtilac : public CreatureScript
                 DoMeleeAttackIfReady();
             }
         private:
+
+            void DespawnCreatures(uint32 entry)
+            {
+                std::list<Creature*> creatures;
+                GetCreatureListWithEntryInGrid(creatures, me, entry, 1000.0f);
+
+                if (creatures.empty())
+                   return;
+
+                for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
+                     (*iter)->DespawnOrUnsummon();
+            }
+
             class PlayerPositionCheck
             {
                 public:
@@ -422,7 +440,7 @@ class npc_bethtilac_spiderweb_filament : public CreatureScript
 
                 if (owner->GetEntry() == NPC_BETHTILAC)
                 {
-                    if (Creature* pSpinner = owner->SummonCreature(NPC_CINDERWEB_SPINNER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
+                    if (Creature* pSpinner = me->SummonCreature(NPC_CINDERWEB_SPINNER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
                     {
                         pSpinner->SetCanFly(true);
                         DoCast(pSpinner, SPELL_SPIDERWEB_FILAMENT_ANY, true);
@@ -433,7 +451,7 @@ class npc_bethtilac_spiderweb_filament : public CreatureScript
                         pSpinner->GetMotionMaster()->MovePoint(0, pSpinner->GetPositionX(), pSpinner->GetPositionY(), z + 5.0f); 
                     }
                 }
-                else if (owner->GetEntry() == NPC_CINDERWEB_SPINNER)
+                else if (owner->GetEntry() == NPC_SPIDERWEB_FILAMENT)
                 {
                     DoCast(me, SPELL_SPIDERWEB_FILAMENT_DOWN, true);
                     //float z = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, 100.0f);
@@ -526,7 +544,7 @@ class npc_bethtilac_cinderweb_spinner : public CreatureScript
                 {
                     bTaunted = true;
                     me->SetReactState(REACT_AGGRESSIVE);
-                    if (owner && owner->GetEntry() == NPC_BETHTILAC)
+                    if (owner && owner->GetEntry() == NPC_SPIDERWEB_FILAMENT)
                         if (Creature* pFilament = me->SummonCreature(NPC_SPIDERWEB_FILAMENT, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 15000))
                         {
                             pFilament->SetCanFly(true);
@@ -799,6 +817,9 @@ class npc_bethtilac_engorged_broodling : public CreatureScript
                 if (!bBurst && me->SelectNearestPlayer(3.0f))
                 {
                     bBurst = true;
+                    me->StopMoving();
+                    me->GetMotionMaster()->MovementExpired(false);
+                    me->SetReactState(REACT_PASSIVE);
                     DoCastAOE(SPELL_VOLATILE_BURST);
                     DoCast(me, SPELL_VOLATILE_POISON, true);
                     me->DespawnOrUnsummon(30000);

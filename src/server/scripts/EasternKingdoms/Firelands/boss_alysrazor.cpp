@@ -748,14 +748,14 @@ class boss_alysrazor : public CreatureScript
 
             void DespawnCreatures(uint32 entry)
             {
-            std::list<Creature*> creatures;
-            GetCreatureListWithEntryInGrid(creatures, me, entry, 1000.0f);
+                std::list<Creature*> creatures;
+                GetCreatureListWithEntryInGrid(creatures, me, entry, 1000.0f);
 
-            if (creatures.empty())
-               return;
+                if (creatures.empty())
+                   return;
 
-            for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
-                 (*iter)->DespawnOrUnsummon();
+                for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
+                     (*iter)->DespawnOrUnsummon();
             }
         };
 }; 
@@ -1385,8 +1385,6 @@ class npc_alysrazor_voracious_hatchling : public CreatureScript // 53509
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
-                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
                 pInstance = me->GetInstanceScript();
                 bDespawn = false;
             }
@@ -1407,6 +1405,8 @@ class npc_alysrazor_voracious_hatchling : public CreatureScript // 53509
                     events.ScheduleEvent(EVENT_HUNGRY, 9000);
                     events.ScheduleEvent(EVENT_GUSHING_WOUND, 15000);
                 }
+                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
             }
 
             void UpdateAI(const uint32 diff)

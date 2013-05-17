@@ -13,6 +13,9 @@ static const DoorData doordata[] =
     {GO_RAID_BRIDGE_FORMING, DATA_BALEROC,   DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
     {GO_STICKY_WEB,          DATA_BETHTILAC, DOOR_TYPE_ROOM,        BOUNDARY_NONE},
     {GO_BRIDGE_OF_RHYOLITH,  DATA_RHYOLITH,  DOOR_TYPE_SPAWN_HOLE,  BOUNDARY_NONE},
+    {GO_FIRE_WALL_FANDRAL_1, DATA_STAGHELM,  DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
+    {GO_FIRE_WALL_FANDRAL_2, DATA_STAGHELM,  DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
+    {GO_SULFURON_KEEP,       DATA_RAGNAROS,  DOOR_TYPE_ROOM,        BOUNDARY_NONE},
     {0, 0, DOOR_TYPE_ROOM, BOUNDARY_NONE},
 };
 
@@ -35,7 +38,12 @@ class instance_firelands : public InstanceMapScript
                 uiShannoxGUID = 0;
                 uiRiplimbGUID = 0;
                 uiRagefaceGUID = 0;
+                uiRhyolithGUID = 0;
+                uiRagnarosGUID = 0;
                 uiRhyolithHealth = 0;
+                uiRagnarosFloor = 0;
+                uiRagnarosCache10 = 0;
+                uiRagnarosCache25 = 0;
                 uiTimer = 0;
                 bEvent = false;
                 creaturePortals.clear();
@@ -69,6 +77,12 @@ class instance_firelands : public InstanceMapScript
                             pCreature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_SPELLCLICK);
                         }
                         break;
+                    case NPC_RHYOLITH:
+                        uiRhyolithGUID = pCreature->GetGUID();
+                        break;
+                    case NPC_RAGNAROS:
+                        uiRagnarosGUID = pCreature->GetGUID();
+                        break;
                     default:
                         break;
                 }
@@ -82,12 +96,24 @@ class instance_firelands : public InstanceMapScript
                     case GO_STICKY_WEB:
                     case GO_RAID_BRIDGE_FORMING:
                     case GO_BRIDGE_OF_RHYOLITH:
+                    case GO_FIRE_WALL_FANDRAL_1:
+                    case GO_FIRE_WALL_FANDRAL_2:
+                    case GO_SULFURON_KEEP:
                         AddDoor(pGo, true);
+                        break;
+                    case GO_RAGNAROS_FLOOR:
+                        uiRagnarosFloor = pGo->GetGUID();
                         break;
                     case GO_CIRCLE_OF_THORNS_PORTAL3:
                         gameobjectPortals.push_back(pGo);
                         if (uiEvent == DONE)
                             HandleGameObject(pGo->GetGUID(), true, pGo);
+                        break;
+                    case GO_CACHE_OF_THE_FIRELORD_10:
+                        uiRagnarosCache10 = pGo->GetGUID();
+                        break;
+                    case GO_CACHE_OF_THE_FIRELORD_25:
+                        uiRagnarosCache25 = pGo->GetGUID();
                         break;
                 }
 		    }
@@ -139,6 +165,9 @@ class instance_firelands : public InstanceMapScript
                     case DATA_SHANNOX: return uiShannoxGUID;
                     case DATA_RIPLIMB: return uiRiplimbGUID;
                     case DATA_RAGEFACE: return uiRagefaceGUID;
+                    case DATA_RHYOLITH: return uiRhyolithGUID;
+                    case DATA_RAGNAROS: return uiRagnarosGUID;
+                    case DATA_RAGNAROS_FLOOR: return uiRagnarosFloor;
                     default: return 0;
                 }
                 return 0;
@@ -148,6 +177,14 @@ class instance_firelands : public InstanceMapScript
             {
 			    if (!InstanceScript::SetBossState(type, state))
 				    return false;
+
+                if (type == DATA_RAGNAROS)
+                {
+                    //if (instance->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL)
+                    //    DoRespawnGameObject(uiRagnarosCache10, DAY);
+                    //else if (instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL)
+                    //    DoRespawnGameObject(uiRagnarosCache25, DAY);
+                }
 
 			    return true;
             }
@@ -242,6 +279,11 @@ class instance_firelands : public InstanceMapScript
                 uint64 uiShannoxGUID;
                 uint64 uiRiplimbGUID;
                 uint64 uiRagefaceGUID;
+                uint64 uiRagnarosGUID;
+                uint64 uiRhyolithGUID;
+                uint64 uiRagnarosFloor;
+                uint64 uiRagnarosCache10;
+                uint64 uiRagnarosCache25;
                 std::list<GameObject*> gameobjectPortals;
                 std::list<Creature*> creaturePortals;
         };

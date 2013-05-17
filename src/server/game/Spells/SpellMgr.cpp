@@ -5258,6 +5258,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 100890:
             case 100891:
             case 100892:
+                spellInfo->AttributesEx3 &= ~SPELL_ATTR5_DONT_TURN_DURING_CAST;
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
             case 98708: // Sulfuras Smash
@@ -5274,8 +5275,88 @@ void SpellMgr::LoadDbcDataCorrections()
             case 101102: // Lavalogged
                 spellInfo->ExcludeTargetAuraSpell = 101102;
                 break;
-            case 99012: // Splitting Blow
+            // Splitting Blow
+            case 98951: case 100883: case 100884: case 100885: 
+            case 98952: case 100877: case 100878: case 100879:
+            case 98953: case 100880: case 100881: case 100882:
+                spellInfo->AttributesEx3 &= ~SPELL_ATTR5_DONT_TURN_DURING_CAST;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            case 99012: // Splitting Blow script
                 spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+                break;
+            case 98497: // Molten Seed aoe 2
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
+            case 98498: // Molten Seed dmg
+            case 100579:
+            case 100589:
+            case 100581:
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
+                break;
+            case 100158: // Molten Power
+            case 100302:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 99125: // Blazing Heat dummy
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
+            case 99129: // Blazing Heat summon
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
+            case 99267: // Living Meteor aoe 1
+            case 101387:
+            case 101388:
+            case 101389:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+                break;
+            case 100249: // Combustion
+            case 100250:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            case 100171: // World in Flame
+            case 100190:
+                spellInfo->SetDurationIndex(566); // 8 seconds
+                break;
+            case 98981: // Lava Bolt
+            case 100290:
+                spellInfo->MaxAffectedTargets = 4;
+                break;
+            case 100289:
+            case 100291:
+                spellInfo->MaxAffectedTargets = 10;
+                break;
+            case 100476: // Breadth of Frost summon
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->SetDurationIndex(23);
+                break;
+            case 100567: // Breadth of Frost dmg
+                spellInfo->ExcludeTargetAuraSpell = 100567;
+                break;
+            case 100679: // Dreadflame summon
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                break;
+            case 100714: // Cloudburst missile
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                break;
+            case 100644: // Entrapping Roots summon
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->SetDurationIndex(23);
+                break;
+            case 100653: // Entrapping Roots dmg
+                spellInfo->ExcludeTargetAuraSpell = 100653;
+                break;
+            case 101237: // Entrapping Roots dmg
+                spellInfo->ExcludeTargetAuraSpell = 101237;
+                break;
+            case 100777: // Magma Geyser
+            case 100822:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ENEMY;
                 break;
             // ENDOF FIRELANDS
             // BASTION OF TWILIGHT SPELLS
