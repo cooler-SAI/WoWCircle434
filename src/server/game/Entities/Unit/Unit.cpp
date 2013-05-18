@@ -9632,6 +9632,13 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Combat Potency
+        case 35541:
+        case 35550:
+        case 35551:
+            if (!procSpell & !(procFlags & PROC_FLAG_DONE_OFFHAND_ATTACK))
+                return false;
+            break;
         // Burnout, Alysrazor
         case 99432:
             if (!victim)
