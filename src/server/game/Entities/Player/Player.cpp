@@ -5921,6 +5921,7 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
             ApplyAttackTimePercentMod(OFF_ATTACK, newchange, true);
             float haste_regen = 1.0f / (1.0f + newchange / 100.0f);
             SetFloatValue(PLAYER_FIELD_MOD_HASTE_REGEN, haste_regen);
+            UpdateAllRunesRegen();
             break;
         }
         case CR_HASTE_RANGED:
@@ -5932,6 +5933,7 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
             ApplyAttackTimePercentMod(RANGED_ATTACK, newchange, true);
             UpdateFocusRegen();
             UpdateEnergyRegen();
+            UpdateAllRunesRegen();
             float haste_regen = 1.0f / (1.0f + newchange / 100.0f);
             SetFloatValue(PLAYER_FIELD_MOD_HASTE_REGEN, haste_regen);
             break;
