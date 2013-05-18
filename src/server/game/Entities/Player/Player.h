@@ -2481,7 +2481,7 @@ class Player : public Unit, public GridObject<Player>
 
         void SendLoot(uint64 guid, LootType loot_type);
         void SendLootRelease(uint64 guid);
-        void SendNotifyLootItemRemoved(uint8 lootSlot);
+        void SendNotifyLootItemRemoved(uint8 lootSlot, bool currency = false);
         void SendNotifyLootMoneyRemoved();
 
         /*********************************************************/
@@ -2792,8 +2792,7 @@ class Player : public Unit, public GridObject<Player>
         bool IsPointInZone(const ResearchPOIPoint &test, const ResearchPOIPoints &polygon);
         uint16 GetResearchSiteID();
         uint32 GetSurveyBotEntry(float &orientation);
-        bool CanResearchWithLevel(uint32 POIid);
-        uint8 CanResearchWithSkillLevel(uint32 POIid);
+        uint8 CanResearchWithLevel(uint32 POIid);
         ResearchSiteEntry const* GetResearchSiteEntryById(uint32 id);
         bool GenerateDigitLoot(uint16 zoneid, DigitSite &site);
         bool IsCompletedProject(uint32 id);

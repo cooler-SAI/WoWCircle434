@@ -8938,9 +8938,9 @@ void Player::SendNotifyLootMoneyRemoved()
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendNotifyLootItemRemoved(uint8 lootSlot)
+void Player::SendNotifyLootItemRemoved(uint8 lootSlot, bool currency)
 {
-    WorldPacket data(SMSG_LOOT_REMOVED, 1);
+    WorldPacket data(currency ? SMSG_CURRENCY_LOOT_REMOVED : SMSG_LOOT_REMOVED, 1);
     data << uint8(lootSlot);
     GetSession()->SendPacket(&data);
 }
@@ -14684,7 +14684,8 @@ bool Player::CanRewardQuest(Quest const* quest, uint32 reward, bool msg)
                 ItemPosCountVec dest;
                 InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, quest->RewardItemId[i], quest->RewardItemIdCount[i]);
                 if (res != EQUIP_ERR_OK)
-                {
+                
+{
                     SendEquipError(res, NULL, NULL, quest->RewardItemId[i]);
                     return false;
                 }
@@ -14909,7 +14910,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
         AddQuestRewardedTalentCount(talents);
         InitTalentForLevel();
     }
-
+     
     // currencies reward
     for (uint32 i = 0; i < QUEST_REWARD_CURRENCY_COUNT; i++)
     {
@@ -14973,6 +14974,8 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, quest->GetQuestId());
     UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_GUILD, 1);
     
+    UpdateForQuestWorldObjects();
+
     //lets remove flag for delayed teleports
     SetCanDelayTeleport(false);
 }
@@ -23821,8 +23824,9 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
     QuestItem* qitem = NULL;
     QuestItem* ffaitem = NULL;
     QuestItem* conditem = NULL;
+    QuestItem* currency = NULL;
 
-    LootItem* item = loot->LootItemInSlot(lootSlot, this, &qitem, &ffaitem, &conditem);
+    LootItem* item = loot->LootItemInSlot(lootSlot, this, &qitem, &ffaitem, &conditem, &currency);
 
     if (!item)
     {
@@ -23834,6 +23838,17 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
     if (!qitem && item->is_blocked)
     {
         SendLootRelease(GetLootGUID());
+        return;
+    }
+
+    if (currency)
+    {
+        if (CurrencyTypesEntry const * currencyEntry = sCurrencyTypesStore.LookupEntry(item->itemid))
+            ModifyCurrency(item->itemid, int32(item->count * currencyEntry->GetPrecision()));
+
+        SendNotifyLootItemRemoved(lootSlot, true);
+        currency->is_looted = true;
+        --loot->unlootedCount;
         return;
     }
 

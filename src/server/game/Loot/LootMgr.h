@@ -72,6 +72,12 @@ enum PermissionTypes
     NONE_PERMISSION             = 5
 };
 
+enum LootItemType
+{
+    LOOT_ITEM_TYPE_ITEM     = 0,
+    LOOT_ITEM_TYPE_CURRENCY = 1,
+};
+
 enum LootType
 {
     LOOT_CORPSE                 = 1,
@@ -103,6 +109,7 @@ class LootStore;
 struct LootStoreItem
 {
     uint32  itemid;                                         // id of the item
+    uint8   type;                                           // 0 = item, 1 = currency
     float   chance;                                         // always positive, chance to drop for both quest and non-quest items, chance to be used for refs
     int32   mincountOrRef;                                  // mincount for drop items (positive) or minus referenced TemplateleId (negative)
     uint16  lootmode;
@@ -113,8 +120,8 @@ struct LootStoreItem
 
     // Constructor, converting ChanceOrQuestChance -> (chance, needs_quest)
     // displayid is filled in IsValid() which must be called after
-    LootStoreItem(uint32 _itemid, float _chanceOrQuestChance, uint16 _lootmode, uint8 _group, int32 _mincountOrRef, uint8 _maxcount)
-        : itemid(_itemid), chance(fabs(_chanceOrQuestChance)), mincountOrRef(_mincountOrRef), lootmode(_lootmode),
+    LootStoreItem(uint32 _itemid, uint8 _type, float _chanceOrQuestChance, uint16 _lootmode, uint8 _group, int32 _mincountOrRef, uint8 _maxcount)
+        : itemid(_itemid), type(_type), chance(fabs(_chanceOrQuestChance)), mincountOrRef(_mincountOrRef), lootmode(_lootmode),
         group(_group), needs_quest(_chanceOrQuestChance < 0), maxcount(_maxcount)
          {}
 
@@ -128,11 +135,13 @@ typedef std::set<uint32> AllowedLooterSet;
 struct LootItem
 {
     uint32  itemid;
+    uint8   type;                                           // 0 = item, 1 = currency
     uint32  randomSuffix;
     int32   randomPropertyId;
     ConditionList conditions;                               // additional loot condition
     AllowedLooterSet allowedGUIDs;
     uint8   count             : 8;
+    bool    currency          : 1;
     bool    is_looted         : 1;
     bool    is_blocked        : 1;
     bool    freeforall        : 1;                          // free for all
@@ -275,9 +284,10 @@ struct Loot
 {
     friend ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv);
 
+    QuestItemMap const& GetPlayerCurrencies() const { return PlayerCurrencies; }
     QuestItemMap const& GetPlayerQuestItems() const { return PlayerQuestItems; }
     QuestItemMap const& GetPlayerFFAItems() const { return PlayerFFAItems; }
-    QuestItemMap const& GetPlayerNonQuestNonFFAConditionalItems() const { return PlayerNonQuestNonFFAConditionalItems; }
+    QuestItemMap const& GetPlayerNonQuestNonFFANonCurrencyConditionalItems() const { return PlayerNonQuestNonFFANonCurrencyConditionalItems; }
 
     std::vector<LootItem> items;
     std::vector<LootItem> quest_items;
@@ -298,6 +308,10 @@ struct Loot
     // void clear();
     void clear()
     {
+        for (QuestItemMap::const_iterator itr = PlayerCurrencies.begin(); itr != PlayerCurrencies.end(); ++itr)
+                delete itr->second;
+        PlayerCurrencies.clear();
+
         for (QuestItemMap::const_iterator itr = PlayerQuestItems.begin(); itr != PlayerQuestItems.end(); ++itr)
             delete itr->second;
         PlayerQuestItems.clear();
@@ -306,9 +320,9 @@ struct Loot
             delete itr->second;
         PlayerFFAItems.clear();
 
-        for (QuestItemMap::const_iterator itr = PlayerNonQuestNonFFAConditionalItems.begin(); itr != PlayerNonQuestNonFFAConditionalItems.end(); ++itr)
+        for (QuestItemMap::const_iterator itr = PlayerNonQuestNonFFANonCurrencyConditionalItems.begin(); itr != PlayerNonQuestNonFFANonCurrencyConditionalItems.end(); ++itr)
             delete itr->second;
-        PlayerNonQuestNonFFAConditionalItems.clear();
+        PlayerNonQuestNonFFANonCurrencyConditionalItems.clear();
 
         PlayersLooting.clear();
         items.clear();
@@ -334,21 +348,23 @@ struct Loot
     // Inserts the item into the loot (called by LootTemplate processors)
     void AddItem(LootStoreItem const & item);
 
-    LootItem* LootItemInSlot(uint32 lootslot, Player* player, QuestItem** qitem = NULL, QuestItem** ffaitem = NULL, QuestItem** conditem = NULL);
+    LootItem* LootItemInSlot(uint32 lootslot, Player* player, QuestItem** qitem = NULL, QuestItem** ffaitem = NULL, QuestItem** conditem = NULL, QuestItem** currency = NULL);
     uint32 GetMaxSlotInLootFor(Player* player) const;
     bool hasItemFor(Player* player) const;
     bool hasOverThresholdItem() const;
 
     private:
         void FillNotNormalLootFor(Player* player, bool presentAtLooting);
+        QuestItemList* FillCurrencyLoot(Player* player);
         QuestItemList* FillFFALoot(Player* player);
         QuestItemList* FillQuestLoot(Player* player);
-        QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player, bool presentAtLooting);
+        QuestItemList* FillNonQuestNonFFANonCurrencyConditionalLoot(Player* player, bool presentAtLooting);
 
         std::set<uint64> PlayersLooting;
+        QuestItemMap PlayerCurrencies;
         QuestItemMap PlayerQuestItems;
         QuestItemMap PlayerFFAItems;
-        QuestItemMap PlayerNonQuestNonFFAConditionalItems;
+        QuestItemMap PlayerNonQuestNonFFANonCurrencyConditionalItems;
 
         // All rolls are registered here. They need to know, when the loot is not valid anymore
         LootValidatorRefManager i_LootValidatorRefManager;
