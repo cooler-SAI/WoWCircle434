@@ -1,0 +1,1 @@
+UPDATE `game_event` SET `length`=64800 WHERE `eventEntry`=10;
