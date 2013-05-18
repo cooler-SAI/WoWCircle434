@@ -1243,6 +1243,7 @@ void Battleground::AddOrSetPlayerToCorrectBgGroup(Player* player, uint32 team)
                 {
                     group->ChangeLeader(playerGuid);
                     group->SendUpdate();
+                    group->SendRaidMarkerUpdateToPlayer(playerGuid);
                 }
         }
     }

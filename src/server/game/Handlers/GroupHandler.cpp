@@ -406,6 +406,21 @@ void WorldSession::HandleGroupInviteResponseOpcode(WorldPacket& recvData)
     }
 }
 
+void WorldSession::HandleGroupClearMarker(WorldPacket& recv_data)
+{
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_CLEAR_RAID_MARKER");
+
+    uint8 marker;
+    recv_data >> marker;
+
+    if (Group* group = GetPlayer()->GetGroup())
+    {
+        group->RemoveGroupMarkerMask(1 << marker);
+        group->SendRaidMarkerUpdate();
+        group->RemoveMarker();
+    }
+}
+
 void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GROUP_UNINVITE_GUID");
