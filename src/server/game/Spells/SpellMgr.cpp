@@ -4099,6 +4099,14 @@ void SpellMgr::LoadDbcDataCorrections()
             case 104994: // Blade Dance dmg
                 spellInfo->Effects[0].SetRadiusIndex(17);
                 break;
+            case 105726: // Blade Dance charge
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+                break;
+            case 105784: // Blade Dance aura 1
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
+                break;
             // ENDOF BARADIN HOLD SPELLS
             //
             // THE STONECORE SPELLS
@@ -6720,7 +6728,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 57472:
             case 57470:
                 spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00001C00, 0x00010000, 0x0);
-                break; 
+                break;
             default:
                 break;
         }
