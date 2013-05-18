@@ -3599,31 +3599,31 @@ class npc_frostfire_orb: public CreatureScript
 
 class npc_power_word_barrier : public CreatureScript
 {
-public:
-    npc_power_word_barrier() : CreatureScript("npc_power_word_barrier") { }
+    public:
+        npc_power_word_barrier() : CreatureScript("npc_power_word_barrier") { }
 
-    struct npc_power_word_barrierAI : public ScriptedAI
-    {
-        npc_power_word_barrierAI(Creature *pCreature) : ScriptedAI(pCreature) {}
-
-        void Reset()
+        CreatureAI* GetAI(Creature* pCreature) const
         {
-            DoCast(me, 81781, true);
+            return new npc_power_word_barrierAI(pCreature);
         }
 
-        void InitializeAI()
+        struct npc_power_word_barrierAI : public Scripted_NoMovementAI
         {
-            ScriptedAI::InitializeAI();
-            me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        }
-    };
+            npc_power_word_barrierAI(Creature *pCreature) : Scripted_NoMovementAI(pCreature) 
+            {
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                me->SetReactState(REACT_PASSIVE);
+            }
 
-    CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new npc_power_word_barrierAI(pCreature);
-    }
+            void IsSummonedBy(Unit* /*owner*/)
+            {
+                DoCast(me, 81781);
+            }
+
+            void EnterEvadeMode() { }
+
+            void UpdateAI(const uint32 diff) { }
+        };
 };
 
 class npc_wild_mushroom : public CreatureScript

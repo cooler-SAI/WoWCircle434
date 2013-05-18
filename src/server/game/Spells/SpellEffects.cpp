@@ -369,7 +369,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         break;
                     }
                     // Shaman, Fire Elemental, Fire Nova
-                    case 13376:
+                    case 12470:
                     {
                         if (Unit* owner = m_caster->GetOwner())
                         {
@@ -379,7 +379,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         break;
                     }
                     // Shaman, Fire Elemental, Fire Shield
-                    case 12740:
+                    case 13376:
                     {
                         if (Unit* owner = m_caster->GetOwner())
                         {

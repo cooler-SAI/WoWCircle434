@@ -2949,6 +2949,8 @@ void SpellMgr::LoadSpellCustomAttr()
             case 100212: // Flame Scythe
             case 100213: // Flame Scythe
             case 100214: // Flame Scythe
+            case 105069: // Seething Hate
+            case 108094: // Seething Hate
                 // ONLY SPELLS WITH SPELLFAMILY_GENERIC and EFFECT_SCHOOL_DAMAGE
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 break;
@@ -6728,6 +6730,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 57472:
             case 57470:
                 spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00001C00, 0x00010000, 0x0);
+                break;
+                // Power Word: Barrier summon
+            case 98888:
+                spellInfo->Effects[EFFECT_0].MiscValueB = 64;
                 break;
             default:
                 break;
