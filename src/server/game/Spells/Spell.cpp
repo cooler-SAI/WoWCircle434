@@ -4997,6 +4997,7 @@ void Spell::TakeRunePower(bool didHit)
     m_runesState = player->GetRunesState();                 // store previous state
 
     int32 runeCost[NUM_RUNE_TYPES];                         // blood, frost, unholy, death
+    SpellSchools school = GetFirstSchoolInMask(m_spellSchoolMask);
 
     for (uint32 i = 0; i < RUNE_DEATH; ++i)
     {
@@ -5004,6 +5005,11 @@ void Spell::TakeRunePower(bool didHit)
         if (Player* modOwner = m_caster->GetSpellModOwner())
         {
             modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, runeCost[i], this);
+
+            // PCT mod from user auras by school
+            runeCost[i] = int32(runeCost[i] * (1.0f + m_caster->GetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER + school)));
+            if (runeCost[i] < 0)
+                runeCost[i] = 0;
 
             if (runeCost[i] < 0)
                 runeCost[i] = 0;
