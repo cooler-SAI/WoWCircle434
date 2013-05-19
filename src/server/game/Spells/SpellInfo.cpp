@@ -2384,6 +2384,21 @@ uint32 SpellInfo::GetRecoveryTime() const
     return RecoveryTime > CategoryRecoveryTime ? RecoveryTime : CategoryRecoveryTime;
 }
 
+uint32 SpellInfo::GetStackAmount(Unit *caster) const
+{
+    // Scent of Blood
+    if (Id == 50421)
+    {
+        if (caster->HasAura(49004))
+            return 1;
+        else if (caster->HasAura(49508))
+            return 2;
+        else if (caster->HasAura(49509))
+            return 3;
+    }
+    return StackAmount;
+}
+
 int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) const
 {
     // Spell drain all exist power on cast (Only paladin lay of Hands)

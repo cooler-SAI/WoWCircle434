@@ -531,6 +531,7 @@ public:
 
     uint32 CalcCastTime(Unit* caster = NULL, Spell* spell = NULL) const;
     uint32 GetRecoveryTime() const;
+    uint32 GetStackAmount(Unit *caster) const;
 
     int32 CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) const;
 
