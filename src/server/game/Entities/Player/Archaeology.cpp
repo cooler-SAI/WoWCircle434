@@ -1,5 +1,5 @@
-
 #include "Player.h"
+#include "Containers.h"
 
 #define MAX_RESEARCH_SITES                      16
 #define MAX_RESEARCH_PROJECTS                   9
@@ -290,7 +290,7 @@ void Player::ShowResearchSites()
         uint32 id = (*itr);
         ResearchSiteEntry const* rs = GetResearchSiteEntryById(id);
 
-        if (!rs || CanResearchWithSkillLevel(rs->POIid) == 2)
+        if (!rs || CanResearchWithLevel(rs->POIid) == 2)
             id = 0;
 
         if (count % 2 == 1)
@@ -332,61 +332,61 @@ void Player::ShowResearchProjects()
     }
 }
 
-bool Player::CanResearchWithLevel(uint32 POIid)
+uint8 Player::CanResearchWithLevel(uint32 POIid)
 {
-    if (!GetSkillValue(SKILL_ARCHAEOLOGY))
-        return false;
-
-    ResearchZoneVector const& zone = sObjectMgr->GetResearchZones();
-    for (ResearchZoneVector::const_iterator itr = zone.begin(); itr != zone.end(); ++itr)
-    {
-        if ((*itr).POIid == POIid)
-            return getLevel() + 19 >= (*itr).level;
-    }
-    return true;
-}
-
-uint8 Player::CanResearchWithSkillLevel(uint32 POIid)
-{
-    uint16 skill_now = GetSkillValue(SKILL_ARCHAEOLOGY);
+    uint32 skill_now = GetSkillValue(SKILL_ARCHAEOLOGY);
     if (!skill_now)
         return 0;
 
     ResearchZoneVector const& zone = sObjectMgr->GetResearchZones();
     for (ResearchZoneVector::const_iterator itr = zone.begin(); itr != zone.end(); ++itr)
     {
-        ResearchZoneEntry entry = (*itr);
-        if (entry.POIid != POIid)
-            continue;
-
-        uint16 skill_cap = 0;
-        switch (entry.map)
+        if ((*itr).POIid == POIid)
         {
-        case 0:
-            if (entry.zone == 4922) // Twilight Hightlands
-                skill_cap = 450;
-            break;
-        case 1:
-            if (entry.zone == 616) // Hidjal
-                skill_cap = 450;
-            else if (entry.zone == 5034) // Uldum
-                skill_cap = 450;
-            break;
-        case 530:
-            skill_cap = 275; // Outland
-            break;
-        case 571:
-            skill_cap = 350; // Northrend
-            break;
-        }
+            uint8 cur_level = getLevel();
 
-        if (skill_now >= skill_cap)
-            return 1;
-        else if (entry.map == 530 || entry.map == 571)
-            return 2;
-        else
-            return 0;
+            // Check for map level
+            if (cur_level + 19 < (*itr).level)
+                return 0;
+
+            // Check for outland level
+            if ((*itr).map == 530 && cur_level < 58)
+                return 2;
+
+            // Check for northrend level
+            if ((*itr).map == 571 && cur_level < 68)
+                return 2;
+
+            // Check for skill level
+            uint16 skill_cap = 0;
+            switch ((*itr).map)
+            {
+                case 0:
+                    if ((*itr).zone == 4922) // Twilight Hightlands
+                        skill_cap = 450;
+                    break;
+                case 1:
+                    if ((*itr).zone == 616) // Hyjal
+                        skill_cap = 450;
+                    else if ((*itr).zone == 5034) // Uldum
+                        skill_cap = 450;
+                    break;
+                case 530:
+                    skill_cap = 275; // Outland
+                    break;
+                case 571:
+                    skill_cap = 350; // Northrend
+                    break;
+            }
+
+            if (skill_now >= skill_cap)
+                return 1;
+            else if ((*itr).map == 530 || (*itr).map == 571)
+                return 2;
+            else return 0;
+        }
     }
+    // If get there, so POIid is wrong
     return 0;
 }
 
@@ -410,22 +410,13 @@ void Player::GenerateResearchSiteInMap(uint32 mapId)
     SiteSet tempSites;
 
     for (std::set<ResearchSiteEntry const*>::const_iterator itr = sResearchSiteSet.begin(); itr != sResearchSiteSet.end(); ++itr)
-    {
-        ResearchSiteEntry const* entry = (*itr);
-        if (!HasResearchSite(entry->ID)
-            && entry->mapId == mapId
-            && CanResearchWithLevel(entry->POIid)
-            && CanResearchWithSkillLevel(entry->POIid))
-            tempSites.insert(entry->ID);
-    }
+        if (!HasResearchSite((*itr)->ID) && (*itr)->mapId == mapId && CanResearchWithLevel((*itr)->POIid))
+            tempSites.insert((*itr)->ID);
 
     if (tempSites.empty())
         return;
 
-    SiteSet::const_iterator entry = tempSites.begin();
-    std::advance(entry, urand(0, tempSites.size() - 1));
-
-    _researchSites.insert((*entry));
+    _researchSites.insert(Trinity::Containers::SelectRandomContainerElement(tempSites));
     _archaeologyChanged = true;
 
     ShowResearchSites();
@@ -440,11 +431,8 @@ void Player::GenerateResearchSites()
 
     Sites tempSites;
     for (std::set<ResearchSiteEntry const*>::const_iterator itr = sResearchSiteSet.begin(); itr != sResearchSiteSet.end(); ++itr)
-    {
-        ResearchSiteEntry const* entry = (*itr);
-        if (CanResearchWithLevel(entry->POIid) && CanResearchWithSkillLevel(entry->POIid))
-            tempSites[entry->mapId].insert(entry->ID);
-    }
+        if (CanResearchWithLevel((*itr)->POIid))
+            tempSites[(*itr)->mapId].insert((*itr)->ID);
 
     uint16 const* map = _mapIds;
     do
@@ -565,10 +553,7 @@ bool Player::SolveResearchProject(uint32 spellId)
         }
     }
 
-    ProjectSet::const_iterator itr = tempProjects.begin();
-    std::advance(itr, urand(0, tempProjects.size() - 1));
-
-    _researchProjects.insert((*itr));
+    _researchProjects.insert(Trinity::Containers::SelectRandomContainerElement(tempProjects));
     _archaeologyChanged = true;
 
     ShowResearchProjects();
@@ -580,13 +565,8 @@ bool Player::IsCompletedProject(uint32 id)
     if (_completedProjects.empty())
         return false;
 
-    for (CompletedProjectSet::const_iterator itr = _completedProjects.begin(); itr != _completedProjects.end(); ++itr)
-    {
-        if (id == (*itr))
-            return true;
-    }
-
-    return false;
+    CompletedProjectSet::const_iterator itr = _completedProjects.find(id);
+    return (itr != _completedProjects.end()); 
 }
 
 void Player::SaveArchaeology(SQLTransaction& trans)

@@ -134,7 +134,10 @@ void WorldSession::HandleArcheologyRequestHistory(WorldPacket& recvPacket)
 
     if (count > 0)
         for (std::set<uint32>::const_iterator itr = GetPlayer()->_completedProjects.begin(); itr != GetPlayer()->_completedProjects.end(); ++itr)
-            data << uint32 (0) << uint32(1) << uint32((*itr)); // dword order : raceID,count,projectID
+        {
+            if (ResearchProjectEntry const* project = sResearchProjectStore.LookupEntry((*itr)))
+                    data << uint32 (project->branchId) << uint32(1) << uint32((*itr)); // dword order : raceID,count,projectID
+        }
 
     SendPacket(&data);
 }
