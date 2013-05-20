@@ -2717,7 +2717,7 @@ void Spell::EffectCreateItem(SpellEffIndex effIndex)
         return;
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->IsAbilityOfSkillType(SKILL_ARCHAEOLOGY))
-        if (!m_caster->ToPlayer()->SolveResearchProject(m_spellInfo->Id))
+        if (!m_caster->ToPlayer()->GetArchaeologyMgr().SolveResearchProject(m_spellInfo->ResearchProject))
             return;
 
     DoCreateItem(effIndex, m_spellInfo->Effects[effIndex].ItemType);
@@ -3793,8 +3793,8 @@ void Spell::EffectLearnSkill(SpellEffIndex effIndex)
     // Archaeology
     if (skillid == SKILL_ARCHAEOLOGY)
     {
-        unitTarget->ToPlayer()->GenerateResearchSites();
-        unitTarget->ToPlayer()->GenerateResearchProjects();
+        unitTarget->ToPlayer()->GetArchaeologyMgr().GenerateResearchSites();
+        unitTarget->ToPlayer()->GetArchaeologyMgr().GenerateResearchProjects();
     }
 }
 
@@ -6314,7 +6314,7 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
     if (m_spellInfo->Id == 80451)
     {
         if (m_caster->ToPlayer())
-            go_id = m_caster->ToPlayer()->GetSurveyBotEntry(o);
+            go_id = m_caster->ToPlayer()->GetArchaeologyMgr().GetSurveyBotEntry(o);
 
         duration = 15000;
     }

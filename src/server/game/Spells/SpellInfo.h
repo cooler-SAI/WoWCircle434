@@ -411,6 +411,7 @@ public:
     SpellEffectInfo Effects[MAX_SPELL_EFFECTS];
     uint32 ExplicitTargetMask;
     SpellChainNode const* ChainEntry;
+    uint32 ResearchProject;
 
     // struct access functions
     SpellTargetRestrictionsEntry const* GetSpellTargetRestrictions() const;

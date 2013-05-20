@@ -8923,7 +8923,7 @@ VehicleAccessoryList const* ObjectMgr::GetVehicleAccessoryList(Vehicle* veh) con
 
 void ObjectMgr::LoadResearchSiteZones()
 {
-    QueryResult result = WorldDatabase.Query("SELECT id, position_x, position_y, map, zone FROM research_site");
+    QueryResult result = WorldDatabase.Query("SELECT id, position_x, position_y, zone FROM research_site");
     if (!result)
     {
         sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 research site zones. DB table `research_site` is empty.");
@@ -8936,14 +8936,28 @@ void ObjectMgr::LoadResearchSiteZones()
     {
         Field *fields = result->Fetch();
 
-        ResearchZoneEntry ptr;
-        ptr.POIid = fields[0].GetUInt32();
-        ptr.x = fields[1].GetInt32();
-        ptr.y = fields[2].GetInt32();
-        ptr.map = fields[3].GetUInt16();
-        ptr.zone = fields[4].GetUInt16();
-        ptr.level = 0;
+        uint32 siteId = 0;
+        uint32 mapId = 0;
+        uint32 POIid = fields[0].GetUInt32();
+        uint32 zoneId = fields[3].GetUInt16();
 
+        bool bFound = false;
+        for (std::set<ResearchSiteEntry const*>::const_iterator itr = sResearchSiteSet.begin(); itr != sResearchSiteSet.end(); ++itr)
+            if ((*itr)->POIid == POIid)
+            {
+                bFound = true;
+                siteId = (*itr)->ID;
+                mapId = (*itr)->mapId;
+                break;
+            }
+        if (!bFound)
+            continue;
+
+        ResearchZoneEntry &ptr = _researchZoneMap[siteId];
+        ptr.coords.push_back(ResearchPOIPoint(fields[1].GetInt32(), fields[2].GetInt32()));
+        ptr.map = mapId;
+        ptr.zone = zoneId;
+        ptr.level = 0;
         for (uint32 i = 0; i < sAreaStore.GetNumRows(); ++i)
         {
             AreaTableEntry const* area = sAreaStore.LookupEntry(i);
@@ -8956,8 +8970,6 @@ void ObjectMgr::LoadResearchSiteZones()
                 break;
             }
         }
-        _researchZones.push_back(ptr);
-
         ++counter;
     }
     while (result->NextRow());

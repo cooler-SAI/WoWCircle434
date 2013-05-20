@@ -1021,6 +1021,8 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effe
         Totem[i] = _totem ? _totem->Totem[i] : 0;
 
     ChainEntry = NULL;
+
+    ResearchProject =  spellEntry->ResearchProject;
 }
 
 SpellInfo::~SpellInfo()

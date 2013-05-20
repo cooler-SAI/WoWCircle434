@@ -610,11 +610,17 @@ struct GuildChallengeReward
     uint32 Gold2;
 };
 
+struct ResearchPOIPoint
+{
+    ResearchPOIPoint(int32 _x, int32 _y) { x = _x; y = _y; }
+    int32 x;
+    int32 y;
+};
+
 struct ResearchZoneEntry
 {
     uint32 POIid;
-    int32 x;
-    int32 y;
+    std::vector<ResearchPOIPoint> coords;
     uint16 map;
     uint16 zone;
     uint8 level;
@@ -631,10 +637,10 @@ struct ResearchLootEntry
 
 typedef std::vector<HotfixInfo> HotfixData;
 typedef std::vector<GuildChallengeReward> GuildChallengeRewardData;
-typedef std::vector<ResearchZoneEntry> ResearchZoneVector;
+
 typedef std::vector<ResearchLootEntry> ResearchLootVector;
 typedef std::vector<ResearchPOIPoint> ResearchPOIPoints;
-typedef std::map<uint32, ResearchPOIPoints> ResearchPOIPointMap;
+typedef std::map<uint32 /*site id*/, ResearchZoneEntry> ResearchZoneMap;
 
 class PlayerDumpReader;
 
@@ -993,7 +999,7 @@ class ObjectMgr
         void LoadResearchSiteZones();
         void LoadResearchSiteLoot();
 
-        ResearchZoneVector const& GetResearchZones() const { return _researchZones; }
+        ResearchZoneMap const& GetResearchZoneMap() const { return _researchZoneMap; }
         ResearchLootVector const& GetResearchLoot() const { return _researchLoot; }
 
         typedef std::map<uint32, uint8> PetScalingAurasMap;
@@ -1353,7 +1359,7 @@ class ObjectMgr
 
         PlayerDeleteInfoStore _playerDeleteInfoStore;
 
-        ResearchZoneVector _researchZones;
+        ResearchZoneMap _researchZoneMap;
         ResearchLootVector _researchLoot;
 
     private:

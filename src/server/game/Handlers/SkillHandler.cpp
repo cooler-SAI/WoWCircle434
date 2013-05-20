@@ -125,18 +125,21 @@ void WorldSession::HandleUnlearnSkillOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleArcheologyRequestHistory(WorldPacket& recvPacket)
 {
-    //empty handler, we must send SMSG_RESEARCH_SETUP_HISTORY. the order of dwords is still to be found
     WorldPacket data(SMSG_RESEARCH_SETUP_HISTORY);
 
-    uint32 count = GetPlayer()->_completedProjects.size();
+    uint32 count = GetPlayer()->GetArchaeologyMgr().GetCompletedProjects().size();
 
     data.WriteBits(count,22);
 
     if (count > 0)
-        for (std::set<uint32>::const_iterator itr = GetPlayer()->_completedProjects.begin(); itr != GetPlayer()->_completedProjects.end(); ++itr)
+        for (std::set<uint32>::const_iterator itr = GetPlayer()->GetArchaeologyMgr().GetCompletedProjects().begin(); itr != GetPlayer()->GetArchaeologyMgr().GetCompletedProjects().end(); ++itr)
         {
             if (ResearchProjectEntry const* project = sResearchProjectStore.LookupEntry((*itr)))
-                    data << uint32 (project->branchId) << uint32(1) << uint32((*itr)); // dword order : raceID,count,projectID
+            {
+                data.append<DWORD>(DWORD((*itr))); // projectId
+                data.append<DWORD>(1); // count
+                data.append<DWORD>(DWORD(time(NULL))); // time
+            }
         }
 
     SendPacket(&data);

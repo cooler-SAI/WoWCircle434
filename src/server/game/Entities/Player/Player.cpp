@@ -683,7 +683,7 @@ void KillRewarder::Reward()
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
-Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_reputationMgr(this), phaseMgr(this)
+Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_reputationMgr(this), phaseMgr(this), m_archaeologyMgr(this)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -16936,7 +16936,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     // load skills after InitStatsForLevel because it triggering aura apply also
     _LoadSkills(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOADSKILLS));
     UpdateSkillsForLevel(); //update skills after load, to make sure they are correctly update at player load
-    LoadArchaeology(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_ARCHAEOLOGY));
+    m_archaeologyMgr.LoadArchaeology(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_ARCHAEOLOGY));
     
     // apply original stats mods before spell loading or item equipment that call before equip _RemoveStatsMods()
 
@@ -18735,7 +18735,7 @@ void Player::SaveToDB(bool create /*=false*/)
     _SaveInstanceTimeRestrictions(trans);
     _SaveCurrency(trans);
     _SaveCUFProfiles(trans);
-    SaveArchaeology(trans);
+    m_archaeologyMgr.SaveArchaeology(trans);
 
     // check if stats should only be saved on logout
     // save stats can be out of transaction
@@ -22048,8 +22048,8 @@ void Player::SendInitialPacketsAfterAddToMap()
 
     if (GetSkillValue(SKILL_ARCHAEOLOGY))
     {
-        ShowResearchSites();
-        ShowResearchProjects();
+        m_archaeologyMgr.ShowResearchSites();
+        m_archaeologyMgr.ShowResearchProjects();
     }
 
     SendDeathRuneUpdate();
