@@ -50,7 +50,7 @@ struct DigitSite
 
 struct ProjectCost
 {
-    ProjectCost(uint32 _itemId, _int32 _count, bool isCurrency)
+    ProjectCost(uint32 _itemId, uint32 _count, bool isCurrency)
     {
         itemId = _itemId;
         count = _count;
