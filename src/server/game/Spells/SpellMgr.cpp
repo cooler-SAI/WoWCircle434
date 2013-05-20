@@ -4090,6 +4090,8 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // Alizabal
             case 105065: // Seething Hate Dummy
+            case 108090:
+                spellInfo->MaxAffectedTargets = 1;
                 spellInfo->Effects[0].SetRadiusIndex(28);
                 break;
             case 105069: // Seething Hate dmg
