@@ -384,6 +384,7 @@ class boss_ragnaros_firelands : public CreatureScript
                 me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 50);
                 me->SetFloatValue(UNIT_FIELD_COMBATREACH, 50);
                 me->SetReactState(REACT_DEFENSIVE);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                 me->LowerPlayerDamageReq(me->GetMaxHealth());
 
                 if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, instance->GetData64(DATA_RAGNAROS_FLOOR)))
