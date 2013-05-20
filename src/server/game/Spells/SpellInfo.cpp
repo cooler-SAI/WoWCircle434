@@ -1685,6 +1685,10 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
         case 43816: // Charm of the Bloodletter
         case 43818: // Charm of Mighty Mojo
             return map_id == 568? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
+        case 99659:
+        case 62857:
+        case 107926:
+            return ((player && player->InBattleground()) ? SPELL_FAILED_NOT_IN_BATTLEGROUND : SPELL_CAST_OK);
         case 23333:                                         // Warsong Flag
         case 23335:                                         // Silverwing Flag
             return (map_id == 489 || map_id == 726) && player && player->InBattleground() ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;

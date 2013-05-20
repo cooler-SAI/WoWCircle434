@@ -3176,6 +3176,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 53783: // Transmute: Eternal Water to Air
             case 53782: // Transmute: Eternal Earth to Shadow
             case 53771: // Transmute: Eternal Life to Shadow
+            case 73478: // Fire Prism
                 spellInfo->RecoveryTime = 0;
                 spellInfo->CategoryRecoveryTime = 86400000; 
                 break;
