@@ -231,21 +231,6 @@ public:
 
         if (status)
             handler->PSendSysMessage(LANG_LIQUID_STATUS, liquidStatus.level, liquidStatus.depth_level, liquidStatus.entry, liquidStatus.type_flags, status);
-        sLog->outError(LOG_FILTER_SERVER_LOADING, "angle is %f", handler->GetSession()->GetPlayer()->GetAngle(object->GetPositionX(), object->GetPositionY()));
-        
-        ResearchPOIPoints vec;
-
-        ResearchPOIPoint posPt[4] = { {0,0}, {0, 3}, {3, 3}, {3, 0}};
-
-        std::vector<ResearchPOIPoint> vect;
-
-
-        for (uint8 i = 0; i < 4; ++i)
-            vect.push_back(posPt[i]);
-
-        ResearchPOIPoint testPt = {1, 1};
-
-        handler->GetSession()->GetPlayer()->IsPointInZone(testPt, vect);
 
         return true;
     }
