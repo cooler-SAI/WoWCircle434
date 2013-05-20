@@ -136,9 +136,9 @@ void WorldSession::HandleArcheologyRequestHistory(WorldPacket& recvPacket)
         {
             if (ResearchProjectEntry const* project = sResearchProjectStore.LookupEntry((*itr)))
             {
-                data.append<DWORD>(DWORD((*itr))); // projectId
-                data.append<DWORD>(1); // count
-                data.append<DWORD>(DWORD(time(NULL))); // time
+                data.append<uint32>(uint32((*itr))); // projectId
+                data.append<uint32>(1); // count
+                data.append<uint32>(uint32(time(NULL))); // time
             }
         }
 
