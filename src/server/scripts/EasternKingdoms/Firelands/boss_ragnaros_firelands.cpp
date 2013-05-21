@@ -1228,16 +1228,7 @@ class npc_ragnaros_firelands_son_of_flame : public CreatureScript
             void Reset()
             {
                 events.Reset();
-            }
-
-            void MovementInform(uint32 type, uint32 data)
-            {
-                if (type == POINT_MOTION_TYPE)
-                    if (data == POINT_SULFURAS)
-                    {
-                        DoCastAOE(SPELL_SUPERNOVA);
-                        me->DespawnOrUnsummon(500);
-                    }
+                bDespawn = false;
             }
 
             void SpellHit(Unit* /*who*/, const SpellInfo* spellInfo)
@@ -1262,14 +1253,23 @@ class npc_ragnaros_firelands_son_of_flame : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
+                if (me->FindNearestCreature(NPC_SULFURAS_HAND_OF_RAGNAROS_1, 0.1f))
+                    if (!bDespawn)
+                    {
+                        bDespawn = true;
+                        DoCastAOE(SPELL_SUPERNOVA);
+                        me->DespawnOrUnsummon(500);
+                    }
+
                 events.Update(diff);
 
                 if (uint32 eventId = events.ExecuteEvent())   
                     if (Creature* pSulfuras = me->FindNearestCreature(NPC_SULFURAS_HAND_OF_RAGNAROS_1, 300.0f))
-                        me->GetMotionMaster()->MovePoint(POINT_SULFURAS, pSulfuras->GetPositionX(), pSulfuras->GetPositionY(), pSulfuras->GetPositionZ());
+                        me->GetMotionMaster()->MoveFollow(pSulfuras, 0.0f, 0.0f);
             }
         private:
             EventMap events;
+            bool bDespawn;
         };
 };
 

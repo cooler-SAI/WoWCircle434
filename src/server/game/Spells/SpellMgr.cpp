@@ -5324,6 +5324,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 101387:
             case 101388:
             case 101389:
+                spellInfo->MaxAffectedTargets = 1;
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
                 break;
             case 100249: // Combustion
