@@ -151,9 +151,9 @@ class boss_echo_of_sylvanas : public CreatureScript
             void EnterCombat(Unit* /*who*/)
             {
                 Talk(SAY_AGGRO);
-                //events.ScheduleEvent(EVENT_UNHOLY_SHOT, urand(5000, 20000));
-                //events.ScheduleEvent(EVENT_SHRIEK_OF_THE_HIGHBORNE, urand(5000, 20000));
-                events.ScheduleEvent(EVENT_TELEPORT, 5000);
+                events.ScheduleEvent(EVENT_UNHOLY_SHOT, urand(5000, 20000));
+                events.ScheduleEvent(EVENT_SHRIEK_OF_THE_HIGHBORNE, urand(5000, 20000));
+                events.ScheduleEvent(EVENT_TELEPORT, 40000);
                 me->RemoveAura(SPELL_SUMMON_GHOULS);
                 summons.DespawnEntry(NPC_BRITTLE_GHOUL);
                 deadghouls = 0;
