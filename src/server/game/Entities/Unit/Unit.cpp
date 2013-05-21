@@ -8790,8 +8790,11 @@ bool Unit::HandleModifierAuraProc(Unit* victim, uint32 damage, AuraEffect* trigg
                             break;
                         // Seed of Corruption
                         case 27243:
-                            CastSpell(this, 86664, true);
+                        {
+                            if (ToPlayer()->HasSpell(86664))
+                                CastSpell(this, 86664, true);                                
                             break;
+                        }
                     }
                     return true;
                 }
@@ -16581,6 +16584,20 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                             else
                                 triggeredByAura->SetAmount(damageLeft - damage);
                         }
+                        break;
+                    }
+                    case SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS:
+                    {
+                        if (triggeredByAura->GetId() == 74434   // Soulburn
+                        && procSpell && procSpell->Id == 27243) // Seed of Corruption
+                        {
+                            if (ToPlayer()->HasSpell(86664))    // Soulburn - Seed of Corruption learned talent check
+                                takeCharges = true;
+                            else
+                                takeCharges = false;
+                            break;
+                        }
+                        takeCharges = true;
                         break;
                     }
                     case SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS_2:
