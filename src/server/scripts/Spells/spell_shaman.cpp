@@ -496,80 +496,6 @@ class spell_sha_flame_shock : public SpellScriptLoader
         {
             return new spell_sha_flame_shock_AuraScript();
         }
-
-        class spell_sha_flame_shock_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_sha_flame_shock_SpellScript)
-            bool Validate(SpellEntry const * spellEntry)
-            {
-                if (!sSpellStore.LookupEntry(SHAMAN_SPELL_FLAME_SHOCK))
-                    return false;
-
-                return true;
-            }
-
-            void HandleDamage(SpellEffIndex /*effIndex*/)
-            {
-                if (!GetCaster() || !GetHitUnit())
-                    return;
-
-                if (Unit* minion = ObjectAccessor::GetUnit(*GetCaster(), GetCaster()->m_SummonSlot[SUMMON_SLOT_TOTEM]))
-                    if (minion->isTotem() && minion->GetEntry() == 2523) // Searing Totem
-                    {
-                        static_cast<TotemAI*>(minion->GetAI())->SetVictim(GetHitUnit()->GetGUID());
-                    }
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_sha_flame_shock_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_sha_flame_shock_SpellScript();
-        }
-};
-
-// 17364 Stormstrike
-class spell_sha_stormstrike: public SpellScriptLoader
-{
-public:
-    spell_sha_stormstrike(): SpellScriptLoader("spell_sha_stormstrike") { }
-
-    class spell_sha_stormstrike_SpellScript: public SpellScript
-    {
-        PrepareSpellScript(spell_sha_stormstrike_SpellScript)
-        bool Validate(SpellInfo const* spellEntry)
-        {
-            if (!sSpellStore.LookupEntry(SHAMAN_SPELL_STORMSTRIKE))
-                return false;
-
-            return true;
-        }
-
-        void HandleApplyAura(SpellEffIndex effIndex)
-        {
-            if (effIndex == 0)
-            {
-                if (Unit* minion = ObjectAccessor::GetUnit(*GetCaster(), GetCaster()->m_SummonSlot[SUMMON_SLOT_TOTEM]))
-                    if (minion->isTotem() && minion->GetEntry() == 2523) // Searing Totem
-                    {
-                        static_cast<TotemAI*>(minion->GetAI())->SetVictim(GetHitUnit()->GetGUID());
-                    }
-            }    
-        }
-
-        void Register()
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_sha_stormstrike_SpellScript::HandleApplyAura, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
-        }
-    };
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_sha_stormstrike_SpellScript();
-    }
 };
 
 // 73680 Unleash Elements
@@ -981,6 +907,5 @@ void AddSC_shaman_spell_scripts()
     new spell_sha_fulmination();
     new spell_sha_totemic_wrath();
     new spell_sha_thunderstorm();
-    new spell_sha_stormstrike();
     new spell_sha_healing_rain();
 }
