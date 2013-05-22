@@ -6744,6 +6744,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 57470:
                 spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00001C00, 0x00010000, 0x0);
                 break;
+            case 66550: // teleports outside (Isle of Conquest)
+            case 66551: // teleports inside (Isle of Conquest)
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
             default:
                 break;
         }
