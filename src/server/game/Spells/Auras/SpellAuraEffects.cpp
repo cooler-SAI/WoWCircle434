@@ -5847,6 +5847,9 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                         {
                             aur->SetMaxDuration(GetBase()->GetDuration());
                             aur->SetDuration(GetBase()->GetDuration());
+                        
+                            if (!target->IsFriendlyTo(caster))
+                                target->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
                         }
                     }
                     else
