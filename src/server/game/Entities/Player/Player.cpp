@@ -15766,6 +15766,27 @@ void Player::KilledMonster(CreatureTemplate const* cInfo, uint64 guid)
 void Player::KilledMonsterCredit(uint32 entry, uint64 guid)
 {
     uint16 addkillcount = 1;
+
+    // Siphon Essence
+    if (entry == 54198)
+    {
+        switch (GetMap()->GetDifficulty())
+        {
+            case RAID_DIFFICULTY_10MAN_NORMAL:
+                addkillcount = urand(4, 6);
+                break;
+            case RAID_DIFFICULTY_10MAN_HEROIC:
+                addkillcount = urand(7, 8);
+                break;
+            case RAID_DIFFICULTY_25MAN_NORMAL:
+                addkillcount = urand(7, 8);
+                break;
+            case RAID_DIFFICULTY_25MAN_HEROIC:
+                addkillcount = urand(9, 11);
+                break;
+        }
+    }
+
     uint32 real_entry = entry;
     if (guid)
     {

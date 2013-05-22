@@ -100,6 +100,24 @@ enum QuestDefines
 
     SPELL_LEGENDARY_PORTAL_OPENING              = 101029,
     SPELL_BRANCH_OF_NORDRASSIL_WIN_COSMETIC     = 100326,
+    SPELL_SMOLDERING_AURA                       = 101093,
+    SPELL_SIPHON_ESSENCE_CREDIT                 = 101149,
+
+    QUEST_HEART_OF_FLAME_ALLIANCE               = 29307,
+    QUEST_HEART_OF_FLAME_HORDE                  = 29308,
 };
+
+static void AddSmoulderingAura(Creature* pCreature)
+{
+    Map::PlayerList const &PlayerList = pCreature->GetMap()->GetPlayers();
+    if (!PlayerList.isEmpty())
+        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+            if (Player* pPlayer = i->getSource())
+                if (pPlayer->GetQuestStatus(QUEST_HEART_OF_FLAME_ALLIANCE) == QUEST_STATUS_INCOMPLETE || pPlayer->GetQuestStatus(QUEST_HEART_OF_FLAME_HORDE) == QUEST_STATUS_INCOMPLETE)
+                {
+                    pCreature->CastSpell(pCreature, SPELL_SMOLDERING_AURA, true);
+                    break;
+                }
+}
 
 #endif

@@ -219,6 +219,8 @@ class boss_bethtilac : public CreatureScript
                 _JustDied();
                 DespawnCreatures(NPC_CINDERWEB_SPINNER);
                 DespawnCreatures(NPC_SPIDERWEB_FILAMENT);
+
+                AddSmoulderingAura(me);
             }
             
             void UpdateAI(const uint32 diff)

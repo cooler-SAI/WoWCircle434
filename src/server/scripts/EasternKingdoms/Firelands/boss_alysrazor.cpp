@@ -470,6 +470,8 @@ class boss_alysrazor : public CreatureScript
                 _JustDied();
                 Talk(SAY_DEATH);
                 RemoveEncounterAuras();
+
+                AddSmoulderingAura(me);
             }
             
             void KilledUnit(Unit* who)

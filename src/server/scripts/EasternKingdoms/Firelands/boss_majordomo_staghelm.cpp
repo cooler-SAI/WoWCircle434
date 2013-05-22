@@ -159,6 +159,8 @@ class boss_majordomo_staghelm : public CreatureScript
                 instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
                 Talk(SAY_DEATH);
                 _JustDied();
+
+                AddSmoulderingAura(me);
             }
 
             void JustReachedHome()

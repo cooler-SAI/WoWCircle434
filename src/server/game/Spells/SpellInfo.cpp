@@ -1665,6 +1665,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     {
         case 100713: // Deluge, Ragnaros, Firelands
         case 101015:
+        case 101110: // Rage of Ragnaros, Ragnaros, Firelands
             return (area_id == 5770)? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         case 98226: // Balance Bar, Lord Rhyolith, Firelands
             return (area_id == 5763)? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;

@@ -372,12 +372,12 @@ class boss_ragnaros_firelands : public CreatureScript
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_DELUGE_AURA_25H);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SUPERHEATED_DMG_10H);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SUPERHEATED_DMG_25H);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RAGE_OF_RAGNAROS);
 
                 phase = 0;
                 Lavalogged = 0;
                 bFlames = false;
                 bRage = false;
-                bFirstRage = false;
                 memset(bFloor, false, sizeof(bFloor));
 
                 me->SetUInt32Value(UNIT_FIELD_BYTES_1, 50331648);
@@ -417,12 +417,12 @@ class boss_ragnaros_firelands : public CreatureScript
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_DELUGE_AURA_25H);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SUPERHEATED_DMG_10H);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SUPERHEATED_DMG_25H);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RAGE_OF_RAGNAROS);
 
                 phase = 0;
                 Lavalogged = 0;
                 bFlames = false;
                 bRage = false;
-                bFirstRage = false;
 
                 events.ScheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000);
                 events.ScheduleEvent(EVENT_MAGMA_TRAP, 15000);
@@ -494,6 +494,7 @@ class boss_ragnaros_firelands : public CreatureScript
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_DELUGE_AURA_25H);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SUPERHEATED_DMG_10H);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SUPERHEATED_DMG_25H);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RAGE_OF_RAGNAROS);
 
                 Talk(SAY_DEATH_2);
 
@@ -702,13 +703,8 @@ class boss_ragnaros_firelands : public CreatureScript
                             DoCast(me, SPELL_BERSERK);
                             break;
                         case EVENT_RAGE_OF_RAGNAROS:
-                            if (!bFirstRage)
-                            {
-                                bFirstRage = true;
-                                Talk(SAY_EVENT);
-                            }
+                            Talk(SAY_EVENT);
                             DoCastAOE(SPELL_RAGE_OF_RAGNAROS_AOE);
-                            events.ScheduleEvent(EVENT_RAGE_OF_RAGNAROS, urand(55000, 65000));
                             break;
                         case EVENT_BURNING_WOUND:
                             DoCastVictim(SPELL_BURNING_WOUND);
@@ -735,7 +731,7 @@ class boss_ragnaros_firelands : public CreatureScript
                             me->SetReactState(REACT_PASSIVE);
                             me->AttackStop();
                             DoCastAOE(SPELL_SULFURAS_SMASH_AOE);
-                            events.ScheduleEvent(EVENT_SULFURAS_SMASH, 39000);
+                            events.ScheduleEvent(EVENT_SULFURAS_SMASH, 30000);
                             events.ScheduleEvent(EVENT_CONTINUE, 5000);
                             if (phase == 0)
                                 events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, 12000);
@@ -747,8 +743,11 @@ class boss_ragnaros_firelands : public CreatureScript
                             break;
                         }
                         case EVENT_CONTINUE:
-                            me->SetReactState(REACT_AGGRESSIVE);
-                            me->Attack(me->getVictim(), false);
+                            if (phase == 0 || phase == 2 || phase == 4)
+                            {
+                                me->SetReactState(REACT_AGGRESSIVE);
+                                me->Attack(me->getVictim(), false);
+                            }
                             break;
                         case EVENT_SUBMERGE:
                             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
@@ -770,8 +769,8 @@ class boss_ragnaros_firelands : public CreatureScript
                             me->RemoveAura(RAID_MODE(SPELL_SUBMERGE_AURA, SPELL_SUBMERGE_AURA_25, SPELL_SUBMERGE_AURA_10H, SPELL_SUBMERGE_AURA_25H));
                             me->SetReactState(REACT_AGGRESSIVE);
                             me->Attack(me->getVictim(), false);
-                            events.ScheduleEvent(EVENT_SULFURAS_SMASH, 5000);
-                            events.ScheduleEvent(EVENT_MOLTEN_SEED, 14000);
+                            events.ScheduleEvent(EVENT_SULFURAS_SMASH, (IsHeroic() ? 6000 : 15500));
+                            events.ScheduleEvent(EVENT_MOLTEN_SEED, (IsHeroic() ? 15000 : 21500));
                             events.ScheduleEvent(EVENT_ENGULFING_FLAMES, 40000);
                             events.ScheduleEvent(EVENT_CHECK_TARGET, 5000);
                             events.ScheduleEvent(EVENT_BURNING_WOUND, urand(5000, 10000));
@@ -838,7 +837,8 @@ class boss_ragnaros_firelands : public CreatureScript
                             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_DELUGE_AURA_25H);
                             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SUPERHEATED_DMG_10H);
                             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SUPERHEATED_DMG_25H);
-                            
+                            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RAGE_OF_RAGNAROS);
+
                             if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                             {
                                 me->SetVisible(false);
@@ -955,7 +955,6 @@ class boss_ragnaros_firelands : public CreatureScript
             uint8 phase;
             bool bFlames;
             bool bRage;
-            bool bFirstRage;
             uint8 Lavalogged;
 
             void DespawnEncounterCreatures()
@@ -1443,7 +1442,7 @@ class npc_ragnaros_firelands_lava_scion : public CreatureScript
                         case EVENT_BLAZING_HEAT:
                             if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, BlazingHeatSelector()))
                                 DoCast(pTarget, SPELL_BLAZING_HEAT);
-                            events.ScheduleEvent(EVENT_BLAZING_HEAT, 15000);
+                            events.ScheduleEvent(EVENT_BLAZING_HEAT, urand(18000, 22000));
                             break;
                     }
                 }
@@ -2771,10 +2770,10 @@ class spell_ragnaros_firelands_rage_of_ragnaros_aoe : public SpellScriptLoader
                 if (Player* plr = GetHitUnit()->ToPlayer())
                 {
                     uint32 questId = 0;
-                    if (plr->GetQuestStatus(29308) == QUEST_STATUS_INCOMPLETE)
-                        questId = 29308;
-                    else if (plr->GetQuestStatus(29307) == QUEST_STATUS_INCOMPLETE)
-                        questId = 29307;
+                    if (plr->GetQuestStatus(QUEST_HEART_OF_FLAME_HORDE) == QUEST_STATUS_INCOMPLETE)
+                        questId = QUEST_HEART_OF_FLAME_HORDE;
+                    else if (plr->GetQuestStatus(QUEST_HEART_OF_FLAME_ALLIANCE) == QUEST_STATUS_INCOMPLETE)
+                        questId = QUEST_HEART_OF_FLAME_ALLIANCE;
 
                     if (questId)
                     {

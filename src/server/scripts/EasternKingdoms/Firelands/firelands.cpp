@@ -1663,6 +1663,35 @@ class spell_alysrazor_aggro_closest : public SpellScriptLoader
         }
 };
 
+class spell_firelands_siphon_essence : public SpellScriptLoader
+{
+    public:
+        spell_firelands_siphon_essence() : SpellScriptLoader("spell_firelands_siphon_essence") { }
+
+        class spell_firelands_siphon_essence_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_firelands_siphon_essence_SpellScript);
+
+            void HandleScript(SpellEffIndex effIndex)
+            {
+                if (!GetCaster())
+                    return;
+
+                GetCaster()->CastSpell(GetCaster(), SPELL_SIPHON_ESSENCE_CREDIT, true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_firelands_siphon_essence_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_firelands_siphon_essence_SpellScript();
+        }
+};
+
 void AddSC_firelands()
 {
     new npc_firelands_ancient_core_hound();
@@ -1694,4 +1723,5 @@ void AddSC_firelands()
     new npc_firelands_dull_focus();
     new npc_firelands_circle_of_thorns_portal();
     new npc_firelands_volcanus();
+    new spell_firelands_siphon_essence();
 }

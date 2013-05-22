@@ -5000,6 +5000,9 @@ void SpellMgr::LoadDbcDataCorrections()
             // FIRELANDS SPELLS
             //
             // Trash
+            case 101093:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                break;
             case 99692: // Terrifying Roar
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(33);
                 break;
@@ -5304,7 +5307,7 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 98498: // Molten Seed dmg
             case 100579:
-            case 100589:
+            case 100580:
             case 100581:
                 spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
                 break;

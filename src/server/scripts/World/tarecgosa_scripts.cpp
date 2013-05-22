@@ -213,6 +213,36 @@ class npc_thyrinar : public CreatureScript
         };
 };
 
+class npc_kalecgos_53349 : public CreatureScript
+{
+    public:
+        npc_kalecgos_53349() : CreatureScript("npc_kalecgos_53349") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_kalecgos_53349AI(pCreature);
+        }
+
+        struct npc_kalecgos_53349AI : ScriptedAI
+        {
+            npc_kalecgos_53349AI(Creature* pCreature) : ScriptedAI(pCreature) 
+            {
+            }
+
+            void MoveInLineOfSight(Unit* who)
+            {
+                if (!who || who->GetTypeId() != TYPEID_PLAYER)
+                    return;
+
+                if (!me->IsWithinDistInMap(who, 20.0f))
+                    return;
+
+                if (who->ToPlayer()->GetQuestStatus(29285) == QUEST_STATUS_INCOMPLETE)
+                    who->ToPlayer()->KilledMonsterCredit(53227, 0);
+            }
+        };
+};
+
 void AddSC_tarecgosa_scripts()
 {
     new npc_anachronos_15192();
@@ -220,4 +250,5 @@ void AddSC_tarecgosa_scripts()
     new npc_thyrinar();
     new npc_tarecgosa_53098();
     new npc_kalecgos_53149();
+    new npc_kalecgos_53349();
 };

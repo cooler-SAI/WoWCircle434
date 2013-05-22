@@ -599,6 +599,8 @@ class npc_lord_rhyolith_rhyolith : public CreatureScript
                     pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BALANCE_BAR);
                 }
                 Talk(SAY_DEATH);
+
+                AddSmoulderingAura(me);
             }
 
             void KilledUnit(Unit* who)
