@@ -4202,6 +4202,20 @@ bool Unit::HasAuraTypeMoreThanDuration(AuraType auratype, int32 duration)
     return false;
 }
 
+bool Unit::HasAuraWithNegativeCaster(uint32 spellid)
+{
+    AuraApplicationMapBounds range = m_appliedAuras.equal_range(spellid);
+    for (AuraApplicationMap::const_iterator iter = range.first; iter != range.second; ++iter)
+    {
+        if (Unit * caster = (iter->second->GetBase()->GetCaster()))
+        {
+            if (!caster->IsFriendlyTo(this))
+                return true;
+        }
+    }
+    return false;
+}
+
 bool Unit::HasAuraWithMechanic(uint32 mechanicMask)
 {
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end(); ++iter)

@@ -5992,6 +5992,15 @@ SpellCastResult Spell::CheckCast(bool strict)
     {
         switch (m_spellInfo->Effects[i].ApplyAuraName)
         {
+            case SPELL_AURA_MOD_STEALTH:
+            {
+                if (m_caster->HasAura(94528) ||                 // Flare
+                m_caster->HasAuraWithNegativeCaster(88611))     // Smoke Bomb
+                {
+                    return SPELL_FAILED_CASTER_AURASTATE;
+                }
+                break;
+            }
             case SPELL_AURA_MOD_RANGED_HASTE:
             {
                 // Focus Fire
