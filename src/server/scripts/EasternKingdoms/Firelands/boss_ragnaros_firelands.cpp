@@ -379,6 +379,7 @@ class boss_ragnaros_firelands : public CreatureScript
                 bFlames = false;
                 bRage = false;
                 memset(bFloor, false, sizeof(bFloor));
+                uiDreadFlameTimer = 40000;
 
                 me->SetUInt32Value(UNIT_FIELD_BYTES_1, 50331648);
                 me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 50);
@@ -423,6 +424,8 @@ class boss_ragnaros_firelands : public CreatureScript
                 Lavalogged = 0;
                 bFlames = false;
                 bRage = false;
+                memset(bFloor, false, sizeof(bFloor));
+                uiDreadFlameTimer = 40000;
 
                 events.ScheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000);
                 events.ScheduleEvent(EVENT_MAGMA_TRAP, 15000);
@@ -731,7 +734,7 @@ class boss_ragnaros_firelands : public CreatureScript
                             me->SetReactState(REACT_PASSIVE);
                             me->AttackStop();
                             DoCastAOE(SPELL_SULFURAS_SMASH_AOE);
-                            events.ScheduleEvent(EVENT_SULFURAS_SMASH, 30000);
+                            events.ScheduleEvent(EVENT_SULFURAS_SMASH, ((phase == 2) ? 40000 : 30000));
                             events.ScheduleEvent(EVENT_CONTINUE, 5000);
                             if (phase == 0)
                                 events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, 12000);
@@ -801,7 +804,7 @@ class boss_ragnaros_firelands : public CreatureScript
                                 me->AddAura(SPELL_WORLD_IN_FLAME, me);
                             }
                             events.RescheduleEvent(EVENT_CHECK_TARGET, 12000);
-                            events.ScheduleEvent(EVENT_ENGULFING_FLAMES, 40000);
+                            events.ScheduleEvent(EVENT_ENGULFING_FLAMES, ((phase == 2) ? 40000 : 30000));
                             break;
                         case EVENT_MOLTEN_SEED:
                         {
@@ -913,7 +916,9 @@ class boss_ragnaros_firelands : public CreatureScript
                                 for (std::list<Position>::const_iterator itr = t_pos.begin(); itr != t_pos.end(); ++itr)
                                     me->CastSpell((*itr).GetPositionX(), (*itr).GetPositionY(), (*itr).GetPositionZ(), SPELL_DREADFLAME_MISSILE, true);
 
-                            events.ScheduleEvent(EVENT_DREADFLAME, 30000);
+                            if (uiDreadFlameTimer > 15000)
+                                uiDreadFlameTimer -= 5000;
+                            events.ScheduleEvent(EVENT_DREADFLAME, uiDreadFlameTimer);
                             break;
                         }
                         case EVENT_EMPOWER_SULFURAS:
@@ -956,6 +961,7 @@ class boss_ragnaros_firelands : public CreatureScript
             bool bFlames;
             bool bRage;
             uint8 Lavalogged;
+            uint32 uiDreadFlameTimer;
 
             void DespawnEncounterCreatures()
             {
