@@ -801,7 +801,7 @@ void Aura::SetAuraTimer(int32 newTime, uint64 guid)
     }
 }
 
-void Aura::RefreshDuration(bool resetPeriodic)
+void Aura::RefreshDuration(bool recalculate)
 {
     SetDuration(GetMaxDuration());
 
@@ -809,9 +809,8 @@ void Aura::RefreshDuration(bool resetPeriodic)
         m_timeCla = 1 * IN_MILLISECONDS;
 
     Unit* caster = GetCaster();
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-        if (HasEffect(i))
-            GetEffect(i)->CalculatePeriodic(caster, resetPeriodic, false);
+    if (recalculate)
+        RecalculateAmountOfEffects();
 }
 
 void Aura::RefreshTimers()
@@ -838,7 +837,11 @@ void Aura::RefreshTimers()
         resetPeriodic = false;
      
 
-    RefreshDuration(resetPeriodic);
+    RefreshDuration(false);
+    Unit* caster = GetCaster();
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        if (HasEffect(i))
+            GetEffect(i)->CalculatePeriodic(caster, resetPeriodic, false);
 }
 
 void Aura::SetCharges(uint8 charges)

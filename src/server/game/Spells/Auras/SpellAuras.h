@@ -131,7 +131,7 @@ class Aura
         int32 GetDuration() const { return m_duration; }
         void SetDuration(int32 duration, bool withMods = false);
         void SetAuraTimer(int32 newTime, uint64 guid = 0);
-        void RefreshDuration(bool resetPeriodic = true);
+        void RefreshDuration(bool recalculate = true);
         void RefreshTimers();
         bool IsExpired() const { return !GetDuration();}
         bool IsPermanent() const { return GetMaxDuration() == -1; }
