@@ -1252,7 +1252,7 @@ class npc_ragnaros_firelands_son_of_flame : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-                if (me->FindNearestCreature(NPC_SULFURAS_HAND_OF_RAGNAROS_1, 0.1f))
+                if (me->FindNearestCreature(NPC_SULFURAS_HAND_OF_RAGNAROS_1, 1.0f))
                     if (!bDespawn)
                     {
                         bDespawn = true;
