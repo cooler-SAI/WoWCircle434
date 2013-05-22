@@ -1869,34 +1869,26 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     }
                     // Shadowburn
                     case 29341:
-                    {
+                        if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+                            if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
+                                caster->ModifyPower(POWER_SOUL_SHARDS, 3);
+                        break;
+                    // Drain Soul
+                    case 1120:
                         if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
                         {
                             if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
                                 caster->ModifyPower(POWER_SOUL_SHARDS, 3);
-                        }
-                        break;
-                    }
-                    // Drain Soul
-                    case 1120:
-                    {
-                        if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
-                        {
-                            if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
-                            caster->ModifyPower(POWER_SOUL_SHARDS, 3);
                         
                             // Glyph of Drain Soul
                             if (caster->HasAura(58070))
                                 caster->CastSpell(caster, 58068, true);
                         }
                         break;
-                    }
                     // Dark Intent
                     case 85767:
-                    {
                         caster->RemoveAurasDueToSpell(85767);
                         break;
-                    }
                     // Haunt
                     case 48181:
                     {
@@ -1912,12 +1904,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     }
                     // Soul Swap
                     case 86211:
-                    {
                         // Send glyphed cooldown to player
                         if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEFAULT && caster->HasAura(56226))
                             caster->CastSpell(caster, 94229, false);
                         break;
-                    }
                 }
                 break;
             case SPELLFAMILY_PRIEST:

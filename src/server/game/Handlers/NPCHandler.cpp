@@ -313,6 +313,8 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
     data << uint64(guid);
     data << uint32(spellId);
     SendPacket(&data);
+
+    SendTrainerList(guid);
 }
 
 void WorldSession::SendTrainerBuyFailed(uint64 guid, uint32 spellId, uint32 reason)

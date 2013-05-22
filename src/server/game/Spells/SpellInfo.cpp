@@ -2620,6 +2620,11 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                     break;
             }
             break;
+        case SPELLFAMILY_WARLOCK:
+            // Immolation Aura
+            if (Id == 50589)
+                return true;
+            break;
         case SPELLFAMILY_MAGE:
             // Amplify Magic, Dampen Magic
             if (SpellFamilyFlags[0] == 0x00002000)

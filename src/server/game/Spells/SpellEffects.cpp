@@ -3254,7 +3254,6 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
 
-    // Hack for water elemental
     switch(m_spellInfo->Id)
     {
         case 31687: // Summon Water Elemental
@@ -3606,7 +3605,7 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
     {
         // Glyph of Dispel Magic
-        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && m_spellInfo->SpellFamilyFlags[1] & 1)
+        if (m_spellInfo->Id == 97690)
             if (AuraEffect* aurEff = m_caster->GetAuraEffect(55677, 0))
                 if (m_caster->IsFriendlyTo(unitTarget))
                 {
@@ -4101,6 +4100,11 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
         if (!owner && m_originalCaster->ToCreature()->isTotem())
             owner = m_originalCaster->GetCharmerOrOwnerPlayerOrPlayerItself();
     }
+
+    // Mark of Demonic Rebirth
+    if (Aura* aur = m_caster->GetAura(88448))
+        if (m_appliedMods.find(aur) != m_appliedMods.end())
+            m_caster->CastSpell(m_caster, 89140, true);
 
     uint32 petentry = m_spellInfo->Effects[effIndex].MiscValue;
 
@@ -5682,7 +5686,10 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                         if (!(*i)->GetAmplitude())
                             continue;
 
-                        basepoints0 += m_caster->SpellDamageBonusDone(unitTarget, (*i)->GetSpellInfo(), (*i)->GetAmount(), DOT) * 1000 / (*i)->GetAmplitude();
+                        if ((*i)->GetFixedDamageInfo().HasDamage())
+                            basepoints0 += int32((*i)->GetFixedDamageInfo().GetFixedDamage() * 1000 / (*i)->GetAmplitude());
+                        else
+                            basepoints0 += int32(m_caster->SpellDamageBonusDone(unitTarget, (*i)->GetSpellInfo(), (*i)->GetAmount(), DOT) * 1000 / (*i)->GetAmplitude());
                     }
                     if (basepoints0)
                     {

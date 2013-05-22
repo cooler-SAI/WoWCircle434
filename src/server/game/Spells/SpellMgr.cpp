@@ -139,6 +139,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Sin and Punishment (Priest)
             else if (spellproto->Id == 87204)
                 return DIMINISHING_LIMITONLY;
+            // Curse of Exhaustion
+            else if (spellproto->Id == 18223)
+                return DIMINISHING_LIMITONLY;
             break;
         }
         case SPELLFAMILY_DRUID:
@@ -324,6 +327,9 @@ int32 GetDiminishingReturnsLimitDuration(DiminishingGroup group, SpellInfo const
             // Curse of Elements - limit to 120 seconds in PvP
             else if (spellproto->SpellFamilyFlags[1] & 0x200)
                return 120 * IN_MILLISECONDS;
+            // Curse of Exhaustion
+            else if (spellproto->Id == 18223)
+                return 10 * IN_MILLISECONDS;
             break;
         }
         default:
@@ -6737,10 +6743,6 @@ void SpellMgr::LoadDbcDataCorrections()
             case 57472:
             case 57470:
                 spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00001C00, 0x00010000, 0x0);
-                break;
-                // Power Word: Barrier summon
-            case 98888:
-                spellInfo->Effects[EFFECT_0].MiscValueB = 64;
                 break;
             default:
                 break;

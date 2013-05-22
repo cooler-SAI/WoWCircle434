@@ -14747,11 +14747,13 @@ void Unit::setDeathState(DeathState s)
         {
             if (Unit* owner = GetOwner())
             {
-                Aura *aur = NULL;
-                if ((aur = owner->GetAura(88446)) || (aur = owner->GetAura(88447)))
+                if (!owner->HasAura(89140))
                 {
-                    int32 bp0 = -aur->GetSpellInfo()->Effects[0].BasePoints;
-                    owner->CastCustomSpell(owner, 88448, &bp0, 0, 0, true);
+                    if (AuraEffect const* aurEff = owner->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_WARLOCK, 1981, EFFECT_0))
+                    {
+                        int32 bp0 = -aurEff->GetAmount();
+                        owner->CastCustomSpell(owner, 88448, &bp0, 0, 0, true);
+                    }
                 }
             }
         }
