@@ -2753,6 +2753,20 @@ void Spell::EffectCreateItem2(SpellEffIndex effIndex)
 
     uint32 item_id = m_spellInfo->Effects[effIndex].ItemType;
 
+    // Some recipes can proc for more valueable items (cataclysm)
+    uint32 new_id = 0;
+    switch (item_id)
+    {
+        case 52309: new_id = 52314; break; // Nightstone Choker
+        case 52308: new_id = 52316; break; // Hessonite Band
+        case 52307: new_id = 52312; break; // Alicite Pendant  
+        case 52306: new_id = 52310; break; // Jasper Ring
+        default: break;
+    }
+
+    if (new_id && roll_chance_i(10))
+        item_id = new_id;
+
     if (item_id)
         DoCreateItem(effIndex, item_id);
 
