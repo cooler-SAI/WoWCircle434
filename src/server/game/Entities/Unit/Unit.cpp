@@ -8295,6 +8295,11 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         case 421:  triggered_spell_id = 45297; break;
                         case 51505: triggered_spell_id = 77451; break;
                     }
+
+                    // Item - Shaman T13 Elemental 4P Bonus (Elemental Overload)
+                    if (HasAura(105816))
+                        CastSpell(this, 105821, true);
+
                     break;
                 }
                 // Item - Shaman T10 Elemental 4P Bonus
