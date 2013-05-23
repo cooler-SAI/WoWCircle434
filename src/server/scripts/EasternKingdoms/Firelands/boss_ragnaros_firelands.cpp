@@ -1080,26 +1080,18 @@ class npc_ragnaros_firelands_sulfuras_smash : public CreatureScript
 
                 if (action == ACTION_LAVA_WAVE)
                 {
-                    float o = me->GetOrientation();
-                    for (float i = -(M_PI / 2.0f); i <= M_PI / 2.0f; i += (M_PI / 2.0f))
-                    {
-                        Position startPos;
-                        me->GetNearPosition(startPos, 1.0f, i);
-                        if (Creature* pRagnaros = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_RAGNAROS)))
-                            if (Creature* pLavaWave = pRagnaros->SummonCreature(NPC_LAVA_WAVE, startPos, TEMPSUMMON_TIMED_DESPAWN, 15000))
-                            {
-                                pLavaWave->SetReactState(REACT_PASSIVE);
-                                Position endPos;
-                                pLavaWave->GetNearPosition(endPos, 100.0f, i);
-                                pLavaWave->CastSpell(pLavaWave, SPELL_LAVA_WAVE_AURA, true);
-                                if (Creature* pStalker = me->SummonCreature(NPC_PLATFORM_STALKER, endPos, TEMPSUMMON_TIMED_DESPAWN, 30000))
-                                {
-                                    pStalker->SetDisableGravity(true);
-                                    pStalker->SetCanFly(true);
-                                    pLavaWave->GetMotionMaster()->MoveFollow(pStalker, 0.0f, 0.0f);
-                                }
-                            }
-                     }
+                    Position startPos[3];
+                    Position endPos[3];
+                    me->GetNearPosition(startPos[0], 1.0f, -(M_PI / 2.0f));
+                    me->GetNearPosition(startPos[1], 1.0f, -(M_PI / 2.0f));
+                    me->GetNearPosition(startPos[2], 1.0f, 0.0f);
+                    me->GetNearPosition(endPos[0], 100.0f, -(M_PI / 2.0f));
+                    me->GetNearPosition(endPos[1], 100.0f, 0.0f);
+                    me->GetNearPosition(endPos[2], 100.0f, (M_PI / 2.0f));
+
+                    for (uint8 i = 0; i < 3; ++i)
+                        SendLavaWave(startPos[i], endPos[i]);
+
                     me->RemoveAura(SPELL_LAVA_POOL);
                     DoCast(me, SPELL_SULFURAS_AURA, true);
                 }
@@ -1107,6 +1099,77 @@ class npc_ragnaros_firelands_sulfuras_smash : public CreatureScript
 
         private:
             InstanceScript* pInstance;
+
+            void SendLavaWave(Position startpos, Position endpos)
+            {
+                if (Creature* pRagnaros = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_RAGNAROS)))
+                    if (Creature* pLavaWave = pRagnaros->SummonCreature(NPC_LAVA_WAVE, startpos, TEMPSUMMON_TIMED_DESPAWN, 15000))
+                    {
+                        pLavaWave->CastSpell(pLavaWave, SPELL_LAVA_WAVE_AURA, true);
+                        if (Creature* pStalker = me->SummonCreature(NPC_PLATFORM_STALKER, endpos, TEMPSUMMON_TIMED_DESPAWN, 30000))
+                        {
+                            pStalker->SetDisableGravity(true);
+                            pStalker->SetCanFly(true);
+                            pLavaWave->AI()->SetGUID(pStalker->GetGUID());
+                        }
+                    }
+            }
+        };
+};
+
+class npc_ragnaros_firelands_lava_wave : public CreatureScript
+{
+    public:
+        npc_ragnaros_firelands_lava_wave() : CreatureScript("npc_ragnaros_firelands_lava_wave") {}
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_ragnaros_firelands_lava_waveAI(pCreature);
+        }
+            
+        struct npc_ragnaros_firelands_lava_waveAI : public Scripted_NoMovementAI
+        {
+            npc_ragnaros_firelands_lava_waveAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+            {
+                me->SetReactState(REACT_PASSIVE);
+                bDest = false;
+                bDespawn = false;
+                destGUID = 0;
+            }
+
+            void SetGUID(uint64 guid, int32 /*type*/)
+            {
+                bDest = true;
+                destGUID = guid;
+                events.ScheduleEvent(EVENT_CONTINUE, 400);
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                events.Update(diff);
+
+                if (uint32 eventId = events.ExecuteEvent())
+                {
+                    if (bDest)
+                        if (Creature* pStalker = ObjectAccessor::GetCreature(*me, destGUID))
+                            me->GetMotionMaster()->MoveFollow(pStalker, 0, 0.0f);
+                }
+
+                if (!bDespawn && bDest)
+                {
+                    if (Creature* pStalker = ObjectAccessor::GetCreature(*me, destGUID))
+                        if (me->GetDistance(pStalker) <= 1.0f)
+                        {
+                            bDespawn = true;
+                            me->DespawnOrUnsummon();
+                        }
+                }
+            }
+        private:
+            EventMap events;
+            bool bDest;
+            bool bDespawn;
+            uint64 destGUID;
         };
 };
 
@@ -1446,10 +1509,25 @@ class npc_ragnaros_firelands_lava_scion : public CreatureScript
                             me->SetReactState(REACT_AGGRESSIVE);
                             break;
                         case EVENT_BLAZING_HEAT:
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, BlazingHeatSelector()))
+                        {
+                            std::list<Creature*> lavascions;
+                            GetCreatureListWithEntryInGrid(lavascions, me, NPC_LAVA_SCION, 500.0f);
+
+                            std::vector<uint64> guids;
+
+                            if (!lavascions.empty())
+                            {
+                                for (std::list<Creature*>::const_iterator itr = lavascions.begin(); itr != lavascions.end(); ++itr)
+                                    if (Creature* scion = (*itr)->ToCreature())
+                                        if (scion->getVictim())
+                                            guids.push_back(scion->getVictim()->GetGUID());
+                            }
+                            
+                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, BlazingHeatSelector(guids)))
                                 DoCast(pTarget, SPELL_BLAZING_HEAT);
                             events.ScheduleEvent(EVENT_BLAZING_HEAT, urand(18000, 22000));
                             break;
+                        }
                     }
                 }
 
@@ -1463,7 +1541,7 @@ class npc_ragnaros_firelands_lava_scion : public CreatureScript
             {
                 public:
                     
-                    BlazingHeatSelector() {}
+                    BlazingHeatSelector(std::vector<uint64> _guids) : tankGUIDs(_guids) {}
 
                     bool operator()(Unit const* target) const
                     {
@@ -1473,9 +1551,16 @@ class npc_ragnaros_firelands_lava_scion : public CreatureScript
                             target->HasAura(SPELL_BLAZING_HEAT_AURA_1_25H))
                             return false;
 
+                        if (!tankGUIDs.empty())
+                            for (std::vector<uint64>::const_iterator itr = tankGUIDs.begin(); itr != tankGUIDs.end(); ++itr)
+                                if (target->GetGUID() == (*itr))
+                                    return false;
+                               
+
                         return true;
                     }
-
+            private:
+                std::vector<uint64> tankGUIDs;
             };
         };
 };
@@ -2807,6 +2892,7 @@ void AddSC_boss_ragnaros_firelands()
 {
     new boss_ragnaros_firelands();
     new npc_ragnaros_firelands_sulfuras_smash();
+    new npc_ragnaros_firelands_lava_wave();
     new npc_ragnaros_firelands_magma_trap();
     new npc_ragnaros_firelands_son_of_flame();
     new npc_ragnaros_firelands_splitting_blow();
