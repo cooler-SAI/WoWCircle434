@@ -1332,6 +1332,12 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         caster->CastSpell(caster, WellFedSpells.front(), true);
                         break;
                     }
+                    case 105785:    // Stolen Time mage T13 set bonus
+                    {
+                        if (target->HasAura(105790))
+                            target->CastSpell(target, 105791, true); // cooldown bonus
+                        break;
+                    }
                 }
 
                 // Recently Bandaged
