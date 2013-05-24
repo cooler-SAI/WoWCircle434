@@ -6913,12 +6913,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 }
                 // Item  Druid T12 Feral 2P Bonus
                 case 99001:
-                {
-                    basepoints0 = int32(CalculatePct(damage, triggerAmount / 2)); // 2 ticks
+                    triggerAmount /= 2;
+                    basepoints0 = int32(CalculatePct(damage, triggerAmount));
                     triggered_spell_id = 99002;
+                    basepoints0 += victim->GetRemainingPeriodicAmount(GetGUID(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE);
                     target = victim;
                     break;
-                }
                 // Nature's Ward
                 case 33881:
                 case 33882:
@@ -7316,14 +7316,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                      break;
                 }
                 case 32748: // Deadly Throw Interrupt
-                {
                     // Prevent cast Deadly Throw Interrupt on self from last effect (apply dummy) of Deadly Throw
                     if (this == victim)
                         return false;
 
                     triggered_spell_id = 32747;
                     break;
-                }
                 case 57934: // Tricks of the Trade
                 {
                     if (GetTypeId() != TYPEID_PLAYER)
@@ -7350,23 +7348,29 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 }
                 // Glyph of Kick
                 case 56805:
-                {
                     ToPlayer()->SpellCooldownReduction(1766, triggerAmount);
                     return true;
-                }
+                // Cut to the Chase
+                case 51664:
+                case 51665:
+                case 51667:
+                    if (Aura* aur = GetAura(5171))
+                    {
+                        uint32 max_duration = aur->GetSpellInfo()->GetMaxDuration();
+                        aur->SetMaxDuration(max_duration);
+                        aur->SetDuration(max_duration, true);
+                        return true;
+                    }
+                    return false;
             }
 
             switch (dummySpell->SpellIconID)
             {
-                case 2909: // Cut to the Chase
+                case 2909: // 
                 {
                     // "refresh your Slice and Dice duration to its 5 combo point maximum"
                     // lookup Slice and Dice
-                    if (Aura* aur = GetAura(5171))
-                    {
-                        aur->SetDuration(aur->GetSpellInfo()->GetMaxDuration(), true);
-                        return true;
-                    }
+                    
                     return false;
                 }
             }

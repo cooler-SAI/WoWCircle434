@@ -2827,6 +2827,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 31803: // Censure
             case 77661: // Searing Flame
             case 77489: // Echo of Light
+            case 99132: // Divine Fire, Item - Priest T12 Healer 2P Bonus
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER;
                 break;
             case 60256:
@@ -6753,6 +6754,14 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
                 spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
+            // Redemption
+            case 7328:
+                spellInfo->SpellFamilyName = SPELLFAMILY_PALADIN;
+                break;
+            // Find Weakness
+            case 91021:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
                 break;
             default:
                 break;
