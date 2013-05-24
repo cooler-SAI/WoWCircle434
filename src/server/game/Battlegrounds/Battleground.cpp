@@ -37,6 +37,7 @@
 #include "Util.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "RatedBattleground.h"
 
 namespace Trinity
 {
@@ -217,6 +218,8 @@ Battleground::Battleground()
     StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_WS_START_ONE_MINUTE;
     StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_WS_START_HALF_MINUTE;
     StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_WS_HAS_BEGUN;
+
+    m_rbgFlag = false;
 }
 
 Battleground::~Battleground()
@@ -908,6 +911,19 @@ void Battleground::EndBattleground(uint32 winner)
 
         sBattlegroundMgr->FinishAndSendPvpLogDataPacket(&pvpLogData, this, &buff, player);
 
+        if (IsRBG())
+        {
+            uint32 realTeam = player->GetTeam();
+            if (realTeam != team)
+                player->setFactionForRace(player->getRace());
+
+            uint32 loser = winner == HORDE ? ALLIANCE : HORDE;
+            player->getRBG()->FinishGame(team == winner, GetArenaMatchmakerRating(team == winner ? loser : winner));
+
+            if (team == winner)
+                player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_BG, RatedBattleground::ConquestPointReward * 100);
+        }
+		
         WorldPacket data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player, player->GetBattlegroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, player->GetBattlegroundQueueJoinTime(GetTypeID()), 0, GetArenaType());
         player->GetSession()->SendPacket(&data);
@@ -978,6 +994,13 @@ void Battleground::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
         {
             player->ResurrectPlayer(1.0f);
             player->SpawnCorpseBones();
+        }
+		
+        if (IsRBG())
+        {
+            uint32 realTeam = player->GetTeam();
+            if (realTeam != team)
+                player->setFactionForRace(player->getRace());
         }
     }
 
@@ -1154,6 +1177,13 @@ void Battleground::AddPlayer(Player* player)
     player->RemoveAurasByType(SPELL_AURA_MOUNTED);
     player->RemoveAurasByType(SPELL_AURA_FLY);
 
+    if (IsRBG())
+    {
+        uint32 realTeam = player->GetTeam();
+        if (realTeam != team)
+            player->setFaction(team == ALLIANCE ? 1 : 2);
+    }
+	
     // add arena specific auras
     if (isArena())
     {

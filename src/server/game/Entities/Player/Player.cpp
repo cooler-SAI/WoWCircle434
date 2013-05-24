@@ -80,6 +80,7 @@
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "BattlefieldWG.h"
+#include "RatedBattleground.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -898,6 +899,8 @@ Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_rep
     _maxPersonalArenaRate = 0;
     _ConquestCurrencytotalWeekCap = 0;
 
+    m_rbg = NULL;	
+	
     memset(_voidStorageItems, 0, VOID_STORAGE_MAX_SLOT * sizeof(VoidStorageItem*));
     memset(_CUFProfiles, 0, MAX_CUF_PROFILES * sizeof(CUFProfile*));
 
@@ -941,6 +944,9 @@ Player::~Player()
 
     delete m_declinedname;
 
+    if (m_rbg)
+        delete m_rbg;
+	
     for (uint8 i = 0; i < VOID_STORAGE_MAX_SLOT; ++i)
         delete _voidStorageItems[i];
 
@@ -9572,6 +9578,8 @@ void Player::SendBattlefieldWorldStates()
             }
         }
     }
+
+    SendUpdateWorldState(WORLD_STATE_ENABLE_RATED_BG, 1);
 }
 
 uint32 Player::GetXPRestBonus(uint32 xp)
@@ -16604,6 +16612,9 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
 
     _LoadArenaTeamInfo(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOADARENAINFO));
 
+    m_rbg = new RatedBattleground(GetGUID());
+    m_rbg->LoadStats();
+	
     // check arena teams integrity
     for (uint32 arena_slot = 0; arena_slot < MAX_ARENA_SLOT; ++arena_slot)
     {
@@ -26279,11 +26290,6 @@ PlayerRole Player::GetRole() const
     }
 
     return role;
-}
-
-uint32 Player::GetRBGPersonalRating() const
-{
-    return 0;
 }
 
 void Player::SendBattlegroundTimer(uint32 currentTime, uint32 maxTime)

@@ -59,6 +59,7 @@ class PlayerSocial;
 class SpellCastTargets;
 class UpdateMask;
 class PhaseMgr;
+class RatedBattleground;
 
 typedef std::deque<Mail*> PlayerMails;
 
@@ -2849,6 +2850,8 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetLastPetNumber() const { return m_lastpetnumber; }
         void SetLastPetNumber(uint32 petnumber) { m_lastpetnumber = petnumber; }
 
+        RatedBattleground* getRBG() { return m_rbg; }
+
         /*********************************************************/
         /***                   GROUP SYSTEM                    ***/
         /*********************************************************/
@@ -2934,7 +2937,6 @@ class Player : public Unit, public GridObject<Player>
         void SendCurrencyWeekCap(const CurrencyTypesEntry* currency) const;
         void FinishWeek();
         void ResetCurrencyWeekCap(SQLTransaction* trans = NULL);
-        uint32 GetRBGPersonalRating() const;
 
         /// modify currency flag
         void ModifyCurrencyFlag(uint32 id, uint8 flag);
@@ -3457,6 +3459,8 @@ class Player : public Unit, public GridObject<Player>
 
         PhaseMgr phaseMgr;
 
+        RatedBattleground* m_rbg;
+		
         uint32 _heal_done[SAVE_FOR_SECONDS];
         uint32 _damage_done[SAVE_FOR_SECONDS];
         uint32 _damage_taken[SAVE_FOR_SECONDS];
