@@ -3122,7 +3122,6 @@ void SpellMgr::LoadDbcDataCorrections()
             case 99:    // Demoralizing Roar
             case 5857:  // Hellfire Effect
             case 49203: // Hungering Cold
-//             case 52212: // Death and Decay
                 spellInfo->Effects[0].SetRadiusIndex(13);
                 break;
             case 6343: // Thunder Clap (Battle, Defensive Stance)
@@ -6097,6 +6096,7 @@ void SpellMgr::LoadDbcDataCorrections()
              // Consecration
             case 36946:
                 spellInfo->SetDurationIndex(1);
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
                 break;
             // Tower of Radiance rank 3
             case 85512:
@@ -6333,10 +6333,6 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_ENERGIZE;
                 spellInfo->Effects[EFFECT_0].MiscValue = 3;
                 break;
-            // Smoke Bomb
-            case 76577:
-                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
-                break;
             // Fan of Knives
             case 51723:
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(14);
@@ -6466,18 +6462,25 @@ void SpellMgr::LoadDbcDataCorrections()
             case 74723:
                 spellInfo->Effects[EFFECT_0].MiscValue = 40065;
                 break;
-            // alot of aoe spells
+            // Rain of Fire
+            case 5740:
+                spellInfo->Effects[EFFECT_1].TriggerSpell = 0;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
+                break;
+            // Hurricane
+            case 16914:
+                spellInfo->Effects[EFFECT_2].TriggerSpell = 0;
+                spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
+                break;
+            // Blizzard
+            case 10:
+                spellInfo->Effects[EFFECT_1].TriggerSpell = 0;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
+                break;
             case 42208: // Blizzard
             case 42223: // Rain of Fire
             case 42231: // Hurricane
-            case 52212: // Death and Decay
-                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ENEMY;
-                spellInfo->Effects[EFFECT_0].TargetB = 0;
-                spellInfo->Effects[EFFECT_0].SetRadiusIndex(0);
-
-                if (spellInfo->Id == 52212)
-                    spellInfo->Effects[0].SetRadiusIndex(13);
-
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
                 break;
             case 54424: // Fel Intelligence
                 spellInfo->Effects[1].SetRadiusIndex(12);

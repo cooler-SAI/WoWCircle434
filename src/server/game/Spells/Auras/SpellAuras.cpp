@@ -1338,6 +1338,12 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             target->CastSpell(target, 105791, true); // cooldown bonus
                         break;
                     }
+                    // Smoke Bomb, Rogue
+                    case 88611:
+                        if (caster)
+                            if (!target->IsFriendlyTo(caster))
+                                target->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
+                        break;
                 }
 
                 // Recently Bandaged

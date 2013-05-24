@@ -12334,7 +12334,7 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
                             break;
                         }
                         // Exorcism
-                        else if (spellProto->Category == 19)
+                        else if (spellProto->Id == 879)
                         {
                             if (victim->GetCreatureTypeMask() & CREATURE_TYPEMASK_DEMON_OR_UNDEAD)
                                 return 100.0f;

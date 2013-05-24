@@ -723,9 +723,10 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             // Exorcism 
             else if (GetId() == 879)
             {
+                int32 basedmg = GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster);
                 float attackPower = caster->GetTotalAttackPowerValue(BASE_ATTACK);
                 int32 spellPower = caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->ScalingClass));
-                uint32 maxdmg = attackPower > spellPower ? (attackPower * 0.344f) : (spellPower * 0.344f);
+                int32 maxdmg = int32(basedmg + ((attackPower > spellPower) ? (attackPower * 0.344f) : (spellPower * 0.344f)));
                 amount = int32(maxdmg / 5.0f);
                 amount /= GetTotalTicks();
             }
@@ -1400,6 +1401,31 @@ void AuraEffect::Update(uint32 diff, Unit* caster)
                         case 78675:
                             GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 81261, true);
                             break;
+                        // Death and Decay
+                        case 43265:
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 52212, true);
+                            break;
+                        // Smoke Bomb
+                        case 76577:
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 88611, true);
+                            break;
+                        // Blizzard
+                        case 10:
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 42208, true);
+                            break;
+                        // Hurricane
+                        case 16914:
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 42231, true);
+                            break;
+                        // Rain of Fire
+                        case 5740:
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 42223, true);
+                            break;
+                        // Consecration
+                        case 36946:
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 81297, true);
+                            break;
+
                     }
                 }
             }
@@ -5831,35 +5857,6 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
             }
             break;
         }
-        case SPELLFAMILY_ROGUE:
-        {
-            if (!(mode & AURA_EFFECT_HANDLE_REAL))
-                break;
-
-            switch (GetId())
-            {
-                // Smoke Bomb
-                case 76577:
-                {
-                    if (apply)
-                    {
-                        if (Aura* aur = caster->AddAura(88611, target))
-                        {
-                            aur->SetMaxDuration(GetBase()->GetDuration());
-                            aur->SetDuration(GetBase()->GetDuration());
-                        
-                            if (!target->IsFriendlyTo(caster))
-                                target->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
-                        }
-                    }
-                    else
-                        target->RemoveAura(88611);
-                    break;
-                }
-            }
-
-            break;
-        }
     }
 }
 
@@ -6555,11 +6552,9 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                     else caster->RemoveAurasDueToSpell(96268);
                     break;
                 }
-                default: break;
+                default:
+                    break;
             }
-            // Death and Decay
-            if (GetSpellInfo()->SpellFamilyFlags[0] & 0x20)
-                caster->CastCustomSpell(target, 52212, &m_amount, NULL, NULL, true, 0, this);
             break;
         case SPELLFAMILY_PALADIN:
             if (!caster || !target)

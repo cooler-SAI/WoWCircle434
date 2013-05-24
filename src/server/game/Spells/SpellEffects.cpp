@@ -904,6 +904,13 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.035f);
                     }
                 }
+                // Chains of Ice
+                else if (m_spellInfo->Id == 45524)
+                {
+                    if (m_caster->HasAura(58620))
+                        damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.08);
+                }
+
                 break;
             }
             case SPELLFAMILY_MAGE:
@@ -982,8 +989,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     {
                         float attackPower = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
                         int32 spellPower = m_caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->SchoolMask));
-                        uint32 maxdmg = attackPower > spellPower ? (attackPower * 0.344f) : (spellPower * 0.344f);
-                        damage += int32(maxdmg);
+                        damage += int32((attackPower > spellPower ? (attackPower * 0.344f) : (spellPower * 0.344f)));
                         break;
                     }
                 }
