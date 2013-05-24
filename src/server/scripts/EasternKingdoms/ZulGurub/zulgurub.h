@@ -29,6 +29,10 @@ enum CreatureIds
     NPC_ZANZIL              = 52053,
     NPC_JINDO               = 52148,
 
+    // Bloodlord Mandokir
+    NPC_CHAINED_SPIRIT      = 52156,
+    NPC_OHGAN               = 52157,
+	
     // Cache of Madness
     NPC_HAZZARAH            = 52271,
     NPC_RENATAKI            = 52269,
@@ -53,6 +57,16 @@ enum OtherSpells
     SPELL_FROSTBURN_FORMULA = 96331,
     SPELL_HYPPOTHERMIA      = 96332,
 };
+
+template<class AI>
+CreatureAI* GetZulGurubAI(Creature* creature)
+{
+    if (InstanceMap* instance = creature->GetMap()->ToInstanceMap())
+        if (instance->GetInstanceScript())
+            if (instance->GetScriptId() == sObjectMgr->GetScriptId(ZGScriptName))
+                return new AI(creature);
+    return NULL;
+}
 
 #endif
 

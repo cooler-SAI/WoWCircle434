@@ -52,7 +52,7 @@ SET @INFLUENCE_TENTACLE := 33943;
 SET @INFLUENCE_TENTACLE_H := 33959;
 SET @DESCEND_INTO_MADNESS := 34072;
 
-SET @GUID := 62015;
+SET @GUID := 56800;
 
 -- GameObjects
 SET @FLEE_TO_THE_SURFACE := 194625;
@@ -60,7 +60,7 @@ SET @DRAGON_SOUL := 194462;
 SET @INSTANCE_PORTAL := 194338;
 SET @CHAIR := 194360;
 
-SET @GO_GUID := 17800;
+SET @GO_GUID := 99269;
 
 DELETE FROM `creature_text` WHERE `entry` IN (@SARA,@YOGG_SARON,@VOICE_OF_YOGG_SARON,@GARONA,@KING_LLANE,@THE_LICH_KING,@IMMOLATED_CHAMPION,@NELTHARION,@YSERA,@MALYGOS,@YOGG_SARON_ILLUSIONS,@FREYA_GOSSIP,@HODIR_GOSSIP,@THORIM_GOSSIP,@MIMIRON_GOSSIP,@OMINOUS_CLOUD,@BRAIN_OF_YOGG_SARON);
 INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`language`,`probability`,`emote`,`duration`,`sound`,`comment`) VALUES
@@ -155,7 +155,7 @@ INSERT INTO `gameobject` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`position_x`
 (@GO_GUID+10,@CHAIR+4,603,3,1,1899.228,45.58289,239.6471,1.417184,0,0,0.6507654,0.7592788,604800,0,0),
 (@GO_GUID+11,@CHAIR+5,603,3,1,1923.472,28.16412,239.6471,2.289849,0,0,0.9106789,0.413115,604800,0,0);
 
-DELETE FROM `creature` WHERE `id` IN (@VOICE_OF_YOGG_SARON,@SARA,@BRAIN_OF_YOGG_SARON,@OMINOUS_CLOUD,@LAUGHING_SKULL,@THE_LICH_KING,@IMMOLATED_CHAMPION,@DEATHSWORN_ZEALOT,@GARONA,@KING_LLANE,@SUIT_OF_ARMOR,@NELTHARION,@MALYGOS,@ALEXSTRASZA,@YSERA,@OBSIDIAN_CONSORT,@AZURE_CONSORT,@EMERALD_CONSORT,@RUBY_CONSORT,@YOGG_SARON_ILLUSIONS,@TRIGGER,@SANITY_WELL);
+DELETE FROM `creature` WHERE `id` IN (@VOICE_OF_YOGG_SARON,@SARA,@BRAIN_OF_YOGG_SARON,@OMINOUS_CLOUD,@LAUGHING_SKULL,@THE_LICH_KING,@IMMOLATED_CHAMPION,@DEATHSWORN_ZEALOT,@GARONA,@KING_LLANE,@SUIT_OF_ARMOR,@NELTHARION,@MALYGOS,@ALEXSTRASZA,@YSERA,@OBSIDIAN_CONSORT,@AZURE_CONSORT,@EMERALD_CONSORT,@RUBY_CONSORT,@YOGG_SARON_ILLUSIONS,@TRIGGER,@SANITY_WELL) AND `map`=603;
 DELETE FROM `creature` WHERE `guid` BETWEEN @GUID+0 AND @GUID+7;
 INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`) VALUES
 (@GUID+0,@VOICE_OF_YOGG_SARON,603,3,1,0,0,1980.137,-25.74376,326.4671,0,604800,0,0,0,0,0,0,0,0),
@@ -384,90 +384,86 @@ DELETE FROM `disables` WHERE `SourceType`=4 AND `entry` IN (10187,10189,10293,10
 DELETE FROM `achievement_criteria_data` WHERE `criteria_id` IN (10185,10187,10189,10296,10321,10322,10323,10324,10325,10326,10388,10409,10410,10412,10414,10415,10416,10417);
 INSERT INTO `achievement_criteria_data` (`criteria_id`,`type`,`value1`,`value2`,`ScriptName`) VALUES
 (10185,18,0,0,''),
-(10185,12,0,0,''),
+-- (10185,12,0,0,''),
 (10187,1,@SARA,0,''),
 (10187,7,65157,0,''),
-(10187,12,0,0,''),
+-- (10187,12,0,0,''),
 (10189,1,@SARA,0,''),
 (10189,7,65157,0,''),
-(10189,12,1,0,''),
+-- (10189,12,1,0,''),
 (10296,18,0,0,''),
-(10296,12,1,0,''),
+-- (10296,12,1,0,''),
 (10321,18,0,0,''),
-(10321,12,1,0,''),
+-- (10321,12,1,0,''),
 (10322,18,0,0,''),
-(10322,12,1,0,''),
+-- (10322,12,1,0,''),
 (10323,18,0,0,''),
-(10323,12,1,0,''),
+-- (10323,12,1,0,''),
 (10324,18,0,0,''),
-(10324,12,0,0,''),
+-- (10324,12,0,0,''),
 (10325,18,0,0,''),
-(10325,12,0,0,''),
+-- (10325,12,0,0,''),
 (10326,18,0,0,''),
-(10326,12,0,0,''),
+-- (10326,12,0,0,''),
 (10388,18,0,0,''),
-(10388,12,0,0,''),
+-- (10388,12,0,0,''),
 (10409,18,0,0,''),
-(10409,12,0,0,''),
+-- (10409,12,0,0,''),
 (10410,18,0,0,''),
-(10410,12,0,0,''),
+-- (10410,12,0,0,''),
 (10412,18,0,0,''),
-(10412,12,0,0,''),
+-- (10412,12,0,0,''),
 (10414,18,0,0,''),
-(10414,12,1,0,''),
+-- (10414,12,1,0,''),
 (10415,18,0,0,''),
-(10415,12,1,0,''),
+-- (10415,12,1,0,''),
 (10416,18,0,0,''),
-(10416,12,1,0,''),
-(10417,18,0,0,''),
-(10417,12,1,0,'');
+-- (10416,12,1,0,''),
+(10417,18,0,0,'');
+-- (10417,12,1,0,'');
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceEntry` IN (62714,65209,62978,63037,63882,63884,63886,64059,64063,64069,64172,64173,64184,65238,63744,63745,63747,64465,64466,64555,65719,65206);
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=17 AND `SourceEntry`=64184;
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=18 AND `SourceGroup`=@DESCEND_INTO_MADNESS;
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorType`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES
-(18,@DESCEND_INTO_MADNESS,63997,0,0,13,0,38,0,0,0,0,0,'','Required instance data for spellclick'),
-(18,@DESCEND_INTO_MADNESS,63998,0,0,13,0,38,1,0,0,0,0,'','Required instance data for spellclick'),
-(18,@DESCEND_INTO_MADNESS,63989,0,0,13,0,38,2,0,0,0,0,'','Required instance data for spellclick'),
-(13,2,62714,0,0,31,0,3,@GUARDIAN_OF_YOGG_SARON,0,0,0,0,'','Shadow Nova'),
-(13,2,65209,0,0,31,0,3,@GUARDIAN_OF_YOGG_SARON,0,0,0,0,'','Shadow Nova'),
-(13,1,62978,0,0,31,0,3,@OMINOUS_CLOUD,0,0,0,0,'','Summon Guardian'),
-(13,1,63037,0,0,31,0,3,@IMMOLATED_CHAMPION,0,0,0,0,'','Deathgrasp'),
-(13,1,63744,0,0,31,0,3,@GUARDIAN_OF_YOGG_SARON,0,0,0,0,'','Sara''s Anger'),
-(13,1,63745,0,0,31,0,4,0,0,0,0,0,'','Sara''s Blessing'),
-(13,1,63747,0,0,31,0,4,0,0,0,0,0,'','Sara''s Fervor'),
-(13,1,63882,0,0,31,0,3,@DEATH_ORB,0,0,0,0,'','Death Ray Warning Visual'),
-(13,1,63884,0,0,1,0,63120,0,0,1,0,0,'','Death Ray damage'),
-(13,1,63884,0,0,1,0,63830,1,0,1,0,0,'','Death Ray damage'),
-(13,1,63884,0,0,1,0,63881,1,0,1,0,0,'','Death Ray damage'),
-(13,1,63886,0,0,31,0,3,@DEATH_ORB,0,0,0,0,'','Death Ray Damage Visual'),
-(13,1,64059,0,0,31,0,4,0,0,0,0,0,'','Induce Madness'),
-(13,1,64059,0,0,1,0,63988,0,0,0,0,0,'','Induce Madness'),
-(13,1,64063,0,0,31,0,3,@KING_LLANE,0,0,0,0,'','Assassinate'),
-(13,1,64069,0,0,31,0,3,@YOGG_SARON,0,0,0,0,'','Match Health'),
-(13,1,64172,0,0,31,0,3,@IMMORTAL_GUARDIAN,0,0,0,0,'','Titanic Storm'),
-(13,1,64172,0,0,1,0,64162,0,0,0,0,0,'','Titanic Storm'),
-(13,1,64172,0,1,31,0,3,@MARKED_IMMORTAL_GUARDIAN,0,0,0,0,'','Titanic Storm'),
-(13,1,64172,0,1,1,0,64162,0,0,0,0,0,'','Titanic Storm'),
-(13,1,64173,0,0,31,0,3,@SARA,0,0,0,0,'','Shattered Illusion'),
-(13,1,64173,0,1,31,0,3,@YOGG_SARON,0,0,0,0,'','Shattered Illusion'),
-(13,1,64173,0,2,31,0,3,@CRUSHER_TENTACLE,0,0,0,0,'','Shattered Illusion'),
-(13,1,64173,0,3,31,0,3,@CONSTRICTOR_TENTACLE,0,0,0,0,'','Shattered Illusion'),
-(13,1,64173,0,4,31,0,3,@CORRUPTOR_TENTACLE,0,0,0,0,'','Shattered Illusion'),
-(13,1,64184,0,0,31,0,3,@YOGG_SARON,0,0,0,0,'','In the Maws of the Old God'),
-(13,1,65238,0,0,31,0,3,@SARA,0,0,0,0,'','Shattered Illusion remove'),
-(13,1,65238,0,1,31,0,3,@YOGG_SARON,0,0,0,0,'','Shattered Illusion remove'),
-(13,1,65238,0,2,31,0,3,@CRUSHER_TENTACLE,0,0,0,0,'','Shattered Illusion remove'),
-(13,1,65238,0,3,31,0,3,@CONSTRICTOR_TENTACLE,0,0,0,0,'','Shattered Illusion remove'),
-(13,1,65238,0,4,31,0,3,@CORRUPTOR_TENTACLE,0,0,0,0,'','Shattered Illusion remove'),
-(13,1,64465,0,0,31,0,3,@IMMORTAL_GUARDIAN,0,0,0,0,'','Shadow Beacon'),
-(13,1,64465,0,0,1,0,64497,0,0,1,0,0,'','Shadow Beacon'),
-(13,1,64466,0,0,31,0,3,@YOGG_SARON,0,0,0,0,'','Empowering Shadows'),
-(13,1,64555,0,0,1,0,63050,0,0,1,0,0,'','Insane Periodic'),
-(13,1,65719,0,0,31,0,3,@SARA,0,0,0,0,'','Shadow Nova'),
-(13,1,65206,0,0,31,0,3,@CORRUPTOR_TENTACLE,0,0,0,0,'','Destabilization Matrix'),
-(13,1,65206,0,1,31,0,3,@CRUSHER_TENTACLE,0,0,0,0,'','Destabilization Matrix');
-
--- Loot
-UPDATE `creature_loot_template` SET `lootmode`=32-`lootmode` WHERE `entry` IN (@YOGG_SARON,@YOGG_SARON_H);
-UPDATE `creature_loot_template` SET `ChanceOrQuestChance`=-100,`lootmode`=32 WHERE `entry`=@YOGG_SARON_H AND `item`=45897;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES
+(18,@DESCEND_INTO_MADNESS,63997,0,0,13,0,38,0,0,0,0,'','Required instance data for spellclick'),
+(18,@DESCEND_INTO_MADNESS,63998,0,0,13,0,38,1,0,0,0,'','Required instance data for spellclick'),
+(18,@DESCEND_INTO_MADNESS,63989,0,0,13,0,38,2,0,0,0,'','Required instance data for spellclick'),
+(13,2,62714,0,0,31,0,3,@GUARDIAN_OF_YOGG_SARON,0,0,0,'','Shadow Nova'),
+(13,2,65209,0,0,31,0,3,@GUARDIAN_OF_YOGG_SARON,0,0,0,'','Shadow Nova'),
+(13,1,62978,0,0,31,0,3,@OMINOUS_CLOUD,0,0,0,'','Summon Guardian'),
+(13,1,63037,0,0,31,0,3,@IMMOLATED_CHAMPION,0,0,0,'','Deathgrasp'),
+(13,1,63744,0,0,31,0,3,@GUARDIAN_OF_YOGG_SARON,0,0,0,'','Sara''s Anger'),
+(13,1,63745,0,0,31,0,4,0,0,0,0,'','Sara''s Blessing'),
+(13,1,63747,0,0,31,0,4,0,0,0,0,'','Sara''s Fervor'),
+(13,1,63882,0,0,31,0,3,@DEATH_ORB,0,0,0,'','Death Ray Warning Visual'),
+(13,1,63884,0,0,1,0,63120,0,0,1,0,'','Death Ray damage'),
+(13,1,63884,0,0,1,0,63830,1,0,1,0,'','Death Ray damage'),
+(13,1,63884,0,0,1,0,63881,1,0,1,0,'','Death Ray damage'),
+(13,1,63886,0,0,31,0,3,@DEATH_ORB,0,0,0,'','Death Ray Damage Visual'),
+(13,1,64059,0,0,31,0,4,0,0,0,0,'','Induce Madness'),
+(13,1,64059,0,0,1,0,63988,0,0,0,0,'','Induce Madness'),
+(13,1,64063,0,0,31,0,3,@KING_LLANE,0,0,0,'','Assassinate'),
+(13,1,64069,0,0,31,0,3,@YOGG_SARON,0,0,0,'','Match Health'),
+(13,1,64172,0,0,31,0,3,@IMMORTAL_GUARDIAN,0,0,0,'','Titanic Storm'),
+(13,1,64172,0,0,1,0,64162,0,0,0,0,'','Titanic Storm'),
+(13,1,64172,0,1,31,0,3,@MARKED_IMMORTAL_GUARDIAN,0,0,0,'','Titanic Storm'),
+(13,1,64172,0,1,1,0,64162,0,0,0,0,'','Titanic Storm'),
+(13,1,64173,0,0,31,0,3,@SARA,0,0,0,'','Shattered Illusion'),
+(13,1,64173,0,1,31,0,3,@YOGG_SARON,0,0,0,'','Shattered Illusion'),
+(13,1,64173,0,2,31,0,3,@CRUSHER_TENTACLE,0,0,0,'','Shattered Illusion'),
+(13,1,64173,0,3,31,0,3,@CONSTRICTOR_TENTACLE,0,0,0,'','Shattered Illusion'),
+(13,1,64173,0,4,31,0,3,@CORRUPTOR_TENTACLE,0,0,0,'','Shattered Illusion'),
+(13,1,64184,0,0,31,0,3,@YOGG_SARON,0,0,0,'','In the Maws of the Old God'),
+(13,1,65238,0,0,31,0,3,@SARA,0,0,0,'','Shattered Illusion remove'),
+(13,1,65238,0,1,31,0,3,@YOGG_SARON,0,0,0,'','Shattered Illusion remove'),
+(13,1,65238,0,2,31,0,3,@CRUSHER_TENTACLE,0,0,0,'','Shattered Illusion remove'),
+(13,1,65238,0,3,31,0,3,@CONSTRICTOR_TENTACLE,0,0,0,'','Shattered Illusion remove'),
+(13,1,65238,0,4,31,0,3,@CORRUPTOR_TENTACLE,0,0,0,'','Shattered Illusion remove'),
+(13,1,64465,0,0,31,0,3,@IMMORTAL_GUARDIAN,0,0,0,'','Shadow Beacon'),
+(13,1,64465,0,0,1,0,64497,0,0,1,0,'','Shadow Beacon'),
+(13,1,64466,0,0,31,0,3,@YOGG_SARON,0,0,0,'','Empowering Shadows'),
+(13,1,64555,0,0,1,0,63050,0,0,1,0,'','Insane Periodic'),
+(13,1,65719,0,0,31,0,3,@SARA,0,0,0,'','Shadow Nova'),
+(13,1,65206,0,0,31,0,3,@CORRUPTOR_TENTACLE,0,0,0,'','Destabilization Matrix'),
+(13,1,65206,0,1,31,0,3,@CRUSHER_TENTACLE,0,0,0,'','Destabilization Matrix');
