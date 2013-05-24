@@ -11894,16 +11894,18 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
             if (spellProto->SpellFamilyFlags[0] & 0x4000 && damagetype == DOT)
             {
                 AlreadyCalculated = true;
+                WeaponAttackType attType = (spellProto->IsRangedWeaponSpell() && spellProto->DmgClass == SPELL_DAMAGE_CLASS_RANGED) ? RANGED_ATTACK : BASE_ATTACK;
+                int32 APbonus = float(victim->GetTotalAuraModifier(attType == BASE_ATTACK ? SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS : SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS));
                 switch (spellProto->Id)
                 {
                     case 1978:
-                        DoneTotal = int32((GetTotalAttackPowerValue(RANGED_ATTACK) * 0.4f + (pdamage * 15 / 3)) / (spellProto->GetMaxDuration() / spellProto->Effects[0].Amplitude));
+                        DoneTotal = int32(((GetTotalAttackPowerValue(RANGED_ATTACK) + APbonus) * 0.4f + (pdamage * 15 / 3)) / (spellProto->GetMaxDuration() / spellProto->Effects[0].Amplitude));
                         break;
                     case 88453:
-                        DoneTotal = int32((GetTotalAttackPowerValue(RANGED_ATTACK) * 0.16f + (pdamage * 6 / 3)) / (spellProto->GetMaxDuration() / spellProto->Effects[0].Amplitude));
+                        DoneTotal = int32(((GetTotalAttackPowerValue(RANGED_ATTACK) + APbonus) * 0.16f + (pdamage * 6 / 3)) / (spellProto->GetMaxDuration() / spellProto->Effects[0].Amplitude));
                         break;
                     case 88466:
-                        DoneTotal = int32((GetTotalAttackPowerValue(RANGED_ATTACK) * 0.24f + (pdamage * 9 / 3)) / (spellProto->GetMaxDuration() / spellProto->Effects[0].Amplitude));
+                        DoneTotal = int32(((GetTotalAttackPowerValue(RANGED_ATTACK) + APbonus) * 0.24f + (pdamage * 9 / 3)) / (spellProto->GetMaxDuration() / spellProto->Effects[0].Amplitude));
                         break;
                     default:
                         break;
