@@ -3014,6 +3014,10 @@ void SpellMgr::LoadSpellCustomAttr()
             case 48707: // Anti-Magic Shell
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SEND_BASE_AMOUNT;
                 break;
+            // Hand of Light
+            case 96172:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_TRIGGERED_IGNORE_RESILENCE;
+                break;
             default:
                 break;
         }

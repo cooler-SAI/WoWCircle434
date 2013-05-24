@@ -448,7 +448,7 @@ bool ArchaeologyMgr::SolveResearchProject(uint32 projectId)
     for (std::vector<ProjectCost>::const_iterator itr = costData.begin(); itr != costData.end(); ++itr)
     {
         if ((*itr).currency)
-            _player->ModifyCurrency((*itr).itemId, -(*itr).count);
+            _player->ModifyCurrency((*itr).itemId, -int32((*itr).count));
         else
             _player->DestroyItemCount((*itr).itemId, (*itr).count, true);
     }
