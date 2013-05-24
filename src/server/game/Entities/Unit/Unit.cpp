@@ -7363,17 +7363,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     }
                     return false;
             }
-
-            switch (dummySpell->SpellIconID)
-            {
-                case 2909: // 
-                {
-                    // "refresh your Slice and Dice duration to its 5 combo point maximum"
-                    // lookup Slice and Dice
-                    
-                    return false;
-                }
-            }
             break;
         }
         case SPELLFAMILY_HUNTER:

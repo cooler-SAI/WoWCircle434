@@ -13977,6 +13977,10 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                     if (!(GetSpecsCount() == 1 && creature->isCanTrainingAndResetTalentsOf(this) && !(getLevel() < sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))))
                         canTalk = false;
                     break;
+                case GOSSIP_OPTION_UNLEARNDUALSPEC:
+                    if (!(GetSpecsCount() > 1 && creature->isCanTrainingAndResetTalentsOf(this) && !(getLevel() < sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))))
+                        canTalk = false;
+                    break;
                 case GOSSIP_OPTION_UNLEARNTALENTS:
                     if (!creature->isCanTrainingAndResetTalentsOf(this))
                         canTalk = false;
@@ -14170,6 +14174,14 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
                 CastSpell(this, 63624, true, NULL, NULL, GetGUID());
 
                 // Should show another Gossip text with "Congratulations..."
+                PlayerTalkClass->SendCloseGossip();
+            }
+            break;
+        case GOSSIP_OPTION_UNLEARNDUALSPEC:
+            if (GetSpecsCount() > 1 && getLevel() >= sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))
+            {
+                CastSpell(this, 63651, true, NULL, NULL, GetGUID());
+
                 PlayerTalkClass->SendCloseGossip();
             }
             break;
