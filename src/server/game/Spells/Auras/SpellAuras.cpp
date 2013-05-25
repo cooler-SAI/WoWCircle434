@@ -2670,7 +2670,7 @@ bool Aura::CanStackWith(Aura const* existingAura) const
             return true;
 
         if (GetCastItemGUID() && existingAura->GetCastItemGUID())
-            if (GetCastItemGUID() != existingAura->GetCastItemGUID() && m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_ENCHANT_PROC))
+            if (GetCastItemGUID() != existingAura->GetCastItemGUID() && m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_ENCHANT_STACK))
                 return true;
 
         // same spell with same caster should not stack
@@ -2704,21 +2704,16 @@ bool Aura::CanStackWith(Aura const* existingAura) const
         (existingSpellInfo->GetMaxDuration() <= 60*IN_MILLISECONDS && existingSpellInfo->GetMaxDuration() != -1)))
         return true;
 
-    if (m_spellInfo->Id == 16191) // mana tide buff
-        return true;
-
-    if (!IsPassive() && !existingSpellInfo->IsPassive() && m_spellInfo->SpellFamilyName != SPELLFAMILY_POTION && existingSpellInfo->SpellFamilyName != SPELLFAMILY_POTION)
+    if (m_spellInfo->IsAllwaysStackModifers() && !existingSpellInfo->IsAllwaysStackModifers())
+    {
         for (int i = 0; i < 3; ++i)
         {
             if ((m_spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA || m_spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID) &&
                 (existingSpellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA || existingSpellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID) &&
                 m_spellInfo->Effects[i].ApplyAuraName == existingSpellInfo->Effects[i].ApplyAuraName)
+            {
                 switch (m_spellInfo->Effects[i].ApplyAuraName)
                 {
-                    case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:
-                        // warsong flags
-                        if (m_spellInfo->Id == 23333 || m_spellInfo->Id == 23335 || existingSpellInfo->Id == 23335 || existingSpellInfo->Id == 23333)
-                            break;
                     case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
                     case SPELL_AURA_MOD_STAT:
                         if (m_spellInfo->Effects[i].MiscValue == existingSpellInfo->Effects[i].MiscValue || (m_spellInfo->Effects[i].MiscValueB != 0 && 
@@ -2731,8 +2726,10 @@ bool Aura::CanStackWith(Aura const* existingAura) const
                         break;
                     default:
                         break;
+                }
             }
         }
+    }
 
    if (m_spellInfo->SpellFamilyName != existingSpellInfo->SpellFamilyName)
         return true;
@@ -2772,7 +2769,7 @@ bool Aura::CanStackWith(Aura const* existingAura) const
         if (m_spellInfo->IsMultiSlotAura() && !IsArea())
             return true;
         if (GetCastItemGUID() && existingAura->GetCastItemGUID())
-            if (GetCastItemGUID() != existingAura->GetCastItemGUID() && (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_ENCHANT_PROC))
+            if (GetCastItemGUID() != existingAura->GetCastItemGUID() && (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_ENCHANT_STACK))
                 return true;
         // same spell with same caster should not stack
         return false;

@@ -2797,7 +2797,20 @@ void SpellMgr::LoadSpellCustomAttr()
                             if (procInfo->HasAura(SPELL_AURA_PROC_TRIGGER_SPELL))
                                 continue;
 
-                            procInfo->AttributesCu |= SPELL_ATTR0_CU_ENCHANT_PROC;
+                            procInfo->AttributesCu |= SPELL_ATTR0_CU_ENCHANT_STACK;
+                        }
+                    }
+                    else if (IsPartOfSkillLine(SKILL_RUNEFORGING, i))
+                    {
+                        uint32 enchantId = spellInfo->Effects[j].MiscValue;
+                        SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchantId);
+                        for (uint8 s = 0; s < MAX_ITEM_ENCHANTMENT_EFFECTS; ++s)
+                        {
+                            SpellInfo* procInfo = (SpellInfo*)GetSpellInfo(enchant->spellid[s]);
+                            if (!procInfo)
+                                continue;
+
+                            procInfo->AttributesCu |= SPELL_ATTR0_CU_ENCHANT_STACK;
                         }
                     }
                     break;

@@ -176,7 +176,7 @@ enum SpellSpecificType
 
 enum SpellCustomAttributes
 {
-    SPELL_ATTR0_CU_ENCHANT_PROC                  = 0x00000001,
+    SPELL_ATTR0_CU_ENCHANT_STACK                 = 0x00000001,
     SPELL_ATTR0_CU_CONE_BACK                     = 0x00000002,
     SPELL_ATTR0_CU_CONE_LINE                     = 0x00000004,
     SPELL_ATTR0_CU_SHARE_DAMAGE                  = 0x00000008,
@@ -547,6 +547,7 @@ public:
     bool IsRankOf(SpellInfo const* spellInfo) const;
     bool IsDifferentRankOf(SpellInfo const* spellInfo) const;
     bool IsHighRankOf(SpellInfo const* spellInfo) const;
+    bool IsAllwaysStackModifers() const;
 
     bool IsIgnoringCombat() const;
     bool IsRequireAdditionalTargetCheck() const;

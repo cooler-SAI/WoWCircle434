@@ -2591,7 +2591,27 @@ uint32 SpellInfo::_GetExplicitTargetMask() const
     }
     return targetMask;
 }
+bool SpellInfo::IsAllwaysStackModifers() const
+{
+    if (IsPassive())
+        return true;
 
+    if (SpellFamilyName == SPELLFAMILY_POTION)
+        return true;
+
+    switch (Id)
+    {
+        // warsong flags
+        case 23333:
+        case 23335:
+
+        case 16191: // mana tide buff 
+            return true;
+       default:
+            break;
+    }
+    return false;
+}
 bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
 {
     // not found a single positive spell with this attribute
