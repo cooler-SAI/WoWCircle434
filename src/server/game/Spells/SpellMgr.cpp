@@ -6762,6 +6762,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 7328:
                 spellInfo->SpellFamilyName = SPELLFAMILY_PALADIN;
                 break;
+            // Bad Manner
+            case 90337:
+                spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
+                break;
             default:
                 break;
         }
