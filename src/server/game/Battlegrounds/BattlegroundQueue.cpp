@@ -886,7 +886,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
             {
                 front2 = m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_HORDE].front();
                 arenaRating = front2->ArenaMatchmakerRating;
-                float mmrSteps = floor(float((getMSTime() - front1->JoinTime) / 60000)); // every 1 minute
+                float mmrSteps = floor(float((getMSTime() - front2->JoinTime) / 60000)); // every 1 minute
                 mmrMaxDiff = mmrSteps * 150; // increase range up to 150
              
             }
