@@ -3214,7 +3214,17 @@ void UnitAura::_ApplyForTarget(Unit* target, Unit* caster, AuraApplication * aur
 
     // register aura diminishing on apply
     if (DiminishingGroup group = GetDiminishGroup())
+    {
         target->ApplyDiminishingAura(group, true);
+        if (GetId() == 82691)       // Ring of Frost
+        {
+            target->ApplyDiminishingAura(DIMINISHING_RING_OF_FROST, true);
+        }
+        else if (GetId() == 44572)  // Deep Freeze
+        {
+            target->ApplyDiminishingAura(DIMINISHING_DEEP_FREEZE, true);
+        }
+    }
 }
 
 void UnitAura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication * aurApp)
@@ -3223,7 +3233,17 @@ void UnitAura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication * a
 
     // unregister aura diminishing (and store last time)
     if (DiminishingGroup group = GetDiminishGroup())
+    {
         target->ApplyDiminishingAura(group, false);
+        if (GetId() == 82691)       // Ring of Frost
+        {
+            target->ApplyDiminishingAura(DIMINISHING_RING_OF_FROST, false);
+        }
+        else if (GetId() == 44572)  // Deep Freeze
+        {
+            target->ApplyDiminishingAura(DIMINISHING_DEEP_FREEZE, false);
+        }
+    }
 }
 
 void UnitAura::Remove(AuraRemoveMode removeMode)

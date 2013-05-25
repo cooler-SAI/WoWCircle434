@@ -2854,7 +2854,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             if (unit->GetCharmerOrOwnerPlayerOrPlayerItself())
                 unit->IncrDiminishing(DIMINISHING_DEEP_FREEZE);
         }
-        m_diminishLevel = DiminishingLevels(m_diminishLevel + unit->GetDiminishing(m_diminishGroup));
+        m_diminishLevel = DiminishingLevels(std::min(m_diminishLevel + unit->GetDiminishing(m_diminishGroup), int(DIMINISHING_LEVEL_IMMUNE)));
         DiminishingReturnsType type = GetDiminishingReturnsGroupType(m_diminishGroup);
         // Increase Diminishing on unit, current informations for actually casts will use values above
         if ((type == DRTYPE_PLAYER && unit->GetCharmerOrOwnerPlayerOrPlayerItself()) || type == DRTYPE_ALL)
