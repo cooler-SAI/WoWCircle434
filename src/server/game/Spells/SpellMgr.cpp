@@ -3512,7 +3512,7 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 70893: // Culling The Herd (needs target selection script)
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
-                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_MASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_MASTER;
                 break;
             case 54800: // Sigil of the Frozen Conscience - change class mask to custom extended flags of Icy Touch
                         // this is done because another spell also uses the same SpellFamilyFlags as Icy Touch
