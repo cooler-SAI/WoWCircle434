@@ -15330,6 +15330,8 @@ float Unit::GetSpellMaxRangeForTarget(Unit const* target, SpellInfo const* spell
         return 0;
     if (spellInfo->RangeEntry->maxRangeFriend == spellInfo->RangeEntry->maxRangeHostile)
         return spellInfo->GetMaxRange();
+    if (!target)
+        return spellInfo->GetMaxRange();
     return spellInfo->GetMaxRange(!IsHostileTo(target));
 }
 
