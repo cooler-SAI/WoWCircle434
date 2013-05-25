@@ -6030,7 +6030,7 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // Steady Shot
             case 56641:
-                spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_TARGET_ENEMY;
                 break;
             // Fortune Cookie
             case 87604:
