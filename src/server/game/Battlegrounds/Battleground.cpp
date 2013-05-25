@@ -1091,7 +1091,7 @@ void Battleground::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
         if (Transport)
             player->TeleportToBGEntryPoint();
 
-        sLog->outInfo(LOG_FILTER_BATTLEGROUND, "BATTLEGROUND: Removed player %s from Battleground.", player->GetName());
+        sLog->outError(LOG_FILTER_BATTLEGROUND, "BATTLEGROUND: Removed player %s from Battleground.", player->GetName());
     }
 
     //battleground object will be deleted next Battleground::Update() call

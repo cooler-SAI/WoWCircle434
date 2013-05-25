@@ -36,7 +36,7 @@ void WorldSession::SendBfInvitePlayerToWar(uint64 guid, uint32 zoneId, uint32 pT
 {
     ObjectGuid guidBytes = guid;
 
-    WorldPacket data(SMSG_BATTLEFIELD_MGR_ENTRY_INVITE, 17);
+    WorldPacket data(SMSG_BATTLEFIELD_MGR_ENTRY_INVITE, 16);
 
     data
         .WriteByteMask(guidBytes[5])
@@ -72,7 +72,7 @@ void WorldSession::SendBfInvitePlayerToQueue(uint64 guid)
 {
     ObjectGuid guidBytes = guid;
 
-    WorldPacket data(SMSG_BATTLEFIELD_MGR_QUEUE_INVITE, 11);
+    WorldPacket data(SMSG_BATTLEFIELD_MGR_QUEUE_INVITE, 5);
 
     data
         .WriteBit(true)               // unk
@@ -162,13 +162,14 @@ void WorldSession::SendBfQueueInviteResponse(uint64 guid, uint32 ZoneId, bool Ca
 //This is call when player accept to join war
 void WorldSession::SendBfEntered(uint64 guid)
 {
-    WorldPacket data(SMSG_BATTLEFIELD_MGR_ENTERED, 11);
-
+    uint8 isAFK = _player->isAFK() ? 1 : 0;
     ObjectGuid guidBytes = guid;
+
+    WorldPacket data(SMSG_BATTLEFIELD_MGR_ENTERED, 11);
 
     data
         .WriteBit(false)              // unk
-        .WriteBit(_player->isAFK())
+        .WriteBit(isAFK)              // Clear AFK
         .WriteByteMask(guidBytes[1])
         .WriteByteMask(guidBytes[4])
         .WriteByteMask(guidBytes[5])
@@ -193,9 +194,9 @@ void WorldSession::SendBfEntered(uint64 guid)
 
 void WorldSession::SendBfLeaveMessage(uint64 guid, BFLeaveReason reason)
 {
-    WorldPacket data(SMSG_BATTLEFIELD_MGR_EJECTED, 11);
-
     ObjectGuid guidBytes = guid;
+
+    WorldPacket data(SMSG_BATTLEFIELD_MGR_EJECTED, 11);
 
     data
         .WriteByteMask(guidBytes[2])

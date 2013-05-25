@@ -830,6 +830,7 @@ class WorldSession
         void HandleBfQueueInviteResponse(WorldPacket& recvData);
         void HandleBfEntryInviteResponse(WorldPacket& recvData);
         void HandleBfExitRequest(WorldPacket& recvData);
+        void HandleBfJoin(WorldPacket &recv_data);
 
         // Looking for Dungeon/Raid
         void HandleLfgSetCommentOpcode(WorldPacket& recvData);
