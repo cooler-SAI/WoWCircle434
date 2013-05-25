@@ -417,7 +417,7 @@ class Spell
         bool CanAutoCast(Unit* target);
         void CheckSrc() { if (!m_targets.HasSrc()) m_targets.SetSrc(*m_caster); }
         void CheckDst() { if (!m_targets.HasDst()) m_targets.SetDst(*m_caster); }
-        bool LOSAdditionalRules(Unit const* target) const;
+        bool LOSAdditionalRules(Unit const* target, int8 eff = -1) const;
 
         static void SendCastResult(Player* caster, SpellInfo const* spellInfo, uint8 cast_count, SpellCastResult result, SpellCustomErrors customError = SPELL_CUSTOM_ERROR_NONE);
         void SendCastResult(SpellCastResult result);

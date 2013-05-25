@@ -7214,7 +7214,15 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                 return true;
             if (LOSAdditionalRules(target))
                 return true;
-            if (target != m_caster && !target->IsWithinLOSInMap(caster))
+            if (m_targets.HasDst())
+            {
+                float x, y, z;
+                m_targets.GetDstPos()->GetPosition(x, y, z);
+                
+                if (!target->IsWithinLOS(x, y, z))
+                    return false;
+            }
+            else if (target != m_caster && !target->IsWithinLOSInMap(caster))
                 return false;
             break;
     }
@@ -7969,10 +7977,10 @@ bool Spell::IsDarkSimulacrum() const
     return false;
 }
 
-bool Spell::LOSAdditionalRules(Unit const* target) const
+bool Spell::LOSAdditionalRules(Unit const* target, int8 eff) const
 {
     // Okay, custom rules for LoS
-    for (uint8 x = 0; x < MAX_SPELL_EFFECTS; ++x)
+    for (uint8 x = (eff == -1 ? 0: eff); x < (eff == -1 ? MAX_SPELL_EFFECTS: eff + 1); ++x)
     {
         // like paladin auras
         if (m_spellInfo->Effects[x].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID)
@@ -7986,8 +7994,14 @@ bool Spell::LOSAdditionalRules(Unit const* target) const
         if (m_spellInfo->IsChanneled())
             continue;
 
-        if (m_spellInfo->Effects[x].TargetA.GetTarget() == TARGET_UNIT_PET || m_spellInfo->Effects[x].TargetA.GetTarget() == TARGET_UNIT_MASTER)
-            return true;
+        switch (m_spellInfo->Effects[x].TargetA.GetTarget())
+        {
+            case TARGET_UNIT_PET:
+            case TARGET_UNIT_MASTER:
+                return true;
+            default:
+                break;
+        }
     }
 
     return false;
