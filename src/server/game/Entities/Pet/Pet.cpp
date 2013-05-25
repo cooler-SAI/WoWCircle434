@@ -928,7 +928,11 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
             //bonusAP += val * 0.57;
 
             if (IsPetGhoul())
-                CastSpell(this, 47466, true);
+            {
+                CastSpell(this, 47466, true);   // Self Stun
+                int32 basepoints = -90;
+                CastCustomSpell(this, 62137, &basepoints, 0, 0, true);   // Avoidance
+            }
 
             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
