@@ -372,8 +372,6 @@ class spell_sha_healing_stream_totem : public SpellScriptLoader
                             // Purification (Passive)
                             if (AuraEffect* purify = owner->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_SHAMAN, ICON_ID_PURIFICATION, 0))
                                 AddPct(damage, purify->GetAmount());                               
-
-                            damage = int32(target->SpellHealingBonusTaken(owner, triggeringSpell, damage, HEAL));
                         }
                         caster->CastCustomSpell(target, SPELL_HEALING_STREAM_TOTEM_HEAL, &damage, 0, 0, true, 0, 0, GetOriginalCaster()->GetGUID());
                     }
