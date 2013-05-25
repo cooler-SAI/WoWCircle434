@@ -6762,10 +6762,6 @@ void SpellMgr::LoadDbcDataCorrections()
             case 7328:
                 spellInfo->SpellFamilyName = SPELLFAMILY_PALADIN;
                 break;
-            // Find Weakness
-            case 91021:
-                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
-                break;
             default:
                 break;
         }

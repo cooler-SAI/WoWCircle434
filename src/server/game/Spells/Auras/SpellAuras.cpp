@@ -2644,8 +2644,8 @@ bool Aura::CanStackWith(Aura const* existingAura) const
                     if (m_spellInfo->Id == 1490)
                         break;
                     return true;
-                // Vendetta-like auras
-                case SPELL_AURA_MOD_DAMAGE_FROM_CASTER:
+                case SPELL_AURA_MOD_DAMAGE_FROM_CASTER:                // Vendetta-like auras
+                case SPELL_AURA_BYPASS_ARMOR_FOR_CASTER:               // Find Weakness-like auras
                     return true;
                 default:
                     break;
