@@ -41,7 +41,10 @@ enum MageSpells
     SPELL_MAGE_GLYPH_OF_BLAST_WAVE               = 62126,
     SPELL_MAGE_FROSTBOLT                         = 116,
     SPELL_MAGE_TIME_WARP                         = 80353,
-    SPELL_MAGE_TEMPORAL_DISPLACEMENT             = 80354
+    SPELL_MAGE_TEMPORAL_DISPLACEMENT             = 80354,
+    SPELL_MAGE_HYPOTERMIA                        = 41425,
+    SPELL_MAGE_FROST_NOVA                        = 122,
+    SPELL_MAGE_GLYPH_OF_ICE_BLOCK                = 56372
 };
 
 enum OtherSpells
@@ -111,6 +114,13 @@ class spell_mage_cold_snap : public SpellScriptLoader
                 caster->RemoveSpellCooldown(44572, true, true); // Deep Freeze
                 caster->RemoveSpellCooldown(45438, true, true); // Ice Block
                 caster->RemoveSpellCooldown(82676, true, true); // Ring of Frost
+
+                // Frostfire orb cooldown
+                if (caster->GetAuraEffect(SPELL_AURA_OVERRIDE_ACTIONBAR_SPELLS, SPELLFAMILY_MAGE, 4650, 1))
+                {
+                    caster->RemoveSpellCooldown(92283, true, true);
+                }
+
                 caster->SendClearCooldownMap(caster);
             }
 
@@ -704,6 +714,44 @@ class spell_mage_impact : public SpellScriptLoader
         }
 };
 
+class spell_mage_ice_block : public SpellScriptLoader
+{
+public:
+    spell_mage_ice_block() : SpellScriptLoader("spell_mage_ice_block") { }
+
+    class spell_mage_ice_block_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_mage_ice_block_SpellScript);
+
+        bool Load()
+        {
+            return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        }
+
+        void ApplyAura(SpellEffIndex /*effIndex*/)
+        {
+            Player* caster = GetCaster()->ToPlayer();
+
+            caster->CastSpell(caster, SPELL_MAGE_HYPOTERMIA, true);
+
+            if (caster->HasAura(SPELL_MAGE_GLYPH_OF_ICE_BLOCK))
+                caster->RemoveSpellCooldown(SPELL_MAGE_FROST_NOVA, true);
+        }
+
+        void Register()
+        {
+            // add dummy effect spell handler to Cold Snap
+            OnEffectHit += SpellEffectFn(spell_mage_ice_block_SpellScript::ApplyAura, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_mage_ice_block_SpellScript();
+    }
+};
+
+
 void AddSC_mage_spell_scripts()
 {
     new spell_mage_blast_wave();
@@ -718,4 +766,5 @@ void AddSC_mage_spell_scripts()
     new spell_mage_cauterize();
     new spell_mage_time_warp();
     new spell_mage_impact();
+    new spell_mage_ice_block();
 }

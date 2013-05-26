@@ -58,6 +58,8 @@ EndContentData */
 #include "Cell.h"
 #include "CellImpl.h"
 #include "SpellAuras.h"
+#include "TotemAI.h"
+#include "Totem.h"
 
 /*########
 # npc_air_force_bots
@@ -3599,31 +3601,31 @@ class npc_frostfire_orb: public CreatureScript
 
 class npc_power_word_barrier : public CreatureScript
 {
-public:
-    npc_power_word_barrier() : CreatureScript("npc_power_word_barrier") { }
+    public:
+        npc_power_word_barrier() : CreatureScript("npc_power_word_barrier") { }
 
-    struct npc_power_word_barrierAI : public ScriptedAI
-    {
-        npc_power_word_barrierAI(Creature *pCreature) : ScriptedAI(pCreature) {}
-
-        void Reset()
+        CreatureAI* GetAI(Creature* pCreature) const
         {
-            DoCast(me, 81781, true);
+            return new npc_power_word_barrierAI(pCreature);
         }
 
-        void InitializeAI()
+        struct npc_power_word_barrierAI : public Scripted_NoMovementAI
         {
-            ScriptedAI::InitializeAI();
-            me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        }
-    };
+            npc_power_word_barrierAI(Creature *pCreature) : Scripted_NoMovementAI(pCreature) 
+            {
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                me->SetReactState(REACT_PASSIVE);
+            }
 
-    CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new npc_power_word_barrierAI(pCreature);
-    }
+            void IsSummonedBy(Unit* /*owner*/)
+            {
+                DoCast(me, 81781);
+            }
+
+            void EnterEvadeMode() { }
+
+            void UpdateAI(const uint32 diff) { }
+        };
 };
 
 class npc_wild_mushroom : public CreatureScript
@@ -3930,7 +3932,113 @@ class npc_warlock_doom_guard : public CreatureScript
             }
         };
 };
+class npc_searing_totem: public CreatureScript
+{
+    public:
+        npc_searing_totem() : CreatureScript("npc_searing_totem") { }
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_searing_totemAI(creature);
+        }
+        enum REDIRECT_AURAS
+        {
+            SHAMAN_SPELL_STORMSTRIKE               = 17364,
+            SHAMAN_SPELL_FLAME_SHOCK               = 8050
+        };
+        struct npc_searing_totemAI : TotemAI
+        {
+            npc_searing_totemAI(Creature *creature) : TotemAI(creature)
+            {
+                owner = me->GetOwner();
+            }
 
+            typedef std::pair <float, Unit*> float_unit_pair;
+            float_unit_pair GetUnitAuraDuration(Unit *owner, float max_range, uint32 spell_id)
+            {
+                Unit * unit = 0;
+                float ratio = 0.0f;
+                Trinity::AnyUnitHavingBuffInObjectRangeCheck u_check(owner, owner, max_range, spell_id, false);
+                Trinity::UnitLastSearcher<Trinity::AnyUnitHavingBuffInObjectRangeCheck> checker(owner, unit, u_check);
+                owner->VisitNearbyGridObject(max_range, checker);
+
+                if (unit)
+                    if (Aura * aur = unit->GetAura(spell_id, owner->GetGUID()))
+                        ratio = float(aur->GetDuration()) / float(aur->GetMaxDuration());
+
+                return float_unit_pair (ratio, unit);
+            }
+
+            void UpdateAI(uint32 const diff)
+            {
+                if (me->ToTotem()->GetTotemType() != TOTEM_ACTIVE)
+                    return;
+
+                if (!me->isAlive())
+                    return;
+
+                // pointer to appropriate target if found any
+                Unit* victim = i_victimGuid ? ObjectAccessor::GetUnit(*me, i_victimGuid) : NULL;
+
+                if (me->IsNonMeleeSpellCasted(false))
+                {
+                    if (victim && victim->HasCrowdControlAura())
+                        victim = NULL;
+                    else
+                        return;            
+                }
+
+                // Search spell
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(me->ToTotem()->GetSpell());
+                if (!spellInfo)
+                    return;
+
+                // Get spell range
+                float max_range = spellInfo->GetMaxRange(false);
+
+                if (owner->IsInWorld())
+                {
+                    float_unit_pair pair_storm = GetUnitAuraDuration(owner, max_range, SHAMAN_SPELL_STORMSTRIKE);
+                    float_unit_pair pair_shock = GetUnitAuraDuration(owner, max_range, SHAMAN_SPELL_FLAME_SHOCK);
+                    if (pair_shock.first > pair_storm.first)
+                    {
+                        if (pair_shock.second)
+                            victim = pair_shock.second;    
+                    }
+                    else
+                    {
+                        if (pair_storm.second)
+                            victim = pair_storm.second;
+                    }
+                }
+                // SPELLMOD_RANGE not applied in this place just because not existence range mods for attacking totems
+
+                // Search victim if no, not attackable, or out of range, or friendly (possible in case duel end)
+                if (!victim ||
+                    !victim->isTargetableForAttack() || !me->IsWithinDistInMap(victim, max_range) ||
+                    me->IsFriendlyTo(victim) || !me->canSeeOrDetect(victim) || victim->HasCrowdControlAura())
+                {
+                    Trinity::NearestAttackableNoCCUnitInObjectRangeCheck u_check(me, me, max_range);
+                    Trinity::UnitLastSearcher<Trinity::NearestAttackableNoCCUnitInObjectRangeCheck> checker1(me, victim, u_check);
+                    me->VisitNearbyObject(max_range, checker1);
+                }
+
+                // If have target
+                if (victim)
+                {
+                    // remember
+                    i_victimGuid = victim->GetGUID();
+
+                    // attack
+                    me->SetInFront(victim);                         // client change orientation by self
+                    me->CastSpell(victim, me->ToTotem()->GetSpell(), false);
+                }
+                else
+                    i_victimGuid = 0;
+            }
+            Unit *owner;
+        };
+
+};
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -3978,4 +4086,5 @@ void AddSC_npcs_special()
     new npc_kwee_q_peddlefeet();
     new npc_moonwell_chalice();
     new npc_warlock_doom_guard();
+    new npc_searing_totem();
 }

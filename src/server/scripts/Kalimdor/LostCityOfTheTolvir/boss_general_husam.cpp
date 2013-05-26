@@ -115,7 +115,7 @@ public:
             // To do: fix client crash
             //events.ScheduleEvent(EVENT_SUMMON_SHOCKWAVE, urand(12000, 17000));
             events.ScheduleEvent(EVENT_HAMMER_FIST, 5000);
-            events.ScheduleEvent(EVENT_BAD_INTENTIONS, urand(7000, 11000));
+            //events.ScheduleEvent(EVENT_BAD_INTENTIONS, urand(7000, 11000));
 
             if (IsHeroic())
                 events.ScheduleEvent(EVENT_COUNTDOWN_LAND_MINES, 15000);

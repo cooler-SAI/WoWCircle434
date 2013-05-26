@@ -605,7 +605,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PREPARE_STATEMENT(CHAR_DEL_GUILD_FINDER_GUILD_SETTINGS, "DELETE FROM guild_finder_guild_settings WHERE guildId = ?", CONNECTION_ASYNC);
 
     // Archaeology
-    PREPARE_STATEMENT(CHAR_SEL_CHAR_ARCHAEOLOGY, "SELECT sites, counts, projects, completed FROM character_archaeology WHERE guid = ?", CONNECTION_ASYNC);
+    PREPARE_STATEMENT(CHAR_SEL_CHAR_ARCHAEOLOGY, "SELECT sites0, sites1, sites2, sites3, counts, projects, completed FROM character_archaeology WHERE guid = ?", CONNECTION_ASYNC);
 
     // Currency
     PREPARE_STATEMENT(CHAR_UPD_CURRENCY_WEEK_CAP, "UPDATE character_currency_cap SET currentArenaCap = ?, currentRBgCap = ?, requireReset = ?, highestArenaRating = ?, highestRBgRating = ? where guid = '?'", CONNECTION_ASYNC);

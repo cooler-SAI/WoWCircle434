@@ -245,6 +245,8 @@ class boss_shannox : public CreatureScript
             {
                 _JustDied();
                 Talk(SAY_DEATH);
+
+                AddSmoulderingAura(me);
             }
             
             void KilledUnit(Unit* who)

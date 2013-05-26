@@ -175,7 +175,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectReputation,                               //103 SPELL_EFFECT_REPUTATION
     &Spell::EffectSummonObject,                             //104 SPELL_EFFECT_SUMMON_OBJECT_SLOT1
     &Spell::EffectSummonObject,                             //105 SPELL_EFFECT_SUMMON_OBJECT_SLOT2
-    &Spell::EffectSummonObject,                             //106 SPELL_EFFECT_SUMMON_OBJECT_SLOT3
+    &Spell::EffectSummonRaidMarker,                         //106 SPELL_EFFECT_SUMMON_OBJECT_SLOT3
     &Spell::EffectSummonObject,                             //107 SPELL_EFFECT_SUMMON_OBJECT_SLOT4
     &Spell::EffectDispelMechanic,                           //108 SPELL_EFFECT_DISPEL_MECHANIC
     &Spell::EffectSummonDeadPet,                            //109 SPELL_EFFECT_RESURRECT_PET
@@ -356,8 +356,20 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                 switch (m_spellInfo->Id)                     // better way to check unknown
                 {
+                    // Ragnaros (Firelands), Molten Inferno
+                    case 98518:
+                    case 100252:
+                    case 100253:
+                    case 100254:
+                    {
+                        int32 min_dmg = 8000;
+                        float distance = m_caster->GetDistance(unitTarget);
+                        int32 new_dmg = damage - (int32(distance * 4000));
+                        damage = std::max(min_dmg, new_dmg);
+                        break;
+                    }
                     // Shaman, Fire Elemental, Fire Nova
-                    case 13376:
+                    case 12470:
                     {
                         if (Unit* owner = m_caster->GetOwner())
                         {
@@ -367,7 +379,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         break;
                     }
                     // Shaman, Fire Elemental, Fire Shield
-                    case 12740:
+                    case 13376:
                     {
                         if (Unit* owner = m_caster->GetOwner())
                         {
@@ -892,6 +904,13 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.035f);
                     }
                 }
+                // Chains of Ice
+                else if (m_spellInfo->Id == 45524)
+                {
+                    if (m_caster->HasAura(58620))
+                        damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.08);
+                }
+
                 break;
             }
             case SPELLFAMILY_MAGE:
@@ -970,8 +989,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     {
                         float attackPower = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
                         int32 spellPower = m_caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->SchoolMask));
-                        uint32 maxdmg = attackPower > spellPower ? (attackPower * 0.344f) : (spellPower * 0.344f);
-                        damage += int32(maxdmg);
+                        damage += int32((attackPower > spellPower ? (attackPower * 0.344f) : (spellPower * 0.344f)));
                         break;
                     }
                 }
@@ -1866,6 +1884,23 @@ void Spell::EffectForceCast(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
+    switch (m_spellInfo->Id)
+    {
+        case 66548: // teleports outside (Isle of Conquest)
+        case 66549: // teleports inside (Isle of Conquest)
+        {
+            if (Creature* teleportTarget = m_caster->FindNearestCreature((m_spellInfo->Id == 66548 ? 23472 : 22515), 60.0f, true))
+            {
+                float x, y, z, o;
+                teleportTarget->GetPosition(x, y, z, o);
+
+                if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                    m_caster->ToPlayer()->TeleportTo(628, x, y, z, o);
+            }
+            break;
+        }
+    }
+
     if (!unitTarget)
         return;
 
@@ -2705,7 +2740,7 @@ void Spell::EffectCreateItem(SpellEffIndex effIndex)
         return;
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->IsAbilityOfSkillType(SKILL_ARCHAEOLOGY))
-        if (!m_caster->ToPlayer()->SolveResearchProject(m_spellInfo->Id))
+        if (!m_caster->ToPlayer()->GetArchaeologyMgr().SolveResearchProject(m_spellInfo->ResearchProject))
             return;
 
     DoCreateItem(effIndex, m_spellInfo->Effects[effIndex].ItemType);
@@ -2723,6 +2758,20 @@ void Spell::EffectCreateItem2(SpellEffIndex effIndex)
     Player* player = unitTarget->ToPlayer();
 
     uint32 item_id = m_spellInfo->Effects[effIndex].ItemType;
+
+    // Some recipes can proc for more valueable items (cataclysm)
+    uint32 new_id = 0;
+    switch (item_id)
+    {
+        case 52309: new_id = 52314; break; // Nightstone Choker
+        case 52308: new_id = 52316; break; // Hessonite Band
+        case 52307: new_id = 52312; break; // Alicite Pendant  
+        case 52306: new_id = 52310; break; // Jasper Ring
+        default: break;
+    }
+
+    if (new_id && roll_chance_i(10))
+        item_id = new_id;
 
     if (item_id)
         DoCreateItem(effIndex, item_id);
@@ -3242,7 +3291,6 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
 
-    // Hack for water elemental
     switch(m_spellInfo->Id)
     {
         case 31687: // Summon Water Elemental
@@ -3594,7 +3642,7 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
     {
         // Glyph of Dispel Magic
-        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST && m_spellInfo->SpellFamilyFlags[1] & 1)
+        if (m_spellInfo->Id == 97690)
             if (AuraEffect* aurEff = m_caster->GetAuraEffect(55677, 0))
                 if (m_caster->IsFriendlyTo(unitTarget))
                 {
@@ -3781,8 +3829,8 @@ void Spell::EffectLearnSkill(SpellEffIndex effIndex)
     // Archaeology
     if (skillid == SKILL_ARCHAEOLOGY)
     {
-        unitTarget->ToPlayer()->GenerateResearchSites();
-        unitTarget->ToPlayer()->GenerateResearchProjects();
+        unitTarget->ToPlayer()->GetArchaeologyMgr().GenerateResearchSites();
+        unitTarget->ToPlayer()->GetArchaeologyMgr().GenerateResearchProjects();
     }
 }
 
@@ -4089,6 +4137,11 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
         if (!owner && m_originalCaster->ToCreature()->isTotem())
             owner = m_originalCaster->GetCharmerOrOwnerPlayerOrPlayerItself();
     }
+
+    // Mark of Demonic Rebirth
+    if (Aura* aur = m_caster->GetAura(88448))
+        if (m_appliedMods.find(aur) != m_appliedMods.end())
+            m_caster->CastSpell(m_caster, 89140, true);
 
     uint32 petentry = m_spellInfo->Effects[effIndex].MiscValue;
 
@@ -5670,7 +5723,10 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                         if (!(*i)->GetAmplitude())
                             continue;
 
-                        basepoints0 += m_caster->SpellDamageBonusDone(unitTarget, (*i)->GetSpellInfo(), (*i)->GetAmount(), DOT) * 1000 / (*i)->GetAmplitude();
+                        if ((*i)->GetFixedDamageInfo().HasDamage())
+                            basepoints0 += int32((*i)->GetFixedDamageInfo().GetFixedDamage() * 1000 / (*i)->GetAmplitude());
+                        else
+                            basepoints0 += int32(m_caster->SpellDamageBonusDone(unitTarget, (*i)->GetSpellInfo(), (*i)->GetAmount(), DOT) * 1000 / (*i)->GetAmplitude());
                     }
                     if (basepoints0)
                     {
@@ -6302,7 +6358,7 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
     if (m_spellInfo->Id == 80451)
     {
         if (m_caster->ToPlayer())
-            go_id = m_caster->ToPlayer()->GetSurveyBotEntry(o);
+            go_id = m_caster->ToPlayer()->GetArchaeologyMgr().GetSurveyBotEntry(o);
 
         duration = 15000;
     }
@@ -6367,6 +6423,58 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
     map->AddToMap(pGameObj);
 
     m_caster->m_ObjectSlot[slot] = pGameObj->GetGUID();
+}
+
+void Spell::EffectSummonDynObj(SpellEffIndex effIndex)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
+        return;
+
+    Player* player = m_caster->ToPlayer();
+    if (!player)
+        return;
+
+    float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster, NULL, true);
+    DynamicObject* dynObj = new DynamicObject(false);
+    if (!dynObj->CreateDynamicObject(sObjectMgr->GenerateLowGuid(HIGHGUID_DYNAMICOBJECT), m_caster, m_spellInfo, *destTarget, radius, DYNAMIC_OBJECT_RAID_MARKER))
+    {
+        delete dynObj;
+        return;
+    }
+
+    int32 duration = m_spellInfo->GetDuration();
+    dynObj->SetDuration(duration);
+}
+
+void Spell::EffectSummonRaidMarker(SpellEffIndex effIndex)
+{
+    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
+        return;
+
+    Player* player = m_caster->ToPlayer();
+    if (!player)
+        return;
+
+    Group* group = player->GetGroup();
+    if (!group)
+        return;
+
+    uint32 slotMask = 1 << m_spellInfo->Effects[effIndex].BasePoints;
+
+    float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster, NULL, true);
+    DynamicObject* dynObj = new DynamicObject(false);
+    if (!dynObj->CreateDynamicObject(sObjectMgr->GenerateLowGuid(HIGHGUID_DYNAMICOBJECT), m_caster, m_spellInfo, *destTarget, radius, DYNAMIC_OBJECT_RAID_MARKER))
+    {
+        delete dynObj;
+        return;
+    }
+
+    group->AddMarkerToList(dynObj->GetGUID());
+    group->AddGroupMarkerMask(slotMask);
+    group->SendRaidMarkerUpdate();
+
+    int32 duration = m_spellInfo->GetDuration();
+    dynObj->SetDuration(duration);
 }
 
 void Spell::EffectResurrect(SpellEffIndex effIndex)

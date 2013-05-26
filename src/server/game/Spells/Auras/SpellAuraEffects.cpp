@@ -513,12 +513,29 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
     {
         case SPELL_AURA_MOD_DECREASE_SPEED:
         {
+            Unit * target = GetBase()->GetUnitOwner();
+            if (!target)
+                break;
             // Unleash Frost
             if (m_spellInfo->Id == 73682)
             {
-                Unit * target = GetBase()->GetUnitOwner();
-                if (target && target->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED))
+                if (target->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED))
                     amount = 70;
+            }
+            break;
+        }
+        case SPELL_AURA_MOD_SPEED_ALWAYS:
+        {
+            Unit * target = GetBase()->GetUnitOwner();
+            if (!target)
+                break;
+
+            // Stealth / Prowl
+            if (m_spellInfo->HasAura(SPELL_AURA_MOD_STEALTH))
+            {
+                // Elusiveness (Racial Passive)
+                if (AuraEffect *eff = target->GetAuraEffect(21009, 0))
+                    amount += eff->GetAmount();
             }
             break;
         }
@@ -723,9 +740,10 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             // Exorcism 
             else if (GetId() == 879)
             {
+                int32 basedmg = GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster);
                 float attackPower = caster->GetTotalAttackPowerValue(BASE_ATTACK);
                 int32 spellPower = caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->ScalingClass));
-                uint32 maxdmg = attackPower > spellPower ? (attackPower * 0.344f) : (spellPower * 0.344f);
+                int32 maxdmg = int32(basedmg + ((attackPower > spellPower) ? (attackPower * 0.344f) : (spellPower * 0.344f)));
                 amount = int32(maxdmg / 5.0f);
                 amount /= GetTotalTicks();
             }
@@ -996,7 +1014,9 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
     // It's only for players now
     if (caster && caster->GetTypeId() == TYPEID_PLAYER)
     {
-        if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE || GetAuraType() == SPELL_AURA_PERIODIC_LEECH)
+        if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE || 
+        GetAuraType() == SPELL_AURA_PERIODIC_LEECH || 
+        GetAuraType() == SPELL_AURA_PERIODIC_HEAL)
         {
             if (GetBase()->GetType() == UNIT_AURA_TYPE)
             {
@@ -1398,6 +1418,31 @@ void AuraEffect::Update(uint32 diff, Unit* caster)
                         case 78675:
                             GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 81261, true);
                             break;
+                        // Death and Decay
+                        case 43265:
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 52212, true);
+                            break;
+                        // Smoke Bomb
+                        case 76577:
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 88611, true);
+                            break;
+                        // Blizzard
+                        case 10:
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 42208, true);
+                            break;
+                        // Hurricane
+                        case 16914:
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 42231, true);
+                            break;
+                        // Rain of Fire
+                        case 5740:
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 42223, true);
+                            break;
+                        // Consecration
+                        case 36946:
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 81297, true);
+                            break;
+
                     }
                 }
             }
@@ -1618,7 +1663,10 @@ void AuraEffect::PeriodicTick(AuraApplication * aurApp, Unit* caster) const
 
 void AuraEffect::HandleProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
 {
-    // TODO: effect script handlers here
+    bool prevented = GetBase()->CallScriptEffectProcHandlers(const_cast<AuraEffect const*>(this), const_cast<AuraApplication const*>(aurApp), eventInfo);
+    if (prevented)
+        return;
+
     switch (GetAuraType())
     {
         case SPELL_AURA_PROC_TRIGGER_SPELL:
@@ -1639,6 +1687,8 @@ void AuraEffect::HandleProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
         default:
             break;
     }
+	
+    GetBase()->CallScriptAfterEffectProcHandlers(const_cast<AuraEffect const*>(this), const_cast<AuraApplication const*>(aurApp), eventInfo);
 }
 
 void AuraEffect::CleanupTriggeredSpells(Unit* target)
@@ -1658,6 +1708,10 @@ void AuraEffect::CleanupTriggeredSpells(Unit* target)
     // TODO: is there a spell flag, which can solve this in a more sophisticated way?
     if (m_spellInfo->Effects[GetEffIndex()].ApplyAuraName == SPELL_AURA_PERIODIC_TRIGGER_SPELL &&
             uint32(m_spellInfo->GetDuration()) == m_spellInfo->Effects[GetEffIndex()].Amplitude)
+        return;
+
+    // Hack for submerge, Ragnaros (Firelands)
+    if (m_spellInfo->Id == 100051)
         return;
 
     target->RemoveAurasDueToSpell(tSpellId, GetCasterGUID());
@@ -5827,32 +5881,6 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
             }
             break;
         }
-        case SPELLFAMILY_ROGUE:
-        {
-            if (!(mode & AURA_EFFECT_HANDLE_REAL))
-                break;
-
-            switch (GetId())
-            {
-                // Smoke Bomb
-                case 76577:
-                {
-                    if (apply)
-                    {
-                        if (Aura* aur = caster->AddAura(88611, target))
-                        {
-                            aur->SetMaxDuration(GetBase()->GetDuration());
-                            aur->SetDuration(GetBase()->GetDuration());
-                        }
-                    }
-                    else
-                        target->RemoveAura(88611);
-                    break;
-                }
-            }
-
-            break;
-        }
     }
 }
 
@@ -6548,11 +6576,9 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                     else caster->RemoveAurasDueToSpell(96268);
                     break;
                 }
-                default: break;
+                default:
+                    break;
             }
-            // Death and Decay
-            if (GetSpellInfo()->SpellFamilyFlags[0] & 0x20)
-                caster->CastCustomSpell(target, 52212, &m_amount, NULL, NULL, true, 0, this);
             break;
         case SPELLFAMILY_PALADIN:
             if (!caster || !target)
@@ -7325,12 +7351,20 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
 
             damage += addition;
         }
+        if (m_fixed_periodic.HasDamage())
+            damage = m_fixed_periodic.GetFixedDamage();
+        else
+            damage = caster->SpellHealingBonusDone(target, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
 
-        damage = caster->SpellHealingBonusDone(target, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
         damage = target->SpellHealingBonusTaken(caster, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
     }
 
-    bool crit = IsPeriodicTickCrit(target, caster);
+    bool crit = false;
+    if (m_fixed_periodic.HasCritChance())
+        crit = m_fixed_periodic.GetCriticalChance();
+    else
+        IsPeriodicTickCrit(target, caster);
+    
     if (crit)
         damage = caster->SpellCriticalHealingBonus(m_spellInfo, damage, target);
 
@@ -7350,7 +7384,7 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     // damage caster for heal amount
     if (target != caster && GetSpellInfo()->AttributesEx2 & SPELL_ATTR2_HEALTH_FUNNEL)
     {
-        uint32 funnelDamage = GetSpellInfo()->ManaPerSecond; // damage is not affected by spell power
+        uint32 funnelDamage = caster->CountPctFromMaxHealth(GetSpellInfo()->Effects[EFFECT_2].BasePoints); // damage is not affected by spell power
         if ((int32)funnelDamage > gain)
             funnelDamage = gain;
         uint32 funnelAbsorb = 0;

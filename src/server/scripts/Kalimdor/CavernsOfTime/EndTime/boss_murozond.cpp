@@ -369,24 +369,18 @@ class npc_murozond_mirror_image : public CreatureScript
                     me->AddAura(SPELL_FADING, me);
             }
 
-            void InitializeAI()
+            void IsSummonedBy(Unit* owner)
             {
-                if (!me->isDead())
-                    Reset();
-
-                Unit* owner = me->GetOwner();
-                if (!owner)
-                    return;
-
-                owner->CastSpell(me, 102284, true);
-                owner->CastSpell(me, 102288, true);
+                if (owner && owner->isAlive() && owner->IsInWorld())
+                    if (owner->GetTypeId() == TYPEID_PLAYER)
+                        m_owner = owner->ToPlayer();
             }
 
             void DoAction(const int32 action)
             {
                 if (action == ACTION_HOURGLASS)
                 {
-                    if (m_owner && m_owner->ToPlayer())
+                    if (m_owner && m_owner->IsInWorld())
                     {
                         if (!m_owner->isAlive())
                             m_owner->ResurrectPlayer(1.0f, false);
@@ -413,6 +407,11 @@ class npc_murozond_mirror_image : public CreatureScript
                                 m_owner->ToPlayer()->RemoveSpellCooldown((*itr), true, true);
                             m_owner->ToPlayer()->SendClearCooldownMap(m_owner);
                         }
+
+                        m_owner->RemoveAura(SPELL_TEMPORAL_BLAST);
+
+                        m_owner->SetHealth(m_owner->GetMaxHealth());
+                        m_owner->SetPower(m_owner->getPowerType(), m_owner->GetMaxPower(m_owner->getPowerType()));
 
                         m_owner->CastSpell(m_owner, SPELL_BLESSING_OF_BRONZE_DRAGONS, true);
                         m_owner->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), true);

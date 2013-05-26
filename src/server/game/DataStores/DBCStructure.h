@@ -1658,31 +1658,26 @@ struct RandomPropertiesPointsEntry
 
 struct ResearchBranchEntry
 {
-    uint32      ID;                                         // 0
-    char*       name;                                       // 1
-    //uint32    unknown;                                    // 2
-    uint32      currency;                                   // 3
-    //char*     unknown;                                    // 4
-    uint32      specItemId;                                 // 5
-};
-
-struct ResearchPOIPoint
-{                                                           
-    int32       x;                                          // 0
-    int32       y;                                          // 1
+    uint32 ID;          // 0
+    //char*  Name;      // 1
+    //uint32 FieldID;   // 2
+    uint32 CurrencyID;  // 3
+    //char*  Icon;      // 4
+    uint32 ItemID;      // 5
 };
 
 struct ResearchProjectEntry
 {
     uint32      ID;                                         // 0
-    char*       name;                                       // 1
-    char*       description;                                // 2
+    //char*       name;                                     // 1
+    //char*       description;                              // 2
     uint32      rare;                                       // 3
     uint32      branchId;                                   // 4
     uint32      spellId;                                    // 5
-    //uint32    quality;                                    // 6
-    //char*     unknown;                                    // 7
+    //uint32    complexity;                                 // 6
+    //char*     path;                                       // 7
     uint32      req_currency;                               // 8
+
 };
 
 struct ResearchSiteEntry
@@ -1690,7 +1685,7 @@ struct ResearchSiteEntry
     uint32 ID;                                              // 0
     uint32 mapId;                                           // 1
     uint32 POIid;                                           // 2
-    char* areaName;                                         // 3
+    //char* areaName;                                       // 3
     //uint32 flags;                                         // 4
 };
 
@@ -1921,7 +1916,7 @@ struct SpellEntry
     uint32 SpellShapeshiftId;                               // 44       SpellShapeshift.dbc
     uint32 SpellTargetRestrictionsId;                       // 45       SpellTargetRestrictions.dbc
     uint32 SpellTotemsId;                                   // 46       SpellTotems.dbc
-    //uint32 ResearchProject;                               // 47       ResearchProject.dbc
+    uint32 ResearchProject;                                 // 47       ResearchProject.dbc
 };
 
 // SpellCategories.dbc
@@ -2260,6 +2255,17 @@ struct TotemCategoryEntry
     uint32    categoryMask;                                 // 3        m_totemCategoryMask (compatibility mask for same type: different for totems, compatible from high to low for rods)
 };
 
+struct TransportAnimationEntry
+{
+    //uint32    id;                                         // 0
+    uint32    transportEntry;                               // 1
+    uint32    timeFrame;                                    // 2
+    //float     xOffs;                                      // 3
+    //float     yOffs;                                      // 4
+    //float     zOffs;                                      // 5
+    //uint32    unk;                                        // 6
+};
+
 #define MAX_VEHICLE_SEATS 8
 
 struct VehicleEntry
@@ -2519,3 +2525,6 @@ typedef std::vector<TaxiPathNodeList> TaxiPathNodesByPath;
 #define TaxiMaskSize 114
 typedef uint8 TaxiMask[TaxiMaskSize];
 #endif
+
+typedef UNORDERED_MAP<uint32 /*frame*/, TransportAnimationEntry const*> TransportAnimationEntryMap;
+typedef UNORDERED_MAP<uint32, TransportAnimationEntryMap> TransportAnimationsByEntry; 

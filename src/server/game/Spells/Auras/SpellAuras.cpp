@@ -801,12 +801,16 @@ void Aura::SetAuraTimer(int32 newTime, uint64 guid)
     }
 }
 
-void Aura::RefreshDuration()
+void Aura::RefreshDuration(bool recalculate)
 {
     SetDuration(GetMaxDuration());
 
     if (m_spellInfo->ManaPerSecond)
         m_timeCla = 1 * IN_MILLISECONDS;
+
+    Unit* caster = GetCaster();
+    if (recalculate)
+        RecalculateAmountOfEffects();
 }
 
 void Aura::RefreshTimers()
@@ -833,7 +837,7 @@ void Aura::RefreshTimers()
         resetPeriodic = false;
      
 
-    RefreshDuration();
+    RefreshDuration(false);
     Unit* caster = GetCaster();
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         if (HasEffect(i))
@@ -909,15 +913,16 @@ void Aura::SetStackAmount(uint8 stackAmount)
 bool Aura::ModStackAmount(int32 num, AuraRemoveMode removeMode)
 {
     int32 stackAmount = m_stackAmount + num;
+    Unit * caster = GetCaster();
 
     // limit the stack amount (only on stack increase, stack amount may be changed manually)
-    if ((num > 0) && (stackAmount > int32(m_spellInfo->StackAmount)))
+    if ((num > 0) && (stackAmount > int32(m_spellInfo->GetStackAmount(caster))))
     {
         // not stackable aura - set stack amount to 1
-        if (!m_spellInfo->StackAmount)
+        if (!m_spellInfo->GetStackAmount(caster))
             stackAmount = 1;
         else
-            stackAmount = m_spellInfo->StackAmount;
+            stackAmount = m_spellInfo->GetStackAmount(caster);
     }
     // we're out of stacks, remove
     else if (stackAmount <= 0)
@@ -1327,6 +1332,18 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         caster->CastSpell(caster, WellFedSpells.front(), true);
                         break;
                     }
+                    case 105785:    // Stolen Time mage T13 set bonus
+                    {
+                        if (target->HasAura(105790))
+                            target->CastSpell(target, 105791, true); // cooldown bonus
+                        break;
+                    }
+                    // Smoke Bomb, Rogue
+                    case 88611:
+                        if (caster)
+                            if (!target->IsFriendlyTo(caster))
+                                target->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
+                        break;
                 }
 
                 // Recently Bandaged
@@ -1765,8 +1782,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             target->CastSpell(target, 83239, true);
                         break;
                     case 66: // Invisibility
-                        // Invisibility - Glyph of Invisibility - Removal
-                        caster->RemoveAurasDueToSpell(87833);   
                         if (removeMode != AURA_REMOVE_BY_EXPIRE)
                             break;
 
@@ -1777,8 +1792,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
 
                         target->CastSpell(target, 32612, true, NULL, GetEffect(1));
                         target->CombatStop();
+    
                         // Invisibility - Glyph of Invisibility
-                        target->CastSpell(target, 87833, true);
+                        if (target->HasAura(56366))
+                            target->CastSpell(target, 87833, true);
+    
                         break;
                     // Ring of Frost - 3 sec immune
                     case 82691:
@@ -1864,34 +1882,26 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     }
                     // Shadowburn
                     case 29341:
-                    {
+                        if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+                            if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
+                                caster->ModifyPower(POWER_SOUL_SHARDS, 3);
+                        break;
+                    // Drain Soul
+                    case 1120:
                         if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
                         {
                             if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
                                 caster->ModifyPower(POWER_SOUL_SHARDS, 3);
-                        }
-                        break;
-                    }
-                    // Drain Soul
-                    case 1120:
-                    {
-                        if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
-                        {
-                            if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
-                            caster->ModifyPower(POWER_SOUL_SHARDS, 3);
                         
                             // Glyph of Drain Soul
                             if (caster->HasAura(58070))
                                 caster->CastSpell(caster, 58068, true);
                         }
                         break;
-                    }
                     // Dark Intent
                     case 85767:
-                    {
                         caster->RemoveAurasDueToSpell(85767);
                         break;
-                    }
                     // Haunt
                     case 48181:
                     {
@@ -1907,12 +1917,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     }
                     // Soul Swap
                     case 86211:
-                    {
                         // Send glyphed cooldown to player
                         if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEFAULT && caster->HasAura(56226))
                             caster->CastSpell(caster, 94229, false);
                         break;
-                    }
                 }
                 break;
             case SPELLFAMILY_PRIEST:
@@ -2028,11 +2036,19 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 break;
             case SPELLFAMILY_HUNTER:
+                if (!caster)
+                    break;
+
                 // Glyph of Freezing Trap
                 if (GetSpellInfo()->SpellFamilyFlags[0] & 0x00000008)
-                    if (caster && caster->HasAura(56845))
+                    if (caster->HasAura(56845))
                         caster->CastSpell(target, 61394, true);
 
+                // Glyph of Misdirection
+                if (GetId() == 34477 && caster->ToPlayer()->GetPetGUID() == caster->GetMisdirectionTargetGuid() && caster->HasAura(56829))
+                {
+                    caster->ToPlayer()->RemoveSpellCooldown(34477, true);
+                }
                 break;
             case SPELLFAMILY_SHAMAN:
                 switch(GetSpellInfo()->Id)
@@ -2386,11 +2402,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 break;
             }
-            // Invisibility - Glyph of Invisibility
-            if (GetId() == 66 && apply && caster->HasAura(56366))
-            {
-                caster->CastSpell(caster, 87833, true);
-            }
+            // Invisibility - Glyph of Invisibility removal
             else if (GetId() == 32612 && !apply)
             {
                 caster->RemoveAurasDueToSpell(87833);
@@ -2630,8 +2642,8 @@ bool Aura::CanStackWith(Aura const* existingAura) const
                     if (m_spellInfo->Id == 1490)
                         break;
                     return true;
-                // Vendetta-like auras
-                case SPELL_AURA_MOD_DAMAGE_FROM_CASTER:
+                case SPELL_AURA_MOD_DAMAGE_FROM_CASTER:                // Vendetta-like auras
+                case SPELL_AURA_BYPASS_ARMOR_FOR_CASTER:               // Find Weakness-like auras
                     return true;
                 default:
                     break;
@@ -2656,7 +2668,7 @@ bool Aura::CanStackWith(Aura const* existingAura) const
             return true;
 
         if (GetCastItemGUID() && existingAura->GetCastItemGUID())
-            if (GetCastItemGUID() != existingAura->GetCastItemGUID() && m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_ENCHANT_PROC))
+            if (GetCastItemGUID() != existingAura->GetCastItemGUID() && m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_ENCHANT_STACK))
                 return true;
 
         // same spell with same caster should not stack
@@ -2690,21 +2702,16 @@ bool Aura::CanStackWith(Aura const* existingAura) const
         (existingSpellInfo->GetMaxDuration() <= 60*IN_MILLISECONDS && existingSpellInfo->GetMaxDuration() != -1)))
         return true;
 
-    if (m_spellInfo->Id == 16191) // mana tide buff
-        return true;
-
-    if (!IsPassive() && !existingSpellInfo->IsPassive() && m_spellInfo->SpellFamilyName != SPELLFAMILY_POTION && existingSpellInfo->SpellFamilyName != SPELLFAMILY_POTION)
+    if (m_spellInfo->IsAllwaysStackModifers() && !existingSpellInfo->IsAllwaysStackModifers())
+    {
         for (int i = 0; i < 3; ++i)
         {
             if ((m_spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA || m_spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID) &&
                 (existingSpellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA || existingSpellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID) &&
                 m_spellInfo->Effects[i].ApplyAuraName == existingSpellInfo->Effects[i].ApplyAuraName)
+            {
                 switch (m_spellInfo->Effects[i].ApplyAuraName)
                 {
-                    case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:
-                        // warsong flags
-                        if (m_spellInfo->Id == 23333 || m_spellInfo->Id == 23335 || existingSpellInfo->Id == 23335 || existingSpellInfo->Id == 23333)
-                            break;
                     case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
                     case SPELL_AURA_MOD_STAT:
                         if (m_spellInfo->Effects[i].MiscValue == existingSpellInfo->Effects[i].MiscValue || (m_spellInfo->Effects[i].MiscValueB != 0 && 
@@ -2717,8 +2724,10 @@ bool Aura::CanStackWith(Aura const* existingAura) const
                         break;
                     default:
                         break;
+                }
             }
         }
+    }
 
    if (m_spellInfo->SpellFamilyName != existingSpellInfo->SpellFamilyName)
         return true;
@@ -2758,7 +2767,7 @@ bool Aura::CanStackWith(Aura const* existingAura) const
         if (m_spellInfo->IsMultiSlotAura() && !IsArea())
             return true;
         if (GetCastItemGUID() && existingAura->GetCastItemGUID())
-            if (GetCastItemGUID() != existingAura->GetCastItemGUID() && (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_ENCHANT_PROC))
+            if (GetCastItemGUID() != existingAura->GetCastItemGUID() && (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_ENCHANT_STACK))
                 return true;
         // same spell with same caster should not stack
         return false;
@@ -2782,9 +2791,12 @@ void Aura::AddProcCooldown(uint32 /*msec*/)
     //m_procCooldown = time(NULL) + msec;
 }
 
-void Aura::PrepareProcToTrigger()
+void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo)
 {
-    // TODO: allow scripts to prevent charge drop/cooldown
+    bool prepare = CallScriptPrepareProcHandlers(aurApp, eventInfo);
+    if (!prepare)
+        return;
+
     // take one charge, aura expiration will be handled in Aura::TriggerProcOnEvent (if needed)
     if (IsUsingCharges())
     {
@@ -2823,14 +2835,19 @@ bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventI
         return false;
 
     // do checks using conditions table
-    ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_SPELL_PROC, GetSpellInfo()->Id);
+    ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_SPELL_PROC, GetId());
     ConditionSourceInfo condInfo = ConditionSourceInfo(eventInfo.GetActor(), eventInfo.GetActionTarget());
     if (!sConditionMgr->IsObjectMeetToConditions(condInfo, conditions))
         return false;		
 		
+    // AuraScript Hook
+    bool check = const_cast<Aura*>(this)->CallScriptCheckProcHandlers(aurApp, eventInfo);
+    if (!check)
+        return false;
+		
     // TODO:
     // - add DoCheckProc() AuraScript hook
-    // to allow additional requirements for procs
+    // do allow additional requirements for procs
     // this is needed because this is the last moment in which you can prevent aura charge drop on proc
     // and possibly a way to prevent default checks (if there're going to be any)
 
@@ -2894,14 +2911,14 @@ float Aura::CalcProcChance(SpellProcEntry const& procEntry, ProcEventInfo& event
 
 void Aura::TriggerProcOnEvent(AuraApplication* aurApp, ProcEventInfo& eventInfo)
 {
-    // TODO: OnProc hook here
+    CallScriptProcHandlers(const_cast<AuraApplication const*>(aurApp), eventInfo);
+
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         if (aurApp->HasEffect(i))
-            // TODO: OnEffectProc hook here (allowing prevention of selected effects)
+            // OnEffectProc / AfterEffectProc hooks handled in AuraEffect::HandleProc()
             GetEffect(i)->HandleProc(aurApp, eventInfo);
-            // TODO: AfterEffectProc hook here
 
-    // TODO: AfterProc hook here
+    CallScriptAfterProcHandlers(const_cast<AuraApplication const*>(aurApp), eventInfo);
 
     // Remove aura if we've used last charge to proc
     if (IsUsingCharges() && !GetCharges())
@@ -3196,6 +3213,95 @@ void Aura::CallScriptEffectSplitHandlers(AuraEffect* aurEff, AuraApplication con
     }
 }
 
+bool Aura::CallScriptCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo)
+{
+    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_HOOK_CHECK_PROC, aurApp);
+        std::list<AuraScript::CheckProcHandler>::iterator hookItrEnd = (*scritr)->DoCheckProc.end(), hookItr = (*scritr)->DoCheckProc.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+            if (!(*hookItr).Call(*scritr, eventInfo))
+                return false;
+        (*scritr)->_FinishScriptCall();
+    }
+    return true;
+}
+
+bool Aura::CallScriptPrepareProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo)
+{
+    bool prepare = true;
+    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_HOOK_PREPARE_PROC, aurApp);
+        std::list<AuraScript::AuraProcHandler>::iterator effEndItr = (*scritr)->DoPrepareProc.end(), effItr = (*scritr)->DoPrepareProc.begin();
+        for (; effItr != effEndItr; ++effItr)
+            (*effItr).Call(*scritr, eventInfo);
+
+        if (prepare && (*scritr)->_IsDefaultActionPrevented())
+            prepare = false;
+        (*scritr)->_FinishScriptCall();
+    }
+    return prepare;
+}
+
+void Aura::CallScriptProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo)
+{
+    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_HOOK_PROC, aurApp);
+        std::list<AuraScript::AuraProcHandler>::iterator hookItrEnd = (*scritr)->OnProc.end(), hookItr = (*scritr)->OnProc.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+            (*hookItr).Call(*scritr, eventInfo);
+        (*scritr)->_FinishScriptCall();
+    }
+}
+
+void Aura::CallScriptAfterProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo)
+{
+    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_HOOK_AFTER_PROC, aurApp);
+        std::list<AuraScript::AuraProcHandler>::iterator hookItrEnd = (*scritr)->AfterProc.end(), hookItr = (*scritr)->AfterProc.begin();
+        for (; hookItr != hookItrEnd; ++hookItr)
+            (*hookItr).Call(*scritr, eventInfo);
+        (*scritr)->_FinishScriptCall();
+    }
+}
+
+bool Aura::CallScriptEffectProcHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, ProcEventInfo& eventInfo)
+{
+    bool preventDefault = false;
+    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_HOOK_EFFECT_PROC, aurApp);
+        std::list<AuraScript::EffectProcHandler>::iterator effEndItr = (*scritr)->OnEffectProc.end(), effItr = (*scritr)->OnEffectProc.begin();
+        for (; effItr != effEndItr; ++effItr)
+        {
+            if ((*effItr).IsEffectAffected(m_spellInfo, aurEff->GetEffIndex()))
+                (*effItr).Call(*scritr, aurEff, eventInfo);
+        }
+        if (!preventDefault)
+            preventDefault = (*scritr)->_IsDefaultActionPrevented();
+        (*scritr)->_FinishScriptCall();
+    }
+    return preventDefault;
+}
+
+void Aura::CallScriptAfterEffectProcHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, ProcEventInfo& eventInfo)
+{
+    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_HOOK_EFFECT_AFTER_PROC, aurApp);
+        std::list<AuraScript::EffectProcHandler>::iterator effEndItr = (*scritr)->AfterEffectProc.end(), effItr = (*scritr)->AfterEffectProc.begin();
+        for (; effItr != effEndItr; ++effItr)
+        {
+            if ((*effItr).IsEffectAffected(m_spellInfo, aurEff->GetEffIndex()))
+                (*effItr).Call(*scritr, aurEff, eventInfo);
+        }
+        (*scritr)->_FinishScriptCall();
+    }
+}
+
 UnitAura::UnitAura(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32 *baseAmount, Item* castItem, uint64 casterGUID)
     : Aura(spellproto, owner, caster, castItem, casterGUID)
 {
@@ -3211,7 +3317,17 @@ void UnitAura::_ApplyForTarget(Unit* target, Unit* caster, AuraApplication * aur
 
     // register aura diminishing on apply
     if (DiminishingGroup group = GetDiminishGroup())
+    {
         target->ApplyDiminishingAura(group, true);
+        if (GetId() == 82691)       // Ring of Frost
+        {
+            target->ApplyDiminishingAura(DIMINISHING_RING_OF_FROST, true);
+        }
+        else if (GetId() == 44572)  // Deep Freeze
+        {
+            target->ApplyDiminishingAura(DIMINISHING_DEEP_FREEZE, true);
+        }
+    }
 }
 
 void UnitAura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication * aurApp)
@@ -3220,7 +3336,17 @@ void UnitAura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication * a
 
     // unregister aura diminishing (and store last time)
     if (DiminishingGroup group = GetDiminishGroup())
+    {
         target->ApplyDiminishingAura(group, false);
+        if (GetId() == 82691)       // Ring of Frost
+        {
+            target->ApplyDiminishingAura(DIMINISHING_RING_OF_FROST, false);
+        }
+        else if (GetId() == 44572)  // Deep Freeze
+        {
+            target->ApplyDiminishingAura(DIMINISHING_DEEP_FREEZE, false);
+        }
+    }
 }
 
 void UnitAura::Remove(AuraRemoveMode removeMode)

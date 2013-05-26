@@ -1179,6 +1179,11 @@ enum TrinityStrings
     LANG_ULD_TEL_DESCENT                = 12008, // Teleport to the Descent into Madness
     LANG_ULD_RAZOR_GOSSIP               = 12009, // Activate Harpoons! (boss Razorscale)
  
+    LANG_BG_BG_STARTING_EVENT_FIRST     = 12010,
+    LANG_BG_BG_STARTING_EVENT_SECOND    = 12011,
+    LANG_BG_BG_STARTING_EVENT_THIRD     = 12012,
+    LANG_BG_BG_STARTING_EVENT_FOURTH    = 12013,
+ 
     // Icecrown Citadel Locales (reserved: 13050 - 13099)
     LANG_ICC_RING_ALREADY_HAVE              = 13050,
     LANG_ICC_RING_NOT_ENOUGH_REP            = 13051,

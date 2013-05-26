@@ -922,6 +922,13 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* 
 
                     *data << flags;
                 }
+                else if (index == GAMEOBJECT_BYTES_1)
+                {
+                    if (((GameObject*)this)->GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT)
+                        *data << uint32(m_uint32Values[index] | GO_STATE_TRANSPORT_SPEC);
+                    else
+                        *data << uint32(m_uint32Values[index]);
+                }
                 else
                     *data << m_uint32Values[index];                // other cases
             }
@@ -1805,6 +1812,10 @@ bool WorldObject::IsWithinLOSInMap(const WorldObject* obj) const
     if (obj->GetTypeId() == TYPEID_UNIT)
         if (obj->GetEntry() == 36980 || obj->GetEntry() == 38320 || obj->GetEntry() == 38321 || obj->GetEntry() == 38322)
             return true;
+
+    // Hack fix for Alysrazor
+    if (GetMapId() == 720 && GetAreaId() == 5766)
+        return true;
 
     return IsWithinLOS(ox, oy, oz);
 }
@@ -2768,6 +2779,25 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     return summon;
 }
 
+/**
+* Summons group of creatures.
+*
+* @param group Id of group to summon.
+* @param list  List to store pointers to summoned creatures.
+*/
+
+void Map::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list /*= NULL*/)
+{
+    std::vector<TempSummonData> const* data = sObjectMgr->GetSummonGroup(GetId(), SUMMONER_TYPE_MAP, group);
+    if (!data)
+        return;
+
+    for (std::vector<TempSummonData>::const_iterator itr = data->begin(); itr != data->end(); ++itr)
+        if (TempSummon* summon = SummonCreature(itr->entry, itr->pos, NULL, itr->time))
+            if (list)
+                list->push_back(summon);
+}
+
 void WorldObject::SetZoneScript()
 {
     if (Map* map = FindMap())
@@ -2976,6 +3006,26 @@ Creature* WorldObject::SummonTrigger(float x, float y, float z, float ang, uint3
     return summon;
 }
 
+/**
+* Summons group of creatures. Should be called only by instances of Creature and GameObject classes.
+*
+* @param group Id of group to summon.
+* @param list  List to store pointers to summoned creatures.
+*/
+void WorldObject::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list /*= NULL*/)
+{
+    ASSERT((GetTypeId() == TYPEID_GAMEOBJECT || GetTypeId() == TYPEID_UNIT) && "Only GOs and creatures can summon npc groups!");
+
+    std::vector<TempSummonData> const* data = sObjectMgr->GetSummonGroup(GetEntry(), GetTypeId() == TYPEID_GAMEOBJECT ? SUMMONER_TYPE_GAMEOBJECT : SUMMONER_TYPE_CREATURE, group);
+    if (!data)
+        return;
+
+    for (std::vector<TempSummonData>::const_iterator itr = data->begin(); itr != data->end(); ++itr)
+        if (TempSummon* summon = SummonCreature(itr->entry, itr->pos, itr->type, itr->time))
+            if (list)
+                list->push_back(summon);
+}
+
 Creature* WorldObject::FindNearestCreature(uint32 entry, float range, bool alive) const
 {
     Creature* creature = NULL;
@@ -3006,7 +3056,7 @@ GameObject* WorldObject::FindNearestGameObjectOfType(GameobjectTypes type, float
 Player* WorldObject::FindNearestPlayer(float range, bool alive)
 {
   Player* player = NULL;
-  Trinity::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange());
+  Trinity::AnyPlayerInObjectRangeCheck check(this, range);
   Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, player, check);
   VisitNearbyWorldObject(range, searcher);
   return player;

@@ -100,6 +100,7 @@ enum Others
     ACTION_REMOVE_MOLTEN_ARMOR      = 4,
     ACTION_ADD_OBSIDIAN_ARMOR       = 5,
     ACTION_REMOVE_OBSIDIAN_ARMOR    = 6,
+    DATA_ACHIEVE                    = 7,
 };
 
 class boss_lord_rhyolith : public CreatureScript
@@ -145,11 +146,6 @@ class boss_lord_rhyolith : public CreatureScript
                     me->IsAIEnabled = false;
                 else if (!me->isDead())
                     Reset();
-            }
-
-            bool AllowAchieve()
-            {
-                return bAchieve;
             }
 
             void Reset()
@@ -293,6 +289,7 @@ class boss_lord_rhyolith : public CreatureScript
                         pRhyolith->SetHealth(_health);
                         pRhyolith->LowerPlayerDamageReq(pRhyolith->GetMaxHealth());
                         pRhyolith->CastSpell(pRhyolith, SPELL_IMMOLATION, true);
+                        pRhyolith->AI()->SetData(DATA_ACHIEVE, uint32(bAchieve));
                     }
 
                     summons.DespawnEntry(NPC_VOLCANO);
@@ -581,14 +578,29 @@ class npc_lord_rhyolith_rhyolith : public CreatureScript
                 DoZoneInCombat();
             }
 
-            void JustDied(Unit* /*killer*/)
+            void SetData(uint32 type, uint32 data)
+            {
+                if (type == DATA_ACHIEVE)
+                    bAchieve = data;
+            }
+
+            bool AllowAchieve()
+            {
+                return bAchieve;
+            }
+
+            void JustDied(Unit* killer)
             {
                 if (pInstance)
                 {
+                    if (Creature* pRhyolith = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_RHYOLITH)))
+                        killer->Kill(pRhyolith);
                     pInstance->SetBossState(DATA_RHYOLITH, DONE);
                     pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BALANCE_BAR);
                 }
                 Talk(SAY_DEATH);
+
+                AddSmoulderingAura(me);
             }
 
             void KilledUnit(Unit* who)
@@ -626,6 +638,7 @@ class npc_lord_rhyolith_rhyolith : public CreatureScript
         private:
             InstanceScript* pInstance;
             EventMap events;
+            bool bAchieve;
         };
 };
 
@@ -1400,7 +1413,7 @@ class achievement_not_an_ambi_turner : public AchievementCriteriaScript
             if (!target)
                 return false;
 
-            if (boss_lord_rhyolith::boss_lord_rhyolithAI* lord_rhyolithAI = CAST_AI(boss_lord_rhyolith::boss_lord_rhyolithAI, target->GetAI()))
+            if (npc_lord_rhyolith_rhyolith::npc_lord_rhyolith_rhyolithAI* lord_rhyolithAI = CAST_AI(npc_lord_rhyolith_rhyolith::npc_lord_rhyolith_rhyolithAI, target->GetAI()))
                 return lord_rhyolithAI->AllowAchieve();
 
             return false;

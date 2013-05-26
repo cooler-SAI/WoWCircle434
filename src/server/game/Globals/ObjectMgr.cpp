@@ -1394,6 +1394,92 @@ bool ObjectMgr::SetCreatureLinkedRespawn(uint32 guidLow, uint32 linkedGuidLow)
     return true;
 }
 
+void ObjectMgr::LoadTempSummons()
+{
+    uint32 oldMSTime = getMSTime();
+
+    //                                               0           1             2        3      4           5           6           7            8           9
+    QueryResult result = WorldDatabase.Query("SELECT summonerId, summonerType, groupId, entry, position_x, position_y, position_z, orientation, summonType, summonTime FROM creature_summon_groups");
+
+    if (!result)
+    {
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 temp summons. DB table `creature_summon_groups` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 summonerId               = fields[0].GetUInt32();
+        SummonerType summonerType       = SummonerType(fields[1].GetUInt8());
+        uint8 group                     = fields[2].GetUInt8();
+
+        switch (summonerType)
+        {
+            case SUMMONER_TYPE_CREATURE:
+                if (!GetCreatureTemplate(summonerId))
+                {
+                    sLog->outError(LOG_FILTER_SQL, "Table `creature_summon_groups` has summoner with non existing entry %u for creature summoner type, skipped.", summonerId);
+                    continue;
+                }
+                break;
+            case SUMMONER_TYPE_GAMEOBJECT:
+                if (!GetGameObjectTemplate(summonerId))
+                {
+                    sLog->outError(LOG_FILTER_SQL, "Table `creature_summon_groups` has summoner with non existing entry %u for gameobject summoner type, skipped.", summonerId);
+                    continue;
+                }
+                break;
+            case SUMMONER_TYPE_MAP:
+                if (!sMapStore.LookupEntry(summonerId))
+                {
+                    sLog->outError(LOG_FILTER_SQL, "Table `creature_summon_groups` has summoner with non existing entry %u for map summoner type, skipped.", summonerId);
+                    continue;
+                }
+                break;
+            default:
+                sLog->outError(LOG_FILTER_SQL, "Table `creature_summon_groups` has unhandled summoner type %u for summoner %u, skipped.", summonerType, summonerId);
+                continue;
+        }
+
+        TempSummonData data;
+        data.entry                      = fields[3].GetUInt32();
+
+        if (!GetCreatureTemplate(data.entry))
+        {
+            sLog->outError(LOG_FILTER_SQL, "Table `creature_summon_groups` has creature in group [Summoner ID: %u, Summoner Type: %u, Group ID: %u] with non existing creature entry %u, skipped.", summonerId, summonerType, group, data.entry);
+            continue;
+        }
+
+        float posX                      = fields[4].GetFloat();
+        float posY                      = fields[5].GetFloat();
+        float posZ                      = fields[6].GetFloat();
+        float orientation               = fields[7].GetFloat();
+
+        data.pos.Relocate(posX, posY, posZ, orientation);
+
+        data.type                       = TempSummonType(fields[8].GetUInt8());
+
+        if (data.type > TEMPSUMMON_MANUAL_DESPAWN)
+        {
+            sLog->outError(LOG_FILTER_SQL, "Table `creature_summon_groups` has unhandled temp summon type %u in group [Summoner ID: %u, Summoner Type: %u, Group ID: %u] for creature entry %u, skipped.", data.type, summonerId, summonerType, group, data.entry);
+            continue;
+        }
+
+        data.time                       = fields[9].GetUInt32();
+
+        TempSummonGroupKey key(summonerId, summonerType, group);
+        _tempSummonDataStore[key].push_back(data);
+
+        ++count;
+
+    } while (result->NextRow());
+
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %u temp summons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
 void ObjectMgr::LoadCreatures()
 {
     uint32 oldMSTime = getMSTime();
@@ -6348,6 +6434,49 @@ void ObjectMgr::LoadGameObjectTemplate()
                     CheckGOLinkedTrapId(&got, got.goober.linkedTrapId, 12);
                 break;
             }
+            case GAMEOBJECT_TYPE_TRANSPORT:                 // 11
+            {
+                TransportAnimationsByEntry::const_iterator itr = sTransportAnimationsByEntry.find(got.entry);
+                if (itr == sTransportAnimationsByEntry.end())
+                    break;
+
+                if (uint32 frame = got.transport.startFrame)
+                {
+                    if (itr->second.find(frame) == itr->second.end())
+                    {
+                        sLog->outError(LOG_FILTER_SQL, "Gameobject (Entry: %u GoType: %u) has data0=%u but this frame is not in TransportAnimation.dbc! May cause client crashes.",
+                            got.entry, got.type, frame);
+                    }
+                }
+
+                if (uint32 frame = got.transport.nextFrame1)
+                {
+                    if (itr->second.find(frame) == itr->second.end())
+                    {
+                        sLog->outError(LOG_FILTER_SQL, "Gameobject (Entry: %u GoType: %u) has data6=%u but this frame is not in TransportAnimation.dbc! May cause client crashes.",
+                            got.entry, got.type, frame);
+                    }
+                }
+
+                if (uint32 frame = got.transport.nextFrame2)
+                {
+                    if (itr->second.find(frame) == itr->second.end())
+                    {
+                        sLog->outError(LOG_FILTER_SQL, "Gameobject (Entry: %u GoType: %u) has data8=%u but this frame is not in TransportAnimation.dbc! May cause client crashes.",
+                            got.entry, got.type, frame);
+                    }
+                }
+
+                if (uint32 frame = got.transport.nextFrame3)
+                {
+                    if (itr->second.find(frame) == itr->second.end())
+                    {
+                        sLog->outError(LOG_FILTER_SQL, "Gameobject (Entry: %u GoType: %u) has data10=%u but this frame is not in TransportAnimation.dbc! May cause client crashes.",
+                            got.entry, got.type, frame);
+                    }
+                }
+                break;
+            } 
             case GAMEOBJECT_TYPE_AREADAMAGE:                //12
             {
                 if (got.areadamage.lockId)
@@ -8880,7 +9009,7 @@ VehicleAccessoryList const* ObjectMgr::GetVehicleAccessoryList(Vehicle* veh) con
 
 void ObjectMgr::LoadResearchSiteZones()
 {
-    QueryResult result = WorldDatabase.Query("SELECT id, position_x, position_y, map, zone FROM research_site");
+    QueryResult result = WorldDatabase.Query("SELECT id, position_x, position_y, zone FROM research_site");
     if (!result)
     {
         sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 research site zones. DB table `research_site` is empty.");
@@ -8893,14 +9022,28 @@ void ObjectMgr::LoadResearchSiteZones()
     {
         Field *fields = result->Fetch();
 
-        ResearchZoneEntry ptr;
-        ptr.POIid = fields[0].GetUInt32();
-        ptr.x = fields[1].GetInt32();
-        ptr.y = fields[2].GetInt32();
-        ptr.map = fields[3].GetUInt16();
-        ptr.zone = fields[4].GetUInt16();
-        ptr.level = 0;
+        uint32 siteId = 0;
+        uint32 mapId = 0;
+        uint32 POIid = fields[0].GetUInt32();
+        uint32 zoneId = fields[3].GetUInt16();
 
+        bool bFound = false;
+        for (std::set<ResearchSiteEntry const*>::const_iterator itr = sResearchSiteSet.begin(); itr != sResearchSiteSet.end(); ++itr)
+            if ((*itr)->POIid == POIid)
+            {
+                bFound = true;
+                siteId = (*itr)->ID;
+                mapId = (*itr)->mapId;
+                break;
+            }
+        if (!bFound)
+            continue;
+
+        ResearchZoneEntry &ptr = _researchZoneMap[siteId];
+        ptr.coords.push_back(ResearchPOIPoint(fields[1].GetInt32(), fields[2].GetInt32()));
+        ptr.map = mapId;
+        ptr.zone = zoneId;
+        ptr.level = 0;
         for (uint32 i = 0; i < sAreaStore.GetNumRows(); ++i)
         {
             AreaTableEntry const* area = sAreaStore.LookupEntry(i);
@@ -8913,8 +9056,6 @@ void ObjectMgr::LoadResearchSiteZones()
                 break;
             }
         }
-        _researchZones.push_back(ptr);
-
         ++counter;
     }
     while (result->NextRow());

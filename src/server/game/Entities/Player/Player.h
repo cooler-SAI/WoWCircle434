@@ -21,6 +21,7 @@
 
 #include <bitset>
 #include "AchievementMgr.h"
+#include "ArchaeologyMgr.h"
 #include "Battleground.h"
 #include "Bag.h"
 #include "Common.h"
@@ -59,6 +60,7 @@ class PlayerSocial;
 class SpellCastTargets;
 class UpdateMask;
 class PhaseMgr;
+class RatedBattleground;
 
 typedef std::deque<Mail*> PlayerMails;
 
@@ -1320,36 +1322,6 @@ private:
     PlayerTalentInfo(PlayerTalentInfo const&);
 };
 
-struct DigitSite
-{
-    uint8 count;
-    uint16 site_id;
-    uint32 loot_id;
-    float loot_x;
-    float loot_y;
-    float loot_z;
-
-    void clear()
-    {
-        site_id = loot_id = 0;
-        loot_x = loot_y = loot_z = 0.0f;
-        count = 0;
-    }
-
-    bool empty() { return site_id == 0; }
-};
-
-typedef std::set<uint32> SiteSet;
-typedef std::map<uint32, SiteSet> Sites;
-typedef std::set<uint32> ProjectSet;
-typedef std::map<uint32, ProjectSet> Projects;
-typedef std::vector<ResearchPOIPoint> ResearchPOIPoints;
-typedef std::map<uint32, ResearchPOIPoints> ResearchPOIPointMap;
-
-typedef std::set<uint32> ResearchSiteSet;
-typedef std::set<uint32> ResearchProjectSet;
-typedef std::set<uint32> CompletedProjectSet;
-
 #define SAVE_FOR_SECONDS 120
 
 class Player : public Unit, public GridObject<Player>
@@ -1492,6 +1464,8 @@ class Player : public Unit, public GridObject<Player>
         void BuildPlayerChat(WorldPacket* data, uint8 msgtype, const std::string& text, uint32 language, const char* addonPrefix = NULL) const;
 
         void SendMessageBox(const std::string& text);
+
+        ArchaeologyMgr& GetArchaeologyMgr() { return m_archaeologyMgr; }
 
         /*********************************************************/
         /***                    STORAGE SYSTEM                 ***/
@@ -2481,7 +2455,7 @@ class Player : public Unit, public GridObject<Player>
 
         void SendLoot(uint64 guid, LootType loot_type);
         void SendLootRelease(uint64 guid);
-        void SendNotifyLootItemRemoved(uint8 lootSlot);
+        void SendNotifyLootItemRemoved(uint8 lootSlot, bool currency = false);
         void SendNotifyLootMoneyRemoved();
 
         /*********************************************************/
@@ -2767,45 +2741,6 @@ class Player : public Unit, public GridObject<Player>
         void SendCinematicStart(uint32 CinematicSequenceId);
         void SendMovieStart(uint32 MovieId);
 
-        //-------------------------------------------------
-        // ARCHAEOLOGY SYSTEM
-        //-------------------------------------------------
-        void SaveArchaeology(SQLTransaction& trans);
-        void LoadArchaeology(PreparedQueryResult result);
-        bool HasResearchSite(uint32 id) const
-        {
-            return _researchSites.find(id) != _researchSites.end();
-        }
-
-        bool HasResearchProject(uint32 id) const
-        {
-            return _researchProjects.find(id) != _researchProjects.end();
-        }
-
-        void ShowResearchSites();
-        void ShowResearchProjects();
-        void GenerateResearchSites();
-        void GenerateResearchSiteInMap(uint32 mapId);
-        void GenerateResearchProjects();
-        bool SolveResearchProject(uint32 spellId);
-        void UseResearchSite(uint32 id);
-        bool IsPointInZone(const ResearchPOIPoint &test, const ResearchPOIPoints &polygon);
-        uint16 GetResearchSiteID();
-        uint32 GetSurveyBotEntry(float &orientation);
-        bool CanResearchWithLevel(uint32 POIid);
-        uint8 CanResearchWithSkillLevel(uint32 POIid);
-        ResearchSiteEntry const* GetResearchSiteEntryById(uint32 id);
-        bool GenerateDigitLoot(uint16 zoneid, DigitSite &site);
-        bool IsCompletedProject(uint32 id);
-
-        DigitSite _digSites[16];
-        ResearchSiteSet _researchSites;
-        ResearchProjectSet _researchProjects;
-        CompletedProjectSet _completedProjects;
-        bool _archaeologyChanged;
-
-        // END
-
         /*********************************************************/
         /***                 INSTANCE SYSTEM                   ***/
         /*********************************************************/
@@ -2848,6 +2783,8 @@ class Player : public Unit, public GridObject<Player>
         // last used pet number (for BG's)
         uint32 GetLastPetNumber() const { return m_lastpetnumber; }
         void SetLastPetNumber(uint32 petnumber) { m_lastpetnumber = petnumber; }
+
+        RatedBattleground* getRBG() { return m_rbg; }
 
         /*********************************************************/
         /***                   GROUP SYSTEM                    ***/
@@ -2913,6 +2850,7 @@ class Player : public Unit, public GridObject<Player>
 
         AchievementMgr<Player>& GetAchievementMgr() { return m_achievementMgr; }
         AchievementMgr<Player> const& GetAchievementMgr() const { return m_achievementMgr; }
+        
         void SendRespondInspectAchievements(Player* player) const;
         bool HasAchieved(uint32 achievementId) const;
         void ResetAchievements();
@@ -2934,7 +2872,6 @@ class Player : public Unit, public GridObject<Player>
         void SendCurrencyWeekCap(const CurrencyTypesEntry* currency) const;
         void FinishWeek();
         void ResetCurrencyWeekCap(SQLTransaction* trans = NULL);
-        uint32 GetRBGPersonalRating() const;
 
         /// modify currency flag
         void ModifyCurrencyFlag(uint32 id, uint8 flag);
@@ -3457,12 +3394,16 @@ class Player : public Unit, public GridObject<Player>
 
         PhaseMgr phaseMgr;
 
+        RatedBattleground* m_rbg;
+		
         uint32 _heal_done[SAVE_FOR_SECONDS];
         uint32 _damage_done[SAVE_FOR_SECONDS];
         uint32 _damage_taken[SAVE_FOR_SECONDS];
 
         int32 DmgandHealDoneTimer;
         uint8 CurrentSecond;
+
+        ArchaeologyMgr m_archaeologyMgr;
 };
 
 void AddItemsSetItem(Player*player, Item* item);

@@ -1,0 +1,3 @@
+REPLACE INTO `achievement_reward` (`entry`, `title_A`, `title_H`, `item`, `sender`, `subject`, `text`) VALUES 
+(5876, 0, 0, 71140, 28951, 'Petting Zoo', 'Hello again, Friend! This mischievous little fellow is driving everyone in the pet store nuts! I thought that perhaps you might take him along on some of your adventures... perhaps he\'ll calm down after he\'s seen a bit of the world. You DO wear a helmet, right...? Breanni'),
+(5877, 0, 0, 71387, 28951, 'Menagerie', 'Hello! Wow, you\'re becoming quite the collector of cute critters, aren\'t you? I thought I\'d write a little note and send\r\na small gift to encourage your efforts. Keep it up! Breanni');

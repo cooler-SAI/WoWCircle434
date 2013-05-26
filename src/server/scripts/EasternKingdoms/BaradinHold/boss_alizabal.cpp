@@ -23,7 +23,8 @@ enum Spells
     SPELL_BLADE_DANCE_CHARGE    = 105726,
     SPELL_BLADE_DANCE_DUMMY     = 106248,
     SPELL_BLADE_DANCE_SELF      = 105828,
-    SPELL_BLADE_DANCE           = 105784,
+    SPELL_BLADE_DANCE_AURA_1    = 105784,
+    SPELL_BLADE_DANCE_AURA_2    = 104995,
     SPELL_BERSERK               = 47008,
 };
 
@@ -34,6 +35,7 @@ enum Events
     EVENT_BLADE_DANCE           = 3,
     EVENT_BERSERK               = 4,
     EVENT_BLADE_DANCE_CHARGE    = 5,
+    EVENT_BLADE_DANCE_AURA      = 6,
 };
 
 class boss_alizabal : public CreatureScript
@@ -98,11 +100,17 @@ class boss_alizabal : public CreatureScript
                 Talk(SAY_WIPE);
             }
 
+            void MovementInform(uint32 type, uint32 data)
+            {
+                if (data == EVENT_CHARGE)
+                    events.ScheduleEvent(EVENT_BLADE_DANCE_AURA, 500);
+            }
+
             void EnterCombat(Unit* attacker)
             {
                 uiCharges = 0;
                 events.ScheduleEvent(EVENT_BERSERK, 300000);
-                events.ScheduleEvent(EVENT_BLADE_DANCE, 35000);
+                events.ScheduleEvent(EVENT_BLADE_DANCE, 25000);
                 if (urand(0, 1))
                 {
                     events.ScheduleEvent(EVENT_SKEWER, 8000);
@@ -119,7 +127,8 @@ class boss_alizabal : public CreatureScript
 
             void KilledUnit(Unit* victim)
             {
-                Talk(SAY_KILL);
+                if (victim && victim->GetTypeId() == TYPEID_PLAYER)
+                    Talk(SAY_KILL);
             }
 
             void JustDied(Unit* killer)
@@ -138,7 +147,7 @@ class boss_alizabal : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                while (uint32 eventId = events.ExecuteEvent())
+                if (uint32 eventId = events.ExecuteEvent())
 				{
 					switch (eventId)
 					{
@@ -156,11 +165,12 @@ class boss_alizabal : public CreatureScript
                             events.ScheduleEvent(EVENT_SEETHING_HATE, 20500);
                             break;
                         case EVENT_BLADE_DANCE:
-                            events.CancelEvent(EVENT_SKEWER);
-                            events.CancelEvent(EVENT_SEETHING_HATE);
-                            DoCast(me, SPELL_BLADE_DANCE_SELF);
-                            DoCast(me, SPELL_BLADE_DANCE, true);
+                            me->SetReactState(REACT_PASSIVE);
+                            me->AttackStop();
+                            DoCast(me, SPELL_BLADE_DANCE_SELF, true);
+                            //DoCast(me, SPELL_BLADE_DANCE, true);
                             DoCastAOE(SPELL_BLADE_DANCE_DUMMY, true);
+                            me->ClearUnitState(UNIT_STATE_CASTING);
                             events.ScheduleEvent(EVENT_BLADE_DANCE, 60000);
                             events.ScheduleEvent(EVENT_BLADE_DANCE_CHARGE, 4000);
                             if (urand(0, 1))
@@ -175,12 +185,24 @@ class boss_alizabal : public CreatureScript
                             }
                             break;
                         case EVENT_BLADE_DANCE_CHARGE:
-                            DoCastAOE(SPELL_BLADE_DANCE_DUMMY);
                             uiCharges++;
-                            if (uiCharges > 3)
+                            if (uiCharges >= 3)
+                            {
                                 uiCharges = 0;
+                                me->InterruptNonMeleeSpells(false);
+                                me->SetReactState(REACT_AGGRESSIVE);
+                                me->GetMotionMaster()->MoveChase(me->getVictim());
+                            }
                             else
-                                events.ScheduleEvent(EVENT_BLADE_DANCE, 4000);
+                            {
+                                DoCastAOE(SPELL_BLADE_DANCE_DUMMY, true);
+                                me->ClearUnitState(UNIT_STATE_CASTING);
+                                events.ScheduleEvent(EVENT_BLADE_DANCE_CHARGE, 4000);
+                            }
+                            break;
+                        case EVENT_BLADE_DANCE_AURA:
+                            DoCast(me, SPELL_BLADE_DANCE_AURA_2, true);
+                            DoCast(me, SPELL_BLADE_DANCE_AURA_1);
                             break;
                     }
                 }
@@ -234,6 +256,7 @@ class spell_alizabal_blade_dance : public SpellScriptLoader
 					return;
 
                 GetCaster()->CastSpell(GetHitUnit(), SPELL_BLADE_DANCE_CHARGE, true);
+                GetCaster()->ClearUnitState(UNIT_STATE_CASTING);
             }
 
             void Register()
@@ -248,9 +271,44 @@ class spell_alizabal_blade_dance : public SpellScriptLoader
         }
 };
 
+class spell_alizabal_blade_dance_dmg : public SpellScriptLoader
+{
+    public:
+        spell_alizabal_blade_dance_dmg() : SpellScriptLoader("spell_alizabal_blade_dance_dmg") { }
+
+        class spell_alizabal_blade_dance_dmg_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_alizabal_blade_dance_dmg_SpellScript);
+
+            void HandleDamage(SpellEffIndex /*effIndex*/)
+			{
+				if(!GetCaster() || !GetHitUnit())
+					return;
+
+                PreventHitDamage();
+                uint32 ticks = 1;
+                if (AuraEffect const* aurEff = GetCaster()->GetAuraEffect(SPELL_BLADE_DANCE_AURA_2, EFFECT_0))
+                    ticks = std::max(aurEff->GetTickNumber(), ticks);
+
+                SetHitDamage(urand(11875, 13125) * ticks);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_alizabal_blade_dance_dmg_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_alizabal_blade_dance_dmg_SpellScript();
+        }
+};
+
 void AddSC_boss_alizabal()
 {
     new boss_alizabal();
     new spell_alizabal_seething_hate();
     new spell_alizabal_blade_dance();
+    new spell_alizabal_blade_dance_dmg();
 }

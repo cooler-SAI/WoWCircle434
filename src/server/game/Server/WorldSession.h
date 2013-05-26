@@ -437,6 +437,8 @@ class WorldSession
 
         // new party stats
         void HandleInspectHonorStatsOpcode(WorldPacket& recvPacket);
+		
+        void HandleInspectRatedBGStats(WorldPacket& recvPacket);
 
         void HandleMountSpecialAnimOpcode(WorldPacket& recvdata);
 
@@ -534,6 +536,7 @@ class WorldSession
         void HandleGroupInviteOpcode(WorldPacket& recvPacket);
         //void HandleGroupCancelOpcode(WorldPacket& recvPacket);
         void HandleGroupInviteResponseOpcode(WorldPacket& recvPacket);
+        void HandleGroupClearMarker(WorldPacket& recvPacket);
         void HandleGroupUninviteOpcode(WorldPacket& recvPacket);
         void HandleGroupUninviteGuidOpcode(WorldPacket& recvPacket);
         void HandleGroupSetLeaderOpcode(WorldPacket& recvPacket);
@@ -796,6 +799,7 @@ class WorldSession
         void HandleBattlefieldListOpcode(WorldPacket& recvData);
         void HandleBattlefieldLeaveOpcode(WorldPacket& recvData);
         void HandleBattlemasterJoinArena(WorldPacket& recvData);
+        void HandleBattlemasterJoinRated(WorldPacket& recvData);		
         void HandleReportPvPAFK(WorldPacket& recvData);
         void HandleRequestRatedBgInfo(WorldPacket& recvData);
         void HandleRequestPvpOptions(WorldPacket& recvData);
@@ -826,6 +830,7 @@ class WorldSession
         void HandleBfQueueInviteResponse(WorldPacket& recvData);
         void HandleBfEntryInviteResponse(WorldPacket& recvData);
         void HandleBfExitRequest(WorldPacket& recvData);
+        void HandleBfJoin(WorldPacket &recv_data);
 
         // Looking for Dungeon/Raid
         void HandleLfgSetCommentOpcode(WorldPacket& recvData);

@@ -1274,6 +1274,14 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_WINTERGRASP_BATTLETIME] = ConfigMgr::GetIntDefault("Wintergrasp.BattleTimer", 30);
     m_int_configs[CONFIG_WINTERGRASP_NOBATTLETIME] = ConfigMgr::GetIntDefault("Wintergrasp.NoBattleTimer", 150);
     m_int_configs[CONFIG_WINTERGRASP_RESTART_AFTER_CRASH] = ConfigMgr::GetIntDefault("Wintergrasp.CrashRestartTimer", 10);
+	
+    m_bool_configs[CONFIG_TOL_BARAD_ENABLE] = ConfigMgr::GetBoolDefault("Tolbarad.Enable", false);
+    m_int_configs[CONFIG_TOL_BARAD_PLR_MAX] = ConfigMgr::GetIntDefault("Tolbarad.PlayerMax", 100);
+    m_int_configs[CONFIG_TOL_BARAD_PLR_MIN] = ConfigMgr::GetIntDefault("Tolbarad.PlayerMin", 0);
+    m_int_configs[CONFIG_TOL_BARAD_PLR_MIN_LVL] = ConfigMgr::GetIntDefault("Tolbarad.PlayerMinLvl", 85);
+    m_int_configs[CONFIG_TOL_BARAD_BATTLETIME] = ConfigMgr::GetIntDefault("Tolbarad.BattleTimer", 30);
+    m_int_configs[CONFIG_TOL_BARAD_NOBATTLETIME] = ConfigMgr::GetIntDefault("Tolbarad.NoBattleTimer", 150);
+    m_int_configs[CONFIG_TOL_BARAD_RESTART_AFTER_CRASH] = ConfigMgr::GetIntDefault("Tolbarad.CrashRestartTimer", 10);
 
     // loading boost
     m_bool_configs[CONFIG_DATABASE_SKIP_LOAD_LOOT] = ConfigMgr::GetBoolDefault("skipLootLoading", false);
@@ -1499,6 +1507,9 @@ void World::SetInitialWorldSettings()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Creature Data...");
     sObjectMgr->LoadCreatures();
 
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Temporary Summon Data...");
+    sObjectMgr->LoadTempSummons();                               // must be after LoadCreatureTemplates() and LoadGameObjectTemplates()
+	
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading pet levelup spells...");
     sSpellMgr->LoadPetLevelupSpellMap();
 

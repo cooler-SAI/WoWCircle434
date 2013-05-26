@@ -1066,7 +1066,7 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
     SpellTargetObjectTypes objectType = targetType.GetObjectType();
     SpellTargetCheckTypes selectionType = targetType.GetCheckType();
     ConditionList* condList = m_spellInfo->Effects[effIndex].ImplicitTargetConditions;
-    float coneAngle = M_PI/2;
+    float coneAngle = M_PI*2/3;
     float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster, NULL, GetSpellInfo()->IsPositive()) * m_spellValue->RadiusMod;
 
     if (uint32 containerTypeMask = GetSearcherTypeMask(objectType, condList))
@@ -2804,16 +2804,20 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
 
         if (m_caster->_IsValidAttackTarget(unit, m_spellInfo))
         {
-            unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
-            //TODO: This is a hack. But we do not know what types of stealth should be interrupted by CC
-            if (m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_AURA_CC) && unit->IsControlledByPlayer() && m_spellInfo->IsBreakingStealth())
-                unit->RemoveAurasByType(SPELL_AURA_MOD_STEALTH, NULL, NULL, 11327);
+            if (m_spellInfo->IsBreakingStealth())
+            {
+                unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
+                //TODO: This is a hack. But we do not know what types of stealth should be interrupted by CC
+                if (m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_AURA_CC) && unit->IsControlledByPlayer())
+                    unit->RemoveAurasByType(SPELL_AURA_MOD_STEALTH, NULL, NULL, 11327);
+            }
         }
         else if (m_caster->IsFriendlyTo(unit))
         {
             // for delayed spells ignore negative spells (after duel end) for friendly targets
             // TODO: this cause soul transfer bugged
-            if (m_spellInfo->Speed > 0.0f && unit->GetTypeId() == TYPEID_PLAYER && !m_spellInfo->IsPositive())
+            // 63881 - Malady of the Mind jump spell (Yogg-Saron)
+            if (m_spellInfo->Speed > 0.0f && unit->GetTypeId() == TYPEID_PLAYER && !m_spellInfo->IsPositive() && m_spellInfo->Id != 63881)
                 return SPELL_MISS_EVADE;
 
             // assisting case, healing and resurrection
@@ -2851,7 +2855,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             if (unit->GetCharmerOrOwnerPlayerOrPlayerItself())
                 unit->IncrDiminishing(DIMINISHING_DEEP_FREEZE);
         }
-        m_diminishLevel = DiminishingLevels(m_diminishLevel + unit->GetDiminishing(m_diminishGroup));
+        m_diminishLevel = DiminishingLevels(std::min(m_diminishLevel + unit->GetDiminishing(m_diminishGroup), int(DIMINISHING_LEVEL_IMMUNE)));
         DiminishingReturnsType type = GetDiminishingReturnsGroupType(m_diminishGroup);
         // Increase Diminishing on unit, current informations for actually casts will use values above
         if ((type == DRTYPE_PLAYER && unit->GetCharmerOrOwnerPlayerOrPlayerItself()) || type == DRTYPE_ALL)
@@ -3424,10 +3428,11 @@ void Spell::cast(bool skipCheck)
         // As of 3.0.2 pets begin attacking their owner's target immediately
         // Let any pets know we've attacked something. Check DmgClass for harmful spells only
         // This prevents spells such as Hunter's Mark from triggering pet attack
-        if (this->GetSpellInfo()->DmgClass != SPELL_DAMAGE_CLASS_NONE)
+        if (!IsTriggered() && GetSpellInfo()->DmgClass != SPELL_DAMAGE_CLASS_NONE)
             if (Pet* playerPet = playerCaster->GetPet())
-                if (playerPet->isAlive() && playerPet->isControlled() && (m_targets.GetTargetMask() & TARGET_FLAG_UNIT))
-                    playerPet->AI()->OwnerAttacked(m_targets.GetObjectTarget()->ToUnit());
+                if (!playerCaster->IsFriendlyTo(m_targets.GetObjectTarget()->ToUnit()))
+                    if (playerPet->isAlive() && playerPet->isControlled() && (m_targets.GetTargetMask() & TARGET_FLAG_UNIT))
+                        playerPet->AI()->OwnerAttacked(m_targets.GetObjectTarget()->ToUnit());     
     }
     SetExecutedCurrently(true);
 
@@ -4994,6 +4999,7 @@ void Spell::TakeRunePower(bool didHit)
     m_runesState = player->GetRunesState();                 // store previous state
 
     int32 runeCost[NUM_RUNE_TYPES];                         // blood, frost, unholy, death
+    SpellSchools school = GetFirstSchoolInMask(m_spellSchoolMask);
 
     for (uint32 i = 0; i < RUNE_DEATH; ++i)
     {
@@ -5001,6 +5007,11 @@ void Spell::TakeRunePower(bool didHit)
         if (Player* modOwner = m_caster->GetSpellModOwner())
         {
             modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, runeCost[i], this);
+
+            // PCT mod from user auras by school
+            runeCost[i] = int32(runeCost[i] * (1.0f + m_caster->GetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER + school)));
+            if (runeCost[i] < 0)
+                runeCost[i] = 0;
 
             if (runeCost[i] < 0)
                 runeCost[i] = 0;
@@ -5196,18 +5207,21 @@ SpellCastResult Spell::CheckCast(bool strict)
         return SPELL_FAILED_CASTER_DEAD;
 
     // check cooldowns to prevent cheating
-    if (m_caster->GetTypeId() == TYPEID_PLAYER && !(m_spellInfo->Attributes & SPELL_ATTR0_PASSIVE))
+    if (!IsTriggered() || !(_triggeredCastFlags & TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD))
     {
         //can cast triggered (by aura only?) spells while have this flag
-        if (!(_triggeredCastFlags & TRIGGERED_IGNORE_CASTER_AURASTATE) && m_caster->ToPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_ALLOW_ONLY_ABILITY))
+        if (!(_triggeredCastFlags & TRIGGERED_IGNORE_CASTER_AURASTATE) && m_caster->HasAuraType(SPELL_AURA_ALLOW_ONLY_ABILITY))
             return SPELL_FAILED_SPELL_IN_PROGRESS;
 
-        if (m_caster->ToPlayer()->HasSpellCooldown(m_spellInfo->Id))
+        if (m_caster->GetTypeId() == TYPEID_PLAYER && !(m_spellInfo->Attributes & SPELL_ATTR0_PASSIVE))
         {
-            if (m_triggeredByAuraSpell)
-                return SPELL_FAILED_DONT_REPORT;
-            else
-                return SPELL_FAILED_NOT_READY;
+            if (m_caster->ToPlayer()->HasSpellCooldown(m_spellInfo->Id))
+            {
+                if (m_triggeredByAuraSpell)
+                    return SPELL_FAILED_DONT_REPORT;
+                else
+                    return SPELL_FAILED_NOT_READY;
+            }
         }
     }
 
@@ -5980,6 +5994,15 @@ SpellCastResult Spell::CheckCast(bool strict)
     {
         switch (m_spellInfo->Effects[i].ApplyAuraName)
         {
+            case SPELL_AURA_MOD_STEALTH:
+            {
+                if (m_caster->HasAura(94528) ||                 // Flare
+                m_caster->HasAuraWithNegativeCaster(88611))     // Smoke Bomb
+                {
+                    return SPELL_FAILED_CASTER_AURASTATE;
+                }
+                break;
+            }
             case SPELL_AURA_MOD_RANGED_HASTE:
             {
                 // Focus Fire
@@ -7201,7 +7224,15 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                 return true;
             if (LOSAdditionalRules(target))
                 return true;
-            if (target != m_caster && !target->IsWithinLOSInMap(caster))
+            if (m_targets.HasDst())
+            {
+                float x, y, z;
+                m_targets.GetDstPos()->GetPosition(x, y, z);
+                
+                if (!target->IsWithinLOS(x, y, z))
+                    return false;
+            }
+            else if (target != m_caster && !target->IsWithinLOSInMap(caster))
                 return false;
             break;
     }
@@ -7956,10 +7987,10 @@ bool Spell::IsDarkSimulacrum() const
     return false;
 }
 
-bool Spell::LOSAdditionalRules(Unit const* target) const
+bool Spell::LOSAdditionalRules(Unit const* target, int8 eff) const
 {
     // Okay, custom rules for LoS
-    for (uint8 x = 0; x < MAX_SPELL_EFFECTS; ++x)
+    for (uint8 x = (eff == -1 ? 0: eff); x < (eff == -1 ? MAX_SPELL_EFFECTS: eff + 1); ++x)
     {
         // like paladin auras
         if (m_spellInfo->Effects[x].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID)
@@ -7973,8 +8004,14 @@ bool Spell::LOSAdditionalRules(Unit const* target) const
         if (m_spellInfo->IsChanneled())
             continue;
 
-        if (m_spellInfo->Effects[x].TargetA.GetTarget() == TARGET_UNIT_PET || m_spellInfo->Effects[x].TargetA.GetTarget() == TARGET_UNIT_MASTER)
-            return true;
+        switch (m_spellInfo->Effects[x].TargetA.GetTarget())
+        {
+            case TARGET_UNIT_PET:
+            case TARGET_UNIT_MASTER:
+                return true;
+            default:
+                break;
+        }
     }
 
     return false;
@@ -8151,7 +8188,10 @@ bool WorldObjectSpellConeTargetCheck::operator()(WorldObject* target)
     else
     {
         if (!_caster->isInFront(target, _coneAngle))
-            return false;
+        {
+            if (_caster->GetDistance2d(target) > 3.0f || !_caster->isInFront(target, M_PI))
+                return false;
+        }
     }
     return WorldObjectSpellAreaTargetCheck::operator ()(target);
 }

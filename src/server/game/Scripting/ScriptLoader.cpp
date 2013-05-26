@@ -276,6 +276,7 @@ void AddSC_stormwind_city();
 void AddSC_stranglethorn_vale();
 void AddSC_swamp_of_sorrows();
 void AddSC_tirisfal_glades();
+void AddSC_tol_barad();
 void AddSC_undercity();
 void AddSC_western_plaguelands();
 void AddSC_westfall();
@@ -452,6 +453,7 @@ void AddSC_boss_kologarn();
 void AddSC_boss_auriaya();              
 void AddSC_boss_hodir();
 void AddSC_boss_freya();
+void AddSC_boss_yogg_saron();
 void AddSC_boss_mimiron();
 void AddSC_boss_thorim();
 void AddSC_boss_general_vezax();
@@ -701,7 +703,7 @@ void AddSC_boss_alysrazor();
 void AddSC_boss_lord_rhyolith();
 void AddSC_boss_baleroc();
 void AddSC_boss_majordomo_staghelm();
-//void AddSC_boss_ragnaros_cata();
+void AddSC_boss_ragnaros_firelands();
 
 void AddSC_instance_end_time(); // End Time
 void AddSC_end_time();
@@ -1013,6 +1015,7 @@ void AddEasternKingdomsScripts()
     AddSC_stranglethorn_vale();
     AddSC_swamp_of_sorrows();
     AddSC_tirisfal_glades();
+    AddSC_tol_barad();
     AddSC_undercity();
     AddSC_western_plaguelands();
     AddSC_westfall();
@@ -1284,6 +1287,7 @@ void AddNorthrendScripts()
     AddSC_boss_auriaya();              
     AddSC_boss_hodir();
     AddSC_boss_freya();
+    AddSC_boss_yogg_saron();
     AddSC_boss_mimiron();
     AddSC_boss_thorim();
     AddSC_boss_general_vezax();
@@ -1447,7 +1451,7 @@ void AddNorthrendScripts()
     AddSC_boss_lord_rhyolith();
     AddSC_boss_baleroc();
     AddSC_boss_majordomo_staghelm();
-//    AddSC_boss_ragnaros_cata();
+    AddSC_boss_ragnaros_firelands();
 
     AddSC_instance_end_time(); // End Time
     AddSC_end_time();

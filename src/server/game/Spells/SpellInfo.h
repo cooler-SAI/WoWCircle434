@@ -176,7 +176,7 @@ enum SpellSpecificType
 
 enum SpellCustomAttributes
 {
-    SPELL_ATTR0_CU_ENCHANT_PROC                  = 0x00000001,
+    SPELL_ATTR0_CU_ENCHANT_STACK                 = 0x00000001,
     SPELL_ATTR0_CU_CONE_BACK                     = 0x00000002,
     SPELL_ATTR0_CU_CONE_LINE                     = 0x00000004,
     SPELL_ATTR0_CU_SHARE_DAMAGE                  = 0x00000008,
@@ -193,8 +193,9 @@ enum SpellCustomAttributes
     SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER      = 0x00010000,
     SPELL_ATTR0_CU_REQ_CASTER_BEHIND_TARGET      = 0x00020000,
     SPELL_ATTR0_CU_SEND_BASE_AMOUNT              = 0x00040000,
-    SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER     = 0x00080000,  // Periodic auras with this flag keep old periodic timer when refreshing 
-    SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS   = 0x00100000,
+    SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER     = 0x00080000, // Periodic auras with this flag keep old periodic timer when refreshing 
+    SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS   = 0x00100000, // Collect auras with diff casters in one stackable aura
+    SPELL_ATTR0_CU_TRIGGERED_IGNORE_RESILENCE    = 0x00200000, // Some triggered damage spells have to ignore resilence because it's already calculated in trigger spell (example: paladin's hand of light)
 
     SPELL_ATTR0_CU_NEGATIVE                      = SPELL_ATTR0_CU_NEGATIVE_EFF0 | SPELL_ATTR0_CU_NEGATIVE_EFF1 | SPELL_ATTR0_CU_NEGATIVE_EFF2
 };
@@ -411,6 +412,7 @@ public:
     SpellEffectInfo Effects[MAX_SPELL_EFFECTS];
     uint32 ExplicitTargetMask;
     SpellChainNode const* ChainEntry;
+    uint32 ResearchProject;
 
     // struct access functions
     SpellTargetRestrictionsEntry const* GetSpellTargetRestrictions() const;
@@ -458,6 +460,7 @@ public:
     bool NeedsToBeTriggeredByCaster() const;
 
     bool IsPassive() const;
+    bool IsRaidMarker() const;	
     bool IsAutocastable() const;
     bool IsStackableWithRanks() const;
     bool IsPassiveStackableWithRanks() const;
@@ -531,6 +534,7 @@ public:
 
     uint32 CalcCastTime(Unit* caster = NULL, Spell* spell = NULL) const;
     uint32 GetRecoveryTime() const;
+    uint32 GetStackAmount(Unit *caster) const;
 
     int32 CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) const;
 
@@ -544,6 +548,7 @@ public:
     bool IsRankOf(SpellInfo const* spellInfo) const;
     bool IsDifferentRankOf(SpellInfo const* spellInfo) const;
     bool IsHighRankOf(SpellInfo const* spellInfo) const;
+    bool IsAllwaysStackModifers() const;
 
     bool IsIgnoringCombat() const;
     bool IsRequireAdditionalTargetCheck() const;

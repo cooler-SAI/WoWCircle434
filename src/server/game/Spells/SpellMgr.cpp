@@ -85,6 +85,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Earthquake
             else if (spellproto->Id == 64697)
                 return DIMINISHING_NONE;
+            // Black Plague
+            else if (spellproto->Id == 64155)
+                return DIMINISHING_NONE;
             break;
         }
         // Event spells
@@ -138,6 +141,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
                 return DIMINISHING_LIMITONLY;
             // Sin and Punishment (Priest)
             else if (spellproto->Id == 87204)
+                return DIMINISHING_LIMITONLY;
+            // Curse of Exhaustion
+            else if (spellproto->Id == 18223)
                 return DIMINISHING_LIMITONLY;
             break;
         }
@@ -324,6 +330,9 @@ int32 GetDiminishingReturnsLimitDuration(DiminishingGroup group, SpellInfo const
             // Curse of Elements - limit to 120 seconds in PvP
             else if (spellproto->SpellFamilyFlags[1] & 0x200)
                return 120 * IN_MILLISECONDS;
+            // Curse of Exhaustion
+            else if (spellproto->Id == 18223)
+                return 10 * IN_MILLISECONDS;
             break;
         }
         default:
@@ -2791,7 +2800,20 @@ void SpellMgr::LoadSpellCustomAttr()
                             if (procInfo->HasAura(SPELL_AURA_PROC_TRIGGER_SPELL))
                                 continue;
 
-                            procInfo->AttributesCu |= SPELL_ATTR0_CU_ENCHANT_PROC;
+                            procInfo->AttributesCu |= SPELL_ATTR0_CU_ENCHANT_STACK;
+                        }
+                    }
+                    else if (IsPartOfSkillLine(SKILL_RUNEFORGING, i))
+                    {
+                        uint32 enchantId = spellInfo->Effects[j].MiscValue;
+                        SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchantId);
+                        for (uint8 s = 0; s < MAX_ITEM_ENCHANTMENT_EFFECTS; ++s)
+                        {
+                            SpellInfo* procInfo = (SpellInfo*)GetSpellInfo(enchant->spellid[s]);
+                            if (!procInfo)
+                                continue;
+
+                            procInfo->AttributesCu |= SPELL_ATTR0_CU_ENCHANT_STACK;
                         }
                     }
                     break;
@@ -2821,6 +2843,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 31803: // Censure
             case 77661: // Searing Flame
             case 77489: // Echo of Light
+            case 99132: // Divine Fire, Item - Priest T12 Healer 2P Bonus
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER;
                 break;
             case 60256:
@@ -2949,6 +2972,8 @@ void SpellMgr::LoadSpellCustomAttr()
             case 100212: // Flame Scythe
             case 100213: // Flame Scythe
             case 100214: // Flame Scythe
+            case 105069: // Seething Hate
+            case 108094: // Seething Hate
                 // ONLY SPELLS WITH SPELLFAMILY_GENERIC and EFFECT_SCHOOL_DAMAGE
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 break;
@@ -3005,6 +3030,10 @@ void SpellMgr::LoadSpellCustomAttr()
                 break;
             case 48707: // Anti-Magic Shell
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SEND_BASE_AMOUNT;
+                break;
+            case 70890: // Scourge Strike triggered part
+            case 96172: // Hand of Light
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_TRIGGERED_IGNORE_RESILENCE;
                 break;
             default:
                 break;
@@ -3109,7 +3138,6 @@ void SpellMgr::LoadDbcDataCorrections()
             case 99:    // Demoralizing Roar
             case 5857:  // Hellfire Effect
             case 49203: // Hungering Cold
-//             case 52212: // Death and Decay
                 spellInfo->Effects[0].SetRadiusIndex(13);
                 break;
             case 6343: // Thunder Clap (Battle, Defensive Stance)
@@ -3174,6 +3202,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 53783: // Transmute: Eternal Water to Air
             case 53782: // Transmute: Eternal Earth to Shadow
             case 53771: // Transmute: Eternal Life to Shadow
+            case 73478: // Fire Prism
                 spellInfo->RecoveryTime = 0;
                 spellInfo->CategoryRecoveryTime = 86400000; 
                 break;
@@ -3486,7 +3515,7 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 70893: // Culling The Herd (needs target selection script)
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
-                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_MASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_MASTER;
                 break;
             case 54800: // Sigil of the Frozen Conscience - change class mask to custom extended flags of Icy Touch
                         // this is done because another spell also uses the same SpellFamilyFlags as Icy Touch
@@ -3594,6 +3623,14 @@ void SpellMgr::LoadDbcDataCorrections()
                 // may be db data bug, or blizz may keep reapplying area auras every update with checking immunity
                 // that will be clear if we get more spells with problem like this
                 spellInfo->AttributesEx |= SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY;
+                break;
+            case 61791: // Ride Vehicle (Yogg-Saron)
+                // TODO: remove this when basepoints of all Ride Vehicle auras are calculated correctly
+                spellInfo->Effects[0].BasePoints = 1;
+                break;
+            case 64468: // Empowering Shadows (Yogg-Saron)
+            case 64486: // Empowering Shadows (Yogg-Saron)
+                spellInfo->MaxAffectedTargets = 3;  // same for both modes?
                 break;
             case 62301: // Cosmic Smash (Algalon the Observer)
                 spellInfo->MaxAffectedTargets = 1;
@@ -4087,6 +4124,8 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // Alizabal
             case 105065: // Seething Hate Dummy
+            case 108090:
+                spellInfo->MaxAffectedTargets = 1;
                 spellInfo->Effects[0].SetRadiusIndex(28);
                 break;
             case 105069: // Seething Hate dmg
@@ -4098,6 +4137,14 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 104994: // Blade Dance dmg
                 spellInfo->Effects[0].SetRadiusIndex(17);
+                break;
+            case 105726: // Blade Dance charge
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+                break;
+            case 105784: // Blade Dance aura 1
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
                 break;
             // ENDOF BARADIN HOLD SPELLS
             //
@@ -4987,6 +5034,9 @@ void SpellMgr::LoadDbcDataCorrections()
             // FIRELANDS SPELLS
             //
             // Trash
+            case 101093:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                break;
             case 99692: // Terrifying Roar
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(33);
                 break;
@@ -5258,6 +5308,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 100890:
             case 100891:
             case 100892:
+                spellInfo->AttributesEx3 &= ~SPELL_ATTR5_DONT_TURN_DURING_CAST;
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
             case 98708: // Sulfuras Smash
@@ -5274,8 +5325,89 @@ void SpellMgr::LoadDbcDataCorrections()
             case 101102: // Lavalogged
                 spellInfo->ExcludeTargetAuraSpell = 101102;
                 break;
-            case 99012: // Splitting Blow
+            // Splitting Blow
+            case 98951: case 100883: case 100884: case 100885: 
+            case 98952: case 100877: case 100878: case 100879:
+            case 98953: case 100880: case 100881: case 100882:
+                spellInfo->AttributesEx3 &= ~SPELL_ATTR5_DONT_TURN_DURING_CAST;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            case 99012: // Splitting Blow script
                 spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+                break;
+            case 98497: // Molten Seed aoe 2
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
+            case 98498: // Molten Seed dmg
+            case 100579:
+            case 100580:
+            case 100581:
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
+                break;
+            case 100158: // Molten Power
+            case 100302:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 99125: // Blazing Heat dummy
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
+            case 99129: // Blazing Heat summon
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
+            case 99267: // Living Meteor aoe 1
+            case 101387:
+            case 101388:
+            case 101389:
+                spellInfo->MaxAffectedTargets = 1;
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+                break;
+            case 100249: // Combustion
+            case 100250:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            case 100171: // World in Flame
+            case 100190:
+                spellInfo->SetDurationIndex(566); // 8 seconds
+                break;
+            case 98981: // Lava Bolt
+            case 100290:
+                spellInfo->MaxAffectedTargets = 4;
+                break;
+            case 100289:
+            case 100291:
+                spellInfo->MaxAffectedTargets = 10;
+                break;
+            case 100476: // Breadth of Frost summon
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->SetDurationIndex(23);
+                break;
+            case 100567: // Breadth of Frost dmg
+                spellInfo->ExcludeTargetAuraSpell = 100567;
+                break;
+            case 100679: // Dreadflame summon
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                break;
+            case 100714: // Cloudburst missile
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                break;
+            case 100644: // Entrapping Roots summon
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->SetDurationIndex(23);
+                break;
+            case 100653: // Entrapping Roots dmg
+                spellInfo->ExcludeTargetAuraSpell = 100653;
+                break;
+            case 101237: // Entrapping Roots dmg
+                spellInfo->ExcludeTargetAuraSpell = 101237;
+                break;
+            case 100777: // Magma Geyser
+            case 100822:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ENEMY;
                 break;
             // ENDOF FIRELANDS
             // BASTION OF TWILIGHT SPELLS
@@ -5909,7 +6041,7 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // Steady Shot
             case 56641:
-                spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_TARGET_ENEMY;
                 break;
             // Fortune Cookie
             case 87604:
@@ -5988,6 +6120,7 @@ void SpellMgr::LoadDbcDataCorrections()
              // Consecration
             case 36946:
                 spellInfo->SetDurationIndex(1);
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
                 break;
             // Tower of Radiance rank 3
             case 85512:
@@ -6224,10 +6357,6 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_ENERGIZE;
                 spellInfo->Effects[EFFECT_0].MiscValue = 3;
                 break;
-            // Smoke Bomb
-            case 76577:
-                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
-                break;
             // Fan of Knives
             case 51723:
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(14);
@@ -6357,18 +6486,25 @@ void SpellMgr::LoadDbcDataCorrections()
             case 74723:
                 spellInfo->Effects[EFFECT_0].MiscValue = 40065;
                 break;
-            // alot of aoe spells
+            // Rain of Fire
+            case 5740:
+                spellInfo->Effects[EFFECT_1].TriggerSpell = 0;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
+                break;
+            // Hurricane
+            case 16914:
+                spellInfo->Effects[EFFECT_2].TriggerSpell = 0;
+                spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
+                break;
+            // Blizzard
+            case 10:
+                spellInfo->Effects[EFFECT_1].TriggerSpell = 0;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
+                break;
             case 42208: // Blizzard
             case 42223: // Rain of Fire
             case 42231: // Hurricane
-            case 52212: // Death and Decay
-                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ENEMY;
-                spellInfo->Effects[EFFECT_0].TargetB = 0;
-                spellInfo->Effects[EFFECT_0].SetRadiusIndex(0);
-
-                if (spellInfo->Id == 52212)
-                    spellInfo->Effects[0].SetRadiusIndex(13);
-
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
                 break;
             case 54424: // Fel Intelligence
                 spellInfo->Effects[1].SetRadiusIndex(12);
@@ -6639,7 +6775,21 @@ void SpellMgr::LoadDbcDataCorrections()
             case 57472:
             case 57470:
                 spellInfo->Effects[EFFECT_0].SpellClassMask = flag96(0x00001C00, 0x00010000, 0x0);
-                break; 
+                break;
+            case 66550: // teleports outside (Isle of Conquest)
+            case 66551: // teleports inside (Isle of Conquest)
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
+            // Redemption
+            case 7328:
+                spellInfo->SpellFamilyName = SPELLFAMILY_PALADIN;
+                break;
+            // Bad Manner
+            case 90337:
+                spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
+                break;
             default:
                 break;
         }
