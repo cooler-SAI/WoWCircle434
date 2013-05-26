@@ -39,22 +39,6 @@ enum CreatureIds
     NPC_SMOULDERING_HATCHLING       = 53794,
 
     NPC_CIRCLE_OF_THRONES_PORTAL    = 54247,
-	
-    // Ragnaros from uwow
-    NPC_SULFURAS_HAMMER             = 53420,
-    NPC_LIVING_METEOR               = 53500,
-    NPC_MOLTEN_ELEMENTAR            = 53189,
-    NPC_ENGULFING_FLAMES_TRIGGER    = 53485,
-    NPC_SPLITTING_BLOW_TRIGGER      = 53393,
-    NPC_MAGMA_POOL_TRIGGER          = 53729,
-    NPC_PLATFORM_TRIGGER            = 53952,
-    NPC_MAGMA_TRAP                  = 53086,
-    NPC_SULFURAS_FLAME_WALL         = 38327,
-    NPC_SULFURAS_SMASH_TARGET_1     = 53268,
-    NPC_LAVA_WAVE                   = 53363,
-    NPC_SON_OF_FLAME                = 53140,
-    NPC_MOLTEN_SEED                 = 53186,
-    NPC_LAVA_SCION                  = 53231,
 };
 
 enum GameobjectIds
@@ -72,10 +56,6 @@ enum GameobjectIds
     GO_FIRE_WALL_FENDRAL        = 208906,
     GO_CACHE_OF_THE_FIRELORD    = 208967,
     GO_CACHE_OF_THE_FIRELORD_H  = 209261,
-	
-    GO_FIRE_WALL_SULFURON       = 208873,
-    GO_RAGNAROS_DOOR            = 209073,
-    GOB_SULFURON_BRIDGE         = 209251,
 };
 
 enum QuestDefines
@@ -117,24 +97,6 @@ enum QuestDefines
 
     SPELL_LEGENDARY_PORTAL_OPENING              = 101029,
     SPELL_BRANCH_OF_NORDRASSIL_WIN_COSMETIC     = 100326,
-};
-
-enum MovePoints
-{
-    POINT_HAMMER,
-    POINT_RAGNAROS_DOWN,         //end of each phase
-    POINT_RAGNAROS_UP,           //start of each next phase
-    POINT_RAGNAROS_STANDUP,      //only on heroic mode
-    POINT_SULFURAS_SMASH,        //target for smashes
-};
-
-enum Actions
-{
-    //Ragnaros
-    ACTION_RAGNAROS_DOWN,        //end of each phase
-    ACTION_RAGNAROS_UP,          //start of each next phase
-    ACTION_RAGNAROS_STANDUP,     //only on heroic mode
-    ACTION_SULFURAS_SMASH,       //target for smashes
 };
 
 #endif

@@ -13,13 +13,6 @@ static const DoorData doordata[] =
     {GO_RAID_BRIDGE_FORMING, DATA_BALEROC,   DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
     {GO_STICKY_WEB,          DATA_BETHTILAC, DOOR_TYPE_ROOM,        BOUNDARY_NONE},
     {GO_BRIDGE_OF_RHYOLITH,  DATA_RHYOLITH,  DOOR_TYPE_SPAWN_HOLE,  BOUNDARY_NONE},
-    //{GO_RAID_BRIDGE_FORMING, DATA_RHYOLITH,  DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
-    {GO_RAID_BRIDGE_FORMING, DATA_SHANNOX,   DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
-    {GO_RAID_BRIDGE_FORMING, DATA_BETHTILAC, DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
-    {GO_RAID_BRIDGE_FORMING, DATA_ALYSRAZOR, DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
-    {GO_FIRE_WALL_FENDRAL,   DATA_STAGHELM,  DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
-    {GO_FIRE_WALL_SULFURON,  DATA_STAGHELM,  DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
-    {GO_RAGNAROS_DOOR,       DATA_RAGNAROS,  DOOR_TYPE_ROOM,        BOUNDARY_NONE},
     {0, 0, DOOR_TYPE_ROOM, BOUNDARY_NONE},
 };
 
@@ -89,9 +82,6 @@ class instance_firelands : public InstanceMapScript
                     case GO_STICKY_WEB:
                     case GO_RAID_BRIDGE_FORMING:
                     case GO_BRIDGE_OF_RHYOLITH:
-                    case GO_FIRE_WALL_FENDRAL:
-                    case GO_FIRE_WALL_SULFURON:
-                    case GO_RAGNAROS_DOOR:
                         AddDoor(pGo, true);
                         break;
                     case GO_CIRCLE_OF_THORNS_PORTAL3:
@@ -100,7 +90,7 @@ class instance_firelands : public InstanceMapScript
                             HandleGameObject(pGo->GetGUID(), true, pGo);
                         break;
                 }
-		    }
+                    }
 
             void SetData(uint32 type, uint32 data)
             {

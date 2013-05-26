@@ -703,7 +703,6 @@ void AddSC_boss_alysrazor();
 void AddSC_boss_lord_rhyolith();
 void AddSC_boss_baleroc();
 void AddSC_boss_majordomo_staghelm();
-void AddSC_boss_ragnaros_cata();
 
 void AddSC_instance_end_time(); // End Time
 void AddSC_end_time();
@@ -1451,7 +1450,6 @@ void AddNorthrendScripts()
     AddSC_boss_lord_rhyolith();
     AddSC_boss_baleroc();
     AddSC_boss_majordomo_staghelm();
-    AddSC_boss_ragnaros_cata();
 
     AddSC_instance_end_time(); // End Time
     AddSC_end_time();
