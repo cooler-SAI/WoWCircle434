@@ -71,10 +71,12 @@ void WorldSession::HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlag
                 case 2: // Keystones
                     recvPacket >> entry;        // Item id
                     recvPacket >> usedCount;    // Item count
+                    GetPlayer()->GetArchaeologyMgr().AddProjectCost(entry, usedCount, false);
                     break;
                 case 1: // Fragments
                     recvPacket >> entry;        // Currency id
                     recvPacket >> usedCount;    // Currency count
+                    GetPlayer()->GetArchaeologyMgr().AddProjectCost(entry, usedCount, true);
                     break;
             }
         }

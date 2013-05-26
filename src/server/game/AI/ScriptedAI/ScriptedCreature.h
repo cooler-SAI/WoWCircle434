@@ -234,8 +234,10 @@ struct ScriptedAI : public CreatureAI
         switch (_difficulty)
         {
             case RAID_DIFFICULTY_10MAN_NORMAL:
+            case RAID_DIFFICULTY_10MAN_HEROIC:
                 return normal10;
             case RAID_DIFFICULTY_25MAN_NORMAL:
+            case RAID_DIFFICULTY_25MAN_HEROIC:
                 return normal25;
             default:
                 break;

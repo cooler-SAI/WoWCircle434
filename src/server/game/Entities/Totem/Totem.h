@@ -31,6 +31,7 @@ enum TotemType
 #define SENTRY_TOTEM_SPELLID  6495
 
 #define SENTRY_TOTEM_ENTRY    3968
+#define SEARING_TOTEM_ENTRY   2523
 
 class Totem : public Minion
 {

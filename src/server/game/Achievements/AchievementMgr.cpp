@@ -3587,9 +3587,9 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
 {
     uint32 oldMSTime = getMSTime();
 
-    QueryResult result = CharacterDatabase.Query("SELECT achievement FROM character_achievement GROUP BY achievement");
+    QueryResult result1 = CharacterDatabase.Query("SELECT achievement FROM character_achievement GROUP BY achievement");
 
-    if (!result)
+    if (!result1)
     {
         sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 completed achievements. DB table `character_achievement` is empty.");
         return;
@@ -3597,7 +3597,7 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
 
     do
     {
-        Field* fields = result->Fetch();
+        Field* fields = result1->Fetch();
 
         uint16 achievementId = fields[0].GetUInt16();
         const AchievementEntry* achievement = sAchievementMgr->GetAchievement(achievementId);
@@ -3611,7 +3611,33 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
         else if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
             m_allCompletedAchievements.insert(achievementId);
     }
-    while (result->NextRow());
+    while (result1->NextRow());
+
+    QueryResult result2 = CharacterDatabase.Query("SELECT achievement FROM guild_achievement GROUP BY achievement");
+
+    if (!result2)
+    {
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 completed achievements. DB table `guild_achievement` is empty.");
+        return;
+    }
+
+    do
+    {
+        Field* fields = result2->Fetch();
+
+        uint16 achievementId = fields[0].GetUInt16();
+        const AchievementEntry* achievement = sAchievementMgr->GetAchievement(achievementId);
+        if (!achievement)
+        {
+            // Remove non existent achievements from all characters
+            sLog->outError(LOG_FILTER_ACHIEVEMENTSYS, "Non-existing achievement %u data removed from table `guild_achievement`.", achievementId);
+            CharacterDatabase.PExecute("DELETE FROM guild_achievement WHERE achievement = %u", achievementId);
+            continue;
+        }
+        else if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL | ACHIEVEMENT_FLAG_REALM_FIRST_GUILD))
+            m_allCompletedAchievements.insert(achievementId);
+    }
+    while (result2->NextRow());
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded %lu completed achievements in %u ms", (unsigned long)m_allCompletedAchievements.size(), GetMSTimeDiffToNow(oldMSTime));
 }

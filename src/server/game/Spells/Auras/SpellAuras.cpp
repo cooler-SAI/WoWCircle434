@@ -801,12 +801,16 @@ void Aura::SetAuraTimer(int32 newTime, uint64 guid)
     }
 }
 
-void Aura::RefreshDuration()
+void Aura::RefreshDuration(bool recalculate)
 {
     SetDuration(GetMaxDuration());
 
     if (m_spellInfo->ManaPerSecond)
         m_timeCla = 1 * IN_MILLISECONDS;
+
+    Unit* caster = GetCaster();
+    if (recalculate)
+        RecalculateAmountOfEffects();
 }
 
 void Aura::RefreshTimers()
@@ -833,7 +837,7 @@ void Aura::RefreshTimers()
         resetPeriodic = false;
      
 
-    RefreshDuration();
+    RefreshDuration(false);
     Unit* caster = GetCaster();
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         if (HasEffect(i))
@@ -909,15 +913,16 @@ void Aura::SetStackAmount(uint8 stackAmount)
 bool Aura::ModStackAmount(int32 num, AuraRemoveMode removeMode)
 {
     int32 stackAmount = m_stackAmount + num;
+    Unit * caster = GetCaster();
 
     // limit the stack amount (only on stack increase, stack amount may be changed manually)
-    if ((num > 0) && (stackAmount > int32(m_spellInfo->StackAmount)))
+    if ((num > 0) && (stackAmount > int32(m_spellInfo->GetStackAmount(caster))))
     {
         // not stackable aura - set stack amount to 1
-        if (!m_spellInfo->StackAmount)
+        if (!m_spellInfo->GetStackAmount(caster))
             stackAmount = 1;
         else
-            stackAmount = m_spellInfo->StackAmount;
+            stackAmount = m_spellInfo->GetStackAmount(caster);
     }
     // we're out of stacks, remove
     else if (stackAmount <= 0)
@@ -1327,6 +1332,18 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         caster->CastSpell(caster, WellFedSpells.front(), true);
                         break;
                     }
+                    case 105785:    // Stolen Time mage T13 set bonus
+                    {
+                        if (target->HasAura(105790))
+                            target->CastSpell(target, 105791, true); // cooldown bonus
+                        break;
+                    }
+                    // Smoke Bomb, Rogue
+                    case 88611:
+                        if (caster)
+                            if (!target->IsFriendlyTo(caster))
+                                target->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
+                        break;
                 }
 
                 // Recently Bandaged
@@ -1765,8 +1782,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             target->CastSpell(target, 83239, true);
                         break;
                     case 66: // Invisibility
-                        // Invisibility - Glyph of Invisibility - Removal
-                        caster->RemoveAurasDueToSpell(87833);   
                         if (removeMode != AURA_REMOVE_BY_EXPIRE)
                             break;
 
@@ -1777,8 +1792,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
 
                         target->CastSpell(target, 32612, true, NULL, GetEffect(1));
                         target->CombatStop();
+    
                         // Invisibility - Glyph of Invisibility
-                        target->CastSpell(target, 87833, true);
+                        if (target->HasAura(56366))
+                            target->CastSpell(target, 87833, true);
+    
                         break;
                     // Ring of Frost - 3 sec immune
                     case 82691:
@@ -1864,34 +1882,26 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     }
                     // Shadowburn
                     case 29341:
-                    {
+                        if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+                            if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
+                                caster->ModifyPower(POWER_SOUL_SHARDS, 3);
+                        break;
+                    // Drain Soul
+                    case 1120:
                         if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
                         {
                             if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
                                 caster->ModifyPower(POWER_SOUL_SHARDS, 3);
-                        }
-                        break;
-                    }
-                    // Drain Soul
-                    case 1120:
-                    {
-                        if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
-                        {
-                            if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
-                            caster->ModifyPower(POWER_SOUL_SHARDS, 3);
                         
                             // Glyph of Drain Soul
                             if (caster->HasAura(58070))
                                 caster->CastSpell(caster, 58068, true);
                         }
                         break;
-                    }
                     // Dark Intent
                     case 85767:
-                    {
                         caster->RemoveAurasDueToSpell(85767);
                         break;
-                    }
                     // Haunt
                     case 48181:
                     {
@@ -1907,12 +1917,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     }
                     // Soul Swap
                     case 86211:
-                    {
                         // Send glyphed cooldown to player
                         if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEFAULT && caster->HasAura(56226))
                             caster->CastSpell(caster, 94229, false);
                         break;
-                    }
                 }
                 break;
             case SPELLFAMILY_PRIEST:
@@ -2028,11 +2036,19 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 break;
             case SPELLFAMILY_HUNTER:
+                if (!caster)
+                    break;
+
                 // Glyph of Freezing Trap
                 if (GetSpellInfo()->SpellFamilyFlags[0] & 0x00000008)
-                    if (caster && caster->HasAura(56845))
+                    if (caster->HasAura(56845))
                         caster->CastSpell(target, 61394, true);
 
+                // Glyph of Misdirection
+                if (GetId() == 34477 && caster->ToPlayer()->GetPetGUID() == caster->GetMisdirectionTargetGuid() && caster->HasAura(56829))
+                {
+                    caster->ToPlayer()->RemoveSpellCooldown(34477, true);
+                }
                 break;
             case SPELLFAMILY_SHAMAN:
                 switch(GetSpellInfo()->Id)
@@ -2386,11 +2402,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 break;
             }
-            // Invisibility - Glyph of Invisibility
-            if (GetId() == 66 && apply && caster->HasAura(56366))
-            {
-                caster->CastSpell(caster, 87833, true);
-            }
+            // Invisibility - Glyph of Invisibility removal
             else if (GetId() == 32612 && !apply)
             {
                 caster->RemoveAurasDueToSpell(87833);
@@ -2630,8 +2642,8 @@ bool Aura::CanStackWith(Aura const* existingAura) const
                     if (m_spellInfo->Id == 1490)
                         break;
                     return true;
-                // Vendetta-like auras
-                case SPELL_AURA_MOD_DAMAGE_FROM_CASTER:
+                case SPELL_AURA_MOD_DAMAGE_FROM_CASTER:                // Vendetta-like auras
+                case SPELL_AURA_BYPASS_ARMOR_FOR_CASTER:               // Find Weakness-like auras
                     return true;
                 default:
                     break;
@@ -2656,7 +2668,7 @@ bool Aura::CanStackWith(Aura const* existingAura) const
             return true;
 
         if (GetCastItemGUID() && existingAura->GetCastItemGUID())
-            if (GetCastItemGUID() != existingAura->GetCastItemGUID() && m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_ENCHANT_PROC))
+            if (GetCastItemGUID() != existingAura->GetCastItemGUID() && m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_ENCHANT_STACK))
                 return true;
 
         // same spell with same caster should not stack
@@ -2690,21 +2702,16 @@ bool Aura::CanStackWith(Aura const* existingAura) const
         (existingSpellInfo->GetMaxDuration() <= 60*IN_MILLISECONDS && existingSpellInfo->GetMaxDuration() != -1)))
         return true;
 
-    if (m_spellInfo->Id == 16191) // mana tide buff
-        return true;
-
-    if (!IsPassive() && !existingSpellInfo->IsPassive() && m_spellInfo->SpellFamilyName != SPELLFAMILY_POTION && existingSpellInfo->SpellFamilyName != SPELLFAMILY_POTION)
+    if (m_spellInfo->IsAllwaysStackModifers() && !existingSpellInfo->IsAllwaysStackModifers())
+    {
         for (int i = 0; i < 3; ++i)
         {
             if ((m_spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA || m_spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID) &&
                 (existingSpellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA || existingSpellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID) &&
                 m_spellInfo->Effects[i].ApplyAuraName == existingSpellInfo->Effects[i].ApplyAuraName)
+            {
                 switch (m_spellInfo->Effects[i].ApplyAuraName)
                 {
-                    case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:
-                        // warsong flags
-                        if (m_spellInfo->Id == 23333 || m_spellInfo->Id == 23335 || existingSpellInfo->Id == 23335 || existingSpellInfo->Id == 23333)
-                            break;
                     case SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE:
                     case SPELL_AURA_MOD_STAT:
                         if (m_spellInfo->Effects[i].MiscValue == existingSpellInfo->Effects[i].MiscValue || (m_spellInfo->Effects[i].MiscValueB != 0 && 
@@ -2717,8 +2724,10 @@ bool Aura::CanStackWith(Aura const* existingAura) const
                         break;
                     default:
                         break;
+                }
             }
         }
+    }
 
    if (m_spellInfo->SpellFamilyName != existingSpellInfo->SpellFamilyName)
         return true;
@@ -2758,7 +2767,7 @@ bool Aura::CanStackWith(Aura const* existingAura) const
         if (m_spellInfo->IsMultiSlotAura() && !IsArea())
             return true;
         if (GetCastItemGUID() && existingAura->GetCastItemGUID())
-            if (GetCastItemGUID() != existingAura->GetCastItemGUID() && (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_ENCHANT_PROC))
+            if (GetCastItemGUID() != existingAura->GetCastItemGUID() && (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_ENCHANT_STACK))
                 return true;
         // same spell with same caster should not stack
         return false;
@@ -3308,7 +3317,17 @@ void UnitAura::_ApplyForTarget(Unit* target, Unit* caster, AuraApplication * aur
 
     // register aura diminishing on apply
     if (DiminishingGroup group = GetDiminishGroup())
+    {
         target->ApplyDiminishingAura(group, true);
+        if (GetId() == 82691)       // Ring of Frost
+        {
+            target->ApplyDiminishingAura(DIMINISHING_RING_OF_FROST, true);
+        }
+        else if (GetId() == 44572)  // Deep Freeze
+        {
+            target->ApplyDiminishingAura(DIMINISHING_DEEP_FREEZE, true);
+        }
+    }
 }
 
 void UnitAura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication * aurApp)
@@ -3317,7 +3336,17 @@ void UnitAura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication * a
 
     // unregister aura diminishing (and store last time)
     if (DiminishingGroup group = GetDiminishGroup())
+    {
         target->ApplyDiminishingAura(group, false);
+        if (GetId() == 82691)       // Ring of Frost
+        {
+            target->ApplyDiminishingAura(DIMINISHING_RING_OF_FROST, false);
+        }
+        else if (GetId() == 44572)  // Deep Freeze
+        {
+            target->ApplyDiminishingAura(DIMINISHING_DEEP_FREEZE, false);
+        }
+    }
 }
 
 void UnitAura::Remove(AuraRemoveMode removeMode)

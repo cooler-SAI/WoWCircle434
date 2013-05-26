@@ -5,7 +5,7 @@ DoorData const doorData[] =
 {
     {GO_TOLBARAD_DOOR_2,    DATA_ARGALOTH,  DOOR_TYPE_ROOM,       BOUNDARY_NONE},
     {GO_CELL_DOOR,          DATA_OCCUTHAR,  DOOR_TYPE_ROOM,       BOUNDARY_NONE},
-    {GO_TOLBARAD_DOOR_2,    DATA_ALIZABAL,  DOOR_TYPE_ROOM,       BOUNDARY_NONE},
+    {GO_TOLBARAD_DOOR_1,    DATA_ALIZABAL,  DOOR_TYPE_ROOM,       BOUNDARY_NONE},
     {0,                     0,              DOOR_TYPE_ROOM,       BOUNDARY_NONE}, // END
 };
 
@@ -33,16 +33,6 @@ class instance_baradin_hold : public InstanceMapScript
                     return false;
                 
                 return true;
-            }
-
-            void OnCreatureCreate(Creature* pCreature)
-            {
-                switch (pCreature->GetEntry())
-                {
-                    case NPC_ALIZABAL:
-                        pCreature->SetVisible(false);
-                        break;
-                }
             }
 
             void OnGameObjectCreate(GameObject* pGo)

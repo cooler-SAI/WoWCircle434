@@ -36,10 +36,10 @@ class TotemAI : public CreatureAI
         void EnterEvadeMode();
         void SetVictim(uint64 victim) { i_victimGuid = victim; }
 
-        void UpdateAI(uint32 const diff);
+        virtual void UpdateAI(uint32 const diff);
         static int Permissible(Creature const* creature);
 
-    private:
+    protected:
         uint64 i_victimGuid;
 };
 #endif

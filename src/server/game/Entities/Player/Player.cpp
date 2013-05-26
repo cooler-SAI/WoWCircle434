@@ -684,7 +684,7 @@ void KillRewarder::Reward()
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
-Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_reputationMgr(this), phaseMgr(this)
+Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_reputationMgr(this), phaseMgr(this), m_archaeologyMgr(this)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -5503,7 +5503,7 @@ void Player::RepopAtGraveyard()
     AreaTableEntry const* zone = GetAreaEntryByAreaID(GetAreaId());
 
     // Such zones are considered unreachable as a ghost and the player must be automatically revived
-    if ((!isAlive() && zone && zone->flags & AREA_FLAG_NEED_FLY) || GetTransport() || GetPositionZ() < (zone ? zone->MaxDepth : -500.0f))
+    if ((!isAlive() && zone && zone->flags & AREA_FLAG_NEED_FLY && zone->mapid != 861) || GetTransport() || GetPositionZ() < (zone ? zone->MaxDepth : -500.0f))
     {
         ResurrectPlayer(0.5f);
         SpawnCorpseBones();
@@ -5931,6 +5931,7 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
             ApplyAttackTimePercentMod(OFF_ATTACK, newchange, true);
             float haste_regen = 1.0f / (1.0f + newchange / 100.0f);
             SetFloatValue(PLAYER_FIELD_MOD_HASTE_REGEN, haste_regen);
+            UpdateAllRunesRegen();
             break;
         }
         case CR_HASTE_RANGED:
@@ -5942,6 +5943,7 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
             ApplyAttackTimePercentMod(RANGED_ATTACK, newchange, true);
             UpdateFocusRegen();
             UpdateEnergyRegen();
+            UpdateAllRunesRegen();
             float haste_regen = 1.0f / (1.0f + newchange / 100.0f);
             SetFloatValue(PLAYER_FIELD_MOD_HASTE_REGEN, haste_regen);
             break;
@@ -8946,9 +8948,9 @@ void Player::SendNotifyLootMoneyRemoved()
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendNotifyLootItemRemoved(uint8 lootSlot)
+void Player::SendNotifyLootItemRemoved(uint8 lootSlot, bool currency)
 {
-    WorldPacket data(SMSG_LOOT_REMOVED, 1);
+    WorldPacket data(currency ? SMSG_CURRENCY_LOOT_REMOVED : SMSG_LOOT_REMOVED, 1);
     data << uint8(lootSlot);
     GetSession()->SendPacket(&data);
 }
@@ -13987,6 +13989,10 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                     if (!(GetSpecsCount() == 1 && creature->isCanTrainingAndResetTalentsOf(this) && !(getLevel() < sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))))
                         canTalk = false;
                     break;
+                case GOSSIP_OPTION_UNLEARNDUALSPEC:
+                    if (!(GetSpecsCount() > 1 && creature->isCanTrainingAndResetTalentsOf(this) && !(getLevel() < sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))))
+                        canTalk = false;
+                    break;
                 case GOSSIP_OPTION_UNLEARNTALENTS:
                     if (!creature->isCanTrainingAndResetTalentsOf(this))
                         canTalk = false;
@@ -14180,6 +14186,14 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
                 CastSpell(this, 63624, true, NULL, NULL, GetGUID());
 
                 // Should show another Gossip text with "Congratulations..."
+                PlayerTalkClass->SendCloseGossip();
+            }
+            break;
+        case GOSSIP_OPTION_UNLEARNDUALSPEC:
+            if (GetSpecsCount() > 1 && getLevel() >= sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))
+            {
+                CastSpell(this, 63651, true, NULL, NULL, GetGUID());
+
                 PlayerTalkClass->SendCloseGossip();
             }
             break;
@@ -14694,7 +14708,8 @@ bool Player::CanRewardQuest(Quest const* quest, uint32 reward, bool msg)
                 ItemPosCountVec dest;
                 InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, quest->RewardItemId[i], quest->RewardItemIdCount[i]);
                 if (res != EQUIP_ERR_OK)
-                {
+                
+{
                     SendEquipError(res, NULL, NULL, quest->RewardItemId[i]);
                     return false;
                 }
@@ -14919,7 +14934,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
         AddQuestRewardedTalentCount(talents);
         InitTalentForLevel();
     }
-
+     
     // currencies reward
     for (uint32 i = 0; i < QUEST_REWARD_CURRENCY_COUNT; i++)
     {
@@ -14983,6 +14998,8 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, quest->GetQuestId());
     UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_GUILD, 1);
     
+    UpdateForQuestWorldObjects();
+
     //lets remove flag for delayed teleports
     SetCanDelayTeleport(false);
 }
@@ -15773,6 +15790,27 @@ void Player::KilledMonster(CreatureTemplate const* cInfo, uint64 guid)
 void Player::KilledMonsterCredit(uint32 entry, uint64 guid)
 {
     uint16 addkillcount = 1;
+
+    // Siphon Essence
+    if (entry == 54198)
+    {
+        switch (GetMap()->GetDifficulty())
+        {
+            case RAID_DIFFICULTY_10MAN_NORMAL:
+                addkillcount = urand(4, 6);
+                break;
+            case RAID_DIFFICULTY_10MAN_HEROIC:
+                addkillcount = urand(7, 8);
+                break;
+            case RAID_DIFFICULTY_25MAN_NORMAL:
+                addkillcount = urand(7, 8);
+                break;
+            case RAID_DIFFICULTY_25MAN_HEROIC:
+                addkillcount = urand(9, 11);
+                break;
+        }
+    }
+
     uint32 real_entry = entry;
     if (guid)
     {
@@ -16946,7 +16984,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     // load skills after InitStatsForLevel because it triggering aura apply also
     _LoadSkills(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOADSKILLS));
     UpdateSkillsForLevel(); //update skills after load, to make sure they are correctly update at player load
-    LoadArchaeology(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_ARCHAEOLOGY));
+    m_archaeologyMgr.LoadArchaeology(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_ARCHAEOLOGY));
     
     // apply original stats mods before spell loading or item equipment that call before equip _RemoveStatsMods()
 
@@ -18745,7 +18783,7 @@ void Player::SaveToDB(bool create /*=false*/)
     _SaveInstanceTimeRestrictions(trans);
     _SaveCurrency(trans);
     _SaveCUFProfiles(trans);
-    SaveArchaeology(trans);
+    m_archaeologyMgr.SaveArchaeology(trans);
 
     // check if stats should only be saved on logout
     // save stats can be out of transaction
@@ -22058,8 +22096,8 @@ void Player::SendInitialPacketsAfterAddToMap()
 
     if (GetSkillValue(SKILL_ARCHAEOLOGY))
     {
-        ShowResearchSites();
-        ShowResearchProjects();
+        m_archaeologyMgr.ShowResearchSites();
+        m_archaeologyMgr.ShowResearchProjects();
     }
 
     SendDeathRuneUpdate();
@@ -23834,8 +23872,9 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
     QuestItem* qitem = NULL;
     QuestItem* ffaitem = NULL;
     QuestItem* conditem = NULL;
+    QuestItem* currency = NULL;
 
-    LootItem* item = loot->LootItemInSlot(lootSlot, this, &qitem, &ffaitem, &conditem);
+    LootItem* item = loot->LootItemInSlot(lootSlot, this, &qitem, &ffaitem, &conditem, &currency);
 
     if (!item)
     {
@@ -23847,6 +23886,17 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
     if (!qitem && item->is_blocked)
     {
         SendLootRelease(GetLootGUID());
+        return;
+    }
+
+    if (currency)
+    {
+        if (CurrencyTypesEntry const * currencyEntry = sCurrencyTypesStore.LookupEntry(item->itemid))
+            ModifyCurrency(item->itemid, int32(item->count * currencyEntry->GetPrecision()));
+
+        SendNotifyLootItemRemoved(lootSlot, true);
+        currency->is_looted = true;
+        --loot->unlootedCount;
         return;
     }
 

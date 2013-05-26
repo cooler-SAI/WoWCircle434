@@ -1022,6 +1022,8 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry, SpellEffectEntry const** effe
         Totem[i] = _totem ? _totem->Totem[i] : 0;
 
     ChainEntry = NULL;
+
+    ResearchProject =  spellEntry->ResearchProject;
 }
 
 SpellInfo::~SpellInfo()
@@ -1667,6 +1669,10 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     // spell checks
     switch (Id)
     {
+        case 100713: // Deluge, Ragnaros, Firelands
+        case 101015:
+        case 101110: // Rage of Ragnaros, Ragnaros, Firelands
+            return (area_id == 5770)? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         case 98226: // Balance Bar, Lord Rhyolith, Firelands
             return (area_id == 5763)? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         case 102668: // Sands of the Hourglass, Murozond, End Time
@@ -1686,6 +1692,10 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
         case 43816: // Charm of the Bloodletter
         case 43818: // Charm of Mighty Mojo
             return map_id == 568? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
+        case 99659:
+        case 62857:
+        case 107926:
+            return ((player && player->InBattleground()) ? SPELL_FAILED_NOT_IN_BATTLEGROUND : SPELL_CAST_OK);
         case 23333:                                         // Warsong Flag
         case 23335:                                         // Silverwing Flag
             return (map_id == 489 || map_id == 726) && player && player->InBattleground() ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
@@ -2387,6 +2397,21 @@ uint32 SpellInfo::GetRecoveryTime() const
     return RecoveryTime > CategoryRecoveryTime ? RecoveryTime : CategoryRecoveryTime;
 }
 
+uint32 SpellInfo::GetStackAmount(Unit *caster) const
+{
+    // Scent of Blood
+    if (Id == 50421)
+    {
+        if (caster->HasAura(49004))
+            return 1;
+        else if (caster->HasAura(49508))
+            return 2;
+        else if (caster->HasAura(49509))
+            return 3;
+    }
+    return StackAmount;
+}
+
 int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) const
 {
     // Spell drain all exist power on cast (Only paladin lay of Hands)
@@ -2572,7 +2597,27 @@ uint32 SpellInfo::_GetExplicitTargetMask() const
     }
     return targetMask;
 }
+bool SpellInfo::IsAllwaysStackModifers() const
+{
+    if (IsPassive())
+        return true;
 
+    if (SpellFamilyName == SPELLFAMILY_POTION)
+        return true;
+
+    switch (Id)
+    {
+        // warsong flags
+        case 23333:
+        case 23335:
+
+        case 16191: // mana tide buff 
+            return true;
+       default:
+            break;
+    }
+    return false;
+}
 bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
 {
     // not found a single positive spell with this attribute
@@ -2600,6 +2645,11 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                 default:
                     break;
             }
+            break;
+        case SPELLFAMILY_WARLOCK:
+            // Immolation Aura
+            if (Id == 50589)
+                return true;
             break;
         case SPELLFAMILY_MAGE:
             // Amplify Magic, Dampen Magic
@@ -3106,17 +3156,19 @@ bool SpellInfo::IsCanBeStolen() const
 
 bool SpellInfo::IsNeedAdditionalLosChecks() const
 {
+    if (HasEffect(SPELL_EFFECT_KNOCK_BACK))
+        return true;
+
     switch(Id)
     {
         case 3600:  // Earthbind Totem
         case 50622: 
         case 44949: // Whirlwind from bladestorm
+        case 23455: // Holy Nova
             return true;
         default:break;
     }
-    // Typhoon
-    if(SpellFamilyFlags[1] == 0x01000000 && SpellFamilyName == SPELLFAMILY_DRUID)
-        return true;
+
     return false;
 }
 

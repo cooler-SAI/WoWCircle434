@@ -141,6 +141,8 @@ class boss_baleroc : public CreatureScript
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BLAZE_OF_GLORY);
                 _JustDied();
                 Talk(SAY_DEATH);
+
+                AddSmoulderingAura(me);
             }
             
             void KilledUnit(Unit* who)

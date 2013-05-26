@@ -922,6 +922,13 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* 
 
                     *data << flags;
                 }
+                else if (index == GAMEOBJECT_BYTES_1)
+                {
+                    if (((GameObject*)this)->GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT)
+                        *data << uint32(m_uint32Values[index] | GO_STATE_TRANSPORT_SPEC);
+                    else
+                        *data << uint32(m_uint32Values[index]);
+                }
                 else
                     *data << m_uint32Values[index];                // other cases
             }
@@ -1805,6 +1812,10 @@ bool WorldObject::IsWithinLOSInMap(const WorldObject* obj) const
     if (obj->GetTypeId() == TYPEID_UNIT)
         if (obj->GetEntry() == 36980 || obj->GetEntry() == 38320 || obj->GetEntry() == 38321 || obj->GetEntry() == 38322)
             return true;
+
+    // Hack fix for Alysrazor
+    if (GetMapId() == 720 && GetAreaId() == 5766)
+        return true;
 
     return IsWithinLOS(ox, oy, oz);
 }
@@ -3045,7 +3056,7 @@ GameObject* WorldObject::FindNearestGameObjectOfType(GameobjectTypes type, float
 Player* WorldObject::FindNearestPlayer(float range, bool alive)
 {
   Player* player = NULL;
-  Trinity::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange());
+  Trinity::AnyPlayerInObjectRangeCheck check(this, range);
   Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, player, check);
   VisitNearbyWorldObject(range, searcher);
   return player;

@@ -204,6 +204,15 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
         return false;
     }
 
+    // transport gameobject must have entry in TransportAnimation.dbc or client will crash
+    if (goinfo->type == GAMEOBJECT_TYPE_TRANSPORT)
+        if (sTransportAnimationsByEntry.find(goinfo->entry) == sTransportAnimationsByEntry.end())
+        {
+            sLog->outError(LOG_FILTER_SQL, "GameObject::Create: gameobject entry %u guid %u is transport, but does not have entry in TransportAnimation.dbc. Can't spawn.",
+                goinfo->entry, guidlow);
+            return false;
+        } 
+
     SetFloatValue(GAMEOBJECT_PARENTROTATION+0, rotation0);
     SetFloatValue(GAMEOBJECT_PARENTROTATION+1, rotation1);
 
@@ -236,7 +245,7 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
             SetUInt32Value(GAMEOBJECT_PARENTROTATION, m_goInfo->building.destructibleData);
             break;
         case GAMEOBJECT_TYPE_TRANSPORT:
-            SetUInt32Value(GAMEOBJECT_LEVEL, goinfo->transport.pause);
+            SetUInt32Value(GAMEOBJECT_LEVEL, getMSTime()/*goinfo->transport.pause*/);
             if (goinfo->transport.startOpen)
                 SetGoState(GO_STATE_ACTIVE);
             SetGoAnimProgress(animprogress);
@@ -856,7 +865,7 @@ bool GameObject::IsDynTransport() const
     if (!gInfo)
         return false;
 
-    return gInfo->type == GAMEOBJECT_TYPE_MO_TRANSPORT || (gInfo->type == GAMEOBJECT_TYPE_TRANSPORT && !gInfo->transport.pause);
+    return gInfo->type == GAMEOBJECT_TYPE_MO_TRANSPORT || (gInfo->type == GAMEOBJECT_TYPE_TRANSPORT && !gInfo->transport.startFrame);
 }
 
 bool GameObject::IsDestructibleBuilding() const

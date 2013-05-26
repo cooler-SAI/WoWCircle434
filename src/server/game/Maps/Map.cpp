@@ -2614,9 +2614,11 @@ void InstanceMap::PermBindAllPlayers(Player* source)
         }
 
         // if the leader is not in the instance the group will not get a perm bind
-        if (group && group->GetLeaderGUID() == player->GetGUID())
-            group->BindToInstance(save, true);
+        //if (group && group->GetLeaderGUID() == player->GetGUID())
+            //group->BindToInstance(save, true);
     }
+    if (group)
+        group->BindToInstance(save, true);
 }
 
 void InstanceMap::UnloadAll()
