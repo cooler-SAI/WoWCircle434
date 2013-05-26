@@ -313,6 +313,38 @@ class achievement_not_even_a_scratch : public AchievementCriteriaScript
         }
 };
 
+class AchievementRewardCheck : public PlayerScript
+{
+    public:
+        AchievementRewardCheck() : PlayerScript("AchievementRewardCheck") { }
+
+        void OnLogin(Player* pPlayer)
+        {
+
+            std::vector<uint32> check_ids;
+            check_ids.push_back(5876); // Pulling Zoo
+            check_ids.push_back(5877); // Menagerie
+            
+            // give reward item's spell for player if he has earned achievement before fixes
+            
+            for (std::vector<uint32>::const_iterator itr = check_ids.begin(); itr != check_ids.end(); ++itr)
+            {
+                if (!pPlayer->HasAchieved((*itr)))
+                    continue;
+
+                    uint32 spellId = 0;
+                    if ((*itr) == 5876)
+                        spellId = 100970;
+                    else if ((*itr) == 5877)
+                        spellId = 101424;
+
+                    if (spellId)
+                        if (!pPlayer->HasSpell(spellId))
+                            pPlayer->learnSpell(spellId, false);
+            }
+        }
+};
+
 void AddSC_achievement_scripts()
 {
     new achievement_resilient_victory();
@@ -331,4 +363,6 @@ void AddSC_achievement_scripts()
     new achievement_bg_sa_defense_of_ancients();
     new achievement_tilted();
     new achievement_not_even_a_scratch();
+
+    new AchievementRewardCheck();
 }
