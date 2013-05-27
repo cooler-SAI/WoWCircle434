@@ -42,6 +42,8 @@ enum ScriptTextsHamuul
 
 enum Spells
 {
+    SPELL_BASE_VISUAL                   = 98860,
+
     // Ragnaros
     SPELL_BERSERK                       = 47008, // ?
     SPELL_BURNING_WOUND_AURA            = 99401, // need cd for creatures?
@@ -373,6 +375,7 @@ class boss_ragnaros_firelands : public CreatureScript
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SUPERHEATED_DMG_10H);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SUPERHEATED_DMG_25H);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RAGE_OF_RAGNAROS);
+                me->AddAura(SPELL_BASE_VISUAL, me);
 
                 phase = 0;
                 Lavalogged = 0;
@@ -488,8 +491,8 @@ class boss_ragnaros_firelands : public CreatureScript
 
             void JustDied(Unit* /*killer*/)
             {
-                if (!IsHeroic())
-                    return;
+                /*if (!IsHeroic())
+                    return;*/
                 
                 _JustDied();
                 DespawnEncounterCreatures();
@@ -499,7 +502,7 @@ class boss_ragnaros_firelands : public CreatureScript
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SUPERHEATED_DMG_25H);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RAGE_OF_RAGNAROS);
 
-                Talk(SAY_DEATH_2);
+                // Talk(SAY_DEATH_2);
 
                 // Achievement Ragnar'os
                 if (Lavalogged >= 3)
@@ -591,6 +594,7 @@ class boss_ragnaros_firelands : public CreatureScript
                     phase = 1;
                     
                     me->SetReactState(REACT_PASSIVE);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     me->AttackStop();
 
                     events.CancelEvent(EVENT_WRATH_OF_RAGNAROS);
@@ -631,6 +635,7 @@ class boss_ragnaros_firelands : public CreatureScript
                     phase = 3;
                     
                     me->SetReactState(REACT_PASSIVE);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     me->AttackStop();
 
                     events.CancelEvent(EVENT_ENGULFING_FLAMES);
@@ -674,7 +679,7 @@ class boss_ragnaros_firelands : public CreatureScript
                     phase = 5;
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
-                    if (IsHeroic())
+                    /*if (IsHeroic())
                     {
                         events.CancelEvent(EVENT_ENGULFING_FLAMES);
                         events.CancelEvent(EVENT_LIVING_METEOR);
@@ -692,10 +697,10 @@ class boss_ragnaros_firelands : public CreatureScript
                         events.ScheduleEvent(EVENT_EVENT_1, 5000);
                     }
                     else
-                    {
+                    {*/
                         CompleteNormalEncounter();
                         return;
-                    }
+                    //}
                 }
 
                 if (uint32 eventId = events.ExecuteEvent())
@@ -711,7 +716,7 @@ class boss_ragnaros_firelands : public CreatureScript
                             break;
                         case EVENT_BURNING_WOUND:
                             DoCastVictim(SPELL_BURNING_WOUND);
-                            events.ScheduleEvent(EVENT_BURNING_WOUND, urand(12000, 15000));
+                            events.ScheduleEvent(EVENT_BURNING_WOUND, urand(5000, 7000));
                             break;
                         case EVENT_CHECK_TARGET:
                             if (!me->IsWithinMeleeRange(me->getVictim()))
@@ -753,7 +758,8 @@ class boss_ragnaros_firelands : public CreatureScript
                             }
                             break;
                         case EVENT_SUBMERGE:
-                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                            me->AddAura(RAID_MODE(SPELL_SUBMERGE_AURA, SPELL_SUBMERGE_AURA_25, SPELL_SUBMERGE_AURA_10H, SPELL_SUBMERGE_AURA_25H), me);
+                            me->RemoveAurasDueToSpell(SPELL_BASE_VISUAL);                           
                             break;
                         case EVENT_CHECK_SONS:
                             if (!me->FindNearestCreature(NPC_SON_OF_FLAME, 300.0f))
@@ -765,11 +771,13 @@ class boss_ragnaros_firelands : public CreatureScript
                             phase = 2;
                             Talk(SAY_PICKUP);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                            me->PlayOneShotAnimKit(1465);
                             summons.DespawnEntry(NPC_SULFURAS_HAND_OF_RAGNAROS_1);
                             summons.DespawnEntry(NPC_SULFURAS_HAND_OF_RAGNAROS_2);
                             DespawnCreatures(NPC_SULFURAS_HAND_OF_RAGNAROS_1);
                             DespawnCreatures(NPC_SULFURAS_HAND_OF_RAGNAROS_2);
                             me->RemoveAura(RAID_MODE(SPELL_SUBMERGE_AURA, SPELL_SUBMERGE_AURA_25, SPELL_SUBMERGE_AURA_10H, SPELL_SUBMERGE_AURA_25H));
+                            me->AddAura(SPELL_BASE_VISUAL, me);
                             me->SetReactState(REACT_AGGRESSIVE);
                             me->Attack(me->getVictim(), false);
                             events.ScheduleEvent(EVENT_SULFURAS_SMASH, (IsHeroic() ? 6000 : 15500));
@@ -816,11 +824,13 @@ class boss_ragnaros_firelands : public CreatureScript
                             phase = 4;
                             Talk(SAY_PICKUP);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                            me->PlayOneShotAnimKit(1465);                             
                             summons.DespawnEntry(NPC_SULFURAS_HAND_OF_RAGNAROS_1);
                             summons.DespawnEntry(NPC_SULFURAS_HAND_OF_RAGNAROS_2);
                             DespawnCreatures(NPC_SULFURAS_HAND_OF_RAGNAROS_1);
                             DespawnCreatures(NPC_SULFURAS_HAND_OF_RAGNAROS_2);
                             me->RemoveAura(RAID_MODE(SPELL_SUBMERGE_AURA, SPELL_SUBMERGE_AURA_25, SPELL_SUBMERGE_AURA_10H, SPELL_SUBMERGE_AURA_25H));
+                            me->AddAura(SPELL_BASE_VISUAL, me);
                             me->SetReactState(REACT_AGGRESSIVE);
                             me->Attack(me->getVictim(), false);
                             events.ScheduleEvent(EVENT_SULFURAS_SMASH, 15500);
@@ -1004,6 +1014,9 @@ class boss_ragnaros_firelands : public CreatureScript
                 me->RemoveAllAuras();
                 DoCast(me, SPELL_LEGS_SUBMERGE);
                 Talk(SAY_DEATH_1);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
+                me->SummonGameObject(RAID_MODE(GO_CACHE_OF_THE_FIRELORD_10,GO_CACHE_OF_THE_FIRELORD_25,GO_CACHE_OF_THE_FIRELORD_10,GO_CACHE_OF_THE_FIRELORD_25), 1016.043f, -57.436f, 55.333f, 3.151f, 0, 0, 0, 0, 70000);
+                me->AddAura(RAID_MODE(SPELL_SUBMERGE_AURA, SPELL_SUBMERGE_AURA_25, SPELL_SUBMERGE_AURA_10H, SPELL_SUBMERGE_AURA_25H), me);
                 
                 // Achievement Ragnar'os
                 if (Lavalogged >= 3)
