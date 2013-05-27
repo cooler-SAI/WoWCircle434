@@ -3131,6 +3131,7 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 34130: // Create Healthstone
                 spellInfo->Effects[0].BasePoints = 1;
+                spellInfo->Stances = 1 << (FORM_METAMORPHOSIS - 1);
                 break;
             case 99:    // Demoralizing Roar
             case 5857:  // Hellfire Effect
