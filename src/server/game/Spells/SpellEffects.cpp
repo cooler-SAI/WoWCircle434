@@ -2450,30 +2450,6 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
                 addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, int32(caster->CountPctFromMaxHealth(damage)), HEAL);
                 break;
             }
-            // Word of Glory
-            case 85673:
-            {
-                addhealth += int32(0.209f * m_caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->SchoolMask)) + 0.198f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
-
-                // Divine Purpose
-                addhealth *= GetPowerCost();
-
-                // Selfless Healer
-                if (m_caster != unitTarget)
-                {
-                    if (AuraEffect const * aurEff = m_caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 3924, 0))
-                        AddPct(addhealth, aurEff->GetAmount());
-                }
-
-                // Guarded by the Light
-                AuraEffect* aur = NULL;
-                if ((aur = m_caster->GetAuraEffect(85646, 0)) || (aur = m_caster->GetAuraEffect(85639, 0)))            
-                    if (unitTarget == m_caster)
-                        AddPct(addhealth, aur->GetAmount());
-
-                addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
-                break;
-            }
             // Seal of Insight
             case 20167:
             {

@@ -51,6 +51,9 @@ enum PaladinSpells
 
     SPELL_HAND_OF_SACRIFICE                      = 6940,
     SPELL_DIVINE_SACRIFICE                       = 64205,
+
+    SPELL_WORD_OF_GLORY                          = 85673,
+    SPELL_GLYPH_OF_THE_LONG_WORD                 = 93466
 };
 
 // 31850 - Ardent Defender
@@ -510,6 +513,78 @@ class spell_pal_divine_sacrifice : public SpellScriptLoader
         }
 };
 
+class spell_pal_word_of_glory : public SpellScriptLoader
+{
+public:
+    spell_pal_word_of_glory() : SpellScriptLoader("spell_pal_word_of_glory") { }
+
+    class spell_pal_word_of_glory_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pal_word_of_glory_SpellScript);
+
+        void HandleHeal(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetOriginalCaster();
+            Unit* target = GetHitUnit();
+            if (!caster || !target)
+                return;
+
+            int32 heal = GetHitHeal();
+            heal += int32(0.209f * caster->SpellBaseDamageBonusDone(SpellSchoolMask(GetSpellInfo()->SchoolMask)) + 0.198f * caster->GetTotalAttackPowerValue(BASE_ATTACK));
+
+            // Divine Purpose
+            heal *= GetSpell()->GetPowerCost();
+
+            // Selfless Healer
+            if (caster != target)
+            {
+                if (AuraEffect const * aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 3924, 0))
+                    AddPct(heal, aurEff->GetAmount());
+            }
+
+            // Guarded by the Light
+            if (AuraEffect *eff = caster->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 3026, 0))          
+                if (target == caster)
+                    AddPct(heal, eff->GetAmount());
+
+            heal = caster->SpellHealingBonusDone(target, GetSpellInfo(), heal, HEAL);
+
+            SetHitHeal(heal);
+        }
+
+        void HandleOnHit()
+        {
+            Unit* caster = GetOriginalCaster();
+            Unit* target = GetHitUnit();
+            if (!caster || !target)
+                return;
+
+            if (AuraEffect * eff = target->GetAuraEffect(SPELL_WORD_OF_GLORY, 1, caster->GetGUID()))
+            {
+                if (caster->HasAura(SPELL_GLYPH_OF_THE_LONG_WORD))
+                {
+                    eff->GetFixedDamageInfo().SetFixedDamage(GetHitHeal() / 3);
+                }
+                else
+                {
+                    target->RemoveAura(eff->GetBase());
+                }
+            }
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_pal_word_of_glory_SpellScript::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+            OnHit += SpellHitFn(spell_pal_word_of_glory_SpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_pal_word_of_glory_SpellScript();
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     new spell_pal_ardent_defender();
@@ -521,4 +596,5 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_exorcism_and_holy_wrath_damage();
     new spell_pal_hand_of_sacrifice();
     new spell_pal_divine_sacrifice();
+    new spell_pal_word_of_glory();
 }
