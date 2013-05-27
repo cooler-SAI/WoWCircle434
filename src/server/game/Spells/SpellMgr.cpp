@@ -3398,6 +3398,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 44401: // Missile Barrage
             case 47283: // Empowered Imp
             case 88688: // Surge of Light
+            case 93400: // Shooting Stars
                 spellInfo->ProcCharges = 1;
                 break;
             case 74396: // Fingers of Frost visual buff

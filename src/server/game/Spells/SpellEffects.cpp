@@ -758,14 +758,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         m_caster->CastCustomSpell(m_caster, 101024, &heal_pct, 0, 0, true);
                     }
                 }
-                // Starsurge
-                else if (m_spellInfo->Id == 78674)
-                {
-                    // Shooting Stars remove aura
-                    if (m_caster->HasAura(93400))
-                        m_caster->RemoveAurasDueToSpell(93400);
-
-                }
                 break;
             }
             case SPELLFAMILY_ROGUE:

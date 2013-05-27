@@ -4117,6 +4117,14 @@ void Spell::finish(bool ok)
 
     switch (m_spellInfo->Id)
     {
+        case 78674: // Starsurge
+        {
+            // Shooting Stars proc
+            if (m_caster->HasAura(93400))
+                m_caster->ToPlayer()->RemoveSpellCooldown(78674, true);
+
+            break;
+        }
         case 30455: // Ice Lance
         case 44572: // Deep Freeze
             m_caster->RemoveAuraFromStack(44544);
