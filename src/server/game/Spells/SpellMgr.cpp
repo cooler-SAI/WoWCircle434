@@ -6779,6 +6779,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 90337:
                 spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
                 break;
+            // Soul Stone
+            case 20707:
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                break;
             default:
                 break;
         }

@@ -717,6 +717,39 @@ public:
     }
 };
 
+class spell_warl_soul_stone : public SpellScriptLoader
+{
+public:
+    spell_warl_soul_stone() : SpellScriptLoader("spell_warl_soul_stone") { }
+
+    class spell_warl_soul_stone_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_warl_soul_stone_SpellScript);
+        void HandleSoulStone()
+        {
+            Unit* target = GetHitUnit();
+            if (!target)
+                return;
+
+            if (target->isDead())
+            {
+                PreventHitAura();
+                target->ToPlayer()->SetUInt32Value(PLAYER_SELF_RES_SPELL, 3026);
+            }
+        }
+
+        void Register()
+        {
+            AfterHit += SpellHitFn(spell_warl_soul_stone_SpellScript::HandleSoulStone);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_warl_soul_stone_SpellScript();
+    }
+};
+
 void AddSC_warlock_spell_scripts()
 {
     new spell_warl_banish();
@@ -734,4 +767,5 @@ void AddSC_warlock_spell_scripts()
     new spell_warlock_dark_intent();
     new spell_warlock_nether_protection_trigger();
     new spell_warlock_flee();
+    new spell_warl_soul_stone();
 }
