@@ -722,61 +722,85 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
         case SPELL_AURA_PERIODIC_DAMAGE:
             if (!caster)
                 break;
-            // Rip
-            if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_DRUID && m_spellInfo->SpellFamilyFlags[0] & 0x00800000)
+
+            switch (GetId())
             {
-                //  ${($m1+$b1*1+0.0207*$AP)*8}
-                if (caster->GetTypeId() != TYPEID_PLAYER)
+                // Mind Flay, Gurthalak, Voice of the Deeps
+                case 52586:
+                     if (caster->GetEntry() == 58078) // Heroic
+                         amount = 12429; 
+                    else if (caster->GetEntry() == 57220) // Normal
+                        amount = 11155;
+                    else if (caster->GetEntry() == 58077)   // LFR
+                        amount = 9881;
+
+                    // Dreadblade, Deathknight mastery
+                    if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, SPELLFAMILY_DEATHKNIGHT, 3571, EFFECT_0))
+                        AddPct(amount, aurEff->GetAmount());
+
                     break;
+                // Rip
+                case 1079:
+                {
+                    //  ${($m1+$b1*1+0.0207*$AP)*8}
+                    if (caster->GetTypeId() != TYPEID_PLAYER)
+                        break;
 
-                uint8 cp = caster->ToPlayer()->GetComboPoints();
+                    uint8 cp = caster->ToPlayer()->GetComboPoints();
 
-                amount += int32(0.0207f * caster->GetTotalAttackPowerValue(BASE_ATTACK) * cp);
+                    amount += int32(0.0207f * caster->GetTotalAttackPowerValue(BASE_ATTACK) * cp);
                 
-                // Total ticks equals 8 always, so * 8 / 8 = * 1
-                //amount *= 8;
-                //amount /= GetTotalTicks();
-            }
-            // Exorcism 
-            else if (GetId() == 879)
-            {
-                int32 basedmg = GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster);
-                float attackPower = caster->GetTotalAttackPowerValue(BASE_ATTACK);
-                int32 spellPower = caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->ScalingClass));
-                int32 maxdmg = int32(basedmg + ((attackPower > spellPower) ? (attackPower * 0.344f) : (spellPower * 0.344f)));
-                amount = int32(maxdmg / 5.0f);
-                amount /= GetTotalTicks();
-            }
-            // Rupture
-            else if (GetId() == 1943)
-            {
-                if (caster->GetTypeId() != TYPEID_PLAYER)
+                    // Total ticks equals 8 always, so * 8 / 8 = * 1
+                    //amount *= 8;
+                    //amount /= GetTotalTicks();
                     break;
+                }
+                // Exorcism
+                case 879:
+                {
+                    int32 basedmg = GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster);
+                    float attackPower = caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                    int32 spellPower = caster->SpellBaseDamageBonusDone(SpellSchoolMask(m_spellInfo->ScalingClass));
+                    int32 maxdmg = int32(basedmg + ((attackPower > spellPower) ? (attackPower * 0.344f) : (spellPower * 0.344f)));
+                    amount = int32(maxdmg / 5.0f);
+                    amount /= GetTotalTicks();
+                    break;
+                }
+                // Rupture
+                case 1943:
+                {
+                    if (caster->GetTypeId() != TYPEID_PLAYER)
+                        break;
 
-                //1 point : ${($m1+$b1*1+0.015*$AP)*4} damage over 8 secs
-                //2 points: ${($m1+$b1*2+0.024*$AP)*5} damage over 10 secs
-                //3 points: ${($m1+$b1*3+0.03*$AP)*6} damage over 12 secs
-                //4 points: ${($m1+$b1*4+0.03428571*$AP)*7} damage over 14 secs
-                //5 points: ${($m1+$b1*5+0.0375*$AP)*8} damage over 16 secs
-                float AP_per_combo[6] = {0.0f, 0.015f, 0.024f, 0.03f, 0.03428571f, 0.0375f};
-                uint8 cp = caster->ToPlayer()->GetComboPoints();
-                if (cp > 5) cp = 5;
-                amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * AP_per_combo[cp]);
+                    //1 point : ${($m1+$b1*1+0.015*$AP)*4} damage over 8 secs
+                    //2 points: ${($m1+$b1*2+0.024*$AP)*5} damage over 10 secs
+                    //3 points: ${($m1+$b1*3+0.03*$AP)*6} damage over 12 secs
+                    //4 points: ${($m1+$b1*4+0.03428571*$AP)*7} damage over 14 secs
+                    //5 points: ${($m1+$b1*5+0.0375*$AP)*8} damage over 16 secs
+                    float AP_per_combo[6] = {0.0f, 0.015f, 0.024f, 0.03f, 0.03428571f, 0.0375f};
+                    uint8 cp = caster->ToPlayer()->GetComboPoints();
+                    if (cp > 5) cp = 5;
+                    amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * AP_per_combo[cp]);
+                    break;
+                }
+                // Rend
+                case 94009:
+                {
+                    // ${0.2 * 6 * (($MWB + $mwb) / 2 + $AP / 14 * $MWS)}  bonus per tick
+                    float ap = caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                    float mws = 0.001 * caster->GetAttackTime(BASE_ATTACK);
+                    float mwb_min = caster->GetWeaponDamageRange(BASE_ATTACK, MINDAMAGE);
+                    float mwb_max = caster->GetWeaponDamageRange(BASE_ATTACK, MAXDAMAGE);
+                    float mwb = ((mwb_min + mwb_max) / 2 + (ap / 14) * mws) * 0.25f * 6.0f;
+                    amount += int32(caster->ApplyEffectModifiers(m_spellInfo, m_effIndex, mwb) / GetTotalTicks());
+                    break;
+                }
+                // Frostfire Bolt
+                case 44614:
+                    return m_baseAmount * GetBase()->GetStackAmount();
+                default:
+                    break;
             }
-            // Rend
-            else if (GetId() == 94009)
-            {
-                // ${0.2 * 6 * (($MWB + $mwb) / 2 + $AP / 14 * $MWS)}  bonus per tick
-                float ap = caster->GetTotalAttackPowerValue(BASE_ATTACK);
-                float mws = 0.001 * caster->GetAttackTime(BASE_ATTACK);
-                float mwb_min = caster->GetWeaponDamageRange(BASE_ATTACK, MINDAMAGE);
-                float mwb_max = caster->GetWeaponDamageRange(BASE_ATTACK, MAXDAMAGE);
-                float mwb = ((mwb_min + mwb_max) / 2 + (ap / 14) * mws) * 0.25f * 6.0f;
-                amount += int32(caster->ApplyEffectModifiers(m_spellInfo, m_effIndex, mwb) / GetTotalTicks());
-            }
-            // Frostfire Bolt
-            else if (GetId() == 44614)
-                return m_baseAmount * GetBase()->GetStackAmount();
             break;
         case SPELL_AURA_PERIODIC_ENERGIZE:
             switch (m_spellInfo->Id)
@@ -1072,6 +1096,15 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool resetPeriodicTimer /*= tru
         return;
 
     Player* modOwner = caster ? caster->GetSpellModOwner() : NULL;
+
+    if (m_spellInfo->Id == 52586) // Hack for Gurthalak
+    {
+        if (caster)
+            if (caster->GetEntry() == 58078 || // Heroic
+                caster->GetEntry() == 57220 || // Normal
+                caster->GetEntry() == 58077)   // LFR
+                m_amplitude = 1500;
+    }
 
     // Apply casting time mods
     if (m_amplitude)

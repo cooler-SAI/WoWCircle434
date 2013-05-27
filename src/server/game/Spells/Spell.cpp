@@ -3429,7 +3429,7 @@ void Spell::cast(bool skipCheck)
         // This prevents spells such as Hunter's Mark from triggering pet attack
         if (!IsTriggered() && GetSpellInfo()->DmgClass != SPELL_DAMAGE_CLASS_NONE && m_targets.GetObjectTarget())
             if (Pet* playerPet = playerCaster->GetPet())
-                if (!playerCaster->IsFriendlyTo(m_targets.GetObjectTarget()->ToUnit()))
+                if (m_targets.GetObjectTarget()->ToUnit() && !playerCaster->IsFriendlyTo(m_targets.GetObjectTarget()->ToUnit()))
                     if (playerPet->isAlive() && playerPet->isControlled() && (m_targets.GetTargetMask() & TARGET_FLAG_UNIT))
                         playerPet->AI()->OwnerAttacked(m_targets.GetObjectTarget()->ToUnit());     
     }

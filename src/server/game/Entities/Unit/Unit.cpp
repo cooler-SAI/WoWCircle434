@@ -6234,11 +6234,33 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 // Sweeping Strikes
                 case 12328:
                 {
-                    target = SelectNearbyTarget(victim);
+                    if (!victim || !damage)
+                        return false;
+
+                    if (GetTypeId() != TYPEID_PLAYER)
+                        return false;
+
+                    if ((!procSpell || (procSpell->Id != 845 && procSpell->Id != 50622)) &&
+                        (procEx & PROC_EX_INTERNAL_TRIGGERED || procEx & PROC_EX_INTERNAL_CANT_PROC))
+                        return false;
+
+                    triggered_spell_id = 12723;
+
+                    // Sweeping Strikes can damage only one target per procSpell
+                    // So add small cooldown to avoid repeated procs from procSpell
+                    if (procSpell && procSpell->IsTargetingArea())
+                    {
+                        if (ToPlayer()->HasSpellCooldown(triggered_spell_id))
+                            return false;
+                        ToPlayer()->AddSpellCooldown(triggered_spell_id, 0, time(NULL) + 1);
+                    }
+
+                    target = SelectNearbyTarget(victim, 5);
+
                     if (!target)
                         return false;
 
-                    triggered_spell_id = 26654;
+                    basepoints0 = damage;
                     break;
                 }
                 // Victorious
@@ -11848,26 +11870,34 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
             }
             break;
         case SPELLFAMILY_WARLOCK:
-            // Fire and Brimstone
-            if (spellProto->SpellFamilyFlags[1] & 0x00020040)
-                if (victim->HasAuraState(AURA_STATE_CONFLAGRATE))
-                {
-                    AuraEffectList const& mDumyAuras = GetAuraEffectsByType(SPELL_AURA_DUMMY);
-                    for (AuraEffectList::const_iterator i = mDumyAuras.begin(); i != mDumyAuras.end(); ++i)
-                        if ((*i)->GetSpellInfo()->SpellIconID == 3173)
-                        {
-                            AddPct(DoneTotalMod, (*i)->GetAmount());
-                            break;
-                        }
-                }
-            // Drain Soul - increased damage for targets under 25 % HP
-            if (spellProto->SpellFamilyFlags[0] & 0x00004000)
-                if (victim->HealthBelowPct(25))
-                    DoneTotalMod *= 2;
-            // Shadow Bite (30% increase from each dot)
-            if (spellProto->SpellFamilyFlags[1] & 0x00400000 && isPet())
-                if (uint8 count = victim->GetDoTsByCaster(GetOwnerGUID()))
-                    AddPct(DoneTotalMod, 30 * count);
+            switch (spellProto->Id)
+            {
+                case 29722: // Incinerate
+                case 50796: // Chaos Bolt
+                    if (victim->HasAuraState(AURA_STATE_CONFLAGRATE))
+                    {
+                        // Fire and Brimstone
+                        if (AuraEffect const* aurEff = GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_WARLOCK, 3173, EFFECT_0))
+                            AddPct(DoneTotalMod, aurEff->GetAmount());
+
+                        if (spellProto->Id == 29722)
+                            AddPct(DoneTotalMod, 16.66f);
+                    }
+                    break;
+                // Drain Soul - increased damage for targets under 25 % HP
+                case 1120:
+                    if (victim->HealthBelowPct(25))
+                        DoneTotalMod *= 2;
+                    break;
+                // Shadow Bite (30% increase from each dot)
+                case 54049:
+                    if (isPet())
+                        if (uint8 count = victim->GetDoTsByCaster(GetOwnerGUID()))
+                            AddPct(DoneTotalMod, 30 * count);
+                    break;
+                default:
+                    break;
+            }
             break;
         case SPELLFAMILY_DEATHKNIGHT:
         {

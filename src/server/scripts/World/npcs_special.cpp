@@ -3715,70 +3715,6 @@ class npc_metzen : public CreatureScript
     }
 };
 
-enum BurningTreant
-{
-    EVENT_FIRESEED  = 1,
-
-    SPELL_FIRESEED  = 99026,
-};
-
-class npc_burning_treant : public CreatureScript
-{
-    public:
-        npc_burning_treant() : CreatureScript("npc_burning_treant") { }
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_burning_treantAI(creature);
-        }
-
-        struct npc_burning_treantAI : CasterAI
-        {
-            npc_burning_treantAI(Creature* creature) : CasterAI(creature) {}
-
-
-            void EnterCombat(Unit* who)
-            {
-                events.ScheduleEvent(EVENT_FIRESEED, 500);
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                if (me->getVictim()->HasCrowdControlAura(me))
-                {
-                    me->InterruptNonMeleeSpells(false);
-                    return;
-                }
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                if (uint32 event_id = events.ExecuteEvent())
-                {
-                    float const maxRange = 40.0f;
-                    float normalRange = maxRange / 1.2f;
-
-                    if (Unit* victim = me->getVictim())
-                    {
-                        if (maxRange && !me->IsWithinDistInMap(victim, maxRange))
-                            me->GetMotionMaster()->MoveChase(victim, normalRange);
-
-                        if (maxRange && !me->IsWithinLOSInMap(victim))
-                            me->GetMotionMaster()->MoveChase(victim, MELEE_RANGE);
-                    }
-
-                    DoCastVictim(SPELL_FIRESEED);
-                    events.ScheduleEvent(EVENT_FIRESEED, 4000);
-                }
-            }
-        };
-};
-
 class npc_kwee_q_peddlefeet : public CreatureScript
 {
     public:
@@ -3855,42 +3791,69 @@ class npc_moonwell_chalice : public CreatureScript
         }; 
 };
 
-enum DoomGuard
+enum CustomCasterGuardian
 {
-    EVENT_DOOM_BOLT  = 1,
+    NPC_DOOM_GUARD      = 11859,
+    NPC_BURNING_TREANT  = 53432,
+    NPC_FIERY_IMP       = 53491,
 
-    SPELL_DOOM_BOLT  = 85692,
+    SPELL_DOOM_BOLT     = 85692,
+    SPELL_FIRESEED      = 99026,
+    SPELL_FLAME_BLAST   = 99226,
+
+    EVENT_CAST_SPELL    = 1,
 };
 
-class npc_warlock_doom_guard : public CreatureScript
+class npc_custom_caster_guard : public CreatureScript
 {
     public:
-        npc_warlock_doom_guard() : CreatureScript("npc_warlock_doom_guard") { }
+        npc_custom_caster_guard() : CreatureScript("npc_custom_caster_guard") { }
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_warlock_doom_guardAI(creature);
+            return new npc_custom_caster_guardAI(creature);
         }
 
-        struct npc_warlock_doom_guardAI : CasterAI
+        struct npc_custom_caster_guardAI : CasterAI
         {
-            npc_warlock_doom_guardAI(Creature* creature) : CasterAI(creature) 
+            npc_custom_caster_guardAI(Creature* creature) : CasterAI(creature) 
             {
                 curTarget = NULL;
+                switch (me->GetEntry())
+                {
+                    case NPC_DOOM_GUARD: // Doom Guard
+                        spellId = SPELL_DOOM_BOLT;
+                        maxRange = 30.0f;
+                        castTime = 3000;
+                        break;
+                    case NPC_BURNING_TREANT: // Burning Treant
+                        spellId = SPELL_DOOM_BOLT;
+                        maxRange = 40.0f;
+                        castTime = 2000;
+                        break;
+                    case NPC_FIERY_IMP:
+                        spellId = SPELL_FLAME_BLAST;
+                        maxRange = 40.0f;
+                        castTime = 1500;
+                        break;
+                    default:
+                        spellId = 0;
+                        maxRange = 0.0f;
+                        castTime = 0;
+                        break;
+                }
             }
-
-            Unit* curTarget;
 
             void EnterCombat(Unit* who)
             {
-                events.ScheduleEvent(EVENT_DOOM_BOLT, 500);
+                if (spellId)
+                    events.ScheduleEvent(EVENT_CAST_SPELL, 1);
             }
 
             void OwnerAttacked(Unit* target)
             {
                 if (!curTarget)
-                    if (target && (target->HasAura(603) || target->HasAura(980)))
-                        curTarget = target;
+                    curTarget = target;
             }
 
             void UpdateAI(const uint32 diff)
@@ -3914,7 +3877,6 @@ class npc_warlock_doom_guard : public CreatureScript
 
                 if (uint32 event_id = events.ExecuteEvent())
                 {
-                    float const maxRange = 40.0f;
                     float normalRange = maxRange / 1.2f;
 
                     if (Unit* victim = me->getVictim())
@@ -3926,12 +3888,18 @@ class npc_warlock_doom_guard : public CreatureScript
                             me->GetMotionMaster()->MoveChase(victim, MELEE_RANGE);
                     }
 
-                    DoCastVictim(SPELL_DOOM_BOLT);
-                    events.ScheduleEvent(EVENT_DOOM_BOLT, 3500);
+                    DoCastVictim(spellId);
+                    events.ScheduleEvent(EVENT_CAST_SPELL, castTime);
                 }
             }
+        private:
+            Unit* curTarget;
+            uint32 spellId;
+            float maxRange;
+            uint32 castTime;
         };
 };
+
 class npc_searing_totem: public CreatureScript
 {
     public:
@@ -4039,6 +4007,73 @@ class npc_searing_totem: public CreatureScript
         };
 
 };
+
+#define SPELL_MIND_FLAY 52586
+#define EVENT_MIND_FLAY 1
+
+class npc_gurthalak_tentacle_of_the_old_ones : public CreatureScript
+{
+    public:
+        npc_gurthalak_tentacle_of_the_old_ones() : CreatureScript("npc_gurthalak_tentacle_of_the_old_ones") { }
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_gurthalak_tentacle_of_the_old_onesAI(creature);
+        }
+
+        struct npc_gurthalak_tentacle_of_the_old_onesAI : CasterAI
+        {
+            npc_gurthalak_tentacle_of_the_old_onesAI(Creature* creature) : CasterAI(creature) 
+            {
+                curTarget = NULL;
+            }
+
+            void EnterCombat(Unit* who)
+            {
+                events.ScheduleEvent(EVENT_MIND_FLAY, 1);
+            }
+
+            void EnterEvadeMode()
+            {
+                me->CombatStop(true);
+            }
+
+            void OwnerAttacked(Unit* target)
+            {
+                if (!curTarget)
+                    curTarget = target;
+            }
+
+            void UpdateAI(const uint32 diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->getVictim()->HasCrowdControlAura())
+                {
+                    me->InterruptNonMeleeSpells(false);
+                    return;
+                }
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                if (curTarget && (me->getVictim() != curTarget))
+                    AttackStart(curTarget);
+
+                if (uint32 event_id = events.ExecuteEvent())
+                {
+                    DoCastVictim(SPELL_MIND_FLAY);
+                    events.ScheduleEvent(EVENT_MIND_FLAY, 2500);
+                }
+            }
+        private:
+            Unit* curTarget;
+        };
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -4082,9 +4117,9 @@ void AddSC_npcs_special()
     new npc_power_word_barrier();
     new npc_wild_mushroom();
     new npc_metzen();
-    new npc_burning_treant();
     new npc_kwee_q_peddlefeet();
     new npc_moonwell_chalice();
-    new npc_warlock_doom_guard();
+    new npc_custom_caster_guard();
     new npc_searing_totem();
+    new npc_gurthalak_tentacle_of_the_old_ones();
 }

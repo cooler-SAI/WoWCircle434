@@ -597,18 +597,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         }
                         break;
                     }
-                    // Incinerate
-                    case 29722:
-                    {
-                        // Incinerate does more dmg (dmg/6) if the target have Immolate debuff.
-                        // Check aura state for speed but aura state set not only for Immolate spell
-                        if (unitTarget->HasAuraState(AURA_STATE_CONFLAGRATE))
-                        {
-                            if (unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x4, 0, 0))
-                                damage += damage / 6;
-                        }
-                        break;
-                    }
                     // Conflagrate - consumes Immolate
                     case 17962:
                     {
