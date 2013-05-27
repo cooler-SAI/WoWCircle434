@@ -104,7 +104,7 @@ isRecruiter(isARecruiter), timeLastWhoCommand(0),
 timeLastChannelInviteCommand(0), timeLastGroupInviteCommand(0), timeLastGuildInviteCommand(0), timeLastChannelPassCommand(0),
 timeLastChannelMuteCommand(0), timeLastChannelBanCommand(0), timeLastChannelUnbanCommand(0), timeLastChannelAnnounceCommand(0),
 timeLastChannelModerCommand(0), timeLastChannelOwnerCommand(0), timeLastChannelSetownerCommand(0), timeLastChannelUnmoderCommand(0),
-timeLastChannelUnmuteCommand(0), timeLastChannelKickCommand(0)
+timeLastChannelUnmuteCommand(0), timeLastChannelKickCommand(0), timelastReloadUi(0)
 {
     _warden = NULL;
     _filterAddonMessages = false;
@@ -996,6 +996,19 @@ void WorldSession::HandleUnregisterAddonPrefixesOpcode(WorldPacket& /*recvPacket
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_UNREGISTER_ALL_ADDON_PREFIXES");
 
     _registeredAddonPrefixes.clear();
+
+    time_t now = time(NULL);
+    if (now - timelastReloadUi < 5)
+        return;
+    else
+        timelastReloadUi = now;
+
+    // reload ui petbar player resend
+    if (Player * player = GetPlayer())
+    {
+        if (Pet * pet = player->GetPet())
+            player->PetSpellInitialize();
+    }
 }
 
 void WorldSession::HandleAddonRegisteredPrefixesOpcode(WorldPacket& recvPacket)

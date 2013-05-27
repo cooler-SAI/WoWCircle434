@@ -1067,6 +1067,7 @@ class WorldSession
         time_t timeLastChannelKickCommand;
         time_t timeLastGroupInviteCommand;
         time_t timeLastGuildInviteCommand;
+        time_t timelastReloadUi;
 };
 #endif
 /// @}
