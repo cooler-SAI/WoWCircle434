@@ -14599,6 +14599,15 @@ bool Player::CanCompleteQuest(uint32 quest_id)
                 if (qInfo->GetPlayersSlain() != 0 && q_status.PlayerCount < qInfo->GetPlayersSlain())
                     return false;
 
+            if (qInfo->HasSpecialFlag(QUEST_SPECIAL_FLAGS_CURRENCY))
+            {
+                 for (uint8 i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; i++)
+                {
+                    if (qInfo->RequiredCurrencyCount[i]!= 0 && q_status.CurrencyCount[i] < qInfo->RequiredCurrencyCount[i])
+                        return false;
+                }
+            }
+
             if (qInfo->HasSpecialFlag(QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT) && !q_status.Explored)
                 return false;
 
@@ -14750,6 +14759,12 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
 
     if (quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_PLAYER_KILL))
         questStatusData.PlayerCount = 0;
+
+    if (quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_CURRENCY))
+    {
+        for (uint8 i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; ++i)
+            questStatusData.CurrencyCount[i] = 0;
+    }
 
     GiveQuestSourceItem(quest);
     AdjustQuestReqItemCount(quest, questStatusData);
