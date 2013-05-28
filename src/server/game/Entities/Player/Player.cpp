@@ -14605,10 +14605,10 @@ bool Player::CanCompleteQuest(uint32 quest_id)
 
             //if (qInfo->HasSpecialFlag(QUEST_SPECIAL_FLAGS_CURRENCY))
             //{
-            //     for (uint8 i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; i++)
+                 for (uint8 i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; i++)
             //    {
-            //        if (qInfo->RequiredCurrencyCount[i]!= 0 && q_status.CurrencyCount[i] < qInfo->RequiredCurrencyCount[i])
-            //            return false;
+                    if (qInfo->RequiredCurrencyCount[i]!= 0 && q_status.CurrencyCount[i] < qInfo->RequiredCurrencyCount[i])
+                        return false;
             //    }
             //}
 

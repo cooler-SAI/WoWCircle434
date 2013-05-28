@@ -429,14 +429,14 @@ struct QuestStatusData
     {
         memset(ItemCount, 0, QUEST_ITEM_OBJECTIVES_COUNT * sizeof(uint16));
         memset(CreatureOrGOCount, 0, QUEST_OBJECTIVES_COUNT * sizeof(uint16));
-        memset(CurrencyCount, 0, QUEST_REQUIRED_CURRENCY_COUNT * sizeof(uint16));
+        memset(CurrencyCount, 0, QUEST_REQUIRED_CURRENCY_COUNT * sizeof(uint32));
     }
 
     QuestStatus Status;
     uint32 Timer;
     uint16 ItemCount[QUEST_ITEM_OBJECTIVES_COUNT];
     uint16 CreatureOrGOCount[QUEST_OBJECTIVES_COUNT];
-    uint16 CurrencyCount[QUEST_REQUIRED_CURRENCY_COUNT];
+    uint32 CurrencyCount[QUEST_REQUIRED_CURRENCY_COUNT];
     uint16 PlayerCount;
     bool Explored;
 };
