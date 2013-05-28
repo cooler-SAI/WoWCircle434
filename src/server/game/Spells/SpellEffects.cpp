@@ -4413,11 +4413,14 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 if (m_caster->GetTypeId() != TYPEID_PLAYER)
                     break;
 
+                // http://www.mmo-champion.com/threads/988380-4-3-Lava-Lash-is-nerfed
+                // 2.6 * (1.0 + 1.0 + 0.4) * (1.0 + 0.2) * new flametongue * mastery
+
                 if (Item* offItem = m_caster->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
                 {
                     // Flametongue
                     if (offItem->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) == 5) 
-                        AddPct(totalDamagePercentMod, 40);
+                        totalDamagePercentMod += 0.40f;
                 }
 
                 // Improved Lava Lash
@@ -4433,7 +4436,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                         if (m_caster->HasAura(99209))
                             sf_bonus +=5;
 
-                        AddPct(totalDamagePercentMod, sf_bonus * stacks);
+                        totalDamagePercentMod += float((sf_bonus * stacks) / 100.0f);
                         unitTarget->RemoveAura(77661, m_caster->GetGUID());
                     }
 

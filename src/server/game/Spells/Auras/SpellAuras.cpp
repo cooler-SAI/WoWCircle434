@@ -1566,8 +1566,18 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_WARRIOR:
                 // Heroic Fury
                 if (m_spellInfo->Id == 60970)
+                {
                     if (target->GetTypeId() == TYPEID_PLAYER)
                         target->ToPlayer()->RemoveSpellCooldown(20252, true);
+                }
+                // Battle Shout && Commander Shout
+                else if (m_spellInfo->Id == 469 || m_spellInfo->Id == 6673)
+                {
+                    // Item - Warrior T12 DPS 2P Bonus
+                    if (caster)
+                        if (caster == target && caster->HasAura(99234))
+                            caster->CastSpell(caster, 99233, true);
+                }
                 break;
             case SPELLFAMILY_HUNTER:
                 if (!caster)

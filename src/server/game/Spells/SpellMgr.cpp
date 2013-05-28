@@ -2830,6 +2830,61 @@ void SpellMgr::LoadSpellCustomAttr()
         if (spellInfo->SpellVisual[0] == 3879)
             spellInfo->AttributesCu |= SPELL_ATTR0_CU_CONE_BACK;
 
+        ////////////////////////////////////
+        ///      DEFINE BINARY SPELLS   ////
+        ////////////////////////////////////
+        for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
+        {
+            switch (spellInfo->Effects[j].Effect)
+            {
+                case SPELL_EFFECT_DISPEL:
+                case SPELL_EFFECT_STEAL_BENEFICIAL_BUFF:
+                case SPELL_EFFECT_POWER_DRAIN:
+                case SPELL_EFFECT_POWER_BURN:
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY;
+                    break;
+            }
+
+            switch (spellInfo->Effects[j].Mechanic)
+            {
+                case MECHANIC_FEAR:
+                case MECHANIC_CHARM:
+                case MECHANIC_SNARE:
+                    // Frost Bolt is not binary
+                    if (spellInfo->Id == 116)
+                        break;
+                case MECHANIC_FREEZE:
+                case MECHANIC_BANISH:
+                case MECHANIC_POLYMORPH:
+                case MECHANIC_ROOT:
+                case MECHANIC_INTERRUPT:
+                case MECHANIC_SILENCE:
+                case MECHANIC_HORROR:
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY;
+                    break;
+             }
+        }
+
+        switch (spellInfo->Mechanic)
+        {
+            case MECHANIC_FEAR:
+            case MECHANIC_CHARM:
+            case MECHANIC_SNARE:
+            case MECHANIC_FREEZE:
+            case MECHANIC_BANISH:
+            case MECHANIC_POLYMORPH:
+            case MECHANIC_ROOT:
+            case MECHANIC_INTERRUPT:
+            case MECHANIC_SILENCE:
+            case MECHANIC_HORROR:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY;
+                break;
+        }
+
+        ///////////////////////////
+        //////   END BINARY  //////
+        ///////////////////////////
+
         switch (spellInfo->Id)
         {
             case 101840: // Molten Axe, Echo of Baine
@@ -3169,6 +3224,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 34026:
                 spellInfo->SetRangeIndex(2);
                 break;
+            case 85673: // Word of Glory
             case 89023: // Blessed life (spell, not talent)
             case 85222: // Light of Dawn
             case 89024: // Pursuit of Justice
@@ -6783,6 +6839,13 @@ void SpellMgr::LoadDbcDataCorrections()
             // Soul Stone
             case 20707:
                 spellInfo->Effects[EFFECT_1].Effect = 0;
+                break;
+            // Item - Warrior T12 DPS 2P Bonus
+            case 99234:
+                spellInfo->ProcChance = 0;
+                spellInfo->ProcFlags = 0;
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
                 break;
             default:
                 break;

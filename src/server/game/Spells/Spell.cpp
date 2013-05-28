@@ -2811,6 +2811,9 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                 if (m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_AURA_CC) && unit->IsControlledByPlayer())
                     unit->RemoveAurasByType(SPELL_AURA_MOD_STEALTH, NULL, NULL, 11327);
             }
+            if (m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_BINARY) && !m_spellInfo->IsChanneled())
+                if (m_caster->IsSpellResisted(unit, m_spellSchoolMask, m_spellInfo))
+                    return SPELL_MISS_RESIST;
         }
         else if (m_caster->IsFriendlyTo(unit))
         {
@@ -2832,6 +2835,12 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                 unit->getHostileRefManager().threatAssist(m_caster, 0.0f);
             }
         }
+    }
+    else if (!m_spellInfo->IsPositive())
+    {
+        if (m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_BINARY) && !m_spellInfo->IsChanneled())
+            if (m_caster->IsSpellResisted(unit, m_spellSchoolMask, m_spellInfo))
+                return SPELL_MISS_RESIST;
     }
 
     // Get Data Needed for Diminishing Returns, some effects may have multiple auras, so this must be done on spell hit, not aura add

@@ -1543,6 +1543,47 @@ uint32 Unit::CalcArmorReducedDamage(Unit* victim, const uint32 damage, SpellInfo
     return (newdamage > 1) ? newdamage : 1;
 }
 
+bool Unit::IsSpellResisted(Unit* victim, SpellSchoolMask schoolMask, SpellInfo const* spellInfo)
+{
+    if (!victim || !victim->isAlive())
+        return false;
+
+    if (GetCharmerOrOwnerPlayerOrPlayerItself())
+        return false;
+
+
+    if ((schoolMask & SPELL_SCHOOL_MASK_NORMAL) == 0 && (!spellInfo || (spellInfo->AttributesEx4 & SPELL_ATTR4_IGNORE_RESISTANCES) == 0))
+    {
+        float victimResistance = float(victim->GetResistance(schoolMask));
+        victimResistance += float(GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask));
+
+        if (Player* player = ToPlayer())
+            victimResistance -= float(player->GetSpellPenetrationItemMod());
+
+        // Resistance can't be lower then 0.
+        if (victimResistance < 0.0f)
+            victimResistance = 0.0f;
+
+        uint32 level = victim->getLevel();
+        float resistanceConstant = 0.0f;
+
+        // http://elitistjerks.com/f15/t29453-combat_ratings_level_85_cataclysm/
+        if (level >= 61)
+            resistanceConstant = 150 + ((level - 60) * (level - 67.5));
+        else if (level >= 21 && level <= 60)
+            resistanceConstant = 50 + ((level - 20) * 2.5);
+        else 
+            resistanceConstant = 50.0f;
+
+        float averageResist = victimResistance / (victimResistance + resistanceConstant);
+        
+        int32 tmp = int32(averageResist * 10000);
+        int32 rand = irand(0, 10000);
+        return (rand < tmp);
+    }
+    return false;
+}
+
 void Unit::CalcAbsorbResist(Unit* victim, SpellSchoolMask schoolMask, DamageEffectType damagetype, uint32 const damage, uint32 *absorb, uint32 *resist, SpellInfo const* spellInfo)
 {
     if (!victim || !victim->isAlive() || !damage)
@@ -1564,15 +1605,16 @@ void Unit::CalcAbsorbResist(Unit* victim, SpellSchoolMask schoolMask, DamageEffe
         if (victimResistance < 0.0f)
             victimResistance = 0.0f;
 
-        static uint32 const BOSS_LEVEL = 83;
-        static float const BOSS_RESISTANCE_CONSTANT = 510.0f;
         uint32 level = victim->getLevel();
         float resistanceConstant = 0.0f;
 
-        if (level == BOSS_LEVEL)
-            resistanceConstant = BOSS_RESISTANCE_CONSTANT;
-        else
-            resistanceConstant = level * 5.0f;
+        // http://elitistjerks.com/f15/t29453-combat_ratings_level_85_cataclysm/
+        if (level >= 61)
+            resistanceConstant = 150 + ((level - 60) * (level - 67.5));
+        else if (level >= 21 && level <= 60)
+            resistanceConstant = 50 + ((level - 20) * 2.5);
+        else 
+            resistanceConstant = 50.0f;
 
         float averageResist = victimResistance / (victimResistance + resistanceConstant);
         float discreteResistProbability[11];
@@ -1599,10 +1641,12 @@ void Unit::CalcAbsorbResist(Unit* victim, SpellSchoolMask schoolMask, DamageEffe
 
         float damageResisted = float(damage * i / 10);
 
-        AuraEffectList const& ResIgnoreAuras = GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
+        // There is no spell with SPELL_AURA_MOD_IGNORE_TARGET_RESIST aura in 4.3.4
+        // Skip this block
+        /*AuraEffectList const& ResIgnoreAuras = GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
         for (AuraEffectList::const_iterator j = ResIgnoreAuras.begin(); j != ResIgnoreAuras.end(); ++j)
             if ((*j)->GetMiscValue() & schoolMask)
-                AddPct(damageResisted, -(*j)->GetAmount());
+                AddPct(damageResisted, -(*j)->GetAmount());*/
 
         dmgInfo.ResistDamage(uint32(damageResisted));
     }
