@@ -2445,7 +2445,9 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
             // Seal of Insight
             case 20167:
             {
-                addhealth = int32(0.15f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK) + 0.15f * m_caster->SpellBaseHealingBonusDone(SpellSchoolMask(m_spellInfo->ScalingClass)));
+                int32 ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                int32 sp = m_caster->SpellBaseHealingBonusDone(SPELL_SCHOOL_MASK_HOLY);
+                addhealth = int32(0.15f * ap + 0.15f * sp);
                 break;
             }
             // Lifebloom final heal
