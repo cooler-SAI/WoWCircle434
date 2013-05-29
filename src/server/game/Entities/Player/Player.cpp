@@ -7309,14 +7309,30 @@ void Player::_SaveCurrency(SQLTransaction& trans)
     PreparedStatement* stmt = NULL;
     for (PlayerCurrenciesMap::iterator itr = _currencyStorage.begin(); itr != _currencyStorage.end(); ++itr)
     {
-        if (!sCurrencyTypesStore.LookupEntry(itr->first)) // should never happen
+        CurrencyTypesEntry const* entry = sCurrencyTypesStore.LookupEntry(itr->first);
+        if (!entry) // should never happen
             continue;
 
-        switch(itr->second.state)
+        switch (itr->second.state)
         {
             case PLAYERCURRENCY_NEW:
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_PLAYER_CURRENCY);
+                stmt->setUInt32(0, GetGUIDLow());
+                stmt->setUInt16(1, itr->first);
+                stmt->setUInt32(2, itr->second.weekCount);
+                stmt->setUInt32(3, itr->second.totalCount);
+                stmt->setUInt32(4, itr->second.seasonCount);
+                stmt->setUInt8(5, itr->second.flags);
+                trans->Append(stmt);
+                break;
             case PLAYERCURRENCY_CHANGED:
-                trans->PAppend("REPLACE INTO character_currency (guid, currency, week_count, total_count, season_count, flags) VALUES ('%u', '%u', '%u', '%u', '%u', '%u')", GetGUIDLow(), itr->first, itr->second.weekCount, itr->second.totalCount, itr->second.seasonCount, itr->second.flags);
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PLAYER_CURRENCY);
+                stmt->setUInt32(0, itr->second.weekCount);
+                stmt->setUInt32(1, itr->second.totalCount);
+                stmt->setUInt32(2, itr->second.seasonCount);
+                stmt->setUInt8(3, itr->second.flags);
+                stmt->setUInt32(4, GetGUIDLow());
+                stmt->setUInt16(5, itr->first);
                 break;
             default:
                 break;
