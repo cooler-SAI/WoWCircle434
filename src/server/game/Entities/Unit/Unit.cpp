@@ -5285,6 +5285,28 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Matrix Restabilizer
+                case 96976:
+                case 97138:
+                {
+                    if (GetTypeId() != TYPEID_PLAYER)
+                        return false;
+
+                    uint32 crit = ToPlayer()->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_CRIT_MELEE);
+                    uint32 mastery = ToPlayer()->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_MASTERY);
+                    uint32 haste = ToPlayer()->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_HASTE_MELEE);
+
+                    if (crit > mastery && crit > haste)
+                        triggered_spell_id = (dummySpell->Id == 96976) ? 96978 : 97140;
+                    else if (haste > mastery && haste > crit)
+                        triggered_spell_id = (dummySpell->Id == 96976) ? 96977 : 97139;
+                    else if (mastery > haste && mastery > crit)
+                        triggered_spell_id = (dummySpell->Id == 96976) ? 96979 : 97141;
+
+                    target = this;
+
+                    break;
+                }
                 // Bane of Havoc
                 case 85466:
                 {

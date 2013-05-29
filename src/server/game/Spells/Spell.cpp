@@ -1245,6 +1245,8 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                     case 71610: // Echoes of Light (Althor's Abacus normal version)
                     case 71641: // Echoes of Light (Althor's Abacus heroic version)
                     case 99152: // Cauterizing Flame, Item - Priest Healer T12 4P Bonus
+                    case 96966: // Blaze of Life, Eye of Blazing Power (Normal)
+                    case 97136: // Blaze of Life, Eye of Blazing Power (Heroic)
                         maxSize = 1;
                         power = POWER_HEALTH;
                         break;
