@@ -180,10 +180,10 @@ class instance_firelands : public InstanceMapScript
 
                 if (type == DATA_RAGNAROS)
                 {
-                    //if (instance->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL)
-                    //    DoRespawnGameObject(uiRagnarosCache10, DAY);
-                    //else if (instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL)
-                    //    DoRespawnGameObject(uiRagnarosCache25, DAY);
+                    if (instance->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL)
+                        DoRespawnGameObject(uiRagnarosCache10, DAY);
+                    else if (instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL)
+                        DoRespawnGameObject(uiRagnarosCache25, DAY);
                 }
 
 			    return true;

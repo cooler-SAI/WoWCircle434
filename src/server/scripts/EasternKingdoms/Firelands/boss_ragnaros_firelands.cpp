@@ -483,7 +483,10 @@ class boss_ragnaros_firelands : public CreatureScript
             void JustDied(Unit* /*killer*/)
             {
                 if (!IsHeroic())
+                {
+                    me->DespawnOrUnsummon();
                     return;
+                }
                 
                 _JustDied();
                 DespawnEncounterCreatures();
