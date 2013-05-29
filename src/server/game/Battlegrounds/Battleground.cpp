@@ -1190,7 +1190,10 @@ void Battleground::AddPlayer(Player* player)
     else
     {
         if (GetStatus() == STATUS_WAIT_JOIN)                 // not started yet
+        {
             player->CastSpell(player, SPELL_PREPARATION, true);   // reduces all mana cost of spells.
+            SendCountdownTimer();
+        }
     }
 
     // Send last message for player if he missed it
@@ -1749,10 +1752,7 @@ void Battleground::SendMessage2ToAll(int32 entry, ChatMsg type, Player const* so
 
 void Battleground::SendCountdownTimer()
 {
-    if (m_CountdownTimer <= 0 || m_CountdownTimer >= 30000)
-        return;
-
-    int countdownSec = ceil(float(m_CountdownTimer) / 1000);
+    int countdownSec = (GetMaxCountdownTimer() - ceil(float(GetElapsedTime()) / 1000));
 
     for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
         if (Player* player = ObjectAccessor::FindPlayer(itr->first))
