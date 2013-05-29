@@ -5455,6 +5455,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 100822:
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ENEMY;
                 break;
+            case 100941: // Dreadflame dmg
+            case 100998:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
+                break;
             // ENDOF FIRELANDS
             // BASTION OF TWILIGHT SPELLS
             //
