@@ -1548,7 +1548,7 @@ bool Unit::IsSpellResisted(Unit* victim, SpellSchoolMask schoolMask, SpellInfo c
     if (!victim || !victim->isAlive())
         return false;
 
-    if (GetCharmerOrOwnerPlayerOrPlayerItself())
+    if (!GetCharmerOrOwnerPlayerOrPlayerItself())
         return false;
 
 
