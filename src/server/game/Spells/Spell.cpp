@@ -5555,6 +5555,26 @@ SpellCastResult Spell::CheckCast(bool strict)
         // for effects of spells that have only one target
         switch (m_spellInfo->Effects[i].Effect)
         {
+            case SPELL_EFFECT_HEAL:
+            case SPELL_EFFECT_ENERGIZE:
+            {
+                // Handling for item heal or energize checks
+                Unit * target = m_targets.GetUnitTarget() ? m_targets.GetUnitTarget(): m_caster;
+                if (!target || target != m_caster || !m_CastItem || IsTriggered())
+                    break;
+
+                if (m_spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL)
+                {
+                    if (target->IsFullHealth())
+                        return SPELL_FAILED_ALREADY_AT_FULL_HEALTH;
+                }
+                else if (m_spellInfo->Effects[i].Effect == SPELL_EFFECT_ENERGIZE)
+                {
+                    if (target->IsFullPower())
+                        return m_spellInfo->PowerType == POWER_MANA ? SPELL_FAILED_ALREADY_AT_FULL_MANA: SPELL_FAILED_ALREADY_AT_FULL_POWER;
+                }
+                break;
+            }
             case SPELL_EFFECT_KNOCK_BACK_DEST:
             {
                 switch (m_spellInfo->Id)
