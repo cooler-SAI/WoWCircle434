@@ -7333,6 +7333,7 @@ void Player::_SaveCurrency(SQLTransaction& trans)
                 stmt->setUInt8(3, itr->second.flags);
                 stmt->setUInt32(4, GetGUIDLow());
                 stmt->setUInt16(5, itr->first);
+                trans->Append(stmt);
                 break;
             default:
                 break;
