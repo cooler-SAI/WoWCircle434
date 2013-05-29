@@ -61,6 +61,7 @@ public:
             { "honor",          SEC_MODERATOR,      false, &HandleModifyHonorCommand,         "", NULL },
             { "reputation",     SEC_GAMEMASTER,     false, &HandleModifyRepCommand,           "", NULL },
             { "currency",       SEC_GAMEMASTER,     false, &HandleModifyCurrencyCommand,      "", NULL },
+            { "qcurrency",       SEC_GAMEMASTER,     false, &HandleModifyQCurrencyCommand,      "", NULL },
             { "drunk",          SEC_MODERATOR,      false, &HandleModifyDrunkCommand,         "", NULL },
             { "standstate",     SEC_GAMEMASTER,     false, &HandleModifyStandStateCommand,    "", NULL },
             { "phase",          SEC_ADMINISTRATOR,  false, &HandleModifyPhaseCommand,         "", NULL },
@@ -1364,6 +1365,32 @@ public:
             return false;
 
         amount *= sCurrencyMgr->GetPrecision(currencyType);
+
+        target->ModifyCurrency(currencyId, amount, true, true);
+        return true;
+    }
+
+    static bool HandleModifyQCurrencyCommand(ChatHandler* handler, const char* args)
+    {
+        if (!*args)
+            return false;
+
+        Player* target = handler->getSelectedPlayer();
+        if (!target)
+        {
+            handler->PSendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint32 currencyId = atoi(strtok((char*)args, " "));
+        const CurrencyTypesEntry* currencyType =  sCurrencyTypesStore.LookupEntry(currencyId);
+        if (!currencyType)
+            return false;
+
+        uint32 amount = atoi(strtok(NULL, " "));
+        if (!amount)
+            return false;
 
         target->ModifyCurrency(currencyId, amount, true, true);
         return true;
