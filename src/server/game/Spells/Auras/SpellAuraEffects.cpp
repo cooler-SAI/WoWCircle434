@@ -513,17 +513,15 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
     {
         case SPELL_AURA_MOD_DECREASE_SPEED:
         {
-            if (GetType() == UNIT_AURA_TYPE)
+            // Unleash Frost
+            if (m_spellInfo->Id == 73682)
             {
                 Unit * target = GetBase()->GetUnitOwner();
                 if (!target)
                     break;
-                // Unleash Frost
-                if (m_spellInfo->Id == 73682)
-                {
-                    if (target->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED))
-                        amount = 70;
-                }
+
+                if (target->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED))
+                    amount = 70;
             }
             break;
         }
