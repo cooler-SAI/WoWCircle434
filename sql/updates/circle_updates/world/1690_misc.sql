@@ -1,4 +1,4 @@
-﻿UPDATE `quest_template` SET `ExclusiveGroup`=3639 WHERE `Id`=3643;
+UPDATE `quest_template` SET `ExclusiveGroup`=3639 WHERE `Id`=3643;
 UPDATE `quest_template` SET `ExclusiveGroup`=3639 WHERE `Id`=3643;
 UPDATE `quest_template` SET `ExclusiveGroup`=10897 WHERE `Id`=10897;
 UPDATE `quest_template` SET `ExclusiveGroup`=10897 WHERE `Id`=10899;
@@ -12,7 +12,7 @@ UPDATE `quest_template` SET `ExclusiveGroup`=5141 WHERE `Id`=5145;
 UPDATE `quest_template` SET `ExclusiveGroup`=5141 WHERE `Id`=5146;
 UPDATE `quest_template` SET `ExclusiveGroup`=5141 WHERE `Id`=5148;
 UPDATE `quest_template` SET `ExclusiveGroup`=5283 WHERE `Id`=5301;
-UPDATE `quest_template` SET `ExclusiveGroup`=5283 WHERE `Id`=5302
+UPDATE `quest_template` SET `ExclusiveGroup`=5283 WHERE `Id`=5302;
 UPDATE `quest_template` SET `ExclusiveGroup`=3639 WHERE `Id`=29475;
 UPDATE `quest_template` SET `ExclusiveGroup`=3639 WHERE `Id`=29476;
 UPDATE `quest_template` SET `ExclusiveGroup`=3639 WHERE `Id`=29477;
