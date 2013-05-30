@@ -17,6 +17,8 @@ enum Data
     DATA_RHYOLITH_HEALTH_SHARED = 9,
     DATA_EVENT                  = 10,
     DATA_RAGNAROS_FLOOR         = 11,
+    DATA_RAGNAROS_CACHE_10      = 12,
+    DATA_RAGNAROS_CACHE_25      = 13,
 };
 
 enum CreatureIds

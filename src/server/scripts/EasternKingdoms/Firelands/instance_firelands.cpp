@@ -168,6 +168,8 @@ class instance_firelands : public InstanceMapScript
                     case DATA_RHYOLITH: return uiRhyolithGUID;
                     case DATA_RAGNAROS: return uiRagnarosGUID;
                     case DATA_RAGNAROS_FLOOR: return uiRagnarosFloor;
+                    case DATA_RAGNAROS_CACHE_10: return uiRagnarosCache10;
+                    case DATA_RAGNAROS_CACHE_25: return uiRagnarosCache25;
                     default: return 0;
                 }
                 return 0;
@@ -177,14 +179,6 @@ class instance_firelands : public InstanceMapScript
             {
 			    if (!InstanceScript::SetBossState(type, state))
 				    return false;
-
-                if (type == DATA_RAGNAROS && state == DONE)
-                {
-                    if (instance->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL)
-                        DoRespawnGameObject(uiRagnarosCache10, DAY);
-                    else if (instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL)
-                        DoRespawnGameObject(uiRagnarosCache25, DAY);
-                }
 
 			    return true;
             }

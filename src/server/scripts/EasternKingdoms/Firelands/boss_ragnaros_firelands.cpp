@@ -1001,6 +1001,11 @@ class boss_ragnaros_firelands : public CreatureScript
                 instance->UpdateEncounterState(ENCOUNTER_CREDIT_CAST_SPELL, SPELL_ENCOUNTER_COMPLETE, me); 
                 instance->SetBossState(DATA_RAGNAROS, DONE);
 
+                if (GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL)
+                    instance->DoRespawnGameObject(instance->GetData64(DATA_RAGNAROS_CACHE_10), DAY);
+                else if (GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL)
+                    instance->DoRespawnGameObject(instance->GetData64(DATA_RAGNAROS_CACHE_25), DAY);
+
                 events.ScheduleEvent(EVENT_DESPAWN, 3000);
             }
         };
