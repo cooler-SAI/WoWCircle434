@@ -380,8 +380,6 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPacket & recvData)
 {
-    sLog->outError(LOG_FILTER_GENERAL, "HandleQuestgiverRequestRewardOpcode===== in ");
-
     uint32 questId;
     uint64 guid;
     recvData >> guid >> questId;
@@ -488,7 +486,6 @@ void WorldSession::HandleQuestConfirmAccept(WorldPacket& recvData)
 
 void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
 {
-    sLog->outError(LOG_FILTER_GENERAL, "HandleQuestgiverCompleteQuest===== in ");
     uint32 questId;
     uint64 playerGuid;
     bool autoCompleteMode;      // 0 - standart complete quest mode with npc, 1 - auto-complete mode
@@ -530,7 +527,6 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
 
         if (_player->GetQuestStatus(questId) != QUEST_STATUS_COMPLETE)
         {
-    sLog->outError(LOG_FILTER_GENERAL, "HandleQuestgiverCompleteQuest===== != QUEST_STATUS_COMPLETE ");
             if (quest->IsRepeatable())
                 _player->PlayerTalkClass->SendQuestGiverRequestItems(quest, playerGuid, _player->CanCompleteRepeatableQuest(quest), false);
             else
@@ -538,7 +534,6 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
         }
         else
         {
-    sLog->outError(LOG_FILTER_GENERAL, "HandleQuestgiverCompleteQuest===== QUEST_STATUS_COMPLETE ");
             if (quest->GetReqItemsCount())                  // some items required
                 _player->PlayerTalkClass->SendQuestGiverRequestItems(quest, playerGuid, _player->CanRewardQuest(quest, false), false);
             else                                            // no items required
