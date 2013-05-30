@@ -583,6 +583,8 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, uint64 npcGUID, b
 
 void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, uint64 npcGUID, bool canComplete, bool closeOnCancel) const
 {
+        sLog->outError(LOG_FILTER_GENERAL, ":SendQuestGiverRequestItems === in");
+        
     // We can always call to RequestItems, but this packet only goes out if there are actually
     // items.  Otherwise, we'll skip straight to the OfferReward
 
@@ -604,7 +606,7 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, uint64 npcGUID, 
         SendQuestGiverOfferReward(quest, npcGUID, true);
         return;
     }
-
+        sLog->outError(LOG_FILTER_GENERAL, "Req item packet");
     WorldPacket data(SMSG_QUESTGIVER_REQUEST_ITEMS, 50);    // guess size
     data << uint64(npcGUID);
     data << uint32(quest->GetQuestId());
@@ -642,15 +644,21 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, uint64 npcGUID, 
             data << uint32(0);
     }
 
+    sLog->outError(LOG_FILTER_GENERAL, ":SendQuestGiverRequestItems === in curr");
     data << uint32(quest->GetReqCurrencyCount());
     for (int i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; ++i)
     {
+    sLog->outError(LOG_FILTER_GENERAL, ":SendQuestGiverRequestItems === curr check  ==");
         if (!quest->RequiredCurrencyId[i])
             continue;
 
         data << uint32(quest->RequiredCurrencyId[i]);
         data << uint32(quest->RequiredCurrencyCount[i]);
     }
+
+    //for (uint8 i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; i++)
+    //if (HasCurrency(quest->RequiredCurrencyId[i], quest->RequiredCurrencyCount[i]))
+    //    data << uint32(0x02);
 
     if (!canComplete)            // Experimental; there are 6 similar flags, if any of them
         data << uint32(0x00);    // of them is 0 player can't complete quest (still unknown meaning)

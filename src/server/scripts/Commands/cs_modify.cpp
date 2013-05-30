@@ -61,7 +61,7 @@ public:
             { "honor",          SEC_MODERATOR,      false, &HandleModifyHonorCommand,         "", NULL },
             { "reputation",     SEC_GAMEMASTER,     false, &HandleModifyRepCommand,           "", NULL },
             { "currency",       SEC_GAMEMASTER,     false, &HandleModifyCurrencyCommand,      "", NULL },
-            { "qcurrency",       SEC_GAMEMASTER,     false, &HandleModifyQCurrencyCommand,      "", NULL },
+            { "qcurrency",      SEC_GAMEMASTER,     false, &HandleModifyQCurrencyCommand,     "", NULL },
             { "drunk",          SEC_MODERATOR,      false, &HandleModifyDrunkCommand,         "", NULL },
             { "standstate",     SEC_GAMEMASTER,     false, &HandleModifyStandStateCommand,    "", NULL },
             { "phase",          SEC_ADMINISTRATOR,  false, &HandleModifyPhaseCommand,         "", NULL },
@@ -1393,6 +1393,7 @@ public:
             return false;
 
         target->ModifyCurrency(currencyId, amount, true, true);
+        target->SaveToDB();
         return true;
     }
 
