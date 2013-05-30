@@ -4326,17 +4326,8 @@ void Spell::SendSpellStart()
          && m_spellInfo->PowerType != POWER_HEALTH)
         castFlags |= CAST_FLAG_POWER_LEFT_SELF;
 
-    if (m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNES)
-    {
+    if (((m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNES) || m_spellInfo->HasEffect(SPELL_EFFECT_ACTIVATE_RUNE))
         castFlags |= CAST_FLAG_UNKNOWN_19;
-        castFlags |= CAST_FLAG_RUNE_LIST;                    // rune cooldowns list
-    }
-
-    if (m_spellInfo->HasEffect(SPELL_EFFECT_ACTIVATE_RUNE))
-    {
-        castFlags |= CAST_FLAG_RUNE_LIST;                    // rune cooldowns list
-        castFlags |= CAST_FLAG_UNKNOWN_19;                   // same as in SMSG_SPELL_GO
-    }
 
     if ( m_casttime && ( m_spellInfo->HasEffect( SPELL_EFFECT_HEAL ) || m_spellInfo->HasEffect( SPELL_EFFECT_HEAL_PCT ) ) 
         || m_spellInfo->IsPeriodicHeal() ) {
@@ -4510,13 +4501,6 @@ void Spell::SendSpellGo()
                 float baseCd = float(player->GetRuneBaseCooldown(i));
                 data << uint8((baseCd - float(player->GetRuneCooldown(i))) / baseCd * 255); // rune cooldown passed
             }
-        }
-        else
-        {
-            data << uint8(0);
-            data << uint8(0);
-            for (uint8 i = 0; i < MAX_RUNES; ++i)
-                data << uint8(0);
         }
     }
 
