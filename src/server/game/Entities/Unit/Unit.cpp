@@ -9903,8 +9903,14 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
         case 49571:
         case 49572:
         {
-            if (!damage)
+            if (!damage || GetTypeId() != TYPEID_PLAYER)
                 return false;
+
+            // Don't apply procs when pet is transformated
+            if (Pet * pet = ToPlayer()->GetPet())
+                if (pet->HasAura(63560))
+                    return false;
+
             break;
         }
         // Will Of The Necropolis Ranks 1-3
