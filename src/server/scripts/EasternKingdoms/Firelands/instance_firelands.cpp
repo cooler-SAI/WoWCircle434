@@ -178,7 +178,7 @@ class instance_firelands : public InstanceMapScript
 			    if (!InstanceScript::SetBossState(type, state))
 				    return false;
 
-                if (type == DATA_RAGNAROS)
+                if (type == DATA_RAGNAROS && state == DONE)
                 {
                     if (instance->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL)
                         DoRespawnGameObject(uiRagnarosCache10, DAY);
