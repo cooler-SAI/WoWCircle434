@@ -260,6 +260,7 @@ class WorldSession
 
         AccountTypes GetSecurity() const { return _security; }
         bool IsPremium() const { return _ispremium; }
+        bool HasCommandsCooldown();
         uint32 GetAccountId() const { return _accountId; }
         Player* GetPlayer() const { return _player; }
         std::string GetPlayerName(bool simple = true) const;
@@ -1068,6 +1069,8 @@ class WorldSession
         time_t timeLastGroupInviteCommand;
         time_t timeLastGuildInviteCommand;
         time_t timelastReloadUi;
+        time_t timeLastServerCommand;
+        time_t timeCharEnumOpcode;
 };
 #endif
 /// @}

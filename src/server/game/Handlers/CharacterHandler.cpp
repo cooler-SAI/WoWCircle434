@@ -287,6 +287,12 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
 
 void WorldSession::HandleCharEnumOpcode(WorldPacket & /*recvData*/)
 {
+    time_t now = time(NULL);
+    if (now - timeCharEnumOpcode < 5)
+        return;
+    else
+        timeCharEnumOpcode = now;
+
     // remove expired bans
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_EXPIRED_BANS);
     CharacterDatabase.Execute(stmt);
@@ -1612,11 +1618,9 @@ void WorldSession::HandleEquipmentSetDelete(WorldPacket &recvData)
 
 void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
 {
-    if (_player->isInCombat())
-        return;
-
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_EQUIPMENT_SET_USE");
 
+    EquipmentSlots startSlot = _player->isInCombat() ? EQUIPMENT_SLOT_MAINHAND : EQUIPMENT_SLOT_START;
     for (uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
     {
         uint64 itemGuid;
@@ -1624,6 +1628,9 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
 
         uint8 srcbag, srcslot;
         recvData >> srcbag >> srcslot;
+
+        if (i < uint32(startSlot))
+            continue;
 
         sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "Item " UI64FMTD ": srcbag %u, srcslot %u", itemGuid, srcbag, srcslot);
 

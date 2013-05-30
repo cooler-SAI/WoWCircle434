@@ -4126,6 +4126,11 @@ void Spell::finish(bool ok)
     if (m_spellInfo->Attributes & SPELL_ATTR0_STOP_ATTACK_TARGET)
         m_caster->AttackStop();
 
+    if (m_castItemGUID && m_caster->GetTypeId() == TYPEID_PLAYER)
+        if (Item* item = m_caster->ToPlayer()->GetItemByGuid(m_castItemGUID))
+            if (item->IsEquipable() && !item->IsEquipped())
+                m_caster->ToPlayer()->ApplyItemEquipSpell(item, false);
+
     switch (m_spellInfo->Id)
     {
         case 78674: // Starsurge
@@ -4326,7 +4331,7 @@ void Spell::SendSpellStart()
          && m_spellInfo->PowerType != POWER_HEALTH)
         castFlags |= CAST_FLAG_POWER_LEFT_SELF;
 
-    if (((m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNES) || m_spellInfo->HasEffect(SPELL_EFFECT_ACTIVATE_RUNE))
+    if (((m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNES) || m_spellInfo->HasEffect(SPELL_EFFECT_ACTIVATE_RUNE)))
         castFlags |= CAST_FLAG_UNKNOWN_19;
 
     if ( m_casttime && ( m_spellInfo->HasEffect( SPELL_EFFECT_HEAL ) || m_spellInfo->HasEffect( SPELL_EFFECT_HEAL_PCT ) ) 

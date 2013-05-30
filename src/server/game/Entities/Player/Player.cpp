@@ -20577,7 +20577,7 @@ void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
         {
             if (idSchoolMask & (1 << i))
             {
-                if (((1 << i) & spellInfo->GetSchoolMask()) && GetSpellCooldownDelay(unSpellId) < unTimeMs)
+                if (((1 << i) & spellInfo->GetSchoolMask()) && GetSpellCooldownDelay(unSpellId) < unTimeMs/IN_MILLISECONDS)
                 {
                     SpellSchools school = GetFirstSchoolInMask(spellInfo->GetSchoolMask());
                     if ((1 << school) != spellInfo->GetSchoolMask())
@@ -23854,6 +23854,8 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         return;
     }
 
+    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item->itemid);
+
     // questitems use the blocked field for other purposes
     if (!qitem && item->is_blocked)
     {
@@ -23874,9 +23876,27 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
 
     ItemPosCountVec dest;
     InventoryResult msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item->itemid, item->count);
+
     if (msg == EQUIP_ERR_OK)
     {
         AllowedLooterSet looters = item->GetAllowedLooters();
+
+        bool canLoot = false;
+        for (AllowedLooterSet::const_iterator itr = looters.begin(); itr != looters.end(); ++itr)
+        {
+            if (*itr == GetGUID())
+            {
+                canLoot = true;
+                break;
+            }
+        }
+
+        if (!canLoot && GetMap()->IsRaidOrHeroicDungeon() && proto && proto->GetMaxStackSize() == 1)
+        {
+            SendEquipError(EQUIP_ERR_NOT_EQUIPPABLE, NULL, NULL, item->itemid);
+            return;
+        }
+
         Item* newitem = StoreNewItem(dest, item->itemid, true, item->randomPropertyId, looters);
 
         if (qitem)

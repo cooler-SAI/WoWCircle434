@@ -271,6 +271,17 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket & recvData)
         return;
     }
 
+    //! If trading
+    if (TradeData* tradeData = _player->GetTradeData())
+    {
+        //! If current item is in trade window (only possible with packet spoofing - silent return)
+        if (tradeData->GetTradeSlotForItem(pItem->GetGUID()) != TRADE_SLOT_INVALID)
+        {
+            _player->SendEquipError(EQUIP_ERR_CANT_SWAP, NULL, NULL);
+            return;
+        }
+    }
+
     if (count)
     {
         uint32 i_count = count;

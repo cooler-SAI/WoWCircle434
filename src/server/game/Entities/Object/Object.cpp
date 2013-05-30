@@ -1817,6 +1817,11 @@ bool WorldObject::IsWithinLOSInMap(const WorldObject* obj) const
     if (GetMapId() == 720 && GetAreaId() == 5766)
         return true;
 
+    // AoE spells
+    if (GetTypeId() == TYPEID_UNIT)
+        if (GetEntry() == 36980 || GetEntry() == 38320 || GetEntry() == 38321 || GetEntry() == 38322)
+            return true;
+
     return IsWithinLOS(ox, oy, oz);
 }
 

@@ -3159,6 +3159,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 88453:
                 spellInfo->Speed = 0;
                 break;
+            case 15850: // Chilled
+            case 16927: // Chilled
+            case 20005: // Chilled
+                spellInfo->Mechanic = MECHANIC_SNARE;
+                break;
             // Master Marksman Aim Shot proc
             case 82928:
                 spellInfo->CastTimeMax = 0;

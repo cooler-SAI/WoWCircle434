@@ -456,6 +456,9 @@ bool ChatHandler::ParseCommands(const char* text)
     if (text[0] == '!' || text[0] == '.')
         ++text;
 
+    if (m_session && AccountMgr::IsPlayerAccount(m_session->GetSecurity()) && m_session->HasCommandsCooldown())
+        return false;
+
     if (!ExecuteCommandInTable(getCommandTable(), text, fullcmd))
     {
         if (m_session && AccountMgr::IsPlayerAccount(m_session->GetSecurity()))

@@ -924,14 +924,15 @@ void WorldSession::HandleRaidReadyCheckOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleRaidReadyCheckFinishedOpcode(WorldPacket& /*recvData*/)
 {
-    //Group* group = GetPlayer()->GetGroup();
-    //if (!group)
-    //    return;
+    Group* group = GetPlayer()->GetGroup();
+    if (!group)
+        return;
 
-    //if (!group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
-    //    return;
+    if (!group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
+        return;
 
-    // Is any reaction need?
+    WorldPacket data(MSG_RAID_READY_CHECK_FINISHED, 0);
+    group->BroadcastPacket(&data, false, -1); 
 }
 
 void _WriteUnitAuras(Unit* unit, WorldPacket* data, uint64 mask)
