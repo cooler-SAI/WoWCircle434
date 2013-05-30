@@ -7143,7 +7143,6 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
         damage = uint32(target->CountPctFromMaxHealth(damage));
 
     bool crit = false;
-
     if (m_fixed_periodic.HasCritChance())
         crit = roll_chance_f(m_fixed_periodic.GetCriticalChance());
     else
@@ -7366,6 +7365,12 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     }
     else
     {
+        
+        if (m_fixed_periodic.HasDamage())
+            damage = m_fixed_periodic.GetFixedDamage();
+        else
+            damage = caster->SpellHealingBonusDone(target, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
+
         // Wild Growth = amount + (6 - 2*doneTicks) * ticks* amount / 100
         if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DRUID && m_spellInfo->SpellIconID == 2864)
         {
@@ -7378,19 +7383,16 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
 
             damage += addition;
         }
-        if (m_fixed_periodic.HasDamage())
-            damage = m_fixed_periodic.GetFixedDamage();
-        else
-            damage = caster->SpellHealingBonusDone(target, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
 
         damage = target->SpellHealingBonusTaken(caster, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
+    
     }
 
     bool crit = false;
     if (m_fixed_periodic.HasCritChance())
-        crit = m_fixed_periodic.GetCriticalChance();
+        crit = roll_chance_f(m_fixed_periodic.GetCriticalChance());
     else
-        IsPeriodicTickCrit(target, caster);
+        crit = IsPeriodicTickCrit(target, caster);
     
     if (crit)
         damage = caster->SpellCriticalHealingBonus(m_spellInfo, damage, target);
