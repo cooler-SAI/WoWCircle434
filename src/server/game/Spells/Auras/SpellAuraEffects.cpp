@@ -6657,6 +6657,16 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
             {
                 switch (auraId)
                 {
+                    // Shadow Cloak, Illidan, Well of Eternity
+                    case 103004:
+                        if (target->isInCombat())
+                            return;
+
+                        if (!target->HasAura(102994))
+                            target->CastSpell(target, 102994, true);
+
+                        target->CastSpell(target, 103020, true);
+                        return;
                     // Thaumaturgy Channel
                     case 9712:
                         triggerSpellId = 21029;

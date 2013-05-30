@@ -1815,7 +1815,8 @@ bool WorldObject::IsWithinLOSInMap(const WorldObject* obj) const
 
     // Hack fix for Alysrazor
     if (GetMapId() == 720 && GetAreaId() == 5766)
-        return true;
+        if ((GetTypeId() == TYPEID_PLAYER) || (obj->GetTypeId() == TYPEID_PLAYER))
+            return true;
 
     // AoE spells
     if (GetTypeId() == TYPEID_UNIT)
