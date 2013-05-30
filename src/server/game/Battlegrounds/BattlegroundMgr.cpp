@@ -1446,7 +1446,12 @@ BattlegroundTypeId BattlegroundMgr::GetRandomBG(BattlegroundTypeId bgTypeId)
     BattlegroundSelectionWeightMap selectionWeights;
 
     if (bgTypeId == BATTLEGROUND_RATED_10_VS_10)
-        return BATTLEGROUND_WS;
+        switch (urand(0,2))
+        {
+            case 0: return BATTLEGROUND_WS;
+            case 1: return BATTLEGROUND_TP;
+            case 2: return BATTLEGROUND_BFG;
+        }
 	
     if (bgTypeId == BATTLEGROUND_AA)
     {

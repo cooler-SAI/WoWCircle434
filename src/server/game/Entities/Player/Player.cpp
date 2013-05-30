@@ -7447,6 +7447,11 @@ void Player::UpdateArea(uint32 newArea)
 
     AreaTableEntry const* area = GetAreaEntryByAreaID(newArea);
     pvpInfo.inFFAPvPArea = area && (area->flags & AREA_FLAG_ARENA);
+	
+    if (Battleground* bg = GetBattleground())
+        if (bg->IsRBG())
+            pvpInfo.inFFAPvPArea = true;
+	
     UpdatePvPState(true);
 
     UpdateAreaDependentAuras(newArea);

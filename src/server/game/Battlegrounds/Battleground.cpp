@@ -896,7 +896,8 @@ void Battleground::EndBattleground(uint32 winner)
                     }
             }
 
-            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, 1);
+            if (IsRBG())
+                player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_BATTLEGROUND, GetMapId());
         }
         else
         {
@@ -913,10 +914,6 @@ void Battleground::EndBattleground(uint32 winner)
 
         if (IsRBG())
         {
-            uint32 realTeam = player->GetTeam();
-            if (realTeam != team)
-                player->setFactionForRace(player->getRace());
-
             uint32 loser = winner == HORDE ? ALLIANCE : HORDE;
             player->getRBG()->FinishGame(team == winner, GetArenaMatchmakerRating(team == winner ? loser : winner));
 
@@ -994,13 +991,6 @@ void Battleground::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
         {
             player->ResurrectPlayer(1.0f);
             player->SpawnCorpseBones();
-        }
-		
-        if (IsRBG())
-        {
-            uint32 realTeam = player->GetTeam();
-            if (realTeam != team)
-                player->setFactionForRace(player->getRace());
         }
     }
 
@@ -1176,13 +1166,6 @@ void Battleground::AddPlayer(Player* player)
 
     player->RemoveAurasByType(SPELL_AURA_MOUNTED);
     player->RemoveAurasByType(SPELL_AURA_FLY);
-
-    if (IsRBG())
-    {
-        uint32 realTeam = player->GetTeam();
-        if (realTeam != team)
-            player->setFaction(team == ALLIANCE ? 1 : 2);
-    }
 	
     // add arena specific auras
     if (isArena())
