@@ -14372,6 +14372,7 @@ void Player::PrepareQuestMenu(uint64 guid)
 
 void Player::SendPreparedQuest(uint64 guid)
 {
+        sLog->outError(LOG_FILTER_GENERAL, "TRANSPORT:");
     QuestMenu& questMenu = PlayerTalkClass->GetQuestMenu();
     if (questMenu.Empty())
         return;
@@ -14408,6 +14409,7 @@ void Player::SendPreparedQuest(uint64 guid)
                 {
                     AddQuest(quest, object);
                     if (CanCompleteQuest(questId))
+       sLog->outInfo(LOG_FILTER_SERVER_LOADING, "SendPreparedQuest ========= IN");
                         CompleteQuest(questId);
                 }
 
@@ -14570,6 +14572,8 @@ bool Player::CanAddQuest(Quest const* quest, bool msg)
 
 bool Player::CanCompleteQuest(uint32 quest_id)
 {
+        sLog->outError(LOG_FILTER_GENERAL, "CanCompleteQuest ========== in");
+        
     if (quest_id)
     {
         Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id);
@@ -14616,16 +14620,25 @@ bool Player::CanCompleteQuest(uint32 quest_id)
                 if (qInfo->GetPlayersSlain() != 0 && q_status.PlayerCount < qInfo->GetPlayersSlain())
                     return false;
 
-           for (uint8 i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; i++)
+/*          for (uint32 i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; i++)
+         {
+         uint32 cuid = qInfo->RequiredCurrencyId[i];
+         uint32 countc = qInfo->RequiredCurrencyCount[i];
             if (qInfo->RequiredCurrencyId[i] && !HasCurrency(qInfo->RequiredCurrencyId[i], qInfo->RequiredCurrencyCount[i]))
-                return false;
 
+        sLog->outError(LOG_FILTER_GENERAL, "CanCompleteQuest ========== CurrencyId %u count %u", cuid, countc);
+                return false;
+        //    else if (CanCompleteQuest(quest_id))
+         // CompleteQuest(qInfo);
+        //  CompleteQuest(quest_id);
+          }
+*/          
             //if (qInfo->HasSpecialFlag(QUEST_SPECIAL_FLAGS_CURRENCY))
             //{
-                 for (uint8 i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; i++)
+            //     for (uint8 i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; i++)
             //    {
-                    if (qInfo->RequiredCurrencyCount[i]!= 0 && q_status.CurrencyCount[i] < qInfo->RequiredCurrencyCount[i])
-                        return false;
+            //        if (qInfo->RequiredCurrencyCount[i]!= 0 && q_status.CurrencyCount[i] < qInfo->RequiredCurrencyCount[i])
+            //            return false;
             //    }
             //}
 
@@ -14672,8 +14685,9 @@ bool Player::CanCompleteRepeatableQuest(Quest const* quest)
 
 bool Player::CanRewardQuest(Quest const* quest, bool msg)
 {
+        sLog->outError(LOG_FILTER_GENERAL, ":CanRewardQuest check========== in");
     // not auto complete quest and not completed quest (only cheating case, then ignore without message)
-    if (!quest->IsDFQuest() && !quest->IsAutoComplete() && !(quest->GetFlags() & QUEST_FLAGS_AUTOCOMPLETE) && GetQuestStatus(quest->GetQuestId()) != QUEST_STATUS_COMPLETE)
+    if (!quest->IsCurrQuest() && !quest->IsDFQuest() && !quest->IsAutoComplete() && !(quest->GetFlags() & QUEST_FLAGS_AUTOCOMPLETE) && GetQuestStatus(quest->GetQuestId()) != QUEST_STATUS_COMPLETE)
         return false;
 
     // daily quest can't be rewarded (25 daily quest already completed)
@@ -14702,19 +14716,36 @@ bool Player::CanRewardQuest(Quest const* quest, bool msg)
         }
     }
 
-    for (uint8 i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; i++)
+    sLog->outError(LOG_FILTER_GENERAL, ":CanRewardQuest check========== before");
+    for (uint32 i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; i++)
+{
+    sLog->outError(LOG_FILTER_GENERAL, ":CanRewardQuest check=======curr=== ");
         if (quest->RequiredCurrencyId[i] && !HasCurrency(quest->RequiredCurrencyId[i], quest->RequiredCurrencyCount[i]))
-            return false; 
-	
+    {
+        sLog->outError(LOG_FILTER_GENERAL, ":CanRewardQuest check========== QUEST_REQUIRED_CURRENCY_COUNT %u", quest);
+      // Quest const* quest = sObjectMgr->GetQuestTemplate(entry);
+    //    CompleteQuest(entry);
+            return false;
+    }
+    //    else
+    sLog->outError(LOG_FILTER_GENERAL, ":CanRewardQuest check=======curr true=== ");
+          // return true;
+}
+
+//    if (CanCompleteQuest(quest->GetQuestId()))
+//    CompleteQuest(quest->GetQuestId());
+                                            
     // prevent receive reward with low money and GetRewOrReqMoney() < 0
     if (quest->GetRewOrReqMoney() < 0 && !HasEnoughMoney(-int64(quest->GetRewOrReqMoney())))
         return false;
 
+    sLog->outError(LOG_FILTER_GENERAL, ":CanRewardQuest check========== out");
     return true;
 }
 
 bool Player::CanRewardQuest(Quest const* quest, uint32 reward, bool msg)
 {
+        sLog->outError(LOG_FILTER_GENERAL, "CanRewardQuest2 ========== in");
     // prevent receive reward with quest items in bank or for not completed quest
     if (!CanRewardQuest(quest, msg))
         return false;
