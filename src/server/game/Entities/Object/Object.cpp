@@ -3297,7 +3297,7 @@ void WorldObject::MovePosition(Position &pos, float dist, float angle)
             destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
         }
         // we have correct destz now
-        else
+        else if (IsWithinLOS(destx, desty, destz))
         {
             pos.Relocate(destx, desty, destz);
             break;
