@@ -324,18 +324,59 @@ class boss_murozond : public CreatureScript
 
             void ActivateMirrors()
             {
-                std::list<Creature*> mirrorList;
-                me->GetCreatureListWithEntryInGrid(mirrorList, NPC_MIRROR, 500.0f);
+                //std::list<Creature*> mirrorList;
+                //me->GetCreatureListWithEntryInGrid(mirrorList, NPC_MIRROR, 500.0f);
                 
-                if (mirrorList.empty())
-                    return;
+                //if (mirrorList.empty())
+                //    return;
 
-                for (std::list<Creature*>::const_iterator itr = mirrorList.begin(); itr != mirrorList.end(); ++itr)
-                {
-                    if (Creature* pMirror = (*itr)->ToCreature())
-                        if (pMirror->isAlive() && pMirror->IsInWorld())
-                            pMirror->AI()->DoAction(ACTION_HOURGLASS);
-                }
+                //for (std::list<Creature*>::const_iterator itr = mirrorList.begin(); itr != mirrorList.end(); ++itr)
+                //{
+                //    if (Creature* pMirror = (*itr)->ToCreature())
+                //        if (pMirror->isAlive() && pMirror->IsInWorld())
+                //            pMirror->AI()->DoAction(ACTION_HOURGLASS);
+                //}
+                Map::PlayerList const &PlayerList = instance->instance->GetPlayers();
+                if (!PlayerList.isEmpty())
+                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                        if (Player* pPlayer = i->getSource())
+                        {
+                            if (pPlayer->IsInWorld())
+                                continue;
+
+                            if (!pPlayer->isAlive())
+                                pPlayer->ResurrectPlayer(1.0f, false);
+
+                            std::list<uint32> spell_list;
+                            SpellCooldowns cd_list = pPlayer->GetSpellCooldowns();
+                            if (!cd_list.empty())
+                            {
+                                for (SpellCooldowns::const_iterator itr = cd_list.begin(); itr != cd_list.end(); ++itr)
+                                {
+                                    SpellInfo const* entry = sSpellMgr->GetSpellInfo(itr->first);
+                                    if (entry &&
+                                        entry->RecoveryTime <= 10 * MINUTE * IN_MILLISECONDS &&
+                                        entry->CategoryRecoveryTime <= 10 * MINUTE * IN_MILLISECONDS)
+                                    {
+                                        spell_list.push_back(itr->first);
+                                    }
+                                }
+                            }
+
+                            if (!spell_list.empty())
+                            {
+                                for (std::list<uint32>::const_iterator itr = spell_list.begin(); itr != spell_list.end(); ++itr)
+                                    pPlayer->RemoveSpellCooldown((*itr), true, true);
+                                pPlayer->SendClearCooldownMap(pPlayer);
+                            }
+
+                            pPlayer->RemoveAura(SPELL_TEMPORAL_BLAST);
+
+                            pPlayer->SetHealth(pPlayer->GetMaxHealth());
+                            pPlayer->SetPower(pPlayer->getPowerType(), pPlayer->GetMaxPower(pPlayer->getPowerType()));
+
+                            pPlayer->CastSpell(pPlayer, SPELL_BLESSING_OF_BRONZE_DRAGONS, true);
+                        }
             }
         };   
 };
