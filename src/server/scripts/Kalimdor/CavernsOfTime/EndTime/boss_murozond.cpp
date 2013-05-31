@@ -341,7 +341,7 @@ class boss_murozond : public CreatureScript
                     for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                         if (Player* pPlayer = i->getSource())
                         {
-                            if (pPlayer->IsInWorld())
+                            if (!pPlayer->IsInWorld())
                                 continue;
 
                             if (!pPlayer->isAlive())
