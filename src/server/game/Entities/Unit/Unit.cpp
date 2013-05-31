@@ -6926,17 +6926,28 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             {
                 // Sudden Eclipse - PVP Druid Set Bonus
                 case 46832:
-                {
+                {   
+                    // disabled if has eclipse
+                    if (HasAura(48518) || HasAura(48517))
+                        return false;
+
                     triggered_spell_id = 95746;
-                    if ((!HasAura(67484) && HasAura(67483))
-                        || GetPower(POWER_ECLIPSE) == 0)
-                        {
-                            basepoints0 = 20;
-                        }
-                        else
-                        {
-                            basepoints0 = -13;
-                        }
+
+                    if ((!HasAura(67484) && HasAura(67483)))
+                    {
+                        basepoints0 = 20;
+
+                        if (!HasAura(67483))
+                            CastSpell(this, 67483, true);
+                    }
+                    else
+                    {
+                        basepoints0 = -13;
+
+                        if (!HasAura(67484))
+                            CastSpell(this, 67484, true);
+                    }
+
                     target = victim;
                     break;
                 }

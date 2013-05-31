@@ -6788,9 +6788,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 46832:
                 spellInfo->Effects[0].SpellClassMask = 0;
                 break;
+            // Eclipse Energy Sudden Eclipse proc
             case 95746:
                 spellInfo->Attributes |= SPELL_ATTR0_NEGATIVE_1;
                 spellInfo->Effects[0].BasePoints = 20;
+                spellInfo->AttributesEx2 |= SPELL_ATTR2_TRIGGERED_CAN_TRIGGER_PROC;
                 break;
             case 79577:
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED;
