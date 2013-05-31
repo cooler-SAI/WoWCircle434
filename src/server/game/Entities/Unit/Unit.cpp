@@ -12353,6 +12353,8 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
                 case 71646: // Item - Bauble of True Blood 25m
                 case 85222: // Paladin - Light of Dawn
                 case 73685: // Shaman - Unleash Elements - Unleash Life 
+                case 86958: // Shaman - Cleansing Waters
+                case 86961:
                     break;
                 default:
                     return 0.0;
