@@ -498,6 +498,8 @@ class boss_ragnaros_firelands : public CreatureScript
 
                 Talk(SAY_DEATH_2);
 
+                AddSmoulderingAura(me);
+
                 // Achievement Ragnar'os
                 if (Lavalogged >= 3)
                     instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_ACHIEVEMENT, 0, 0, me); 
