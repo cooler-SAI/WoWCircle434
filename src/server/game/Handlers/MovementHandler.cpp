@@ -269,8 +269,15 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
 
     ASSERT(mover != NULL);                      // there must always be a mover
 
-    Player* plrMover = mover->ToPlayer();
-    bool fall = recvPacket.GetOpcode() == MSG_MOVE_FALL_LAND && plrMover && !plrMover->isInFlight();
+    Player *plrMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL;
+    Vehicle *vehMover = mover->GetVehicleKit();
+    if (vehMover)
+        if (mover->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+            if (Unit *charmer = mover->GetCharmer())
+                if (charmer->GetTypeId() == TYPEID_PLAYER)
+                    plrMover = (Player*)charmer;
+
+    bool fall = recvPacket.GetOpcode() == MSG_MOVE_FALL_LAND && plrMover && !plrMover->isInFlight() && !vehMover;
 
     if (fall)
     {

@@ -1475,12 +1475,21 @@ void MovementInfo::OutDebug() const
 bool MovementInfo::Check(Player* target, Opcodes opcode)
 {
     //if (opcode == CMSG_FORCE_MOVE_ROOT_ACK || opcode == CMSG_FORCE_MOVE_UNROOT_ACK)
-       // return true; // Skip check for this opcode
+    //    return true; // Skip check for this opcode
+
+    if (opcode == CMSG_MOVE_NOT_ACTIVE_MOVER)
+        return true; // Skip check for this opcode
 
     Unit* mover = target->m_mover;
     ASSERT(mover != NULL);                                  // there must always be a mover
 
-    Player* plMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL;
+    Player *plMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL;
+    Vehicle *vehMover = mover->GetVehicleKit();
+    if (vehMover)
+        if (mover->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+            if (Unit *charmer = mover->GetCharmer())
+                if (charmer->GetTypeId() == TYPEID_PLAYER)
+                    plMover = (Player*)charmer;
 
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
     if (plMover && plMover->IsBeingTeleported())
@@ -1548,7 +1557,13 @@ bool MovementInfo::AcceptClientChanges(Player* player, MovementInfo& client, Opc
     Unit* mover = player->m_mover;
     ASSERT(mover != NULL);                                  // there must always be a mover
 
-    Player* plMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL;
+    Player *plMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL;
+    Vehicle *vehMover = mover->GetVehicleKit();
+    if (vehMover)
+        if (mover->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+            if (Unit *charmer = mover->GetCharmer())
+                if (charmer->GetTypeId() == TYPEID_PLAYER)
+                    plMover = (Player*)charmer;
 
     if (!client.Check(player, opcode))
         return false;
@@ -1587,6 +1602,17 @@ bool MovementInfo::AcceptClientChanges(Player* player, MovementInfo& client, Opc
         client.t_seat = -1;
     }
 
+    if (plMover && ((client.flags & MOVEMENTFLAG_SWIMMING) != 0) != plMover->IsInWater())
+    {
+        // now client not include swimming flag in case jumping under water
+        plMover->SetInWater(!plMover->IsInWater() || plMover->GetBaseMap()->IsUnderWater(client.pos.GetPositionX(), client.pos.GetPositionY(), client.pos.GetPositionZ()));
+    }
+
+    this->time = getMSTime();
+    this->guid = mover->GetGUID();
+    //memcpy(this, &client, sizeof(MovementInfo));
+    memcpy(&mover->m_movementInfo, &client, sizeof(MovementInfo));
+
     // this is almost never true (not sure why it is sometimes, but it is), normally use mover->IsVehicle()
     if (mover->GetVehicle())
     {
@@ -1596,21 +1622,28 @@ bool MovementInfo::AcceptClientChanges(Player* player, MovementInfo& client, Opc
 
     mover->UpdatePosition(client.pos);
 
-    if (plMover && ((client.flags & MOVEMENTFLAG_SWIMMING) != 0) != plMover->IsInWater())
-    {
-        // now client not include swimming flag in case jumping under water
-        plMover->SetInWater(!plMover->IsInWater() || plMover->GetBaseMap()->IsUnderWater(client.pos.GetPositionX(), client.pos.GetPositionY(), client.pos.GetPositionZ()));
-    }
-
-    memcpy(this, &client, sizeof(MovementInfo));
-    this->time = getMSTime();
-
-    if (plMover)                                            // nothing is charmed, or player charmed
+    if (plMover && !vehMover)                                            // nothing is charmed, or player charmed
     {
         plMover->UpdateFallInformationIfNeed(client);
 
-        AreaTableEntry const* zone = GetAreaEntryByAreaID(plMover->GetAreaId());
-        if (client.pos.GetPositionZ() < (zone ? zone->MaxDepth : -500.0f))
+        // that's too slow
+        //AreaTableEntry const* zone = GetAreaEntryByAreaID(plMover->GetAreaId());
+        float underMapValueZ = -500.0f;
+        switch (plMover->GetMapId())
+        {
+            case 617: underMapValueZ = 3.0f; break; // Dalaran Sewers
+            case 0:                                 // Vajsh'ir
+            {
+                if (plMover->GetZoneId() == 5144
+                    || plMover->GetZoneId() == 5145
+                    || plMover->GetZoneId() == 4815
+                    || plMover->GetZoneId() == 4816
+                    || plMover->GetZoneId() == 5146)
+                    underMapValueZ = -3000.0f;
+                break;
+            }
+        }
+        if (client.pos.GetPositionZ() < underMapValueZ)
         {
             if (!(plMover->InBattleground()
                 && plMover->GetBattleground()

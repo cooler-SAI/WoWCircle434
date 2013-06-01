@@ -9305,7 +9305,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             case SPELLFAMILY_GENERIC:
                 switch (auraSpellInfo->Id)
                 {
-                    case 99399: // Burning Wound
+                    case 99399: // Burning Wound, Ragnaros, Firelands
                     case 101238:
                     case 101239:
                     case 101240:
@@ -20981,6 +20981,8 @@ void Unit::WriteMovementInfo(WorldPacket &data)
     }
 
     Unit* mover = GetCharmerGUID() ? GetCharmer() : this;
+    if (Player const* player = ToPlayer())
+        mover = player->m_mover;
 
     bool hasTransportData = mover->GetTransport() != NULL;
     bool hasTimestamp = GetTypeId() == TYPEID_PLAYER ? (mover->m_movementInfo.time != 0) : true;
