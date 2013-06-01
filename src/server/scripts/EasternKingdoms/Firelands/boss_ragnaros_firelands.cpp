@@ -1015,7 +1015,7 @@ class boss_ragnaros_firelands : public CreatureScript
                 DoCast(me, SPELL_LEGS_SUBMERGE);
                 Talk(SAY_DEATH_1);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
-                me->SummonGameObject(RAID_MODE(GO_CACHE_OF_THE_FIRELORD_10,GO_CACHE_OF_THE_FIRELORD_25,GO_CACHE_OF_THE_FIRELORD_10,GO_CACHE_OF_THE_FIRELORD_25), 1016.043f, -57.436f, 55.333f, 3.151f, 0, 0, 0, 0, 70000);
+                me->SummonGameObject(RAID_MODE(GO_CACHE_OF_THE_FIRELORD_10,GO_CACHE_OF_THE_FIRELORD_25,GO_CACHE_OF_THE_FIRELORD_10h,GO_CACHE_OF_THE_FIRELORD_25h), 1016.043f, -57.436f, 55.333f, 3.151f, 0, 0, 0, 0, 70000);
                 me->AddAura(RAID_MODE(SPELL_SUBMERGE_AURA, SPELL_SUBMERGE_AURA_25, SPELL_SUBMERGE_AURA_10H, SPELL_SUBMERGE_AURA_25H), me);
                 
                 // Achievement Ragnar'os

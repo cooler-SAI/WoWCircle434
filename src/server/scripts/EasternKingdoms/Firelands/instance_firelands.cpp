@@ -48,6 +48,8 @@ class instance_firelands : public InstanceMapScript
                 uiRagnarosFloor = 0;
                 uiRagnarosCache10 = 0;
                 uiRagnarosCache25 = 0;
+                uiRagnarosCache10h = 0;
+                uiRagnarosCache25h = 0;
                 uiTimer = 0;
                 bEvent = false;
                 creaturePortals.clear();
@@ -118,6 +120,12 @@ class instance_firelands : public InstanceMapScript
                         break;
                     case GO_CACHE_OF_THE_FIRELORD_25:
                         uiRagnarosCache25 = pGo->GetGUID();
+                        break;
+                    case GO_CACHE_OF_THE_FIRELORD_10h:
+                        uiRagnarosCache10h = pGo->GetGUID();
+                        break;
+                    case GO_CACHE_OF_THE_FIRELORD_25h:
+                        uiRagnarosCache25h = pGo->GetGUID();
                         break;
                 }
                     }
@@ -288,6 +296,8 @@ class instance_firelands : public InstanceMapScript
                 uint64 uiRagnarosFloor;
                 uint64 uiRagnarosCache10;
                 uint64 uiRagnarosCache25;
+                uint64 uiRagnarosCache10h;
+                uint64 uiRagnarosCache25h;
                 std::list<GameObject*> gameobjectPortals;
                 std::list<Creature*> creaturePortals;
         };
