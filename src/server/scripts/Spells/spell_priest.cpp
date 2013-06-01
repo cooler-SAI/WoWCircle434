@@ -382,48 +382,6 @@ class spell_pri_vampiric_touch : public SpellScriptLoader
         }
 };
 
-class spell_priest_renew : public SpellScriptLoader
-{
-    public:
-        spell_priest_renew() : SpellScriptLoader("spell_priest_renew") { }
-
-        class spell_priest_renew_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_priest_renew_AuraScript);
-
-            bool Load()
-            {
-                return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
-            }
-
-            void HandleApplyEffect(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-            {
-                if (Unit* caster = GetCaster())
-                {
-                    // Empowered Renew
-                    if (AuraEffect const* empoweredRenewAurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, PRIEST_ICON_ID_EMPOWERED_RENEW_TALENT, EFFECT_1))
-                    {
-                        uint32 heal = caster->SpellHealingBonusDone(GetTarget(), GetSpellInfo(), GetEffect(EFFECT_0)->GetAmount(), DOT);
-                        heal = GetTarget()->SpellHealingBonusTaken(caster, GetSpellInfo(), heal, DOT);
-
-                        int32 basepoints0 = empoweredRenewAurEff->GetAmount() * GetEffect(EFFECT_0)->GetTotalTicks() * int32(heal) / 100;
-                        caster->CastCustomSpell(GetTarget(), PRIEST_SPELL_EMPOWERED_RENEW, &basepoints0, NULL, NULL, true, NULL, aurEff);
-                    }
-                }
-            }
-
-            void Register()
-            {
-                OnEffectApply += AuraEffectApplyFn(spell_priest_renew_AuraScript::HandleApplyEffect, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_priest_renew_AuraScript();
-        }
-};
-
 class spell_pri_shadow_word_death : public SpellScriptLoader
 {
     public:
@@ -543,7 +501,6 @@ void AddSC_priest_spell_scripts()
     new spell_pri_mind_sear();
     new spell_pri_prayer_of_mending_heal();
     new spell_pri_vampiric_touch();
-    new spell_priest_renew();
     new spell_pri_shadow_word_death();
     new spell_pri_shadowform();
     new spell_pri_improved_devouring_plague();

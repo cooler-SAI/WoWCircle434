@@ -132,5 +132,5 @@ class boss_vanessa_vancleef : public CreatureScript
 
 void AddSC_boss_vanessa_vancleef()
 {
-    new boss_vanessa_vancleef();
+    //new boss_vanessa_vancleef();
 }

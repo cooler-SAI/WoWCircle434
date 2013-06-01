@@ -398,7 +398,7 @@ public:
                 pInstance->SetData(DATA_DLG_ENTRANCE, DONE);
             }
         }
-        return true;
+        return false;
     }
 };
 

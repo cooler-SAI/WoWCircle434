@@ -1712,13 +1712,13 @@ void AddSC_firelands()
     new spell_firelands_molten_lord_summon_lava_jets();
 
     // alysrazor event
-    new npc_harbinger_of_flame();
+    /*new npc_harbinger_of_flame();
     new npc_blazing_monstrosity();
     new npc_molten_barrage();
     new npc_egg_pile();
     new spell_alysrazor_cosmetic_egg_xplosion();
     new spell_alysrazor_turn_monstrosity();
-    new spell_alysrazor_aggro_closest();
+    new spell_alysrazor_aggro_closest();*/
 
     new npc_firelands_dull_focus();
     new npc_firelands_circle_of_thorns_portal();

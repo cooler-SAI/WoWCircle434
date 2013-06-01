@@ -109,7 +109,6 @@ enum Spells
     SPELL_LEAVE_TWILIGHT_REALM          = 74812,
     SPELL_TWILIGHT_PHASING              = 74808, // Phase spell from phase 1 to phase 2
     SPELL_SUMMON_TWILIGHT_PORTAL        = 74809, // Summons go 202794
-    SPELL_SUMMON_EXIT_PORTALS           = 74805, // Custom spell created in spell_dbc.
     SPELL_TWILIGHT_MENDING              = 75509,
     SPELL_TWILIGHT_REALM                = 74807,
     SPELL_DUSK_SHROUD                   = 75476,
@@ -770,7 +769,7 @@ class npc_halion_controller : public CreatureScript
                                 }
 
                                 // Summon Twilight portals
-                                DoCast(me, SPELL_SUMMON_EXIT_PORTALS);
+                                //DoCast(me, SPELL_SUMMON_EXIT_PORTALS);
 
                                 _instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TOGGLE, 1);
                                 // Hardcoding doesn't really matter here.
@@ -1701,41 +1700,6 @@ class spell_halion_twilight_phasing : public SpellScriptLoader
         }
 };
 
-class spell_halion_summon_exit_portals : public SpellScriptLoader
-{
-    public:
-        spell_halion_summon_exit_portals() : SpellScriptLoader("spell_halion_summon_exit_portals") { }
-
-        class spell_halion_summon_exit_portals_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_halion_summon_exit_portals_SpellScript);
-
-            void OnSummon(SpellEffIndex effIndex)
-            {
-                WorldLocation summonPos = *GetExplTargetDest();
-                Position offset = {0.0f, 20.0f, 0.0f, 0.0f};
-                if (effIndex == EFFECT_1)
-                    offset.m_positionY = -20.0f;
-
-                summonPos.RelocateOffset(offset);
-
-                SetExplTargetDest(summonPos);
-                GetHitDest()->RelocateOffset(offset);
-            }
-
-            void Register()
-            {
-                OnEffectLaunch += SpellEffectFn(spell_halion_summon_exit_portals_SpellScript::OnSummon, EFFECT_0, SPELL_EFFECT_SUMMON_OBJECT_WILD);
-                OnEffectLaunch += SpellEffectFn(spell_halion_summon_exit_portals_SpellScript::OnSummon, EFFECT_1, SPELL_EFFECT_SUMMON_OBJECT_WILD);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_halion_summon_exit_portals_SpellScript();
-        }
-};
-
 void AddSC_boss_halion()
 {
     new boss_halion();
@@ -1759,7 +1723,6 @@ void AddSC_boss_halion()
     new spell_halion_damage_aoe_summon();
     new spell_halion_twilight_realm_handlers("spell_halion_leave_twilight_realm", SPELL_SOUL_CONSUMPTION, false);
     new spell_halion_twilight_realm_handlers("spell_halion_enter_twilight_realm", SPELL_FIERY_COMBUSTION, true);
-    new spell_halion_summon_exit_portals();
     new spell_halion_twilight_phasing();
     new spell_halion_twilight_cutter();
     new spell_halion_clear_debuffs();

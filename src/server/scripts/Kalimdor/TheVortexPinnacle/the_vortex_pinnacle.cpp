@@ -1208,5 +1208,5 @@ void AddSC_the_vortex_pinnacle()
     new npc_turbulent_squall();
     new npc_wild_vortex();
     new spell_minister_of_air_lightning_lash();
-    new spell_howling_gale_howling_gale();
+    //new spell_howling_gale_howling_gale();
 };

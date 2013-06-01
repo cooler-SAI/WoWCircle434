@@ -363,7 +363,7 @@ void AddSC_boss_akilzon()
 {
     new boss_akilzon();
     new npc_akilzon_soaring_eagle();
-    new npc_akilzon_amani_kidnapper();
+    //new npc_akilzon_amani_kidnapper();
     new spell_akilzon_electrical_storm();
     new spell_akilzon_electrical_storm_dmg();
 }
