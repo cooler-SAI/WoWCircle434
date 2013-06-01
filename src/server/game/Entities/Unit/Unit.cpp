@@ -10211,6 +10211,9 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
         case 16176:
         case 16235:
         {
+            if (!victim)
+                return false;
+
             AuraEffect *aura_eff = victim->GetAuraEffect(105284, EFFECT_0);
 
             int32 basepoints_ = std::min((aura_eff ? aura_eff->GetAmount() : 0.0f) + 
