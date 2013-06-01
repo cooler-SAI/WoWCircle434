@@ -14,6 +14,7 @@ set(scripts_STAT_SRCS
   World/areatrigger_scripts.cpp
   World/boss_emerald_dragons.cpp
   World/chat_log.cpp
+  World/duel_scripts.cpp
   World/go_scripts.cpp
   World/guards.cpp
   World/item_scripts.cpp
