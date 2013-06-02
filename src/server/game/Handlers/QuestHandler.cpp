@@ -148,8 +148,20 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
         if (_player->GetDivider() != 0)
         {
             Player* player = ObjectAccessor::FindPlayer(_player->GetDivider());
+            if (!player)
+            {
+                _player->SetDivider(0);
+                return;
+            }
+
             if (player)
             {
+                if (!player->CanShareQuest(questId))
+                {
+                    player->SendPushToPartyResponse(_player, QUEST_PARTY_MSG_CANT_TAKE_QUEST);
+                    _player->SetDivider(0);
+                    return;
+                }
                 player->SendPushToPartyResponse(_player, QUEST_PARTY_MSG_ACCEPT_QUEST);
                 _player->SetDivider(0);
             }
