@@ -1079,12 +1079,13 @@ void AchievementMgr<T>::UpdateAchievementCriteria(AchievementCriteriaTypes type,
     if (type >= ACHIEVEMENT_CRITERIA_TYPE_TOTAL)
         return;
 
-    if (!referencePlayer)
+    if (!IsGuild<T>() && !referencePlayer)
         return;
 
     // disable for gamemasters with GM-mode enabled
-    if (referencePlayer && referencePlayer->isGameMaster())
-        return;
+    if (referencePlayer)
+        if (referencePlayer->isGameMaster())
+            return;
 
     // Lua_GetGuildLevelEnabled() is checked in achievement UI to display guild tab
     if (IsGuild<T>() && !sWorld->getBoolConfig(CONFIG_GUILD_LEVELING_ENABLED))
@@ -2339,12 +2340,14 @@ bool AchievementMgr<T>::CanUpdateCriteria(AchievementCriteriaEntry const* criter
          break;
     }
 
-    if (achievement->mapID != -1 && referencePlayer->GetMapId() != uint32(achievement->mapID))
-        return false;
+    if (referencePlayer) 
+        if (achievement->mapID != -1 && referencePlayer->GetMapId() != uint32(achievement->mapID))
+            return false;
 
-    if ((achievement->requiredFaction == ACHIEVEMENT_FACTION_HORDE    && referencePlayer->GetTeam() != HORDE) ||
-        (achievement->requiredFaction == ACHIEVEMENT_FACTION_ALLIANCE && referencePlayer->GetTeam() != ALLIANCE))
-        return false;
+    if (referencePlayer) 
+        if ((achievement->requiredFaction == ACHIEVEMENT_FACTION_HORDE    && referencePlayer->GetTeam() != HORDE) ||
+            (achievement->requiredFaction == ACHIEVEMENT_FACTION_ALLIANCE && referencePlayer->GetTeam() != ALLIANCE))
+            return false;
 
     if (IsCompletedCriteria(criteria, achievement))
         return false;
@@ -2372,10 +2375,16 @@ bool AchievementMgr<T>::ConditionsSatisfied(AchievementCriteriaEntry const *crit
         switch (criteria->additionalRequirements[i].additionalRequirement_type)
         {
             case ACHIEVEMENT_CRITERIA_CONDITION_BG_MAP:
+                if (!referencePlayer)
+                    return false;
+
                 if (referencePlayer->GetMapId() != criteria->additionalRequirements[i].additionalRequirement_value)
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_CONDITION_NOT_IN_GROUP:
+                if (!referencePlayer)
+                    return false;
+                
                 if (referencePlayer->GetGroup())
                     return false;
                 break;
@@ -2449,7 +2458,7 @@ bool AchievementMgr<T>::RequirementsSatisfied(AchievementCriteriaEntry const *ac
                 return false;
             break;
         case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
-            if (!miscValue1 || achievementCriteria->win_bg.bgMapID != referencePlayer->GetMapId())
+            if (!miscValue1 || !referencePlayer || achievementCriteria->win_bg.bgMapID != referencePlayer->GetMapId())
                 return false;
             break;
         case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
@@ -2471,16 +2480,18 @@ bool AchievementMgr<T>::RequirementsSatisfied(AchievementCriteriaEntry const *ac
                 return false;
             break;
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
-            if (!miscValue1 || referencePlayer->GetMapId() != achievementCriteria->complete_battleground.mapID)
+            if (!miscValue1 || !referencePlayer || referencePlayer->GetMapId() != achievementCriteria->complete_battleground.mapID)
                 return false;
             break;
         case ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP:
-            if (!miscValue1 || referencePlayer->GetMapId() != achievementCriteria->death_at_map.mapID)
+            if (!miscValue1 || !referencePlayer ||referencePlayer->GetMapId() != achievementCriteria->death_at_map.mapID)
                 return false;
             break;
         case ACHIEVEMENT_CRITERIA_TYPE_DEATH:
         {
             if (!miscValue1)
+                return false;
+            if (!referencePlayer)
                 return false;
             // skip wrong arena achievements, if not achievIdByArenaSlot then normal total death counter
             bool notfit = false;
@@ -2501,6 +2512,9 @@ bool AchievementMgr<T>::RequirementsSatisfied(AchievementCriteriaEntry const *ac
         case ACHIEVEMENT_CRITERIA_TYPE_DEATH_IN_DUNGEON:
         {
             if (!miscValue1)
+                return false;
+
+            if (!referencePlayer)
                 return false;
 
             Map const* map = referencePlayer->IsInWorld() ? referencePlayer->GetMap() : sMapMgr->FindMap(referencePlayer->GetMapId(), referencePlayer->GetInstanceId());
@@ -2567,7 +2581,7 @@ bool AchievementMgr<T>::RequirementsSatisfied(AchievementCriteriaEntry const *ac
             else
             {
                 // login case.
-                if (!referencePlayer->GetQuestRewardStatus(achievementCriteria->complete_quest.questID))
+                if (!referencePlayer || !referencePlayer->GetQuestRewardStatus(achievementCriteria->complete_quest.questID))
                     return false;
             }
 
@@ -2590,7 +2604,7 @@ bool AchievementMgr<T>::RequirementsSatisfied(AchievementCriteriaEntry const *ac
             if (miscValue1 && miscValue1 != achievementCriteria->learn_spell.spellID)
                 return false;
 
-            if (!referencePlayer->HasSpell(achievementCriteria->learn_spell.spellID))
+            if (!referencePlayer || !referencePlayer->HasSpell(achievementCriteria->learn_spell.spellID))
                 return false;
             break;
         case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:
@@ -2613,6 +2627,9 @@ bool AchievementMgr<T>::RequirementsSatisfied(AchievementCriteriaEntry const *ac
             break;
         case ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA:
         {
+            if (!referencePlayer)
+                return false;
+
             WorldMapOverlayEntry const* worldOverlayEntry = sWorldMapOverlayStore.LookupEntry(achievementCriteria->explore_area.areaReference);
             if (!worldOverlayEntry)
                 break;
@@ -2674,6 +2691,9 @@ bool AchievementMgr<T>::RequirementsSatisfied(AchievementCriteriaEntry const *ac
         case ACHIEVEMENT_CRITERIA_TYPE_DAMAGE_DONE:
         case ACHIEVEMENT_CRITERIA_TYPE_HEALING_DONE:
             if (!miscValue1)
+                return false;
+            
+            if (!referencePlayer)
                 return false;
 
             if (achievementCriteria->additionalRequirements[0].additionalRequirement_type == ACHIEVEMENT_CRITERIA_CONDITION_BG_MAP)
@@ -2969,7 +2989,7 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
         {
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_SOURCE_DRUNK_VALUE: // 1
             {
-                if (referencePlayer->GetDrunkValue() < reqValue)
+                if (!referencePlayer || (referencePlayer->GetDrunkValue() < reqValue))
                     return false;
                 break;
             }
@@ -3003,6 +3023,8 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_MUST_BE_ENEMY: // 7
+                if (!referencePlayer)
+                    return false;                
                 if (!unit || !unit->IsInWorld() || !referencePlayer->IsHostileTo(unit))
                     return false;
                 break;
@@ -3015,7 +3037,7 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                         break;
                 }
 
-                if (!referencePlayer->HasAura(reqValue))
+                if (!referencePlayer || !referencePlayer->HasAura(reqValue))
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_HAS_AURA: // 10
@@ -3044,6 +3066,9 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
             }
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_SOURCE_AREA_OR_ZONE: // 17
             {
+                if (!referencePlayer)
+                    return false;
+
                 uint32 zoneId, areaId;
                 referencePlayer->GetZoneAndAreaId(zoneId, areaId);
                 if (zoneId != reqValue && areaId != reqValue)
@@ -3062,6 +3087,9 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
             }
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_MAP_DIFFICULTY: // 20
             {
+                if (!referencePlayer)
+                    return false;
+
                 if (Map* pMap = referencePlayer->GetMap())
                 {
                     if (pMap->IsNonRaidDungeon()
@@ -3078,11 +3106,11 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                 break;
             }
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_SOURCE_RACE: // 25
-                if (referencePlayer->getRace() != reqValue)
+                if (!referencePlayer || (referencePlayer->getRace() != reqValue))
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_SOURCE_CLASS: // 26
-                if (referencePlayer->getClass() != reqValue)
+                if (!referencePlayer || (referencePlayer->getClass() != reqValue))
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_RACE: // 27
@@ -3094,7 +3122,7 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_MAX_GROUP_MEMBERS: // 29
-                if (referencePlayer->GetGroup() && referencePlayer->GetGroup()->GetMembersCount() >= reqValue)
+                if (!referencePlayer || (referencePlayer->GetGroup() && referencePlayer->GetGroup()->GetMembersCount() >= reqValue))
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_CREATURE_TYPE: // 30
@@ -3107,7 +3135,7 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                 break;
             }
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_SOURCE_MAP: // 32
-                if (referencePlayer->GetMapId() != reqValue)
+                if (!referencePlayer || (referencePlayer->GetMapId() != reqValue))
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_ITEM_CLASS: // 33
@@ -3142,7 +3170,7 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_SOURCE_LEVEL: // 39
-                if (referencePlayer->getLevel() != reqValue)
+                if (!referencePlayer || (referencePlayer->getLevel() != reqValue))
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_LEVEL: // 40
@@ -3158,11 +3186,14 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_MIN_ACHIEVEMENT_POINTS: // 56
-                if (referencePlayer->GetAchievementMgr().GetAchievementPoints() < reqValue)
+                if (!referencePlayer || (referencePlayer->GetAchievementMgr().GetAchievementPoints() < reqValue))
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_REQUIRES_GUILD_GROUP: // 61
             {
+                if (!referencePlayer)
+                    return false;
+
                 Group* pGroup = referencePlayer->GetGroup();
                 if (!pGroup)
                     return false;
@@ -3173,6 +3204,9 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
             }
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_GUILD_REPUTATION: // 62
             {
+                if (!referencePlayer)
+                    return false;
+
                 if (uint32(referencePlayer->GetReputationMgr().GetReputation(1168)) < reqValue) // 1168 = Guild faction
                     return false;
                 break;
