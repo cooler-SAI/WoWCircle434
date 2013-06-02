@@ -6194,6 +6194,18 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                 break;
             }
+            case SPELL_AURA_MOD_HEALTH_REGEN_PERCENT:
+            {
+                // Health Funnel
+                if (m_spellInfo->Id == 755)
+                {
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                        if (Pet * pet = m_caster->ToPlayer()->GetPet())
+                            if (pet->IsFullHealth())
+                                return SPELL_FAILED_ALREADY_AT_FULL_HEALTH;
+                }
+                break;
+            }
             default:
                 break;
         }
