@@ -997,8 +997,14 @@ bool Aura::CanBeSaved() const
     if (HasEffectType(SPELL_AURA_CONVERT_RUNE))
         return false;
 
+    // Can't save vehicle auras, it requires both caster & target to be in world
+    if (HasEffectType(SPELL_AURA_CONTROL_VEHICLE))
+        return false;
+
     switch (GetId())
     {
+        case 40075: // Fel Flak Fire 
+        case 55849: // Power Spark
         // Silithyst
         case 29519:
         // When a druid logins, he doesnt have either eclipse power, nor the marker auras, nor the eclipse buffs. Dont save them.
@@ -3310,7 +3316,7 @@ void UnitAura::FillTargetMap(std::map<Unit*, uint8> & targets, Unit* caster)
                     }
                     case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
                     {
-                        Trinity::AnyAoETargetUnitInObjectRangeCheck u_check(GetUnitOwner(), GetUnitOwner(), radius); // No GetCharmer in searcher
+                        Trinity::AnyAoETargetUnitInObjectRangeCheck u_check(GetUnitOwner(), (GetCaster() ? GetCaster() : GetUnitOwner()), radius); // No GetCharmer in searcher
                         Trinity::UnitListSearcher<Trinity::AnyAoETargetUnitInObjectRangeCheck> searcher(GetUnitOwner(), targetList, u_check);
                         GetUnitOwner()->VisitNearbyObject(radius, searcher);
                         break;
