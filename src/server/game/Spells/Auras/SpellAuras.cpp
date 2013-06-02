@@ -2372,7 +2372,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             target->CastSpell(target, 64364, true);
                     }
                     else
+                    {
                         target->RemoveAurasDueToSpell(64364, GetCasterGUID());
+                        target->RemoveOwnedAura(64364, GetCasterGUID());
+                    }
                     break;
                 case 31842: // Divine Favor
                     // Item - Paladin T10 Holy 2P Bonus
