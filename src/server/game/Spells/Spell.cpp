@@ -3428,7 +3428,7 @@ void Spell::cast(bool skipCheck)
         // As of 3.0.2 pets begin attacking their owner's target immediately
         // Let any pets know we've attacked something. Check DmgClass for harmful spells only
         // This prevents spells such as Hunter's Mark from triggering pet attack
-        if (!IsTriggered() && GetSpellInfo()->DmgClass != SPELL_DAMAGE_CLASS_NONE)
+        if (!IsTriggered() && GetSpellInfo()->DmgClass != SPELL_DAMAGE_CLASS_NONE && m_targets.GetObjectTarget())
             if (Pet* playerPet = playerCaster->GetPet())
                 if (!playerCaster->IsFriendlyTo(m_targets.GetObjectTarget()->ToUnit()))
                     if (playerPet->isAlive() && playerPet->isControlled() && (m_targets.GetTargetMask() & TARGET_FLAG_UNIT))
