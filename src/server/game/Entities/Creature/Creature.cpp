@@ -1343,6 +1343,7 @@ bool Creature::LoadCreatureFromDB(uint32 guid, Map* map, bool addToMap)
     m_respawnradius = data->spawndist;
 
     m_respawnDelay = data->spawntimesecs;
+    m_corpseDelay = std::min(m_respawnDelay * 9 / 10, m_corpseDelay);
     m_deathState = ALIVE;
 
     m_respawnTime  = GetMap()->GetCreatureRespawnTime(m_DBTableGuid);
