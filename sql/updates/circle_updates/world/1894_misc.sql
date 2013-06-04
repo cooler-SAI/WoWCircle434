@@ -1,6 +1,6 @@
 UPDATE `creature_template_addon` SET `emote`=0 WHERE `entry` IN (31681, 29941);
 UPDATE `creature_addon` SET `emote`=0 WHERE `guid` IN 
-(54539, 52277, 54687, 91937, 52276, 89751, 89750, 98007, 98008, 98009, 98010, 98011, 98012)
+(54539, 52277, 54687, 91937, 52276, 89751, 89750, 98007, 98008, 98009, 98010, 98011, 98012);
 UPDATE `creature_template` SET `modelid2`=0 WHERE `entry`=17591;
 UPDATE `creature_template` SET `modelid2`=0 WHERE `entry`=17641;
 
