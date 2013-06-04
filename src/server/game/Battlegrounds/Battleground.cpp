@@ -918,7 +918,7 @@ void Battleground::EndBattleground(uint32 winner)
             player->getRBG()->FinishGame(team == winner, GetArenaMatchmakerRating(team == winner ? loser : winner));
 
             if (team == winner)
-                player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_BG, RatedBattleground::ConquestPointReward * 100);
+                player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_BG, RatedBattleground::ConquestPointReward);
         }
 		
         WorldPacket data;
