@@ -451,15 +451,27 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
         return;
     }
 
-    BattlegroundTypeId bgTypeId = BattlegroundMgr::BGTemplateId(bgQueueTypeId);
     BattlegroundQueue& bgQueue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
+    BattlegroundTypeId bgTypeId = BattlegroundMgr::BGTemplateId(bgQueueTypeId);
+
+    if (bgTypeId == BATTLEGROUND_TYPE_NONE || bgTypeId >= MAX_BATTLEGROUND_TYPE_ID)
+    {
+        sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattlegroundHandler: invalid bgTypeId (%u) received.", bgTypeId);
+        return;
+    }
 
     //we must use temporary variable, because GroupQueueInfo pointer can be deleted in BattlegroundQueue::RemovePlayer() function
     GroupQueueInfo ginfo;
     if (bgQueueTypeId != BATTLEGROUND_QUEUE_RBG)
     {
-        sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattlegroundHandler: itrplayerstatus not found.");
-        return;
+        //sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattlegroundHandler: itrplayerstatus not found.");
+        //return;
+        if (!bgQueue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
+        {
+            sLog->outDebug(LOG_FILTER_BATTLEGROUND, "CMSG_BATTLEFIELD_PORT %s Slot: %u, Unk: %u, Time: %u, Action: %u. Player not in queue (No player Group Info)!",
+                GetPlayerInfo().c_str(), queueSlot, unk, time, action);
+            return;
+        }
     }
     else
         sRBGQueue->GetQueueInfoByPlayer(_player->GetGUID(), &ginfo);
@@ -482,7 +494,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
                 GetPlayerInfo().c_str(), queueSlot, unk, time, action, ginfo.IsInvitedToBGInstanceGUID);
             return;
         }*/
-
+        if (!bg && action == 0)
         bg = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId);
         if (!bg)
         {
