@@ -456,22 +456,13 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
 
     //we must use temporary variable, because GroupQueueInfo pointer can be deleted in BattlegroundQueue::RemovePlayer() function
     GroupQueueInfo ginfo;
-	if (bgQueueTypeId != BATTLEGROUND_QUEUE_RBG)
-	{
-		if (!bgQueue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
-		{
-			sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattlegroundHandler: itrplayerstatus not found.");
-			return;
-		}
-	}
-	else
-	{
-		if (!sRBGQueue->GetQueueInfoByPlayer(_player->GetGUID(), &ginfo))
-		{
-			sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattlegroundHandler: itrplayerstatus not found.");
-			return;
-		}
-	}
+    if (bgQueueTypeId != BATTLEGROUND_QUEUE_RBG)
+    {
+        sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattlegroundHandler: itrplayerstatus not found.");
+        return;
+    }
+    else
+        sRBGQueue->GetQueueInfoByPlayer(_player->GetGUID(), &ginfo);
 
     // if action == 1, then instanceId is required
     if (!ginfo.IsInvitedToBGInstanceGUID && action == 1)
