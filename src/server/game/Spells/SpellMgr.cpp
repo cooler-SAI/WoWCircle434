@@ -6857,6 +6857,13 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
                 spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
                 break;
+            // Dark Command
+            case 56222:
+                spellInfo->Attributes &= ~SPELL_ATTR0_ABILITY;
+                spellInfo->AttributesEx3 &= ~SPELL_ATTR3_CANT_TRIGGER_PROC;
+                spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+                spellInfo->SchoolMask = SPELL_SCHOOL_MASK_SHADOW;
+                break;
             default:
                 break;
         }
