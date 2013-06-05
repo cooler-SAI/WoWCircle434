@@ -469,7 +469,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
         if (!bgQueue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
         {
             sLog->outDebug(LOG_FILTER_BATTLEGROUND, "CMSG_BATTLEFIELD_PORT %s Slot: %u, Unk: %u, Time: %u, Action: %u. Player not in queue (No player Group Info)!",
-                GetPlayerInfo().c_str(), queueSlot, unk, time, action);
+                queueSlot, unk, time, action);
             return;
         }
     }
