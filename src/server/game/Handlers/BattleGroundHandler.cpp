@@ -464,8 +464,6 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
     GroupQueueInfo ginfo;
     if (bgQueueTypeId != BATTLEGROUND_QUEUE_RBG)
     {
-        //sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattlegroundHandler: itrplayerstatus not found.");
-        //return;
         if (!bgQueue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
         {
             sLog->outDebug(LOG_FILTER_BATTLEGROUND, "CMSG_BATTLEFIELD_PORT %s Slot: %u, Unk: %u, Time: %u, Action: %u. Player not in queue (No player Group Info)!",
@@ -488,13 +486,13 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
     Battleground* bg = sBattlegroundMgr->GetBattleground(ginfo.IsInvitedToBGInstanceGUID, bgTypeId == BATTLEGROUND_AA || bgTypeId == BATTLEGROUND_RATED_10_VS_10 ? BATTLEGROUND_TYPE_NONE : bgTypeId);
     if (!bg)
     {
-        /*if (action)
+        if (action)
         {
             sLog->outDebug(LOG_FILTER_BATTLEGROUND, "CMSG_BATTLEFIELD_PORT %s Slot: %u, Unk: %u, Time: %u, Action: %u. Cant find BG with id %u!",
-                GetPlayerInfo().c_str(), queueSlot, unk, time, action, ginfo.IsInvitedToBGInstanceGUID);
+                queueSlot, unk, time, action, ginfo.IsInvitedToBGInstanceGUID);
             return;
-        }*/
-        if (!bg && action == 0)
+        }
+        // if (!bg && action == 0)
         bg = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId);
         if (!bg)
         {
@@ -503,8 +501,8 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
         }
     }
 
-    /*sLog->outDebug(LOG_FILTER_BATTLEGROUND, "CMSG_BATTLEFIELD_PORT %s Slot: %u, Unk: %u, Time: %u, Action: %u.",
-        GetPlayerInfo().c_str(), queueSlot, unk, time, action);*/
+    sLog->outDebug(LOG_FILTER_BATTLEGROUND, "CMSG_BATTLEFIELD_PORT %s Slot: %u, Unk: %u, Time: %u, Action: %u.",
+        queueSlot, unk, time, action);
 
     // get real bg type
     bgTypeId = bg->GetTypeID();
@@ -537,9 +535,9 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
     }
 
     WorldPacket data;
-    switch (action)
+    if (action)
     {
-        case 1:                                         // port to battleground
+            // port to battleground
             if (!_player->IsInvitedForBattlegroundQueueType(bgQueueTypeId))
                 return;                                 // cheating?
 
@@ -579,11 +577,9 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
             // add only in HandleMoveWorldPortAck()
             // bg->AddPlayer(_player, team);
             sLog->outDebug(LOG_FILTER_BATTLEGROUND, "Battleground: player %s (%u) joined battle for bg %u, bgtype %u, queue type %u.", _player->GetName(), _player->GetGUIDLow(), bg->GetInstanceID(), bg->GetTypeID(), bgQueueTypeId);
-            break;
-        case 0:                                         // leave queue
-            if (bg->isArena() && bg->GetStatus() > STATUS_WAIT_QUEUE)
-                return;
-
+    }
+    else // leave queue
+    {
             // if player leaves rated arena match before match start, it is counted as he played but he lost
             if (ginfo.IsRated && ginfo.IsInvitedToBGInstanceGUID)
             {
@@ -606,10 +602,10 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
                 sBattlegroundMgr->ScheduleQueueUpdate(ginfo.ArenaMatchmakerRating, ginfo.ArenaType, bgQueueTypeId, bgTypeId, bracketEntry->GetBracketId());
 
             sLog->outDebug(LOG_FILTER_BATTLEGROUND, "Battleground: player %s (%u) left queue for bgtype %u, queue type %u.", _player->GetName(), _player->GetGUIDLow(), bg->GetTypeID(), bgQueueTypeId);
-            break;
-        default:
-            sLog->outError(LOG_FILTER_NETWORKIO, "Battleground port: unknown action %u", action);
-            break;
+            // break;
+        // default:
+            // sLog->outError(LOG_FILTER_NETWORKIO, "Battleground port: unknown action %u", action);
+            // break;
     }
 }
 
