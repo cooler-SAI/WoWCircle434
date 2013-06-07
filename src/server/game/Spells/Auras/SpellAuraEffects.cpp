@@ -4352,12 +4352,14 @@ void AuraEffect::HandleModResistancePercent(AuraApplication const* aurApp, uint8
     {
         if (GetMiscValue() & int32(1<<i))
         {
-            target->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + i), TOTAL_PCT, float(GetAmount()), apply);
+            float mult = target->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_RESISTANCE_PCT, 1 << i);
+            target->SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_START + i), TOTAL_PCT, mult);
             if (target->GetTypeId() == TYPEID_PLAYER || target->ToCreature()->isPet())
             {
-                target->ApplyResistanceBuffModsPercentMod(SpellSchools(i), true, (float)GetAmount(), apply);
-                target->ApplyResistanceBuffModsPercentMod(SpellSchools(i), false, (float)GetAmount(), apply);
+                target->SetResistanceBuffMods(SpellSchools(i), true, mult);
+                target->SetResistanceBuffMods(SpellSchools(i), false, mult);
             }
+            target->UpdateArmor();
         }
     }
 }
