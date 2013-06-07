@@ -4359,7 +4359,16 @@ void AuraEffect::HandleModResistancePercent(AuraApplication const* aurApp, uint8
                 target->SetResistanceBuffMods(SpellSchools(i), true, mult);
                 target->SetResistanceBuffMods(SpellSchools(i), false, mult);
             }
-            target->UpdateArmor();
+            switch (i)
+            {
+                case SPELL_SCHOOL_NORMAL:
+                    target->UpdateArmor();
+                    break;
+                default:
+                    target->UpdateResistances(i);
+                    break;
+            }
+            
         }
     }
 }
