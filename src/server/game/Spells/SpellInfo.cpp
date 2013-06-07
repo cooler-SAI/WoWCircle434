@@ -3161,6 +3161,7 @@ bool SpellInfo::IsNeedAdditionalLosChecks() const
         case 50622: 
         case 44949: // Whirlwind from bladestorm
         case 23455: // Holy Nova
+        case 87204: // Sin and Punishment proc
             return true;
         default:break;
     }
