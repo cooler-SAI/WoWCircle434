@@ -23,6 +23,7 @@
 #include "DBCStores.h"
 #include "ConditionMgr.h"
 #include "Common.h"
+#include "Vehicle.h"
 
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType)
 {
@@ -1289,7 +1290,7 @@ bool SpellInfo::IsPassiveStackableWithRanks() const
 
 bool SpellInfo::IsMultiSlotAura() const
 {
-    return IsPassive() || Id == 40075 || Id == 44413; // No other way to make 40075 have more than 1 copy of aura
+    return IsPassive() || Id == 55849 || Id == 40075 || Id == 44413; // Power Spark, Fel Flak Fire, Incanter's Absorption
 }
 
 bool SpellInfo::IsDeathPersistent() const
@@ -1423,6 +1424,9 @@ bool SpellInfo::CanPierceImmuneAura(SpellInfo const* aura) const
         if (Id == aura->Id || SpellIconID == 109)
             return false;
     }
+
+    if (HasEffect(SPELL_EFFECT_INTERRUPT_CAST) && aura && aura->Id == 102915)
+        return true;
 
     // these spells (Cyclone for example) can pierce all...
     if ((AttributesEx & SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE)
@@ -1663,6 +1667,8 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     // spell checks
     switch (Id)
     {
+        case 105009: // Gift of Sargeras, Well of Eternity
+            return (map_id == 939)? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         case 100713: // Deluge, Ragnaros, Firelands
         case 101015:
         case 101110: // Rage of Ragnaros, Ragnaros, Firelands
@@ -1962,6 +1968,56 @@ bool SpellInfo::CheckTargetCreatureType(Unit const* target) const
     }
     uint32 creatureType = target->GetCreatureTypeMask();
     return !TargetCreatureType || !creatureType || (creatureType & TargetCreatureType);
+}
+
+SpellCastResult SpellInfo::CheckVehicle(Unit const* caster) const
+{
+    // All creatures should be able to cast as passengers freely, restriction and attribute are only for players
+    if (caster->GetTypeId() != TYPEID_PLAYER)
+        return SPELL_CAST_OK;
+
+    Vehicle* vehicle = caster->GetVehicle();
+    if (vehicle)
+    {
+        uint16 checkMask = 0;
+        for (uint8 effIndex = EFFECT_0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
+        {
+            if (Effects[effIndex].ApplyAuraName == SPELL_AURA_MOD_SHAPESHIFT)
+            {
+                SpellShapeshiftFormEntry const* shapeShiftFormEntry = sSpellShapeshiftFormStore.LookupEntry(Effects[effIndex].MiscValue);
+                if (shapeShiftFormEntry && (shapeShiftFormEntry->flags1 & 1) == 0)  // unk flag
+                    checkMask |= VEHICLE_SEAT_FLAG_UNCONTROLLED;
+                break;
+            }
+        }
+
+        if (HasAura(SPELL_AURA_MOUNTED))
+            checkMask |= VEHICLE_SEAT_FLAG_CAN_CAST_MOUNT_SPELL;
+
+        if (!checkMask)
+            checkMask = VEHICLE_SEAT_FLAG_CAN_ATTACK;
+
+        VehicleSeatEntry const* vehicleSeat = vehicle->GetSeatForPassenger(caster);
+        if (!(AttributesEx6 & SPELL_ATTR6_CASTABLE_WHILE_ON_VEHICLE) && !(Attributes & SPELL_ATTR0_CASTABLE_WHILE_MOUNTED)
+            && (vehicleSeat->m_flags & checkMask) != checkMask)
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+
+        // Can only summon uncontrolled minions/guardians when on controlled vehicle
+        if (vehicleSeat->m_flags & (VEHICLE_SEAT_FLAG_CAN_CONTROL | VEHICLE_SEAT_FLAG_UNK2))
+        {
+            for (uint32 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
+            {
+                if (Effects[i].Effect != SPELL_EFFECT_SUMMON)
+                    continue;
+
+                SummonPropertiesEntry const* props = sSummonPropertiesStore.LookupEntry(Effects[i].MiscValueB);
+                if (props && props->Category != SUMMON_CATEGORY_WILD)
+                    return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+            }
+        }
+    }
+
+    return SPELL_CAST_OK;
 }
 
 SpellSchoolMask SpellInfo::GetSchoolMask() const

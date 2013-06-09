@@ -3512,6 +3512,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 16835:
                 spellInfo->SetDurationIndex(21);
                 break;
+            case 57528: // Nightmare Figment Mirror Image
+                spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_SCRIPT_EFFECT;
+                spellInfo->Effects[EFFECT_2].Effect = SPELL_EFFECT_SCRIPT_EFFECT;
+                break;
             case 65142: // Ebon Plague
                 spellInfo->Effects[1].Effect = SPELL_EFFECT_APPLY_AURA;
                 spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
@@ -3966,13 +3970,25 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->ManaCost = 0;
                 spellInfo->ManaPerSecond = 0;
                 break;
-            // OCULUS SPELLS
-            // The spells below are here, because their effect 1 is giving warning, because the triggered spell is not found in dbc and is missing from encounter sniff.
-            case 49462: // Call Ruby Drake
-            case 49461: // Call Amber Drake
-            case 49345: // Call Emerald Drake
-                spellInfo->Effects[EFFECT_0].Effect = 0;
+            // EYE OF ETERNITY SPELLS
+            // All spells below work even without these changes. The LOS attribute is due to problem
+            // from collision between maps & gos with active destroyed state.
+            case 57473: // Arcane Storm bonus explicit visual spell
+            case 57431: // Summon Static Field
+            case 56091: // Flame Spike (Wyrmrest Skytalon)
+            case 56092: // Engulf in Flames (Wyrmrest Skytalon)
+            case 57090: // Revivify (Wyrmrest Skytalon)
+            case 57143: // Life Burst (Wyrmrest Skytalon)
+                spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
                 break;
+            // This would never crit on retail and it has attribute for SPELL_ATTR3_NO_DONE_BONUS because is handled from player, 
+            // until someone figures how to make scions not critting without hack and without making them main casters this should stay here. 
+            case 63934: // Arcane Barrage (casted by players and NONMELEEDAMAGELOG with caster Scion of Eternity (original caster)). 
+                spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT; 
+                break;
+            // ENDOF EYE OF ETERNITY SPELLS
+            // OCULUS SPELLS
+            //
             // ENDOF OCULUS SPELLS
             //
             // THRONE OF THE TIDES SPELLS
@@ -6089,6 +6105,54 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
                 break;
             // ENDOF END TIME SPELLS
+            //
+            // WELL OF_ ETERNITY SPELLS
+            //
+            // Trash
+            case 108474: // Crushing Leap
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+                spellInfo->Effects[EFFECT_1].TriggerSpell = 0;
+                break;
+            // Perotharn
+            case 105496: // Track player
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
+			case 107536: // Punishing Flame dmg
+				spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_SRC_AREA_ENEMY;
+				break;
+            // Queen Azshara
+            case 102478: // Ice Fling
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 103241: // Total Obedience
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_INSTAKILL;
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = 0;
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = 0;
+                spellInfo->Effects[EFFECT_2].Effect = 0;
+                spellInfo->Effects[EFFECT_2].ApplyAuraName = 0;
+                break;
+            // Mannoroth
+            case 104648: // Nether Portal
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_3_YARDS);
+                break;
+            case 104678: // Debilitating Flay
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 105073: // Wrath of Elune
+                spellInfo->MaxAffectedTargets = 3;
+                break;
+            case 105054: // Summon Felhound
+            case 105058: // Summon Felguard
+            case 105059: // Summon Devastator
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DB;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
+            case 105523: // Magistrike Arc
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            // ENDOF WELL OF ETERNITY SPELLS
             // Camouflage
             case 80325:
                 spellInfo->Effects[EFFECT_1].Effect = 0;
@@ -6328,15 +6392,6 @@ void SpellMgr::LoadDbcDataCorrections()
             case 45204:
                 spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
                 spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-                break;
-            // Copy Weapon Spells
-            case 41055:
-            case 45206:
-            case 63416:
-            case 69891:
-            case 69892:
-                spellInfo->Effects[0].Effect = SPELL_EFFECT_DUMMY;
-                spellInfo->Mechanic = 0;
                 break;
             // Jinx: Curse of Elements
             case 86105:

@@ -5285,6 +5285,16 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Fel Decay, Peroth'arn, Well of Eternity
+                case 108124:
+                    if (!victim)
+                        return false;
+                    if (!damage)
+                        return false;
+                    triggered_spell_id = 108128;
+                    target = victim;
+                    basepoints0 = damage;
+                    break;
                 // Matrix Restabilizer
                 case 96976:
                 case 97138:
@@ -9737,6 +9747,12 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Embedded Blade, Mannoroth, Well of Eternity
+        case 109542: 
+            if (!victim)
+                return false;
+            target = victim;
+            break;
         // Combat Potency
         case 35541:
         case 35550:
@@ -12985,6 +13001,11 @@ bool Unit::IsImmunedToDamage(SpellInfo const* spellInfo)
 {
     if (spellInfo->Attributes & SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY)
         return false;
+
+    // Queen Azshara, Well of Eternity
+    if (GetEntry() == 54853)
+        if (spellInfo->HasEffect(SPELL_EFFECT_INTERRUPT_CAST))
+            return false;
 
     uint32 shoolMask = spellInfo->GetSchoolMask();
     if (spellInfo->IsNeedToCheckSchoolImmune())

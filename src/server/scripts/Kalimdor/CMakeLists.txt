@@ -54,7 +54,12 @@ set(scripts_STAT_SRCS
   Kalimdor/CavernsOfTime/DarkPortal/boss_temporus.cpp
   Kalimdor/CavernsOfTime/EndTime/instance_end_time.cpp
   Kalimdor/CavernsOfTime/EndTime/end_time.h
+  Kalimdor/CavernsOfTime/WellofEternity/boss_perotharn.cpp
+  Kalimdor/CavernsOfTime/WellofEternity/boss_queen_azshara.cpp
+  Kalimdor/CavernsOfTime/WellofEternity/boss_mannoroth.cpp
   Kalimdor/CavernsOfTime/WellofEternity/instance_well_of_eternity.cpp
+  Kalimdor/CavernsOfTime/WellofEternity/well_of_eternity_teleport.cpp
+  Kalimdor/CavernsOfTime/WellofEternity/well_of_eternity.cpp
   Kalimdor/CavernsOfTime/WellofEternity/well_of_eternity.h
   Kalimdor/CavernsOfTime/HourofTwilight/instance_hour_of_twilight.cpp
   Kalimdor/CavernsOfTime/HourofTwilight/hour_of_twilight.h

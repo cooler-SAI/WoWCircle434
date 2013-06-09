@@ -200,6 +200,8 @@ class InstanceScript : public ZoneScript
 
         void DoSetAlternatePowerOnPlayers(int32 value);
 
+        void DoModifyPlayerCurrencies(uint32 id, int32 value);
+
         // Return wether server allow two side groups or not
         bool ServerAllowsTwoSideGroups() { return sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP); }
 

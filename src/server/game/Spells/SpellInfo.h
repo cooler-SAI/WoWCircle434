@@ -510,6 +510,7 @@ public:
     SpellCastResult CheckTarget(Unit const* caster, WorldObject const* target, bool implicit = true) const;
     SpellCastResult CheckExplicitTarget(Unit const* caster, WorldObject const* target, Item const* itemTarget = NULL) const;
     bool CheckTargetCreatureType(Unit const* target) const;
+    SpellCastResult CheckVehicle(Unit const* caster) const;
 
     SpellSchoolMask GetSchoolMask() const;
     uint32 GetAllEffectsMechanicMask() const;

@@ -418,6 +418,16 @@ void InstanceScript::DoSetAlternatePowerOnPlayers(int32 value)
                 player->SetPower(POWER_ALTERNATE_POWER, value);
 }
 
+void InstanceScript::DoModifyPlayerCurrencies(uint32 id, int32 value)
+{
+    Map::PlayerList const &PlayerList = instance->GetPlayers();
+
+    if (!PlayerList.isEmpty())
+        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+            if (Player* player = i->getSource())
+                player->ModifyCurrency(id, value);
+}
+
 bool InstanceScript::CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/ /*= NULL*/, uint32 /*miscvalue1*/ /*= 0*/)
 {
     sLog->outError(LOG_FILTER_GENERAL, "Achievement system call InstanceScript::CheckAchievementCriteriaMeet but instance script for map %u not have implementation for achievement criteria %u",

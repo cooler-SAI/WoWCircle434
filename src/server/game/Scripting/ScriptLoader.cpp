@@ -709,6 +709,13 @@ void AddSC_boss_echo_of_baine();
 void AddSC_boss_echo_of_jaina();
 void AddSC_boss_murozond();
 
+void AddSC_instance_well_of_eternity(); // Well of Eternity
+void AddSC_well_of_eternity();
+void AddSC_well_of_eternity_teleport();
+void AddSC_boss_perotharn();
+void AddSC_boss_queen_azshara();
+void AddSC_boss_mannoroth();
+
 
 // battlegrounds
 
@@ -1453,6 +1460,13 @@ void AddNorthrendScripts()
     AddSC_boss_echo_of_baine();
     AddSC_boss_echo_of_jaina();
     AddSC_boss_murozond();
+
+    AddSC_instance_well_of_eternity(); // Well of Eternity
+    AddSC_well_of_eternity();
+    AddSC_well_of_eternity_teleport();
+    AddSC_boss_perotharn();
+    AddSC_boss_queen_azshara();
+    AddSC_boss_mannoroth();
 
 #endif
 }
