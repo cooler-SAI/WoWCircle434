@@ -56,11 +56,11 @@ class Vehicle : public TransportBase
         void RemoveAllPassengers();
         void Dismiss();
         void TeleportVehicle(float x, float y, float z, float ang);
-        bool IsVehicleInUse() { return Seats.begin() != Seats.end(); }
+        bool IsVehicleInUse() const;
 
         SeatMap Seats;
 
-        VehicleSeatEntry const* GetSeatForPassenger(Unit* passenger);
+        VehicleSeatEntry const* GetSeatForPassenger(Unit const* passenger);
 
     private:
         SeatMap::iterator GetSeatIteratorForPassenger(Unit* passenger);

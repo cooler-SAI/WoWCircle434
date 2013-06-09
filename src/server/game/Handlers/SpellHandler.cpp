@@ -287,12 +287,15 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket & recvData)
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_GAMEOBJ_USE Message [guid=%u]", GUID_LOPART(guid));
 
-    // ignore for remote control state
-    if (_player->m_mover != _player)
-        return;
-
     if (GameObject* obj = GetPlayer()->GetMap()->GetGameObject(guid))
+    {
+        // ignore for remote control state
+        if (_player->m_mover != _player)
+            if (!(_player->IsOnVehicle(_player->m_mover) || _player->IsMounted()) && !obj->GetGOInfo()->IsUsableMounted())
+                return;
+
         obj->Use(_player);
+    }
 }
 
 void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
@@ -350,7 +353,36 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (mover->GetTypeId() == TYPEID_PLAYER)
+    if (spellInfo->IsPassive())
+    {
+        recvPacket.rfinish(); // prevent spam at ignore packet 
+        return; 
+    }
+
+    Unit* caster = mover;
+    if (caster->GetTypeId() == TYPEID_UNIT && !caster->ToCreature()->HasSpell(spellId)) 
+    {
+        // If the vehicle creature does not have the spell but it allows the passenger to cast own spells 
+        // change caster to player and let him cast
+        if (!_player->IsOnVehicle(caster) || spellInfo->CheckVehicle(_player) != SPELL_CAST_OK) 
+        {
+            recvPacket.rfinish(); // prevent spam at ignore packet
+            return;
+        }
+
+        caster = _player; 
+    }
+
+    if (caster->GetTypeId() == TYPEID_PLAYER && 
+        !caster->ToPlayer()->HasActiveSpell(spellId) &&
+         spellId != 101603) // Hack for Throw Totem, Echo of Baine 
+    {
+        // not have spell in spellbook 
+        recvPacket.rfinish(); // prevent spam at ignore packet 
+        return; 
+    }
+
+    /*if (mover->GetTypeId() == TYPEID_PLAYER)
     {
         // not have spell in spellbook or spell passive and not casted by client
         if ((!mover->ToPlayer()->HasActiveSpell(spellId) || spellInfo->IsPassive()) &&
@@ -373,7 +405,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
             recvPacket.rfinish(); // prevent spam at ignore packet
             return;
         }
-    }
+    }*/
 
     // Client is resending autoshot cast opcode when other spell is casted during shoot rotation
     // Skip it to prevent "interrupt" message

@@ -478,6 +478,15 @@ void Vehicle::Dismiss()
     GetBase()->ToCreature()->DespawnOrUnsummon();
 }
 
+bool Vehicle::IsVehicleInUse() const
+{
+    for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
+        if (itr->second.Passenger)
+            return true;
+
+    return false;
+}
+
 void Vehicle::InitMovementInfoForBase()
 {
     uint32 vehicleFlags = GetVehicleInfo()->m_flags;
@@ -494,7 +503,7 @@ void Vehicle::InitMovementInfoForBase()
         _me->AddExtraUnitMovementFlag(MOVEMENTFLAG2_FULL_SPEED_PITCHING);
 }
 
-VehicleSeatEntry const* Vehicle::GetSeatForPassenger(Unit* passenger)
+VehicleSeatEntry const* Vehicle::GetSeatForPassenger(Unit const* passenger)
 {
     SeatMap::iterator itr;
     for (itr = Seats.begin(); itr != Seats.end(); ++itr)
