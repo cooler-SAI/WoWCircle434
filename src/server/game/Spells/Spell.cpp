@@ -5523,26 +5523,6 @@ SpellCastResult Spell::CheckCast(bool strict)
         // for effects of spells that have only one target
         switch (m_spellInfo->Effects[i].Effect)
         {
-            case SPELL_EFFECT_HEAL:
-            case SPELL_EFFECT_ENERGIZE:
-            {
-                // Handling for item heal or energize checks
-                Unit * target = m_targets.GetUnitTarget() ? m_targets.GetUnitTarget(): m_caster;
-                if (!target || target != m_caster || !m_CastItem || IsTriggered())
-                    break;
-
-                if (m_spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL)
-                {
-                    if (target->IsFullHealth())
-                        return SPELL_FAILED_ALREADY_AT_FULL_HEALTH;
-                }
-                else if (m_spellInfo->Effects[i].Effect == SPELL_EFFECT_ENERGIZE)
-                {
-                    if (target->IsFullPower())
-                        return m_spellInfo->PowerType == POWER_MANA ? SPELL_FAILED_ALREADY_AT_FULL_MANA: SPELL_FAILED_ALREADY_AT_FULL_POWER;
-                }
-                break;
-            }
             case SPELL_EFFECT_KNOCK_BACK_DEST:
             {
                 switch (m_spellInfo->Id)
@@ -6627,19 +6607,25 @@ SpellCastResult Spell::CheckItems()
                     return SPELL_FAILED_NO_CHARGES_REMAIN;
 
         // consumable cast item checks
-        if (proto->Class == ITEM_CLASS_CONSUMABLE && m_targets.GetUnitTarget())
+        Unit * target = m_targets.GetUnitTarget() ? m_targets.GetUnitTarget(): m_caster;
+        if (proto->Class == ITEM_CLASS_CONSUMABLE && target)
         {
             // such items should only fail if there is no suitable effect at all - see Rejuvenation Potions for example
             SpellCastResult failReason = SPELL_CAST_OK;
             for (int i = 0; i < MAX_SPELL_EFFECTS; i++)
             {
-                    // skip check, pet not required like checks, and for TARGET_UNIT_PET m_targets.GetUnitTarget() is not the real target but the caster
-                    if (m_spellInfo->Effects[i].TargetA.GetTarget() == TARGET_UNIT_PET)
+                // skip check, pet not required like checks, and for TARGET_UNIT_PET m_targets.GetUnitTarget() is not the real target but the caster
+                if (m_spellInfo->Effects[i].TargetA.GetTarget() == TARGET_UNIT_PET)
                     continue;
 
                 if (m_spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL)
                 {
-                    if (m_targets.GetUnitTarget()->IsFullHealth())
+                    if (m_spellInfo->HasEffect(SPELL_EFFECT_ENERGIZE))
+                    {
+                        break;   
+                    } 
+
+                    if (target->IsFullHealth())
                     {
                         failReason = SPELL_FAILED_ALREADY_AT_FULL_HEALTH;
                         continue;
@@ -6654,6 +6640,11 @@ SpellCastResult Spell::CheckItems()
                 // Mana Potion, Rage Potion, Thistle Tea(Rogue), ...
                 if (m_spellInfo->Effects[i].Effect == SPELL_EFFECT_ENERGIZE)
                 {
+                    if (m_spellInfo->HasEffect(SPELL_EFFECT_HEAL))
+                    {
+                        break;
+                    }
+
                     if (m_spellInfo->Effects[i].MiscValue < 0 || m_spellInfo->Effects[i].MiscValue >= int8(MAX_POWERS))
                     {
                         failReason = SPELL_FAILED_ALREADY_AT_FULL_POWER;
@@ -6661,7 +6652,7 @@ SpellCastResult Spell::CheckItems()
                     }
 
                     Powers power = Powers(m_spellInfo->Effects[i].MiscValue);
-                    if (m_targets.GetUnitTarget()->GetPower(power) == m_targets.GetUnitTarget()->GetMaxPower(power))
+                    if (target->IsFullPower())
                     {
                         failReason = SPELL_FAILED_ALREADY_AT_FULL_POWER;
                         continue;
