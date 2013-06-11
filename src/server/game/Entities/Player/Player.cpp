@@ -80,6 +80,7 @@
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "BattlefieldWG.h"
+#include "RatedBattleground.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -898,6 +899,8 @@ Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_rep
     _maxPersonalArenaRate = 0;
     _ConquestCurrencytotalWeekCap = 0;
 
+    m_rbg = NULL;	
+	
     memset(_voidStorageItems, 0, VOID_STORAGE_MAX_SLOT * sizeof(VoidStorageItem*));
     memset(_CUFProfiles, 0, MAX_CUF_PROFILES * sizeof(CUFProfile*));
 
@@ -941,6 +944,9 @@ Player::~Player()
 
     delete m_declinedname;
 
+    if (m_rbg)
+        delete m_rbg;
+	
     for (uint8 i = 0; i < VOID_STORAGE_MAX_SLOT; ++i)
         delete _voidStorageItems[i];
 
@@ -5562,6 +5568,10 @@ void Player::SendCemeteryList(bool onMap)
 
 bool Player::CanJoinConstantChannelInZone(ChatChannelsEntry const* channel, AreaTableEntry const* zone)
 {
+    // Player can join LFG anywhere
+    if (channel->flags & CHANNEL_DBC_FLAG_LFG)
+        return true;
+
     if (channel->flags & CHANNEL_DBC_FLAG_ZONE_DEP && zone->flags & AREA_FLAG_ARENA_INSTANCE)
         return false;
 
@@ -7299,14 +7309,31 @@ void Player::_SaveCurrency(SQLTransaction& trans)
     PreparedStatement* stmt = NULL;
     for (PlayerCurrenciesMap::iterator itr = _currencyStorage.begin(); itr != _currencyStorage.end(); ++itr)
     {
-        if (!sCurrencyTypesStore.LookupEntry(itr->first)) // should never happen
+        CurrencyTypesEntry const* entry = sCurrencyTypesStore.LookupEntry(itr->first);
+        if (!entry) // should never happen
             continue;
 
-        switch(itr->second.state)
+        switch (itr->second.state)
         {
             case PLAYERCURRENCY_NEW:
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_PLAYER_CURRENCY);
+                stmt->setUInt32(0, GetGUIDLow());
+                stmt->setUInt16(1, itr->first);
+                stmt->setUInt32(2, itr->second.weekCount);
+                stmt->setUInt32(3, itr->second.totalCount);
+                stmt->setUInt32(4, itr->second.seasonCount);
+                stmt->setUInt8(5, itr->second.flags);
+                trans->Append(stmt);
+                break;
             case PLAYERCURRENCY_CHANGED:
-                trans->PAppend("REPLACE INTO character_currency (guid, currency, week_count, total_count, season_count, flags) VALUES ('%u', '%u', '%u', '%u', '%u', '%u')", GetGUIDLow(), itr->first, itr->second.weekCount, itr->second.totalCount, itr->second.seasonCount, itr->second.flags);
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PLAYER_CURRENCY);
+                stmt->setUInt32(0, itr->second.weekCount);
+                stmt->setUInt32(1, itr->second.totalCount);
+                stmt->setUInt32(2, itr->second.seasonCount);
+                stmt->setUInt8(3, itr->second.flags);
+                stmt->setUInt32(4, GetGUIDLow());
+                stmt->setUInt16(5, itr->first);
+                trans->Append(stmt);
                 break;
             default:
                 break;
@@ -7420,6 +7447,11 @@ void Player::UpdateArea(uint32 newArea)
 
     AreaTableEntry const* area = GetAreaEntryByAreaID(newArea);
     pvpInfo.inFFAPvPArea = area && (area->flags & AREA_FLAG_ARENA);
+	
+    if (Battleground* bg = GetBattleground())
+        if (bg->IsRBG())
+            pvpInfo.inFFAPvPArea = true;
+	
     UpdatePvPState(true);
 
     UpdateAreaDependentAuras(newArea);
@@ -9570,6 +9602,8 @@ void Player::SendBattlefieldWorldStates()
             }
         }
     }
+
+    SendUpdateWorldState(WORLD_STATE_ENABLE_RATED_BG, 1);
 }
 
 uint32 Player::GetXPRestBonus(uint32 xp)
@@ -14660,6 +14694,10 @@ bool Player::CanRewardQuest(Quest const* quest, bool msg)
         }
     }
 
+    for (uint32 i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; i++)
+        if (quest->RequiredCurrencyId[i] && !HasCurrency(quest->RequiredCurrencyId[i], quest->RequiredCurrencyCount[i]))
+            return false;
+
     // prevent receive reward with low money and GetRewOrReqMoney() < 0
     if (quest->GetRewOrReqMoney() < 0 && !HasEnoughMoney(-int64(quest->GetRewOrReqMoney())))
         return false;
@@ -14696,8 +14734,7 @@ bool Player::CanRewardQuest(Quest const* quest, uint32 reward, bool msg)
                 ItemPosCountVec dest;
                 InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, quest->RewardItemId[i], quest->RewardItemIdCount[i]);
                 if (res != EQUIP_ERR_OK)
-                
-{
+	{
                     SendEquipError(res, NULL, NULL, quest->RewardItemId[i]);
                     return false;
                 }
@@ -14738,6 +14775,12 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
 
     if (quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_PLAYER_KILL))
         questStatusData.PlayerCount = 0;
+
+    //if (quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_CURRENCY))
+    //{
+    //    for (uint8 i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; ++i)
+    //        questStatusData.CurrencyCount[i] = 0;
+    //}
 
     GiveQuestSourceItem(quest);
     AdjustQuestReqItemCount(quest, questStatusData);
@@ -14823,6 +14866,10 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
         if (quest->RequiredItemId[i])
             DestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true);
 
+    for (uint8 i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; ++i)
+        if (quest->RequiredCurrencyId[i])
+            ModifyCurrency(quest->RequiredCurrencyId[i], -int32(quest->RequiredCurrencyCount[i]));
+			
     for (uint8 i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
     {
         if (quest->RequiredSourceItemId[i])
@@ -16638,6 +16685,9 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
 
     _LoadArenaTeamInfo(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOADARENAINFO));
 
+    m_rbg = new RatedBattleground(GetGUID());
+    m_rbg->LoadStats();
+	
     // check arena teams integrity
     for (uint32 arena_slot = 0; arena_slot < MAX_ARENA_SLOT; ++arena_slot)
     {
@@ -20861,7 +20911,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
     if (count < 1) count = 1;
 
     // cheating attempt
-    if (slot > MAX_BAG_SIZE && slot !=NULL_SLOT)
+    if (slot > MAX_BAG_SIZE && slot != NULL_SLOT)
         return false;
 
     if (!isAlive())
@@ -26332,11 +26382,6 @@ PlayerRole Player::GetRole() const
     }
 
     return role;
-}
-
-uint32 Player::GetRBGPersonalRating() const
-{
-    return 0;
 }
 
 void Player::SendBattlegroundTimer(uint32 currentTime, uint32 maxTime)

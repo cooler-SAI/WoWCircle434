@@ -463,12 +463,21 @@ WorldPacket Battlefield::BuildWarningAnnPacket(std::string msg)
     return data;
 }
 
-void Battlefield::SendWarningToAllInZone(uint32 entry)
+void Battlefield::SendWarningToAllInZone(uint32 entry,...)
 {
-    if (Unit* unit = sObjectAccessor->FindUnit(StalkerGuid))
+    const char *format = sObjectMgr->GetTrinityStringForDBCLocale(entry);
+    va_list ap;
+    char str [1024];
+    va_start(ap, entry);
+    vsnprintf(str,1024,format, ap);
+    va_end(ap);
+    std::string msg = (std::string)str;
+    WorldPacket data = BuildWarningAnnPacket(msg);
+    BroadcastPacketToZone(data);
+   /* if (Unit* unit = sObjectAccessor->FindUnit(StalkerGuid))
         if (Creature* stalker = unit->ToCreature())
             // FIXME: replaced CHAT_TYPE_END with CHAT_MSG_BG_SYSTEM_NEUTRAL to fix compile, it's a guessed change :/
-            sCreatureTextMgr->SendChat(stalker, (uint8) entry, 0, CHAT_MSG_BG_SYSTEM_NEUTRAL, LANG_ADDON, TEXT_RANGE_ZONE);
+            sCreatureTextMgr->SendChat(stalker, (uint8) entry, 0, CHAT_MSG_BG_SYSTEM_NEUTRAL, LANG_ADDON, TEXT_RANGE_ZONE);*/
 }
 
 /*void Battlefield::SendWarningToAllInWar(int32 entry,...)
@@ -673,6 +682,43 @@ void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, uint64 guid)
     player->GetSession()->SendPacket(&data);
 }
 
+bool Battlefield::IncrementQuest(Player *player, uint32 quest, bool complete)
+{
+    if (!player)
+        return false;
+    Quest const* pQuest = sObjectMgr->GetQuestTemplate(quest);
+    if (!pQuest || player->GetQuestStatus(quest) == QUEST_STATUS_NONE)
+        return false;
+    if (complete)
+    {
+        player->CompleteQuest(quest);
+        return true;
+    }
+    else
+    {
+        for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+        {
+			int32 creature = pQuest->RequiredNpcOrGo[i];
+			if (uint32 spell_id = pQuest->RequiredSpellCast[i])
+            {
+                player->CastedCreatureOrGO(creature,0,spell_id);
+                return true;
+            }
+            else if (creature > 0)
+            {
+                player->KilledMonsterCredit(creature,0);
+                return true;
+            }
+            else if (creature < 0)
+            {
+                player->CastedCreatureOrGO(creature,0,0);
+                return true;
+            }
+            return true;
+        }
+    }
+    return false;
+}
 // ----------------------
 // - BfGraveyard Method -
 // ----------------------
@@ -690,6 +736,34 @@ void BfGraveyard::Initialize(TeamId startControl, uint32 graveyardId)
 {
     m_ControlTeam = startControl;
     m_GraveyardId = graveyardId;
+}
+
+void BfGraveyard::Initialize(uint32 horde_entry,uint32 alliance_entry,float x,float y, float z, float o,TeamId startcontrol,uint32 gy)
+{
+    m_ControlTeam = startcontrol;
+    if(Creature* cre = m_Bf->SpawnCreature(horde_entry,x,y,z,o,TEAM_HORDE))
+    {
+		m_SpiritGuide[TEAM_HORDE] = cre->GetGUID();
+        cre->SetReactState(REACT_PASSIVE);
+        if(m_ControlTeam==TEAM_ALLIANCE){
+           cre->SetVisible(false);
+        }
+    }
+    else
+		sLog->outError(LOG_FILTER_BATTLEFIELD, "BfGraveYard::Init can't spawn horde spiritguide %u",horde_entry);
+
+    if(Creature* cre = m_Bf->SpawnCreature(alliance_entry,x,y,z,o,TEAM_ALLIANCE))
+    {
+		m_SpiritGuide[TEAM_ALLIANCE] = cre->GetGUID();
+        cre->SetReactState(REACT_PASSIVE);
+        if(m_ControlTeam==TEAM_HORDE){
+            cre->SetVisible(false);
+        }
+    }
+    else
+        sLog->outError(LOG_FILTER_BATTLEFIELD, "BfGraveYard::Init can't spawn alliance spiritguide %u",alliance_entry);
+
+    m_GraveyardId = gy;
 }
 
 void BfGraveyard::SetSpirit(Creature* spirit, TeamId team)
@@ -842,10 +916,10 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
 }
 
 // Method for spawning gameobject on map
-GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z, float o)
+GameObject* Battlefield::SpawnGameObject(uint32 entry, uint32 mapid, float x, float y, float z, float o)
 {
     // Get map object
-    Map* map = const_cast<Map*>(sMapMgr->CreateBaseMap(571)); // *vomits*
+    Map* map = const_cast<Map*>(sMapMgr->CreateBaseMap(mapid));
     if (!map)
         return 0;
 
@@ -919,6 +993,42 @@ void BfCapturePoint::SendChangePhase()
     SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate2, (uint32) ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f));
     // send this too, sometimes it resets :S
     SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate3, m_neutralValuePct);
+}
+
+bool BfCapturePoint::SetCapturePointData(uint32 entry, uint32 map, float x, float y, float z, float o)
+{
+    sLog->outDebug(LOG_FILTER_BATTLEGROUND, "Creating capture point %u", entry);
+
+    // check info existence
+    GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
+    if (!goinfo || goinfo->type != GAMEOBJECT_TYPE_CAPTURE_POINT)
+    {
+		sLog->outError(LOG_FILTER_OUTDOORPVP, "OutdoorPvP: GO %u is not capture point!", entry);
+        return false;
+    }
+
+    if (m_capturePoint = m_Bf->SpawnGameObject(entry,map,x,y,z,o))
+    {    
+        // get the needed values from goinfo
+        m_maxValue = goinfo->capturePoint.maxTime;
+        m_maxSpeed = m_maxValue / (goinfo->capturePoint.minTime ? goinfo->capturePoint.minTime : 60);
+        m_neutralValuePct = goinfo->capturePoint.neutralPercent;
+        m_minValue = m_maxValue * goinfo->capturePoint.neutralPercent / 100;
+        m_capturePointEntry = entry;
+        if (m_team == TEAM_ALLIANCE)
+        {
+            m_value = m_maxValue;
+            m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE;
+        }
+        else 
+        {
+            m_value = -m_maxValue;
+            m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE;
+        }
+        return true;
+    }
+    else
+        return false;
 }
 
 bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)

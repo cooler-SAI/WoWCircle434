@@ -13,11 +13,11 @@ enum ScriptTexts
     SAY_CONVERSION    = 2,
     SAY_AGGRO        = 3,
     SAY_ADDS        = 4,
-    SAY_CONSUME        = 7,
-    SAY_CREATIONS    = 8,
-    SAY_DEATH_1        = 11,
-    SAY_DEATH_2        = 12,
-    SAY_WIPE        = 13,
+    SAY_CONSUME        = 6,
+    SAY_CREATIONS    = 7,
+    SAY_DEATH_1        = 10,
+    SAY_DEATH_2        = 11,
+    SAY_WIPE        = 12,
 };
 
 enum Spells

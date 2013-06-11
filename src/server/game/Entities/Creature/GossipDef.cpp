@@ -604,7 +604,7 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, uint64 npcGUID, 
         SendQuestGiverOfferReward(quest, npcGUID, true);
         return;
     }
-
+        sLog->outError(LOG_FILTER_GENERAL, "Req item packet");
     WorldPacket data(SMSG_QUESTGIVER_REQUEST_ITEMS, 50);    // guess size
     data << uint64(npcGUID);
     data << uint32(quest->GetQuestId());

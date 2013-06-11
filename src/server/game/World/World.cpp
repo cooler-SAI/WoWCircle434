@@ -1274,6 +1274,14 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_WINTERGRASP_BATTLETIME] = ConfigMgr::GetIntDefault("Wintergrasp.BattleTimer", 30);
     m_int_configs[CONFIG_WINTERGRASP_NOBATTLETIME] = ConfigMgr::GetIntDefault("Wintergrasp.NoBattleTimer", 150);
     m_int_configs[CONFIG_WINTERGRASP_RESTART_AFTER_CRASH] = ConfigMgr::GetIntDefault("Wintergrasp.CrashRestartTimer", 10);
+	
+    m_bool_configs[CONFIG_TOL_BARAD_ENABLE] = ConfigMgr::GetBoolDefault("Tolbarad.Enable", false);
+    m_int_configs[CONFIG_TOL_BARAD_PLR_MAX] = ConfigMgr::GetIntDefault("Tolbarad.PlayerMax", 100);
+    m_int_configs[CONFIG_TOL_BARAD_PLR_MIN] = ConfigMgr::GetIntDefault("Tolbarad.PlayerMin", 0);
+    m_int_configs[CONFIG_TOL_BARAD_PLR_MIN_LVL] = ConfigMgr::GetIntDefault("Tolbarad.PlayerMinLvl", 85);
+    m_int_configs[CONFIG_TOL_BARAD_BATTLETIME] = ConfigMgr::GetIntDefault("Tolbarad.BattleTimer", 30);
+    m_int_configs[CONFIG_TOL_BARAD_NOBATTLETIME] = ConfigMgr::GetIntDefault("Tolbarad.NoBattleTimer", 150);
+    m_int_configs[CONFIG_TOL_BARAD_RESTART_AFTER_CRASH] = ConfigMgr::GetIntDefault("Tolbarad.CrashRestartTimer", 10);
 
     // loading boost
     m_bool_configs[CONFIG_DATABASE_SKIP_LOAD_LOOT] = ConfigMgr::GetBoolDefault("skipLootLoading", false);
@@ -1499,6 +1507,9 @@ void World::SetInitialWorldSettings()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Creature Data...");
     sObjectMgr->LoadCreatures();
 
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Temporary Summon Data...");
+    sObjectMgr->LoadTempSummons();                               // must be after LoadCreatureTemplates() and LoadGameObjectTemplates()
+	
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading pet levelup spells...");
     sSpellMgr->LoadPetLevelupSpellMap();
 
@@ -1782,6 +1793,9 @@ void World::SetInitialWorldSettings()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Initialize game time and timers");
     m_gameTime = time(NULL);
     m_startTime = m_gameTime;
+
+    LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES(%u, %u, 0, '%s')",
+                           realmID, uint32(m_startTime), _FULLVERSION);       // One-time query
 
     m_timers[WUPDATE_WEATHERS].SetInterval(1*IN_MILLISECONDS);
     m_timers[WUPDATE_RESETCAP].SetInterval(1*IN_MILLISECONDS);
@@ -2095,6 +2109,15 @@ void World::Update(uint32 diff)
         uint32 maxOnlinePlayers = GetMaxPlayerCount();
 
         m_timers[WUPDATE_UPTIME].Reset();
+
+        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_UPTIME_PLAYERS);
+
+        stmt->setUInt32(0, tmpDiff);
+        stmt->setUInt16(1, uint16(maxOnlinePlayers));
+        stmt->setUInt32(2, realmID);
+        stmt->setUInt32(3, uint32(m_startTime));
+
+        LoginDatabase.Execute(stmt);
     }
 
     /// <li> Clean logs table
@@ -2394,20 +2417,46 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, std::string dura
     PreparedQueryResult resultAccounts = PreparedQueryResult(NULL); //used for kicking
     PreparedStatement* stmt = NULL;
 
+    if (mode == BAN_ACCOUNT_ID)
+    {
+        uint32 account = atoi(nameOrIP.c_str());
+        SQLTransaction trans = LoginDatabase.BeginTransaction();
+        // make sure there is only one active ban
+        stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
+        stmt->setUInt32(0, account);
+        trans->Append(stmt);
+        // No SQL injection with prepared statements
+        stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_AUTO_BANNED);
+        stmt->setUInt32(0, account);
+        stmt->setUInt32(1, ConfigMgr::GetIntDefault("RealmID", 0));
+        stmt->setUInt32(2, duration_secs);
+        stmt->setString(3, author);
+        stmt->setString(4, reason);
+        trans->Append(stmt);
+
+        if (WorldSession* sess = FindSession(account))
+            if (std::string(sess->GetPlayerName()) != author)
+                sess->KickPlayer();
+
+        LoginDatabase.CommitTransaction(trans);
+        return BAN_SUCCESS;
+    }
+
     ///- Update the database with ban information
     switch (mode)
     {
          case BAN_IP:
              // No SQL injection with prepared statements
              stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_IP);
-             stmt->setString(0, nameOrIP);
-             resultAccounts = LoginDatabase.Query(stmt);
-             stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_IP_BANNED);
-             stmt->setString(0, nameOrIP);
-             stmt->setUInt32(1, duration_secs);
-             stmt->setString(2, author);
-             stmt->setString(3, reason);
-             LoginDatabase.Execute(stmt);
+            stmt->setString(0, nameOrIP);
+            resultAccounts = LoginDatabase.Query(stmt);
+            stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_IP_BANNED);
+            stmt->setString(0, nameOrIP);
+            stmt->setUInt32(1, ConfigMgr::GetIntDefault("RealmID", 0));
+            stmt->setUInt32(2, duration_secs);
+            stmt->setString(3, author);
+            stmt->setString(4, reason);
+            LoginDatabase.Execute(stmt);
              break;
          case BAN_ACCOUNT:
              // No SQL injection with prepared statements
@@ -2484,6 +2533,16 @@ bool World::RemoveBanAccount(BanMode mode, std::string nameOrIP)
             account = sObjectMgr->GetPlayerAccountIdByPlayerName(nameOrIP);
 
         if (!account)
+            return false;
+
+        QueryResult result = LoginDatabase.PQuery("SELECT realm FROM account_banned WHERE id = '%u' AND active = '1'", account);
+        if (!result)
+            return false;
+
+        Field *fields = result->Fetch();
+        uint32 realmID = fields[0].GetUInt32();
+
+        if (realmID != ConfigMgr::GetIntDefault("RealmID", 0))
             return false;
 
         //NO SQL injection as account is uint32

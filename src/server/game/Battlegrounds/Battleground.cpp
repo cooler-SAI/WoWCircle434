@@ -37,6 +37,7 @@
 #include "Util.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "RatedBattleground.h"
 
 namespace Trinity
 {
@@ -217,6 +218,8 @@ Battleground::Battleground()
     StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_WS_START_ONE_MINUTE;
     StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_WS_START_HALF_MINUTE;
     StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_WS_HAS_BEGUN;
+
+    m_rbgFlag = false;
 }
 
 Battleground::~Battleground()
@@ -893,7 +896,8 @@ void Battleground::EndBattleground(uint32 winner)
                     }
             }
 
-            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, 1);
+            if (IsRBG())
+                player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_BATTLEGROUND, GetMapId());
         }
         else
         {
@@ -908,6 +912,15 @@ void Battleground::EndBattleground(uint32 winner)
 
         sBattlegroundMgr->FinishAndSendPvpLogDataPacket(&pvpLogData, this, &buff, player);
 
+        if (IsRBG())
+        {
+            uint32 loser = winner == HORDE ? ALLIANCE : HORDE;
+            player->getRBG()->FinishGame(team == winner, GetArenaMatchmakerRating(team == winner ? loser : winner));
+
+            if (team == winner)
+                player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_BG, RatedBattleground::ConquestPointReward);
+        }
+		
         WorldPacket data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player, player->GetBattlegroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, player->GetBattlegroundQueueJoinTime(GetTypeID()), 0, GetArenaType());
         player->GetSession()->SendPacket(&data);
@@ -1068,7 +1081,7 @@ void Battleground::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
         if (Transport)
             player->TeleportToBGEntryPoint();
 
-        sLog->outInfo(LOG_FILTER_BATTLEGROUND, "BATTLEGROUND: Removed player %s from Battleground.", player->GetName());
+        sLog->outError(LOG_FILTER_BATTLEGROUND, "BATTLEGROUND: Removed player %s from Battleground.", player->GetName());
     }
 
     //battleground object will be deleted next Battleground::Update() call
@@ -1153,7 +1166,7 @@ void Battleground::AddPlayer(Player* player)
 
     player->RemoveAurasByType(SPELL_AURA_MOUNTED);
     player->RemoveAurasByType(SPELL_AURA_FLY);
-
+	
     // add arena specific auras
     if (isArena())
     {
@@ -1246,6 +1259,7 @@ void Battleground::AddOrSetPlayerToCorrectBgGroup(Player* player, uint32 team)
                 {
                     group->ChangeLeader(playerGuid);
                     group->SendUpdate();
+                    group->SendRaidMarkerUpdateToPlayer(playerGuid);
                 }
         }
     }

@@ -51,9 +51,6 @@ BattlegroundBFG::~BattlegroundBFG() {}
 
 void BattlegroundBFG::PostUpdateImpl(uint32 diff)
 {
-    if (GetStatus() != STATUS_IN_PROGRESS)
-        return;
-
     if (GetStatus() == STATUS_IN_PROGRESS)
     {
         int team_points[BG_TEAMS_COUNT] = { 0, 0 };
@@ -306,7 +303,7 @@ void BattlegroundBFG::FillInitialWorldStates(WorldPacket& data)
     data << uint32(GILNEAS_BG_OP_RESOURCES_HORDE)    << uint32(m_TeamScores[TEAM_HORDE]);
 
     // other unknown
-    //data << uint32(0x745) << uint32(0x2);           // 37 1861 unk
+    data << uint32(0x745) << uint32(0x2);           // 37 1861 unk
 }
 
 void BattlegroundBFG::_SendNodeUpdate(uint8 node)
@@ -418,7 +415,7 @@ void BattlegroundBFG::EventPlayerClickedOnFlag(Player* source, GameObject* /*tar
         return;
     }
 
-    TeamId teamIndex = GetTeamIndexByTeamId(source->GetTeam());
+    TeamId teamIndex = GetTeamIndexByTeamId(source->GetBGTeam());
 
     // Check if player really could use this banner, and has not cheated
     if (!(_Nodes[node] == 0 || teamIndex == _Nodes[node]%2))
@@ -645,7 +642,7 @@ void BattlegroundBFG::EndBattleground(uint32 winner)
 
 WorldSafeLocsEntry const* BattlegroundBFG::GetClosestGraveYard(Player* player)
 {
-    TeamId teamIndex = GetTeamIndexByTeamId(player->GetTeam());
+    TeamId teamIndex = GetTeamIndexByTeamId(player->GetBGTeam());
 
     // Is there any occupied node for this team?
     std::vector<uint8> nodes;

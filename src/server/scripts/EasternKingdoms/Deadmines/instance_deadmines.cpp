@@ -67,19 +67,24 @@ class instance_deadmines : public InstanceMapScript
 				}
 			}
 
-			void OnGameObjectCreate(GameObject* pGo, bool)
+			void OnGameObjectCreate(GameObject *pGo)
 			{
 				switch(pGo->GetEntry())
 				{
 				    case GO_FACTORY_DOOR:   
-					    break;
 				    case GO_MAST_ROOM_DOOR:   
 				    case GO_FOUNDRY_DOOR:   
-                        AddDoor(pGo, true);
+					    AddDoor(pGo, true);
 					    break;
-				    case GO_IRONCLAD_DOOR:  IronCladDoorGUID = pGo->GetGUID();  break;
-				    case GO_DEFIAS_CANNON:  DefiasCannonGUID = pGo->GetGUID();  break;
-				    case GO_DOOR_LEVER:     DoorLeverGUID = pGo->GetGUID();     break;
+				    case GO_IRONCLAD_DOOR:
+					    IronCladDoorGUID = pGo->GetGUID();  
+					    break;
+				    case GO_DEFIAS_CANNON:  
+					    DefiasCannonGUID = pGo->GetGUID();  
+					    break;
+				    case GO_DOOR_LEVER:     
+					    DoorLeverGUID = pGo->GetGUID();     
+					    break;
 				}
 			}
 

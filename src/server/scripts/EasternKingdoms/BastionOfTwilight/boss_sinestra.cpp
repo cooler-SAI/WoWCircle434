@@ -708,6 +708,7 @@ class npc_sinestra_twilight_whelp : public CreatureScript
             void Reset()
             {
                 events.Reset();
+                DoZoneInCombat();
             }
 
             void IsSummonedBy(Unit* summoner)

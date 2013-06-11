@@ -31,8 +31,8 @@ enum ArionScriptText
 
 enum TerrastraScriptText
 {
-    SAY_TERRASTRA_AGGRO        = 1,
-    SAY_TERRASTRA_KILL        = 0,
+    SAY_TERRASTRA_AGGRO        = 0,
+    SAY_TERRASTRA_KILL        = 1,
     SAY_TERRASTRA_SPELL        = 2,
     SAY_TERRASTRA_SPECIAL    = 3,
 };
@@ -41,8 +41,8 @@ enum MonstrosityScriptText
 {
     SAY_MONSTROSITY_AGGRO        = 0,
     SAY_MONSTROSITY_KILL        = 1,
-    SAY_MONSTROSITY_DEATH        = 3,
-    SAY_MONSTROSITY_SPELL        = 4,
+    SAY_MONSTROSITY_DEATH        = 2,
+    SAY_MONSTROSITY_SPELL        = 3,
 };
 
 enum Spells

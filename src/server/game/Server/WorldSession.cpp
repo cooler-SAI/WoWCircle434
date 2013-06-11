@@ -514,8 +514,13 @@ void WorldSession::LogoutPlayer(bool Save)
             if (BattlegroundQueueTypeId bgQueueTypeId = _player->GetBattlegroundQueueTypeId(i))
             {
                 _player->RemoveBattlegroundQueueId(bgQueueTypeId);
-                BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
-                queue.RemovePlayer(_player->GetGUID(), true);
+                if (bgQueueTypeId != BATTLEGROUND_QUEUE_RBG)
+                {
+                    BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
+                    queue.RemovePlayer(_player->GetGUID(), true);
+                }
+                else
+                    sRBGQueue->RemovePlayer(_player->GetGUID());
             }
         }
 

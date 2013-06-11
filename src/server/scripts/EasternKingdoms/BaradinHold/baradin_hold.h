@@ -10,6 +10,8 @@ enum Creatures
     NPC_ARGALOTH            = 47120,
     NPC_OCCUTHAR            = 52363,
     NPC_ALIZABAL            = 55869,
+	
+    NPC_FEL_FLAMES          = 47829,
 };
 
 enum Gameobjects

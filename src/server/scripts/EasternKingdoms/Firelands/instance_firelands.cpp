@@ -15,7 +15,11 @@ static const DoorData doordata[] =
     {GO_BRIDGE_OF_RHYOLITH,  DATA_RHYOLITH,  DOOR_TYPE_SPAWN_HOLE,  BOUNDARY_NONE},
     {GO_FIRE_WALL_FANDRAL_1, DATA_STAGHELM,  DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
     {GO_FIRE_WALL_FANDRAL_2, DATA_STAGHELM,  DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
-    {GO_SULFURON_KEEP,       DATA_RAGNAROS,  DOOR_TYPE_ROOM,        BOUNDARY_NONE},
+    {GO_SULFURON_KEEP,       DATA_RAGNAROS,  DOOR_TYPE_ROOM,        BOUNDARY_NONE},	
+    {GO_RAID_BRIDGE_FORMING, DATA_RHYOLITH,  DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
+    {GO_RAID_BRIDGE_FORMING, DATA_SHANNOX,   DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
+    {GO_RAID_BRIDGE_FORMING, DATA_BETHTILAC, DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
+    {GO_RAID_BRIDGE_FORMING, DATA_ALYSRAZOR, DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
     {0, 0, DOOR_TYPE_ROOM, BOUNDARY_NONE},
 };
 
@@ -44,6 +48,8 @@ class instance_firelands : public InstanceMapScript
                 uiRagnarosFloor = 0;
                 uiRagnarosCache10 = 0;
                 uiRagnarosCache25 = 0;
+                uiRagnarosCache10h = 0;
+                uiRagnarosCache25h = 0;
                 uiTimer = 0;
                 bEvent = false;
                 creaturePortals.clear();
@@ -115,8 +121,14 @@ class instance_firelands : public InstanceMapScript
                     case GO_CACHE_OF_THE_FIRELORD_25:
                         uiRagnarosCache25 = pGo->GetGUID();
                         break;
+                    case GO_CACHE_OF_THE_FIRELORD_10h:
+                        uiRagnarosCache10h = pGo->GetGUID();
+                        break;
+                    case GO_CACHE_OF_THE_FIRELORD_25h:
+                        uiRagnarosCache25h = pGo->GetGUID();
+                        break;
                 }
-		    }
+                    }
 
             void SetData(uint32 type, uint32 data)
             {
@@ -278,6 +290,8 @@ class instance_firelands : public InstanceMapScript
                 uint64 uiRagnarosFloor;
                 uint64 uiRagnarosCache10;
                 uint64 uiRagnarosCache25;
+                uint64 uiRagnarosCache10h;
+                uint64 uiRagnarosCache25h;
                 std::list<GameObject*> gameobjectPortals;
                 std::list<Creature*> creaturePortals;
         };
