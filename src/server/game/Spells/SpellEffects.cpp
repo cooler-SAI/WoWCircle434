@@ -1276,10 +1276,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                         
                         // Judgement of the Just 
                         if (AuraEffect* aurEff = m_caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_PALADIN, 3015, 0))
-                        {
-                            int32 bp0 = aurEff->GetAmount();
-                            m_caster->CastCustomSpell(unitTarget, 68055, &bp0, 0, 0, true);
-                        }
+                            m_caster->CastSpell(unitTarget, 68055, true);
                     }
 
                     uint32 spellId = 0;
