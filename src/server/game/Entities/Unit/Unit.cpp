@@ -4609,6 +4609,47 @@ int32 Unit::GetMaxNegativeAuraModifierByAffectMask(AuraType auratype, SpellInfo 
     return modifier;
 }
 
+int32 Unit::GetAuraAmountNoStack(AuraEffect const* effect) const
+{
+    int32 amount = effect->GetAmount();
+    if (!amount)
+        return 0;
+
+    int32 cur_amount = amount;
+
+    AuraType auratype = effect->GetAuraType();
+    AuraEffectList const& mTotalAuraList = GetAuraEffectsByType(auratype);
+    for (AuraEffectList::const_iterator i = mTotalAuraList.begin(); i != mTotalAuraList.end(); ++i)
+    {
+        if (sSpellMgr->CheckSpellGroupStackRules(effect->GetSpellInfo(), (*i)->GetSpellInfo()) == SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT)
+        {
+            if (amount < 0)
+            {
+                if (amount < (*i)->GetAmount())
+                {
+                    cur_amount = amount - (*i)->GetAmount();
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            else
+            {
+                if (amount > (*i)->GetAmount())
+                {
+                    cur_amount = amount - (*i)->GetAmount();
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+    }
+    return cur_amount;
+}
+
 void Unit::_RegisterDynObject(DynamicObject* dynObj)
 {
     m_dynObj.push_back(dynObj);

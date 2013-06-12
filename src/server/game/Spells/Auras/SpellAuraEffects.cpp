@@ -4962,9 +4962,12 @@ void AuraEffect::HandleModMeleeRangedSpeedPct(AuraApplication const* aurApp, uin
     //! ToDo: Haste auras with the same handler _CAN'T_ stack together
     Unit* target = aurApp->GetTarget();
 
-    target->ApplyAttackTimePercentMod(BASE_ATTACK, (float)GetAmount(), apply);
-    target->ApplyAttackTimePercentMod(OFF_ATTACK, (float)GetAmount(), apply);
-    target->ApplyAttackTimePercentMod(RANGED_ATTACK, (float)GetAmount(), apply);
+    if (int32 amount = target->GetAuraAmountNoStack(this))
+    {
+        target->ApplyAttackTimePercentMod(BASE_ATTACK, (float)amount, apply);
+        target->ApplyAttackTimePercentMod(OFF_ATTACK, (float)amount, apply);
+        target->ApplyAttackTimePercentMod(RANGED_ATTACK, (float)amount, apply);
+    }
 }
 
 void AuraEffect::HandleModCombatSpeedPct(AuraApplication const* aurApp, uint8 mode, bool apply) const
