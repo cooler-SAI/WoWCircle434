@@ -1060,6 +1060,19 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                // Chirping Box
+                case 98681:
+                {
+                    if (Player* pPlayer = m_caster->ToPlayer())
+                    {
+                        if (!pPlayer->HasItemCount(65661) && !pPlayer->HasSpell(78683))
+                            pPlayer->AddItem(65661, 1);
+                        
+                        if (!pPlayer->HasItemCount(65662) && !pPlayer->HasSpell(78685))
+                            pPlayer->AddItem(65662, 1);
+                    }
+                    return;
+                }
                 // Flask of Enhancement
                 case 79637:
                 {
