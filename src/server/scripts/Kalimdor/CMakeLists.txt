@@ -63,7 +63,9 @@ set(scripts_STAT_SRCS
   Kalimdor/CavernsOfTime/WellofEternity/well_of_eternity.h
   Kalimdor/CavernsOfTime/HourofTwilight/instance_hour_of_twilight.cpp
   Kalimdor/CavernsOfTime/HourofTwilight/hour_of_twilight.h
+  Kalimdor/CavernsOfTime/DragonSoul/boss_morchok.cpp
   Kalimdor/CavernsOfTime/DragonSoul/instance_dragon_soul.cpp
+  Kalimdor/CavernsOfTime/DragonSoul/dragon_soul.cpp
   Kalimdor/CavernsOfTime/DragonSoul/dragon_soul.h
   Kalimdor/ThroneoftheFourWinds/instance_throne_of_the_four_winds.cpp
   Kalimdor/ThroneoftheFourWinds/throne_of_the_four_winds.h

@@ -3026,6 +3026,10 @@ void SpellMgr::LoadSpellCustomAttr()
             case 100214: // Flame Scythe
             case 105069: // Seething Hate
             case 108094: // Seething Hate
+            case 103414: // Stomp
+            case 108571: // Stomp
+            case 109033: // Stomp
+            case 109034: // Stomp
                 // ONLY SPELLS WITH SPELLFAMILY_GENERIC and EFFECT_SCHOOL_DAMAGE
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 break;
@@ -6153,6 +6157,34 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
             // ENDOF WELL OF ETERNITY SPELLS
+            //
+            // DRAGON SOUL SPELLS
+            //
+            case 109247:
+                spellInfo->Effects[EFFECT_0].BasePoints = 0;
+                spellInfo->Effects[EFFECT_1].BasePoints = 0;
+                break;
+            // Morchok
+            case 103821: // Earthen Vortex
+            case 110047:
+            case 110046:
+            case 110045:
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_STUN;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_60_YARDS);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(EFFECT_RADIUS_60_YARDS);
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(EFFECT_RADIUS_60_YARDS);
+                break;
+            case 103178: // Earths Vengeance dmg
+                spellInfo->SetDurationIndex(18);
+                break;
+            case 103534: // Danger
+            case 103536: // Warning
+            case 103541: // Safe
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
+                break;
+            // ENDOF DRAGON SOUL SPELLS
+            //
             // Camouflage
             case 80325:
                 spellInfo->Effects[EFFECT_1].Effect = 0;

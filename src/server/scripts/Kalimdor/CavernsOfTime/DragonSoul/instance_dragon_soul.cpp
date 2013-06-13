@@ -24,46 +24,66 @@ public:
         {
             SetBossNumber(MAX_ENCOUNTER);
             LoadDoorData(doordata);
+
+            uiMorchokGUID = 0;
+            uiKohcromGUID = 0;
         }
 
         void OnPlayerEnter(Player* pPlayer)
         {
             if (!uiTeamInInstance)
-				uiTeamInInstance = pPlayer->GetTeam();
+                uiTeamInInstance = pPlayer->GetTeam();
         }
 
         void OnCreatureCreate(Creature* pCreature)
         {
-		}
+            switch (pCreature->GetEntry())
+            {
+                case NPC_MORCHOK:
+                    uiMorchokGUID = pCreature->GetGUID();
+                    break;
+                case NPC_KOHCROM:
+                    uiKohcromGUID = pCreature->GetGUID();
+                    break;
+                default:
+                    break;
+            }
+        }
 
         void OnGameObjectCreate(GameObject* pGo)
         {
-		}
+        }
 
         void OnGameObjectRemove(GameObject* pGo)
-		{
-		}
+        {
+        }
 
         void SetData(uint32 type, uint32 data)
         {
-		}
+        }
 
         uint32 GetData(uint32 type)
         {
-			return 0;
+            return 0;
         }
 
         uint64 GetData64(uint32 type)
         {
+            switch (type)
+            {
+                case DATA_MORCHOK: return uiMorchokGUID;
+                case DATA_KOHCROM: return uiKohcromGUID;
+                default: return 0;
+            }
             return 0;
         }
 
         bool SetBossState(uint32 type, EncounterState state)
         {
-			if (!InstanceScript::SetBossState(type, state))
-				return false;
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
 
-			return true;
+            return true;
         }
 
         std::string GetSaveData()
@@ -73,7 +93,7 @@ public:
             std::string str_data;
 
             std::ostringstream saveStream;
-            saveStream << "H o T " << GetBossSaveData();
+            saveStream << "D S " << GetBossSaveData();
 
             str_data = saveStream.str();
 
@@ -99,24 +119,27 @@ public:
             if (dataHead1 == 'D' && dataHead2 == 'S')
             {
                 for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-				{
-					uint32 tmpState;
-					loadStream >> tmpState;
-					if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-						tmpState = NOT_STARTED;
-					SetBossState(i, EncounterState(tmpState));
-				}} else OUT_LOAD_INST_DATA_FAIL;
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                        tmpState = NOT_STARTED;
+                    SetBossState(i, EncounterState(tmpState));
+                }} else OUT_LOAD_INST_DATA_FAIL;
 
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
         private:
             uint32 uiTeamInInstance;
+
+            uint64 uiMorchokGUID;
+            uint64 uiKohcromGUID;
            
     };
 };
 
 void AddSC_instance_dragon_soul()
 {
-	   new instance_dragon_soul();
+    new instance_dragon_soul();
 }

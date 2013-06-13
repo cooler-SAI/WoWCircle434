@@ -355,7 +355,43 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 }
 
                 switch (m_spellInfo->Id)                     // better way to check unknown
-                {
+                {   
+                    // Resonating Crystal dmg, Morchok, Dragon Soul
+                    case 103545:
+                    case 108572:
+                    case 110041:
+                    case 110040:
+                        if (!unitTarget)
+                            break;
+
+                        if (unitTarget->HasAura(103534))
+                            damage *= 1.5f;
+                        else if (unitTarget->HasAura(103536))
+                            damage *= 0.7f;
+                        else if (unitTarget->HasAura(103541))
+                            damage *= 0.3f;
+
+                        unitTarget->RemoveAura(103534);
+                        unitTarget->RemoveAura(103536);
+                        unitTarget->RemoveAura(103541);
+                        break;
+                    // Stomp, Morchok, Dragon Soul
+                    case 103414:
+                    case 108571:
+                    case 109033:
+                    case 109034:
+                    {
+                        if (!unitTarget)
+                            break;
+
+                        if (Creature* pMorchok = m_caster->ToCreature())
+                        {
+                            if ((unitTarget->GetGUID() == pMorchok->AI()->GetGUID(1)) || 
+                                (unitTarget->GetGUID() == pMorchok->AI()->GetGUID(2)))
+                                damage *= 2;
+                        }
+                        break;
+                    }
                     // Ragnaros (Firelands), Molten Inferno
                     case 98518:
                     case 100252:
@@ -3760,10 +3796,13 @@ void Spell::EffectTeleUnitsFaceCaster(SpellEffIndex effIndex)
 
     float dis = m_spellInfo->Effects[effIndex].CalcRadius(m_caster, NULL, !m_caster->IsHostileTo(unitTarget));
 
-    float fx, fy, fz;
-    m_caster->GetClosePoint(fx, fy, fz, unitTarget->GetObjectSize(), dis);
+    //float fx, fy, fz;
+    //m_caster->GetClosePoint(fx, fy, fz, unitTarget->GetObjectSize(), dis);
+    Position pos;
+    m_caster->GetNearPosition(pos, m_caster->GetObjectSize(), m_caster->GetAngle(unitTarget));
 
-    unitTarget->NearTeleportTo(fx, fy, fz, -m_caster->GetOrientation(), unitTarget == m_caster);
+
+    unitTarget->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), -m_caster->GetOrientation(), unitTarget == m_caster);
 }
 
 void Spell::EffectLearnSkill(SpellEffIndex effIndex)
