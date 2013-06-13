@@ -4227,8 +4227,21 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
         if (HostileReference* forcedVictim = unitTarget->getThreatManager().getOnlineContainer().getReferenceByTarget(m_caster))
             unitTarget->getThreatManager().setCurrentVictim(forcedVictim);
 
-    if (unitTarget->GetTypeId() == TYPEID_UNIT && unitTarget->ToCreature()->IsAIEnabled && !unitTarget->ToCreature()->HasReactState(REACT_PASSIVE))
+    if (unitTarget->GetTypeId() == TYPEID_UNIT && unitTarget->ToCreature()->IsAIEnabled 
+    && (!unitTarget->ToCreature()->HasReactState(REACT_PASSIVE) || unitTarget->IsPetGuardianStuff()))
+    {
+        // taken from case COMMAND_ATTACK:                        //spellid=1792  //ATTACK PetHandler.cpp
+        if (CharmInfo* charmInfo = unitTarget->GetCharmInfo())
+        {
+            unitTarget->AttackStop();
+            charmInfo->SetIsCommandAttack(true);
+            charmInfo->SetIsAtStay(false);
+            charmInfo->SetIsFollowing(false);
+            charmInfo->SetIsCommandFollow(false);
+            charmInfo->SetIsReturning(false);
+        }
         unitTarget->ToCreature()->AI()->AttackStart(m_caster);
+    }
 }
 
 void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
