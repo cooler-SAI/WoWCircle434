@@ -1304,8 +1304,22 @@ void AuraEffect::HandleEffect(AuraApplication * aurApp, uint8 mode, bool apply)
     // check if script events have removed the aura or if default effect prevention was requested
     if ((apply && aurApp->GetRemoveMode()) || prevented)
         return;
-    
-    (*this.*AuraEffectHandler [GetAuraType()])(const_cast<AuraApplication const*>(aurApp), mode, apply);
+
+    // TODO: We may reimplement this if it would be work bad. Should we?
+    // Some Auras can stack from different caster but their amount should not stack
+    if (m_base->IsUniqueVisibleAuraBuff() && (
+        (AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModWeaponCritPercent && GetSpellInfo()->Effects[GetEffIndex()].HasRadius()) ||
+        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModAttackPowerPercent || AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModPowerRegen ||
+        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModRangedAttackPowerPercent || AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModDamagePercentDone ||
+        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModCastingSpeed || AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModCritPct ||
+        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModMeleeSpeedPct || AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModAttackSpeed ||
+        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModRangedHaste ||
+        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModIncreaseEnergy))
+    {
+        DoUniqueStackAura(aurApp, mode, apply);
+    }
+    else
+        (*this.*AuraEffectHandler [GetAuraType()])(const_cast<AuraApplication const*>(aurApp), mode, apply);
 
     // check if script events have removed the aura or if default effect prevention was requested
     if (apply && aurApp->GetRemoveMode())
