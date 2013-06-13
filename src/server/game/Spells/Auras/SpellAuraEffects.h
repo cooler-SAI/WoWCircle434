@@ -153,6 +153,7 @@ class AuraEffect
         // aura stack helpers
         void DoUniqueStackAura(AuraApplication const * aurApp, uint8 mode, bool apply) const;
         mod_pair GetUniqueVisibleAuraBuff(Unit* target, int8 x) const;
+        bool IsUniqueStackAuraType() const;
 
         bool HaveChargeStore(uint8 /*chargeId*/) const
         {

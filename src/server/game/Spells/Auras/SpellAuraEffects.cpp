@@ -1307,14 +1307,7 @@ void AuraEffect::HandleEffect(AuraApplication * aurApp, uint8 mode, bool apply)
 
     // TODO: We may reimplement this if it would be work bad. Should we?
     // Some Auras can stack from different caster but their amount should not stack
-    if (m_base->IsUniqueVisibleAuraBuff() && (
-        (AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModWeaponCritPercent && GetSpellInfo()->Effects[GetEffIndex()].HasRadius()) ||
-        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModAttackPowerPercent || AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModPowerRegen ||
-        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModRangedAttackPowerPercent || AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModDamagePercentDone ||
-        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModCastingSpeed || AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModCritPct ||
-        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModMeleeSpeedPct || AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleModAttackSpeed ||
-        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModRangedHaste ||
-        AuraEffectHandler[GetAuraType()] == &AuraEffect::HandleAuraModIncreaseEnergy))
+    if (m_base->IsUniqueVisibleAuraBuff() && IsUniqueStackAuraType())
     {
         DoUniqueStackAura(aurApp, mode, apply);
     }
@@ -7921,6 +7914,18 @@ mod_pair AuraEffect::GetUniqueVisibleAuraBuff(Unit* target, int8 x) const
     }
 
     return mod_pair();
+}
+
+bool AuraEffect::IsUniqueStackAuraType() const
+{
+    // BOO code
+    pAuraEffectHandler pAEH_value = AuraEffectHandler[GetAuraType()];
+    return (pAEH_value == &AuraEffect::HandleAuraModWeaponCritPercent && GetSpellInfo()->Effects[GetEffIndex()].HasRadius()) ||
+        pAEH_value == &AuraEffect::HandleAuraModAttackPowerPercent || pAEH_value == &AuraEffect::HandleModPowerRegen ||
+        pAEH_value == &AuraEffect::HandleAuraModRangedAttackPowerPercent || pAEH_value == &AuraEffect::HandleModDamagePercentDone ||
+        pAEH_value == &AuraEffect::HandleModCastingSpeed || pAEH_value == &AuraEffect::HandleAuraModCritPct ||
+        pAEH_value == &AuraEffect::HandleModMeleeSpeedPct || pAEH_value == &AuraEffect::HandleModAttackSpeed ||
+        pAEH_value == &AuraEffect::HandleAuraModRangedHaste || pAEH_value == &AuraEffect::HandleAuraModIncreaseEnergy;
 }
 
 void AuraEffect::HandleAuraProgressBar(AuraApplication const* aurApp, uint8 mode, bool apply) const
