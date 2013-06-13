@@ -4397,9 +4397,6 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 if (m_caster->GetTypeId() != TYPEID_PLAYER)
                     break;
 
-                if (m_caster->ToPlayer()->GetComboTarget() == unitTarget->GetGUID())
-                    m_caster->ToPlayer()->AddComboPoints(unitTarget, 1);
-
                 // Fan of Knives - Vile Poisons
                 if (AuraEffect * aur = m_caster->GetDummyAuraEffect(SPELLFAMILY_ROGUE, 857, 2))
                 {
