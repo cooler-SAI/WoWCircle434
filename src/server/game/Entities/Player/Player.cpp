@@ -21320,10 +21320,21 @@ void Player::UpdatePotionCooldown(Spell* spell)
     {
         // spell/item pair let set proper cooldown (except not existed charged spell cooldown spellmods for potions)
         if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(m_lastPotionId))
+        {
+            bool found = false;
             for (uint8 idx = 0; idx < MAX_ITEM_SPELLS; ++idx)
                 if (proto->Spells[idx].SpellId && proto->Spells[idx].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
                     if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[idx].SpellId))
+                    {
                         SendCooldownEvent(spellInfo, m_lastPotionId);
+                        found = true;
+                    }
+            // if not - used by Spinal Healing Injector
+            if (!found)
+            {
+                SendCooldownEvent(sSpellMgr->GetSpellInfo(82184), m_lastPotionId);
+            }
+        }
     }
     // from spell cases (m_lastPotionId set in Spell::SendSpellCooldown)
     else
