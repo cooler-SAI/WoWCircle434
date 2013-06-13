@@ -3026,7 +3026,7 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
     // this is executed after spell proc spells on target hit
     // spells are triggered for each hit spell target
     // info confirmed with retail sniffs of permafrost and shadow weaving
-    if (!m_hitTriggerSpells.empty())
+    if (!m_hitTriggerSpells.empty() && unit != m_caster)
     {
         int _duration = 0;
         for (HitTriggerSpellList::const_iterator i = m_hitTriggerSpells.begin(); i != m_hitTriggerSpells.end(); ++i)
