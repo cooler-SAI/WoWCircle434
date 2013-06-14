@@ -1090,6 +1090,9 @@ void GameObject::Use(Unit* user)
 
     if (Player* playerUser = user->ToPlayer())
     {
+        if (playerUser->GetEmoteState())
+            playerUser->SetEmoteState(0);
+
         if (sScriptMgr->OnGossipHello(playerUser, this))
             return;
 

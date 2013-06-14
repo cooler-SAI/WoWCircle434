@@ -2441,6 +2441,9 @@ class Player : public Unit, public GridObject<Player>
         void SetEquipmentSet(uint32 index, EquipmentSet eqset);
         void DeleteEquipmentSet(uint64 setGuid);
 
+        void SetEmoteState(uint32 anim_id);
+        uint32 GetEmoteState() { return m_emote; }
+
         void SendInitWorldStates(uint32 zone, uint32 area);
         void SendUpdateWorldState(uint32 Field, uint32 Value);
         void SendDirectMessage(WorldPacket* data);
@@ -3400,6 +3403,8 @@ class Player : public Unit, public GridObject<Player>
         uint8 CurrentSecond;
 
         ArchaeologyMgr m_archaeologyMgr;
+
+        uint32 m_emote;
 };
 
 void AddItemsSetItem(Player*player, Item* item);

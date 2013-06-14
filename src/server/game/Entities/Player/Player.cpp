@@ -911,6 +911,8 @@ Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_rep
     {
         prohibited[i] = prohibited_struct();
     }
+
+    m_emote = 0;
 }
 
 Player::~Player()
@@ -26473,4 +26475,10 @@ void Player::SendPetTameResult(PetTameResult result)
     WorldPacket data(SMSG_PET_TAME_FAILURE, 4);
     data << uint32(result); // The result
     GetSession()->SendPacket(&data);
+}
+
+void Player::SetEmoteState(uint32 anim_id)
+{
+    HandleEmoteCommand(anim_id);
+    m_emote = anim_id;
 }

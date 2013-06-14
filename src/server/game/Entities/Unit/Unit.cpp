@@ -10893,6 +10893,10 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         ToCreature()->CallAssistance();
     }
 
+    if (GetTypeId() == TYPEID_PLAYER)
+        if (ToPlayer()->GetEmoteState())
+            ToPlayer()->SetEmoteState(0);
+
     // delay offhand weapon attack to next attack time
     if (haveOffhandWeapon())
         resetAttackTimer(OFF_ATTACK);
@@ -10943,6 +10947,10 @@ bool Unit::AttackStop()
     }
 
     SendMeleeAttackStop(victim);
+
+    if (GetTypeId() == TYPEID_PLAYER)
+        if (ToPlayer()->GetEmoteState())
+            ToPlayer()->SetEmoteState(0);
 
     return true;
 }
@@ -13560,6 +13568,10 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
 
     if (Player* player = ToPlayer())
     {
+        
+        if (player->GetEmoteState())
+            player->SetEmoteState(0);
+
         // mount as a vehicle
         if (VehicleId)
         {

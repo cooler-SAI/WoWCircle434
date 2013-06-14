@@ -1624,6 +1624,10 @@ bool MovementInfo::AcceptClientChanges(Player* player, MovementInfo& client, Opc
 
     if (plMover && !vehMover)                                            // nothing is charmed, or player charmed
     {
+
+        if (plMover->GetEmoteState() != 0 && opcode == MSG_MOVE_START_FORWARD)
+            plMover->SetEmoteState(0);
+
         plMover->UpdateFallInformationIfNeed(client);
 
         // that's too slow
