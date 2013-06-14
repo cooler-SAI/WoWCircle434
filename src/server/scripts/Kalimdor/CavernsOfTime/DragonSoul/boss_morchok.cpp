@@ -545,7 +545,7 @@ class spell_morchok_target_selected : public SpellScriptLoader
                     targets.sort(DistanceOrderPred(GetCaster()));
                 }
 
-                max_size = std::min(targets.size(), max_size);
+                max_size = std::min((uint32)targets.size(), max_size);
                 
                 uint32 count = 0;
                 for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
