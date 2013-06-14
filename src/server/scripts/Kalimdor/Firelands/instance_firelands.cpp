@@ -1,5 +1,7 @@
 #include "ScriptPCH.h"
+#include "AccountMgr.h"
 #include "firelands.h"
+
 // areatrigger
 // 6929 - quest1
 // 6861 - near miniboss 1
@@ -181,6 +183,38 @@ class instance_firelands : public InstanceMapScript
 				    return false;
 
 			    return true;
+            }
+
+            bool CheckRequiredBosses(uint32 bossId, Player const* player = NULL) const
+            {
+                if (player && AccountMgr::IsGMAccount(player->GetSession()->GetSecurity()))
+                    return true;
+
+                switch (bossId)
+                {
+                    case DATA_RAGNAROS:
+                        if (GetBossState(DATA_STAGHELM) != DONE)
+                            return false;
+                        break;
+                    case DATA_STAGHELM:
+                        if (GetBossState(DATA_BALEROC) != DONE)
+                            return false;
+                        break;
+                    case DATA_BALEROC:
+                        if (GetBossState(DATA_SHANNOX) != DONE)
+                            return false;
+                        if (GetBossState(DATA_ALYSRAZOR) != DONE)
+                            return false;
+                        if (GetBossState(DATA_BETHTILAC) != DONE)
+                            return false;
+                        if (GetBossState(DATA_RHYOLITH) != DONE)
+                            return false;
+                        break;
+                    default:
+                        break;
+                }
+
+                return true;
             }
 
             void ProcessEvent(WorldObject* /*source*/, uint32 eventId)

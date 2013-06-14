@@ -3,6 +3,8 @@
 
 #define FLScriptName "instance_firelands"
 
+const Position FLEntrancePos = {-547.313f, 318.42f, 115.473f, 5.91667f}; // Firelands Entrance
+
 enum Data
 {
     DATA_SHANNOX                = 0,

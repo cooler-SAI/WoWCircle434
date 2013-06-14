@@ -202,6 +202,8 @@ class InstanceScript : public ZoneScript
 
         void DoModifyPlayerCurrencies(uint32 id, int32 value);
 
+        void DoNearTeleportPlayers(const Position pos, bool casting = false);
+
         // Return wether server allow two side groups or not
         bool ServerAllowsTwoSideGroups() { return sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP); }
 

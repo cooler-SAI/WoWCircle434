@@ -403,6 +403,13 @@ class boss_ragnaros_firelands : public CreatureScript
 
             void EnterCombat(Unit* attacker)
             {
+                if (!instance->CheckRequiredBosses(DATA_RAGNAROS, attacker->ToPlayer()))
+                {
+                    EnterEvadeMode();
+                    instance->DoNearTeleportPlayers(FLEntrancePos);
+                    return;
+                }
+
                 Talk(SAY_AGGRO);
 
                 DespawnEncounterCreatures();

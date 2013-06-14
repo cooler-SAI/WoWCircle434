@@ -139,6 +139,13 @@ class boss_majordomo_staghelm : public CreatureScript
 
             void EnterCombat(Unit* attacker)
             {
+                if (!instance->CheckRequiredBosses(DATA_STAGHELM, attacker->ToPlayer()))
+                {
+                    EnterEvadeMode();
+                    instance->DoNearTeleportPlayers(FLEntrancePos);
+                    return;
+                }
+
                 if (IsHeroic())
                     DoCast(me, SPELL_CONCENTRATION, true);
 
