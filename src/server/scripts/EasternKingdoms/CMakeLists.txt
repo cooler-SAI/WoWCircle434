@@ -44,7 +44,6 @@ set(scripts_STAT_SRCS
   EasternKingdoms/ZulGurub/instance_zulgurub.cpp
   EasternKingdoms/ZulGurub/zulgurub.h
   EasternKingdoms/wetlands.cpp
-  EasternKingdoms/mount_hyjal.cpp
   EasternKingdoms/arathi_highlands.cpp
   EasternKingdoms/Gnomeregan/instance_gnomeregan.cpp
   EasternKingdoms/Gnomeregan/gnomeregan.cpp
@@ -197,6 +196,7 @@ set(scripts_STAT_SRCS
   EasternKingdoms/alterac_mountains.cpp
   EasternKingdoms/westfall.cpp
   EasternKingdoms/silverpine_forest.cpp
+  EasternKingdoms/deepholm.cpp
   EasternKingdoms/Karazhan/instance_karazhan.cpp
   EasternKingdoms/Karazhan/boss_nightbane.cpp
   EasternKingdoms/Karazhan/karazhan.cpp
@@ -230,18 +230,6 @@ set(scripts_STAT_SRCS
   EasternKingdoms/BaradinHold/boss_alizabal.cpp
   EasternKingdoms/BaradinHold/instance_baradin_hold.cpp
   EasternKingdoms/BaradinHold/baradin_hold.h
-  EasternKingdoms/Firelands/boss_shannox.cpp
-  EasternKingdoms/Firelands/boss_lord_rhyolith.cpp
-  EasternKingdoms/Firelands/boss_lord_rhyolith.h
-  EasternKingdoms/Firelands/boss_bethtilac.cpp
-  EasternKingdoms/Firelands/boss_alysrazor.cpp
-  EasternKingdoms/Firelands/boss_baleroc.cpp
-  EasternKingdoms/Firelands/boss_majordomo_staghelm.cpp
-  EasternKingdoms/Firelands/boss_ragnaros_firelands.cpp
-  EasternKingdoms/Firelands/boss_ragnaros_firelands.h
-  EasternKingdoms/Firelands/instance_firelands.cpp
-  EasternKingdoms/Firelands/firelands.cpp
-  EasternKingdoms/Firelands/firelands.h
   EasternKingdoms/TheStonecore/boss_corborus.cpp
   EasternKingdoms/TheStonecore/boss_slabhide.cpp
   EasternKingdoms/TheStonecore/boss_ozruk.cpp

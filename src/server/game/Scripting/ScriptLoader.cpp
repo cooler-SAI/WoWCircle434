@@ -280,7 +280,7 @@ void AddSC_undercity();
 void AddSC_western_plaguelands();
 void AddSC_westfall();
 void AddSC_wetlands();
-void AddSC_mount_hyjal();
+void AddSC_deepholm();
 
 //kalimdor
 void AddSC_blackfathom_deeps();              //Blackfathom Depths
@@ -368,6 +368,8 @@ void AddSC_thousand_needles();
 void AddSC_thunder_bluff();
 void AddSC_ungoro_crater();
 void AddSC_winterspring();
+void AddSC_mount_hyjal();
+void AddSC_uldum();
 
 //northrend
 void AddSC_boss_slad_ran();
@@ -1023,7 +1025,7 @@ void AddEasternKingdomsScripts()
     AddSC_western_plaguelands();
     AddSC_westfall();
     AddSC_wetlands();
-    AddSC_mount_hyjal(); 
+    AddSC_deepholm();
 #endif
 }
 
@@ -1115,6 +1117,8 @@ void AddKalimdorScripts()
     AddSC_thunder_bluff();
     AddSC_ungoro_crater();
     AddSC_winterspring();
+    AddSC_mount_hyjal(); 
+    AddSC_uldum();
 #endif
 }
 

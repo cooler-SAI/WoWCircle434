@@ -3995,6 +3995,12 @@ void SpellMgr::LoadDbcDataCorrections()
             //
             // ENDOF OCULUS SPELLS
             //
+
+            // World Bosses (cata)
+            // Akma'hat
+            case 93578: // Sands of Time
+                spellInfo->MaxAffectedTargets = 1;
+                break;
             // THRONE OF THE TIDES SPELLS
             //
             // Lady Nazjar

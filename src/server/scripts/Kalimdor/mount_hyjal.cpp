@@ -77,7 +77,7 @@ class npc_garr : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
                 
-                while (uint32 eventId = events.ExecuteEvent())
+                if (uint32 eventId = events.ExecuteEvent())
                 {
                     switch (eventId)
                     {
@@ -157,7 +157,7 @@ class npc_garr_firesworn : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
                 
-                while (uint32 eventId = events.ExecuteEvent())
+                if (uint32 eventId = events.ExecuteEvent())
                 {
                     switch (eventId)
                     {

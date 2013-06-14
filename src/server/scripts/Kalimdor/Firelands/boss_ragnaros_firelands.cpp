@@ -341,7 +341,6 @@ class boss_ragnaros_firelands : public CreatureScript
                 me->setActive(true);
                 me->SetDisableGravity(true);
                 me->SetCanFly(true);
-                
             }
 
             void InitializeAI()

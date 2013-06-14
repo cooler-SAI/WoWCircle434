@@ -52,7 +52,14 @@ set(scripts_STAT_SRCS
   Kalimdor/CavernsOfTime/DarkPortal/dark_portal.cpp
   Kalimdor/CavernsOfTime/DarkPortal/boss_aeonus.cpp
   Kalimdor/CavernsOfTime/DarkPortal/boss_temporus.cpp
+  Kalimdor/CavernsOfTime/EndTime/boss_echo_of_tyrande.cpp
+  Kalimdor/CavernsOfTime/EndTime/boss_echo_of_baine.cpp
+  Kalimdor/CavernsOfTime/EndTime/boss_echo_of_sylvanas.cpp
+  Kalimdor/CavernsOfTime/EndTime/boss_echo_of_jaina.cpp
+  Kalimdor/CavernsOfTime/EndTime/boss_murozond.cpp
+  Kalimdor/CavernsOfTime/EndTime/end_time_teleport.cpp
   Kalimdor/CavernsOfTime/EndTime/instance_end_time.cpp
+  Kalimdor/CavernsOfTime/EndTime/end_time.cpp
   Kalimdor/CavernsOfTime/EndTime/end_time.h
   Kalimdor/CavernsOfTime/WellofEternity/boss_perotharn.cpp
   Kalimdor/CavernsOfTime/WellofEternity/boss_queen_azshara.cpp
@@ -124,6 +131,8 @@ set(scripts_STAT_SRCS
   Kalimdor/thousand_needles.cpp
   Kalimdor/ashenvale.cpp
   Kalimdor/teldrassil.cpp
+  Kalimdor/mount_hyjal.cpp
+  Kalimdor/uldum.cpp
   Kalimdor/OnyxiasLair/boss_onyxia.cpp
   Kalimdor/OnyxiasLair/onyxias_lair.h
   Kalimdor/OnyxiasLair/instance_onyxias_lair.cpp
@@ -150,15 +159,18 @@ set(scripts_STAT_SRCS
   Kalimdor/HallsOfOrigination/instance_halls_of_origination.cpp
   Kalimdor/HallsOfOrigination/halls_of_origination.cpp
   Kalimdor/HallsOfOrigination/halls_of_origination.h
-  Kalimdor/CavernsOfTime/EndTime/boss_echo_of_tyrande.cpp
-  Kalimdor/CavernsOfTime/EndTime/boss_echo_of_baine.cpp
-  Kalimdor/CavernsOfTime/EndTime/boss_echo_of_sylvanas.cpp
-  Kalimdor/CavernsOfTime/EndTime/boss_echo_of_jaina.cpp
-  Kalimdor/CavernsOfTime/EndTime/boss_murozond.cpp
-  Kalimdor/CavernsOfTime/EndTime/end_time_teleport.cpp
-  Kalimdor/CavernsOfTime/EndTime/instance_end_time.cpp
-  Kalimdor/CavernsOfTime/EndTime/end_time.cpp
-  Kalimdor/CavernsOfTime/EndTime/end_time.h
+  Kalimdor/Firelands/boss_shannox.cpp
+  Kalimdor/Firelands/boss_lord_rhyolith.cpp
+  Kalimdor/Firelands/boss_lord_rhyolith.h
+  Kalimdor/Firelands/boss_bethtilac.cpp
+  Kalimdor/Firelands/boss_alysrazor.cpp
+  Kalimdor/Firelands/boss_baleroc.cpp
+  Kalimdor/Firelands/boss_majordomo_staghelm.cpp
+  Kalimdor/Firelands/boss_ragnaros_firelands.cpp
+  Kalimdor/Firelands/boss_ragnaros_firelands.h
+  Kalimdor/Firelands/instance_firelands.cpp
+  Kalimdor/Firelands/firelands.cpp
+  Kalimdor/Firelands/firelands.h
 )
 
 message("  -> Prepared: Kalimdor")
