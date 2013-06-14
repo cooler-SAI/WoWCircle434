@@ -16765,16 +16765,8 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     case SPELL_AURA_MOD_ROOT:
                     case SPELL_AURA_TRANSFORM:
                     {
-                        // Dragon Breath & Living Bomb
-                        if (spellInfo->Category == 1215 && procSpell &&
-                            procSpell->SpellFamilyName == SPELLFAMILY_MAGE && procSpell->SpellFamilyFlags[1] == 0x00010000)
+                        if (IsNoBreakingCC(isVictim, target, procFlag, procExtra, attType, procSpell, damage, absorb, procAura, spellInfo))
                             break;
-
-                        // Sanguinary Vein and Gouge
-                        if (spellInfo->Id == 1776 && target && (procFlag & PROC_FLAG_TAKEN_PERIODIC) && (procSpell && (procSpell->GetAllEffectsMechanicMask() & (1<<MECHANIC_BLEED))))
-                            if (AuraEffect * aur = target->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 4821, 1))
-                                if (roll_chance_i(aur->GetAmount()))
-                                    break;
 
                         damage += absorb;
                         // chargeable mods are breaking on hit
@@ -16841,6 +16833,27 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
     // Cleanup proc requirements
     if (procExtra & (PROC_EX_INTERNAL_TRIGGERED | PROC_EX_INTERNAL_CANT_PROC))
         SetCantProc(false);
+}
+
+bool Unit::IsNoBreakingCC(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpell, 
+uint32 damage, uint32 absorb /* = 0 */, SpellInfo const* procAura /* = NULL */, SpellInfo const* spellInfo ) const
+{
+    // Dragon Breath & Living Bomb
+    if (spellInfo->Category == 1215 && procSpell &&
+        procSpell->SpellFamilyName == SPELLFAMILY_MAGE && procSpell->SpellFamilyFlags[1] == 0x00010000)
+        return true;
+
+    // Sanguinary Vein and Gouge
+    if (spellInfo->Id == 1776 && target && (procFlag & PROC_FLAG_TAKEN_PERIODIC) && (procSpell && (procSpell->GetAllEffectsMechanicMask() & (1<<MECHANIC_BLEED))))
+        if (AuraEffect * aur = target->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 4821, 1))
+            if (roll_chance_i(aur->GetAmount()))
+                return true;
+
+    // Main Gauche & Gouge
+    if (procSpell && procSpell->Id == 86392 && spellInfo->Id == 1776)
+        return true;
+
+    return false;
 }
 
 void Unit::GetProcAurasTriggeredOnEvent(std::list<AuraApplication*>& aurasTriggeringProc, std::list<AuraApplication*>* procAuras, ProcEventInfo eventInfo)
