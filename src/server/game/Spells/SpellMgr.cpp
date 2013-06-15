@@ -85,6 +85,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Earthquake
             else if (spellproto->Id == 64697)
                 return DIMINISHING_NONE;
+            // Summoning Disorientation
+            else if (spellproto->Id == 32752)
+                return DIMINISHING_NONE;
             break;
         }
         // Event spells
