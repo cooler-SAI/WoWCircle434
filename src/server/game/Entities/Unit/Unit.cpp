@@ -9675,7 +9675,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                             return false;
 
                         trigger_spell_id = 96172;
-                        basepoints0 = int32(damage / 100.0f * triggeredByAura->GetAmount());
+                        basepoints0 = int32((damage + absorb) / 100.0f * triggeredByAura->GetAmount());
                         if (HasAura(84963))
                             AddPct(basepoints0, 30);
                         target = victim;
