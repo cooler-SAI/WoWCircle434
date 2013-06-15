@@ -4169,7 +4169,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
     // if pet requested type already exist
     if (OldSummon)
     {
-        if (petentry == 0 || OldSummon->GetEntry() == petentry)
+        if (petentry == 0)
         {
             // pet in corpse state can't be summoned
             if (OldSummon->isDead())
