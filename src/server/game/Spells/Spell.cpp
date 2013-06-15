@@ -2865,6 +2865,12 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             if (unit->GetCharmerOrOwnerPlayerOrPlayerItself())
                 unit->IncrDiminishing(DIMINISHING_DEEP_FREEZE);
         }
+        // Holy Wrath diminishing problem
+        else if (m_spellInfo->Id == 2812)
+        {
+            if ((effectMask & (1 << EFFECT_1)) == 0)
+                m_diminishGroup = DIMINISHING_NONE;
+        }
         m_diminishLevel = DiminishingLevels(std::min(m_diminishLevel + unit->GetDiminishing(m_diminishGroup), int(DIMINISHING_LEVEL_IMMUNE)));
         DiminishingReturnsType type = GetDiminishingReturnsGroupType(m_diminishGroup);
         // Increase Diminishing on unit, current informations for actually casts will use values above
