@@ -5887,6 +5887,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (GetTypeId() != TYPEID_PLAYER)
                         return false;
 
+                    if (ToPlayer()->HasSpellCooldown(dummySpell->Id))
+                        return false;
+
                     std::vector<uint32> RandomSpells;
                     switch (getClass())
                     {
@@ -5919,13 +5922,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (RandomSpells.empty()) // shouldn't happen
                         return false;
 
-                    uint8 rand_spell = irand(0, (RandomSpells.size() - 1));
-                    CastSpell(target, RandomSpells[rand_spell], true, castItem, triggeredByAura, originalCaster);
-                    for (std::vector<uint32>::iterator itr = RandomSpells.begin(); itr != RandomSpells.end(); ++itr)
-                    {
-                        if (!ToPlayer()->HasSpellCooldown(*itr))
-                            ToPlayer()->AddSpellCooldown(*itr, 0, time(NULL) + cooldown);
-                    }
+                    triggered_spell_id = RandomSpells[irand(0, (RandomSpells.size() - 1))];
+                    ToPlayer()->AddSpellCooldown(dummySpell->Id, 0, time(NULL) + cooldown);
                     break;
                 }
                 case 71562: // Deathbringer's Will Heroic
@@ -5933,6 +5931,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (GetTypeId() != TYPEID_PLAYER)
                         return false;
 
+                    if (ToPlayer()->HasSpellCooldown(dummySpell->Id))
+                        return false;
+
                     std::vector<uint32> RandomSpells;
                     switch (getClass())
                     {
@@ -5965,13 +5966,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (RandomSpells.empty()) // shouldn't happen
                         return false;
 
-                    uint8 rand_spell = irand(0, (RandomSpells.size() - 1));
-                    CastSpell(target, RandomSpells[rand_spell], true, castItem, triggeredByAura, originalCaster);
-                    for (std::vector<uint32>::iterator itr = RandomSpells.begin(); itr != RandomSpells.end(); ++itr)
-                    {
-                        if (!ToPlayer()->HasSpellCooldown(*itr))
-                            ToPlayer()->AddSpellCooldown(*itr, 0, time(NULL) + cooldown);
-                    }
+                    triggered_spell_id = RandomSpells[irand(0, (RandomSpells.size() - 1))];
+                    ToPlayer()->AddSpellCooldown(dummySpell->Id, 0, time(NULL) + cooldown);
                     break;
                 }
                 case 71875: // Item - Black Bruise: Necrotic Touch Proc
