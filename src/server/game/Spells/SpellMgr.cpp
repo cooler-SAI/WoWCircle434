@@ -6968,6 +6968,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 92146:
                 spellInfo->AttributesEx4 |= SPELL_ATTR4_NOT_USABLE_IN_ARENA_OR_RATED_BG;
                 break;
+            // Chain Lightning Elemental Overload proc
+            case 45297:
+                spellInfo->MaxLevel = spellInfo->SpellLevel;
+                break;
             default:
                 break;
         }
