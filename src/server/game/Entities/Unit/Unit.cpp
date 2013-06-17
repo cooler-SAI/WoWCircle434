@@ -9352,11 +9352,6 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             case SPELLFAMILY_GENERIC:
                 switch (auraSpellInfo->Id)
                 {
-                    // Fusing Vapors, Yor'sahj, Dragon Soul
-                    case 103968:
-                        if (GetHealthPct() > 50.0f)
-                            return false;
-                        break;
                     case 99399: // Burning Wound, Ragnaros, Firelands
                     case 101238:
                     case 101239:
@@ -9789,6 +9784,36 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Item - Dragon Soul Legendary Daggers
+        case 109939:
+        {
+            if (!victim)
+                return false;
+
+            if (HasAura(109949))
+                return false;
+
+            if (Aura* aur = GetAura(109941))
+            {
+                uint8 stacks = aur->GetStackAmount();
+                if (stacks >= 30)
+                {
+                    float chance = ((1.0f / (51.0f - stacks)) * 100);
+                    if (roll_chance_f(chance))
+                    {
+                        CastSpell(victim, 109949, true);
+                        aur->Remove();
+                        return false;
+                    }
+                }
+            }
+            break;
+        }
+        // Fusing Vapors, Yor'sahj, Dragon Soul
+        case 103968:
+            if (GetHealthPct() > 50.0f)
+                return false;
+            break;
         // Embedded Blade, Mannoroth, Well of Eternity
         case 109542: 
             if (!victim)
