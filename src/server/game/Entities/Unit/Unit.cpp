@@ -9352,6 +9352,11 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             case SPELLFAMILY_GENERIC:
                 switch (auraSpellInfo->Id)
                 {
+                    // Fusing Vapors, Yor'sahj, Dragon Soul
+                    case 103968:
+                        if (GetHealthPct() > 50.0f)
+                            return false;
+                        break;
                     case 99399: // Burning Wound, Ragnaros, Firelands
                     case 101238:
                     case 101239:

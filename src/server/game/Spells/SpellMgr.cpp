@@ -6173,6 +6173,9 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].BasePoints = 0;
                 spellInfo->Effects[EFFECT_1].BasePoints = 0;
                 break;
+            case 108220: // Deep Corruption
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
+                break;
             // Morchok
             case 103821: // Earthen Vortex
             case 110047:
@@ -6191,6 +6194,22 @@ void SpellMgr::LoadDbcDataCorrections()
             case 103536: // Warning
             case 103541: // Safe
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
+                break;
+            // Yoe'sahj The Unsleeping
+            case 105420: // Color Combine 1
+            case 105435: // Color Combine 2
+            case 105436: // Color Combine 3
+            case 105437: // Color Combine 4
+            case 105439: // Color Combine 5
+            case 105440: // Color Combine 6
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_DEST_AREA_ENTRY;
+                break;
+            case 105636: // Corrupted Minions aura
+            case 109558:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                break;
+            case 105534: // Mana Void dummy
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
                 break;
             // ENDOF DRAGON SOUL SPELLS
             //

@@ -355,7 +355,23 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 }
 
                 switch (m_spellInfo->Id)                     // better way to check unknown
-                {   
+                { 
+                    case 105033: // Searing Blood, Yor'sahj The Unsleeping, Dragon Soul
+                    case 108356:
+                    case 108357:
+                    case 108358:
+                    case 108218: // Searing Blood, Crimson Globule, Dragon Soul
+                    case 108363:
+                    {
+                        if (!unitTarget)
+                            break;
+
+                        float dist = m_caster->GetDistance(unitTarget);
+
+                        if (dist > 10.0f)
+                            damage *= dist / 10.0f;
+                        break;
+                    }
                     // Resonating Crystal dmg, Morchok, Dragon Soul
                     case 103545:
                     case 108572:
