@@ -158,6 +158,8 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
                 me->setActive(true);
                 bIntro = false;
+                bShuma = false;
+                memset(bAchieve, false, sizeof(bAchieve));
             }
 
             void InitializeAI()
@@ -187,6 +189,7 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                 bShuma = false;
                 bContinue = false;
                 _spellId = 0;
+                memset(bAchieve, false, sizeof(bAchieve));
 
                 me->SetReactState(REACT_AGGRESSIVE);
             }
@@ -211,6 +214,11 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                 Talk(SAY_DEATH);
                 DoCastAOE(SPELL_YORSAHJ_WHISPER_DEATH, true);
 
+            }
+
+            bool AllowAchieve(uint32 Id)
+            {
+                return bAchieve[Id];
             }
 
             void KilledUnit(Unit* victim)
@@ -363,6 +371,15 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                                 }
                             }
 
+                            if (me->HasAura(SPELL_BLACK_BLOOD_OF_SHUMA) && me->HasAura(SPELL_GLOWING_BLOOD_OF_SHUMA))
+                                bAchieve[0] = true;
+                            else if (me->HasAura(SPELL_CRIMSON_BLOOD_OF_SHUMA) && me->HasAura(SPELL_ACIDIC_BLOOD_OF_SHUMA))
+                                bAchieve[1] = true;
+                            else if (me->HasAura(SPELL_BLACK_BLOOD_OF_SHUMA) && me->HasAura(SPELL_COBALT_BLOOD_OF_SHUMA))
+                                bAchieve[2] = true;
+                            else if (me->HasAura(SPELL_SHADOWED_BLOOD_OF_SHUMA) && me->HasAura(SPELL_GLOWING_BLOOD_OF_SHUMA))
+                                bAchieve[3] = true;
+
                             me->SetReactState(REACT_AGGRESSIVE);
                             AttackStart(me->getVictim());
                             events.ScheduleEvent(EVENT_VOID_BOLT, urand(6000, 7000));
@@ -405,6 +422,7 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
             uint32 _spellId;
             bool bContinue;
             bool bShuma;
+            bool bAchieve[4];
 
             // Returns spell for animation
             void SelectRandomGlobules(uint32 &spellId, std::list<uint32> &entryList)
@@ -887,6 +905,33 @@ class spell_yorsahj_the_unsleeping_mana_void : public SpellScriptLoader
         }
 };
 
+typedef boss_yorsahj_the_unsleeping::boss_yorsahj_the_unsleepingAI YorsahjAI;
+
+class achievement_taste_the_rainbow : public AchievementCriteriaScript
+{
+    public:
+        achievement_taste_the_rainbow(char const* scriptName, uint32 Id) : AchievementCriteriaScript(scriptName), _Id(Id) { }
+
+        bool OnCheck(Player* source, Unit* target)
+        {
+            if (!target)
+                return false;
+
+            if (!_Id)
+                return false;
+
+            if (YorsahjAI* jorsahjAI = CAST_AI(YorsahjAI, target->GetAI()))
+                return jorsahjAI->AllowAchieve(_Id);
+
+            return false;
+        }
+
+    private:
+        uint32 _Id;
+};
+
+
+
 void AddSC_boss_yorsahj_the_unsleeping()
 {
     new boss_yorsahj_the_unsleeping();
@@ -897,4 +942,8 @@ void AddSC_boss_yorsahj_the_unsleeping()
     new spell_yorsahj_the_unsleeping_deep_corruption();
     new spell_yorsahj_the_unsleeping_digestive_acid_aoe();
     new spell_yorsahj_the_unsleeping_mana_void();
+    new achievement_taste_the_rainbow("achievement_taste_the_rainbow_BY", 0);
+    new achievement_taste_the_rainbow("achievement_taste_the_rainbow_RG", 1);
+    new achievement_taste_the_rainbow("achievement_taste_the_rainbow_BB", 2);
+    new achievement_taste_the_rainbow("achievement_taste_the_rainbow_PY", 3);
 }
