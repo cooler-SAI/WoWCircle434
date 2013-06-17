@@ -1533,8 +1533,8 @@ public:
             float x, y, z;
             //if (GETGO(Gate, GateGUID)) // fuck up after new invis system
             //    Gate->GetPosition(x, y, z);
-             GateGUID = pInstance->GetData64(DATA_GAMEOBJECT_ILLIDAN_GATE);
- 	if (GameObject* obj = pInstance->instance->GetGameObject(GateGUID))
+             GateGUID = instance->GetData64(DATA_GAMEOBJECT_ILLIDAN_GATE);
+ 	if (GameObject* obj = instance->instance->GetGameObject(GateGUID))
                  obj->GetPosition(x, y, z);
             else
                 return; // if door not spawned, don't crash server
