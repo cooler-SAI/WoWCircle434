@@ -6337,6 +6337,10 @@ SpellCastResult Spell::CheckCasterAuras() const
             {
                 if ((*i)->GetSpellInfo()->GetAllEffectsMechanicMask() && !((*i)->GetSpellInfo()->GetAllEffectsMechanicMask() & (1<<MECHANIC_STUN)))
                 {
+                    // Sap & Hand of Freedom hack
+                    if ((*i)->GetSpellInfo()->Id == 6770 && m_spellInfo->Id == 1044)
+                        continue;
+
                     foundNotStun = true;
                     break;
                 }
