@@ -2369,6 +2369,11 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
     if (!unitTarget || !unitTarget->isAlive() || unitTarget->getPowerType() != powerType || damage < 0)
         return;
 
+    if (m_spellInfo->Id == 8129)
+        if (unitTarget->GetEntry() == 52498 || // Beth'tilac
+            unitTarget->GetEntry() == 52530)   // Alysrazor
+            return;
+
     // burn x% of target's mana, up to maximum of 2x% of caster's mana (Mana Burn)
     if (m_spellInfo->Id == 8129)
     {
