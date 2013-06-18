@@ -4213,6 +4213,7 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 106248: // Blade Dance Dummy
                 spellInfo->Effects[0].SetRadiusIndex(28);
+                spellInfo->MaxAffectedTargets = 1;
                 break;
             case 104994: // Blade Dance dmg
                 spellInfo->Effects[0].SetRadiusIndex(17);

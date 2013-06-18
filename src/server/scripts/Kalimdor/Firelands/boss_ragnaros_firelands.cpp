@@ -516,6 +516,33 @@ class boss_ragnaros_firelands : public CreatureScript
                     pCenarius->AI()->DoAction(ACTION_WIN);
                 if (Creature* pHamuul = me->FindNearestCreature(NPC_HAMUUL_RUNETOTEM, 300.0f))
                     pHamuul->AI()->DoAction(ACTION_WIN);
+                
+                Map::PlayerList const &plrList = instance->instance->GetPlayers();
+                if (!plrList.isEmpty())
+                {
+                    for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
+                    {
+                        if (Player* plr = i->getSource())
+                        {
+                            uint32 questId = 0;
+                            if (plr->GetQuestStatus(29308) == QUEST_STATUS_INCOMPLETE)
+                                questId = 29308;
+                            else if (plr->GetQuestStatus(29307) == QUEST_STATUS_INCOMPLETE)
+                                questId = 29307;
+
+                            if (questId)
+                            {
+                                QuestStatusMap::const_iterator itr = plr->getQuestStatusMap().find(questId);
+                                if (itr != plr->getQuestStatusMap().end())
+                                    if (itr->second.CreatureOrGOCount[0] >= 250)
+                                    {
+                                        plr->CastSpell(plr, SPELL_HEART_OF_RAGNAROS_CREATE, true);
+                                        break;
+                                    }
+                            }
+                        }
+                    }
+                }
             }
             
             void KilledUnit(Unit* who)
@@ -602,6 +629,7 @@ class boss_ragnaros_firelands : public CreatureScript
                     events.CancelEvent(EVENT_HAND_OF_RAGNAROS);
                     events.CancelEvent(EVENT_MAGMA_TRAP);
                     events.CancelEvent(EVENT_SULFURAS_SMASH);
+                    events.CancelEvent(EVENT_CONTINUE);
                     events.CancelEvent(EVENT_CHECK_TARGET);
                     events.CancelEvent(EVENT_BURNING_WOUND);
                     events.CancelEvent(EVENT_RAGE_OF_RAGNAROS);
@@ -640,6 +668,7 @@ class boss_ragnaros_firelands : public CreatureScript
 
                     events.CancelEvent(EVENT_ENGULFING_FLAMES);
                     events.CancelEvent(EVENT_SULFURAS_SMASH);
+                    events.CancelEvent(EVENT_CONTINUE);
                     events.CancelEvent(EVENT_MOLTEN_SEED);
                     events.CancelEvent(EVENT_CHECK_TARGET);
                     events.CancelEvent(EVENT_BURNING_WOUND);
@@ -762,7 +791,12 @@ class boss_ragnaros_firelands : public CreatureScript
                             break;
                         case EVENT_CHECK_SONS:
                             if (!me->FindNearestCreature(NPC_SON_OF_FLAME, 300.0f))
-                                events.RescheduleEvent(phase == 1? EVENT_CONTINUE_PHASE_2 : EVENT_CONTINUE_PHASE_3, 2000);
+                            {
+                                if (phase == 1)
+                                    events.RescheduleEvent(EVENT_CONTINUE_PHASE_2, 2000);
+                                else if (phase == 3)
+                                    events.RescheduleEvent(EVENT_CONTINUE_PHASE_3, 2000);
+                            }
                             else
                                 events.ScheduleEvent(EVENT_CHECK_SONS, 2000);
                             break;
@@ -992,10 +1026,10 @@ class boss_ragnaros_firelands : public CreatureScript
                 instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_ENCOUNTER_COMPLETE, 0, 0, me); 
                     
                 // Guild Achievement
-                Map::PlayerList const &PlayerList = instance->instance->GetPlayers();
-                if (!PlayerList.isEmpty())
+                Map::PlayerList const &plrList = instance->instance->GetPlayers();
+                if (!plrList.isEmpty())
                 {
-                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                    for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
                     {
                         if (Player* pPlayer = i->getSource())
                             if (Group* pGroup = pPlayer->GetGroup())
@@ -1005,7 +1039,31 @@ class boss_ragnaros_firelands : public CreatureScript
                                     break;
                                 }
                     }
+                    
+                    for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
+                    {
+                        if (Player* plr = i->getSource())
+                        {
+                            uint32 questId = 0;
+                            if (plr->GetQuestStatus(29308) == QUEST_STATUS_INCOMPLETE)
+                                questId = 29308;
+                            else if (plr->GetQuestStatus(29307) == QUEST_STATUS_INCOMPLETE)
+                                questId = 29307;
+
+                            if (questId)
+                            {
+                                QuestStatusMap::const_iterator itr = plr->getQuestStatusMap().find(questId);
+                                if (itr != plr->getQuestStatusMap().end())
+                                    if (itr->second.CreatureOrGOCount[0] >= 250)
+                                    {
+                                        plr->CastSpell(plr, SPELL_HEART_OF_RAGNAROS_CREATE, true);
+                                        break;
+                                    }
+                            }
+                        }
+                    }
                 }
+
                 instance->UpdateEncounterState(ENCOUNTER_CREDIT_CAST_SPELL, SPELL_ENCOUNTER_COMPLETE, me); 
                 instance->SetBossState(DATA_RAGNAROS, DONE);
 

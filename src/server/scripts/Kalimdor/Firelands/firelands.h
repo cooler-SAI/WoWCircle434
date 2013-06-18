@@ -106,6 +106,7 @@ enum QuestDefines
     SPELL_BRANCH_OF_NORDRASSIL_WIN_COSMETIC     = 100326,
     SPELL_SMOLDERING_AURA                       = 101093,
     SPELL_SIPHON_ESSENCE_CREDIT                 = 101149,
+    SPELL_HEART_OF_RAGNAROS_CREATE              = 101125,
 
     QUEST_HEART_OF_FLAME_ALLIANCE               = 29307,
     QUEST_HEART_OF_FLAME_HORDE                  = 29308,

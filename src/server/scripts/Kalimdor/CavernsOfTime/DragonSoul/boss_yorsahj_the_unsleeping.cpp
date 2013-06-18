@@ -917,9 +917,6 @@ class achievement_taste_the_rainbow : public AchievementCriteriaScript
             if (!target)
                 return false;
 
-            if (!_Id)
-                return false;
-
             if (YorsahjAI* jorsahjAI = CAST_AI(YorsahjAI, target->GetAI()))
                 return jorsahjAI->AllowAchieve(_Id);
 
