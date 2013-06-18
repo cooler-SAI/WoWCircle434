@@ -6988,6 +6988,13 @@ void SpellMgr::LoadDbcDataCorrections()
             case 45297:
                 spellInfo->MaxLevel = spellInfo->SpellLevel;
                 break;
+            // Shard of the Defiler - Echo of Archimonde
+            case 21079:
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = 0;
+                spellInfo->Effects[EFFECT_2].Effect = 0;
+                spellInfo->Effects[EFFECT_2].ApplyAuraName = 0;
+                break;
             default:
                 break;
         }

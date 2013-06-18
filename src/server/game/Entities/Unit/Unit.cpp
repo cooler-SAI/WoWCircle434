@@ -7702,6 +7702,27 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                case 96887: // Variable Pulse Lightning Capacitor
+                case 97119: // Variable Pulse Lightning Capacitor (Heroic)
+                {
+                    if (!victim)
+                        return false;
+
+                    if (Aura* aur = GetAura(96890))
+                    {
+                        uint8 stacks = aur->GetStackAmount();
+                        if (roll_chance_i(15))
+                        {
+                            int32 bp0 = dummySpell->Effects[EFFECT_0].CalcValue() * stacks;
+                            CastCustomSpell(victim, 96891, &bp0, 0, 0, true);
+                            aur->Remove();
+                            return true;
+                        }
+                    }
+                    triggered_spell_id = 96890;
+                    target = victim;
+                    break;
+                }
                 // Item - Paladin T12 Holy 4P Bonus
                 case 99070:
                 {
