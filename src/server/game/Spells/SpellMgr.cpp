@@ -6980,10 +6980,6 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
                 spellInfo->SchoolMask = SPELL_SCHOOL_MASK_SHADOW;
                 break;
-            // Dragon's Breath
-            case 31661:
-                spellInfo->ProcFlags |= PROC_FLAG_TAKEN_PERIODIC;
-                break;
             // Scarab Storm
             case 92146:
                 spellInfo->AttributesEx4 |= SPELL_ATTR4_NOT_USABLE_IN_ARENA_OR_RATED_BG;
