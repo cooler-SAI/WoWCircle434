@@ -387,8 +387,12 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
          spellId != 101603) // Hack for Throw Totem, Echo of Baine 
     {
         // not have spell in spellbook 
-        recvPacket.rfinish(); // prevent spam at ignore packet 
-        return; 
+        //cheater? kick? ban?
+        if (!spellInfo->IsAbilityOfSkillType(SKILL_ARCHAEOLOGY))
+        {
+            recvPacket.rfinish(); // prevent spam at ignore packet
+            return;
+        } 
     }
 
     /*if (mover->GetTypeId() == TYPEID_PLAYER)
