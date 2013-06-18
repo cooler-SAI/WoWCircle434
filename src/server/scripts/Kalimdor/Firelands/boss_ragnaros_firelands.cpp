@@ -801,6 +801,8 @@ class boss_ragnaros_firelands : public CreatureScript
                                 events.ScheduleEvent(EVENT_CHECK_SONS, 2000);
                             break;
                         case EVENT_CONTINUE_PHASE_2:
+                            events.CancelEvent(EVENT_CHECK_SONS);
+                            summons.DespawnEntry(NPC_SON_OF_FLAME);
                             phase = 2;
                             Talk(SAY_PICKUP);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
@@ -852,6 +854,8 @@ class boss_ragnaros_firelands : public CreatureScript
                             break;
                         }
                         case EVENT_CONTINUE_PHASE_3:
+                            events.CancelEvent(EVENT_CHECK_SONS);
+                            summons.DespawnEntry(NPC_SON_OF_FLAME);
                             phase = 4;
                             Talk(SAY_PICKUP);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);

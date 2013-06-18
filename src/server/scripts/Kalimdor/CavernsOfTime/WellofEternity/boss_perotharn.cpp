@@ -300,6 +300,7 @@ class boss_perotharn : public CreatureScript
                             break;
                         case EVENT_EASY_PREY:
                             phase = 4;
+                            events.CancelEvent(EVENT_END_HUNT);
                             me->SetReactState(REACT_AGGRESSIVE);
                             DoCast(me, SPELL_CAMOUFLAGE_REMOVE, true);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
@@ -314,6 +315,7 @@ class boss_perotharn : public CreatureScript
                             events.ScheduleEvent(EVENT_FEL_DECAY, urand(12000, 15000));
                             break;
                         case EVENT_END_HUNT:
+                            events.CancelEvent(EVENT_EASY_PREY);
                             phase = 4; 
                             summons.DespawnEntry(NPC_EYE_OF_PEROTHARN_1);
                             summons.DespawnEntry(NPC_HUNTING_SUMMON_CIRCLE);

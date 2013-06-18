@@ -197,8 +197,11 @@ class boss_morchok: public CreatureScript
                 if (!UpdateVictim())
                         return;
 
-                if (!(CheckInArea(diff, 5923) || CheckInArea(diff, 5926)))
+                if (me->GetDistance(me->GetHomePosition()) > 500.0f)
+                {
+                    EnterEvadeMode();
                     return;
+                }
 
                 events.Update(diff);
 
