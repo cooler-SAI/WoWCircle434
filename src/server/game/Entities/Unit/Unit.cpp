@@ -3122,18 +3122,17 @@ void Unit::_AddAura(UnitAura* aura, Unit* caster)
         // register single target aura
         caster->GetSingleCastAuras().push_back(aura);
         // remove other single target auras
+        Unit::AuraList tempList;
         Unit::AuraList& scAuras = caster->GetSingleCastAuras();
-        for (Unit::AuraList::iterator itr = scAuras.begin(); itr != scAuras.end();)
-        {
-            if ((*itr) != aura &&
+        for (AuraList::const_iterator itr = scAuras.begin(); itr != scAuras.end(); ++itr)
+            if ((*itr) != aura && 
                 (*itr)->GetSpellInfo()->IsSingleTargetWith(aura->GetSpellInfo()))
-            {
-                (*itr)->Remove();
-                itr = scAuras.begin();
-            }
-            else
-                ++itr;
-        }
+                    tempList.push_back(aura);
+
+        if (!tempList.empty())
+            for (AuraList::const_iterator itr = tempList.begin(); itr != tempList.end(); ++itr)
+                if (Aura* aura = *itr)
+                    aura->Remove();
     }
 }
 
