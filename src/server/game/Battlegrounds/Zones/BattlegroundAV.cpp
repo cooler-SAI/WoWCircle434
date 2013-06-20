@@ -301,7 +301,7 @@ Creature* BattlegroundAV::AddAVCreature(uint16 cinfoid, uint16 type)
         //just copied this code from a gm-command
     }
 
-    if (level != 0)
+    /*if (level != 0)
     {
         uint32 minLevel = GetMinLevel() < 85 ? GetMinLevel() : 81;
         uint32 diff = level - 45;
@@ -341,7 +341,7 @@ Creature* BattlegroundAV::AddAVCreature(uint16 cinfoid, uint16 type)
         creature->SetMaxHealth(health);
         creature->SetHealth(health);
     }
-    creature->SetLevel(level);
+    creature->SetLevel(level);*/
 
     uint32 triggerSpawnID = 0;
     uint32 newFaction = 0;

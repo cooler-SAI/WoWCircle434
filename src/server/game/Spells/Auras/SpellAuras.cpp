@@ -3409,19 +3409,27 @@ void DynObjAura::FillTargetMap(std::map<Unit*, uint8> & targets, Unit* /*caster*
 
 bool Aura::IsUniqueVisibleAuraBuff() const
 {
+    switch (GetId())
+    {
+        case 2825: // Bloodlust
+        case 32182: // Heroism
+        case 80353: // Time Warp
+        case 90355: // Ancient Hysteria
+        case 45822: // Alterac Valley boss buffs
+        case 45823:
+        case 45824:
+        case 45826:
+        case 45828:
+        case 45829:
+        case 45830:
+        case 45831:
+            return false;
+    }
+
     for(uint8 i = 0; i < 3; ++i)
     {
         if (!(GetEffectMask() & (1 << i)))
             continue;
-
-        switch (GetId())
-        {
-            case 2825: // Bloodlust
-            case 32182: // Heroism
-            case 80353: // Time Warp
-            case 90355: // Ancient Hysteria
-                return false;
-        }
 
         switch (GetSpellInfo()->Effects[i].TargetA.GetTarget())
         {

@@ -1171,10 +1171,79 @@ void Creature::SelectLevel(const CreatureTemplate* cinfo)
 {
     uint32 rank = isPet()? 0 : cinfo->rank;
 
+    uint32 bg_minlevel = 0;
+    uint32 bg_maxlevel = 0;
+    uint32 bg_level = 0;
+    float bg_mindmg = 0;
+    float bg_maxdmg = 0;
+    if (GetMap()->IsBattleground())
+    {
+        Battleground* bg = NULL;
+        bg = reinterpret_cast<BattlegroundMap*>(GetMap())->GetBG();
+        if (bg)
+        {
+            bg_minlevel = bg->GetMinLevel();
+            bg_maxlevel = bg->GetMaxLevel();
+            if (bg_minlevel > 0 && bg_maxlevel > 2)
+            {
+                switch (rank)
+                {
+                    case CREATURE_ELITE_NORMAL:
+                    {
+                        if (bg_minlevel < 85)
+                        {
+                            if (IsVehicle())
+                                bg_level = bg_maxlevel;
+                            else
+                                bg_level = urand(bg_minlevel, bg_minlevel + 2);
+                        }
+                        else
+                            bg_level = 85;
+                        GtOCTBaseHPByClassEntry const* hp = sGtOCTBaseHPByClassStore.LookupEntry((CLASS_WARRIOR - 1) * GT_MAX_LEVEL + bg_level - 1);
+                        bg_mindmg = hp->ratio / 6;
+                        bg_maxdmg = hp->ratio / 5;
+                        break;
+                    }
+                    case CREATURE_ELITE_ELITE:
+                    case CREATURE_ELITE_RAREELITE:
+                    {
+                        if (bg_minlevel < 85)
+                            bg_level = urand(bg_maxlevel - 2, bg_maxlevel);
+                        else
+                            bg_level = 87;
+                        GtOCTBaseHPByClassEntry const* hp = sGtOCTBaseHPByClassStore.LookupEntry((CLASS_WARRIOR - 1) * GT_MAX_LEVEL + ((bg_level > 85) ? 85 : bg_level) - 1);
+                        if (GetEntry() == 34924 || GetEntry() == 34922) // IC Bosses, elite rank, but should have huge damage
+                        {
+                            bg_mindmg = hp->ratio * 1.1;
+                            bg_maxdmg = hp->ratio * 1.2;    
+                        }
+                        bg_mindmg = hp->ratio / 3;
+                        bg_maxdmg = hp->ratio / 2;
+                        break;
+                    }
+                    case CREATURE_ELITE_WORLDBOSS:
+                    {
+                        bg_level = bg_maxlevel + 3;
+                        GtOCTBaseHPByClassEntry const* hp = sGtOCTBaseHPByClassStore.LookupEntry((CLASS_WARRIOR - 1) * GT_MAX_LEVEL + ((bg_level > 85) ? 85 : bg_level) - 1);
+                        bg_mindmg = hp->ratio * 1.1f;
+                        bg_maxdmg = hp->ratio * 1.2f;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    
+
     // level
     uint8 minlevel = std::min(cinfo->maxlevel, cinfo->minlevel);
     uint8 maxlevel = std::max(cinfo->maxlevel, cinfo->minlevel);
+
     uint8 level = minlevel == maxlevel ? minlevel : urand(minlevel, maxlevel);
+    if (bg_level)
+        level = bg_level;
+        
     SetLevel(level);
 
     CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(level, cinfo->unit_class);
@@ -1214,8 +1283,8 @@ void Creature::SelectLevel(const CreatureTemplate* cinfo)
     //damage
     //float damagemod = _GetDamageMod(rank);      // Set during loading templates into dmg_multiplier field
 
-    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->mindmg);
-    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->maxdmg);
+    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (bg_mindmg ? bg_mindmg : cinfo->mindmg));
+    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (bg_maxdmg ? bg_maxdmg : cinfo->maxdmg));
 
     SetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE, cinfo->minrangedmg);
     SetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE, cinfo->maxrangedmg);

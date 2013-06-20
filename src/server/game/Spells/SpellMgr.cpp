@@ -6995,6 +6995,11 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_2].Effect = 0;
                 spellInfo->Effects[EFFECT_2].ApplyAuraName = 0;
                 break;
+            // Isle of Conquest Gunship Portal
+            case 66630:
+            case 66637:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                break;
             default:
                 break;
         }

@@ -1956,6 +1956,13 @@ WorldSafeLocsEntry const* Battleground::GetClosestGraveYard(Player* player)
     return sObjectMgr->GetClosestGraveYard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetTeam());
 }
 
+bool Battleground::IsTeamScoreInRange(uint32 team, uint32 minScore, uint32 maxScore) const
+{
+    TeamId teamIndex = GetTeamIndexByTeamId(team);
+    uint32 score = std::max(m_TeamScores[teamIndex], 0);
+    return score >= minScore && score <= maxScore;
+}
+
 void Battleground::StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry)
 {
     for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)

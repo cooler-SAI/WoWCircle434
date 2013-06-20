@@ -58,6 +58,8 @@ BattlegroundIC::BattlegroundIC()
 
 BattlegroundIC::~BattlegroundIC()
 {
+    sMapMgr->m_Transports.erase(gunshipHorde);
+    sMapMgr->m_Transports.erase(gunshipAlliance);
     delete gunshipHorde;
     delete gunshipAlliance;
 }
@@ -99,18 +101,19 @@ void BattlegroundIC::DoAction(uint32 action, uint64 var)
     if (!player)
         return;
 
-    player->SetTransport(player->GetTeamId() == TEAM_ALLIANCE ? gunshipAlliance : gunshipHorde);
-
-    player->m_movementInfo.t_pos.m_positionX = TransportMovementInfo.GetPositionX();
-    player->m_movementInfo.t_pos.m_positionY = TransportMovementInfo.GetPositionY();
-    player->m_movementInfo.t_pos.m_positionZ = TransportMovementInfo.GetPositionZ();
+    player->SetTransport((player->GetTeamId() == TEAM_ALLIANCE) ? gunshipAlliance : gunshipHorde);
     player->m_movementInfo.t_guid = (player->GetTeamId() == TEAM_ALLIANCE ? gunshipAlliance : gunshipHorde)->GetGUID();
+    player->m_movementInfo.t_pos.m_positionX = ((player->GetTeamId() == TEAM_ALLIANCE) ? allianceShipPos : hordeShipPos).GetPositionX(); 
+    player->m_movementInfo.t_pos.m_positionY = ((player->GetTeamId() == TEAM_ALLIANCE) ? allianceShipPos : hordeShipPos).GetPositionY(); 
+    player->m_movementInfo.t_pos.m_positionZ = ((player->GetTeamId() == TEAM_ALLIANCE) ? allianceShipPos : hordeShipPos).GetPositionZ(); 
+    player->m_movementInfo.t_pos.m_orientation = ((player->GetTeamId() == TEAM_ALLIANCE) ? allianceShipPos : hordeShipPos).GetOrientation();
 
-    if (player->TeleportTo(GetMapId(), TeleportToTransportPosition.GetPositionX(),
-                        TeleportToTransportPosition.GetPositionY(),
-                        TeleportToTransportPosition.GetPositionZ(),
-                        TeleportToTransportPosition.GetOrientation(),
-                        TELE_TO_NOT_LEAVE_TRANSPORT))
+    if (player->TeleportTo(GetMapId(), 
+        ((player->GetTeamId() == TEAM_ALLIANCE) ? allianceShipPos : hordeShipPos).GetPositionX(), 
+        ((player->GetTeamId() == TEAM_ALLIANCE) ? allianceShipPos : hordeShipPos).GetPositionY(), 
+        ((player->GetTeamId() == TEAM_ALLIANCE) ? allianceShipPos : hordeShipPos).GetPositionZ(), 
+        ((player->GetTeamId() == TEAM_ALLIANCE) ? allianceShipPos : hordeShipPos).GetOrientation(), 
+        TELE_TO_NOT_LEAVE_TRANSPORT))
     {
         player->CastSpell(player, SPELL_PARACHUTE, true); // this must be changed, there is a trigger in each transport that casts the spell.
         player->CastSpell(player, SPELL_SLOW_FALL, true);
@@ -835,11 +838,17 @@ void BattlegroundIC::ActivateBoss(uint8 faction)
     {
         if (Creature* icBoss = GetBGCreature(BG_IC_NPC_OVERLORD_AGMAR))
             icBoss->setFaction(83);
+        for (uint8 i = 0; i < 4; ++i)
+            if (Creature* pGuard = GetBGCreature(BG_IC_NPC_KOR_KRON_GUARD_1 + i))
+                pGuard->setFaction(83);
     }
     else
     {
         if (Creature* icBoss = GetBGCreature(BG_IC_NPC_HIGH_COMMANDER_HALFORD_WYRMBANE))
             icBoss->setFaction(84);
+        for (uint8 i = 0; i < 4; ++i)
+            if (Creature* pGuard = GetBGCreature(BG_IC_NPC_SEVEN_TH_LEGION_INFANTRY_1 + i))
+                pGuard->setFaction(84);
     }
 }
 
@@ -971,9 +980,12 @@ Transport* BattlegroundIC::CreateTransport(uint32 goEntry, uint32 period)
         return NULL;
     }
 
+    sMapMgr->m_Transports.insert(t);
+
     //If we someday decide to use the grid to track transports, here:
     t->SetMap(GetBgMap());
 
+    
     for (uint8 i = 0; i < 5; ++i)
         t->AddNPCPassenger(0, (goEntry == GO_HORDE_GUNSHIP ? NPC_HORDE_GUNSHIP_CANNON : NPC_ALLIANCE_GUNSHIP_CANNON), (goEntry == GO_HORDE_GUNSHIP ? hordeGunshipPassengers[i].GetPositionX() : allianceGunshipPassengers[i].GetPositionX()), (goEntry == GO_HORDE_GUNSHIP ? hordeGunshipPassengers[i].GetPositionY() : allianceGunshipPassengers[i].GetPositionY()), (goEntry == GO_HORDE_GUNSHIP ? hordeGunshipPassengers[i].GetPositionZ() : allianceGunshipPassengers[i].GetPositionZ()), (goEntry == GO_HORDE_GUNSHIP ? hordeGunshipPassengers[i].GetOrientation() : allianceGunshipPassengers[i].GetOrientation()));
 
