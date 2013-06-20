@@ -10532,6 +10532,13 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                 return false;
             break;
         }
+        case 81141: // Crimson Scourge
+        {
+            // proc only on Blood Plague affected targets
+            if (!victim || !victim->HasAura(55078, GetGUID()))
+                return false;
+            break;
+        }
     }
 
     if (cooldown && GetTypeId() == TYPEID_PLAYER && ToPlayer()->HasSpellCooldown(trigger_spell_id))
