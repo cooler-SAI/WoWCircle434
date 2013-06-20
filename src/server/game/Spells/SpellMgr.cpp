@@ -7017,6 +7017,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 66637:
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
                 break;
+            // Starfall
+            case 48505:
+                spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+                break;
             default:
                 break;
         }

@@ -477,6 +477,12 @@ class spell_dru_savage_roar : public SpellScriptLoader
         }
 };
 
+enum StarfallSpells
+{
+    DRUID_STARFALL_AURA                 = 48505,
+};
+
+
 class spell_dru_starfall_dummy : public SpellScriptLoader
 {
     public:
@@ -484,15 +490,13 @@ class spell_dru_starfall_dummy : public SpellScriptLoader
         class spell_dru_starfall_dummy_SpellScript : public SpellScript
         {
             PrepareSpellScript(spell_dru_starfall_dummy_SpellScript);
-
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
                 Unit* caster = GetCaster();
                 // Shapeshifting into an animal form or mounting cancels the effect
                 if (caster->GetCreatureType() == CREATURE_TYPE_BEAST || caster->IsMounted())
                 {
-                    if (SpellInfo const* spellInfo = GetTriggeringSpell())
-                        caster->RemoveAurasDueToSpell(spellInfo->Id);
+                    caster->RemoveAurasDueToSpell(DRUID_STARFALL_AURA);
                     return;
                 }
 
@@ -502,6 +506,7 @@ class spell_dru_starfall_dummy : public SpellScriptLoader
 
                 caster->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
             }
+
             void FilterTargets(std::list<WorldObject*>& targets)
             {
                 targets.remove(GetExplTargetUnit());
@@ -511,6 +516,19 @@ class spell_dru_starfall_dummy : public SpellScriptLoader
                         itr = targets.erase(itr);
                     else
                         ++itr;
+                }
+
+                if (AuraEffect * eff = GetCaster()->GetAuraEffect(DRUID_STARFALL_AURA, 1))
+                {
+                    int32 stars = eff->GetAmount() - targets.size();
+                    if (stars <= 0)
+                    {
+                        GetCaster()->RemoveAurasDueToSpell(DRUID_STARFALL_AURA);
+                    }
+                    else 
+                    {
+                        eff->SetAmount(stars);
+                    }
                 }
             }
 
