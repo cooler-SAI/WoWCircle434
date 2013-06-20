@@ -2122,7 +2122,7 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
     if (!orientation && m_targets.GetUnitTarget())
         orientation = m_targets.GetUnitTarget()->GetOrientation();
 
-    if (mapid == unitTarget->GetMapId())
+    if (mapid == unitTarget->GetMapId() && !(m_spellInfo->AttributesEx7 & SPELL_ATTR7_ZONE_TELEPORT))
         unitTarget->NearTeleportTo(x, y, z, orientation, unitTarget == m_caster);
     else if (unitTarget->GetTypeId() == TYPEID_PLAYER)
         unitTarget->ToPlayer()->TeleportTo(mapid, x, y, z, orientation, unitTarget == m_caster ? TELE_TO_SPELL : 0);

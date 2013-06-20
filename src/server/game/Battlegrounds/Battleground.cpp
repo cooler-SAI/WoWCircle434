@@ -893,6 +893,8 @@ void Battleground::EndBattleground(uint32 winner)
                     }
             }
 
+            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, BattlegroundMgr::GetBgQuestId(GetTypeID(true), winner));
+             
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, 1);
         }
         else

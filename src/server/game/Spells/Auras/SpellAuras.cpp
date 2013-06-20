@@ -2122,6 +2122,12 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 case 71289: // Mind Control (Lady Deathwisper)
                     target->ApplyPercentModFloatValue(OBJECT_FIELD_SCALE_X, 100.0f, apply);
                     break;
+                case 70227: // Empowered Blood
+                    if (apply)
+                        target->CastSpell(target, 70232, true);
+                    else
+                        target->RemoveAurasDueToSpell(70232);
+                    break;
                 case 91838: // Huddle
                     target->SetControlled(apply, UNIT_STATE_STUNNED);
                     break;

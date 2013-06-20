@@ -349,7 +349,7 @@ class boss_deathbringer_saurfang : public CreatureScript
                 if (!_frenzied && HealthBelowPct(31)) // AT 30%, not below
                 {
                     _frenzied = true;
-                    DoCast(me, SPELL_FRENZY);
+                    DoCast(me, SPELL_FRENZY, true);
                     Talk(SAY_FRENZY);
                 }
             }
@@ -390,7 +390,7 @@ class boss_deathbringer_saurfang : public CreatureScript
                     case 72445:
                     case 72446:
                         if (me->GetPower(POWER_ENERGY) != me->GetMaxPower(POWER_ENERGY))
-                            target->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, 1, me, true);
+                            target->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, IsHeroic() ? 2 : 1, me, true);
                         break;
                     default:
                         break;
@@ -467,8 +467,7 @@ class boss_deathbringer_saurfang : public CreatureScript
                             events.ScheduleEvent(EVENT_RUNE_OF_BLOOD, 19500, 0, PHASE_COMBAT);
                             break;
                         case EVENT_BOILING_BLOOD:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, -BOILING_BLOOD_HELPER))
-                                me->AddAura(BOILING_BLOOD_HELPER, target);
+                            me->CastCustomSpell(BOILING_BLOOD_HELPER, SPELLVALUE_MAX_TARGETS, RAID_MODE<int32>(1, 3, 1, 3), me);
                             events.ScheduleEvent(EVENT_BOILING_BLOOD, urand(15000, 20000), 0, PHASE_COMBAT);
                             break;
                         case EVENT_BERSERK:
@@ -1129,7 +1128,7 @@ class spell_deathbringer_rune_of_blood : public SpellScriptLoader
             {
                 PreventHitDefaultEffect(effIndex);  // make this the default handler
                 if (GetCaster()->GetPower(POWER_ENERGY) != GetCaster()->GetMaxPower(POWER_ENERGY))
-                    GetHitUnit()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, 1, GetCaster(), true);
+                    GetHitUnit()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, GetCaster()->GetMap()->IsHeroic() ? 2 : 1, GetCaster(), true);
             }
 
             void Register()
@@ -1164,7 +1163,7 @@ class spell_deathbringer_blood_nova : public SpellScriptLoader
             {
                 PreventHitDefaultEffect(effIndex);  // make this the default handler
                 if (GetCaster()->GetPower(POWER_ENERGY) != GetCaster()->GetMaxPower(POWER_ENERGY))
-                    GetHitUnit()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, 2, GetCaster(), true);
+                    GetHitUnit()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, GetCaster()->GetMap()->IsHeroic() ? 4 : 2, GetCaster(), true);
             }
 
             void Register()
@@ -1258,42 +1257,35 @@ class spell_deathbringer_blood_nova_targeting : public SpellScriptLoader
         }
 };
 
-/*class spell_deathbringer_boiling_blood : public SpellScriptLoader
+class spell_deathbringer_boiling_blood : public SpellScriptLoader
 {
     public:
         spell_deathbringer_boiling_blood() : SpellScriptLoader("spell_deathbringer_boiling_blood") { }
 
-        class spell_deathbringer_boiling_blood_SpellScript : public SpellScript
+        class spell_deathbringer_boiling_blood_AuraScript : public AuraScript
         {
-            PrepareSpellScript(spell_deathbringer_boiling_blood_SpellScript);
+            PrepareAuraScript(spell_deathbringer_boiling_blood_AuraScript);
 
-            bool Load()
+            void OnPeriodic(AuraEffect const* /*aurEff*/)
             {
-                return GetCaster()->GetTypeId() == TYPEID_UNIT;
-            }
-
-            void FilterTargets(std::list<WorldObject*>& targets)
-            {
-                targets.remove(GetCaster()->getVictim());
-                if (targets.empty())
+                Unit* caster = GetCaster();
+                if (!caster)
                     return;
 
-                WorldObject* target = SelectRandomContainerElement(targets);
-                targets.clear();
-                targets.push_back(target);
+                GetTarget()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, caster->GetMap()->IsHeroic() ? 2 : 1, caster, true);
             }
 
             void Register()
             {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_deathbringer_boiling_blood_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_deathbringer_boiling_blood_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        AuraScript* GetAuraScript() const
         {
-            return new spell_deathbringer_boiling_blood_SpellScript();
+            return new spell_deathbringer_boiling_blood_AuraScript();
         }
-};*/
+};
 
 class spell_deathbringer_remove_marks : public SpellScriptLoader
 {
@@ -1350,7 +1342,7 @@ void AddSC_boss_deathbringer_saurfang()
     new spell_deathbringer_rune_of_blood();
     new spell_deathbringer_blood_nova();
     new spell_deathbringer_blood_nova_targeting();
-    //new spell_deathbringer_boiling_blood();
+    new spell_deathbringer_boiling_blood();
     new spell_deathbringer_remove_marks();
     new achievement_ive_gone_and_made_a_mess();
 }

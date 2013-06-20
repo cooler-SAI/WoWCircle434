@@ -51,7 +51,16 @@ enum BattlegroundQuests
     SPELL_EY_QUEST_REWARD           = 43477,
     SPELL_SA_QUEST_REWARD           = 61213,
     SPELL_AB_QUEST_REWARD_4_BASES   = 24061,
-    SPELL_AB_QUEST_REWARD_5_BASES   = 24064
+    SPELL_AB_QUEST_REWARD_5_BASES   = 24064,
+
+    QUEST_CALL_TO_ARMS_AB_A         = 11335,
+    QUEST_CALL_TO_ARMS_AV_A         = 11336,
+    QUEST_CALL_TO_ARMS_EY_A         = 11337,
+    QUEST_CALL_TO_ARMS_WS_A         = 11338,
+    QUEST_CALL_TO_ARMS_AB_H         = 11339,
+    QUEST_CALL_TO_ARMS_AV_H         = 11340,
+    QUEST_CALL_TO_ARMS_EY_H         = 11341,
+    QUEST_CALL_TO_ARMS_WS_H         = 11342 
 };
 
 enum BattlegroundMarks

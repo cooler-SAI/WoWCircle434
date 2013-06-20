@@ -3751,6 +3751,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_200_YARDS);
                 spellInfo->Effects[EFFECT_1].SetRadiusIndex(EFFECT_RADIUS_200_YARDS);
                 break;
+            case 72385: // Boiling Blood (Deathbringer Saurfang)
+            case 72441: // Boiling Blood (Deathbringer Saurfang)
+            case 72442: // Boiling Blood (Deathbringer Saurfang)
+            case 72443: // Boiling Blood (Deathbringer Saurfang)
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_200_YARDS);
+                break;
             case 72769: // Scent of Blood (Deathbringer Saurfang)
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_200_YARDS);
                 // no break
@@ -3803,6 +3809,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 72934: // Blood Infusion Quest Credit (Blood-Queen Lana'thel)
             case 72289: // Frost Infusion Quest Credit (Sindragosa)
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_50000_YARDS); // another missing radius
+                break;
+            case 70232: // Empowered Blood
+            case 70320: // Empowered Blood
+                spellInfo->Effects[EFFECT_0].MiscValue = 127;
+                spellInfo->Effects[EFFECT_0].MiscValueB = 127;
                 break;
             case 71708: // Empowered Flare (Blood Prince Council)
             case 72785: // Empowered Flare (Blood Prince Council)
@@ -3885,8 +3896,14 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_1].SetRadiusIndex(EFFECT_RADIUS_50000_YARDS); // 50000yd
                 spellInfo->Effects[EFFECT_2].SetRadiusIndex(EFFECT_RADIUS_50000_YARDS); // 50000yd
                 break;
+            case 72546: // Harvest Soul
+            case 72597: // Harvest Soul
+            case 72608: // Harvest Soul
+                spellInfo->AttributesEx7 |= SPELL_ATTR7_ZONE_TELEPORT;
+                break;
             case 73655: // Harvest Soul
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
+                spellInfo->AttributesEx7 |= SPELL_ATTR7_ZONE_TELEPORT;
                 break;
             case 73540: // Summon Shadow Trap
                 spellInfo->SetDurationIndex(23); // 90 seconds

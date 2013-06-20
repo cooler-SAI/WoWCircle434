@@ -2270,9 +2270,10 @@ bool Creature::LoadCreaturesAddon(bool reload)
                 sLog->outError(LOG_FILTER_SQL, "Creature (GUID: %u Entry: %u) has wrong spell %u defined in `auras` field.", GetGUIDLow(), GetEntry(), *itr);
                 continue;
             }
-
+            
+            uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(*itr, this);
             // skip already applied aura
-            if (HasAura(*itr))
+            if (HasAura(spellId))
             {
                 //if (!reload)
                 //    sLog->outError(LOG_FILTER_SQL, "Creature (GUID: %u Entry: %u) has duplicate aura (spell %u) in `auras` field.", GetGUIDLow(), GetEntry(), *itr);
@@ -2280,7 +2281,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
                 continue;
             }
 
-            AddAura(*itr, this);
+            AddAura(spellId, this);
             sLog->outDebug(LOG_FILTER_UNITS, "Spell: %u added to creature (GUID: %u Entry: %u)", *itr, GetGUIDLow(), GetEntry());
         }
     }
