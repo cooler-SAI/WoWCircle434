@@ -3125,14 +3125,18 @@ void Unit::_AddAura(UnitAura* aura, Unit* caster)
         Unit::AuraList tempList;
         Unit::AuraList& scAuras = caster->GetSingleCastAuras();
         for (AuraList::const_iterator itr = scAuras.begin(); itr != scAuras.end(); ++itr)
+        {
             if ((*itr) != aura && 
                 (*itr)->GetSpellInfo()->IsSingleTargetWith(aura->GetSpellInfo()))
-                    tempList.push_back(aura);
+                    tempList.push_back((*itr));
+        }
 
         if (!tempList.empty())
-            for (AuraList::const_iterator itr = tempList.begin(); itr != tempList.end(); ++itr)
-                if (Aura* aura = *itr)
+        {
+            for (AuraList::const_iterator t_itr = tempList.begin(); t_itr != tempList.end(); ++t_itr)
+                if (Aura* aura = *t_itr)
                     aura->Remove();
+        }
     }
 }
 
@@ -6326,6 +6330,26 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Item - Warrior T13 Protection 2P Bonus (Revenge)
+                case 105908:
+                    if (!victim)
+                        return false;
+
+                    if (GetTypeId() != TYPEID_PLAYER)
+                        return false;
+
+                    if (victim != ToPlayer()->GetSelectedUnit())
+                        return false;
+                    
+                    basepoints0 = int32(CalculatePct(damage, 20));
+                    triggered_spell_id = 105909;
+
+                    if (AuraEffect const* aurEff = GetAuraEffect(triggered_spell_id, EFFECT_0))
+                        basepoints0 += aurEff->GetAmount();
+
+                    target = this;
+
+                    break;
                 // Item - Warrior T12 Protection 2P Bonus
                 case 99239:
                 {
@@ -9978,6 +10002,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
         case 92234: // Item - Proc Dodge Below 35%, Bedrock Talisman
         case 96947: // Loom of Fate, Spediersilk Spindle
         case 97130: // Loom of Fate, Spediersilk Spindle (H)
+        case 105552: // Item - Death Knight T12 Blood 2P Bonus
             if (!HealthBelowPct(35) && !HealthBelowPctDamaged(35, damage))
                 return false;
             break;
@@ -20106,7 +20131,7 @@ bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool tel
         return false;
 
     bool turn = (GetOrientation() != orientation);
-    bool relocated = (teleport || GetPositionX() != x || GetPositionY() != y || GetPositionZ() != z);
+    bool relocated = (teleport || GetPositionX() != x || GetPositionY() != y || (!HasUnitMovementFlag(MOVEMENTFLAG_HOVER) && GetPositionZ() != z));
 
     if (turn)
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TURNING);

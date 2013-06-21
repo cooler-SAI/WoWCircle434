@@ -7023,6 +7023,25 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
                 spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
                 break;
+            case 45671: // Midsummer - Juggle Torch (Catch, Quest)
+                spellInfo->AttributesEx3 &= ~SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+                break;
+            case 45907: // Midsummer - Torch Target Picker
+                spellInfo->AttributesEx &= ~SPELL_ATTR1_CANT_TARGET_SELF;
+                break;
+            case 45819: // Midsummer - Throw Torch
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_DEST_AREA_ENTRY;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(15);
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 46363: // Midsummer - Beam Attack against Ahune
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_SRC_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_TARGET_ANY;
+                break;
+            // Midsummer - Return Torch
+            case 45280:
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
+                break;
             default:
                 break;
         }

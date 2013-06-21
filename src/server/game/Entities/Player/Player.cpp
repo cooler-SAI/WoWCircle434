@@ -23052,8 +23052,8 @@ void Player::SetClientControl(Unit* target, uint8 allowMove)
     data << uint8(allowMove);
     GetSession()->SendPacket(&data);
 
-    //if (Player* player = target->ToPlayer())
-    //    player->SetRooted(!allowMove);
+    if (Player* player = target->ToPlayer())
+        player->SetRooted(!allowMove);
 
     if (target == this)
         SetMover(this);
@@ -23735,9 +23735,9 @@ void Player::RestoreBaseRune(uint8 index)
     uint32 spell_id = m_runes.runes[index].spell_id;
     ConvertRune(index, GetBaseRune(index));
     SetRuneConvertSpell(index, 0);
-    // Only Blood Tap can be removed
-    if (spell_id == 45529)
-        RemoveAura(45529);
+    
+    if (spell_id == 45529 || spell_id == 105582)
+        RemoveAura(spell_id);
 }
 
 void Player::ConvertRune(uint8 index, RuneType newType)
