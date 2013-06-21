@@ -239,6 +239,33 @@ class npc_pengu : public CreatureScript
         }
 };
 
+class npc_puzzle_box_of_yogg_saron : public CreatureScript
+{
+    public:
+        npc_puzzle_box_of_yogg_saron() : CreatureScript("npc_puzzle_box_of_yogg_saron") { }
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_puzzle_box_of_yogg_saronAI(creature);
+        }
+
+        struct npc_puzzle_box_of_yogg_saronAI : public Scripted_NoMovementAI
+        {
+            npc_puzzle_box_of_yogg_saronAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+            {
+            }
+
+            void IsSummonedBy(Unit* owner)
+            {
+                if (owner->GetTypeId() == TYPEID_PLAYER)
+                {
+                    me->PlayDirectSound(23414, owner->ToPlayer());
+                    Talk(0, owner->GetGUID());
+                }
+                me->DespawnOrUnsummon(1000);
+            }
+        };
+};
 
 void AddSC_npc_companions()
 {
@@ -246,4 +273,5 @@ void AddSC_npc_companions()
     new npc_train_wrecker();
     new npc_mini_tyrael();
     new npc_pengu();
+    new npc_puzzle_box_of_yogg_saron();
 }
