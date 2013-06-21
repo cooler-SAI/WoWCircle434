@@ -188,6 +188,7 @@ class boss_mannoroth : public CreatureScript
                 bVarothen = false;
                 bAchieve = false;
                 bDebilitating = false;
+                bEndEncounter = false;
             }
 
             void JustReachedHome()
@@ -219,6 +220,7 @@ class boss_mannoroth : public CreatureScript
                 bVarothen = false;
                 bAchieve = false;
                 bDebilitating = false;
+                bEndEncounter = false;
 
                 events.ScheduleEvent(EVENT_MANNOROTH_AGGRO, 5000);
                 //events.ScheduleEvent(EVENT_FEL_FIRESTORM, 20000);
@@ -267,7 +269,10 @@ class boss_mannoroth : public CreatureScript
             {
                 if (!bDebilitating)
                     if (me->HealthBelowPctDamaged(88, damage))
-                        damage = 0;                
+                        damage = 0;
+
+                if (bEndEncounter)
+                    damage = 0;
             }
 
             void UpdateAI(const uint32 diff)
@@ -319,6 +324,7 @@ class boss_mannoroth : public CreatureScript
                 else if (me->HealthBelowPct(25) && (phase == 4))
                 {
                     phase = 5;
+                    bEndEncounter = true;
                     CompleteEncounter();
                     return;
                 }
@@ -441,6 +447,7 @@ class boss_mannoroth : public CreatureScript
             bool bVarothen;
             bool bAchieve;
             bool bDebilitating;
+            bool bEndEncounter;
 
             void CompleteEncounter()
             {
@@ -537,6 +544,11 @@ class npc_mannoroth_varothen : public CreatureScript
                     Talk(SAY_VAROTHEN_KILL);
             }
 
+            void SpellHit(Unit* who, const SpellInfo* spellInfo)
+            {
+                if (spellInfo->Id == SPELL_ARCHIVED_VAROTHEN_1)
+                    DoCast(who, SPELL_ARCHIVED_VAROTHEN_2, true);
+            }
 
             void JustDied(Unit* /*killer*/)
             {
@@ -551,8 +563,7 @@ class npc_mannoroth_varothen : public CreatureScript
                     if (!PlayerList.isEmpty())
                         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                             if (Player* pPlayer = i->getSource())
-                                if (me->GetDistance2d(pPlayer) <= 50.0f &&
-                                    pPlayer->GetQuestStatus(QUEST_DOCUMENTING_THE_TIMEWAYS) == QUEST_STATUS_INCOMPLETE)
+                                if (me->GetDistance(pPlayer) <= 50.0f && pPlayer->GetQuestStatus(QUEST_DOCUMENTING_THE_TIMEWAYS) == QUEST_STATUS_INCOMPLETE)
                                     pPlayer->CastSpell(me, SPELL_ARCHIVED_VAROTHEN_1, true);
                 }
             }
