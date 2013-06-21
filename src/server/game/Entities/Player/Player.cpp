@@ -2731,7 +2731,7 @@ void Player::Regenerate(Powers power)
             m_powerFraction[powerIndex] = addvalue - integerValue;
     }
 
-    if (m_regenTimerCount >= 2000)
+    if (m_regenTimerCount >= 2000 || HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD))
         SetPower(power, curValue);
     else
         UpdateUInt32Value(UNIT_FIELD_POWER1 + powerIndex, curValue);

@@ -2927,7 +2927,10 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
                                                             // blizz like 2.0.x
         target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                                                             // blizz like 2.0.x
-        target->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+        target->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD); // bugs energy bar
+
+        if (target->IsFullPower())
+            target->SetPower(target->getPowerType(), target->GetPower(target->getPowerType()) - 1);
 
         target->AddUnitState(UNIT_STATE_DIED);
     }
