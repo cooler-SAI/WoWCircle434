@@ -2490,6 +2490,18 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) c
         return 0;
     }
 
+    switch (Id)
+    {
+        case 98474: // Flame Scythe, Majordomo Staghelm, Firelands
+        case 100212:
+        case 100213:
+        case 100214:
+        case 98476: // Leaping Flames, Majordomo Staghelm, Firelands
+            return 100;
+        default:
+            break;
+    }
+
     // Base powerCost
     int32 powerCost = ManaCost;
     // PCT cost from total amount

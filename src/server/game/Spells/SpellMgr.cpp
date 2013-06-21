@@ -5378,9 +5378,7 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->MaxAffectedTargets = 2;
                 break;
             case 99254: // Torment visual
-                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
                 spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
-                spellInfo->Effects[EFFECT_0].Amplitude = 0;
                 break;
             case 99256: // Torment
             case 100230:

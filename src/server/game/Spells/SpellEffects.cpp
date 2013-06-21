@@ -2369,14 +2369,13 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
     if (!unitTarget || !unitTarget->isAlive() || unitTarget->getPowerType() != powerType || damage < 0)
         return;
 
+    // burn x% of target's mana, up to maximum of 2x% of caster's mana (Mana Burn)
     if (m_spellInfo->Id == 8129)
+    {
         if (unitTarget->GetEntry() == 52498 || // Beth'tilac
             unitTarget->GetEntry() == 52530)   // Alysrazor
             return;
 
-    // burn x% of target's mana, up to maximum of 2x% of caster's mana (Mana Burn)
-    if (m_spellInfo->Id == 8129)
-    {
         int32 maxDamage = int32(CalculatePct(m_caster->GetMaxPower(powerType), damage * 2));
         damage = int32(CalculatePct(unitTarget->GetMaxPower(powerType), damage));
         damage = std::min(damage, maxDamage);
@@ -6855,7 +6854,22 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
     float speedxy = float(m_spellInfo->Effects[effIndex].MiscValue)/10;
     float speedz = float(damage/10);
     //1891: Disengage
-    m_caster->JumpTo(speedxy, speedz, m_spellInfo->SpellIconID != 1891);
+    switch (m_spellInfo->Id)
+    {
+        case 98928: // Lava Wave dmg, Ragnaros, Firelands
+        case 100292:
+        case 100293:
+        case 100294:
+            if (!unitTarget)
+                break;
+
+            if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+                unitTarget->JumpTo(speedxy, speedz, false);
+            break;
+        default:
+            m_caster->JumpTo(speedxy, speedz, m_spellInfo->SpellIconID != 1891);
+            break;
+    }    
 }
 
 void Spell::EffectQuestClear(SpellEffIndex effIndex)

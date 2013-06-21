@@ -7942,6 +7942,9 @@ bool AuraEffect::IsUniqueStackAuraType() const
 
 void AuraEffect::HandleAuraProgressBar(AuraApplication const* aurApp, uint8 mode, bool apply) const
 {
+    if (!(mode & AURA_EFFECT_HANDLE_REAL))
+        return;
+
     Unit* target = aurApp->GetTarget();
 
     Unit* caster = GetCaster();
