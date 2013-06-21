@@ -59,6 +59,7 @@ enum Events
     EVENT_EXPLODE               = 9,
     EVENT_CHECK_PLAYERS         = 10,
     EVENT_CONTINUE_1            = 11,
+    EVENT_UPDATE_HEALTH         = 12,
 }; 
 
 enum Adds
@@ -126,6 +127,8 @@ class boss_morchok: public CreatureScript
 
                 me->SetReactState(REACT_AGGRESSIVE);
 
+                me->LowerPlayerDamageReq(me->GetHealth());
+
                 _stompguid1 = 0;
                 _stompguid2 = 0;
                 bEnrage = false;
@@ -181,6 +184,15 @@ class boss_morchok: public CreatureScript
                 return 0;
             }
 
+            void JustSummoned(Creature* summon)
+            {
+                BossAI::JustSummoned(summon);
+                if (summon->GetEntry() == NPC_KOHCROM)
+                {
+                    summon->SetMaxHealth(me->GetMaxHealth());
+                    summon->SetHealth(me->GetHealth());
+                }
+            }
             void KilledUnit(Unit* victim)
             {
                 if (victim && victim->GetTypeId() == TYPEID_PLAYER)
@@ -211,15 +223,18 @@ class boss_morchok: public CreatureScript
                 if (IsHeroic() && me->HealthBelowPct(90) && !bKohcrom)
                 {
                     bKohcrom = true;
-                    me->AttackStop();
                     me->SetReactState(REACT_PASSIVE);
+                    me->AttackStop();
+                    
                     Talk(SAY_KOHCROM);
 
                     DoCast(me, SPELL_MORCHOK_JUMP);
                     DoCast(me, SPELL_SUMMON_KOHCROM, true);
 
-                    events.DelayEvents(5000);
+
+                    events.DelayEvents(6000);
                     events.ScheduleEvent(EVENT_CONTINUE, 5000);
+                    events.ScheduleEvent(EVENT_UPDATE_HEALTH, 8000);
                     return;
                 }
 
@@ -234,6 +249,26 @@ class boss_morchok: public CreatureScript
                 {
                     switch (eventId)
                     {
+                        case EVENT_UPDATE_HEALTH:
+                            if (me->isAlive())
+                            {
+                                if (Creature* pKohcrom = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_KOHCROM)))
+                                {
+                                    if (!pKohcrom->isAlive())
+                                        break;
+
+                                    if (me->GetHealth() < 500000 || pKohcrom->GetHealth() < 500000)
+                                        break;
+
+                                    uint32 new_health = (me->GetHealth() + pKohcrom->GetHealth()) / 2;
+                                    std::min(new_health, me->GetMaxHealth());
+                                    me->SetHealth(new_health);
+                                    pKohcrom->SetHealth(new_health);
+                                }
+                                events.ScheduleEvent(EVENT_UPDATE_HEALTH, 3000);
+                            }
+                            
+                            break;
                         case EVENT_BERSERK:
                             DoCast(me, SPELL_BERSERK);
                             break;
