@@ -20708,7 +20708,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         for (int i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
         {
             if (iece->RequiredItem[i])
-                DestroyItemCount(iece->RequiredItem[i], iece->RequiredItemCount[i], true);
+                DestroyItemCount(iece->RequiredItem[i], iece->RequiredItemCount[i] * (count / pProto->BuyCount), true);
         }
 
         for (int i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
@@ -20718,7 +20718,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
                 continue;
 
             if (iece->RequiredCurrency[i])
-                ModifyCurrency(iece->RequiredCurrency[i], -int32(iece->RequiredCurrencyCount[i]), true, true);
+                ModifyCurrency(iece->RequiredCurrency[i], -int32(iece->RequiredCurrencyCount[i]  * (count / pProto->BuyCount)), true, true);
         }
     }
 
@@ -20923,7 +20923,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
     if (crItem->ExtendedCost)
     {
         // Can only buy full stacks for extended cost
-        if (pProto->BuyCount != count)
+        if (pProto->BuyCount > 1 && pProto->BuyCount != count)
         {
             SendEquipError(EQUIP_ERR_CANT_BUY_QUANTITY, NULL, NULL);
             return false;
@@ -20966,7 +20966,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
                     return false;
                 }
             }
-            else if (!HasCurrency(iece->RequiredCurrency[i], (iece->RequiredCurrencyCount[i] * count)))
+            else if (!HasCurrency(iece->RequiredCurrency[i], (iece->RequiredCurrencyCount[i] * count) / pProto->BuyCount))
             {
                 SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL);
                 return false;
