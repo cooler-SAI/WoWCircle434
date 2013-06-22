@@ -12568,12 +12568,6 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
                             if (victim->HasAuraWithMechanic((1<<MECHANIC_STUN) | (1<<MECHANIC_KNOCKOUT)))
                                 if (AuraEffect const* aurEff = GetAuraEffect(56369, EFFECT_0))
                                     crit_chance += aurEff->GetAmount();
-                        // Shatter (same misc values now)
-                        if (victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this))
-                        {
-                            if (AuraEffect const* Shatter = GetDummyAuraEffect(SPELLFAMILY_MAGE, 976, 1))
-                                crit_chance *= (float(Shatter->GetAmount()) / 10.0f) + 1.0f;
-                        }
                         break;
                     case SPELLFAMILY_DRUID:
 
@@ -12724,6 +12718,17 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
         if (Unit* owner = GetOwner())
             if (Aura* aur = victim->GetAura(86000, owner->GetGUID()))
                 crit_chance += float(aur->GetEffect(0)->GetAmount());
+
+    // Shatter (same misc values now)
+    // Shatter should calculated last
+    if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_MAGIC && spellProto->SpellFamilyName == SPELLFAMILY_MAGE)
+    {
+        if (victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this))
+        {
+            if (AuraEffect const* Shatter = GetDummyAuraEffect(SPELLFAMILY_MAGE, 976, 1))
+                crit_chance *= (float(Shatter->GetAmount()) / 10.0f) + 1.0f;
+        }
+    }
 
     crit_chance = crit_chance > 0.0f ? crit_chance : 0.0f;
     return crit_chance;
