@@ -1941,7 +1941,7 @@ class npc_strangulate_vehicle : public CreatureScript
 
                             // Teleport to main tank location, otherwise we might land under the map or inside defile
                             if (Unit* victim = lichKing->getVictim())
-                                summoner->NearTeleportTo(victim->GetPositionX(), victim->GetPositionY(), victim->GetPositionZ() + 1.0f, victim->GetOrientation());
+                                summoner->NearTeleportTo(victim->GetPositionX(), victim->GetPositionY(), victim->GetPositionZ() + 20.0f, victim->GetOrientation());
                             else
                                 DoCast(summoner, SPELL_HARVEST_SOUL_TELEPORT_BACK);
                         }
