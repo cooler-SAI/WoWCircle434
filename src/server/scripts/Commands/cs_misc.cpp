@@ -1566,7 +1566,7 @@ public:
             userName      = fields[0].GetString();
             security      = fields[1].GetUInt8();
             eMail         = fields[2].GetString();
-            muteTime      = fields[5].GetUInt64();
+            muteTime      = fields[5].GetInt64();
 
             if (eMail.empty())
                 eMail = "-";
@@ -1821,7 +1821,7 @@ public:
         else
         {
             // Target is offline, mute will be in effect starting from the next login.
-            int32 muteTime = -int32(notSpeakTime * MINUTE);
+            int64 muteTime = -int64(notSpeakTime * MINUTE);
             stmt->setInt64(0, muteTime);
         }
 
