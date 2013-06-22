@@ -98,6 +98,7 @@ class boss_mandokir : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+                me->setActive(true);
             }
 
             void Reset()
@@ -106,15 +107,19 @@ class boss_mandokir : public CreatureScript
 
                 for (uint8 i = 0; i < 8; ++i)
                     me->SummonCreature(NPC_CHAINED_SPIRIT, chainedspiritPos[i]);
+                
+                bAchieve = true;
             }
 
             void KilledUnit(Unit* victim)
             {
+                if (victim->GetTypeId() != TYPEID_PLAYER)
+                    return;
+
                 Talk(SAY_KILL);
+
                 if (Creature* spirit = me->FindNearestCreature(NPC_CHAINED_SPIRIT, 200.0f))
-                {
                     spirit->AI()->SetGUID(victim->GetGUID(), DATA_RES);
-                }
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -132,11 +137,19 @@ class boss_mandokir : public CreatureScript
                 _JustDied();
                 Talk(SAY_DEATH);
             }
+
+            bool AllowAchieve()
+            {
+                return bAchieve;
+            }
             
             void SummonedCreatureDies(Creature* summon, Unit* killer)
             {
                 if (summon->GetEntry() == NPC_OHGAN)
+                {
+                    bAchieve = false;
                     events.ScheduleEvent(EVENT_OHGAN_RES, 10000);
+                }
             }
 
             void UpdateAI(uint32 const diff)
@@ -149,7 +162,7 @@ class boss_mandokir : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
             
-                while (uint32 eventId = events.ExecuteEvent())
+                if (uint32 eventId = events.ExecuteEvent())
                 {
                     switch (eventId)
                     {
@@ -197,10 +210,11 @@ class boss_mandokir : public CreatureScript
                             break;
                     }
                 }
-            
-
                 DoMeleeAttackIfReady();
             }
+        private:
+            bool bAchieve;
+
         };
 };
 
@@ -347,10 +361,30 @@ class spell_mandokir_bloodletting : public SpellScriptLoader
         }
 };
 
+typedef boss_mandokir::boss_mandokirAI MandokirAI;
+
+class achievement_ohganot_so_fast : public AchievementCriteriaScript
+{
+    public:
+        achievement_ohganot_so_fast() : AchievementCriteriaScript("achievement_ohganot_so_fast") { }
+
+        bool OnCheck(Player* source, Unit* target)
+        {
+            if (!target)
+                return false;
+
+            if (MandokirAI* mandokirAI = CAST_AI(MandokirAI, target->GetAI()))
+                return mandokirAI->AllowAchieve();
+
+            return false;
+        }
+};
+
 void AddSC_boss_mandokir()
 {
     new boss_mandokir();
     new npc_mandokir_chained_spirit();
     new npc_mandokir_ohgan();
     new spell_mandokir_bloodletting();
+    new achievement_ohganot_so_fast();
 }

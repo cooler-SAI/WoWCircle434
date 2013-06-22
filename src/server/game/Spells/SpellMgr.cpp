@@ -7040,6 +7040,9 @@ void SpellMgr::LoadDbcDataCorrections()
             case 45280:
                 spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
                 break;
+            // Turkey Vengeance
+            case 25281:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
             default:
                 break;
         }

@@ -3051,11 +3051,27 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                     if (referencePlayer->HasAura(62061))
                         break;
                 }
-
+                else if (criteria->achievement == 233) // Take a Chill Pill 
+                {
+                    if (!referencePlayer)
+                        return false;
+                    if (!referencePlayer->HasAura(23505) && !referencePlayer->HasAura(reqValue))
+                        return false;
+                    break;
+                }
                 if (!referencePlayer || !referencePlayer->HasAura(reqValue))
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_HAS_AURA: // 10
+                
+                if (criteria->achievement == 1258) // Bloodthirsty Berserker
+                {
+                    if (!unit || !unit->IsInWorld())
+                        return false;
+                    if (!unit->HasAura(23505) && !unit->HasAura(reqValue))
+                        return false;
+                    break;
+                }
                 if (!unit || !unit->IsInWorld() || !unit->HasAura(reqValue))
                     return false;
                 break;

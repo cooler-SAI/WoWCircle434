@@ -2617,7 +2617,7 @@ void InstanceMap::PermBindAllPlayers(Player* source)
         //if (group && group->GetLeaderGUID() == player->GetGUID())
             //group->BindToInstance(save, true);
     }
-    if (group)
+    if (!bLfg && group)
         group->BindToInstance(save, true);
 }
 
