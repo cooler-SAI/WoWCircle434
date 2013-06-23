@@ -6897,6 +6897,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 73920: // Healing Rain
                 spellInfo->AttributesEx5 &= ~SPELL_ATTR5_START_PERIODIC_AT_APPLY;
                 break;
+            case 51699: // Honor Among Thieves
             case 6770:  // Sap
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_CANT_TRIGGER_PROC;
                 break;

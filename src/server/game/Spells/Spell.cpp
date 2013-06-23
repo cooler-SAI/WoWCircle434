@@ -7854,7 +7854,8 @@ bool Spell::CanProcOnTarget(Unit *target) const
     if (m_spellInfo->SpellFamilyName != SPELLFAMILY_PRIEST && !m_spellInfo->IsPositive() && m_caster->IsFriendlyTo(target))
         return false;
 
-    if (m_spellInfo->HasEffect(SPELL_EFFECT_DISTRACT)) // Distract can't be proced
+    // Distract can't be proced
+    if (m_spellInfo->HasEffect(SPELL_EFFECT_DISTRACT))
         return false;
 
     return true;
