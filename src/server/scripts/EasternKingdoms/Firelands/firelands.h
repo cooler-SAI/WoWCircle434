@@ -53,6 +53,7 @@ enum GameobjectIds
     GO_BRIDGE_OF_RHYOLITH       = 209255,
     GO_FIRE_WALL_BALEROC        = 209066,
     GO_RAID_BRIDGE_FORMING      = 209277,
+    GO_SULFURON_BRIDGE          = 209251,
     GO_RAGNAROS_FLOOR           = 208835,
     GO_STICKY_WEB               = 208877,
     GO_MOLTEN_METEOR            = 208966,
