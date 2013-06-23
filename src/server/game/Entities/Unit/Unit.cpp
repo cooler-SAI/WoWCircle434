@@ -7517,8 +7517,10 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 }
                 // Glyph of Kick
                 case 56805:
+                {
                     ToPlayer()->SpellCooldownReduction(1766, triggerAmount);
                     return true;
+                }
                 // Cut to the Chase
                 case 51664:
                 case 51665:
