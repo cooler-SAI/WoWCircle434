@@ -23904,7 +23904,9 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
             }
         }
 
-        if (!canLoot && GetMap()->IsRaidOrHeroicDungeon() && proto && proto->GetMaxStackSize() == 1 && proto->Class != ITEM_CLASS_QUEST)
+        if (!canLoot && GetMap()->IsRaidOrHeroicDungeon() && 
+            proto && proto->GetMaxStackSize() == 1 && 
+            proto->Class != ITEM_CLASS_QUEST && proto->Class != ITEM_CLASS_MISCELLANEOUS)
         {
             SendEquipError(EQUIP_ERR_NOT_EQUIPPABLE, NULL, NULL, item->itemid);
             return;

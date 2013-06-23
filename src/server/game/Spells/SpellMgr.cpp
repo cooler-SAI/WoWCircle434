@@ -7043,6 +7043,11 @@ void SpellMgr::LoadDbcDataCorrections()
             // Turkey Vengeance
             case 25281:
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            // Ram
+            case 60206:
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(EFFECT_RADIUS_10_YARDS);
+                break;
             default:
                 break;
         }
