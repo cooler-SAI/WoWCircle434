@@ -76,9 +76,9 @@ INSERT INTO `reference_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `
 
 DELETE FROM `reference_loot_template` WHERE `entry`=78858;
 INSERT INTO `reference_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `lootmode`, `groupid`, `mincountOrRef`, `maxcount`) VALUES 
-(78171, 78858, 40, 1, 1, 1, 1),
-(78171, 78857, 30, 1, 1, 1, 1),
-(78171, 78856, 30, 1, 1, 1, 1);
+(78858, 78858, 40, 1, 1, 1, 1),
+(78858, 78857, 30, 1, 1, 1, 1),
+(78858, 78856, 30, 1, 1, 1, 1);
 
 REPLACE INTO `creature_currency` (`creature_id`, `CurrencyId1`, `CurrencyId2`, `CurrencyId3`, `CurrencyCount1`, `CurrencyCount2`, `CurrencyCount3`) VALUES 
 (55312, 396, 614, 0, 12000, 1, 0),
