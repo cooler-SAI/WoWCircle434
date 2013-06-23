@@ -196,6 +196,14 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
 
             void EnterCombat(Unit* who)
             {
+
+                if (instance->GetBossState(DATA_MORCHOK) != DONE)
+                {
+                    EnterEvadeMode();
+                    instance->DoNearTeleportPlayers(teleportPos[0]);
+                    return;
+                }
+
                 Talk(SAY_AGGRO);
                 DoCastAOE(SPELL_YORSAHJ_WHISPER_AGGRO, true);
 
@@ -239,6 +247,13 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                 }
             }
 
+            void JustSummoned(Creature* summon)
+            {
+                BossAI::JustSummoned(summon);
+                if (summon->GetEntry() == NPC_MANA_VOID)
+                    summon->GetMotionMaster()->MoveRandom(25.0f);
+            }
+
             void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
@@ -262,7 +277,7 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                             else
                                 DoCastVictim(SPELL_VOID_BOLT);
 
-                            events.ScheduleEvent(EVENT_VOID_BOLT, 10000);
+                            events.ScheduleEvent(EVENT_VOID_BOLT, 9000);
                             break;
                         case EVENT_CALL_BLOOD_1:
                             events.CancelEvent(EVENT_VOID_BOLT);
@@ -729,6 +744,7 @@ class npc_yorsahj_the_unsleeping_mana_void: public CreatureScript
             void JustDied(Unit* /*killer*/)
             {
                 DoCastAOE(SPELL_MANA_DIFFUSION, true);
+                me->DespawnOrUnsummon(1000);
             }
         };
 };

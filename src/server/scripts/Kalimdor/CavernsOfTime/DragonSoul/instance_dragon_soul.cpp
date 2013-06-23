@@ -6,7 +6,7 @@
 class instance_dragon_soul : public InstanceMapScript
 {
     public:
-        instance_dragon_soul() : InstanceMapScript("instance_dragon_soul", 940) { }
+        instance_dragon_soul() : InstanceMapScript("instance_dragon_soul", 967) { }
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const
         {

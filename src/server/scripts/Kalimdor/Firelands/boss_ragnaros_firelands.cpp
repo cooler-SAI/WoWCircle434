@@ -633,6 +633,7 @@ class boss_ragnaros_firelands : public CreatureScript
                     events.CancelEvent(EVENT_CHECK_TARGET);
                     events.CancelEvent(EVENT_BURNING_WOUND);
                     events.CancelEvent(EVENT_RAGE_OF_RAGNAROS);
+                    DespawnEventCreatures();
 
                     Talk(SAY_DROP);
                     DoCast(me, SPELL_SUBMERGE, true);
@@ -673,6 +674,7 @@ class boss_ragnaros_firelands : public CreatureScript
                     events.CancelEvent(EVENT_CHECK_TARGET);
                     events.CancelEvent(EVENT_BURNING_WOUND);
                     events.CancelEvent(EVENT_RAGE_OF_RAGNAROS);
+                    DespawnEventCreatures();
 
                     Talk(SAY_DROP);
                     DoCast(me, SPELL_SUBMERGE, true);
