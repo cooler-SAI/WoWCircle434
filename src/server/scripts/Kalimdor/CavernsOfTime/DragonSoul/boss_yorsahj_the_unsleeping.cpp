@@ -259,6 +259,12 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                 if (!UpdateVictim())
                     return;
 
+                if (me->GetDistance(me->GetHomePosition()) > 300.0f)
+                {
+                    EnterEvadeMode();
+                    return;
+                }
+
                 events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))

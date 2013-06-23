@@ -402,6 +402,9 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                         if (Creature* pMorchok = m_caster->ToCreature())
                         {
+                            if ((pMorchok->GetEntry() == 57773) || pMorchok->AI()->GetData(3))
+                                damage /= 2;
+
                             if ((unitTarget->GetGUID() == pMorchok->AI()->GetGUID(1)) || 
                                 (unitTarget->GetGUID() == pMorchok->AI()->GetGUID(2)))
                                 damage *= 2;

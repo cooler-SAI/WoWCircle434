@@ -76,8 +76,9 @@ enum Actions
 };
 enum MiscData
 {
-    DATA_GUID_1 = 1,
-    DATA_GUID_2 = 2,
+    DATA_GUID_1         = 1,
+    DATA_GUID_2         = 2,
+    DATA_KOHCROM_DONE   = 3,
 };
 
 class boss_morchok: public CreatureScript
@@ -202,6 +203,14 @@ class boss_morchok: public CreatureScript
             bool AllowAchieve()
             {
                 return bAchieve;
+            }
+
+            uint32 GetData(uint32 type)
+            {
+                if (type == DATA_KOHCROM_DONE)
+                    return uint32(bKohcrom);
+
+                return 0;
             }
 
             void UpdateAI(const uint32 diff)
@@ -857,8 +866,8 @@ class spell_morchok_stomp : public SpellScriptLoader
                     DistanceOrderPred(WorldObject* searcher) : _searcher(searcher) { }
                     bool operator() (WorldObject* a, WorldObject* b) const
                     {
-                        float rA = _searcher->GetDistance(a);
-                        float rB = _searcher->GetDistance(b);
+                        float rA = _searcher->GetExactDist(a);
+                        float rB = _searcher->GetExactDist(b);
                         return rA < rB;
                     }
 
