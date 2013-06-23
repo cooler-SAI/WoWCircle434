@@ -10,6 +10,7 @@
 
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
+  Events/boss_ahune.cpp
   Events/childrens_week.cpp
 )
 
