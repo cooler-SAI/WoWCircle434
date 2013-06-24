@@ -18272,28 +18272,31 @@ void Unit::SetStunned(bool apply)
         else
             SetStandState(UNIT_STAND_STATE_STAND);
 
-        WorldPacket data(SMSG_SPLINE_MOVE_ROOT, 8);
-        {
-            data
-                .WriteByteMask(guid[5])
-                .WriteByteMask(guid[4])
-                .WriteByteMask(guid[6])
-                .WriteByteMask(guid[1])
-                .WriteByteMask(guid[3])
-                .WriteByteMask(guid[7])
-                .WriteByteMask(guid[2])
-                .WriteByteMask(guid[0])
-                .WriteByteSeq(guid[2])
-                .WriteByteSeq(guid[1])
-                .WriteByteSeq(guid[7])
-                .WriteByteSeq(guid[3])
-                .WriteByteSeq(guid[5])
-                .WriteByteSeq(guid[0])
-                .WriteByteSeq(guid[6])
-                .WriteByteSeq(guid[4]);
-        }
         if (GetTypeId() == TYPEID_PLAYER)
             SendMoveRoot(0);
+        else
+        {
+            WorldPacket data(SMSG_SPLINE_MOVE_ROOT, 8);
+            {
+                data
+                    .WriteByteMask(guid[5])
+                    .WriteByteMask(guid[4])
+                    .WriteByteMask(guid[6])
+                    .WriteByteMask(guid[1])
+                    .WriteByteMask(guid[3])
+                    .WriteByteMask(guid[7])
+                    .WriteByteMask(guid[2])
+                    .WriteByteMask(guid[0])
+                    .WriteByteSeq(guid[2])
+                    .WriteByteSeq(guid[1])
+                    .WriteByteSeq(guid[7])
+                    .WriteByteSeq(guid[3])
+                    .WriteByteSeq(guid[5])
+                    .WriteByteSeq(guid[0])
+                    .WriteByteSeq(guid[6])
+                    .WriteByteSeq(guid[4]);
+            }
+        }
 
         CastStop();
     }
@@ -18309,28 +18312,30 @@ void Unit::SetStunned(bool apply)
 
         if (!HasUnitState(UNIT_STATE_ROOT))         // prevent moving if it also has root effect
         {
-            WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
-            data
-                .WriteByteMask(guid[0])
-                .WriteByteMask(guid[1])
-                .WriteByteMask(guid[6])
-                .WriteByteMask(guid[5])
-                .WriteByteMask(guid[3])
-                .WriteByteMask(guid[2])
-                .WriteByteMask(guid[7])
-                .WriteByteMask(guid[4])
-                .WriteByteSeq(guid[6])
-                .WriteByteSeq(guid[3])
-                .WriteByteSeq(guid[1])
-                .WriteByteSeq(guid[5])
-                .WriteByteSeq(guid[2])
-                .WriteByteSeq(guid[0])
-                .WriteByteSeq(guid[7])
-                .WriteByteSeq(guid[4]);
-            SendMessageToSet(&data, true);
-
             if (GetTypeId() == TYPEID_PLAYER)
                 SendMoveUnroot(0);
+            else
+            {
+                WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
+                data
+                    .WriteByteMask(guid[0])
+                    .WriteByteMask(guid[1])
+                    .WriteByteMask(guid[6])
+                    .WriteByteMask(guid[5])
+                    .WriteByteMask(guid[3])
+                    .WriteByteMask(guid[2])
+                    .WriteByteMask(guid[7])
+                    .WriteByteMask(guid[4])
+                    .WriteByteSeq(guid[6])
+                    .WriteByteSeq(guid[3])
+                    .WriteByteSeq(guid[1])
+                    .WriteByteSeq(guid[5])
+                    .WriteByteSeq(guid[2])
+                    .WriteByteSeq(guid[0])
+                    .WriteByteSeq(guid[7])
+                    .WriteByteSeq(guid[4]);
+                SendMessageToSet(&data, true);
+            }
 
             RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
         }
@@ -18352,61 +18357,63 @@ void Unit::SetRooted(bool apply)
         RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
 
-        if (GetTypeId() != TYPEID_PLAYER)
-            ToCreature()->StopMoving();
-
-        WorldPacket data(SMSG_SPLINE_MOVE_ROOT, 8);
-        {
-            data
-                .WriteByteMask(guid[5])
-                .WriteByteMask(guid[4])
-                .WriteByteMask(guid[6])
-                .WriteByteMask(guid[1])
-                .WriteByteMask(guid[3])
-                .WriteByteMask(guid[7])
-                .WriteByteMask(guid[2])
-                .WriteByteMask(guid[0])
-                .WriteByteSeq(guid[2])
-                .WriteByteSeq(guid[1])
-                .WriteByteSeq(guid[7])
-                .WriteByteSeq(guid[3])
-                .WriteByteSeq(guid[5])
-                .WriteByteSeq(guid[0])
-                .WriteByteSeq(guid[6])
-                .WriteByteSeq(guid[4]);
-        }
-        SendMessageToSet(&data, true);
-
         if (GetTypeId() == TYPEID_PLAYER)
             SendMoveRoot(m_rootTimes);
-        
+        else
+        {
+
+            WorldPacket data(SMSG_SPLINE_MOVE_ROOT, 8);
+            {
+                data
+                    .WriteByteMask(guid[5])
+                    .WriteByteMask(guid[4])
+                    .WriteByteMask(guid[6])
+                    .WriteByteMask(guid[1])
+                    .WriteByteMask(guid[3])
+                    .WriteByteMask(guid[7])
+                    .WriteByteMask(guid[2])
+                    .WriteByteMask(guid[0])
+                    .WriteByteSeq(guid[2])
+                    .WriteByteSeq(guid[1])
+                    .WriteByteSeq(guid[7])
+                    .WriteByteSeq(guid[3])
+                    .WriteByteSeq(guid[5])
+                    .WriteByteSeq(guid[0])
+                    .WriteByteSeq(guid[6])
+                    .WriteByteSeq(guid[4]);
+            }
+            SendMessageToSet(&data, true);
+            StopMoving();
+        }
     }
     else
     {
         if (!HasUnitState(UNIT_STATE_STUNNED))      // prevent moving if it also has stun effect
         {
-            WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
-            data
-                .WriteByteMask(guid[0])
-                .WriteByteMask(guid[1])
-                .WriteByteMask(guid[6])
-                .WriteByteMask(guid[5])
-                .WriteByteMask(guid[3])
-                .WriteByteMask(guid[2])
-                .WriteByteMask(guid[7])
-                .WriteByteMask(guid[4])
-                .WriteByteSeq(guid[6])
-                .WriteByteSeq(guid[3])
-                .WriteByteSeq(guid[1])
-                .WriteByteSeq(guid[5])
-                .WriteByteSeq(guid[2])
-                .WriteByteSeq(guid[0])
-                .WriteByteSeq(guid[7])
-                .WriteByteSeq(guid[4]);
-            SendMessageToSet(&data, true);
-
             if (GetTypeId() == TYPEID_PLAYER)
                 SendMoveUnroot(++m_rootTimes);
+            else
+            {
+                WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
+                data
+                    .WriteByteMask(guid[0])
+                    .WriteByteMask(guid[1])
+                    .WriteByteMask(guid[6])
+                    .WriteByteMask(guid[5])
+                    .WriteByteMask(guid[3])
+                    .WriteByteMask(guid[2])
+                    .WriteByteMask(guid[7])
+                    .WriteByteMask(guid[4])
+                    .WriteByteSeq(guid[6])
+                    .WriteByteSeq(guid[3])
+                    .WriteByteSeq(guid[1])
+                    .WriteByteSeq(guid[5])
+                    .WriteByteSeq(guid[2])
+                    .WriteByteSeq(guid[0])
+                    .WriteByteSeq(guid[7])
+                    .WriteByteSeq(guid[4]);
+                SendMessageToSet(&data, true);
+            }
 
             RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
         }
