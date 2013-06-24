@@ -259,7 +259,7 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-                if (me->GetDistance(me->GetHomePosition()) > 300.0f)
+                if (me->GetDistance(me->GetHomePosition()) > 150.0f)
                 {
                     EnterEvadeMode();
                     return;
@@ -583,9 +583,6 @@ class npc_yorsahj_the_unsleeping_globule: public CreatureScript
                     spellInfo->Id == SPELL_COLOR_COMBINATION_5 ||
                     spellInfo->Id == SPELL_COLOR_COMBINATION_6)
                 {
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetDisplayId(me->GetNativeDisplayId());
-                    DoCast(me, SPELL_FUSING_VAPORS, true);
                     events.ScheduleEvent(EVENT_CONTINUE, 2000);
                 }
             }
@@ -623,6 +620,10 @@ class npc_yorsahj_the_unsleeping_globule: public CreatureScript
                     switch (eventId)
                     {
                         case EVENT_CONTINUE:
+                            me->SetSpeed(MOVE_RUN, 0.47142876f, true);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            me->SetDisplayId(me->GetNativeDisplayId());
+                            DoCast(me, SPELL_FUSING_VAPORS, true);
                             if (Creature* pYorsahj = me->FindNearestCreature(NPC_YORSAHJ, 200.0f))
                                 me->GetMotionMaster()->MoveFollow(pYorsahj, 0.0f, 0.0f);
                             break;
