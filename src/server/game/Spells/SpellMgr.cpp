@@ -6189,6 +6189,18 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].BasePoints = 0;
                 spellInfo->Effects[EFFECT_1].BasePoints = 0;
                 break;
+            // Flood aoe
+            case 107796:
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            // Flood channel
+            case 107791:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            // Boulder Smash aoe
+            case 107596:
+                spellInfo->MaxAffectedTargets = 1;
+                break;
             case 108220: // Deep Corruption
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
                 break;

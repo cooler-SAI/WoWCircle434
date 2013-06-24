@@ -135,6 +135,8 @@ class boss_morchok: public CreatureScript
                 bEnrage = false;
                 bKohcrom = false;
                 bAchieve = true;
+                bFirstStomp = false;
+                bFirstCrystal = false;
             }
 
             void EnterCombat(Unit* who)
@@ -147,6 +149,14 @@ class boss_morchok: public CreatureScript
                 events.ScheduleEvent(EVENT_BERSERK, 7 * MINUTE * IN_MILLISECONDS);
                 if (!IsHeroic())
                     events.ScheduleEvent(EVENT_CRUSH_ARMOR, urand(6000, 12000));
+
+                _stompguid1 = 0;
+                _stompguid2 = 0;
+                bEnrage = false;
+                bKohcrom = false;
+                bAchieve = true;
+                bFirstStomp = false;
+                bFirstCrystal = false;
 
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_DANGER);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_WARNING);
@@ -240,8 +250,9 @@ class boss_morchok: public CreatureScript
                     DoCast(me, SPELL_MORCHOK_JUMP);
                     DoCast(me, SPELL_SUMMON_KOHCROM, true);
 
+                    bFirstCrystal = true;
 
-                    events.DelayEvents(6000);
+                    events.DelayEvents(10000);
                     events.ScheduleEvent(EVENT_CONTINUE, 5000);
                     events.ScheduleEvent(EVENT_UPDATE_HEALTH, 8000);
                     return;
@@ -286,31 +297,41 @@ class boss_morchok: public CreatureScript
                             events.ScheduleEvent(EVENT_CRUSH_ARMOR, urand(12000, 15000));
                             break;
                         case EVENT_STOMP:
+                        {
                             _stompguid1 = 0;
                             _stompguid2 = 0;
+
+                            int32 tim = int32(events.GetNextEventTime(EVENT_EARTHEN_VORTEX)) - int32(events.GetTimer());
+                            if (tim <= 7000)
+                                break;
+
                             DoCast(me, SPELL_STOMP);
-                            if (events.GetNextEventTime(EVENT_EARTHEN_VORTEX) >= 20000)
+                            events.ScheduleEvent(EVENT_STOMP, urand(12000, 14000));
+                            if (bKohcrom && !bFirstStomp)
                             {
-                                events.ScheduleEvent(EVENT_STOMP, urand(12000, 14000));
-                                if (bKohcrom)
-                                    if (Creature* pKohcrom = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_KOHCROM)))
-                                        pKohcrom->AI()->DoAction(ACTION_KOHCROM_STOMP);
+                                if (Creature* pKohcrom = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_KOHCROM)))
+                                    pKohcrom->AI()->DoAction(ACTION_KOHCROM_STOMP);
                             }
+                            bFirstStomp = false;
                             break;
+                        }
                         case EVENT_RESONATING_CRYSTAL:
                         {
+                            int32 tim = int32(events.GetNextEventTime(EVENT_EARTHEN_VORTEX)) - int32(events.GetTimer());
+                            if (tim <= 17000)
+                                break;
+                            
                             Talk(SAY_CRYSTAL);
                             Position pos;
                             me->GetNearPosition(pos, frand(25.0f, 45.0f), frand(0, 2 * M_PI));
                             me->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_RESONATING_CRYSTAL, true);
-                            int32 tim = int32(events.GetNextEventTime(EVENT_EARTHEN_VORTEX)) - int32(events.GetTimer());
-                            if (tim >= 27000)
+                            events.ScheduleEvent(EVENT_RESONATING_CRYSTAL, urand(12000, 14000));
+                            if (bKohcrom && !bFirstCrystal)
                             {
-                                events.ScheduleEvent(EVENT_RESONATING_CRYSTAL, urand(12000, 14000));
-                                if (bKohcrom)
-                                    if (Creature* pKohcrom = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_KOHCROM)))
-                                        pKohcrom->AI()->DoAction(ACTION_KOHCROM_RESONATING_CRYSTAL);
+                                if (Creature* pKohcrom = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_KOHCROM)))
+                                    pKohcrom->AI()->DoAction(ACTION_KOHCROM_RESONATING_CRYSTAL);
                             }
+                            bFirstCrystal = false;
                             break;
                         }
                         case EVENT_EARTHEN_VORTEX:
@@ -344,8 +365,9 @@ class boss_morchok: public CreatureScript
                         case EVENT_CONTINUE_1:
                             me->SetReactState(REACT_AGGRESSIVE);
                             AttackStart(me->getVictim());
-                            events.ScheduleEvent(EVENT_STOMP, urand(12000, 14000));
-                            events.ScheduleEvent(EVENT_RESONATING_CRYSTAL, urand(19000, 20000));
+                            bFirstCrystal = true;
+                            events.ScheduleEvent(EVENT_STOMP, 18000);
+                            events.ScheduleEvent(EVENT_RESONATING_CRYSTAL, 25000);
                             if (!IsHeroic())
                                 events.ScheduleEvent(EVENT_CRUSH_ARMOR, urand(6000, 12000));
                             break;
@@ -363,6 +385,8 @@ class boss_morchok: public CreatureScript
             bool bEnrage;
             bool bKohcrom;
             bool bAchieve;
+            bool bFirstStomp;
+            bool bFirstCrystal;
         };
 };
 
@@ -436,13 +460,13 @@ class npc_morchok_kohcrom: public CreatureScript
                 switch (action)
                 {
                     case ACTION_KOHCROM_STOMP:
-                        events.ScheduleEvent(EVENT_STOMP, urand(3000, 4000));
+                        events.ScheduleEvent(EVENT_STOMP, urand(4000, 6000));
                         break;
                     case ACTION_KOHCROM_RESONATING_CRYSTAL:
-                        events.ScheduleEvent(EVENT_RESONATING_CRYSTAL, urand(3000, 4000));
+                        events.ScheduleEvent(EVENT_RESONATING_CRYSTAL, urand(4000, 6000));
                         break;
                     case ACTION_KOHCROM_EARTHEN_VORTEX:
-                        events.ScheduleEvent(EVENT_EARTHEN_VORTEX, urand(3000, 4000));
+                        events.ScheduleEvent(EVENT_EARTHEN_VORTEX, 1);
                         break;
                 }
             }

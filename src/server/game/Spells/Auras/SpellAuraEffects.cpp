@@ -6883,6 +6883,11 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
         // Spell exist but require custom code
         switch (auraId)
         {
+            // Flood, Ancient Water Lord, Dragon Soul
+            case 107797:
+                if (caster)
+                    caster->CastSpell(caster, 107791, true);
+                return;
             // Meltdown, Fragment of Rhyolith
             case 98646:
             {

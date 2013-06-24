@@ -31,6 +31,8 @@ enum Adds
     NPC_ANCIENT_WATER_LORD          = 57160,
     NPC_EARTHEN_DESTROYER           = 57158,
     NPC_EARTHEN_SOLDIER             = 57159,
+    NPC_TWILIGHT_SIEGE_CAPTAIN      = 57280,
+    NPC_TWILIGHT_PORTAL             = 57231,
 
     NPC_CRIMSON_GLOBULE             = 57386,
     NPC_ACIDIC_GLOBULE              = 57333,
@@ -59,9 +61,14 @@ enum Spells
     SPELL_DUST_STORM                = 107682,
 
     // Earthen Soldier
+    SPELL_ZERO_POWER                = 78725,
     SPELL_SHADOW_BOLT               = 95440,
     SPELL_TWILIGHT_CORRUPTION       = 107852,
     SPELL_TWILIGHT_RAGE             = 107872,
+
+    // Twilight Siege Captain
+    SPELL_TWILIGHT_SUBMISSION       = 108183,
+    SPELL_TWILIGHT_VOLLEY           = 108172,
 
     // Crimson Globule
     SPELL_CRIMSON_BLOOD_OF_SHUMA    = 110750,
@@ -95,21 +102,39 @@ enum Spells
 
 enum Events
 {
+    // Ancient Water Lord
+    EVENT_DRENCHED              = 1,
+    EVENT_FLOOD                 = 2,
+
+    // Earthen Destroyer
+    EVENT_BOULDER_SMASH         = 3,
+    EVENT_DUST_STORM            = 4,
+
+    // Earthen Soldier
+    EVENT_SHADOW_BOLT           = 5,
+    EVENT_TWILIGHT_CORRUPTION   = 6,
+
+    // Twilight Siege Captain
+    EVENT_TWILIGHT_VOLLEY       = 7,
+    EVENT_TWILIGHT_SUBMISSION   = 8,
+
+    // Twilight Portal
+    EVENT_CHECK_PLAYERS         = 9,
+
     // Crimson Globule
-    EVENT_SEARING_BLOOD     = 1,
+    EVENT_SEARING_BLOOD         = 10,
 
     // Acidic Globule
-    EVENT_DIGESTIVE_ACID    = 2,
+    EVENT_DIGESTIVE_ACID        = 11,
 
     // Dark Globule
-    EVENT_PSYCHIC_SLICE     = 3,
+    EVENT_PSYCHIC_SLICE         = 12,
 
     // Shadowed Globule
-    EVENT_DEEP_CORRUPTION   = 4,
+    EVENT_DEEP_CORRUPTION       = 13,
 
     // Cobalt Globule
-    EVENT_MANA_VOID         = 5,
-
+    EVENT_MANA_VOID             = 14,
 };
 
 class npc_dragon_soul_ancient_water_lord : public CreatureScript
@@ -148,7 +173,8 @@ class npc_dragon_soul_ancient_water_lord : public CreatureScript
 
             void EnterCombat(Unit* /*who*/)
             {
-
+                events.ScheduleEvent(EVENT_FLOOD, urand(8000, 12000));
+                events.ScheduleEvent(EVENT_DRENCHED, urand(3000, 6000));
             }
 
             void UpdateAI(uint32 const diff)
@@ -165,12 +191,309 @@ class npc_dragon_soul_ancient_water_lord : public CreatureScript
                 {
                     switch (eventId)
                     {
+                        case EVENT_DRENCHED:
+                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                                DoCast(pTarget, EVENT_DRENCHED);
+                            events.ScheduleEvent(EVENT_DRENCHED, urand(13000, 15000));
+                            break;
+                        case EVENT_FLOOD:
+                            DoCastAOE(SPELL_FLOOD_AOE);
+                            events.ScheduleEvent(EVENT_FLOOD, urand(18000, 25000));
+                            break;
                         default:
                             break;
                     }
                 }
                 
                 DoMeleeAttackIfReady();
+            }
+        };
+};
+
+class npc_dragon_soul_earthen_destroyer : public CreatureScript
+{
+    public:
+        npc_dragon_soul_earthen_destroyer() : CreatureScript("npc_dragon_soul_earthen_destroyer") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_dragon_soul_earthen_destroyerAI (pCreature);
+        }
+
+        struct npc_dragon_soul_earthen_destroyerAI : public ScriptedAI
+        {
+            npc_dragon_soul_earthen_destroyerAI(Creature* pCreature) : ScriptedAI(pCreature)
+            {
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            }
+
+            EventMap events;
+
+            void Reset()
+            {
+                events.Reset();
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+                events.ScheduleEvent(EVENT_BOULDER_SMASH, urand(3000, 5000));
+                events.ScheduleEvent(EVENT_DUST_STORM, urand(7000, 11000));
+            }
+
+            void UpdateAI(uint32 const diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+                
+                if (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_BOULDER_SMASH:
+                            DoCastAOE(SPELL_BOULDER_SMASH_AOE);
+                            events.ScheduleEvent(EVENT_BOULDER_SMASH, urand(6000, 7000));
+                            break;
+                        case EVENT_DUST_STORM:
+                            DoCast(me, SPELL_DUST_STORM);
+                            events.ScheduleEvent(EVENT_DUST_STORM, urand(15000, 20000));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                
+                DoMeleeAttackIfReady();
+            }
+        };
+};
+
+class npc_dragon_soul_earthen_soldier : public CreatureScript
+{
+    public:
+        npc_dragon_soul_earthen_soldier() : CreatureScript("npc_dragon_soul_earthen_soldier") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_dragon_soul_earthen_soldierAI (pCreature);
+        }
+
+        struct npc_dragon_soul_earthen_soldierAI : public ScriptedAI
+        {
+            npc_dragon_soul_earthen_soldierAI(Creature* pCreature) : ScriptedAI(pCreature)
+            {
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            }
+
+            EventMap events;
+
+            void Reset()
+            {
+                DoCast(me, SPELL_ZERO_POWER, true);
+                me->setPowerType(POWER_ENERGY);
+                me->SetMaxPower(POWER_ENERGY, 0);
+                me->SetPower(POWER_ENERGY, 0);
+                events.Reset();
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+                events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 5000));
+                events.ScheduleEvent(EVENT_TWILIGHT_CORRUPTION, urand(6000, 7000));
+            }
+
+            void UpdateAI(uint32 const diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                if (me->GetPower(POWER_ENERGY) == 100)
+                {
+                    DoCast(me, SPELL_TWILIGHT_RAGE);
+                    return;
+                }
+                
+                if (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_SHADOW_BOLT:
+                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                                DoCast(pTarget, SPELL_SHADOW_BOLT);
+                            events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(6000, 9000));
+                            break;
+                        case EVENT_TWILIGHT_CORRUPTION:
+                            DoCast(me, SPELL_TWILIGHT_CORRUPTION);
+                            events.ScheduleEvent(EVENT_TWILIGHT_CORRUPTION, urand(12000, 14000));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                
+                DoMeleeAttackIfReady();
+            }
+        };
+};
+
+class npc_dragon_soul_twilight_siege_captain : public CreatureScript
+{
+    public:
+        npc_dragon_soul_twilight_siege_captain() : CreatureScript("npc_dragon_soul_twilight_siege_captain") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_dragon_soul_twilight_siege_captainAI (pCreature);
+        }
+
+        struct npc_dragon_soul_twilight_siege_captainAI : public ScriptedAI
+        {
+            npc_dragon_soul_twilight_siege_captainAI(Creature* pCreature) : ScriptedAI(pCreature)
+            {
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            }
+
+            EventMap events;
+
+            void Reset()
+            {
+                events.Reset();
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+                events.ScheduleEvent(EVENT_TWILIGHT_VOLLEY, urand(3000, 5000));
+                events.ScheduleEvent(EVENT_TWILIGHT_SUBMISSION, urand(10000, 12000));
+            }
+
+            void UpdateAI(uint32 const diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                if (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_TWILIGHT_VOLLEY:
+                            DoCastAOE(SPELL_TWILIGHT_VOLLEY);
+                            events.ScheduleEvent(EVENT_TWILIGHT_VOLLEY, urand(5000, 10000));
+                            break;
+                        case EVENT_TWILIGHT_SUBMISSION:
+                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                                DoCast(pTarget, SPELL_TWILIGHT_SUBMISSION);
+                            events.ScheduleEvent(EVENT_TWILIGHT_SUBMISSION, urand(7000, 10000));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                
+                DoMeleeAttackIfReady();
+            }
+        };
+};
+
+class npc_dragon_soul_twilight_portal : public CreatureScript
+{
+    public:
+        npc_dragon_soul_twilight_portal() : CreatureScript("npc_dragon_soul_twilight_portal") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_dragon_soul_twilight_portalAI (pCreature);
+        }
+
+        struct npc_dragon_soul_twilight_portalAI : public Scripted_NoMovementAI
+        {
+            npc_dragon_soul_twilight_portalAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+            {
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            }
+
+            EventMap events;
+
+            void Reset()
+            {
+                events.Reset();
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+                events.ScheduleEvent(EVENT_CHECK_PLAYERS, 5000);
+            }
+
+            void UpdateAI(uint32 const diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (uint32 eventId = events.ExecuteEvent())
+                {
+                    if (!SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f))
+                    {
+                        events.Reset();
+                        EnterEvadeMode();
+                    }
+                    else
+                        events.ScheduleEvent(EVENT_CHECK_PLAYERS, 5000);
+                }
             }
         };
 };
@@ -505,6 +828,71 @@ class npc_dragon_soul_teleport : public CreatureScript
         }
 };
 
+class spell_dragon_soul_trigger_spell_from_aoe : public SpellScriptLoader
+{
+    public:
+        spell_dragon_soul_trigger_spell_from_aoe(char const* scriptName, uint32 triggerId) : SpellScriptLoader(scriptName), _triggerId(triggerId){ }
+
+        class spell_dragon_soul_trigger_spell_from_aoe_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_dragon_soul_trigger_spell_from_aoe_SpellScript);
+            
+        public:
+            spell_dragon_soul_trigger_spell_from_aoe_SpellScript(uint32 triggerId) : SpellScript(), _triggerId(triggerId) { }
+
+            void FilterTargets(std::list<WorldObject*>& targets)
+            {
+                if (!GetCaster())
+                    return;
+
+                if (targets.size() <= 1)
+                    return;
+
+                std::list<WorldObject*> tempList;
+
+                for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
+                    if (GetCaster()->GetDistance((*itr)) >= 15.0f)
+                        tempList.push_back((*itr));
+
+                if (!tempList.empty())
+                {
+                    targets.clear();
+                    targets.push_back(Trinity::Containers::SelectRandomContainerElement(tempList));
+                }
+                else
+                    Trinity::Containers::RandomResizeList(targets, 1);
+            }
+
+            void HandleDummy()
+            {
+                if (!GetCaster() || !GetHitUnit())
+                    return;
+
+                GetCaster()->CastSpell(GetHitUnit(), _triggerId, true);
+            }
+
+            void Register()
+            {
+                if (m_scriptSpellId == SPELL_BOULDER_SMASH_AOE)
+                {
+                    OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dragon_soul_trigger_spell_from_aoe_SpellScript::FilterTargets, EFFECT_0,TARGET_UNIT_SRC_AREA_ENEMY);
+                }
+                AfterHit += SpellHitFn(spell_dragon_soul_trigger_spell_from_aoe_SpellScript::HandleDummy);
+            }
+
+        private:
+            uint32 _triggerId;
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_dragon_soul_trigger_spell_from_aoe_SpellScript(_triggerId);
+        }
+
+    private:
+        uint32 _triggerId;
+};
+
 class spell_dragon_soul_shadowed_globule_deep_corruption : public SpellScriptLoader
 {
     public:
@@ -589,13 +977,19 @@ class spell_dragon_soul_cobalt_globule_mana_void : public SpellScriptLoader
 
 void AddSC_dragon_soul()
 {
-    //new npc_dragon_soul_ancient_water_lord();
+    new npc_dragon_soul_ancient_water_lord();
+    new npc_dragon_soul_earthen_destroyer();
+    new npc_dragon_soul_earthen_soldier();
+    new npc_dragon_soul_twilight_siege_captain();
+    new npc_dragon_soul_twilight_portal();
     new npc_dragon_soul_crimson_globule();
     new npc_dragon_soul_acidic_globule();
     new npc_dragon_soul_dark_globule();
     new npc_dragon_soul_shadowed_globule();
     new npc_dragon_soul_cobalt_globule();
     new npc_dragon_soul_teleport();
+    new spell_dragon_soul_trigger_spell_from_aoe("spell_dragon_soul_ancient_water_lord_flood", SPELL_FLOOD);
+    new spell_dragon_soul_trigger_spell_from_aoe("spell_dragon_soul_earthen_destroyer_boulder_smash", SPELL_BOULDER_SMASH);
     new spell_dragon_soul_shadowed_globule_deep_corruption();
     new spell_dragon_soul_cobalt_globule_mana_void();
 }
