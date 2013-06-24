@@ -2289,7 +2289,7 @@ class Unit : public WorldObject
         void setSimulacrumTarget(Unit* victim) { simulacrumTarget = victim; }
         void removeSimulacrumTarget() { simulacrumTarget = NULL; }
 
-        void SpreadAura(uint32 spellId, float radius, bool positive, int8 count = -1);
+        void SpreadAura(uint32 spellId, float radius, bool positive, int8 count = -1, Unit * except = NULL);
 
     protected:
         explicit Unit (bool isWorldObject);

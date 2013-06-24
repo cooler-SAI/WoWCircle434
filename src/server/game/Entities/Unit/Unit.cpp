@@ -20850,7 +20850,7 @@ void Unit::DoBuffPartyOrSingle(uint32 single_buff, uint32 party_buff, Unit *targ
         CastSpell(target, single_buff, true);
 }
 
-void Unit::SpreadAura(uint32 spellId, float radius, bool positive, int8 count)
+void Unit::SpreadAura(uint32 spellId, float radius, bool positive, int8 count, Unit * except)
 {
     UnitList targets;
     Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck u_check(this, radius);
@@ -20866,9 +20866,10 @@ void Unit::SpreadAura(uint32 spellId, float radius, bool positive, int8 count)
     {
         for (UnitList::iterator itr = targets.begin(); itr != targets.end(); )
         {
-            if (!(*itr)->HasAura(spellId))
+            Unit *unit_itr = *itr;
+            if ((!except || except != unit_itr) && !unit_itr->HasAura(spellId))
             {
-                targets_limited.push_back(*itr);
+                targets_limited.push_back(unit_itr);
                 itr = targets.erase(itr);
 
                 // break if we have full needed list
@@ -20892,6 +20893,10 @@ void Unit::SpreadAura(uint32 spellId, float radius, bool positive, int8 count)
     {
         for (UnitList::iterator itr = targets.begin(); itr != targets.end(); ++itr)
         {
+            Unit *unit_itr = *itr;
+            if (unit_itr == except)
+                continue;
+
             AddAura(spellId, *itr);
 
             if (--count == 0)

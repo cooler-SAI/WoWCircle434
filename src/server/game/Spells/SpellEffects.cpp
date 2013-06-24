@@ -4525,7 +4525,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                     }
 
                     if (unitTarget->HasAura(8050, m_caster->GetGUID()))
-                        m_caster->SpreadAura(8050, 12, false, 4);
+                        m_caster->SpreadAura(8050, 12, false, 4, unitTarget);
                 }
             }
             break;
