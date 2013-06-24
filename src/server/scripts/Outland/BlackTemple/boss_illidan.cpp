@@ -29,7 +29,6 @@ EndScriptData */
 #include "PassiveAI.h"
 #include "black_temple.h"
 
-#define GETGO(obj, guid)      GameObject* obj = instance->instance->GetGameObject(guid)
 #define GETUNIT(unit, guid)   Unit* unit = Unit::GetUnit(*me, guid)
 #define GETCRE(cre, guid)     Creature* cre = Unit::GetCreature(*me, guid)
 
@@ -792,7 +791,17 @@ public:
         }
         void SummonMaiev()
         {
-            DoCast(me, SPELL_SHADOW_PRISON, true);
+            //DoCast(me, SPELL_SHADOW_PRISON, true);
+            // Spell causes client crash!
+            if (instance)
+            {
+                Map::PlayerList const& PlayerList = instance->instance->GetPlayers();
+                if (!PlayerList.isEmpty())
+                    for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+                        if (Player* player = itr->getSource())
+                            me->AddAura(SPELL_SHADOW_PRISON, player);
+            }
+
             DoCast(me, 40403, true);
             if (!MaievGUID) // If Maiev cannot be summoned, reset the encounter and post some errors to the console.
             {
@@ -1400,11 +1409,10 @@ public:
         bool Event;
         uint32 Timer;
 
-        uint64 IllidanGUID;
+        //uint64 IllidanGUID;
         uint64 ChannelGUID;
         uint64 SpiritGUID[2];
-        uint64 GateGUID;
-        uint64 DoorGUID[2];
+        //uint64 DoorGUID[2];
 
         uint32 ChannelCount;
         uint32 WalkCount;
@@ -1418,33 +1426,19 @@ public:
             {
                 instance->SetData(DATA_ILLIDANSTORMRAGEEVENT, NOT_STARTED);
 
-                IllidanGUID = instance->GetData64(DATA_ILLIDANSTORMRAGE);
-                GateGUID = instance->GetData64(DATA_GAMEOBJECT_ILLIDAN_GATE);
-                DoorGUID[0] = instance->GetData64(DATA_GAMEOBJECT_ILLIDAN_DOOR_R);
-                DoorGUID[1] = instance->GetData64(DATA_GAMEOBJECT_ILLIDAN_DOOR_L);
-
                 if (JustCreated) // close all doors at create
                 {
-                    instance->HandleGameObject(GateGUID, false);
-
-                    for (uint8 i = 0; i < 2; ++i)
-                        instance->HandleGameObject(DoorGUID[i], false);
+                    instance->HandleGameObject(instance->GetData64(DATA_GAMEOBJECT_ILLIDAN_GATE), false);
+                    instance->HandleGameObject(instance->GetData64(DATA_GAMEOBJECT_ILLIDAN_DOOR_R), false);
+                    instance->HandleGameObject(instance->GetData64(DATA_GAMEOBJECT_ILLIDAN_DOOR_L), false);
                 }
                 else // open all doors, raid wiped
                 {
-                    instance->HandleGameObject(GateGUID, true);
+                    instance->HandleGameObject(instance->GetData64(DATA_GAMEOBJECT_ILLIDAN_GATE), true);
+                    instance->HandleGameObject(instance->GetData64(DATA_GAMEOBJECT_ILLIDAN_DOOR_R), true);
+                    instance->HandleGameObject(instance->GetData64(DATA_GAMEOBJECT_ILLIDAN_DOOR_L), true);
                     WalkCount = 1; // skip first wp
-
-                    for (uint8 i = 0; i < 2; ++i)
-                        instance->HandleGameObject(DoorGUID[i], true);
                 }
-            }
-            else
-            {
-                IllidanGUID = 0;
-                GateGUID = 0;
-                DoorGUID[0] = 0;
-                DoorGUID[1] = 0;
             }
 
             ChannelGUID = 0;
@@ -1463,7 +1457,7 @@ public:
             me->SetUInt32Value(UNIT_NPC_FLAGS, 0); // Database sometimes has strange values..
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             me->setActive(false);
-            me->SetVisible(false);
+            //me->SetVisible(false);
         }
 
         // Do not call reset in Akama's evade mode, as this will stop him from summoning minions after he kills the first bit
@@ -1485,7 +1479,10 @@ public:
 
         void DamageTaken(Unit* done_by, uint32 &damage)
         {
-            if (damage > me->GetHealth() || done_by->GetGUID() != IllidanGUID)
+            if (!instance)
+                return;
+
+            if (damage > me->GetHealth() || done_by->GetGUID() != instance->GetData64(DATA_ILLIDANSTORMRAGE))
                 damage = 0;
         }
 
@@ -1510,17 +1507,17 @@ public:
                 return;
 
             instance->SetData(DATA_ILLIDANSTORMRAGEEVENT, IN_PROGRESS);
-            for (uint8 i = 0; i < 2; ++i)
-                instance->HandleGameObject(DoorGUID[i], false);
-            if (GETCRE(Illidan, IllidanGUID))
+            instance->HandleGameObject(instance->GetData64(DATA_GAMEOBJECT_ILLIDAN_DOOR_R), false);
+            instance->HandleGameObject(instance->GetData64(DATA_GAMEOBJECT_ILLIDAN_DOOR_L), false);
+            if (Creature* pIllidan = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ILLIDANSTORMRAGE)))
             {
-                Illidan->RemoveAurasDueToSpell(SPELL_KNEEL);
-                me->SetInFront(Illidan);
-                Illidan->SetInFront(me);
+                pIllidan->RemoveAurasDueToSpell(SPELL_KNEEL);
+                me->SetInFront(pIllidan);
+                pIllidan->SetInFront(me);
                 me->GetMotionMaster()->MoveIdle();
-                Illidan->GetMotionMaster()->MoveIdle();
-                CAST_AI(boss_illidan_stormrage::boss_illidan_stormrageAI, Illidan->AI())->AkamaGUID = me->GetGUID();
-                CAST_AI(boss_illidan_stormrage::boss_illidan_stormrageAI, Illidan->AI())->EnterPhase(PHASE_TALK_SEQUENCE);
+                pIllidan->GetMotionMaster()->MoveIdle();
+                CAST_AI(boss_illidan_stormrage::boss_illidan_stormrageAI, pIllidan->AI())->AkamaGUID = me->GetGUID();
+                CAST_AI(boss_illidan_stormrage::boss_illidan_stormrageAI, pIllidan->AI())->EnterPhase(PHASE_TALK_SEQUENCE);
             }
         }
 
@@ -1531,8 +1528,8 @@ public:
             if (!JustCreated)
                 return;
             float x, y, z;
-            if (GETGO(Gate, GateGUID))
-                Gate->GetPosition(x, y, z);
+            if (GameObject* pGate = ObjectAccessor::GetGameObject(*me, instance->GetData64(DATA_GAMEOBJECT_ILLIDAN_GATE)))
+                pGate->GetPosition(x, y, z);
             else
                 return; // if door not spawned, don't crash server
 
@@ -1574,8 +1571,8 @@ public:
                     WalkCount = 0;
                 else if (Phase == PHASE_TALK)
                 {
-                    if (GETCRE(Illidan, IllidanGUID))
-                        CAST_AI(boss_illidan_stormrage::boss_illidan_stormrageAI, Illidan->AI())->DeleteFromThreatList(me->GetGUID());
+                    if (Creature* pIllidan = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ILLIDANSTORMRAGE)))
+                        CAST_AI(boss_illidan_stormrage::boss_illidan_stormrageAI, pIllidan->AI())->DeleteFromThreatList(me->GetGUID());
                     EnterEvadeMode();
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     ++WalkCount;
@@ -1597,10 +1594,10 @@ public:
                 }
                 break;
             case PHASE_FIGHT_ILLIDAN:
-                if (GETUNIT(Illidan, IllidanGUID))
+                if (Unit* pIllidan = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_ILLIDANSTORMRAGE)))
                 {
-                    me->AddThreat(Illidan, 10000000.0f);
-                    me->GetMotionMaster()->MoveChase(Illidan);
+                    me->AddThreat(pIllidan, 10000000.0f);
+                    me->GetMotionMaster()->MoveChase(pIllidan);
                 }
                 Timer = 30000; // chain lightning
                 break;
@@ -1627,11 +1624,11 @@ public:
             switch (TalkCount)
             {
             case 0:
-                if (GETCRE(Illidan, IllidanGUID))
+                if (Creature* pIllidan = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ILLIDANSTORMRAGE)))
                 {
-                    CAST_AI(boss_illidan_stormrage::boss_illidan_stormrageAI, Illidan->AI())->Timer[EVENT_TAUNT] += 30000;
-                    Illidan->MonsterYell(SAY_AKAMA_MINION, LANG_UNIVERSAL, 0);
-                    DoPlaySoundToSet(Illidan, SOUND_AKAMA_MINION);
+                    CAST_AI(boss_illidan_stormrage::boss_illidan_stormrageAI, pIllidan->AI())->Timer[EVENT_TAUNT] += 30000;
+                    pIllidan->MonsterYell(SAY_AKAMA_MINION, LANG_UNIVERSAL, 0);
+                    DoPlaySoundToSet(pIllidan, SOUND_AKAMA_MINION);
                 }
                 Timer = 8000;
                 break;
@@ -1681,7 +1678,7 @@ public:
                 Spirit[0]->InterruptNonMeleeSpells(true);
                 Spirit[1]->InterruptNonMeleeSpells(true);
                 if (instance)
-                    instance->HandleGameObject(GateGUID, true);
+                    instance->HandleGameObject(instance->GetData64(DATA_GAMEOBJECT_ILLIDAN_GATE), true);
                 Timer = 2000;
                 break;
             case 4:
@@ -1712,7 +1709,10 @@ public:
             case 6:
                 for (uint8 i = 0; i < 2; ++i)
                     if (instance)
-                        instance->HandleGameObject(DoorGUID[i], true);
+                    {
+                        instance->HandleGameObject(instance->GetData64(DATA_GAMEOBJECT_ILLIDAN_DOOR_R), true);
+                        instance->HandleGameObject(instance->GetData64(DATA_GAMEOBJECT_ILLIDAN_DOOR_L), true);
+                    }
                 break;
             case 8:
                 if (Phase == PHASE_WALK)
@@ -1773,8 +1773,8 @@ public:
                     break;
                 case PHASE_FIGHT_ILLIDAN:
                     {
-                        GETUNIT(Illidan, IllidanGUID);
-                        if (Illidan && Illidan->HealthBelowPct(90))
+                        Creature* pIllidan = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ILLIDANSTORMRAGE));
+                        if (pIllidan && pIllidan->HealthBelowPct(90))
                             EnterPhase(PHASE_TALK);
                         else
                         {
@@ -1797,8 +1797,8 @@ public:
                             me->AddThreat(Elite, 1000000.0f);
                         }
                         Timer = urand(10000, 16000);
-                        GETUNIT(Illidan, IllidanGUID);
-                        if (Illidan && Illidan->HealthBelowPct(10))
+                        Unit* pIllidan = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_ILLIDANSTORMRAGE));
+                        if (pIllidan && pIllidan->HealthBelowPct(10))
                             EnterPhase(PHASE_RETURN);
                     }
                     break;
