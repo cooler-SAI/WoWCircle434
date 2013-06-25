@@ -15,11 +15,7 @@ static const DoorData doordata[] =
     {GO_BRIDGE_OF_RHYOLITH,  DATA_RHYOLITH,  DOOR_TYPE_SPAWN_HOLE,  BOUNDARY_NONE},
     {GO_FIRE_WALL_FANDRAL_1, DATA_STAGHELM,  DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
     {GO_FIRE_WALL_FANDRAL_2, DATA_STAGHELM,  DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
-    {GO_SULFURON_KEEP,       DATA_RAGNAROS,  DOOR_TYPE_ROOM,        BOUNDARY_NONE},	
-    {GO_RAID_BRIDGE_FORMING, DATA_RHYOLITH,  DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
-    {GO_RAID_BRIDGE_FORMING, DATA_SHANNOX,   DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
-    {GO_RAID_BRIDGE_FORMING, DATA_BETHTILAC, DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
-    {GO_RAID_BRIDGE_FORMING, DATA_ALYSRAZOR, DOOR_TYPE_PASSAGE,     BOUNDARY_NONE},
+    {GO_SULFURON_KEEP,       DATA_RAGNAROS,  DOOR_TYPE_ROOM,        BOUNDARY_NONE},
     {0, 0, DOOR_TYPE_ROOM, BOUNDARY_NONE},
 };
 
@@ -116,6 +112,8 @@ class instance_firelands : public InstanceMapScript
                         break;
                     case GO_SULFURON_BRIDGE:
                         uiSulfuronBridgeGUID = pGo->GetGUID();
+                        if (GetBossState(DATA_BALEROC)==DONE)
+                            pGo->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
                         break;
                     case GO_RAGNAROS_FLOOR:
                         uiRagnarosFloor = pGo->GetGUID();
