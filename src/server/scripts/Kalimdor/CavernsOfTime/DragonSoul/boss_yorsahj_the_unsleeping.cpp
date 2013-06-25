@@ -423,6 +423,7 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                             break;
                         case EVENT_DEEP_CORRUPTION:
                             DoCastAOE(SPELL_DEEP_CORRUPTION);
+                            events.ScheduleEvent(EVENT_DEEP_CORRUPTION, 25000);
                             break;
                         case EVENT_MANA_VOID_1:
                             DoCastAOE(SPELL_MANA_VOID);
