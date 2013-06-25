@@ -95,7 +95,7 @@ class npc_zulaman_forest_frog : public CreatureScript
                 {
                     uint32 cEntry = 0;
                     uint32 spellId = 0; // For Achievement
-                    switch(urand(0, 9))
+                    switch(urand(0, 11))
                     {
                         case 0: cEntry = NPC_HARALD; spellId = SPELL_HARALD_ACHIEVEMENT; break;
                         case 1: cEntry = NPC_EULINDA; spellId = SPELL_EULINDA_ACHIEVEMENT; break;

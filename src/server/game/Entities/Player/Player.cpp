@@ -20799,6 +20799,12 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
         return false;
     }
 
+    if (GetCurrency(currency, false) + count > GetCurrencyWeekCap(currency, false))
+    {
+        SendBuyError(BUY_ERR_CANT_CARRY_MORE, vendorGuid, currency);
+        return false;
+    }
+
     if (crItem->ExtendedCost)
     {
         ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(crItem->ExtendedCost);
@@ -23009,6 +23015,9 @@ bool Player::IsAtGroupRewardDistance(WorldObject const* pRewardSource) const
 
     if (player->GetMapId() != pRewardSource->GetMapId() || player->GetInstanceId() != pRewardSource->GetInstanceId())
         return false;
+
+    if (GetMap()->IsRaid())
+        return true;
 
     return pRewardSource->GetDistance(player) <= sWorld->getFloatConfig(CONFIG_GROUP_XP_DISTANCE);
 }

@@ -3845,7 +3845,7 @@ void Spell::EffectTeleUnitsFaceCaster(SpellEffIndex effIndex)
         case 110045:
         case 110046:
         case 110047:
-            pos.GetPositionZ() += 8.0f;
+            pos.m_positionX += 8.0f;
             break;
         default:
             break;
@@ -4969,6 +4969,9 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                case 60603:
+                    m_caster->RemoveAura(84896);
+                    break;
                 case 87806: // Seafood Magnifique Feast
                 {
                     m_caster->CastSpell(unitTarget, 87584, true);
