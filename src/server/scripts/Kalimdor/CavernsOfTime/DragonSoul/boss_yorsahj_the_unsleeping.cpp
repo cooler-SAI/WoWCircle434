@@ -714,6 +714,8 @@ class npc_yorsahj_the_unsleeping_forgotten_one: public CreatureScript
                             break;
                     }
                 }
+
+                DoMeleeAttackIfReady();
             }
         private:
             EventMap events;

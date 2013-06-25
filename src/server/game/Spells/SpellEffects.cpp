@@ -3836,8 +3836,21 @@ void Spell::EffectTeleUnitsFaceCaster(SpellEffIndex effIndex)
     //m_caster->GetClosePoint(fx, fy, fz, unitTarget->GetObjectSize(), dis);
     Position pos;
     m_caster->GetNearPosition(pos, m_caster->GetObjectSize(), m_caster->GetAngle(unitTarget));
-
-
+    
+    // Earthen Vortex, Morchok, Dragon Soul
+    // Prevent dropping into textures
+    switch (m_spellInfo->Id)
+    {
+        case 103821:
+        case 110045:
+        case 110046:
+        case 110047:
+            pos.GetPositionZ() += 8.0f;
+            break;
+        default:
+            break;
+    }
+    
     unitTarget->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), -m_caster->GetOrientation(), unitTarget == m_caster);
 }
 

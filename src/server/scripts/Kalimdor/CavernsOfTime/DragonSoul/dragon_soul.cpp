@@ -193,7 +193,7 @@ class npc_dragon_soul_ancient_water_lord : public CreatureScript
                     {
                         case EVENT_DRENCHED:
                             if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                                DoCast(pTarget, EVENT_DRENCHED);
+                                DoCast(pTarget, SPELL_DRENCHED);
                             events.ScheduleEvent(EVENT_DRENCHED, urand(13000, 15000));
                             break;
                         case EVENT_FLOOD:
