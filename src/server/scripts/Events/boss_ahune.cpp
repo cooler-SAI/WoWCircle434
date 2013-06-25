@@ -1,5 +1,7 @@
 #include "ScriptPCH.h"
- 
+#include "LFGMgr.h"
+#include "Group.h"
+
 enum Creatures
 {
     NPC_AHUNE                   = 25740,
@@ -143,9 +145,15 @@ class boss_ahune : public CreatureScript
 
                 Map::PlayerList const& playerList = me->GetMap()->GetPlayers();
                 if (!playerList.isEmpty())
+                {
+                    Player* pPlayer = playerList.begin()->getSource();
+                    if (pPlayer && pPlayer->GetGroup())
+                        sLFGMgr->FinishDungeon(pPlayer->GetGroup()->GetGUID(), 286);
+                    
                     for (Map::PlayerList::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
                         if (i->getSource())
                             DoCast(i->getSource(), SPELL_AHUNE_ACHIEVEMENT);
+                }
  
                 ObjectList* units = GetWorldObjectsInDist(me, 100);
                 for (ObjectList::const_iterator itr = units->begin(); itr != units->end(); ++itr)
