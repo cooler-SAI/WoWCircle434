@@ -9727,6 +9727,16 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                         target = victim;
                         break;
                     }
+                    // Item - Paladin T13 Protection 2P Bonus (Judgement)
+                    case 105800:
+                    {
+                        if (!damage)
+                            return false;
+
+                        basepoints0 = triggerAmount * damage / 100.0f;
+                        trigger_spell_id = 105801;
+                        break;
+                    }
                     default:
                         break;
                 }
