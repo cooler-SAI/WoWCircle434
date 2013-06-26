@@ -46,9 +46,7 @@ enum Events
 
 enum Adds
 {
-    NPC_OHGAN               = 52157,
     NPC_DEVASTATING_SLAM    = 52324,
-    NPC_CHAINED_SPIRIT      = 52156,
 };
 
 enum Points
