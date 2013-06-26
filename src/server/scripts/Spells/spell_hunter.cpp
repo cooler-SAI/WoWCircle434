@@ -637,7 +637,8 @@ public:
 
         void Absorb(AuraEffect * aurEff, DamageInfo & dmgInfo, uint32 & absorbAmount)
         {
-            Remove(AURA_REMOVE_BY_ENEMY_SPELL);
+            if (dmgInfo.GetDamageType() != DOT)
+                Remove(AURA_REMOVE_BY_ENEMY_SPELL);
         }
 
         void CalculateAmount(AuraEffect const * /*aurEff*/, int32 & amount, bool & canBeRecalculated)

@@ -1591,6 +1591,9 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
 
                 switch(GetId())
                 {
+                    case 53490: // Bullheaded
+                        caster->RemoveMovementImpairingAuras();
+                        break;
                     case 1978:  // Improved Serpent Sting
                     case 88453:
                     case 88466:
