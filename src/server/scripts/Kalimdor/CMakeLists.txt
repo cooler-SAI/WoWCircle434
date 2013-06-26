@@ -70,7 +70,10 @@ set(scripts_STAT_SRCS
   Kalimdor/CavernsOfTime/WellofEternity/well_of_eternity.h
   Kalimdor/CavernsOfTime/HourofTwilight/instance_hour_of_twilight.cpp
   Kalimdor/CavernsOfTime/HourofTwilight/hour_of_twilight.h
+  Kalimdor/CavernsOfTime/DragonSoul/boss_morchok.cpp
+  Kalimdor/CavernsOfTime/DragonSoul/boss_yorsahj_the_unsleeping.cpp
   Kalimdor/CavernsOfTime/DragonSoul/instance_dragon_soul.cpp
+  Kalimdor/CavernsOfTime/DragonSoul/dragon_soul.cpp
   Kalimdor/CavernsOfTime/DragonSoul/dragon_soul.h
   Kalimdor/ThroneoftheFourWinds/instance_throne_of_the_four_winds.cpp
   Kalimdor/ThroneoftheFourWinds/throne_of_the_four_winds.h
@@ -129,6 +132,8 @@ set(scripts_STAT_SRCS
   Kalimdor/thousand_needles.cpp
   Kalimdor/ashenvale.cpp
   Kalimdor/teldrassil.cpp
+  Kalimdor/mount_hyjal.cpp
+  Kalimdor/uldum.cpp
   Kalimdor/OnyxiasLair/boss_onyxia.cpp
   Kalimdor/OnyxiasLair/onyxias_lair.h
   Kalimdor/OnyxiasLair/instance_onyxias_lair.cpp
@@ -155,6 +160,18 @@ set(scripts_STAT_SRCS
   Kalimdor/HallsOfOrigination/instance_halls_of_origination.cpp
   Kalimdor/HallsOfOrigination/halls_of_origination.cpp
   Kalimdor/HallsOfOrigination/halls_of_origination.h
+  Kalimdor/Firelands/boss_shannox.cpp
+  Kalimdor/Firelands/boss_lord_rhyolith.cpp
+  Kalimdor/Firelands/boss_lord_rhyolith.h
+  Kalimdor/Firelands/boss_bethtilac.cpp
+  Kalimdor/Firelands/boss_alysrazor.cpp
+  Kalimdor/Firelands/boss_baleroc.cpp
+  Kalimdor/Firelands/boss_majordomo_staghelm.cpp
+  Kalimdor/Firelands/boss_ragnaros_firelands.cpp
+  Kalimdor/Firelands/boss_ragnaros_firelands.h
+  Kalimdor/Firelands/instance_firelands.cpp
+  Kalimdor/Firelands/firelands.cpp
+  Kalimdor/Firelands/firelands.h
 )
 
 message("  -> Prepared: Kalimdor")

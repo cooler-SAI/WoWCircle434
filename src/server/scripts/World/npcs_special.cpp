@@ -436,7 +436,6 @@ public:
             me->Relocate(x, y, z + 0.94f);
             me->SetDisableGravity(true);
             me->HandleEmoteCommand(EMOTE_ONESHOT_DANCE);
-            me->SendMovementFlagUpdate(true);
         }
 
         void UpdateAI(uint32 const diff)
@@ -463,7 +462,6 @@ public:
                 me->SetInFront(player);
                 Active = false;
 
-                me->SendMovementFlagUpdate(true);
                 switch (emote)
                 {
                     case TEXT_EMOTE_KISS:

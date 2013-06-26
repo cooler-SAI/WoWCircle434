@@ -1591,6 +1591,9 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
 
                 switch(GetId())
                 {
+                    case 53490: // Bullheaded
+                        caster->RemoveMovementImpairingAuras();
+                        break;
                     case 1978:  // Improved Serpent Sting
                     case 88453:
                     case 88466:
@@ -1698,6 +1701,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_GENERIC:
                 switch (GetId())
                 {
+                    case 52418: // Carrying Seaforium
+                        if (removeMode == AURA_REMOVE_BY_CANCEL)
+                            target->CastSpell(target, 52417, true);
+                        break;
                     case 69674: // Mutated Infection (Rotface)
                     case 71224: // Mutated Infection (Rotface)
                     case 73022: // Mutated Infection (Rotface)
@@ -2122,6 +2129,12 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     break;
                 case 71289: // Mind Control (Lady Deathwisper)
                     target->ApplyPercentModFloatValue(OBJECT_FIELD_SCALE_X, 100.0f, apply);
+                    break;
+                case 70227: // Empowered Blood
+                    if (apply)
+                        target->CastSpell(target, 70232, true);
+                    else
+                        target->RemoveAurasDueToSpell(70232);
                     break;
                 case 91838: // Huddle
                     target->SetControlled(apply, UNIT_STATE_STUNNED);
@@ -3512,19 +3525,27 @@ void DynObjAura::FillTargetMap(std::map<Unit*, uint8> & targets, Unit* /*caster*
 
 bool Aura::IsUniqueVisibleAuraBuff() const
 {
+    switch (GetId())
+    {
+        case 2825: // Bloodlust
+        case 32182: // Heroism
+        case 80353: // Time Warp
+        case 90355: // Ancient Hysteria
+        case 45822: // Alterac Valley boss buffs
+        case 45823:
+        case 45824:
+        case 45826:
+        case 45828:
+        case 45829:
+        case 45830:
+        case 45831:
+            return false;
+    }
+
     for(uint8 i = 0; i < 3; ++i)
     {
         if (!(GetEffectMask() & (1 << i)))
             continue;
-
-        switch (GetId())
-        {
-            case 2825: // Bloodlust
-            case 32182: // Heroism
-            case 80353: // Time Warp
-            case 90355: // Ancient Hysteria
-                return false;
-        }
 
         switch (GetSpellInfo()->Effects[i].TargetA.GetTarget())
         {

@@ -1,0 +1,1 @@
+DELETE FROM `npc_spellclick_spells` WHERE `npc_entry`=39238 AND `spell_id`=73677;

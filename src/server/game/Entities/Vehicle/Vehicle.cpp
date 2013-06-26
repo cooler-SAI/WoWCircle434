@@ -203,6 +203,12 @@ void Vehicle::RemoveAllPassengers()
     // We don't need to iterate over Seats
     _me->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE);
 
+    // Temporary hack for sandstone drake
+    // Sometimes passenger don't remove with aura
+    if (GetVehicleInfo()->m_ID == 1424) 
+        if (Unit* pUnit = GetPassenger(1))
+            pUnit->_ExitVehicle();
+
     // Following the above logic, this assertion should NEVER fail.
     // Even in 'hacky' cases, there should at least be VEHICLE_SPELL_RIDE_HARDCODED on us.
     // SeatMap::const_iterator itr;

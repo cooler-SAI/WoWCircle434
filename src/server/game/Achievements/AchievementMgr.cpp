@@ -335,8 +335,23 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
             if (!bg)
                 return false;
 
-            uint32 score = bg->GetTeamScore(source->GetTeamId() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
-            return score >= bg_loss_team_score.min_score && score <= bg_loss_team_score.max_score;
+            uint16 winnerTeamScore = 0;
+            switch(bg->GetTypeID(true))
+            {
+                case BATTLEGROUND_WS:
+                    winnerTeamScore = 3;
+                    break;
+                case BATTLEGROUND_AB:
+                case BATTLEGROUND_EY:
+                    winnerTeamScore = 1600;
+                    break;
+                default:
+                    break;
+            }
+            if (winnerTeamScore > 0 && !bg->IsTeamScoreInRange(source->GetTeam(), winnerTeamScore, winnerTeamScore))
+                return false;
+
+            return bg->IsTeamScoreInRange(source->GetTeam() == ALLIANCE ? HORDE : ALLIANCE, bg_loss_team_score.min_score, bg_loss_team_score.max_score);
         }
         case ACHIEVEMENT_CRITERIA_DATA_INSTANCE_SCRIPT:
         {
@@ -1548,7 +1563,7 @@ bool AchievementMgr<T>::IsCompletedCriteria(AchievementCriteriaEntry const* achi
         case ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING:
             return progress->counter >= achievementCriteria->fall_without_dying.fallHeight;
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
-            return progress->counter >= 1;
+            return progress->counter >= achievementCriteria->complete_quest.questCount;
         case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
         case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2:
             return progress->counter >= achievementCriteria->be_spell_target.spellCount;
@@ -3037,11 +3052,27 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                     if (referencePlayer->HasAura(62061))
                         break;
                 }
-
+                else if (criteria->achievement == 233) // Take a Chill Pill 
+                {
+                    if (!referencePlayer)
+                        return false;
+                    if (!referencePlayer->HasAura(23505) && !referencePlayer->HasAura(reqValue))
+                        return false;
+                    break;
+                }
                 if (!referencePlayer || !referencePlayer->HasAura(reqValue))
                     return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_HAS_AURA: // 10
+                
+                if (criteria->achievement == 1258) // Bloodthirsty Berserker
+                {
+                    if (!unit || !unit->IsInWorld())
+                        return false;
+                    if (!unit->HasAura(23505) && !unit->HasAura(reqValue))
+                        return false;
+                    break;
+                }
                 if (!unit || !unit->IsInWorld() || !unit->HasAura(reqValue))
                     return false;
                 break;

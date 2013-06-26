@@ -1304,8 +1304,15 @@ void AuraEffect::HandleEffect(AuraApplication * aurApp, uint8 mode, bool apply)
     // check if script events have removed the aura or if default effect prevention was requested
     if ((apply && aurApp->GetRemoveMode()) || prevented)
         return;
-    
-    (*this.*AuraEffectHandler [GetAuraType()])(const_cast<AuraApplication const*>(aurApp), mode, apply);
+
+    // TODO: We may reimplement this if it would be work bad. Should we?
+    // Some Auras can stack from different caster but their amount should not stack
+    if (m_base->IsUniqueVisibleAuraBuff() && IsUniqueStackAuraType())
+    {
+        DoUniqueStackAura(aurApp, mode, apply);
+    }
+    else
+        (*this.*AuraEffectHandler [GetAuraType()])(const_cast<AuraApplication const*>(aurApp), mode, apply);
 
     // check if script events have removed the aura or if default effect prevention was requested
     if (apply && aurApp->GetRemoveMode())
@@ -2927,7 +2934,10 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
                                                             // blizz like 2.0.x
         target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                                                             // blizz like 2.0.x
-        target->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+        target->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD); // bugs energy bar
+
+        if (target->IsFullPower())
+            target->SetPower(target->getPowerType(), target->GetPower(target->getPowerType()) - 1);
 
         target->AddUnitState(UNIT_STATE_DIED);
     }
@@ -4969,9 +4979,12 @@ void AuraEffect::HandleModMeleeRangedSpeedPct(AuraApplication const* aurApp, uin
     //! ToDo: Haste auras with the same handler _CAN'T_ stack together
     Unit* target = aurApp->GetTarget();
 
-    target->ApplyAttackTimePercentMod(BASE_ATTACK, (float)GetAmount(), apply);
-    target->ApplyAttackTimePercentMod(OFF_ATTACK, (float)GetAmount(), apply);
-    target->ApplyAttackTimePercentMod(RANGED_ATTACK, (float)GetAmount(), apply);
+    if (int32 amount = target->GetAuraAmountNoStack(this))
+    {
+        target->ApplyAttackTimePercentMod(BASE_ATTACK, (float)amount, apply);
+        target->ApplyAttackTimePercentMod(OFF_ATTACK, (float)amount, apply);
+        target->ApplyAttackTimePercentMod(RANGED_ATTACK, (float)amount, apply);
+    }
 }
 
 void AuraEffect::HandleModCombatSpeedPct(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -6662,6 +6675,18 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
             {
                 switch (auraId)
                 {
+                    // Earth's Vengeance, Morchok, Dragon Soul
+                    case 103176:
+                    {
+                        for (uint8 i = 0; i < 2; ++i)
+                        {
+                            Position pos;
+                            caster->GetNearPosition(pos, 40.0f, frand(0.0f, 2 * M_PI));
+                            if (caster->GetDistance(pos) >= 20.0f)
+                                caster->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), 103177, true);
+                        }
+                        return;
+                    }
                     // Shadow Cloak, Illidan, Well of Eternity
                     case 103004:
                         if (target->isInCombat())
@@ -6865,6 +6890,11 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
         // Spell exist but require custom code
         switch (auraId)
         {
+            // Flood, Ancient Water Lord, Dragon Soul
+            case 107797:
+                if (caster)
+                    caster->CastSpell(caster, 107791, true);
+                return;
             // Meltdown, Fragment of Rhyolith
             case 98646:
             {
@@ -7913,8 +7943,23 @@ mod_pair AuraEffect::GetUniqueVisibleAuraBuff(Unit* target, int8 x) const
     return mod_pair();
 }
 
+bool AuraEffect::IsUniqueStackAuraType() const
+{
+    // BOO code
+    pAuraEffectHandler pAEH_value = AuraEffectHandler[GetAuraType()];
+    return (pAEH_value == &AuraEffect::HandleAuraModWeaponCritPercent && GetSpellInfo()->Effects[GetEffIndex()].HasRadius()) ||
+        pAEH_value == &AuraEffect::HandleAuraModAttackPowerPercent || pAEH_value == &AuraEffect::HandleModPowerRegen ||
+        pAEH_value == &AuraEffect::HandleAuraModRangedAttackPowerPercent || pAEH_value == &AuraEffect::HandleModDamagePercentDone ||
+        pAEH_value == &AuraEffect::HandleModCastingSpeed || pAEH_value == &AuraEffect::HandleAuraModCritPct ||
+        pAEH_value == &AuraEffect::HandleModMeleeSpeedPct || pAEH_value == &AuraEffect::HandleModAttackSpeed ||
+        pAEH_value == &AuraEffect::HandleAuraModRangedHaste || pAEH_value == &AuraEffect::HandleAuraModIncreaseEnergy;
+}
+
 void AuraEffect::HandleAuraProgressBar(AuraApplication const* aurApp, uint8 mode, bool apply) const
 {
+    if (!(mode & AURA_EFFECT_HANDLE_REAL))
+        return;
+
     Unit* target = aurApp->GetTarget();
 
     Unit* caster = GetCaster();

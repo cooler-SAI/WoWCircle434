@@ -3122,17 +3122,20 @@ void Unit::_AddAura(UnitAura* aura, Unit* caster)
         // register single target aura
         caster->GetSingleCastAuras().push_back(aura);
         // remove other single target auras
+        Unit::AuraList tempList;
         Unit::AuraList& scAuras = caster->GetSingleCastAuras();
-        for (Unit::AuraList::iterator itr = scAuras.begin(); itr != scAuras.end();)
+        for (AuraList::const_iterator itr = scAuras.begin(); itr != scAuras.end(); ++itr)
         {
-            if ((*itr) != aura &&
+            if ((*itr) != aura && 
                 (*itr)->GetSpellInfo()->IsSingleTargetWith(aura->GetSpellInfo()))
-            {
-                (*itr)->Remove();
-                itr = scAuras.begin();
-            }
-            else
-                ++itr;
+                    tempList.push_back((*itr));
+        }
+
+        if (!tempList.empty())
+        {
+            for (AuraList::const_iterator t_itr = tempList.begin(); t_itr != tempList.end(); ++t_itr)
+                if (Aura* aura = *t_itr)
+                    aura->Remove();
         }
     }
 }
@@ -4609,6 +4612,47 @@ int32 Unit::GetMaxNegativeAuraModifierByAffectMask(AuraType auratype, SpellInfo 
     return modifier;
 }
 
+int32 Unit::GetAuraAmountNoStack(AuraEffect const* effect) const
+{
+    int32 amount = effect->GetAmount();
+    if (!amount)
+        return 0;
+
+    int32 cur_amount = amount;
+
+    AuraType auratype = effect->GetAuraType();
+    AuraEffectList const& mTotalAuraList = GetAuraEffectsByType(auratype);
+    for (AuraEffectList::const_iterator i = mTotalAuraList.begin(); i != mTotalAuraList.end(); ++i)
+    {
+        if (sSpellMgr->CheckSpellGroupStackRules(effect->GetSpellInfo(), (*i)->GetSpellInfo()) == SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT)
+        {
+            if (amount < 0)
+            {
+                if (amount < (*i)->GetAmount())
+                {
+                    cur_amount = amount - (*i)->GetAmount();
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            else
+            {
+                if (amount > (*i)->GetAmount())
+                {
+                    cur_amount = amount - (*i)->GetAmount();
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+    }
+    return cur_amount;
+}
+
 void Unit::_RegisterDynObject(DynamicObject* dynObj)
 {
     m_dynObj.push_back(dynObj);
@@ -5846,6 +5890,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (GetTypeId() != TYPEID_PLAYER)
                         return false;
 
+                    if (ToPlayer()->HasSpellCooldown(dummySpell->Id))
+                        return false;
+
                     std::vector<uint32> RandomSpells;
                     switch (getClass())
                     {
@@ -5878,18 +5925,16 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (RandomSpells.empty()) // shouldn't happen
                         return false;
 
-                    uint8 rand_spell = irand(0, (RandomSpells.size() - 1));
-                    CastSpell(target, RandomSpells[rand_spell], true, castItem, triggeredByAura, originalCaster);
-                    for (std::vector<uint32>::iterator itr = RandomSpells.begin(); itr != RandomSpells.end(); ++itr)
-                    {
-                        if (!ToPlayer()->HasSpellCooldown(*itr))
-                            ToPlayer()->AddSpellCooldown(*itr, 0, time(NULL) + cooldown);
-                    }
+                    triggered_spell_id = RandomSpells[irand(0, (RandomSpells.size() - 1))];
+                    ToPlayer()->AddSpellCooldown(dummySpell->Id, 0, time(NULL) + cooldown);
                     break;
                 }
                 case 71562: // Deathbringer's Will Heroic
                 {
                     if (GetTypeId() != TYPEID_PLAYER)
+                        return false;
+
+                    if (ToPlayer()->HasSpellCooldown(dummySpell->Id))
                         return false;
 
                     std::vector<uint32> RandomSpells;
@@ -5921,16 +5966,11 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         default:
                             return false;
                     }
-                    if (RandomSpells.empty()) //shouldn't happen
+                    if (RandomSpells.empty()) // shouldn't happen
                         return false;
 
-                    uint8 rand_spell = irand(0,(RandomSpells.size() - 1));
-                    CastSpell(target,RandomSpells[rand_spell],true,castItem,triggeredByAura, originalCaster);
-                    for (std::vector<uint32>::iterator itr = RandomSpells.begin(); itr != RandomSpells.end(); ++itr)
-                    {
-                        if (!ToPlayer()->HasSpellCooldown(*itr))
-                            ToPlayer()->AddSpellCooldown(*itr,0,time(NULL) + cooldown);
-                    }
+                    triggered_spell_id = RandomSpells[irand(0, (RandomSpells.size() - 1))];
+                    ToPlayer()->AddSpellCooldown(dummySpell->Id, 0, time(NULL) + cooldown);
                     break;
                 }
                 case 71875: // Item - Black Bruise: Necrotic Touch Proc
@@ -6290,6 +6330,26 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                // Item - Warrior T13 Protection 2P Bonus (Revenge)
+                case 105908:
+                    if (!victim)
+                        return false;
+
+                    if (GetTypeId() != TYPEID_PLAYER)
+                        return false;
+
+                    if (victim != ToPlayer()->GetSelectedUnit())
+                        return false;
+                    
+                    basepoints0 = int32(CalculatePct(damage, 20));
+                    triggered_spell_id = 105909;
+
+                    if (AuraEffect const* aurEff = GetAuraEffect(triggered_spell_id, EFFECT_0))
+                        basepoints0 += aurEff->GetAmount();
+
+                    target = this;
+
+                    break;
                 // Item - Warrior T12 Protection 2P Bonus
                 case 99239:
                 {
@@ -7457,8 +7517,10 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 }
                 // Glyph of Kick
                 case 56805:
+                {
                     ToPlayer()->SpellCooldownReduction(1766, triggerAmount);
                     return true;
+                }
                 // Cut to the Chase
                 case 51664:
                 case 51665:
@@ -7665,6 +7727,27 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                case 96887: // Variable Pulse Lightning Capacitor
+                case 97119: // Variable Pulse Lightning Capacitor (Heroic)
+                {
+                    if (!victim)
+                        return false;
+
+                    if (Aura* aur = GetAura(96890))
+                    {
+                        uint8 stacks = aur->GetStackAmount();
+                        if (roll_chance_i(15))
+                        {
+                            int32 bp0 = dummySpell->Effects[EFFECT_0].CalcValue() * stacks;
+                            CastCustomSpell(victim, 96891, &bp0, 0, 0, true);
+                            aur->Remove();
+                            return true;
+                        }
+                    }
+                    triggered_spell_id = 96890;
+                    target = victim;
+                    break;
+                }
                 // Item - Paladin T12 Holy 4P Bonus
                 case 99070:
                 {
@@ -9640,10 +9723,20 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                             return false;
 
                         trigger_spell_id = 96172;
-                        basepoints0 = int32(damage / 100.0f * triggeredByAura->GetAmount());
+                        basepoints0 = int32((damage + absorb) / 100.0f * triggeredByAura->GetAmount());
                         if (HasAura(84963))
                             AddPct(basepoints0, 30);
                         target = victim;
+                        break;
+                    }
+                    // Item - Paladin T13 Protection 2P Bonus (Judgement)
+                    case 105800:
+                    {
+                        if (!damage)
+                            return false;
+
+                        basepoints0 = triggerAmount * damage / 100.0f;
+                        trigger_spell_id = 105801;
                         break;
                     }
                     default:
@@ -9749,6 +9842,36 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Item - Dragon Soul Legendary Daggers
+        case 109939:
+        {
+            if (!victim)
+                return false;
+
+            if (HasAura(109949))
+                return false;
+
+            if (Aura* aur = GetAura(109941))
+            {
+                uint8 stacks = aur->GetStackAmount();
+                if (stacks >= 30)
+                {
+                    float chance = ((1.0f / (51.0f - stacks)) * 100);
+                    if (roll_chance_f(chance))
+                    {
+                        CastSpell(victim, 109949, true);
+                        aur->Remove();
+                        return false;
+                    }
+                }
+            }
+            break;
+        }
+        // Fusing Vapors, Yor'sahj, Dragon Soul
+        case 103968:
+            if (GetHealthPct() > 50.0f)
+                return false;
+            break;
         // Embedded Blade, Mannoroth, Well of Eternity
         case 109542: 
             if (!victim)
@@ -9893,6 +10016,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
         case 92234: // Item - Proc Dodge Below 35%, Bedrock Talisman
         case 96947: // Loom of Fate, Spediersilk Spindle
         case 97130: // Loom of Fate, Spediersilk Spindle (H)
+        case 105552: // Item - Death Knight T12 Blood 2P Bonus
             if (!HealthBelowPct(35) && !HealthBelowPctDamaged(35, damage))
                 return false;
             break;
@@ -10447,6 +10571,13 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                 return false;
             break;
         }
+        case 81141: // Crimson Scourge
+        {
+            // proc only on Blood Plague affected targets
+            if (!victim || !victim->HasAura(55078, GetGUID()))
+                return false;
+            break;
+        }
     }
 
     if (cooldown && GetTypeId() == TYPEID_PLAYER && ToPlayer()->HasSpellCooldown(trigger_spell_id))
@@ -10854,6 +10985,10 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         ToCreature()->CallAssistance();
     }
 
+    if (GetTypeId() == TYPEID_PLAYER)
+        if (ToPlayer()->GetEmoteState())
+            ToPlayer()->SetEmoteState(0);
+
     // delay offhand weapon attack to next attack time
     if (haveOffhandWeapon())
         resetAttackTimer(OFF_ATTACK);
@@ -10904,6 +11039,10 @@ bool Unit::AttackStop()
     }
 
     SendMeleeAttackStop(victim);
+
+    if (GetTypeId() == TYPEID_PLAYER)
+        if (ToPlayer()->GetEmoteState())
+            ToPlayer()->SetEmoteState(0);
 
     return true;
 }
@@ -12385,8 +12524,14 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
                 case 71646: // Item - Bauble of True Blood 25m
                 case 85222: // Paladin - Light of Dawn
                 case 73685: // Shaman - Unleash Elements - Unleash Life 
+
                 case 86958: // Shaman - Cleansing Waters
                 case 86961:
+
+                case 94286: // Paladin - Protector of the Innocent proc
+                case 94288:
+                case 94289:
+  
                     break;
                 default:
                     return 0.0;
@@ -12437,12 +12582,6 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
                             if (victim->HasAuraWithMechanic((1<<MECHANIC_STUN) | (1<<MECHANIC_KNOCKOUT)))
                                 if (AuraEffect const* aurEff = GetAuraEffect(56369, EFFECT_0))
                                     crit_chance += aurEff->GetAmount();
-                        // Shatter (same misc values now)
-                        if (victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this))
-                        {
-                            if (AuraEffect const* Shatter = GetDummyAuraEffect(SPELLFAMILY_MAGE, 976, 1))
-                                crit_chance *= (float(Shatter->GetAmount()) / 10.0f) + 1.0f;
-                        }
                         break;
                     case SPELLFAMILY_DRUID:
 
@@ -12593,6 +12732,17 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
         if (Unit* owner = GetOwner())
             if (Aura* aur = victim->GetAura(86000, owner->GetGUID()))
                 crit_chance += float(aur->GetEffect(0)->GetAmount());
+
+    // Shatter (same misc values now)
+    // Shatter should calculated last
+    if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_MAGIC && spellProto->SpellFamilyName == SPELLFAMILY_MAGE)
+    {
+        if (victim->HasAuraState(AURA_STATE_FROZEN, spellProto, this))
+        {
+            if (AuraEffect const* Shatter = GetDummyAuraEffect(SPELLFAMILY_MAGE, 976, 1))
+                crit_chance *= (float(Shatter->GetAmount()) / 10.0f) + 1.0f;
+        }
+    }
 
     crit_chance = crit_chance > 0.0f ? crit_chance : 0.0f;
     return crit_chance;
@@ -13521,6 +13671,10 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
 
     if (Player* player = ToPlayer())
     {
+        
+        if (player->GetEmoteState())
+            player->SetEmoteState(0);
+
         // mount as a vehicle
         if (VehicleId)
         {
@@ -16744,16 +16898,8 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     case SPELL_AURA_MOD_ROOT:
                     case SPELL_AURA_TRANSFORM:
                     {
-                        // Dragon Breath & Living Bomb
-                        if (spellInfo->Category == 1215 && procSpell &&
-                            procSpell->SpellFamilyName == SPELLFAMILY_MAGE && procSpell->SpellFamilyFlags[1] == 0x00010000)
+                        if (IsNoBreakingCC(isVictim, target, procFlag, procExtra, attType, procSpell, damage, absorb, procAura, spellInfo))
                             break;
-
-                        // Sanguinary Vein and Gouge
-                        if (spellInfo->Id == 1776 && target && (procFlag & PROC_FLAG_TAKEN_PERIODIC) && (procSpell && (procSpell->GetAllEffectsMechanicMask() & (1<<MECHANIC_BLEED))))
-                            if (AuraEffect * aur = target->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 4821, 1))
-                                if (roll_chance_i(aur->GetAmount()))
-                                    break;
 
                         damage += absorb;
                         // chargeable mods are breaking on hit
@@ -16823,6 +16969,27 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
     // Cleanup proc requirements
     if (procExtra & (PROC_EX_INTERNAL_TRIGGERED | PROC_EX_INTERNAL_CANT_PROC))
         SetCantProc(false);
+}
+
+bool Unit::IsNoBreakingCC(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpell, 
+uint32 damage, uint32 absorb /* = 0 */, SpellInfo const* procAura /* = NULL */, SpellInfo const* spellInfo ) const
+{
+    // Dragon Breath & Living Bomb
+    if (spellInfo->Category == 1215 && procSpell &&
+        procSpell->SpellFamilyName == SPELLFAMILY_MAGE && procSpell->SpellFamilyFlags[1] == 0x00010000)
+        return true;
+
+    // Sanguinary Vein and Gouge
+    if (spellInfo->Id == 1776 && target && (procFlag & PROC_FLAG_TAKEN_PERIODIC) && (procSpell && (procSpell->GetAllEffectsMechanicMask() & (1<<MECHANIC_BLEED))))
+        if (AuraEffect * aur = target->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 4821, 1))
+            if (roll_chance_i(aur->GetAmount()))
+                return true;
+
+    // Main Gauche & Gouge
+    if (procSpell && procSpell->Id == 86392 && spellInfo->Id == 1776)
+        return true;
+
+    return false;
 }
 
 void Unit::GetProcAurasTriggeredOnEvent(std::list<AuraApplication*>& aurasTriggeringProc, std::list<AuraApplication*>* procAuras, ProcEventInfo eventInfo)
@@ -18150,28 +18317,31 @@ void Unit::SetStunned(bool apply)
         else
             SetStandState(UNIT_STAND_STATE_STAND);
 
-        WorldPacket data(SMSG_SPLINE_MOVE_ROOT, 8);
-        {
-            data
-                .WriteByteMask(guid[5])
-                .WriteByteMask(guid[4])
-                .WriteByteMask(guid[6])
-                .WriteByteMask(guid[1])
-                .WriteByteMask(guid[3])
-                .WriteByteMask(guid[7])
-                .WriteByteMask(guid[2])
-                .WriteByteMask(guid[0])
-                .WriteByteSeq(guid[2])
-                .WriteByteSeq(guid[1])
-                .WriteByteSeq(guid[7])
-                .WriteByteSeq(guid[3])
-                .WriteByteSeq(guid[5])
-                .WriteByteSeq(guid[0])
-                .WriteByteSeq(guid[6])
-                .WriteByteSeq(guid[4]);
-        }
         if (GetTypeId() == TYPEID_PLAYER)
             SendMoveRoot(0);
+        else
+        {
+            WorldPacket data(SMSG_SPLINE_MOVE_ROOT, 8);
+            {
+                data
+                    .WriteByteMask(guid[5])
+                    .WriteByteMask(guid[4])
+                    .WriteByteMask(guid[6])
+                    .WriteByteMask(guid[1])
+                    .WriteByteMask(guid[3])
+                    .WriteByteMask(guid[7])
+                    .WriteByteMask(guid[2])
+                    .WriteByteMask(guid[0])
+                    .WriteByteSeq(guid[2])
+                    .WriteByteSeq(guid[1])
+                    .WriteByteSeq(guid[7])
+                    .WriteByteSeq(guid[3])
+                    .WriteByteSeq(guid[5])
+                    .WriteByteSeq(guid[0])
+                    .WriteByteSeq(guid[6])
+                    .WriteByteSeq(guid[4]);
+            }
+        }
 
         CastStop();
     }
@@ -18187,28 +18357,30 @@ void Unit::SetStunned(bool apply)
 
         if (!HasUnitState(UNIT_STATE_ROOT))         // prevent moving if it also has root effect
         {
-            WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
-            data
-                .WriteByteMask(guid[0])
-                .WriteByteMask(guid[1])
-                .WriteByteMask(guid[6])
-                .WriteByteMask(guid[5])
-                .WriteByteMask(guid[3])
-                .WriteByteMask(guid[2])
-                .WriteByteMask(guid[7])
-                .WriteByteMask(guid[4])
-                .WriteByteSeq(guid[6])
-                .WriteByteSeq(guid[3])
-                .WriteByteSeq(guid[1])
-                .WriteByteSeq(guid[5])
-                .WriteByteSeq(guid[2])
-                .WriteByteSeq(guid[0])
-                .WriteByteSeq(guid[7])
-                .WriteByteSeq(guid[4]);
-            SendMessageToSet(&data, true);
-
             if (GetTypeId() == TYPEID_PLAYER)
                 SendMoveUnroot(0);
+            else
+            {
+                WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
+                data
+                    .WriteByteMask(guid[0])
+                    .WriteByteMask(guid[1])
+                    .WriteByteMask(guid[6])
+                    .WriteByteMask(guid[5])
+                    .WriteByteMask(guid[3])
+                    .WriteByteMask(guid[2])
+                    .WriteByteMask(guid[7])
+                    .WriteByteMask(guid[4])
+                    .WriteByteSeq(guid[6])
+                    .WriteByteSeq(guid[3])
+                    .WriteByteSeq(guid[1])
+                    .WriteByteSeq(guid[5])
+                    .WriteByteSeq(guid[2])
+                    .WriteByteSeq(guid[0])
+                    .WriteByteSeq(guid[7])
+                    .WriteByteSeq(guid[4]);
+                SendMessageToSet(&data, true);
+            }
 
             RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
         }
@@ -18230,61 +18402,63 @@ void Unit::SetRooted(bool apply)
         RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
 
-        if (GetTypeId() != TYPEID_PLAYER)
-            ToCreature()->StopMoving();
-
-        WorldPacket data(SMSG_SPLINE_MOVE_ROOT, 8);
-        {
-            data
-                .WriteByteMask(guid[5])
-                .WriteByteMask(guid[4])
-                .WriteByteMask(guid[6])
-                .WriteByteMask(guid[1])
-                .WriteByteMask(guid[3])
-                .WriteByteMask(guid[7])
-                .WriteByteMask(guid[2])
-                .WriteByteMask(guid[0])
-                .WriteByteSeq(guid[2])
-                .WriteByteSeq(guid[1])
-                .WriteByteSeq(guid[7])
-                .WriteByteSeq(guid[3])
-                .WriteByteSeq(guid[5])
-                .WriteByteSeq(guid[0])
-                .WriteByteSeq(guid[6])
-                .WriteByteSeq(guid[4]);
-        }
-        SendMessageToSet(&data, true);
-
         if (GetTypeId() == TYPEID_PLAYER)
             SendMoveRoot(m_rootTimes);
-        
+        else
+        {
+
+            WorldPacket data(SMSG_SPLINE_MOVE_ROOT, 8);
+            {
+                data
+                    .WriteByteMask(guid[5])
+                    .WriteByteMask(guid[4])
+                    .WriteByteMask(guid[6])
+                    .WriteByteMask(guid[1])
+                    .WriteByteMask(guid[3])
+                    .WriteByteMask(guid[7])
+                    .WriteByteMask(guid[2])
+                    .WriteByteMask(guid[0])
+                    .WriteByteSeq(guid[2])
+                    .WriteByteSeq(guid[1])
+                    .WriteByteSeq(guid[7])
+                    .WriteByteSeq(guid[3])
+                    .WriteByteSeq(guid[5])
+                    .WriteByteSeq(guid[0])
+                    .WriteByteSeq(guid[6])
+                    .WriteByteSeq(guid[4]);
+            }
+            SendMessageToSet(&data, true);
+            StopMoving();
+        }
     }
     else
     {
         if (!HasUnitState(UNIT_STATE_STUNNED))      // prevent moving if it also has stun effect
         {
-            WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
-            data
-                .WriteByteMask(guid[0])
-                .WriteByteMask(guid[1])
-                .WriteByteMask(guid[6])
-                .WriteByteMask(guid[5])
-                .WriteByteMask(guid[3])
-                .WriteByteMask(guid[2])
-                .WriteByteMask(guid[7])
-                .WriteByteMask(guid[4])
-                .WriteByteSeq(guid[6])
-                .WriteByteSeq(guid[3])
-                .WriteByteSeq(guid[1])
-                .WriteByteSeq(guid[5])
-                .WriteByteSeq(guid[2])
-                .WriteByteSeq(guid[0])
-                .WriteByteSeq(guid[7])
-                .WriteByteSeq(guid[4]);
-            SendMessageToSet(&data, true);
-
             if (GetTypeId() == TYPEID_PLAYER)
                 SendMoveUnroot(++m_rootTimes);
+            else
+            {
+                WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
+                data
+                    .WriteByteMask(guid[0])
+                    .WriteByteMask(guid[1])
+                    .WriteByteMask(guid[6])
+                    .WriteByteMask(guid[5])
+                    .WriteByteMask(guid[3])
+                    .WriteByteMask(guid[2])
+                    .WriteByteMask(guid[7])
+                    .WriteByteMask(guid[4])
+                    .WriteByteSeq(guid[6])
+                    .WriteByteSeq(guid[3])
+                    .WriteByteSeq(guid[1])
+                    .WriteByteSeq(guid[5])
+                    .WriteByteSeq(guid[2])
+                    .WriteByteSeq(guid[0])
+                    .WriteByteSeq(guid[7])
+                    .WriteByteSeq(guid[4]);
+                SendMessageToSet(&data, true);
+            }
 
             RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
         }
@@ -20016,7 +20190,7 @@ bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool tel
         return false;
 
     bool turn = (GetOrientation() != orientation);
-    bool relocated = (teleport || GetPositionX() != x || GetPositionY() != y || GetPositionZ() != z);
+    bool relocated = (teleport || GetPositionX() != x || GetPositionY() != y || (!HasUnitMovementFlag(MOVEMENTFLAG_HOVER) && GetPositionZ() != z));
 
     if (turn)
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TURNING);
@@ -20721,7 +20895,7 @@ void Unit::DoBuffPartyOrSingle(uint32 single_buff, uint32 party_buff, Unit *targ
         CastSpell(target, single_buff, true);
 }
 
-void Unit::SpreadAura(uint32 spellId, float radius, bool positive, int8 count)
+void Unit::SpreadAura(uint32 spellId, float radius, bool positive, int8 count, Unit * except)
 {
     UnitList targets;
     Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck u_check(this, radius);
@@ -20737,9 +20911,10 @@ void Unit::SpreadAura(uint32 spellId, float radius, bool positive, int8 count)
     {
         for (UnitList::iterator itr = targets.begin(); itr != targets.end(); )
         {
-            if (!(*itr)->HasAura(spellId))
+            Unit *unit_itr = *itr;
+            if ((!except || except != unit_itr) && !unit_itr->HasAura(spellId))
             {
-                targets_limited.push_back(*itr);
+                targets_limited.push_back(unit_itr);
                 itr = targets.erase(itr);
 
                 // break if we have full needed list
@@ -20763,6 +20938,10 @@ void Unit::SpreadAura(uint32 spellId, float radius, bool positive, int8 count)
     {
         for (UnitList::iterator itr = targets.begin(); itr != targets.end(); ++itr)
         {
+            Unit *unit_itr = *itr;
+            if (unit_itr == except)
+                continue;
+
             AddAura(spellId, *itr);
 
             if (--count == 0)

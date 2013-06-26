@@ -199,6 +199,20 @@ class boss_perotharn : public CreatureScript
                 instance->SetData(DATA_EVENT_ILLIDAN_1, DONE);
                 if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_1, 100.0f))
                     pIllidan->AI()->DoAction(1); // ACTION_PEROTHARN_DEAD
+
+                // Temporary quest
+                Map::PlayerList const &PlayerList = instance->instance->GetPlayers();
+                if (!PlayerList.isEmpty())
+                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                        if (Player* pPlayer = i->getSource())
+                            if (me->GetDistance(pPlayer) <= 50.0f && pPlayer->GetQuestStatus(QUEST_IN_UNENDING_NUMBERS) == QUEST_STATUS_INCOMPLETE)
+                            {
+                                pPlayer->KilledMonsterCredit(58239, 0);
+                                pPlayer->KilledMonsterCredit(58240, 0);
+                                pPlayer->KilledMonsterCredit(58241, 0);
+                            }
+
+                                    
             }
             
             void KilledUnit(Unit* who)
@@ -300,6 +314,7 @@ class boss_perotharn : public CreatureScript
                             break;
                         case EVENT_EASY_PREY:
                             phase = 4;
+                            events.CancelEvent(EVENT_END_HUNT);
                             me->SetReactState(REACT_AGGRESSIVE);
                             DoCast(me, SPELL_CAMOUFLAGE_REMOVE, true);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
@@ -314,6 +329,7 @@ class boss_perotharn : public CreatureScript
                             events.ScheduleEvent(EVENT_FEL_DECAY, urand(12000, 15000));
                             break;
                         case EVENT_END_HUNT:
+                            events.CancelEvent(EVENT_EASY_PREY);
                             phase = 4; 
                             summons.DespawnEntry(NPC_EYE_OF_PEROTHARN_1);
                             summons.DespawnEntry(NPC_HUNTING_SUMMON_CIRCLE);

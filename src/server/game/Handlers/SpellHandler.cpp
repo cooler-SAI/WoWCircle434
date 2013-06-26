@@ -92,6 +92,9 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     if (pUser->m_mover != pUser)
         return;
 
+    if (pUser->GetEmoteState())
+        pUser->SetEmoteState(0);
+
     uint8 bagIndex, slot, castFlags;
     uint8 castCount;                                       // next cast if exists (single or not)
     uint64 itemGUID;
@@ -353,6 +356,12 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         return;
     }
 
+    if (mover->GetTypeId() == TYPEID_PLAYER)
+    {
+        if (mover->ToPlayer()->GetEmoteState())
+            mover->ToPlayer()->SetEmoteState(0);
+    }
+
     if (spellInfo->IsPassive())
     {
         recvPacket.rfinish(); // prevent spam at ignore packet 
@@ -377,12 +386,13 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         !caster->ToPlayer()->HasActiveSpell(spellId) && !spellInfo->IsRaidMarker() &&
          spellId != 101603) // Hack for Throw Totem, Echo of Baine 
     {
+        // not have spell in spellbook 
+        //cheater? kick? ban?
         if (!spellInfo->IsAbilityOfSkillType(SKILL_ARCHAEOLOGY))
         {
-            // not have spell in spellbook 
-            recvPacket.rfinish(); // prevent spam at ignore packet 
+            recvPacket.rfinish(); // prevent spam at ignore packet
             return;
-        }
+        } 
     }
 
     /*if (mover->GetTypeId() == TYPEID_PLAYER)

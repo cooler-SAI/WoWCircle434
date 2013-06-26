@@ -898,6 +898,9 @@ void Battleground::EndBattleground(uint32 winner)
 
             if (IsRBG())
                 player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_BATTLEGROUND, GetMapId());
+            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, BattlegroundMgr::GetBgQuestId(GetTypeID(true), winner));
+             
+            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, 1);
         }
         else
         {
@@ -1968,6 +1971,13 @@ void Battleground::SetBgRaid(uint32 TeamID, Group* bg_raid)
 WorldSafeLocsEntry const* Battleground::GetClosestGraveYard(Player* player)
 {
     return sObjectMgr->GetClosestGraveYard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetTeam());
+}
+
+bool Battleground::IsTeamScoreInRange(uint32 team, uint32 minScore, uint32 maxScore) const
+{
+    TeamId teamIndex = GetTeamIndexByTeamId(team);
+    uint32 score = std::max(m_TeamScores[teamIndex], 0);
+    return score >= minScore && score <= maxScore;
 }
 
 void Battleground::StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry)

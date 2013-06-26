@@ -180,7 +180,7 @@ class ArenaTeam
         void Inspect(WorldSession* session, uint64 guid);
 
         int32  GetMatchmakerRatingMod(uint32 ownRating, uint32 opponentRating, bool won);
-        int32  GetRatingMod(uint32 ownRating, uint32 opponentRating, bool won);
+        int32  GetRatingMod(uint32 ownRating, uint32 opponentRating, uint32 ownMmr, bool won);
         float  GetChanceAgainst(uint32 ownRating, uint32 opponentRating);
         int32  WonAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32& rating_change);
         void   MemberWon(Player* player, uint32 againstMatchmakerRating, int32 MatchmakerRatingChange);

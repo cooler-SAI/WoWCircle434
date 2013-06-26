@@ -283,7 +283,7 @@ void AddSC_undercity();
 void AddSC_western_plaguelands();
 void AddSC_westfall();
 void AddSC_wetlands();
-void AddSC_mount_hyjal();
+void AddSC_deepholm();
 
 //kalimdor
 void AddSC_blackfathom_deeps();              //Blackfathom Depths
@@ -371,6 +371,8 @@ void AddSC_thousand_needles();
 void AddSC_thunder_bluff();
 void AddSC_ungoro_crater();
 void AddSC_winterspring();
+void AddSC_mount_hyjal();
+void AddSC_uldum();
 
 //northrend
 void AddSC_boss_slad_ran();
@@ -575,6 +577,7 @@ void AddSC_boss_warlord_kalithresh();
 void AddSC_instance_steam_vault();
 void AddSC_boss_hungarfen();                 //CR Underbog
 void AddSC_boss_the_black_stalker();
+void AddSC_boss_frostlord_ahune();
 void AddSC_boss_gruul();                     //Gruul's Lair
 void AddSC_boss_high_king_maulgar();
 void AddSC_instance_gruuls_lair();
@@ -724,6 +727,10 @@ void AddSC_boss_perotharn();
 void AddSC_boss_queen_azshara();
 void AddSC_boss_mannoroth();
 
+void AddSC_instance_dragon_soul(); // Dragon Soul
+void AddSC_dragon_soul();
+void AddSC_boss_morchok();
+void AddSC_boss_yorsahj_the_unsleeping();
 
 // battlegrounds
 
@@ -1032,7 +1039,7 @@ void AddEasternKingdomsScripts()
     AddSC_western_plaguelands();
     AddSC_westfall();
     AddSC_wetlands();
-    AddSC_mount_hyjal(); 
+    AddSC_deepholm();
 #endif
 }
 
@@ -1124,6 +1131,8 @@ void AddKalimdorScripts()
     AddSC_thunder_bluff();
     AddSC_ungoro_crater();
     AddSC_winterspring();
+    AddSC_mount_hyjal(); 
+    AddSC_uldum();
 #endif
 }
 
@@ -1166,6 +1175,7 @@ void AddOutlandScripts()
     AddSC_instance_steam_vault();
     AddSC_boss_hungarfen();                 //CR Underbog
     AddSC_boss_the_black_stalker();
+    AddSC_boss_frostlord_ahune();
     AddSC_boss_gruul();                     //Gruul's Lair
     AddSC_boss_high_king_maulgar();
     AddSC_instance_gruuls_lair();
@@ -1480,6 +1490,11 @@ void AddNorthrendScripts()
     AddSC_boss_perotharn();
     AddSC_boss_queen_azshara();
     AddSC_boss_mannoroth();
+
+    AddSC_instance_dragon_soul(); // Dragon Soul
+    AddSC_dragon_soul();
+    AddSC_boss_morchok();
+    AddSC_boss_yorsahj_the_unsleeping();
 
 #endif
 }
