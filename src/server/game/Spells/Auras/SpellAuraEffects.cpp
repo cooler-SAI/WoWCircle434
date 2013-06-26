@@ -1049,7 +1049,11 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 int32 temp_damage = amount;
                 float temp_crit = 0.0f;
 
-                temp_damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), temp_damage, DOT, GetBase()->GetStackAmount());
+                if (GetAuraType() == SPELL_AURA_PERIODIC_HEAL)
+                    temp_damage = caster->SpellHealingBonusDone(target, GetSpellInfo(), temp_damage, DOT, GetBase()->GetStackAmount());
+                else
+                    temp_damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), temp_damage, DOT, GetBase()->GetStackAmount());
+                
                 temp_crit = caster->GetSpellCrit(target, GetSpellInfo(), SpellSchoolMask(GetSpellInfo()->SchoolMask));
                 
                 m_fixed_periodic.SetFixedDamage(temp_damage);
