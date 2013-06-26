@@ -41,7 +41,8 @@ public:
             { "item",           SEC_ADMINISTRATOR,  true,  &HandleListItemCommand,              "", NULL },
             { "object",         SEC_ADMINISTRATOR,  true,  &HandleListObjectCommand,            "", NULL },
             { "auras",          SEC_ADMINISTRATOR,  false, &HandleListAurasCommand,             "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "aggro",          SEC_ADMINISTRATOR,  false, &HandleListAggroCommand,             "", NULL },
+            { NULL,             0,                  false, NULL,                                "", NULL },
         };
         static ChatCommand commandTable[] =
         {
@@ -458,6 +459,53 @@ public:
             for (Unit::AuraEffectList::const_iterator itr = auraList.begin(); itr != auraList.end(); ++itr)
                 handler->PSendSysMessage(LANG_COMMAND_TARGET_AURASIMPLE, (*itr)->GetId(), (*itr)->GetEffIndex(), (*itr)->GetAmount());
         }
+
+        
+        return true;
+    }
+
+    static bool HandleListAggroCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        Unit* unit = handler->getSelectedUnit();
+        if (!unit)
+            unit = handler->GetSession()->GetPlayer();
+
+        uint32 unitGuid = unit->GetGUIDLow();
+        if (Creature* creature = unit->GetCreature(*unit, unit->GetGUID()))
+        {
+            uint32 dbGuid = creature->GetDBTableGUIDLow();
+            if (unitGuid != dbGuid)
+                unitGuid = dbGuid;
+        }
+        if (unit->GetTypeId() == TYPEID_PLAYER)
+            handler->PSendSysMessage("Listing attackers of player |cffffffff%s|r (guid: |cffffffff%u|r)", unit->GetName(), unitGuid);
+        else
+            handler->PSendSysMessage("Listing attackers of creature |cffffffff%s|r (guid: |cffffffff%u|r id: |cffffffff%u|r)", unit->GetName(), unitGuid, unit->GetEntry());
+
+        uint32 attackersCount = 0;
+        Unit::AttackerSet const& attackers = unit->getAttackers();
+        for (Unit::AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
+        {
+            if (!(*itr))
+                break;
+            Unit* attacker = (*itr);
+            uint32 guid = attacker->GetGUIDLow();
+            if (attacker->GetTypeId() == TYPEID_PLAYER)
+                handler->PSendSysMessage("guid: |cffffffff%u|r - player - |cffffffff%s|r", guid, attacker->GetName());
+            else
+            {
+                if (Creature* creature = attacker->GetCreature(*attacker, attacker->GetGUID()))
+                {
+                    uint32 dbGuid = creature->GetDBTableGUIDLow();
+                    if (guid != dbGuid)
+                        guid = dbGuid;
+                }
+                float threat = attacker->getThreatManager().getThreat(unit, false);
+                handler->PSendSysMessage("guid: |cffffffff%u|r - id: |cffffffff%u|r - |cffffffff%s|r (%.2f)", guid, attacker->GetEntry(), attacker->GetName(), threat);
+            }
+            ++attackersCount;
+        }
+        handler->PSendSysMessage("%u attackers total", attackersCount);
 
         return true;
     }
