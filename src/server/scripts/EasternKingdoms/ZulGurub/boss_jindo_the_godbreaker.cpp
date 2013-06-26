@@ -133,15 +133,7 @@ class boss_jindo_the_godbreaker : public CreatureScript
                 if (instance->GetData(DATA_BOSSES) < 2)
                 {
                     EnterEvadeMode();
-
-                    Map::PlayerList const &pList = me->GetMap()->GetPlayers();
-                        if (pList.isEmpty())
-                            return;
-
-                    for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                        if (Player* pPlayer = itr->getSource())
-                            pPlayer->NearTeleportTo(enterPos.GetPositionX(), enterPos.GetPositionY(), enterPos.GetPositionZ(), enterPos.GetOrientation());
- 
+                    instance->DoNearTeleportPlayers(enterPos);
                     return;
                 }
 

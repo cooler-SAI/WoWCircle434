@@ -782,6 +782,8 @@ const uint32 BG_IC_GraveyardIds[MAX_NODE_TYPES+2] = {0, 0, 1480, 1481, 1482, 148
 
 const Position TransportMovementInfo = {7.305609f, -0.095246f, 34.51022f, 0.0f};
 const Position TeleportToTransportPosition = {661.0f, -1244.0f, 288.0f, 0.0f};
+const Position allianceShipPos = {-22.291981f, 6.3076372f, 20.507608f, 1.5147992f};
+const Position hordeShipPos = {-0.62292081f, -10.558434f, 34.176037f, 4.6480589f};
 
 const float BG_IC_SpiritGuidePos[MAX_NODE_TYPES+2][4] =
 {

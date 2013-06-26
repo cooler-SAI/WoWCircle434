@@ -24,6 +24,7 @@
 #include "ConditionMgr.h"
 #include "Common.h"
 #include "Vehicle.h"
+#include "InstanceScript.h"
 
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType)
 {
@@ -563,6 +564,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
                 Effect != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
                 Effect != SPELL_EFFECT_KNOCK_BACK &&
                 Effect != SPELL_EFFECT_ADD_EXTRA_ATTACKS &&
+                Effect != SPELL_EFFECT_GAMEOBJECT_DAMAGE &&
                 ApplyAuraName != SPELL_AURA_MOD_SPEED_ALWAYS &&
                 ApplyAuraName != SPELL_AURA_MOD_SPEED_NOT_STACK &&
                 ApplyAuraName != SPELL_AURA_MOD_INCREASE_SPEED &&
@@ -1619,7 +1621,7 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
     return SPELL_CAST_OK;
 }
 
-SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 area_id, Player const* player) const
+SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 area_id, Player* player) const
 {
     // normal case
     if (AreaGroupId > 0)
@@ -1673,6 +1675,16 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     // spell checks
     switch (Id)
     {
+        case 103534: // Danger, Morchok, Dragon Soul
+        case 103536: // Warning, Morchok, Dragon Soul
+        case 103541: // Safe, Morchok, Dragon Soul
+        {
+            if (player)
+                if (InstanceScript* pInstance = player->GetInstanceScript())
+                    return (pInstance->GetBossState(0) == IN_PROGRESS) ? SPELL_CAST_OK : SPELL_FAILED_DONT_REPORT;
+            
+            return (area_id == 5926 || area_id == 5923) ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
+        }
         case 105009: // Gift of Sargeras, Well of Eternity
             return (map_id == 939)? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         case 100713: // Deluge, Ragnaros, Firelands
@@ -2485,6 +2497,18 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) c
         return 0;
     }
 
+    switch (Id)
+    {
+        case 98474: // Flame Scythe, Majordomo Staghelm, Firelands
+        case 100212:
+        case 100213:
+        case 100214:
+        case 98476: // Leaping Flames, Majordomo Staghelm, Firelands
+            return 100;
+        default:
+            break;
+    }
+
     // Base powerCost
     int32 powerCost = ManaCost;
     // PCT cost from total amount
@@ -3039,6 +3063,7 @@ bool SpellInfo::_IsNeedDelay() const
         case 70157: // Ice Tomb (Sindragosa, ICC)
         case 79128: // Improved Expose Armor
         case 36032: // Arcane Blast
+        case 109950: // Fury of Destroyer
             return true;
     }
 

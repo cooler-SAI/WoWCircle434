@@ -139,6 +139,19 @@ class boss_majordomo_staghelm : public CreatureScript
 
             void EnterCombat(Unit* attacker)
             {
+                if (!instance->CheckRequiredBosses(DATA_STAGHELM, attacker->ToPlayer()))
+                {
+                    EnterEvadeMode();
+                    instance->DoNearTeleportPlayers(FLEntrancePos);
+                    return;
+                }
+
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CONCENTRATION_AURA);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_LEGENDARY_CONCENTRATION);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_EPIC_CONCENTRATION);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RARE_CONCENTRATION);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_UNCOMMON_CONCENTRATION);
+
                 if (IsHeroic())
                     DoCast(me, SPELL_CONCENTRATION, true);
 
@@ -192,6 +205,14 @@ class boss_majordomo_staghelm : public CreatureScript
                     DoZoneInCombat(summon);
             }
 
+            void MovementInform(uint32 type, uint32 data)
+            {
+                if (data == EVENT_JUMP)
+                {
+                    me->CastSpell(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), SPELL_LEAPING_FLAMES_PERSISTENT, true);
+                }
+            }
+
             void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim() || !CheckInArea(diff, 5769))
@@ -206,16 +227,13 @@ class boss_majordomo_staghelm : public CreatureScript
                 {
                     if (_currentPhase == PHASE_CAT)
                     {
-                        DoCast(me, SPELL_LEAPING_FLAMES_SUMMON);
+                        DoCast(me, SPELL_LEAPING_FLAMES_SUMMON, true);
                         Unit* target = NULL;
                         target = SelectTarget(SELECT_TARGET_RANDOM, 1, -20.0f, true);
                         if (!target)
                             target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
                         if (target)
-                        {
                             DoCast(target, SPELL_LEAPING_FLAMES);
-                            me->CastSpell(target, SPELL_LEAPING_FLAMES_PERSISTENT, true); // doesn't work as trigger spell of 98476
-                        }
                         else
                             me->SetPower(POWER_ENERGY, 0);
                     }

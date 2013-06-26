@@ -355,7 +355,62 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 }
 
                 switch (m_spellInfo->Id)                     // better way to check unknown
-                {
+                { 
+                    case 105033: // Searing Blood, Yor'sahj The Unsleeping, Dragon Soul
+                    case 108356:
+                    case 108357:
+                    case 108358:
+                    case 108218: // Searing Blood, Crimson Globule, Dragon Soul
+                    case 108363:
+                    {
+                        if (!unitTarget)
+                            break;
+
+                        float dist = m_caster->GetDistance(unitTarget);
+
+                        if (dist > 10.0f)
+                            damage *= dist / 10.0f;
+                        break;
+                    }
+                    // Resonating Crystal dmg, Morchok, Dragon Soul
+                    case 103545:
+                    case 108572:
+                    case 110041:
+                    case 110040:
+                        if (!unitTarget)
+                            break;
+
+                        if (unitTarget->HasAura(103534))
+                            damage *= 1.5f;
+                        else if (unitTarget->HasAura(103536))
+                            damage *= 0.7f;
+                        else if (unitTarget->HasAura(103541))
+                            damage *= 0.3f;
+
+                        unitTarget->RemoveAura(103534);
+                        unitTarget->RemoveAura(103536);
+                        unitTarget->RemoveAura(103541);
+                        break;
+                    // Stomp, Morchok, Dragon Soul
+                    case 103414:
+                    case 108571:
+                    case 109033:
+                    case 109034:
+                    {
+                        if (!unitTarget)
+                            break;
+
+                        if (Creature* pMorchok = m_caster->ToCreature())
+                        {
+                            if ((pMorchok->GetEntry() == 57773) || pMorchok->AI()->GetData(3))
+                                damage /= 2;
+
+                            if ((unitTarget->GetGUID() == pMorchok->AI()->GetGUID(1)) || 
+                                (unitTarget->GetGUID() == pMorchok->AI()->GetGUID(2)))
+                                damage *= 2;
+                        }
+                        break;
+                    }
                     // Ragnaros (Firelands), Molten Inferno
                     case 98518:
                     case 100252:
@@ -1024,6 +1079,19 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                // Chirping Box
+                case 98681:
+                {
+                    if (Player* pPlayer = m_caster->ToPlayer())
+                    {
+                        if (!pPlayer->HasItemCount(65661) && !pPlayer->HasSpell(78683))
+                            pPlayer->AddItem(65661, 1);
+                        
+                        if (!pPlayer->HasItemCount(65662) && !pPlayer->HasSpell(78685))
+                            pPlayer->AddItem(65662, 1);
+                    }
+                    return;
+                }
                 // Flask of Enhancement
                 case 79637:
                 {
@@ -1276,10 +1344,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                         
                         // Judgement of the Just 
                         if (AuraEffect* aurEff = m_caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_PALADIN, 3015, 0))
-                        {
-                            int32 bp0 = aurEff->GetAmount();
-                            m_caster->CastCustomSpell(unitTarget, 68055, &bp0, 0, 0, true);
-                        }
+                            m_caster->CastSpell(unitTarget, 68055, true);
                     }
 
                     uint32 spellId = 0;
@@ -2060,7 +2125,7 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
     if (!orientation && m_targets.GetUnitTarget())
         orientation = m_targets.GetUnitTarget()->GetOrientation();
 
-    if (mapid == unitTarget->GetMapId())
+    if (mapid == unitTarget->GetMapId() && !(m_spellInfo->AttributesEx7 & SPELL_ATTR7_ZONE_TELEPORT))
         unitTarget->NearTeleportTo(x, y, z, orientation, unitTarget == m_caster);
     else if (unitTarget->GetTypeId() == TYPEID_PLAYER)
         unitTarget->ToPlayer()->TeleportTo(mapid, x, y, z, orientation, unitTarget == m_caster ? TELE_TO_SPELL : 0);
@@ -2310,6 +2375,10 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
     // burn x% of target's mana, up to maximum of 2x% of caster's mana (Mana Burn)
     if (m_spellInfo->Id == 8129)
     {
+        if (unitTarget->GetEntry() == 52498 || // Beth'tilac
+            unitTarget->GetEntry() == 52530)   // Alysrazor
+            return;
+
         int32 maxDamage = int32(CalculatePct(m_caster->GetMaxPower(powerType), damage * 2));
         damage = int32(CalculatePct(unitTarget->GetMaxPower(powerType), damage));
         damage = std::min(damage, maxDamage);
@@ -3763,10 +3832,26 @@ void Spell::EffectTeleUnitsFaceCaster(SpellEffIndex effIndex)
 
     float dis = m_spellInfo->Effects[effIndex].CalcRadius(m_caster, NULL, !m_caster->IsHostileTo(unitTarget));
 
-    float fx, fy, fz;
-    m_caster->GetClosePoint(fx, fy, fz, unitTarget->GetObjectSize(), dis);
-
-    unitTarget->NearTeleportTo(fx, fy, fz, -m_caster->GetOrientation(), unitTarget == m_caster);
+    //float fx, fy, fz;
+    //m_caster->GetClosePoint(fx, fy, fz, unitTarget->GetObjectSize(), dis);
+    Position pos;
+    m_caster->GetNearPosition(pos, m_caster->GetObjectSize(), m_caster->GetAngle(unitTarget));
+    
+    // Earthen Vortex, Morchok, Dragon Soul
+    // Prevent dropping into textures
+    switch (m_spellInfo->Id)
+    {
+        case 103821:
+        case 110045:
+        case 110046:
+        case 110047:
+            pos.m_positionX += 8.0f;
+            break;
+        default:
+            break;
+    }
+    
+    unitTarget->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), -m_caster->GetOrientation(), unitTarget == m_caster);
 }
 
 void Spell::EffectLearnSkill(SpellEffIndex effIndex)
@@ -4120,7 +4205,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
     // if pet requested type already exist
     if (OldSummon)
     {
-        if (petentry == 0 || OldSummon->GetEntry() == petentry)
+        if (petentry == 0)
         {
             // pet in corpse state can't be summoned
             if (OldSummon->isDead())
@@ -4230,8 +4315,21 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
         if (HostileReference* forcedVictim = unitTarget->getThreatManager().getOnlineContainer().getReferenceByTarget(m_caster))
             unitTarget->getThreatManager().setCurrentVictim(forcedVictim);
 
-    if (unitTarget->GetTypeId() == TYPEID_UNIT && unitTarget->ToCreature()->IsAIEnabled && !unitTarget->ToCreature()->HasReactState(REACT_PASSIVE))
+    if (unitTarget->GetTypeId() == TYPEID_UNIT && unitTarget->ToCreature()->IsAIEnabled 
+    && (!unitTarget->ToCreature()->HasReactState(REACT_PASSIVE) || unitTarget->IsPetGuardianStuff()))
+    {
+        // taken from case COMMAND_ATTACK:                        //spellid=1792  //ATTACK PetHandler.cpp
+        if (CharmInfo* charmInfo = unitTarget->GetCharmInfo())
+        {
+            unitTarget->AttackStop();
+            charmInfo->SetIsCommandAttack(true);
+            charmInfo->SetIsAtStay(false);
+            charmInfo->SetIsFollowing(false);
+            charmInfo->SetIsCommandFollow(false);
+            charmInfo->SetIsReturning(false);
+        }
         unitTarget->ToCreature()->AI()->AttackStart(m_caster);
+    }
 }
 
 void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
@@ -4387,9 +4485,6 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 if (m_caster->GetTypeId() != TYPEID_PLAYER)
                     break;
 
-                if (m_caster->ToPlayer()->GetComboTarget() == unitTarget->GetGUID())
-                    m_caster->ToPlayer()->AddComboPoints(unitTarget, 1);
-
                 // Fan of Knives - Vile Poisons
                 if (AuraEffect * aur = m_caster->GetDummyAuraEffect(SPELLFAMILY_ROGUE, 857, 2))
                 {
@@ -4443,7 +4538,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                     }
 
                     if (unitTarget->HasAura(8050, m_caster->GetGUID()))
-                        m_caster->SpreadAura(8050, 12, false, 4);
+                        m_caster->SpreadAura(8050, 12, false, 4, unitTarget);
                 }
             }
             break;
@@ -4874,6 +4969,9 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
         {
             switch (m_spellInfo->Id)
             {
+                case 60603:
+                    m_caster->RemoveAura(84896);
+                    break;
                 case 87806: // Seafood Magnifique Feast
                 {
                     m_caster->CastSpell(unitTarget, 87584, true);
@@ -4881,8 +4979,31 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                 }
                 case 87763: // Broiled Dragon Feast
                 {
-                    m_caster->CastSpell(unitTarget, 87544, true);
-                    break;
+                    if (!unitTarget)
+                        return;
+
+                    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        float stat = 0.0f;
+                        uint32 spellId = 0;
+
+                        // there are more spells
+                        // 87570 mastery
+                        // 87571 accuracy
+                        // 87572 crit
+                        // 87573 haste
+                        // 87577 dodge
+                        // 87580 parry
+
+                        if (unitTarget->GetStat(STAT_STRENGTH) > stat) { spellId = 87544; stat = unitTarget->GetStat(STAT_STRENGTH); }
+                        if (unitTarget->GetStat(STAT_AGILITY)  > stat) { spellId = 87566; stat = unitTarget->GetStat(STAT_AGILITY); }
+                        if (unitTarget->GetStat(STAT_INTELLECT)  > stat) { spellId = 87567; stat = unitTarget->GetStat(STAT_INTELLECT); }
+                        if (unitTarget->GetStat(STAT_SPIRIT)  > stat) { spellId = 87568; }
+                        
+                        if (spellId)
+                            unitTarget->CastSpell(unitTarget, spellId, true);
+                    }
+                    return;
                 }
                 // Blood in the Water
                 case 80863:
@@ -6804,7 +6925,22 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
     float speedxy = float(m_spellInfo->Effects[effIndex].MiscValue)/10;
     float speedz = float(damage/10);
     //1891: Disengage
-    m_caster->JumpTo(speedxy, speedz, m_spellInfo->SpellIconID != 1891);
+    switch (m_spellInfo->Id)
+    {
+        case 98928: // Lava Wave dmg, Ragnaros, Firelands
+        case 100292:
+        case 100293:
+        case 100294:
+            if (!unitTarget)
+                break;
+
+            if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+                unitTarget->JumpTo(speedxy, speedz, false);
+            break;
+        default:
+            m_caster->JumpTo(speedxy, speedz, m_spellInfo->SpellIconID != 1891);
+            break;
+    }    
 }
 
 void Spell::EffectQuestClear(SpellEffIndex effIndex)

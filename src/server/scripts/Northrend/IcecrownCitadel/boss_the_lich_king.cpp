@@ -1941,7 +1941,7 @@ class npc_strangulate_vehicle : public CreatureScript
 
                             // Teleport to main tank location, otherwise we might land under the map or inside defile
                             if (Unit* victim = lichKing->getVictim())
-                                summoner->NearTeleportTo(victim->GetPositionX(), victim->GetPositionY(), victim->GetPositionZ() + 1.0f, victim->GetOrientation());
+                                summoner->NearTeleportTo(victim->GetPositionX(), victim->GetPositionY(), victim->GetPositionZ() + 20.0f, victim->GetOrientation());
                             else
                                 DoCast(summoner, SPELL_HARVEST_SOUL_TELEPORT_BACK);
                         }
@@ -2129,6 +2129,7 @@ class npc_terenas_menethil : public CreatureScript
                             break;
                         case EVENT_OUTRO_TERENAS_TALK_2:
                             Talk(SAY_TERENAS_OUTRO_2);
+                            _instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FURY_OF_FROSTMOURNE_NO_REZ);
                             DoCastAOE(SPELL_MASS_RESURRECTION);
                             if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
                             {

@@ -88,6 +88,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Black Plague
             else if (spellproto->Id == 64155)
                 return DIMINISHING_NONE;
+            // Summoning Disorientation
+            else if (spellproto->Id == 32752)
+                return DIMINISHING_NONE;
             break;
         }
         // Event spells
@@ -3029,6 +3032,10 @@ void SpellMgr::LoadSpellCustomAttr()
             case 100214: // Flame Scythe
             case 105069: // Seething Hate
             case 108094: // Seething Hate
+            case 103414: // Stomp
+            case 108571: // Stomp
+            case 109033: // Stomp
+            case 109034: // Stomp
                 // ONLY SPELLS WITH SPELLFAMILY_GENERIC and EFFECT_SCHOOL_DAMAGE
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 break;
@@ -3755,6 +3762,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_200_YARDS);
                 spellInfo->Effects[EFFECT_1].SetRadiusIndex(EFFECT_RADIUS_200_YARDS);
                 break;
+            case 72385: // Boiling Blood (Deathbringer Saurfang)
+            case 72441: // Boiling Blood (Deathbringer Saurfang)
+            case 72442: // Boiling Blood (Deathbringer Saurfang)
+            case 72443: // Boiling Blood (Deathbringer Saurfang)
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_200_YARDS);
+                break;
             case 72769: // Scent of Blood (Deathbringer Saurfang)
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_200_YARDS);
                 // no break
@@ -3807,6 +3820,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 72934: // Blood Infusion Quest Credit (Blood-Queen Lana'thel)
             case 72289: // Frost Infusion Quest Credit (Sindragosa)
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_50000_YARDS); // another missing radius
+                break;
+            case 70232: // Empowered Blood
+            case 70320: // Empowered Blood
+                spellInfo->Effects[EFFECT_0].MiscValue = 127;
+                spellInfo->Effects[EFFECT_0].MiscValueB = 127;
                 break;
             case 71708: // Empowered Flare (Blood Prince Council)
             case 72785: // Empowered Flare (Blood Prince Council)
@@ -3889,8 +3907,14 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_1].SetRadiusIndex(EFFECT_RADIUS_50000_YARDS); // 50000yd
                 spellInfo->Effects[EFFECT_2].SetRadiusIndex(EFFECT_RADIUS_50000_YARDS); // 50000yd
                 break;
+            case 72546: // Harvest Soul
+            case 72597: // Harvest Soul
+            case 72608: // Harvest Soul
+                spellInfo->AttributesEx7 |= SPELL_ATTR7_ZONE_TELEPORT;
+                break;
             case 73655: // Harvest Soul
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
+                spellInfo->AttributesEx7 |= SPELL_ATTR7_ZONE_TELEPORT;
                 break;
             case 73540: // Summon Shadow Trap
                 spellInfo->SetDurationIndex(23); // 90 seconds
@@ -4002,6 +4026,12 @@ void SpellMgr::LoadDbcDataCorrections()
             //
             // ENDOF OCULUS SPELLS
             //
+
+            // World Bosses (cata)
+            // Akma'hat
+            case 93578: // Sands of Time
+                spellInfo->MaxAffectedTargets = 1;
+                break;
             // THRONE OF THE TIDES SPELLS
             //
             // Lady Nazjar
@@ -4211,6 +4241,7 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 106248: // Blade Dance Dummy
                 spellInfo->Effects[0].SetRadiusIndex(28);
+                spellInfo->MaxAffectedTargets = 1;
                 break;
             case 104994: // Blade Dance dmg
                 spellInfo->Effects[0].SetRadiusIndex(17);
@@ -5358,9 +5389,7 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->MaxAffectedTargets = 2;
                 break;
             case 99254: // Torment visual
-                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
                 spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
-                spellInfo->Effects[EFFECT_0].Amplitude = 0;
                 break;
             case 99256: // Torment
             case 100230:
@@ -6164,6 +6193,65 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
             // ENDOF WELL OF ETERNITY SPELLS
+            //
+            // DRAGON SOUL SPELLS
+            //
+            case 109247:
+                spellInfo->Effects[EFFECT_0].BasePoints = 0;
+                spellInfo->Effects[EFFECT_1].BasePoints = 0;
+                break;
+            // Flood aoe
+            case 107796:
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            // Flood channel
+            case 107791:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            // Boulder Smash aoe
+            case 107596:
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 108220: // Deep Corruption
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
+                break;
+            // Morchok
+            case 103821: // Earthen Vortex
+            case 110047:
+            case 110046:
+            case 110045:
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_STUN;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_60_YARDS);
+                spellInfo->Effects[EFFECT_1].SetRadiusIndex(EFFECT_RADIUS_60_YARDS);
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(EFFECT_RADIUS_60_YARDS);
+                break;
+            case 103178: // Earths Vengeance dmg
+                spellInfo->SetDurationIndex(18);
+                break;
+            case 103534: // Danger
+            case 103536: // Warning
+            case 103541: // Safe
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
+                break;
+            // Yoe'sahj The Unsleeping
+            case 105420: // Color Combine 1
+            case 105435: // Color Combine 2
+            case 105436: // Color Combine 3
+            case 105437: // Color Combine 4
+            case 105439: // Color Combine 5
+            case 105440: // Color Combine 6
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_DEST_AREA_ENTRY;
+                break;
+            case 105636: // Corrupted Minions aura
+            case 109558:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                break;
+            case 105534: // Mana Void dummy
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                break;
+            // ENDOF DRAGON SOUL SPELLS
+            //
             // Camouflage
             case 80325:
                 spellInfo->Effects[EFFECT_1].Effect = 0;
@@ -6832,6 +6920,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 73920: // Healing Rain
                 spellInfo->AttributesEx5 &= ~SPELL_ATTR5_START_PERIODIC_AT_APPLY;
                 break;
+            case 51699: // Honor Among Thieves
             case 6770:  // Sap
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_CANT_TRIGGER_PROC;
                 break;
@@ -6930,9 +7019,58 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
                 spellInfo->SchoolMask = SPELL_SCHOOL_MASK_SHADOW;
                 break;
-            // Dragon's Breath
-            case 31661:
-                spellInfo->ProcFlags |= PROC_FLAG_TAKEN_PERIODIC;
+            // Scarab Storm
+            case 92146:
+                spellInfo->AttributesEx4 |= SPELL_ATTR4_NOT_USABLE_IN_ARENA_OR_RATED_BG;
+                break;
+            // Chain Lightning Elemental Overload proc
+            case 45297:
+                spellInfo->MaxLevel = spellInfo->SpellLevel;
+                break;
+            // Shard of the Defiler - Echo of Archimonde
+            case 21079:
+                spellInfo->Effects[EFFECT_1].Effect = 0;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = 0;
+                spellInfo->Effects[EFFECT_2].Effect = 0;
+                spellInfo->Effects[EFFECT_2].ApplyAuraName = 0;
+                break;
+            // Isle of Conquest Gunship Portal
+            case 66630:
+            case 66637:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                break;
+            // Starfall
+            case 48505:
+                spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+                break;
+            case 45671: // Midsummer - Juggle Torch (Catch, Quest)
+                spellInfo->AttributesEx3 &= ~SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+                break;
+            case 45907: // Midsummer - Torch Target Picker
+                spellInfo->AttributesEx &= ~SPELL_ATTR1_CANT_TARGET_SELF;
+                break;
+            case 45819: // Midsummer - Throw Torch
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_DEST_AREA_ENTRY;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(15);
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 46363: // Midsummer - Beam Attack against Ahune
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_SRC_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_TARGET_ANY;
+                break;
+            // Midsummer - Return Torch
+            case 45280:
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
+                break;
+            // Turkey Vengeance
+            case 25281:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            // Ram
+            case 60206:
+                spellInfo->Effects[EFFECT_2].SetRadiusIndex(EFFECT_RADIUS_10_YARDS);
                 break;
             default:
                 break;

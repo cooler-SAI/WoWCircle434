@@ -914,6 +914,8 @@ Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_rep
     {
         prohibited[i] = prohibited_struct();
     }
+
+    m_emote = 0;
 }
 
 Player::~Player()
@@ -2735,7 +2737,7 @@ void Player::Regenerate(Powers power)
             m_powerFraction[powerIndex] = addvalue - integerValue;
     }
 
-    if (m_regenTimerCount >= 2000)
+    if (m_regenTimerCount >= 2000 || HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD))
         SetPower(power, curValue);
     else
         UpdateUInt32Value(UNIT_FIELD_POWER1 + powerIndex, curValue);
@@ -20756,7 +20758,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         for (int i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
         {
             if (iece->RequiredItem[i])
-                DestroyItemCount(iece->RequiredItem[i], iece->RequiredItemCount[i], true);
+                DestroyItemCount(iece->RequiredItem[i], iece->RequiredItemCount[i] * (count / pProto->BuyCount), true);
         }
 
         for (int i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
@@ -20766,7 +20768,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
                 continue;
 
             if (iece->RequiredCurrency[i])
-                ModifyCurrency(iece->RequiredCurrency[i], -int32(iece->RequiredCurrencyCount[i]), true, true);
+                ModifyCurrency(iece->RequiredCurrency[i], -int32(iece->RequiredCurrencyCount[i]  * (count / pProto->BuyCount)), true, true);
         }
     }
 
@@ -20844,6 +20846,12 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
     if (!crItem || crItem->item != currency || crItem->Type != ITEM_VENDOR_TYPE_CURRENCY)
     {
         SendBuyError(BUY_ERR_CANT_FIND_ITEM, vendorGuid, currency);
+        return false;
+    }
+
+    if (GetCurrency(currency, false) + count > GetCurrencyWeekCap(currency, false))
+    {
+        SendBuyError(BUY_ERR_CANT_CARRY_MORE, vendorGuid, currency);
         return false;
     }
 
@@ -20971,7 +20979,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
     if (crItem->ExtendedCost)
     {
         // Can only buy full stacks for extended cost
-        if (pProto->BuyCount != count)
+        if (pProto->BuyCount > 1 && pProto->BuyCount != count)
         {
             SendEquipError(EQUIP_ERR_CANT_BUY_QUANTITY, NULL, NULL);
             return false;
@@ -21014,7 +21022,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
                     return false;
                 }
             }
-            else if (!HasCurrency(iece->RequiredCurrency[i], (iece->RequiredCurrencyCount[i] * count)))
+            else if (!HasCurrency(iece->RequiredCurrency[i], (iece->RequiredCurrencyCount[i] * count) / pProto->BuyCount))
             {
                 SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL);
                 return false;
@@ -21370,10 +21378,21 @@ void Player::UpdatePotionCooldown(Spell* spell)
     {
         // spell/item pair let set proper cooldown (except not existed charged spell cooldown spellmods for potions)
         if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(m_lastPotionId))
+        {
+            bool found = false;
             for (uint8 idx = 0; idx < MAX_ITEM_SPELLS; ++idx)
                 if (proto->Spells[idx].SpellId && proto->Spells[idx].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
                     if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[idx].SpellId))
+                    {
                         SendCooldownEvent(spellInfo, m_lastPotionId);
+                        found = true;
+                    }
+            // if not - used by Spinal Healing Injector
+            if (!found)
+            {
+                SendCooldownEvent(sSpellMgr->GetSpellInfo(82184), m_lastPotionId);
+            }
+        }
     }
     // from spell cases (m_lastPotionId set in Spell::SendSpellCooldown)
     else
@@ -22039,6 +22058,24 @@ void Player::SendInitialPacketsBeforeAddToMap()
     // SMSG_SET_PCT_SPELL_MODIFIER
     // SMSG_SET_FLAT_SPELL_MODIFIER
     // SMSG_UPDATE_AURA_DURATION
+
+    data.Initialize(SMSG_WORLD_SERVER_INFO, 1 + 1 + 4 + 4);
+    data.WriteByteMask(0);                                          // HasRestrictedLevel
+    data.WriteByteMask(0);                                          // HasRestrictedMoney
+    data.WriteByteMask(0);                                          // IneligibleForLoot
+    //if (IneligibleForLoot)
+    //    data << uint32(0);                                        // EncounterMask
+
+    data << uint8(0);                                               // IsOnTournamentRealm
+    //if (HasRestrictedMoney)
+    //    data << uint32(100000);                                   // RestrictedMoney (starter accounts)
+    //if (HasRestrictedLevel)
+    //    data << uint32(20);                                       // RestrictedLevel (starter accounts)
+
+    data << uint32(sWorld->GetNextWeeklyQuestsResetTime() - WEEK);  // LastWeeklyReset (not instance reset)
+    data << uint32(GetMap()->GetDifficulty());
+    GetSession()->SendPacket(&data); 
+
 
     SendTalentsInfoData(false);
 
@@ -23029,6 +23066,9 @@ bool Player::IsAtGroupRewardDistance(WorldObject const* pRewardSource) const
     if (player->GetMapId() != pRewardSource->GetMapId() || player->GetInstanceId() != pRewardSource->GetInstanceId())
         return false;
 
+    if (GetMap()->IsRaid())
+        return true;
+
     return pRewardSource->GetDistance(player) <= sWorld->getFloatConfig(CONFIG_GROUP_XP_DISTANCE);
 }
 
@@ -23089,8 +23129,8 @@ void Player::SetClientControl(Unit* target, uint8 allowMove)
     data << uint8(allowMove);
     GetSession()->SendPacket(&data);
 
-    //if (Player* player = target->ToPlayer())
-    //    player->SetRooted(!allowMove);
+    if (Player* player = target->ToPlayer())
+        player->SetRooted(!allowMove);
 
     if (target == this)
         SetMover(this);
@@ -23772,9 +23812,9 @@ void Player::RestoreBaseRune(uint8 index)
     uint32 spell_id = m_runes.runes[index].spell_id;
     ConvertRune(index, GetBaseRune(index));
     SetRuneConvertSpell(index, 0);
-    // Only Blood Tap can be removed
-    if (spell_id == 45529)
-        RemoveAura(45529);
+    
+    if (spell_id == 45529 || spell_id == 105582)
+        RemoveAura(spell_id);
 }
 
 void Player::ConvertRune(uint8 index, RuneType newType)
@@ -23941,7 +23981,9 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
             }
         }
 
-        if (!canLoot && GetMap()->IsRaidOrHeroicDungeon() && proto && proto->GetMaxStackSize() == 1 && proto->Class != ITEM_CLASS_QUEST)
+        if (!canLoot && GetMap()->IsRaidOrHeroicDungeon() && 
+            proto && proto->GetMaxStackSize() == 1 && 
+            proto->Class != ITEM_CLASS_QUEST && proto->Class != ITEM_CLASS_MISCELLANEOUS)
         {
             SendEquipError(EQUIP_ERR_NOT_EQUIPPABLE, NULL, NULL, item->itemid);
             return;
@@ -26507,4 +26549,10 @@ void Player::SendPetTameResult(PetTameResult result)
     WorldPacket data(SMSG_PET_TAME_FAILURE, 4);
     data << uint32(result); // The result
     GetSession()->SendPacket(&data);
+}
+
+void Player::SetEmoteState(uint32 anim_id)
+{
+    HandleEmoteCommand(anim_id);
+    m_emote = anim_id;
 }

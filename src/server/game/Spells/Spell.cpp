@@ -2866,6 +2866,12 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             if (unit->GetCharmerOrOwnerPlayerOrPlayerItself())
                 unit->IncrDiminishing(DIMINISHING_DEEP_FREEZE);
         }
+        // Holy Wrath diminishing problem
+        else if (m_spellInfo->Id == 2812)
+        {
+            if ((effectMask & (1 << EFFECT_1)) == 0)
+                m_diminishGroup = DIMINISHING_NONE;
+        }
         m_diminishLevel = DiminishingLevels(std::min(m_diminishLevel + unit->GetDiminishing(m_diminishGroup), int(DIMINISHING_LEVEL_IMMUNE)));
         DiminishingReturnsType type = GetDiminishingReturnsGroupType(m_diminishGroup);
         // Increase Diminishing on unit, current informations for actually casts will use values above
@@ -3027,7 +3033,7 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
     // this is executed after spell proc spells on target hit
     // spells are triggered for each hit spell target
     // info confirmed with retail sniffs of permafrost and shadow weaving
-    if (!m_hitTriggerSpells.empty())
+    if (!m_hitTriggerSpells.empty() && unit != m_caster)
     {
         int _duration = 0;
         for (HitTriggerSpellList::const_iterator i = m_hitTriggerSpells.begin(); i != m_hitTriggerSpells.end(); ++i)
@@ -6111,6 +6117,9 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_caster->IsInDisallowedMountForm())
                     return SPELL_FAILED_NOT_SHAPESHIFT;
 
+                if (m_caster->HasAuraType(SPELL_AURA_TRANSFORM))
+                    return SPELL_FAILED_CONFUSED;
+
                 break;
             }
             case SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS:
@@ -6332,6 +6341,10 @@ SpellCastResult Spell::CheckCasterAuras() const
             {
                 if ((*i)->GetSpellInfo()->GetAllEffectsMechanicMask() && !((*i)->GetSpellInfo()->GetAllEffectsMechanicMask() & (1<<MECHANIC_STUN)))
                 {
+                    // Sap & Hand of Freedom hack
+                    if ((*i)->GetSpellInfo()->Id == 6770 && m_spellInfo->Id == 1044)
+                        continue;
+
                     foundNotStun = true;
                     break;
                 }
@@ -7840,6 +7853,10 @@ bool Spell::CanProcOnTarget(Unit *target) const
 
     // swd for priest, for other it does bugs
     if (m_spellInfo->SpellFamilyName != SPELLFAMILY_PRIEST && !m_spellInfo->IsPositive() && m_caster->IsFriendlyTo(target))
+        return false;
+
+    // Distract can't be proced
+    if (m_spellInfo->HasEffect(SPELL_EFFECT_DISTRACT))
         return false;
 
     return true;

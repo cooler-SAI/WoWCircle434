@@ -1,6 +1,50 @@
 #ifndef DEF_DRAGONSOUL_H
 #define DEF_DRAGONSOUL_H
-
+// 109247 - ds neft
+// 108202 - temple teleport
+// 108263 - ship teleport
+// 106094 - eye teleport +
+// 109835 - summit teleport +
+// 106054 - spine teleport
+// 106093 - summit teleport aoe
+// 106092 - temple teleport aoe
 #define DSScriptName "instance_dragon_soul"
+
+enum Datas
+{
+    DATA_MORCHOK    = 0,
+    DATA_YORSAHJ    = 1,
+    DATA_KOHCROM    = 10,
+};
+
+enum CreatureIds
+{
+    NPC_MORCHOK                     = 55265,
+    NPC_KOHCROM                     = 57773,
+    NPC_YORSAHJ                     = 55312,
+
+    NPC_NETHESTRASZ                 = 57287, // teleport upstairs
+    NPC_EIENDORMI                   = 57288, // teleport to Yor'sahj
+    NPC_VALEERA                     = 57289, // teleport to Zon'ozz
+    NPC_TRAVEL_TO_WYRMREST_TEMPLE   = 57328, //
+    NPC_DASNURIMI                   = 58153, // trader
+};
+
+enum GameObjects
+{
+    GO_INNER_WALL = 209596,
+};
+
+enum SharedSpells
+{
+    SPELL_TELEPORT_VISUAL_ACTIVE    = 108203,
+    SPELL_TELEPORT_VISUAL_DISABLED  = 108227,
+};
+
+const Position teleportPos[2] =
+{
+    {-1779.503662f, -2393.439941f, 45.61f, 3.20f},  // Wyrmrest Temple
+    {-1854.233154f, -3068.658691f, -178.34f, 0.46f} // Yor'sahj The Unsleeping
+};
 
 #endif

@@ -270,8 +270,8 @@ class Group
         bool isRollLootActive() const;
         void SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll &r);
         void SendLootStartRollToPlayer(uint32 countDown, uint32 mapId, Player* p, bool canNeed, Roll const& r);
-        void SendLootRoll(uint64 SourceGuid, uint64 TargetGuid, uint8 RollNumber, uint8 RollType, const Roll &r);
-        void SendLootRollWon(uint64 SourceGuid, uint64 TargetGuid, uint8 RollNumber, uint8 RollType, const Roll &r);
+        void SendLootRoll(uint64 SourceGuid, uint64 TargetGuid, uint32 RollNumber, uint8 RollType, const Roll &r);
+        void SendLootRollWon(uint64 SourceGuid, uint64 TargetGuid, uint32 RollNumber, uint8 RollType, const Roll &r);
         void SendLootAllPassed(Roll const& roll);
         void SendLooter(Creature* creature, Player* pLooter);
         void GroupLoot(Loot* loot, WorldObject* pLootedObject);

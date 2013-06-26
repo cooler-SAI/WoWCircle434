@@ -27,9 +27,6 @@ class on_duel : public PlayerScript
             case POWER_HOLY_POWER:
                 player1->SetPower(POWER_HOLY_POWER, 0);
             break;
-            case POWER_FOCUS:
-                player1->SetPower(POWER_FOCUS, 0);
-            break;
         }
 
         switch(player2->getPowerType())
@@ -49,8 +46,6 @@ class on_duel : public PlayerScript
             case POWER_HOLY_POWER:
                 player1->SetPower(POWER_HOLY_POWER, 0);
             break;
-            case POWER_FOCUS:
-                player1->SetPower(POWER_FOCUS, 0);
         }
     }
 

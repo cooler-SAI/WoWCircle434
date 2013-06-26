@@ -96,7 +96,11 @@ class boss_grand_vizier_ertan : public CreatureScript
                 instance->SetBossState(DATA_ERTAN, IN_PROGRESS);
             }    
 
-            void AttackStart(Unit* who){}
+            void AttackStart(Unit* who)
+            {
+                if (who)
+                    me->Attack(who, false);
+            }
 
             void KilledUnit(Unit* who)
             {
@@ -116,7 +120,7 @@ class boss_grand_vizier_ertan : public CreatureScript
 
                 events.Update(diff);
 
-                while (uint32 eventId = events.ExecuteEvent())
+                if (uint32 eventId = events.ExecuteEvent())
                 {
                     switch (eventId)
                     {

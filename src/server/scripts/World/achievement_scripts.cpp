@@ -324,7 +324,10 @@ class AchievementRewardCheck : public PlayerScript
             std::vector<uint32> check_ids;
             check_ids.push_back(5876); // Pulling Zoo
             check_ids.push_back(5877); // Menagerie
-            
+            check_ids.push_back(5866); // The Molten Front Offensive
+            check_ids.push_back(5449); // Rock Lover
+            check_ids.push_back(5860); // The 'Unbeatable?' Pterodactyl: BEATEN.
+
             // give reward item's spell for player if he has earned achievement before fixes
             
             for (std::vector<uint32>::const_iterator itr = check_ids.begin(); itr != check_ids.end(); ++itr)
@@ -332,15 +335,25 @@ class AchievementRewardCheck : public PlayerScript
                 if (!pPlayer->HasAchieved((*itr)))
                     continue;
 
-                    uint32 spellId = 0;
-                    if ((*itr) == 5876)
-                        spellId = 100970;
-                    else if ((*itr) == 5877)
-                        spellId = 101424;
+                uint32 spellId1 = 0;
+                uint32 spellId2 = 0;
+                switch ((*itr))
+                {
+                    case 5876: spellId1 = 100970; break; // Pulling Zoo
+                    case 5877: spellId1 = 101424; break; // Menagerie
+                    case 5866: spellId1 = 97359; break; // The Molten Front Offensive
+                    case 5449: spellId1 = 84492; break; // Rock Lover
+                    case 5860: spellId1 = 78683; spellId2 = 78685; break;    // The 'Unbeatable?' Pterodactyl: BEATEN.
+                    default: break;
+                }
 
-                    if (spellId)
-                        if (!pPlayer->HasSpell(spellId))
-                            pPlayer->learnSpell(spellId, false);
+                if (spellId1)
+                    if (!pPlayer->HasSpell(spellId1))
+                        pPlayer->learnSpell(spellId1, false);
+
+                 if (spellId2)
+                    if (!pPlayer->HasSpell(spellId2))
+                        pPlayer->learnSpell(spellId2, false);
             }
         }
 };

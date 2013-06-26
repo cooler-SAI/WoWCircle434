@@ -688,6 +688,9 @@ void WorldSession::HandleEmoteOpcode(WorldPacket & recvData)
 
     uint32 emote;
     recvData >> emote;
+    if (emote == 0)
+        return;
+
     sScriptMgr->OnPlayerEmote(GetPlayer(), emote);
     GetPlayer()->HandleEmoteCommand(emote);
 }
@@ -753,6 +756,8 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket & recvData)
 
     switch (emote_anim)
     {
+        case 483:   // map emote
+            break;
         case EMOTE_STATE_SLEEP:
         case EMOTE_STATE_SIT:
         case EMOTE_STATE_KNEEL:
@@ -762,7 +767,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket & recvData)
             // Only allow text-emotes for "dead" entities (feign death included)
             if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
                 break;
-             GetPlayer()->HandleEmoteCommand(emote_anim);
+             GetPlayer()->SetEmoteState(emote_anim);
              break;
     }
 

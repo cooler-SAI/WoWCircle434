@@ -622,11 +622,46 @@ int32 ArenaTeam::GetMatchmakerRatingMod(uint32 ownRating, uint32 opponentRating,
     return (int32)ceil(mod);
 }
 
-int32 ArenaTeam::GetRatingMod(uint32 ownRating, uint32 opponentRating, bool won /*, float confidence_factor*/)
+int32 ArenaTeam::GetRatingMod(uint32 ownRating, uint32 opponentRating, uint32 ownMmr, bool won /*, float confidence_factor*/)
 {
+    float chance = GetChanceAgainst(ownMmr, opponentRating);
+    float won_mod = (won) ? 1.0f : 0.0f;
+
+    const int32 min_change = -96;
+    const int32 max_change = 96;   
+    
+    float mod;
+
+    int32 _diff = (won ? (ownMmr - ownRating) : (ownRating - ownMmr));
+    if (_diff > 50)
+    {
+        if (_diff > 300)
+            mod = 96.0f;
+        else
+            mod = (14.0f + (82.0f * (float(abs(_diff)) - 50.0f) / 250.0f));
+    }
+    else if (_diff < -50)
+    {
+        if (_diff < -300)
+            mod = 1;
+        else
+            mod = (14.0f - (14.0f * (float(abs(_diff)) - 50.0f) / 250.0f));
+    }
+    else
+        mod = 14.0f;
+
+    mod *= 2;
+    mod *= (won_mod - chance);
+
+    if (mod > max_change)
+        mod = max_change;
+    if (mod < min_change)
+        mod = min_change;
+        
+    return (int32)ceil(mod);
     // 'Chance' calculation - to beat the opponent
     // This is a simulation. Not much info on how it really works
-    float chance = GetChanceAgainst(ownRating, opponentRating);
+    /*float chance = GetChanceAgainst(ownRating, opponentRating);
     float won_mod = (won) ? 1.0f : 0.0f;
 
     // Calculate the rating modification
@@ -641,9 +676,7 @@ int32 ArenaTeam::GetRatingMod(uint32 ownRating, uint32 opponentRating, bool won 
             mod = (24.0f + (24.0f * (1300.0f - float(ownRating)) / 300.0f)) * (won_mod - chance);
     }
     else
-        mod = 24.0f * (won_mod - chance);
-
-    return (int32)ceil(mod);
+        mod = 24.0f * (won_mod - chance);*/
 }
 
 void ArenaTeam::FinishGame(int32 mod)
@@ -682,7 +715,7 @@ int32 ArenaTeam::WonAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32
     int32 mod = GetMatchmakerRatingMod(Own_MMRating, Opponent_MMRating, true);
 
     // Change in Team Rating
-    rating_change = GetRatingMod(Stats.Rating, Opponent_MMRating, true);
+    rating_change = GetRatingMod(Stats.Rating, Opponent_MMRating, Own_MMRating, true);
 
     // Modify the team stats accordingly
     FinishGame(rating_change);
@@ -702,7 +735,7 @@ int32 ArenaTeam::LostAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int3
     int32 mod = GetMatchmakerRatingMod(Own_MMRating, Opponent_MMRating, false);
 
     // Change in Team Rating
-    rating_change = GetRatingMod(Stats.Rating, Opponent_MMRating, false);
+    rating_change = GetRatingMod(Stats.Rating, Opponent_MMRating, Own_MMRating, false);
 
     // Modify the team stats accordingly
     FinishGame(rating_change);
@@ -719,7 +752,7 @@ void ArenaTeam::MemberLost(Player* player, uint32 againstMatchmakerRating, int32
         if (itr->Guid == player->GetGUID())
         {
             // Update personal rating
-            int32 mod = GetRatingMod(itr->PersonalRating, againstMatchmakerRating, false);
+            int32 mod = GetRatingMod(itr->PersonalRating, againstMatchmakerRating, itr->MatchMakerRating, false);
             itr->ModifyPersonalRating(player, mod, GetType());
 
             // Update matchmaker rating
@@ -745,7 +778,7 @@ void ArenaTeam::OfflineMemberLost(uint64 guid, uint32 againstMatchmakerRating, i
         if (itr->Guid == guid)
         {
             // update personal rating
-            int32 mod = GetRatingMod(itr->PersonalRating, againstMatchmakerRating, false);
+            int32 mod = GetRatingMod(itr->PersonalRating, againstMatchmakerRating, itr->MatchMakerRating, false);
             itr->ModifyPersonalRating(NULL, mod, GetType());
 
             // update matchmaker rating
@@ -767,7 +800,7 @@ void ArenaTeam::MemberWon(Player* player, uint32 againstMatchmakerRating, int32 
         if (itr->Guid == player->GetGUID())
         {
             // update personal rating
-            int32 mod = GetRatingMod(itr->PersonalRating, againstMatchmakerRating, true);
+            int32 mod = GetRatingMod(itr->PersonalRating, againstMatchmakerRating, itr->MatchMakerRating, true);
             itr->ModifyPersonalRating(player, mod, GetType());
 
             // update matchmaker rating

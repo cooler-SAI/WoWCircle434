@@ -212,19 +212,25 @@ class boss_blood_council_controller : public CreatureScript
                 if (Creature* keleseth = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_KELESETH_GUID)))
                 {
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, keleseth);
-                    DoZoneInCombat(keleseth);
+                    keleseth->SetInCombatWithZone();
+                    if (who && !keleseth->isInCombat())
+                        keleseth->AI()->EnterCombat(who);
                 }
 
                 if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_TALDARAM_GUID)))
                 {
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, taldaram);
-                    DoZoneInCombat(taldaram);
+                    taldaram->SetInCombatWithZone();
+                    if (who && !taldaram->isInCombat())
+                        taldaram->AI()->EnterCombat(who);
                 }
 
                 if (Creature* valanar = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PRINCE_VALANAR_GUID)))
                 {
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, valanar);
-                    DoZoneInCombat(valanar);
+                    valanar->SetInCombatWithZone();
+                    if (who && !valanar->isInCombat())
+                        valanar->AI()->EnterCombat(who);
                 }
 
                 events.ScheduleEvent(EVENT_INVOCATION_OF_BLOOD, 46500);

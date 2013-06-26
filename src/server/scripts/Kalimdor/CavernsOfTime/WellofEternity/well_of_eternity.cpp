@@ -457,8 +457,7 @@ class npc_well_of_eternity_legion_demon : public CreatureScript
                 if (!PlayerList.isEmpty())
                     for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                         if (Player* pPlayer = i->getSource())
-                            if (me->GetDistance2d(pPlayer) <= 50.0f &&
-                                pPlayer->GetQuestStatus(QUEST_DOCUMENTING_THE_TIMEWAYS) == QUEST_STATUS_INCOMPLETE)
+                            if (me->GetDistance(pPlayer) <= 50.0f && pPlayer->GetQuestStatus(QUEST_DOCUMENTING_THE_TIMEWAYS) == QUEST_STATUS_INCOMPLETE)
                                 pPlayer->CastSpell(me, SPELL_ARCHIVED_DEMON_1, true);
             }
 
@@ -895,6 +894,11 @@ class npc_well_of_eternity_royal_handmaiden : public CreatureScript
                 events.ScheduleEvent(EVENT_SWEET_LULLABY, urand(7000, 12000));
             }
 
+            void SpellHit(Unit* who, const SpellInfo* spellInfo)
+            {
+                if (spellInfo->Id == SPELL_ARCHIVED_HANDMAIDEN_1)
+                    DoCast(who, SPELL_ARCHIVED_HANDMAIDEN_2, true);
+            }
 
             void JustDied(Unit* /*killer*/)
             {

@@ -1283,6 +1283,14 @@ bool Item::HasSpells() const
     return false;
 }
 
+bool Item::IsPotion() const
+{
+    // hack for Spinal Healing Injector
+    if (GetEnchantmentId(ENGINEERING_ENCHANTMENT_SLOT) == 4182)
+        return true;
+
+    return GetTemplate()->IsPotion();
+}
 // used by mail items, transmog cost, stationeryinfo and others
 uint32 Item::GetSellPrice(ItemTemplate const* proto, bool& normalSellPrice)
 {

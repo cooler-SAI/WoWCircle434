@@ -46,6 +46,7 @@ enum GameObjectIds
 enum QuestIds
 {
     QUEST_DOCUMENTING_THE_TIMEWAYS  = 30104,
+    QUEST_IN_UNENDING_NUMBERS       = 30099,
 };
 
 enum QuestSpells

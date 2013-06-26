@@ -1439,6 +1439,33 @@ bool BattlegroundMgr::IsBGWeekend(BattlegroundTypeId bgTypeId)
     return IsHolidayActive(BGTypeToWeekendHolidayId(bgTypeId));
 }
 
+
+uint32 BattlegroundMgr::GetBgQuestId(BattlegroundTypeId bgTypeId, uint32 faction)
+{
+    uint32 questId = 0;
+
+    switch (bgTypeId)
+    {
+        case BATTLEGROUND_AB:
+            questId = (faction == ALLIANCE) ? QUEST_CALL_TO_ARMS_AB_A : QUEST_CALL_TO_ARMS_AB_H;
+            break;
+        case BATTLEGROUND_AV:
+            questId = (faction == ALLIANCE) ? QUEST_CALL_TO_ARMS_AV_A : QUEST_CALL_TO_ARMS_AV_H;
+            break;
+        case BATTLEGROUND_EY: 
+            questId = (faction == ALLIANCE) ? QUEST_CALL_TO_ARMS_EY_A : QUEST_CALL_TO_ARMS_EY_H;
+            break;
+        case BATTLEGROUND_WS:
+            questId = (faction == ALLIANCE) ? QUEST_CALL_TO_ARMS_WS_A : QUEST_CALL_TO_ARMS_WS_H;
+            break;
+        default:
+            return 0;
+    }
+
+    return questId;
+}
+
+
 BattlegroundTypeId BattlegroundMgr::GetRandomBG(BattlegroundTypeId bgTypeId)
 {
     uint32 weight = 0;

@@ -124,6 +124,13 @@ class boss_baleroc : public CreatureScript
 
             void EnterCombat(Unit* attacker)
             {
+                if (!instance->CheckRequiredBosses(DATA_BALEROC, attacker->ToPlayer()))
+                {
+                    EnterEvadeMode();
+                    instance->DoNearTeleportPlayers(FLEntrancePos);
+                    return;
+                }
+                
                 Talk(SAY_AGGRO);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BLAZE_OF_GLORY);
                 events.ScheduleEvent(EVENT_BERSERK, 6 * MINUTE * IN_MILLISECONDS);

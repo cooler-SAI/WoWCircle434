@@ -68,9 +68,9 @@ bool BattlegroundSA::SetupBattleground()
 
 bool BattlegroundSA::ResetObjs()
 {
-    for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+    /*for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
         if (Player* player = ObjectAccessor::FindPlayer(itr->first))
-            SendTransportsRemove(player);
+            SendTransportsRemove(player);*/
 
     uint32 atF = BG_SA_Factions[Attackers];
     uint32 defF = BG_SA_Factions[Attackers ? TEAM_ALLIANCE : TEAM_HORDE];
@@ -93,7 +93,7 @@ bool BattlegroundSA::ResetObjs()
             return false;
     }
 
-    for (uint8 i = BG_SA_BOAT_ONE; i <= BG_SA_BOAT_TWO; i++)
+    /*for (uint8 i = BG_SA_BOAT_ONE; i <= BG_SA_BOAT_TWO; i++)
     {
         uint32 boatid = 0;
         switch (i)
@@ -112,7 +112,7 @@ bool BattlegroundSA::ResetObjs()
           BG_SA_ObjSpawnlocs[i][2]+(Attackers ? -3.750f: 0),
           BG_SA_ObjSpawnlocs[i][3], 0, 0, 0, 0, RESPAWN_ONE_DAY))
             return false;
-    }
+    }*/
 
     for (uint8 i = BG_SA_SIGIL_1; i <= BG_SA_LEFT_FLAGPOLE; i++)
     {
@@ -124,10 +124,10 @@ bool BattlegroundSA::ResetObjs()
     }
 
     // MAD props for Kiper for discovering those values - 4 hours of his work.
-    GetBGObject(BG_SA_BOAT_ONE)->UpdateRotationFields(1.0f, 0.0002f);
-    GetBGObject(BG_SA_BOAT_TWO)->UpdateRotationFields(1.0f, 0.00001f);
-    SpawnBGObject(BG_SA_BOAT_ONE, RESPAWN_IMMEDIATELY);
-    SpawnBGObject(BG_SA_BOAT_TWO, RESPAWN_IMMEDIATELY);
+    //GetBGObject(BG_SA_BOAT_ONE)->UpdateRotationFields(1.0f, 0.0002f);
+    //GetBGObject(BG_SA_BOAT_TWO)->UpdateRotationFields(1.0f, 0.00001f);
+    //SpawnBGObject(BG_SA_BOAT_ONE, RESPAWN_IMMEDIATELY);
+    //SpawnBGObject(BG_SA_BOAT_TWO, RESPAWN_IMMEDIATELY);
 
     //Cannons and demolishers - NPCs are spawned
     //By capturing GYs.
@@ -165,10 +165,7 @@ bool BattlegroundSA::ResetObjs()
         sg = sWorldSafeLocsStore.LookupEntry(BG_SA_GYEntries[i]);
 
         if (!sg)
-        {
-            sLog->outError(LOG_FILTER_BATTLEGROUND, "SOTA: Can't find GY entry %u", BG_SA_GYEntries[i]);
             return false;
-        }
 
         if (i == BG_SA_BEACH_GY)
         {
@@ -178,8 +175,7 @@ bool BattlegroundSA::ResetObjs()
         else
         {
             GraveyardStatus[i] = ((Attackers == TEAM_HORDE)? TEAM_ALLIANCE : TEAM_HORDE);
-            if (!AddSpiritGuide(i + BG_SA_MAXNPC, sg->x, sg->y, sg->z, BG_SA_GYOrientation[i], ((Attackers == TEAM_HORDE)? ALLIANCE : HORDE)))
-                sLog->outError(LOG_FILTER_BATTLEGROUND, "SOTA: couldn't spawn GY: %u", i);
+            AddSpiritGuide(i + BG_SA_MAXNPC, sg->x, sg->y, sg->z, BG_SA_GYOrientation[i], ((Attackers == TEAM_HORDE)? ALLIANCE : HORDE));
         }
     }
 
@@ -247,10 +243,10 @@ bool BattlegroundSA::ResetObjs()
     UpdateWorldState(BG_SA_YELLOW_GATEWS, 1);
     UpdateWorldState(BG_SA_ANCIENT_GATEWS, 1);
 
-    for (int i = BG_SA_BOAT_ONE; i <= BG_SA_BOAT_TWO; i++)
+    /*for (int i = BG_SA_BOAT_ONE; i <= BG_SA_BOAT_TWO; i++)
         for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(itr->first))
-                SendTransportInit(player);
+                SendTransportInit(player);*/
 
     // set status manually so preparation is cast correctly in 2nd round too
     SetStatus(STATUS_WAIT_JOIN);
@@ -264,9 +260,23 @@ void BattlegroundSA::StartShips()
     if (ShipsStarted)
         return;
 
-    DoorOpen(BG_SA_BOAT_ONE);
+    /*DoorOpen(BG_SA_BOAT_ONE);
     DoorOpen(BG_SA_BOAT_TWO);
 
+    for (int i = BG_SA_BOAT_ONE; i <= BG_SA_BOAT_TWO; i++)
+    {
+        for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+        {
+            if (Player* p = ObjectAccessor::FindPlayer(itr->first))
+            {
+                UpdateData data(GetMapId());
+                WorldPacket pkt;
+                GetBGObject(i)->BuildValuesUpdateBlockForPlayer(&data, p);
+                data.BuildPacket(&pkt);
+                p->GetSession()->SendPacket(&pkt);
+            }
+        }
+    }*/
     ShipsStarted = true;
 }
 
@@ -450,6 +460,7 @@ void BattlegroundSA::AddPlayer(Player* player)
             player->CastSpell(player, 12438, true);//Without this player falls before boat loads...
 
             player->TeleportTo(607, 1828.809f, -28.069f, 57.951f, 3.11f, 0);
+
         }
         else
             player->TeleportTo(607, 1209.7f, -65.16f, 70.1f, 0.0f, 0);
@@ -461,7 +472,7 @@ void BattlegroundSA::AddPlayer(Player* player)
         else
             player->TeleportTo(607, 1209.7f, -65.16f, 70.1f, 0.0f, 0);
     }
-    SendTransportInit(player);
+    //SendTransportInit(player);
     PlayerScores[player->GetGUID()] = sc;
 }
 
@@ -522,6 +533,7 @@ void BattlegroundSA::TeleportPlayers()
                 player->CastSpell(player, 12438, true);     //Without this player falls before boat loads...
 
                 player->TeleportTo(607, 1828.809f, -28.069f, 57.951f, 3.11f, 0);
+                
             }
             else
                 player->TeleportTo(607, 1209.7f, -65.16f, 70.1f, 0.0f, 0);
@@ -756,10 +768,7 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
     GraveyardStatus[i] = Source->GetTeamId();
     WorldSafeLocsEntry const* sg = sWorldSafeLocsStore.LookupEntry(BG_SA_GYEntries[i]);
     if (!sg)
-    {
-        sLog->outError(LOG_FILTER_BATTLEGROUND, "BattlegroundSA::CaptureGraveyard: non-existant GY entry: %u", BG_SA_GYEntries[i]);
         return;
-    }
 
     AddSpiritGuide(i + BG_SA_MAXNPC, sg->x, sg->y, sg->z, BG_SA_GYOrientation[i], (GraveyardStatus[i] == TEAM_ALLIANCE?  ALLIANCE : HORDE));
     uint32 npc = 0;
@@ -960,8 +969,45 @@ void BattlegroundSA::UpdateDemolisherSpawns()
 
 void BattlegroundSA::SendTransportInit(Player* player)
 {
+    /*if (BgObjects[BG_SA_BOAT_ONE] ||  BgObjects[BG_SA_BOAT_TWO])
+    {
+        UpdateData transData(GetMapId());
+        if (BgObjects[BG_SA_BOAT_ONE])
+            GetBGObject(BG_SA_BOAT_ONE)->BuildCreateUpdateBlockForPlayer(&transData, player);
+        if (BgObjects[BG_SA_BOAT_TWO])
+            GetBGObject(BG_SA_BOAT_TWO)->BuildCreateUpdateBlockForPlayer(&transData, player);
+        WorldPacket packet;
+        transData.BuildPacket(&packet);
+        player->GetSession()->SendPacket(&packet);
+    }*/
 }
 
 void BattlegroundSA::SendTransportsRemove(Player* player)
 {
+    /*if (BgObjects[BG_SA_BOAT_ONE] ||  BgObjects[BG_SA_BOAT_TWO]
+        || BgObjects[BG_SA_GREEN_GATE] || BgObjects[BG_SA_YELLOW_GATE]
+        || BgObjects[BG_SA_BLUE_GATE] || BgObjects[BG_SA_RED_GATE]
+        || BgObjects[BG_SA_PURPLE_GATE] || BgObjects[BG_SA_ANCIENT_GATE])
+    {
+        UpdateData transData(GetMapId());
+        if (BgObjects[BG_SA_BOAT_ONE])
+            GetBGObject(BG_SA_BOAT_ONE)->BuildOutOfRangeUpdateBlock(&transData);
+        if (BgObjects[BG_SA_BOAT_TWO])
+            GetBGObject(BG_SA_BOAT_TWO)->BuildOutOfRangeUpdateBlock(&transData);
+        if (BgObjects[BG_SA_GREEN_GATE])
+            GetBGObject(BG_SA_GREEN_GATE)->BuildOutOfRangeUpdateBlock(&transData);
+        if (BgObjects[BG_SA_YELLOW_GATE])
+            GetBGObject(BG_SA_YELLOW_GATE)->BuildOutOfRangeUpdateBlock(&transData);
+        if (BgObjects[BG_SA_BLUE_GATE])
+            GetBGObject(BG_SA_BLUE_GATE)->BuildOutOfRangeUpdateBlock(&transData);
+        if (BgObjects[BG_SA_RED_GATE])
+            GetBGObject(BG_SA_RED_GATE)->BuildOutOfRangeUpdateBlock(&transData);
+        if (BgObjects[BG_SA_PURPLE_GATE])
+            GetBGObject(BG_SA_PURPLE_GATE)->BuildOutOfRangeUpdateBlock(&transData);
+        if (BgObjects[BG_SA_ANCIENT_GATE])
+            GetBGObject(BG_SA_ANCIENT_GATE)->BuildOutOfRangeUpdateBlock(&transData);
+        WorldPacket packet;
+        transData.BuildPacket(&packet);
+        player->GetSession()->SendPacket(&packet);
+    }*/
 }

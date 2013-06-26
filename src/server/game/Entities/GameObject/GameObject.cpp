@@ -448,6 +448,9 @@ void GameObject::Update(uint32 diff)
                         }
                     }
 
+                    if (goInfo->entry == 193963) // Toy Train Set
+                        owner = NULL;
+
                     // Note: this hack with search required until GO casting not implemented
                     // search unfriendly creature
                     if (owner)                    // hunter trap
@@ -1090,6 +1093,9 @@ void GameObject::Use(Unit* user)
 
     if (Player* playerUser = user->ToPlayer())
     {
+        if (playerUser->GetEmoteState())
+            playerUser->SetEmoteState(0);
+
         if (sScriptMgr->OnGossipHello(playerUser, this))
             return;
 
