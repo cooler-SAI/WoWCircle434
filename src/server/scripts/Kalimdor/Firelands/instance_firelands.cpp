@@ -40,8 +40,11 @@ class instance_firelands : public InstanceMapScript
                 uiShannoxGUID = 0;
                 uiRiplimbGUID = 0;
                 uiRagefaceGUID = 0;
+                uiBalerocGUID = 0;
                 uiRhyolithGUID = 0;
                 uiRagnarosGUID = 0;
+                uiFirewallBalerockGUID = 0;
+                uiSulfuronBridgeGUID = 0;
                 uiRhyolithHealth = 0;
                 uiRagnarosFloor = 0;
                 uiRagnarosCache10 = 0;
@@ -71,6 +74,9 @@ class instance_firelands : public InstanceMapScript
                     case NPC_RAGEFACE:
                         uiRagefaceGUID = pCreature->GetGUID();
                         break;
+                    case NPC_BALEROC:
+                        uiBalerocGUID = pCreature->GetGUID();
+                        break;
                     case NPC_CIRCLE_OF_THRONES_PORTAL:
                         creaturePortals.push_back(pCreature);
                         if (uiEvent == DONE)
@@ -95,6 +101,9 @@ class instance_firelands : public InstanceMapScript
                 switch (pGo->GetEntry())
                 {
                     case GO_FIRE_WALL_BALEROC:
+                        uiFirewallBalerockGUID = pGo->GetGUID();
+                        HandleGameObject(0, (GetBossState(DATA_SHANNOX)==DONE) && (GetBossState(DATA_RHYOLITH)==DONE) && (GetBossState(DATA_BETHTILAC)==DONE) && (GetBossState(DATA_ALYSRAZOR)==DONE), pGo);
+                        break;
                     case GO_STICKY_WEB:
                     case GO_RAID_BRIDGE_FORMING:
                     case GO_BRIDGE_OF_RHYOLITH:
@@ -102,6 +111,11 @@ class instance_firelands : public InstanceMapScript
                     case GO_FIRE_WALL_FANDRAL_2:
                     case GO_SULFURON_KEEP:
                         AddDoor(pGo, true);
+                        break;
+                    case GO_SULFURON_BRIDGE:
+                        uiSulfuronBridgeGUID = pGo->GetGUID();
+                        if (GetBossState(DATA_BALEROC)==DONE)
+                            pGo->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
                         break;
                     case GO_RAGNAROS_FLOOR:
                         uiRagnarosFloor = pGo->GetGUID();
@@ -181,6 +195,31 @@ class instance_firelands : public InstanceMapScript
             {
 			    if (!InstanceScript::SetBossState(type, state))
 				    return false;
+
+                bool balerocAvailable = (GetBossState(DATA_SHANNOX)==DONE) && (GetBossState(DATA_RHYOLITH)==DONE) && (GetBossState(DATA_BETHTILAC)==DONE) && (GetBossState(DATA_ALYSRAZOR)==DONE);
+
+                switch (type)
+                {
+                case DATA_BALEROC:
+                    if (state == DONE)
+                        if (GameObject* obj = instance->GetGameObject(uiSulfuronBridgeGUID))
+                                obj->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
+                    if (state == IN_PROGRESS)
+                        HandleGameObject(uiFirewallBalerockGUID, false);
+                    else
+                        HandleGameObject(uiFirewallBalerockGUID, balerocAvailable);
+                    break;
+                case DATA_SHANNOX:
+                case DATA_RHYOLITH:
+                case DATA_BETHTILAC:
+                case DATA_ALYSRAZOR:
+                    if (uiFirewallBalerockGUID)
+                        HandleGameObject(uiFirewallBalerockGUID, balerocAvailable);
+                    if (balerocAvailable)
+                        if (Creature* baleroc = instance->GetCreature(uiBalerocGUID))
+                            baleroc->SetPhaseMask(1, true);
+                    break;
+                }
 
 			    return true;
             }
@@ -307,7 +346,10 @@ class instance_firelands : public InstanceMapScript
                 uint64 uiShannoxGUID;
                 uint64 uiRiplimbGUID;
                 uint64 uiRagefaceGUID;
+                uint64 uiBalerocGUID;
                 uint64 uiRagnarosGUID;
+                uint64 uiFirewallBalerockGUID;
+                uint64 uiSulfuronBridgeGUID;
                 uint64 uiRhyolithGUID;
                 uint64 uiRagnarosFloor;
                 uint64 uiRagnarosCache10;
