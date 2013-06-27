@@ -625,7 +625,6 @@ void AddSC_terokkar_forest();
 void AddSC_zangarmarsh();
 
 // Events
-void AddSC_boss_ahune();
 void AddSC_event_childrens_week();
 
 // Cataclysm Scripts
@@ -1502,7 +1501,6 @@ void AddNorthrendScripts()
 void AddEventScripts()
 {
 #ifdef SCRIPTS
-    AddSC_boss_ahune();
     AddSC_event_childrens_week();
 #endif
 }
