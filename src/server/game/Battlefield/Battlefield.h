@@ -35,8 +35,7 @@ enum BattlefieldTypes
 
 enum BattlefieldIDs
 {
-    BATTLEFIELD_BATTLEID_WG                      = 1,        // Wintergrasp battle
-    BATTLEFIELD_BATTLEID_TB                      = 2        // Tol Barad battle
+    BATTLEFIELD_BATTLEID_WG                      = 1        // Wintergrasp battle
 };
 
 enum BattlefieldObjectiveStates
@@ -103,7 +102,6 @@ class BfCapturePoint
         virtual void SendChangePhase();
 
         bool SetCapturePointData(GameObject* capturePoint);
-		bool SetCapturePointData(uint32 entry, uint32 map, float x, float y, float z, float o);
         GameObject* GetCapturePointGo() { return m_capturePoint; }
 
         TeamId GetTeamId() { return m_team; }
@@ -155,8 +153,6 @@ class BfGraveyard
 
         // Initialize the graveyard
         void Initialize(TeamId startcontrol, uint32 gy);
-
-		void Initialize(uint32 horde_entry,uint32 alliance_entry,float x,float y,float z,float o,TeamId startcontrol,uint32 gy);
 
         // Set spirit service for the graveyard
         void SetSpirit(Creature* spirit, TeamId team);
@@ -301,7 +297,7 @@ class Battlefield : public ZoneScript
         // Misc methods
         Creature* SpawnCreature(uint32 entry, float x, float y, float z, float o, TeamId team);
         Creature* SpawnCreature(uint32 entry, Position pos, TeamId team);
-        GameObject* SpawnGameObject(uint32 entry, uint32 mapid, float x, float y, float z, float o);
+        GameObject* SpawnGameObject(uint32 entry, float x, float y, float z, float o);
 
         // Script-methods
 
@@ -321,7 +317,7 @@ class Battlefield : public ZoneScript
         virtual void OnPlayerEnterZone(Player* /*player*/) { }
 
         WorldPacket BuildWarningAnnPacket(std::string msg);
-        void SendWarningToAllInZone(uint32 entry, ...);
+        void SendWarningToAllInZone(uint32 entry);
         //void SendWarningToAllInWar(int32 entry, ...); -- UNUSED
         void SendWarningToPlayer(Player* player, uint32 entry);
 
@@ -338,7 +334,7 @@ class Battlefield : public ZoneScript
 
         /// Return if we can use mount in battlefield
         bool CanFlyIn() { return !m_isActive; }
-		bool IncrementQuest(Player *player, uint32 quest, bool complete = false);
+
         void SendAreaSpiritHealerQueryOpcode(Player* player, uint64 guid);
 
         void StartBattle();

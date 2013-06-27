@@ -96,7 +96,6 @@ set(scripts_STAT_SRCS
   EasternKingdoms/Stratholme/stratholme.h
   EasternKingdoms/Stratholme/stratholme.cpp
   EasternKingdoms/tirisfal_glades.cpp
-  EasternKingdoms/tol_barad.cpp
   EasternKingdoms/SunkenTemple/sunken_temple.cpp
   EasternKingdoms/SunkenTemple/sunken_temple.h
   EasternKingdoms/SunkenTemple/instance_sunken_temple.cpp

@@ -1278,9 +1278,9 @@ struct BfWGGameObjectBuilding
             for (uint8 i = 0; i < AttackTowers[towerid - 4].nbObject; i++)
             {
                 WintergraspObjectPositionData gobData = AttackTowers[towerid - 4].GameObject[i];
-                if (GameObject* go = m_WG->SpawnGameObject(gobData.entryHorde, 571, gobData.x, gobData.y, gobData.z, gobData.o))
+                if (GameObject* go = m_WG->SpawnGameObject(gobData.entryHorde, gobData.x, gobData.y, gobData.z, gobData.o))
                     m_GameObjectList[TEAM_HORDE].insert(go);
-                if (GameObject* go = m_WG->SpawnGameObject(gobData.entryAlliance, 571, gobData.x, gobData.y, gobData.z, gobData.o))
+                if (GameObject* go = m_WG->SpawnGameObject(gobData.entryAlliance, gobData.x, gobData.y, gobData.z, gobData.o))
                     m_GameObjectList[TEAM_ALLIANCE].insert(go);
             }
 
@@ -1578,9 +1578,9 @@ struct WintergraspWorkshopData
     // Spawning Associate gameobject and store them
     void AddGameObject(WintergraspObjectPositionData obj)
     {
-        if (GameObject* gameobject = m_WG->SpawnGameObject(obj.entryHorde, 571, obj.x, obj.y, obj.z, obj.o))
+        if (GameObject* gameobject = m_WG->SpawnGameObject(obj.entryHorde, obj.x, obj.y, obj.z, obj.o))
             m_GameObjectOnPoint[TEAM_HORDE].insert(gameobject);
-        if (GameObject* gameobject = m_WG->SpawnGameObject(obj.entryAlliance, 571, obj.x, obj.y, obj.z, obj.o))
+        if (GameObject* gameobject = m_WG->SpawnGameObject(obj.entryAlliance, obj.x, obj.y, obj.z, obj.o))
             m_GameObjectOnPoint[TEAM_ALLIANCE].insert(gameobject);
     }
 
