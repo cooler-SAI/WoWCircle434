@@ -2254,7 +2254,7 @@ class Unit : public WorldObject
         // Handling caster facing during spellcast
         void FocusTarget(Spell const* focusSpell, uint64 target);
         void ReleaseFocus(Spell const* focusSpell);
-        bool IsVisionObscured(Unit* victim) const;
+        bool IsVisionObscured(Unit* victim, SpellInfo const* spellInfo) const;
 
         // Movement info
         Movement::MoveSpline * movespline;

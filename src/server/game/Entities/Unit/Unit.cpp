@@ -20778,7 +20778,7 @@ void Unit::ReleaseFocus(Spell const* focusSpell)
         ClearUnitState(UNIT_STATE_ROTATING);
 }
 
-bool Unit::IsVisionObscured(Unit* victim) const
+bool Unit::IsVisionObscured(Unit* victim, SpellInfo const* spellInfo) const
 {
     Aura* victimAura = NULL;
     Unit* victimCaster = NULL;
@@ -20808,7 +20808,7 @@ bool Unit::IsVisionObscured(Unit* victim) const
     // Spells fail unless I'm friendly to the caster of victim's smoke bomb
     if (victimAura != NULL && myAura == NULL)
     {
-        if (IsFriendlyTo(victimCaster))
+        if (IsFriendlyTo(victimCaster) || spellInfo->GetMaxRange(false) <= 5.0f)
             return false;
         else
             return true;

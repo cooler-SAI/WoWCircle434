@@ -5415,7 +5415,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!IsTriggered() && !(m_spellInfo->AttributesEx2 & SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && VMAP::VMapFactory::checkSpellForLoS(m_spellInfo->Id) && !m_caster->IsWithinLOSInMap(target))
                         return SPELL_FAILED_LINE_OF_SIGHT;
 
-            if (!IsTriggered() && m_caster->IsVisionObscured(target))
+            if (!IsTriggered() && m_caster->IsVisionObscured(target, m_spellInfo))
                 return SPELL_FAILED_VISION_OBSCURED; // smoke bomb, camouflage...
         }
     }
