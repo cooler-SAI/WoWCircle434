@@ -1816,6 +1816,15 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                 }
                 return;
             }
+            // Faerie Fire (Feral) damage
+            case 91565:
+            {
+                if (m_caster->GetShapeshiftForm() == FORM_BEAR)
+                {
+                    m_caster->CastSpell(unitTarget, 60089, true);
+                }
+                break;
+            }
         }
     }
 
