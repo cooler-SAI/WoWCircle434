@@ -7061,6 +7061,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 60206:
                 spellInfo->Effects[EFFECT_2].SetRadiusIndex(EFFECT_RADIUS_10_YARDS);
                 break;
+            // Faerie Fire (Feral)
+            case 16857:
+                spellInfo->Attributes &= ~SPELL_ATTR0_ABILITY;
+                break;
             default:
                 break;
         }
