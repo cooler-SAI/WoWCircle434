@@ -6116,7 +6116,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_caster->IsInDisallowedMountForm())
                     return SPELL_FAILED_NOT_SHAPESHIFT;
 
-                if (m_caster->HasAuraType(SPELL_AURA_TRANSFORM))
+                // hex & mount
+                if (m_caster->HasAura(51514))
                     return SPELL_FAILED_CONFUSED;
 
                 break;
