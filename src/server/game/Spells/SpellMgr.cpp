@@ -7085,6 +7085,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 6358: // Seduction
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
                 break;
+            case 64843:     // Divine Hymn
+            case 64901:     // Hymn of Hope
+                spellInfo->ChannelInterruptFlags &= ~CHANNEL_FLAG_DELAY;
+                break;
             default:
                 break;
         }
