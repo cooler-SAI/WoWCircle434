@@ -13706,7 +13706,7 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
                 player->UnsummonPetTemporaryIfAny();
         }
 
-        player->SendMovementSetCollisionHeight(player->GetCollisionHeight(true));
+        //player->SendMovementSetCollisionHeight(player->GetCollisionHeight(true));
     }
 
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOUNT);
@@ -13720,8 +13720,8 @@ void Unit::Dismount()
     SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT);
 
-    if (Player* thisPlayer = ToPlayer())
-        thisPlayer->SendMovementSetCollisionHeight(thisPlayer->GetCollisionHeight(false));
+    //if (Player* thisPlayer = ToPlayer())
+    //    thisPlayer->SendMovementSetCollisionHeight(thisPlayer->GetCollisionHeight(false));
 
     WorldPacket data(SMSG_DISMOUNT, 8);
     data.appendPackGUID(GetGUID());
@@ -13893,8 +13893,8 @@ void Unit::UpdateMount()
         if (oldFlyer != newFlyer)
             SetCanFly(newFlyer);
 
-        if (!(oldFlyer ^ newFlyer))
-            SetCanFly(newFlyer);
+        //if (!(oldFlyer ^ newFlyer))
+        //    SetCanFly(newFlyer);
 
         Player* player = ToPlayer();
         if (!player)
