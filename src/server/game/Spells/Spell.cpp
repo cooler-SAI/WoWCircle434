@@ -7243,10 +7243,19 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                 caster = m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
             if (!caster)
                 caster = m_caster;
+
+            // Sin and Punishment from duel bug
+            if (m_spellInfo->Id == 87204)
+            {
+                if (caster != target && caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->duel && target->GetTypeId() == TYPEID_PLAYER)
+                    return false;
+            }
+
             if (target->GetEntry() == 5925)
                 return true;
             if (LOSAdditionalRules(target))
                 return true;
+ 
             if (m_targets.HasDst())
             {
                 float x, y, z;
