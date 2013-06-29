@@ -76,6 +76,7 @@ class instance_firelands : public InstanceMapScript
                         break;
                     case NPC_BALEROC:
                         uiBalerocGUID = pCreature->GetGUID();
+                        pCreature->SetPhaseMask((GetBossState(DATA_SHANNOX)==DONE) && (GetBossState(DATA_RHYOLITH)==DONE) && (GetBossState(DATA_BETHTILAC)==DONE) && (GetBossState(DATA_ALYSRAZOR)==DONE) ? 1 : 2, true);
                         break;
                     case NPC_CIRCLE_OF_THRONES_PORTAL:
                         creaturePortals.push_back(pCreature);
