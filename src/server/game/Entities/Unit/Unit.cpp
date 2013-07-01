@@ -9504,15 +9504,6 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                             RemoveAurasDueToSpell(50240);
                         break;
                     }
-                    // Warrior - Vigilance, SPELLFAMILY_GENERIC
-                    case 50720:
-                    {
-                        target = triggeredByAura->GetCaster();
-                        if (!target)
-                            return false;
-
-                        break;
-                    }
                     // Reactive Barrier
                     case 86303:
                     case 86304:           
@@ -9842,6 +9833,44 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Vigilance
+        case 50720:
+        {   
+            if (!victim)
+                return false;
+
+            target = triggeredByAura->GetCaster();
+
+            // Add vengeance
+            if (!target || target->GetTypeId() != TYPEID_PLAYER)
+                break;
+
+            if (victim->GetTypeId() == TYPEID_PLAYER || (victim->GetOwner() && victim->GetOwner()->GetTypeId() == TYPEID_PLAYER))
+                break;
+
+            if (!target->isInCombat())
+                break;
+
+            int32 aviableBasepoints = 0;
+            int32 max_amount = 0;
+                        
+            if (Aura const* aur = target->GetAura(76691, target->GetGUID()))
+            {
+                aviableBasepoints += aur->GetEffect(EFFECT_0)->GetAmount();
+                max_amount += aur->GetEffect(EFFECT_2)->GetAmount();
+            }
+   
+            int32 cap = (target->GetCreateHealth() + target->GetStat(STAT_STAMINA) * 14) / 10;
+            basepoints0 = int32((damage * triggerAmount) / 500); // 20% damage
+            basepoints0 += aviableBasepoints;
+            basepoints0 = std::min(cap, basepoints0);
+
+            int32 basepoints1 = std::max(basepoints0, max_amount);
+
+            target->CastCustomSpell(target, 76691, &basepoints0, &basepoints0, &basepoints1, true);
+
+            break;
+        }
         // Item - Dragon Soul Legendary Daggers
         case 109939:
         {
