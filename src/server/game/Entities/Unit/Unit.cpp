@@ -10365,6 +10365,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             if (!(procEx & PROC_EX_CRITICAL_HIT))
                 return false;
 
+            target = victim;
             break;
         }
         default:
