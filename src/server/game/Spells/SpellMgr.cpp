@@ -7065,6 +7065,14 @@ void SpellMgr::LoadDbcDataCorrections()
             case 16857:
                 spellInfo->Attributes &= ~SPELL_ATTR0_ABILITY;
                 break;
+            // Charge stun
+            case 7922:
+            case 96273:
+            // Intercept stun
+            case 20253:
+                spellInfo->Attributes |= SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK;
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+                break;
             default:
                 break;
         }
