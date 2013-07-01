@@ -6756,11 +6756,11 @@ void Spell::EffectSkinning(SpellEffIndex /*effIndex*/)
 
 void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
 {
+    if (!unitTarget)
+        return;
+
     if (effectHandleMode == SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
     {
-        if (!unitTarget)
-            return;
-
         float angle = unitTarget->GetRelativeAngle(m_caster);
         Position pos;
 
@@ -6777,13 +6777,13 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
 
     if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET)
     {
-        if (!unitTarget)
-            return;
-
         // not all charge effects used in negative spells
         if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER)
             m_caster->Attack(unitTarget, true);
     }
+
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        m_caster->ToPlayer()->SetFallInformation(0, unitTarget->GetPositionZ());
 }
 
 void Spell::EffectChargeDest(SpellEffIndex /*effIndex*/)
