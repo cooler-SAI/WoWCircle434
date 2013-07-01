@@ -187,7 +187,6 @@ class spell_pet_stat_calculate : public SpellScriptLoader
                 {
                     case DEATHKNIGHT_SCALING_2:
                         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_stat_calculate_AuraScript::CalculateAmountHasteSpell, EFFECT_1, SPELL_AURA_MELEE_SLOW);
-                        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_stat_calculate_AuraScript::CalculateAmountSpellPenetration, EFFECT_2, SPELL_AURA_MOD_TARGET_RESISTANCE);
                         break;
                     case SHAMAN_SCALING:
                     case DEATHKNIGHT_SCALING_3:
@@ -202,6 +201,7 @@ class spell_pet_stat_calculate : public SpellScriptLoader
                     case HUNTER_SCALING_5:
                         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_stat_calculate_AuraScript::CalculateAmountMeleeCrit, EFFECT_0, SPELL_AURA_MOD_CRIT_PCT);
                         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_stat_calculate_AuraScript::CalculateAmountHasteSpell, EFFECT_1, SPELL_AURA_MELEE_SLOW);
+                        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_stat_calculate_AuraScript::CalculateAmountSpellPenetration, EFFECT_2, SPELL_AURA_MOD_TARGET_RESISTANCE);
                         break;
                     case WARLOCK_SCALING_5:
                         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_stat_calculate_AuraScript::CalculateAmountMeleeHit, EFFECT_0, SPELL_AURA_MOD_HIT_CHANCE);
@@ -211,9 +211,11 @@ class spell_pet_stat_calculate : public SpellScriptLoader
                     case WARLOCK_SCALING_6:
                         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_stat_calculate_AuraScript::CalculateAmountSpellCrit, EFFECT_0, SPELL_AURA_MOD_CRIT_PCT);
                         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_stat_calculate_AuraScript::CalculateAmountHasteSpell, EFFECT_1, SPELL_AURA_MELEE_SLOW);
+                        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_stat_calculate_AuraScript::CalculateAmountSpellPenetration, EFFECT_2, SPELL_AURA_MOD_TARGET_RESISTANCE);
                         break;
                     case DEATHKNIGHT_SCALING_5:
                         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_stat_calculate_AuraScript::CalculateAmountMeleeCrit, EFFECT_0, SPELL_AURA_MOD_CRIT_PCT);
+                        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_stat_calculate_AuraScript::CalculateAmountSpellPenetration, EFFECT_2, SPELL_AURA_MOD_TARGET_RESISTANCE);
                         break;
                     default:
                         break;

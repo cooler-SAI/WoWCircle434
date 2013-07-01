@@ -667,6 +667,9 @@ void Player::UpdateAllSpellCritChances()
 {
     for (int i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
         UpdateSpellCritChance(i);
+
+    if (Pet* pPet = GetPet())
+        pPet->UpdateCriticalChance();
 }
 
 void Player::UpdateExpertise(WeaponAttackType attack)

@@ -1247,6 +1247,9 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                     case 99152: // Cauterizing Flame, Item - Priest Healer T12 4P Bonus
                     case 96966: // Blaze of Life, Eye of Blazing Power (Normal)
                     case 97136: // Blaze of Life, Eye of Blazing Power (Heroic)
+                    case 109825: // Nick of Time, Windward Heart (heroic)
+                    case 108000: // Nick of Time, Windward Heart (normal)
+                    case 109822: // Nick of Time, Windward Heart (lfr)
                         maxSize = 1;
                         power = POWER_HEALTH;
                         break;
@@ -2814,7 +2817,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                     unit->RemoveAurasByType(SPELL_AURA_MOD_STEALTH, NULL, NULL, 11327);
             }
             if (m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_BINARY) && !m_spellInfo->IsChanneled())
-                if (m_caster->IsSpellResisted(unit, m_spellSchoolMask, m_spellInfo))
+                if (m_originalCaster->IsSpellResisted(unit, m_spellSchoolMask, m_spellInfo))
                     return SPELL_MISS_RESIST;
         }
         else if (m_caster->IsFriendlyTo(unit))
@@ -2841,7 +2844,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
     else if (!m_spellInfo->IsPositive())
     {
         if (m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_BINARY) && !m_spellInfo->IsChanneled())
-            if (m_caster->IsSpellResisted(unit, m_spellSchoolMask, m_spellInfo))
+            if (m_originalCaster->IsSpellResisted(unit, m_spellSchoolMask, m_spellInfo))
                 return SPELL_MISS_RESIST;
     }
 

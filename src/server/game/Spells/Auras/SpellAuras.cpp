@@ -1658,6 +1658,12 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
 
                 switch (m_spellInfo->Id)
                 {
+                    // Vampiric Blood
+                    case 55233:
+                        // Item - Death Knight T13 Blood 4P Bonus
+                        if (caster->HasAura(105587))
+                            caster->CastSpell((Unit*)NULL, 105588, true);
+                        break;
                     // Shadow Infusion
                     case 91342:
                         if (GetStackAmount() == 5 && !caster->HasAura(93426))

@@ -916,14 +916,13 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             break;
         }
         case SPELL_AURA_MOD_INCREASE_HEALTH:
-            // Vampiric Blood
-            if (GetId() == 55233)
-                amount = GetBase()->GetUnitOwner()->CountPctFromMaxHealth(amount);
-            // Soulburn - Healthstone
-            else if (m_spellInfo->Id == 79437)
+            switch (GetId())
             {
-                if (GetBase()->GetUnitOwner())
-                    amount = GetBase()->GetUnitOwner()->CountPctFromMaxHealth(20);
+                case 55233: // Vampiric Blood
+                case 79437: // Soulburn - Healthstone
+                case 105588: // Vampiric Brood
+                    amount = GetBase()->GetUnitOwner()->CountPctFromMaxHealth(amount);
+                    break;
             }
             break;
         case SPELL_AURA_MOD_INCREASE_SPEED:

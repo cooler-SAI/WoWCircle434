@@ -3361,6 +3361,10 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
     if (Player* modOwner = m_originalCaster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
+    // Item - Warlock T13 2P Bonus (Doomguard and Infernal)
+    if (AuraEffect const* aurEff = m_originalCaster->GetAuraEffect(105888, EFFECT_1))
+        duration += aurEff->GetAmount();
+
     TempSummon* summon = NULL;
 
     // determine how many units should be summoned
