@@ -2831,7 +2831,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                 if (m_caster->GetTypeId() == TYPEID_PLAYER)
                     m_caster->ToPlayer()->UpdatePvP(true);
             }
-            if (unit->isInCombat() && !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_NO_INITIAL_AGGRO))
+            if (unit->isInCombat() && !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_NO_INITIAL_AGGRO) && !m_spellInfo->IsIgnoringCombat())
             {
                 m_caster->SetInCombatState(unit->GetCombatTimer() > 0, unit);
                 unit->getHostileRefManager().threatAssist(m_caster, 0.0f);

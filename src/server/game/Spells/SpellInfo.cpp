@@ -3162,6 +3162,13 @@ bool SpellInfo::IsIgnoringCombat() const
         case 79140:
         // Earth Shield
         case 379:
+        // Earthliving Weapon proc
+        case 51730:
+        // Ancestral Vigor
+        case 105284:
+        // Ancestral Fortitude
+        case 16177:
+        case 16236:
             return true;
         default: break;
     }
