@@ -419,16 +419,16 @@ void BattlegroundSA::FillInitialWorldStates(WorldPacket& data)
   data << uint32(BG_SA_RED_GATEWS) << uint32(GateStatus[BG_SA_RED_GATE]);
   data << uint32(BG_SA_PURPLE_GATEWS) << uint32(GateStatus[BG_SA_PURPLE_GATE]);
 
-  data << uint32(BG_SA_BONUS_TIMER) << uint32(0);
+  //data << uint32(BG_SA_BONUS_TIMER) << uint32(0);
 
   data << uint32(BG_SA_HORDE_ATTACKS)<< horde_attacks;
   data << uint32(BG_SA_ALLY_ATTACKS) << ally_attacks;
 
   //Time will be sent on first update...
-  data << uint32(BG_SA_ENABLE_TIMER) << ((TimerEnabled) ? uint32(1) : uint32(0));
+  /*data << uint32(BG_SA_ENABLE_TIMER) << ((TimerEnabled) ? uint32(1) : uint32(0));
   data << uint32(BG_SA_TIMER_MINS) << uint32(0);
   data << uint32(BG_SA_TIMER_SEC_TENS) << uint32(0);
-  data << uint32(BG_SA_TIMER_SEC_DECS) << uint32(0);
+  data << uint32(BG_SA_TIMER_SEC_DECS) << uint32(0);*/
 
   data << uint32(BG_SA_RIGHT_GY_HORDE) << uint32(GraveyardStatus[BG_SA_RIGHT_CAPTURABLE_GY] == TEAM_HORDE?1:0);
   data << uint32(BG_SA_LEFT_GY_HORDE) << uint32(GraveyardStatus[BG_SA_LEFT_CAPTURABLE_GY] == TEAM_HORDE?1:0);
@@ -725,10 +725,10 @@ WorldSafeLocsEntry const* BattlegroundSA::GetClosestGraveYard(Player* player)
 
 void BattlegroundSA::SendTime()
 {
-    uint32 end_of_round = (EndRoundTimer - TotalTime);
+    /*uint32 end_of_round = (EndRoundTimer - TotalTime);
     UpdateWorldState(BG_SA_TIMER_MINS, end_of_round/60000);
     UpdateWorldState(BG_SA_TIMER_SEC_TENS, (end_of_round%60000)/10000);
-    UpdateWorldState(BG_SA_TIMER_SEC_DECS, ((end_of_round%60000)%10000)/1000);
+    UpdateWorldState(BG_SA_TIMER_SEC_DECS, ((end_of_round%60000)%10000)/1000);*/
 }
 
 void BattlegroundSA::EventPlayerClickedOnFlag(Player* Source, GameObject* target_obj)
@@ -917,7 +917,7 @@ void BattlegroundSA::EventPlayerUsedGO(Player* Source, GameObject* object)
 void BattlegroundSA::ToggleTimer()
 {
     TimerEnabled = !TimerEnabled;
-    UpdateWorldState(BG_SA_ENABLE_TIMER, (TimerEnabled) ? 1 : 0);
+    //UpdateWorldState(BG_SA_ENABLE_TIMER, (TimerEnabled) ? 1 : 0);
 }
 
 void BattlegroundSA::EndBattleground(uint32 winner)
