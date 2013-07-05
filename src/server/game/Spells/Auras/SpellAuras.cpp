@@ -2681,6 +2681,7 @@ bool Aura::CanStackWith(Aura const* existingAura) const
                     return true;
                 case SPELL_AURA_MOD_DAMAGE_FROM_CASTER:                // Vendetta-like auras
                 case SPELL_AURA_BYPASS_ARMOR_FOR_CASTER:               // Find Weakness-like auras
+                case SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS:    // Hunter's Mark-like auras
                     return true;
                 default:
                     break;
