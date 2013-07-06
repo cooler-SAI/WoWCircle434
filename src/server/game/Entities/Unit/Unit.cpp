@@ -17331,7 +17331,7 @@ Unit* Unit::SelectNearbyTarget(Unit* exclude, float dist) const
     // remove not LoS targets
     for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
     {
-        if (!IsWithinLOSInMap(*tIter) || (*tIter)->isTotem() || (*tIter)->isSpiritService() || (*tIter)->GetCreatureType() == CREATURE_TYPE_CRITTER)
+        if (!IsValidAttackTarget(*tIter) || !IsWithinLOSInMap(*tIter) || (*tIter)->isTotem() || (*tIter)->isSpiritService() || (*tIter)->GetCreatureType() == CREATURE_TYPE_CRITTER)
             targets.erase(tIter++);
         else
             ++tIter;
