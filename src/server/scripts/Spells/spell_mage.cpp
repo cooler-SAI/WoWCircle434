@@ -246,7 +246,7 @@ class spell_mage_living_bomb : public SpellScriptLoader
             void AfterRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
                 AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
-                if (removeMode != AURA_REMOVE_BY_ENEMY_SPELL && removeMode != AURA_REMOVE_BY_EXPIRE)
+                if (removeMode != AURA_REMOVE_BY_EXPIRE)
                     return;
 
                 if (Unit* caster = GetCaster())

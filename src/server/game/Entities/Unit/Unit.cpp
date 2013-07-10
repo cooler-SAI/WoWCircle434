@@ -12896,12 +12896,14 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
         }
     }
 
-    // Mastery Shaman
+    // Deep Healing, Mastery Shaman
     if (victim && victim->isAlive())
     {
-        if (Aura* deepHealing = GetAura(77226))
-            if (deepHealing->GetSpellInfo()->Effects[0].SpellClassMask.HasFlag(spellProto->SpellFamilyFlags[0], spellProto->SpellFamilyFlags[1], spellProto->SpellFamilyFlags[2]))
+        if (spellProto->SpellFamilyName == SPELLFAMILY_SHAMAN)
+        {
+            if (Aura* deepHealing = GetAura(77226))
             {
+
                 float effectAmount = float(deepHealing->GetEffect(0)->GetAmount());
                 float mod = 100.0f - victim->GetHealthPct();
                 if (mod < 1.0f)
@@ -12909,6 +12911,7 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
                 float amount_pct = mod * effectAmount / 100.0f;
                 AddPct(DoneTotalMod, amount_pct);
             }
+        }
     }
 
     // Done fixed damage bonus auras
