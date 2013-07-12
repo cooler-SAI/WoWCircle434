@@ -38,7 +38,10 @@ enum WarriorSpells
     SPELL_CHARGE                            = 34846,
     SPELL_SLAM                              = 50782,
     ICON_ID_SUDDEN_DEATH                    = 1989,
-    SPELL_BLOODTHIRST = 23885,
+    SPELL_BLOODTHIRST                       = 23885,
+    SPELL_VICTORY_RUSH                      = 34428,
+    SPELL_VICTORY_RUSH_AURA                 = 82368,
+    SPELL_VICTORY_RUSH_AURA_TWO             = 32216
 };
 
 /// Updated 4.3.4
@@ -328,6 +331,38 @@ class spell_warr_whirlwind: public SpellScriptLoader
     }
 };
 
+class spell_warr_victory_rush : public SpellScriptLoader
+{
+public:
+    spell_warr_victory_rush() : SpellScriptLoader("spell_warr_victory_rush") { }
+
+    class spell_warr_victory_rush_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_warr_victory_rush_SpellScript);
+
+        bool Validate(SpellInfo const* /*SpellEntry*/)
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_VICTORY_RUSH))
+                return false;
+            return true;
+        }
+
+        void HandleDamage(SpellEffIndex /*effIndex*/)
+        {
+            GetCaster()->RemoveAurasDueToSpell(SPELL_VICTORY_RUSH_AURA);
+            GetCaster()->RemoveAurasDueToSpell(SPELL_VICTORY_RUSH_AURA_TWO);
+        }
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_warr_victory_rush_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_warr_victory_rush_SpellScript();
+    }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_last_stand();
@@ -337,4 +372,5 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_concussion_blow();
     new spell_warr_bloodthirst();
     new spell_warr_whirlwind();
+    new spell_warr_victory_rush();
 }
