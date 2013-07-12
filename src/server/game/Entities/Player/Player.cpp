@@ -4563,6 +4563,15 @@ bool Player::ResetTalents(bool no_cost)
 
     RemovePet(NULL, PET_SLOT_ACTUAL_PET_SLOT, true);
 
+    // Remove spec specific spells
+    for (uint32 i = 0; i < MAX_TALENT_TABS; ++i)
+    {
+        std::vector<uint32> const* specSpells = GetTalentTreePrimarySpells(GetTalentTabPages(getClass())[i]);
+        if (specSpells)
+            for (size_t i = 0; i < specSpells->size(); ++i)
+                removeSpell(specSpells->at(i), true);
+    }
+
     for (uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
     {
         TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
@@ -4599,22 +4608,8 @@ bool Player::ResetTalents(bool no_cost)
             if (plrTalent != GetTalentMap(GetActiveSpec())->end())
                 plrTalent->second->state = PLAYERSPELL_REMOVED;
         }
-
-        for (uint8 j = 0; j < MAX_MASTERY_SPELL; ++j)
-        {
-            if (uint32 spell = talentTabInfo->spellIds[j])
-                removeSpell(spell);
-        }
     }
-
-    // Remove spec specific spells
-    for (uint32 i = 0; i < MAX_TALENT_TABS; ++i)
-    {
-        std::vector<uint32> const* specSpells = GetTalentTreePrimarySpells(GetTalentTabPages(getClass())[i]);
-        if (specSpells)
-            for (size_t i = 0; i < specSpells->size(); ++i)
-                removeSpell(specSpells->at(i), true);
-    }
+    RemoveMasterySpells();
 
     // Remove endless auras
     for (AuraMap::iterator itr = m_ownedAuras.begin(); itr != m_ownedAuras.end();)
@@ -25389,6 +25384,13 @@ void Player::ActivateSpec(uint8 spec)
         }
     }
 
+    // set glyphs
+    for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
+        // remove secondary glyph
+        if (uint32 oldglyph = GetGlyph(GetActiveSpec(), slot))
+            if (GlyphPropertiesEntry const* old_gp = sGlyphPropertiesStore.LookupEntry(oldglyph))
+                RemoveAurasDueToSpell(old_gp->SpellId);
+
     // Remove spec specific spells
     for (uint32 i = 0; i < MAX_TALENT_TABS; ++i)
     {
@@ -25397,13 +25399,6 @@ void Player::ActivateSpec(uint8 spec)
             for (size_t i = 0; i < specSpells->size(); ++i)
                 removeSpell(specSpells->at(i), true);
     }
-
-    // set glyphs
-    for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
-        // remove secondary glyph
-        if (uint32 oldglyph = GetGlyph(GetActiveSpec(), slot))
-            if (GlyphPropertiesEntry const* old_gp = sGlyphPropertiesStore.LookupEntry(oldglyph))
-                RemoveAurasDueToSpell(old_gp->SpellId);
 
     RemoveMasterySpells();
 
