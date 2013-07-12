@@ -12552,28 +12552,9 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
     switch (spellProto->DmgClass)
     {
         case SPELL_DAMAGE_CLASS_NONE:
-            // We need more spells to find a general way (if there is any)
-            switch (spellProto->Id)
-            {
-                case 379:   // Earth Shield
-                case 33778: // Lifebloom Final Bloom
-                case 64844: // Divine Hymn
-                case 71607: // Item - Bauble of True Blood 10m
-                case 71646: // Item - Bauble of True Blood 25m
-                case 85222: // Paladin - Light of Dawn
-                case 73685: // Shaman - Unleash Elements - Unleash Life 
-
-                case 86958: // Shaman - Cleansing Waters
-                case 86961:
-
-                case 94286: // Paladin - Protector of the Innocent proc
-                case 94288:
-                case 94289:
-  
-                    break;
-                default:
-                    return 0.0;
-            }
+            if (spellProto->CanCritDamageClassNone())
+                break;
+            return 0.0;
         case SPELL_DAMAGE_CLASS_MAGIC:
         {
             // exeption is healthstone and heal potions
