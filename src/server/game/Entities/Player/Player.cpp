@@ -24302,6 +24302,12 @@ InventoryResult Player::CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 
     return EQUIP_ERR_OK;
 }
 
+void Player::HandleJump(MovementInfo const& movementInfo)
+{
+    RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_JUMP);
+    ProcDamageAndSpell(NULL, PROC_FLAG_JUMP, PROC_FLAG_NONE, PROC_EX_NONE, 0, 0, BASE_ATTACK, 0);
+}
+
 void Player::HandleFall(MovementInfo const& movementInfo)
 {
     // calculate total z distance of the fall

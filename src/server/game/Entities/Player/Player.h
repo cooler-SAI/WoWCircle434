@@ -2623,6 +2623,7 @@ class Player : public Unit, public GridObject<Player>
             m_lastFallTime = time;
             m_lastFallZ = z;
         }
+        void HandleJump(MovementInfo const& movementInfo);
         void HandleFall(MovementInfo const& movementInfo);
 
         bool IsKnowHowFlyIn(uint32 mapid, uint32 zone, uint32 spellId = 0) const;
