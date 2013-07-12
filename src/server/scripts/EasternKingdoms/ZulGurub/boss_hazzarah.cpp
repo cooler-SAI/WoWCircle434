@@ -225,10 +225,15 @@ class boss_hazzarah : public CreatureScript
                     while (true)
                     {
                         randomIndex = urand(0, playerCount - 1);
+                        bool ok = true;
                         for (uint32 j = 0; j < stunnedPlayerCount; ++j)
                             if (stunnedPlayerIndexes[j] == randomIndex)
-                                continue;
-                        break;
+                            {
+                                ok = false;
+                                break;
+                            }
+                        if (ok)
+                            break;
                     }
                     stunnedPlayerIndexes[stunnedPlayerCount++] = randomIndex;
                 }
