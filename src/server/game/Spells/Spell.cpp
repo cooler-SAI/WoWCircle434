@@ -3035,31 +3035,37 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
     // this is executed after spell proc spells on target hit
     // spells are triggered for each hit spell target
     // info confirmed with retail sniffs of permafrost and shadow weaving
-    if (!m_hitTriggerSpells.empty() && unit != m_caster)
+    if (!m_hitTriggerSpells.empty())
     {
         int _duration = 0;
-        for (HitTriggerSpellList::const_iterator i = m_hitTriggerSpells.begin(); i != m_hitTriggerSpells.end(); ++i)
+        for (HitTriggerSpellList::const_iterator i = m_hitTriggerSpells.begin(); i != m_hitTriggerSpells.end(); )
         {
-            if (CanExecuteTriggersOnHit(effMask, i->triggeredByAura) && roll_chance_i(i->chance))
+            if (CanExecuteTriggersOnHit(effMask, i->triggeredByAura))
             {
-                m_caster->CastSpell(unit, i->triggeredSpell, true);
-
-                // SPELL_AURA_ADD_TARGET_TRIGGER auras shouldn't trigger auras without duration
-                // set duration of current aura to the triggered spell
-                if (i->triggeredSpell->GetDuration() == -1)
+                if (roll_chance_i(i->chance))
                 {
-                    if (Aura* triggeredAur = unit->GetAura(i->triggeredSpell->Id, m_caster->GetGUID()))
+                    m_caster->CastSpell(unit, i->triggeredSpell, true);
+
+                    // SPELL_AURA_ADD_TARGET_TRIGGER auras shouldn't trigger auras without duration
+                    // set duration of current aura to the triggered spell
+                    if (i->triggeredSpell->GetDuration() == -1)
                     {
-                        // get duration from aura-only once
-                        if (!_duration)
+                        if (Aura* triggeredAur = unit->GetAura(i->triggeredSpell->Id, m_caster->GetGUID()))
                         {
-                            Aura* aur = unit->GetAura(m_spellInfo->Id, m_caster->GetGUID());
-                            _duration = aur ? aur->GetDuration() : -1;
+                            // get duration from aura-only once
+                            if (!_duration)
+                            {
+                                Aura* aur = unit->GetAura(m_spellInfo->Id, m_caster->GetGUID());
+                                _duration = aur ? aur->GetDuration() : -1;
+                            }
+                            triggeredAur->SetDuration(_duration);
                         }
-                        triggeredAur->SetDuration(_duration);
                     }
                 }
+                i = m_hitTriggerSpells.erase(i);
+                continue;
             }
+            ++i;
         }
     }
 
