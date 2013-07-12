@@ -7455,6 +7455,7 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
                 
                 // Field Dressing
                 target->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DOT, damage);
+                break;
             }
             case 29841: // Second Wind Rank 1
             case 29842: // Second Wind Rank 2
