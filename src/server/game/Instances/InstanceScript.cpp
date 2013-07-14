@@ -290,58 +290,55 @@ void InstanceScript::DoRespawnGameObject(uint64 uiGuid, uint32 uiTimeToDespawn)
 
 void InstanceScript::DoUpdateWorldState(uint32 uiStateId, uint32 uiStateData)
 {
-    Map::PlayerList const& lPlayers = instance->GetPlayers();
+    Map::PlayerList const& plrList = instance->GetPlayers();
 
-    if (!lPlayers.isEmpty())
-    {
-        for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-            if (Player* player = itr->getSource())
-                player->SendUpdateWorldState(uiStateId, uiStateData);
-    }
-    else
-        sLog->outDebug(LOG_FILTER_TSCR, "DoUpdateWorldState attempt send data but no players in map.");
+    if (!plrList.isEmpty())
+        for (Map::PlayerList::const_iterator itr = plrList.begin(); itr != plrList.end(); ++itr)
+            if (Player* pPlayer = itr->getSource())
+                pPlayer->SendUpdateWorldState(uiStateId, uiStateData);
+
 }
 
 // Send Notify to all players in instance
 void InstanceScript::DoSendNotifyToInstance(char const* format, ...)
 {
-    InstanceMap::PlayerList const& players = instance->GetPlayers();
+    InstanceMap::PlayerList const& plrList = instance->GetPlayers();
 
-    if (!players.isEmpty())
+    if (!plrList.isEmpty())
     {
         va_list ap;
         va_start(ap, format);
         char buff[1024];
         vsnprintf(buff, 1024, format, ap);
         va_end(ap);
-        for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
-            if (Player* player = i->getSource())
-                if (WorldSession* session = player->GetSession())
-                    session->SendNotification("%s", buff);
+        for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
+            if (Player* pPlayer = i->getSource())
+                if (WorldSession* pSession = pPlayer->GetSession())
+                    pSession->SendNotification("%s", buff);
     }
 }
 
 // Reset Achievement Criteria for all players in instance
 void InstanceScript::DoResetAchievementCriteria(AchievementCriteriaTypes type, uint64 miscValue1 /*= 0*/, uint64 miscValue2 /*= 0*/, bool evenIfCriteriaComplete /*= false*/)
 {
-    Map::PlayerList const &PlayerList = instance->GetPlayers();
+    Map::PlayerList const &plrList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
-        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->getSource())
-                player->ResetAchievementCriteria(type, miscValue1, miscValue2, evenIfCriteriaComplete);
+    if (!plrList.isEmpty())
+        for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
+            if (Player* pPlayer = i->getSource())
+                pPlayer->ResetAchievementCriteria(type, miscValue1, miscValue2, evenIfCriteriaComplete);
 }
 
 // Complete Achievement for all players in instance
 void InstanceScript::DoCompleteAchievement(uint32 achievement)
 {
   AchievementEntry const* pAE = sAchievementStore.LookupEntry(achievement);
-  Map::PlayerList const &PlayerList = instance->GetPlayers();
+  Map::PlayerList const &plrList = instance->GetPlayers();
   if (!pAE)
       return;
 
-  if (!PlayerList.isEmpty())
-      for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+  if (!plrList.isEmpty())
+      for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
           if (Player *pPlayer = i->getSource())
               pPlayer->CompletedAchievement(pAE);
 }
@@ -349,93 +346,103 @@ void InstanceScript::DoCompleteAchievement(uint32 achievement)
 // Update Achievement Criteria for all players in instance
 void InstanceScript::DoUpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, uint32 miscValue3 /*=0*/, Unit* unit /*= NULL*/)
 {
-    Map::PlayerList const &PlayerList = instance->GetPlayers();
+    Map::PlayerList const &plrList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
-        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->getSource())
-                player->UpdateAchievementCriteria(type, miscValue1, miscValue2, miscValue3, unit);
+    if (!plrList.isEmpty())
+        for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
+            if (Player* pPlayer = i->getSource())
+                pPlayer->UpdateAchievementCriteria(type, miscValue1, miscValue2, miscValue3, unit);
 }
 
 // Start timed achievement for all players in instance
 void InstanceScript::DoStartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry)
 {
-    Map::PlayerList const &PlayerList = instance->GetPlayers();
+    Map::PlayerList const &plrList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
-        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->getSource())
-                player->StartTimedAchievement(type, entry);
+    if (!plrList.isEmpty())
+        for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
+            if (Player* pPlayer = i->getSource())
+                pPlayer->StartTimedAchievement(type, entry);
 }
 
 // Stop timed achievement for all players in instance
 void InstanceScript::DoStopTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry)
 {
-    Map::PlayerList const &PlayerList = instance->GetPlayers();
+    Map::PlayerList const &plrList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
-        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->getSource())
-                player->RemoveTimedAchievement(type, entry);
+    if (!plrList.isEmpty())
+        for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
+            if (Player* pPlayer = i->getSource())
+                pPlayer->RemoveTimedAchievement(type, entry);
 }
 
 // Remove Auras due to Spell on all players in instance
 void InstanceScript::DoRemoveAurasDueToSpellOnPlayers(uint32 spell)
 {
-    Map::PlayerList const& PlayerList = instance->GetPlayers();
-    if (!PlayerList.isEmpty())
+    Map::PlayerList const& plrList = instance->GetPlayers();
+    if (!plrList.isEmpty())
     {
-        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        for (Map::PlayerList::const_iterator itr = plrList.begin(); itr != plrList.end(); ++itr)
         {
-            if (Player* player = itr->getSource())
+            if (Player* pPlayer = itr->getSource())
             {
-                player->RemoveAurasDueToSpell(spell);
-                if (Pet* pet = player->GetPet())
-                    pet->RemoveAurasDueToSpell(spell);
+                pPlayer->RemoveAurasDueToSpell(spell);
+                if (Pet* pPet = pPlayer->GetPet())
+                    pPet->RemoveAurasDueToSpell(spell);
             }
         }
     }
 }
 
+// Remove aura from stack on all players in instance
+void InstanceScript::DoRemoveAuraFromStackOnPlayers(uint32 spell, uint64 casterGUID, AuraRemoveMode mode, uint32 num)
+{
+    Map::PlayerList const& plrList = instance->GetPlayers();
+    if (!plrList.isEmpty())
+        for (Map::PlayerList::const_iterator itr = plrList.begin(); itr != plrList.end(); ++itr)
+            if (Player* pPlayer = itr->getSource())
+                pPlayer->RemoveAuraFromStack(spell, casterGUID, mode, num);
+}
+
 // Cast spell on all players in instance
 void InstanceScript::DoCastSpellOnPlayers(uint32 spell)
 {
-    Map::PlayerList const &PlayerList = instance->GetPlayers();
+    Map::PlayerList const &plrList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
-        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->getSource())
-                player->CastSpell(player, spell, true);
+    if (!plrList.isEmpty())
+        for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
+            if (Player* pPlayer = i->getSource())
+                pPlayer->CastSpell(pPlayer, spell, true);
 }
 
 void InstanceScript::DoSetAlternatePowerOnPlayers(int32 value)
 {
-    Map::PlayerList const &PlayerList = instance->GetPlayers();
+    Map::PlayerList const &plrList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
-        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->getSource())
-                player->SetPower(POWER_ALTERNATE_POWER, value);
+    if (!plrList.isEmpty())
+        for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
+            if (Player* pPlayer = i->getSource())
+                pPlayer->SetPower(POWER_ALTERNATE_POWER, value);
 }
 
 void InstanceScript::DoModifyPlayerCurrencies(uint32 id, int32 value)
 {
-    Map::PlayerList const &PlayerList = instance->GetPlayers();
+    Map::PlayerList const &plrList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
-        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->getSource())
-                player->ModifyCurrency(id, value);
+    if (!plrList.isEmpty())
+        for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
+            if (Player* pPlayer = i->getSource())
+                pPlayer->ModifyCurrency(id, value);
 }
 
 void InstanceScript::DoNearTeleportPlayers(const Position pos, bool casting /*=false*/)
 {
-    Map::PlayerList const &PlayerList = instance->GetPlayers();
+    Map::PlayerList const &plrList = instance->GetPlayers();
 
-    if (!PlayerList.isEmpty())
-        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->getSource())
-                player->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), casting);
+    if (!plrList.isEmpty())
+        for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
+            if (Player* pPlayer = i->getSource())
+                pPlayer->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), casting);
 }
 
 bool InstanceScript::CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/ /*= NULL*/, uint32 /*miscvalue1*/ /*= 0*/)
