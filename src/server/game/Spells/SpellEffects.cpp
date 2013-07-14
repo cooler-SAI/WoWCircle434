@@ -4974,10 +4974,26 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     break;
                 case 87806: // Seafood Magnifique Feast
                 {
-                    m_caster->CastSpell(unitTarget, 87584, true);
-                    break;
+                    if (!unitTarget)
+                        return;
+
+                    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        float stat = 0.0f;
+                        uint32 spellId = 0;
+
+                        if (unitTarget->GetStat(STAT_STRENGTH) > stat) { spellId = 87584; stat = unitTarget->GetStat(STAT_STRENGTH); }
+                        if (unitTarget->GetStat(STAT_AGILITY)  > stat) { spellId = 87586; stat = unitTarget->GetStat(STAT_AGILITY); }
+                        if (unitTarget->GetStat(STAT_INTELLECT)  > stat) { spellId = 87587; stat = unitTarget->GetStat(STAT_INTELLECT); }
+                        if (unitTarget->GetStat(STAT_SPIRIT)  > stat) { spellId = 87588; }
+                        
+                        if (spellId)
+                            unitTarget->CastSpell(unitTarget, spellId, true);
+                    }
+                    return;
                 }
                 case 87763: // Broiled Dragon Feast
+                case 87916: // Goblin Barbecue Feast
                 {
                     if (!unitTarget)
                         return;
