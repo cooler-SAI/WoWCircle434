@@ -356,6 +356,15 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                 switch (m_spellInfo->Id)                     // better way to check unknown
                 { 
+                    case 109721: // Lightning Strike, Vial of Shadows (lfr)
+                        damage += int32(0.266f * m_caster->GetTotalAttackPowerValue(m_caster->getClass() == CLASS_HUNTER ? RANGED_ATTACK : BASE_ATTACK));
+                        break;
+                    case 107994: // Lightning Strike, Vial of Shadows (normal)
+                        damage += int32(0.3f * m_caster->GetTotalAttackPowerValue(m_caster->getClass() == CLASS_HUNTER ? RANGED_ATTACK : BASE_ATTACK));
+                        break;
+                    case 109724: // Lightning Strike, Vial of Shadows (heroic)
+                        damage += int32(0.339f * m_caster->GetTotalAttackPowerValue(m_caster->getClass() == CLASS_HUNTER ? RANGED_ATTACK : BASE_ATTACK));
+                        break;
                     case 105033: // Searing Blood, Yor'sahj The Unsleeping, Dragon Soul
                     case 108356:
                     case 108357:
@@ -4459,54 +4468,60 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
         }
         case SPELLFAMILY_ROGUE:
         {
-            // Hemorrhage
-            if (m_spellInfo->SpellFamilyFlags[0] & 0x2000000)
+            switch (m_spellInfo->Id)
             {
-                if (m_caster->GetTypeId() == TYPEID_PLAYER)
-                    m_caster->ToPlayer()->AddComboPoints(unitTarget, 1, this);
-                // 45% more damage with daggers
-                if (m_caster->GetTypeId() == TYPEID_PLAYER)
-                    if (Item* item = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
-                        if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
-                            totalDamagePercentMod *= 1.45f;
-            }
-            // Ambush
-            else if (m_spellInfo->Id == 8676)
-            {
-                // 44.7% more damage with daggers
-                if (m_caster->GetTypeId() == TYPEID_PLAYER)
-                    if (Item* item = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
-                        if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
-                            totalDamagePercentMod *= 1.447f;
-            }
-            // Backstab
-            else if (m_spellInfo->Id == 53)
-            {
-                // Murderous Intent
-                if (unitTarget->HealthAbovePct(35) || effIndex != EFFECT_1)
+                case 1752: // Sinister Strike
+                case 84617: // Revealing Strike
+                    // Weighted Blades
+                    if (m_caster->HasAura(110211))
+                        totalDamagePercentMod *= 1.45f;
                     break;
-
-                if (AuraEffect const* aurEff = m_caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_ROGUE, 134, 0))
-                {
-                    int32 bp0 = aurEff->GetAmount();
-                    m_caster->CastCustomSpell(m_caster, 79132, &bp0, 0, 0, true);
-                }
-            }
-            // Fan of Knives
-            else if (m_spellInfo->Id == 51723)
-            {
-                if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                // Hemorrhage
+                case 16511:
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                        m_caster->ToPlayer()->AddComboPoints(unitTarget, 1, this);
+                    // 45% more damage with daggers
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                        if (Item* item = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
+                            if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
+                                totalDamagePercentMod *= 1.45f;
                     break;
+                // Ambush
+                case 8676:
+                    // 44.7% more damage with daggers
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                        if (Item* item = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
+                            if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
+                                totalDamagePercentMod *= 1.447f;
+                    break;
+                // Backstab
+                case 53:
+                    // Murderous Intent
+                    if (unitTarget->HealthAbovePct(35) || effIndex != EFFECT_1)
+                        break;
 
-                // Fan of Knives - Vile Poisons
-                if (AuraEffect * aur = m_caster->GetDummyAuraEffect(SPELLFAMILY_ROGUE, 857, 2))
-                {
-                    if (roll_chance_i(aur->GetAmount()))
+                    if (AuraEffect const* aurEff = m_caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_ROGUE, 134, 0))
                     {
-                        for (uint8 i = BASE_ATTACK; i < MAX_ATTACK; ++i)
-                            m_caster->ToPlayer()->CastItemCombatSpell(unitTarget, WeaponAttackType(i), PROC_FLAG_TAKEN_DAMAGE, PROC_EX_NORMAL_HIT);
+                        int32 bp0 = aurEff->GetAmount();
+                        m_caster->CastCustomSpell(m_caster, 79132, &bp0, 0, 0, true);
                     }
-                }
+                    break;
+                // Fan of Knives
+                case 51723:
+
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                        break;
+
+                    // Fan of Knives - Vile Poisons
+                    if (AuraEffect * aur = m_caster->GetDummyAuraEffect(SPELLFAMILY_ROGUE, 857, 2))
+                    {
+                        if (roll_chance_i(aur->GetAmount()))
+                        {
+                            for (uint8 i = BASE_ATTACK; i < MAX_ATTACK; ++i)
+                                m_caster->ToPlayer()->CastItemCombatSpell(unitTarget, WeaponAttackType(i), PROC_FLAG_TAKEN_DAMAGE, PROC_EX_NORMAL_HIT);
+                        }
+                    }
+                    break;
             }
             break;
         }

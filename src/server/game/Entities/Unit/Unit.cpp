@@ -9833,6 +9833,19 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Savage Defence
+        case 62600:
+        {
+            int32 chance = 50;
+            
+            // Item - Druid T13 Feral 2P Bonus (Savage Defense and Blood In The Water)
+            if (procSpell && procSpell->Id == 33878 && HasAura(105725))
+                chance = 100;
+            
+            if (!roll_chance_i(chance))
+                return false;
+            break;
+        }
         // Vigilance
         case 50720:
         {   
@@ -10114,7 +10127,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
         // Blood in the Water
         case 80318:
         case 80319:
-            if (victim->GetHealthPct() > triggerAmount)
+            if (victim->GetHealthPct() > (HasAura(105725) ? 60 : triggerAmount))
                 return false;
             break;
         // Crimson Scourge
