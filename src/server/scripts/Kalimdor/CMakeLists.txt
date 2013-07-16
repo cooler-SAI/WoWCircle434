@@ -72,6 +72,7 @@ set(scripts_STAT_SRCS
   Kalimdor/CavernsOfTime/HourofTwilight/hour_of_twilight.h
   Kalimdor/CavernsOfTime/DragonSoul/boss_morchok.cpp
   Kalimdor/CavernsOfTime/DragonSoul/boss_yorsahj_the_unsleeping.cpp
+  Kalimdor/CavernsOfTime/DragonSoul/boss_warlord_zonozz.cpp
   Kalimdor/CavernsOfTime/DragonSoul/instance_dragon_soul.cpp
   Kalimdor/CavernsOfTime/DragonSoul/dragon_soul.cpp
   Kalimdor/CavernsOfTime/DragonSoul/dragon_soul.h

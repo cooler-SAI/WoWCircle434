@@ -1707,6 +1707,14 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_GENERIC:
                 switch (GetId())
                 {
+                    // Disrupting Shadows, Warlord Zon'ozz, Dragon Soul
+                    case 103434:
+                    case 104599:
+                    case 104600:
+                    case 104601:
+                        if (removeMode == AURA_REMOVE_BY_ENEMY_SPELL)
+                            target->CastSpell(target, 103948, true);
+                        break;
                     case 52418: // Carrying Seaforium
                         if (removeMode == AURA_REMOVE_BY_CANCEL)
                             target->CastSpell(target, 52417, true);

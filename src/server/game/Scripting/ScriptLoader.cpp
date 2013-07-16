@@ -723,6 +723,7 @@ void AddSC_instance_dragon_soul(); // Dragon Soul
 void AddSC_dragon_soul();
 void AddSC_boss_morchok();
 void AddSC_boss_yorsahj_the_unsleeping();
+void AddSC_boss_warlord_zonozz();
 
 // battlegrounds
 
@@ -1482,6 +1483,7 @@ void AddNorthrendScripts()
     AddSC_dragon_soul();
     AddSC_boss_morchok();
     AddSC_boss_yorsahj_the_unsleeping();
+    AddSC_boss_warlord_zonozz();
 
 #endif
 }
