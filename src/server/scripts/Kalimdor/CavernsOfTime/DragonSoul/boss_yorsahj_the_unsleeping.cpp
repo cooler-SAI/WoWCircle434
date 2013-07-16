@@ -26,6 +26,9 @@ enum Spells
     SPELL_DEEP_CORRUPTION           = 105171,
     SPELL_DEEP_CORRUPTION_AURA      = 103628,
     SPELL_DEEP_CORRUPTION_DMG       = 105173,
+    SPELL_DEEP_CORRUPTION_DMG_25    = 108347,
+    SPELL_DEEP_CORRUPTION_DMG_10H   = 108348,
+    SPELL_DEEP_CORRUPTION_DMG_25H   = 108349,
     SPELL_DIGESTIVE_ACID            = 105031,
     SPELL_DIGESTIVE_ACID_DUMMY      = 105562,
     SPELL_DIGESTIVE_ACID_AOE        = 105571,
@@ -821,7 +824,23 @@ class spell_yorsahj_the_unsleeping_deep_corruption : public SpellScriptLoader
                 {
                     if (aur->GetStackAmount() >= 5)
                     {
-                        GetCaster()->CastSpell(GetCaster(), SPELL_DEEP_CORRUPTION_DMG, true);
+                        uint32 spellId = SPELL_DEEP_CORRUPTION_DMG;
+                        switch (GetCaster()->GetMap()->GetDifficulty())
+                        {
+                            case RAID_DIFFICULTY_10MAN_NORMAL: spellId = SPELL_DEEP_CORRUPTION_DMG; break;
+                            case RAID_DIFFICULTY_25MAN_NORMAL: spellId = SPELL_DEEP_CORRUPTION_DMG_25; break;
+                            case RAID_DIFFICULTY_10MAN_HEROIC: spellId = SPELL_DEEP_CORRUPTION_DMG_10H; break;
+                            case RAID_DIFFICULTY_25MAN_HEROIC: spellId = SPELL_DEEP_CORRUPTION_DMG_25H; break;
+                        }
+
+                        if (InstanceScript* pInstance = GetCaster()->GetInstanceScript())
+                        {
+                            if (uint64 guid = pInstance->GetData64(DATA_YORSAHJ))
+                                GetCaster()->CastSpell(GetCaster(), spellId, true, 0, NULL, guid);
+                        }
+                        else
+                            GetCaster()->CastSpell(GetCaster(), spellId, true);
+
                         aur->Remove();
                     }
                 }
@@ -860,7 +879,7 @@ class spell_yorsahj_the_unsleeping_digestive_acid_aoe : public SpellScriptLoader
                     if (Unit* pTank = pYorsahj->getVictim())
                         targets.remove(pTank);
 
-                uint32 max_targets = (GetCaster()->GetMap()->Is25ManRaid() ? 10 : 5);
+                uint32 max_targets = (GetCaster()->GetMap()->Is25ManRaid() ? 16 : 8);
                 Trinity::Containers::RandomResizeList(targets, max_targets);
             }
 
@@ -919,7 +938,9 @@ class spell_yorsahj_the_unsleeping_mana_void : public SpellScriptLoader
             
                     bool operator()(WorldObject* unit)
                     {
-                        return (!unit->ToUnit() || unit->ToUnit()->getPowerType() != POWER_MANA);
+                        if (unit->GetTypeId() != TYPEID_PLAYER)
+                            return true;
+                        return (unit->ToPlayer()->getPowerType() != POWER_MANA);
                     }
             };
 
@@ -952,8 +973,6 @@ class achievement_taste_the_rainbow : public AchievementCriteriaScript
     private:
         uint32 _Id;
 };
-
-
 
 void AddSC_boss_yorsahj_the_unsleeping()
 {

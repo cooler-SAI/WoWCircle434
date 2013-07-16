@@ -6204,6 +6204,9 @@ void SpellMgr::LoadDbcDataCorrections()
             case 108220: // Deep Corruption
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
                 break;
+            case 108183: // Twilight Submission
+                spellInfo->MaxAffectedTargets = 1;
+                break;
             // Morchok
             case 103821: // Earthen Vortex
             case 110047:
@@ -6216,14 +6219,14 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_2].SetRadiusIndex(EFFECT_RADIUS_60_YARDS);
                 break;
             case 103178: // Earths Vengeance dmg
-                spellInfo->SetDurationIndex(18);
+                spellInfo->SetDurationIndex(618);
                 break;
             case 103534: // Danger
             case 103536: // Warning
             case 103541: // Safe
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
                 break;
-            // Yoe'sahj The Unsleeping
+            // Yor'sahj The Unsleeping
             case 105420: // Color Combine 1
             case 105435: // Color Combine 2
             case 105436: // Color Combine 3
@@ -6238,6 +6241,61 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 105534: // Mana Void dummy
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                break;
+            case 109390: // Deep Corruption dmg (trash)
+            case 105173: // Deep Corruption dmg
+            case 108347:
+            case 108348:
+            case 108349:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+                break;
+            case 108228: // Mana Diffusion
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+                break;
+            // Warlord Zon'ozz
+            case 109197: // Tentacle Toss aoe 1
+            case 109237: // Tentacle Toss aoe 2
+                spellInfo->MaxAffectedTargets = 1;
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+                break;
+            case 109240: // Tentacle Toss jump
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            case 104031: // Void Diffusion
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            case 104377: // Black Blood of Go'rath
+            case 110306:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            // Hagara the Stormbinder
+            case 109393:
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                break;
+            case 109305: // Frozen Grasp
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_100_YARDS);
+                break;
+            case 109307: // Frozen Grasp grip
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_JUMP_DEST;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+                break;
+            case 109315: // Icicle
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            case 105311: // Crystalline Tether
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 105316: // Ice Lance dmg
+            case 107061:
+            case 107062:
+            case 107063:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 105256: // Frozen Tempest
+                spellInfo->Mechanic = 0;
                 break;
             // ENDOF DRAGON SOUL SPELLS
             //
