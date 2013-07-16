@@ -3038,7 +3038,7 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
     if (!m_hitTriggerSpells.empty())
     {
         int _duration = 0;
-        for (HitTriggerSpellList::const_iterator i = m_hitTriggerSpells.begin(); i != m_hitTriggerSpells.end(); )
+        for (HitTriggerSpellList::iterator i = m_hitTriggerSpells.begin(); i != m_hitTriggerSpells.end(); )
         {
             if (CanExecuteTriggersOnHit(effMask, i->triggeredByAura))
             {
