@@ -818,7 +818,7 @@ void Battleground::EndBattleground(uint32 winner)
     }
 
     if (isArena() && isRated() && winnerArenaTeam && loserArenaTeam && winnerArenaTeam != loserArenaTeam)
-        CalculatingMatchmakingRating(winnerArenaTeam, loserArenaTeam, winnerMatchmakerChange, loserMatchmakerChange, winner);
+        CalculatingMatchmakingRating(winnerArenaTeam, loserArenaTeam, winnerMatchmakerChange, loserMatchmakerChange, winnerTeamRating, loserTeamRating, winner);
 
     bool guildAwarded = false;
     WorldPacket pvpLogData;
@@ -1011,7 +1011,7 @@ void Battleground::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
                     ArenaTeam* winnerArenaTeam = sArenaTeamMgr->GetArenaTeamById(GetArenaTeamIdForTeam(GetOtherTeam(team)));
                     ArenaTeam* loserArenaTeam = sArenaTeamMgr->GetArenaTeamById(GetArenaTeamIdForTeam(team));
                     if (winnerArenaTeam && loserArenaTeam && winnerArenaTeam != loserArenaTeam)
-                        loserArenaTeam->MemberLost(player, GetArenaMatchmakerRating(GetOtherTeam(team)));
+                        loserArenaTeam->MemberLost(player, GetArenaMatchmakerRating(GetOtherTeam(team)), -12, loserArenaTeam->GetRating());
                 }
             }
             if (SendPacket)
@@ -1033,7 +1033,7 @@ void Battleground::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
                 ArenaTeam* others_arena_team = sArenaTeamMgr->GetArenaTeamById(GetArenaTeamIdForTeam(GetOtherTeam(team)));
                 ArenaTeam* players_arena_team = sArenaTeamMgr->GetArenaTeamById(GetArenaTeamIdForTeam(team));
                 if (others_arena_team && players_arena_team)
-                    players_arena_team->OfflineMemberLost(guid, GetArenaMatchmakerRating(GetOtherTeam(team)));
+                    players_arena_team->OfflineMemberLost(guid, GetArenaMatchmakerRating(GetOtherTeam(team)), -12, players_arena_team->GetRating());
             }
         }
 
@@ -1999,7 +1999,7 @@ void Battleground::HandleAreaTrigger(Player* player, uint32 trigger)
                    trigger, player->GetMapId(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
 }
 
-void Battleground::CalculatingMatchmakingRating(ArenaTeam* winnerTeam, ArenaTeam* loserTeam, uint32 winnerMatchmaking, uint32 loserMatchmaking, uint32 winner)
+void Battleground::CalculatingMatchmakingRating(ArenaTeam* winnerTeam, ArenaTeam* loserTeam, uint32 winnerMatchmaking, uint32 loserMatchmaking, uint32 winnerTeamRating, uint32 loserTeamRating, uint32 winner)
 {
     for (BattlegroundPlayerMap::iterator itr = m_Players.begin(); ; ++itr)
     {
@@ -2014,12 +2014,12 @@ void Battleground::CalculatingMatchmakingRating(ArenaTeam* winnerTeam, ArenaTeam
         {
             if (team == winner)
             {
-                winnerTeam->OfflineMemberLost(itr->first, loserMatchmaking, winnerMatchmaking);
+                winnerTeam->OfflineMemberLost(itr->first, loserMatchmaking, winnerMatchmaking, winnerTeamRating);
                 SetMatchMakingRatingChange(itr->first, winnerMatchmaking);
             }
             else
             {
-                loserTeam->OfflineMemberLost(itr->first, winnerMatchmaking, loserMatchmaking);
+                loserTeam->OfflineMemberLost(itr->first, winnerMatchmaking, loserMatchmaking, loserTeamRating);
                 SetMatchMakingRatingChange(itr->first, loserMatchmaking);
             }
             continue;
@@ -2036,13 +2036,13 @@ void Battleground::CalculatingMatchmakingRating(ArenaTeam* winnerTeam, ArenaTeam
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA, rating ? rating : 1);
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA, GetMapId());
 
-            winnerTeam->MemberWon(player, loserMatchmaking, winnerMatchmaking);
+            winnerTeam->MemberWon(player, loserMatchmaking, winnerMatchmaking, winnerTeamRating);
             SetMatchMakingRatingChange(player->GetGUID(), winnerMatchmaking);
             player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_ARENA, sWorld->getIntConfig(CONFIG_CURRENCY_CONQUEST_POINTS_ARENA_REWARD));
         }
         else
         {
-            loserTeam->MemberLost(player, winnerMatchmaking, loserMatchmaking);
+            loserTeam->MemberLost(player, winnerMatchmaking, loserMatchmaking, loserTeamRating);
             SetMatchMakingRatingChange(player->GetGUID(), loserMatchmaking);
 
             // Arena lost => reset the win_rated_arena having the "no_lose" condition

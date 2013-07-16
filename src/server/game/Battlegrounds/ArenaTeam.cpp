@@ -727,7 +727,7 @@ int32 ArenaTeam::LostAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int3
     return mod;
 }
 
-void ArenaTeam::MemberLost(Player* player, uint32 againstMatchmakerRating, int32 MatchmakerRatingChange)
+void ArenaTeam::MemberLost(Player* player, uint32 againstMatchmakerRating, int32 MatchmakerRatingChange, uint32 loserTeamRating)
 {
     // Called for each participant of a match after losing
     for (MemberList::iterator itr = Members.begin(); itr != Members.end(); ++itr)
@@ -735,7 +735,7 @@ void ArenaTeam::MemberLost(Player* player, uint32 againstMatchmakerRating, int32
         if (itr->Guid == player->GetGUID())
         {
             // Update personal rating
-            int32 mod = GetRatingMod(itr->PersonalRating, againstMatchmakerRating, itr->MatchMakerRating, false);
+            int32 mod = GetRatingMod(loserTeamRating, againstMatchmakerRating, itr->MatchMakerRating, false);
             itr->ModifyPersonalRating(player, mod, GetType());
 
             // Update matchmaker rating
@@ -753,7 +753,7 @@ void ArenaTeam::MemberLost(Player* player, uint32 againstMatchmakerRating, int32
     }
 }
 
-void ArenaTeam::OfflineMemberLost(uint64 guid, uint32 againstMatchmakerRating, int32 MatchmakerRatingChange)
+void ArenaTeam::OfflineMemberLost(uint64 guid, uint32 againstMatchmakerRating, int32 MatchmakerRatingChange, uint32 loserTeamRating)
 {
     // Called for offline player after ending rated arena match!
     for (MemberList::iterator itr = Members.begin(); itr != Members.end(); ++itr)
@@ -761,7 +761,7 @@ void ArenaTeam::OfflineMemberLost(uint64 guid, uint32 againstMatchmakerRating, i
         if (itr->Guid == guid)
         {
             // update personal rating
-            int32 mod = GetRatingMod(itr->PersonalRating, againstMatchmakerRating, itr->MatchMakerRating, false);
+            int32 mod = GetRatingMod(loserTeamRating, againstMatchmakerRating, itr->MatchMakerRating, false);
             itr->ModifyPersonalRating(NULL, mod, GetType());
 
             // update matchmaker rating
@@ -775,7 +775,7 @@ void ArenaTeam::OfflineMemberLost(uint64 guid, uint32 againstMatchmakerRating, i
     }
 }
 
-void ArenaTeam::MemberWon(Player* player, uint32 againstMatchmakerRating, int32 MatchmakerRatingChange)
+void ArenaTeam::MemberWon(Player* player, uint32 againstMatchmakerRating, int32 MatchmakerRatingChange, uint32 winnerTeamRating)
 {
     // called for each participant after winning a match
     for (MemberList::iterator itr = Members.begin(); itr != Members.end(); ++itr)
@@ -783,7 +783,7 @@ void ArenaTeam::MemberWon(Player* player, uint32 againstMatchmakerRating, int32 
         if (itr->Guid == player->GetGUID())
         {
             // update personal rating
-            int32 mod = GetRatingMod(itr->PersonalRating, againstMatchmakerRating, itr->MatchMakerRating, true);
+            int32 mod = GetRatingMod(winnerTeamRating, againstMatchmakerRating, itr->MatchMakerRating, true);
             itr->ModifyPersonalRating(player, mod, GetType());
 
             // update matchmaker rating
