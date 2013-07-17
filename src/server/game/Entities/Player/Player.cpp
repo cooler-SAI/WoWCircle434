@@ -3688,7 +3688,7 @@ bool Player::addSpell(uint32 spellId, bool active, bool learning, bool dependent
                 continue;
 
             if (!HasSkill(spell_idx->second->skillId))
-                return false;
+                disabled = true;
         }
     }
 

@@ -441,6 +441,7 @@ class boss_hagara_the_stormbinder: public CreatureScript
                         events.ScheduleEvent(EVENT_ICE_LANCE, 12000);
                         events.ScheduleEvent(EVENT_ICY_TOMB, 20000);
                         events.ScheduleEvent(EVENT_FOCUSED_ASSAULT, 15000);
+                        events.ScheduleEvent(EVENT_SHATTERED_ICE, urand(20000, 30500));
                         if (phase == 10)
                             events.ScheduleEvent(EVENT_FROZEN_TEMPEST_1, 62000);
                         else if (phase == 11)
@@ -625,6 +626,8 @@ class boss_hagara_the_stormbinder: public CreatureScript
                             
                             if (pTarget)
                                 DoCast(pTarget, SPELL_SHATTERED_ICE);
+
+                            events.ScheduleEvent(EVENT_SHATTERED_ICE, 10500);
                             break;
                         }
                         case EVENT_FOCUSED_ASSAULT:
