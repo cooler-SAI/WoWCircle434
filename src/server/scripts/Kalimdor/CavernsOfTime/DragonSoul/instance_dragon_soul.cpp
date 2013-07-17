@@ -50,6 +50,9 @@ class instance_dragon_soul : public InstanceMapScript
                         uiHagaraGUID = pCreature->GetGUID();
                         break;
                     case NPC_TRAVEL_TO_WYRMREST_TEMPLE:
+                    case NPC_TRAVEL_TO_EYE_OF_ETERNITY:
+                    case NPC_TRAVEL_TO_WYRMREST_BASE:
+                    case NPC_TRAVEL_TO_WYRMREST_SUMMIT:
                         teleportGUIDs.push_back(pCreature->GetGUID());
                         break;
                     default:

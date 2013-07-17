@@ -6962,6 +6962,28 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
         // Spell exist but require custom code
         switch (auraId)
         {
+            case 107851: // Focused Assault, Hagara, Dragon Soul
+            case 110900:
+            case 110899:
+            case 110898:
+                if (caster)
+                    if (Creature* pHagara = caster->ToCreature())
+                        if (Unit* pTarget = pHagara->getVictim())
+                        {
+                            if (!pHagara->GetMap()->IsHeroic())
+                                if (!pHagara->isInFront(pTarget) || !pHagara->IsWithinMeleeRange(pTarget))
+                                {
+                                    GetBase()->Remove();
+                                    return;
+                                }
+
+                            pHagara->CastSpell(pHagara->getVictim(), 107850, true);
+                        }
+                return;
+            case 105285: // Target, Hagara, Dragon Soul
+                if (caster)
+                    caster->CastSpell(target, triggerSpellId, true);
+                return;
             // Flood, Ancient Water Lord, Dragon Soul
             case 107797:
                 if (caster)

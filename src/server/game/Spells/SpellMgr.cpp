@@ -3033,6 +3033,10 @@ void SpellMgr::LoadSpellCustomAttr()
             case 108571: // Stomp
             case 109033: // Stomp
             case 109034: // Stomp
+            case 103527: // Void Diffusion dmg
+            case 104605: // Void Diffusion dmg
+            case 108345: // Void Diffusion dmg
+            case 108346: // Void Diffusion dmg
                 // ONLY SPELLS WITH SPELLFAMILY_GENERIC and EFFECT_SCHOOL_DAMAGE
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 break;
@@ -6286,6 +6290,7 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
             case 105311: // Crystalline Tether
+            case 105482:
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
                 break;
             case 105316: // Ice Lance dmg
@@ -6296,6 +6301,18 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 105256: // Frozen Tempest
                 spellInfo->Mechanic = 0;
+                break;
+            case 105367: // Lightning Conduit dummy 1
+                spellInfo->SetDurationIndex(39); // 2 secs
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_8_YARDS);
+                spellInfo->Effects[EFFECT_0].ChainTarget = 25;
+                break;
+            case 105371: // Lightning Conduit dummy 2
+                spellInfo->SetDurationIndex(39); // 2 secs
+                spellInfo->AttributesEx5 |= SPELL_ATTR5_HIDE_DURATION;
+                break;
+            case 107850: // Focused Assault dmg
+                spellInfo->SetRangeIndex(13); // 50000
                 break;
             // ENDOF DRAGON SOUL SPELLS
             //

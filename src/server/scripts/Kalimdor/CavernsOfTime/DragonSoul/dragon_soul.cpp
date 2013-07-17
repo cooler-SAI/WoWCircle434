@@ -1095,7 +1095,19 @@ class npc_dragon_soul_teleport : public CreatureScript
                         break;
                         break;
                     case NPC_TRAVEL_TO_WYRMREST_TEMPLE:
+                    case NPC_TRAVEL_TO_WYRMREST_BASE:
                         pPlayer->NearTeleportTo(teleportPos[0].GetPositionX(), teleportPos[0].GetPositionY(), teleportPos[0].GetPositionZ(), teleportPos[0].GetOrientation());
+                        break;
+                    case NPC_TRAVEL_TO_WYRMREST_SUMMIT:
+                        pPlayer->NearTeleportTo(teleportPos[3].GetPositionX(), teleportPos[3].GetPositionY(), teleportPos[3].GetPositionZ(), teleportPos[3].GetOrientation());
+                        break;
+                    case NPC_NETHESTRASZ:
+                        if (pInstance->GetBossState(DATA_YORSAHJ) == DONE && pInstance->GetBossState(DATA_ZONOZZ) == DONE)
+                            pPlayer->NearTeleportTo(teleportPos[3].GetPositionX(), teleportPos[3].GetPositionY(), teleportPos[3].GetPositionZ(), teleportPos[3].GetOrientation());
+                        break;
+                    case NPC_TRAVEL_TO_EYE_OF_ETERNITY:
+                        if (pInstance->GetBossState(DATA_YORSAHJ) == DONE && pInstance->GetBossState(DATA_ZONOZZ) == DONE)
+                            pPlayer->NearTeleportTo(teleportPos[4].GetPositionX(), teleportPos[4].GetPositionY(), teleportPos[4].GetPositionZ(), teleportPos[4].GetOrientation());
                         break;
                     default:
                         break;
