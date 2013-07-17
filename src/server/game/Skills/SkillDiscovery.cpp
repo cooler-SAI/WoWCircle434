@@ -76,6 +76,16 @@ void LoadSkillDiscoveryTable()
         uint32 reqSkillValue   = fields[2].GetUInt16();
         float  chance          = fields[3].GetFloat();
 
+        if (spellId > 0)
+        {
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (!spellInfo)
+            {
+                sLog->outError(LOG_FILTER_SQL, "There is not existed spell (ID: %i) in `spellId` field in `skill_discovery_template` table", spellId);
+                continue;
+            }
+        }
+
         if (chance <= 0)                                    // chance
         {
             ssNonDiscoverableEntries << "spellId = " << spellId << " reqSkillOrSpell = " << reqSkillOrSpell
@@ -172,11 +182,12 @@ uint32 GetExplicitDiscoverySpell(uint32 spellId, Player* player)
 
     if (tab != SkillDiscoveryStore.end())
     {
-        uint32 weight = 0;
         std::list<uint32> spellIds;
         for (SkillDiscoveryList::const_iterator item_iter = tab->second.begin(); item_iter != tab->second.end(); ++item_iter)
+        {
             if (item_iter->reqSkillValue <= skillvalue && item_iter->chance > 0 && !player->HasSpell(item_iter->spellId))
                 spellIds.push_back(item_iter->spellId);
+        }
         
         if (!spellIds.empty())
             return Trinity::Containers::SelectRandomContainerElement(spellIds);

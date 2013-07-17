@@ -9368,6 +9368,14 @@ bool Unit::HandleAuraProc(Unit* victim, uint32 damage, uint32 absorb, Aura* trig
             }
             break;
         }
+        case SPELLFAMILY_WARLOCK:
+            // Soulburn
+            if (dummySpell->Id == 74434)
+                if (procSpell->Id == 6353)
+                    // Item - Warlock T13 4P Bonus (Soulburn)
+                    if (HasAura(105787))
+                        EnergizeBySpell(this, 74434, 1, POWER_SOUL_SHARDS);
+            break;
     }
     return false;
 }
