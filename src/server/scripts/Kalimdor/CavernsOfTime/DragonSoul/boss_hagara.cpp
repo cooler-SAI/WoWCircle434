@@ -41,6 +41,7 @@ enum Spells
     SPELL_ICE_WAVE                  = 105265,
     SPELL_CRYSTALLINE_TETHER_1      = 105311,
     SPELL_CRYSTALLINE_OVERLOAD_1    = 105312,
+    SPELL_FROSTFLAKE                = 109325,
     SPELL_FEEDBACK                  = 108934,
     SPELL_WATER_SHIELD              = 105409,
     SPELL_LIGHTNING_STORM           = 105465,
@@ -123,6 +124,7 @@ enum Events
     EVENT_ICICLE,
     EVENT_ICE_WAVE,
     EVENT_ICE_WAVE_MOVE,
+    EVENT_FROSTFLAKE,
     EVENT_ELECTRICAL_STORM_1,
     EVENT_ELECTRICAL_STORM_2,
     EVENT_STORM_PILLARS,
@@ -432,6 +434,7 @@ class boss_hagara_the_stormbinder: public CreatureScript
                         specialPhase = false;
                         events.CancelEvent(EVENT_ICICLE);
                         events.CancelEvent(EVENT_STORM_PILLARS);
+                        events.CancelEvent(EVENT_FROSTFLAKE);
                         me->RemoveAllAuras();
                         DespawnCreatures(NPC_ICE_WAVE);
                         summons.DespawnEntry(NPC_CRYSTAL_CONDUCTOR);
@@ -676,6 +679,7 @@ class boss_hagara_the_stormbinder: public CreatureScript
                             DoCast(me, SPELL_FROZEN_TEMPEST);
                             events.ScheduleEvent(EVENT_ICE_WAVE, 1000);
                             events.ScheduleEvent(EVENT_ICICLE, 2000);
+                            events.ScheduleEvent(EVENT_FROSTFLAKE, urand(2000, 5000));
                             break;
                         case EVENT_ICE_WAVE:
                         {
@@ -726,6 +730,10 @@ class boss_hagara_the_stormbinder: public CreatureScript
                             events.ScheduleEvent(EVENT_ICICLE, urand(8000, 9000));
                             break;
                         }
+                        case EVENT_FROSTFLAKE:
+                            DoCastAOE(SPELL_FROSTFLAKE, true);
+                            events.ScheduleEvent(EVENT_FROSTFLAKE, urand(9000, 12000));
+                            break;
                         case EVENT_ELECTRICAL_STORM_1:
                             events.CancelEvent(EVENT_SHATTERED_ICE);
                             events.CancelEvent(EVENT_ICY_TOMB);
@@ -1645,10 +1653,19 @@ class go_hagara_the_stormbinder_the_focusing_iris : public GameObjectScript
         bool OnGossipHello(Player* pPlayer, GameObject* pGo)
         {
             if (InstanceScript* pInstance = pGo->GetInstanceScript())
-                if (Creature* pHagara = ObjectAccessor::GetCreature(*pGo, pInstance->GetData64(DATA_HAGARA)))
-                    pHagara->AI()->DoAction(ACTION_START_EVENT);
+            {
+                if (pInstance->GetBossState(DATA_ZONOZZ) != DONE || pInstance->GetBossState(DATA_YORSAHJ) != DONE)
+                {
+                    pInstance->DoNearTeleportPlayers(teleportPos[0]);
+                    return true;
+                }
 
-            pGo->Delete();
+                if (Creature* pHagara = ObjectAccessor::GetCreature(*pGo, pInstance->GetData64(DATA_HAGARA)))
+                {
+                    pHagara->AI()->DoAction(ACTION_START_EVENT);
+                    pGo->Delete();
+                }
+            }
             return true;
         }
 };
@@ -1933,6 +1950,37 @@ class spell_hagara_the_stormbinder_storm_pillars : public SpellScriptLoader
         }
 };
 
+class spell_hagara_the_stormbinder_frostflake : public SpellScriptLoader
+{
+    public:
+        spell_hagara_the_stormbinder_frostflake() : SpellScriptLoader("spell_hagara_the_stormbinder_frostflake") { }
+
+        class spell_hagara_the_stormbinder_frostflake_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_hagara_the_stormbinder_frostflake_AuraScript);
+
+            void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
+            {
+                if (!GetUnitOwner())
+                    return;
+
+                if (Aura* aur = GetAura())
+                    if (aur->GetStackAmount() < 9)
+                        aur->ModStackAmount(1);
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_hagara_the_stormbinder_frostflake_AuraScript::HandlePeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_hagara_the_stormbinder_frostflake_AuraScript();
+        }
+};
+
 void AddSC_boss_hagara_the_stormbinder()
 {
     new boss_hagara_the_stormbinder();
@@ -1956,4 +2004,5 @@ void AddSC_boss_hagara_the_stormbinder()
     new spell_hagara_the_stormbinder_ice_lance_target();
     new spell_hagara_the_stormbinder_crystal_conduit_target();
     new spell_hagara_the_stormbinder_storm_pillars();
+    new spell_hagara_the_stormbinder_frostflake();
 }

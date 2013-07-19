@@ -6268,9 +6268,20 @@ void SpellMgr::LoadDbcDataCorrections()
             case 104031: // Void Diffusion
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
                 break;
+            case 104347: // Shadow Gaze
+            case 104602:
+            case 104603:
+            case 104604:
+                spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+                break;
+            case 104378: // Black Blood of Go'rath
+            case 110322:
+                spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+                break;
             case 104377: // Black Blood of Go'rath
             case 110306:
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
                 break;
             // Hagara the Stormbinder
             case 109393:
@@ -6313,6 +6324,9 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 107850: // Focused Assault dmg
                 spellInfo->SetRangeIndex(13); // 50000
+                break;
+            case 109325: // Frostflake
+                spellInfo->MaxAffectedTargets = 1;
                 break;
             // ENDOF DRAGON SOUL SPELLS
             //

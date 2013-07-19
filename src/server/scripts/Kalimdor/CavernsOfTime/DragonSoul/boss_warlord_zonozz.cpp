@@ -177,6 +177,8 @@ class boss_warlord_zonozz: public CreatureScript
 
                 bAchieve = false;
 
+                me->SetReactState(REACT_AGGRESSIVE);
+
                 instance->DoRemoveAurasDueToSpellOnPlayers(RAID_MODE(SPELL_BLACK_BLOOD_OF_GORATH, SPELL_BLACK_BLOOD_OF_GORATH_25));
             }
 
@@ -661,14 +663,14 @@ class npc_warlord_zonozz_tentacle : public CreatureScript
                 switch (me->GetEntry())
                 {
                     case NPC_FLAIL_OF_GORATH:
-                        events.ScheduleEvent(EVENT_SLUDGE_SPEW, urand(5000, 15000));
-                        events.ScheduleEvent(EVENT_WILD_FLAIL, 10000);
+                        events.ScheduleEvent(EVENT_SLUDGE_SPEW, urand(10000, 15000));
+                        events.ScheduleEvent(EVENT_WILD_FLAIL, 15000);
                         break;
                     case NPC_CLAW_OF_GORATH:
-                        events.ScheduleEvent(EVENT_OOZE_SPIT, 5000);
+                        events.ScheduleEvent(EVENT_OOZE_SPIT, 8000);
                         break;
                     case NPC_EYE_OF_GORATH:
-                        events.ScheduleEvent(EVENT_SHADOW_GAZE, urand(3000, 5000));
+                        events.ScheduleEvent(EVENT_SHADOW_GAZE, urand(3000, 15000));
                         break;
                     default:
                         break;
@@ -689,7 +691,7 @@ class npc_warlord_zonozz_tentacle : public CreatureScript
                         case EVENT_SLUDGE_SPEW:
                             if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                                 DoCast(pTarget, SPELL_SLUDGE_SPEW);
-                            events.ScheduleEvent(EVENT_SLUDGE_SPEW, urand(12000, 15000));
+                            events.ScheduleEvent(EVENT_SLUDGE_SPEW, urand(12000, 20000));
                             break;
                         case EVENT_WILD_FLAIL:
                             DoCastAOE(SPELL_WILD_FLAIL);
@@ -699,12 +701,12 @@ class npc_warlord_zonozz_tentacle : public CreatureScript
                             if (!me->IsWithinMeleeRange(me->getVictim()))
                                 if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                                     DoCast(pTarget, SPELL_OOZE_SPIT);
-                            events.ScheduleEvent(EVENT_OOZE_SPIT, 4000);
+                            events.ScheduleEvent(EVENT_OOZE_SPIT, 6000);
                             break;
                         case EVENT_SHADOW_GAZE:
                             if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -int32(RAID_MODE(SPELL_SHADOW_GAZE, SPELL_SHADOW_GAZE_25, SPELL_SHADOW_GAZE_10H, SPELL_SHADOW_GAZE_25H))))
                                 DoCast(pTarget, SPELL_SHADOW_GAZE);
-                            events.ScheduleEvent(EVENT_SHADOW_GAZE, urand(3000, 4000));
+                            events.ScheduleEvent(EVENT_SHADOW_GAZE, urand(8000, 15000));
                             break;
                         default:
                             break;
