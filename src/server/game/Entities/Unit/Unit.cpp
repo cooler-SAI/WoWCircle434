@@ -5331,6 +5331,22 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                case 108007: // Indomitable, Indomitable Pride (normal)
+                case 109785: // Indomitable, Indomitable Pride (lfr)
+                case 109786: // Indomitable, Indomitable Pride (heroic)
+                    if (!victim)
+                        return false;
+                    if (!damage)
+                        return false;
+                    if (effIndex != EFFECT_1)
+                        return false;
+
+                     if (Aura const* aur = triggeredByAura->GetBase())
+                         if (AuraEffect const* aurEff = aur->GetEffect(EFFECT_1))
+                             basepoints0 = int32(CalculatePct(damage, aurEff->GetAmount()));
+
+                     triggered_spell_id = 108008;
+                    break;
                 // Fel Decay, Peroth'arn, Well of Eternity
                 case 108124:
                     if (!victim)
