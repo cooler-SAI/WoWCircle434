@@ -639,7 +639,7 @@ class boss_hagara_the_stormbinder: public CreatureScript
                             break;
                         case EVENT_ICY_TOMB:
                             Talk(SAY_ICY_TOMB);
-                            DoCastAOE(SPELL_ICY_TOMB_AOE);
+                            me->CastCustomSpell(SPELL_ICY_TOMB_AOE, SPELLVALUE_MAX_TARGETS, RAID_MODE(2, 5, 2, 6));
                             break;
                         case EVENT_ICE_LANCE:
                         {
