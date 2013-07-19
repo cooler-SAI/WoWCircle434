@@ -552,7 +552,7 @@ class Battleground
         void CheckArenaAfterTimerConditions();
         void CheckArenaWinConditions();
         void UpdateArenaWorldState();
-        void CalculatingMatchmakingRating(ArenaTeam* winnerTeam, ArenaTeam* loserTeam, uint32 winnerMatchmaking, uint32 loserMatchmaking, uint32 winnerTeamRating, uint32 loserTeamrating, uint32 winner);
+        void CalculatingMatchmakingRating(ArenaTeam* winnerTeam, ArenaTeam* loserTeam, uint32 winnerMatchmaking, uint32 loserMatchmaking, uint32 winner);
 
         // Triggers handle
         // must be implemented in BG subclass

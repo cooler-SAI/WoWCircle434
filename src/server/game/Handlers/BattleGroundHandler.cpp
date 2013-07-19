@@ -557,7 +557,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
                 if (at)
                 {
                     sLog->outDebug(LOG_FILTER_BATTLEGROUND, "UPDATING memberLost's personal arena rating for %u by opponents rating: %u, because he has left queue!", GUID_LOPART(_player->GetGUID()), ginfo.OpponentsTeamRating);
-                    at->MemberLost(_player, ginfo.OpponentsMatchmakerRating, -12, at->GetRating());
+                    at->MemberLost(_player, ginfo.OpponentsMatchmakerRating);
                     at->SaveToDB();
                 }
             }
