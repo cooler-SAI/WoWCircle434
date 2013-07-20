@@ -412,7 +412,7 @@ class boss_hagara_the_stormbinder: public CreatureScript
                 Talk(SAY_AGGRO);
 
                 events.ScheduleEvent(EVENT_BERSERK, 8 * MINUTE * IN_MILLISECONDS);
-                /*if (urand(0, 1))
+                if (urand(0, 1))
                 {
                     events.ScheduleEvent(EVENT_FROZEN_TEMPEST_1, 32000);
                     DoCast(me, SPELL_HAGARA_FROST_AXES, true);
@@ -421,8 +421,7 @@ class boss_hagara_the_stormbinder: public CreatureScript
                 {
                     events.ScheduleEvent(EVENT_ELECTRICAL_STORM_1, 32000);
                     DoCast(me, SPELL_HAGARA_LIGHTNING_AXES, true);
-                }*/
-                events.ScheduleEvent(EVENT_FROZEN_TEMPEST_1, 10000);
+                }
                 events.ScheduleEvent(EVENT_SHATTERED_ICE, urand(10500, 15000));
                 events.ScheduleEvent(EVENT_FOCUSED_ASSAULT, 11000);
                 events.ScheduleEvent(EVENT_ICE_LANCE, 10000);
