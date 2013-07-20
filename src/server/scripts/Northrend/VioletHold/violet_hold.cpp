@@ -15,14 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
+#include "ScriptPCH.h"
 #include "ScriptedEscortAI.h"
 #include "violet_hold.h"
 
 #define GOSSIP_START_EVENT  "Get your people to safety, we'll keep the Blue Dragonflight's forces at bay."
-#define GOSSIP_ITEM_1       "Activate the crystals when we get in trouble, right"
+#define GOSSIP_ITEM_1       "Activate the crystals when we get in trouble, right?"
 #define GOSSIP_I_WANT_IN    "I'm not fighting, so send me in now!"
 #define SPAWN_TIME          20000
 
@@ -39,7 +37,7 @@ enum PortalCreatures
     CREATURE_AZURE_CAPTAIN            = 30666,
     CREATURE_AZURE_SORCEROR           = 30667,
     CREATURE_AZURE_RAIDER             = 30668,
-    CREATURE_AZURE_STALKER            = 32191
+    CREATURE_AZURE_STALKER            = 32191,
 };
 
 enum AzureInvaderSpells
@@ -449,32 +447,32 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 uiWPointId)
         {
             switch (uiBoss)
             {
                 case 1:
-                    if (waypointId == 2)
+                    if (uiWPointId == 2)
                         FinishPointReached();
                     break;
                 case 2:
-                    if (waypointId == 2)
+                    if (uiWPointId == 2)
                         FinishPointReached();
                     break;
                 case 3:
-                    if (waypointId == 1)
+                    if (uiWPointId == 1)
                         FinishPointReached();
                     break;
                 case 4:
-                    if (waypointId == 0)
+                    if (uiWPointId == 0)
                         FinishPointReached();
                     break;
                 case 5:
-                    if (waypointId == 0)
+                    if (uiWPointId == 0)
                         FinishPointReached();
                     break;
                 case 6:
-                    if (waypointId == 4)
+                    if (uiWPointId == 4)
                         FinishPointReached();
                     break;
             }
@@ -661,15 +659,11 @@ public:
         void JustSummoned(Creature* summoned)
         {
             listOfMobs.Summon(summoned);
-            if (summoned)
-                instance->SetData64(DATA_ADD_TRASH_MOB, summoned->GetGUID());
         }
 
         void SummonedMobDied(Creature* summoned)
         {
             listOfMobs.Despawn(summoned);
-            if (summoned)
-                instance->SetData64(DATA_DEL_TRASH_MOB, summoned->GetGUID());
         }
     };
 
@@ -692,32 +686,32 @@ struct violet_hold_trashAI : public npc_escortAI
         uint32 portalLocationID;
         uint32 secondPortalRouteID;
 
-    void WaypointReached(uint32 waypointId)
+    void WaypointReached(uint32 uiPointId)
     {
         switch (portalLocationID)
         {
             case 0:
-                if (waypointId == 5)
+                if (uiPointId == 5)
                    CreatureStartAttackDoor();
                 break;
             case 1:
-                if ((waypointId == 8 && secondPortalRouteID == 0) || (waypointId == 7 && secondPortalRouteID == 1))
+                if ((uiPointId == 8 && secondPortalRouteID == 0) || (uiPointId == 7 && secondPortalRouteID == 1))
                     CreatureStartAttackDoor();
                 break;
             case 2:
-                if (waypointId == 7)
+                if (uiPointId == 7)
                    CreatureStartAttackDoor();
                 break;
             case 3:
-                if (waypointId == 8)
+                if (uiPointId == 8)
                     CreatureStartAttackDoor();
                 break;
             case 4:
-                if (waypointId == 5)
+                if (uiPointId == 5)
                     CreatureStartAttackDoor();
                 break;
             case 5:
-                if (waypointId == 3)
+                if (uiPointId == 3)
                     CreatureStartAttackDoor();
                 break;
         }
@@ -780,7 +774,7 @@ struct violet_hold_trashAI : public npc_escortAI
         }
     }
 
-    void JustDied(Unit* /*killer*/)
+    void JustDied(Unit* /*unit*/)
     {
         if (instance)
         {

@@ -15,8 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
+#include "ScriptPCH.h"
 #include "violet_hold.h"
 
 #define MAX_ENCOUNTER          3
@@ -138,12 +137,11 @@ public:
         uint64 uiSaboteurPortal;
 
         uint64 uiActivationCrystal[3];
+        uint64 uiDefenseSystem;
 
         uint32 uiActivationTimer;
         uint32 uiCyanigosaEventTimer;
         uint32 uiDoorSpellTimer;
-
-        std::set<uint64> trashMobs; // to kill with crystal
 
         uint8 uiWaveCount;
         uint8 uiLocation;
@@ -191,8 +189,7 @@ public:
             uiMainDoor = 0;
             uiTeleportationPortal = 0;
             uiSaboteurPortal = 0;
-
-            trashMobs.clear();
+            uiDefenseSystem = 0;
 
             uiRemoveNpc = 0;
 
@@ -232,6 +229,9 @@ public:
         {
             switch (creature->GetEntry())
             {
+                case CREATURE_DEFENSE_SYSTEM:
+                    uiDefenseSystem = creature->GetGUID();
+                    break;
                 case CREATURE_XEVOZZ:
                     uiXevozz = creature->GetGUID();
                     break;
@@ -400,19 +400,6 @@ public:
                         bActive = true;
                         uiRemoveNpc = 0; // might not have been reset after a wipe on a boss.
                     }
-                    break;
-            }
-        }
-
-        void SetData64(uint32 type, uint64 data)
-        {
-            switch (type)
-            {
-                case DATA_ADD_TRASH_MOB:
-                    trashMobs.insert(data);
-                    break;
-                case DATA_DEL_TRASH_MOB:
-                    trashMobs.erase(data);
                     break;
             }
         }
@@ -786,18 +773,6 @@ public:
             }
         }
 
-        void ActivateCrystal()
-        {
-            // Kill all mobs registered with SetData64(ADD_TRASH_MOB)
-            // TODO: All visual, spells etc
-            for (std::set<uint64>::const_iterator itr = trashMobs.begin(); itr != trashMobs.end(); ++itr)
-            {
-                Creature* creature = instance->GetCreature(*itr);
-                if (creature && creature->isAlive())
-                    creature->CastSpell(creature, SPELL_ARCANE_LIGHTNING, true);  // Who should cast the spell?
-            }
-        }
-
         void ProcessEvent(WorldObject* /*go*/, uint32 uiEventId)
         {
             switch (uiEventId)
@@ -807,6 +782,13 @@ public:
                     ActivateCrystal();
                     break;
             }
+        }
+
+        void ActivateCrystal()
+        {
+            if (uiDefenseSystem)
+                if (Creature* pSystem = instance->GetCreature(uiDefenseSystem))
+                    pSystem->CastSpell(pSystem, SPELL_ARCANE_LIGHTNING);
         }
     };
 };
