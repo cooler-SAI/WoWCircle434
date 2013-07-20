@@ -245,6 +245,19 @@ class go_harpy_signal_fire : public GameObjectScript
         }
 };
 
+class at_king_of_the_spider_hill : public AreaTriggerScript
+{
+public:
+    at_king_of_the_spider_hill() : AreaTriggerScript("at_king_of_the_spider_hill") { }
+ 
+    bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/)
+    {
+        if (player)
+            player->CompletedAchievement(sAchievementMgr->GetAchievement(5872));
+        return true;
+    }
+};
+
 void AddSC_mount_hyjal()
 {
     new npc_garr();
@@ -252,4 +265,5 @@ void AddSC_mount_hyjal()
     new npc_lycanthoth();
     new npc_marion_wormswing();
     new go_harpy_signal_fire();
+    new at_king_of_the_spider_hill();
 }
