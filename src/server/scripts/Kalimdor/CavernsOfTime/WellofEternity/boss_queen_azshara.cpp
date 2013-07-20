@@ -255,11 +255,21 @@ class boss_queen_azshara : public CreatureScript
                             events.ScheduleEvent(EVENT_TOTAL_OBEDIENCE, urand(10000, 20000));
                             break;
                         case EVENT_END:
+                        {    
+                            // Temporary quest
+                            Map::PlayerList const &PlayerList = instance->instance->GetPlayers();
+                            if (!PlayerList.isEmpty())
+                                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                                    if (Player* pPlayer = i->getSource())
+                                        if (me->GetDistance(pPlayer) <= 100.0f && pPlayer->GetQuestStatus(QUEST_THE_VAINGLORIOUS) == QUEST_STATUS_INCOMPLETE)
+                                            pPlayer->KilledMonsterCredit(54853, 0);
+
                             instance->SetBossState(DATA_AZSHARA, DONE);
                             instance->DoRespawnGameObject(instance->GetData64(DATA_ROYAL_CACHE), DAY);
                             instance->DoModifyPlayerCurrencies(395, 7000);
                             me->DespawnOrUnsummon();
                             break;
+                        }
                         default:
                             break;
                     }
