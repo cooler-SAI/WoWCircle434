@@ -5341,6 +5341,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (effIndex != EFFECT_1)
                         return false;
 
+                    if (!HealthBelowPctDamaged(50, damage))
+                        return false;
+
                      if (Aura const* aur = triggeredByAura->GetBase())
                          if (AuraEffect const* aurEff = aur->GetEffect(EFFECT_1))
                              basepoints0 = int32(CalculatePct(damage, aurEff->GetAmount()));
