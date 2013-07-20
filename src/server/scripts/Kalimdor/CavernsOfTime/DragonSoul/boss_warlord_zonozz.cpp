@@ -567,7 +567,7 @@ class npc_warlord_zonozz_void_of_the_unmaking : public CreatureScript
                                 me->DespawnOrUnsummon(2000);
                             }
                             else
-                                events.ScheduleEvent(EVENT_CHECK_DISTANCE, 500);
+                                events.ScheduleEvent(EVENT_CHECK_DISTANCE, 200);
                             break;
                         }
                         case EVENT_UPDATE_AURA:

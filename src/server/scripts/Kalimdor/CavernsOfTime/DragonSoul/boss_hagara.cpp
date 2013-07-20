@@ -451,6 +451,7 @@ class boss_hagara_the_stormbinder: public CreatureScript
                         me->RemoveAllAuras();
                         DespawnCreatures(NPC_ICE_WAVE);
                         summons.DespawnEntry(NPC_CRYSTAL_CONDUCTOR);
+                        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_WATERY_ENTRENCHMENT);
                         me->SetReactState(REACT_AGGRESSIVE);
                         AttackStart(me->getVictim());
                         DoCast(me, SPELL_FEEDBACK, true);
@@ -1615,7 +1616,7 @@ class npc_hagara_the_stormbinder_crystal_conductor : public CreatureScript
 
                 if (uint32 eventId = events.ExecuteEvent())
                 {
-                    if (Player* pPlayer = me->FindNearestPlayer(5.0f))
+                    if (Player* pPlayer = me->FindNearestPlayer(8.0f))
                         DoCast(pPlayer, SPELL_LIGHTNING_CONDUIT_DUMMY_1, true);
                     events.ScheduleEvent(EVENT_CHECK_PLAYERS, 1000);
                 }

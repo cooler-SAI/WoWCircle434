@@ -6311,6 +6311,9 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
                 break;
             case 105256: // Frozen Tempest
+            case 109552:
+            case 109553:
+            case 109554:
                 spellInfo->Mechanic = 0;
                 break;
             case 105367: // Lightning Conduit dummy 1
@@ -6333,6 +6336,13 @@ void SpellMgr::LoadDbcDataCorrections()
             case 110887:
             case 110888:
                 spellInfo->InterruptFlags = 0;
+                break;
+            case 105409: // Water Shield
+            case 109560:
+                spellInfo->Effects[EFFECT_2].Amplitude = 8000;
+                break;
+            case 109557: // Storm Pillars
+                spellInfo->MaxAffectedTargets = 1;
                 break;
             // ENDOF DRAGON SOUL SPELLS
             //
