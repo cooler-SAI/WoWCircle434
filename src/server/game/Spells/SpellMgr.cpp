@@ -6328,6 +6328,12 @@ void SpellMgr::LoadDbcDataCorrections()
             case 109325: // Frostflake
                 spellInfo->MaxAffectedTargets = 1;
                 break;
+            case 105289: // Shattered Ice
+            case 108567:
+            case 110887:
+            case 110888:
+                spellInfo->InterruptFlags = 0;
+                break;
             // ENDOF DRAGON SOUL SPELLS
             //
             // Camouflage

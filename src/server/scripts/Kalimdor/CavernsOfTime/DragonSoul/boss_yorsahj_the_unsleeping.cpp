@@ -879,7 +879,7 @@ class spell_yorsahj_the_unsleeping_digestive_acid_aoe : public SpellScriptLoader
                     if (Unit* pTank = pYorsahj->getVictim())
                         targets.remove(pTank);
 
-                uint32 max_targets = (GetCaster()->GetMap()->Is25ManRaid() ? 16 : 8);
+                uint32 max_targets = (GetCaster()->GetMap()->Is25ManRaid() ? 8 : 4);
                 Trinity::Containers::RandomResizeList(targets, max_targets);
             }
 

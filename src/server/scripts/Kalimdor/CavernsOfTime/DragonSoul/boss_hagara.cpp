@@ -679,7 +679,8 @@ class boss_hagara_the_stormbinder: public CreatureScript
                             DoCast(me, SPELL_FROZEN_TEMPEST);
                             events.ScheduleEvent(EVENT_ICE_WAVE, 1000);
                             events.ScheduleEvent(EVENT_ICICLE, 2000);
-                            events.ScheduleEvent(EVENT_FROSTFLAKE, urand(2000, 5000));
+                            if (IsHeroic())
+                                events.ScheduleEvent(EVENT_FROSTFLAKE, urand(2000, 5000));
                             break;
                         case EVENT_ICE_WAVE:
                         {
