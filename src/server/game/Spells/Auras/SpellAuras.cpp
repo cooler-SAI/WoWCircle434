@@ -2281,12 +2281,21 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Tiger's Fury
                 case 5217:
                 {
+                    // Primal Madness
                     if (apply)
                     {
                         if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 2850, 1))
                         {
                             int32 bp = aurEff->GetAmount();
                             caster->CastCustomSpell(caster, 51178, &bp, 0, 0, true);
+                        }
+                    }
+                    else
+                    {
+                        if (!caster->HasAura(50334))
+                        {
+                            caster->RemoveAurasDueToSpell(80886);
+                            caster->RemoveAurasDueToSpell(80879);
                         }
                     }
                     break;
