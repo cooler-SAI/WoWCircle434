@@ -41,6 +41,7 @@ enum Spells
     SPELL_ICE_WAVE                  = 105265,
     SPELL_CRYSTALLINE_TETHER_1      = 105311,
     SPELL_CRYSTALLINE_OVERLOAD_1    = 105312,
+    SPELL_WATERY_ENTRENCHMENT       = 110317,
     SPELL_FROSTFLAKE                = 109325,
     SPELL_FEEDBACK                  = 108934,
     SPELL_WATER_SHIELD              = 105409,
@@ -59,6 +60,8 @@ enum Spells
     SPELL_STORM_PILLAR              = 109541,
 
     SPELL_TWILIGHT_PORTAL_VISUAL    = 95716,
+    SPELL_HAGARA_LIGHTNING_AXES     = 109670,
+    SPELL_HAGARA_FROST_AXES         = 109671,
 
     // Stormborn Myrmidon
     SPELL_SPARK                     = 109368,
@@ -129,6 +132,7 @@ enum Events
     EVENT_ELECTRICAL_STORM_2,
     EVENT_STORM_PILLARS,
     EVENT_BERSERK,
+    EVENT_WATERY_ENTRENCHMENT,
 
 
     // Stormborn Myrmidon
@@ -399,6 +403,8 @@ class boss_hagara_the_stormbinder: public CreatureScript
                     me->SetReactState(REACT_DEFENSIVE);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 }
+
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_WATERY_ENTRENCHMENT);
             }
 
             void EnterCombat(Unit* who)
@@ -406,10 +412,17 @@ class boss_hagara_the_stormbinder: public CreatureScript
                 Talk(SAY_AGGRO);
 
                 events.ScheduleEvent(EVENT_BERSERK, 8 * MINUTE * IN_MILLISECONDS);
-                if (urand(0, 1))
+                /*if (urand(0, 1))
+                {
                     events.ScheduleEvent(EVENT_FROZEN_TEMPEST_1, 32000);
+                    DoCast(me, SPELL_HAGARA_FROST_AXES, true);
+                }
                 else
+                {
                     events.ScheduleEvent(EVENT_ELECTRICAL_STORM_1, 32000);
+                    DoCast(me, SPELL_HAGARA_LIGHTNING_AXES, true);
+                }*/
+                events.ScheduleEvent(EVENT_FROZEN_TEMPEST_1, 10000);
                 events.ScheduleEvent(EVENT_SHATTERED_ICE, urand(10500, 15000));
                 events.ScheduleEvent(EVENT_FOCUSED_ASSAULT, 11000);
                 events.ScheduleEvent(EVENT_ICE_LANCE, 10000);
@@ -433,6 +446,7 @@ class boss_hagara_the_stormbinder: public CreatureScript
                     {
                         specialPhase = false;
                         events.CancelEvent(EVENT_ICICLE);
+                        events.CancelEvent(EVENT_WATERY_ENTRENCHMENT);
                         events.CancelEvent(EVENT_STORM_PILLARS);
                         events.CancelEvent(EVENT_FROSTFLAKE);
                         me->RemoveAllAuras();
@@ -446,9 +460,17 @@ class boss_hagara_the_stormbinder: public CreatureScript
                         events.ScheduleEvent(EVENT_FOCUSED_ASSAULT, 15000);
                         events.ScheduleEvent(EVENT_SHATTERED_ICE, urand(20000, 30500));
                         if (phase == 10)
+                        {
                             events.ScheduleEvent(EVENT_FROZEN_TEMPEST_1, 62000);
+                            me->RemoveAura(SPELL_HAGARA_LIGHTNING_AXES);
+                            DoCast(me, SPELL_HAGARA_FROST_AXES, true);
+                        }
                         else if (phase == 11)
+                        {
                             events.ScheduleEvent(EVENT_ELECTRICAL_STORM_1, 62000);
+                            me->RemoveAura(SPELL_HAGARA_FROST_AXES);
+                            DoCast(me, SPELL_HAGARA_LIGHTNING_AXES, true);
+                        }
                         phase = 0;
 
                     }
@@ -460,6 +482,8 @@ class boss_hagara_the_stormbinder: public CreatureScript
                 _JustDied();
 
                 Talk(SAY_DEATH);
+
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_WATERY_ENTRENCHMENT);
             }
 
             void KilledUnit(Unit* victim)
@@ -677,11 +701,32 @@ class boss_hagara_the_stormbinder: public CreatureScript
                                 if (Creature* pCrystal = me->SummonCreature(NPC_FROZEN_BINDING_CRYSTAL, frozencrystalPos[i]))
                                     pCrystal->CastSpell(me, SPELL_CRYSTALLINE_TETHER_1);
                             DoCast(me, SPELL_FROZEN_TEMPEST);
-                            events.ScheduleEvent(EVENT_ICE_WAVE, 1000);
+                            events.ScheduleEvent(EVENT_ICE_WAVE, 6000);
                             events.ScheduleEvent(EVENT_ICICLE, 2000);
+                            events.ScheduleEvent(EVENT_WATERY_ENTRENCHMENT, 7000);
                             if (IsHeroic())
                                 events.ScheduleEvent(EVENT_FROSTFLAKE, urand(2000, 5000));
                             break;
+                        case EVENT_WATERY_ENTRENCHMENT:
+                        {
+                            Map::PlayerList const& plrList = instance->instance->GetPlayers();
+                            if (!plrList.isEmpty())
+                            {
+                                for (Map::PlayerList::const_iterator itr = plrList.begin(); itr != plrList.end(); ++itr)
+                                    if (Player* pPlayer = itr->getSource())
+                                    {
+                                        if (me->GetDistance(pPlayer) <= 23)
+                                        {
+                                            if (!pPlayer->HasAura(SPELL_WATERY_ENTRENCHMENT))
+                                                pPlayer->CastSpell(pPlayer, SPELL_WATERY_ENTRENCHMENT, true);
+                                        }
+                                        else
+                                            pPlayer->RemoveAurasDueToSpell(SPELL_WATERY_ENTRENCHMENT);
+                                    }
+                            }
+                            events.ScheduleEvent(EVENT_WATERY_ENTRENCHMENT, 1000);
+                            break;
+                        }
                         case EVENT_ICE_WAVE:
                         {
                             Talk(SAY_ICE_WAVE);
