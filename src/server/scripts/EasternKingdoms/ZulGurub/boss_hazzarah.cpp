@@ -48,8 +48,12 @@ class npc_nightmare_illusion : public CreatureScript
             {
                 SetCombatMovement(false);
                 me->SetSpeed(MOVE_RUN, 0.25f, true);
+                me->SetSpeed(MOVE_WALK, 0.25f, true);
+                me->SetSpeed(MOVE_FLIGHT, 0.25f, true);
                 //me->SetWalk(true);
                 aiSet = false;
+                nightmareOwner = 0;
+                nightmareTarget = 0;
             }
 
             void JustDied(Unit* /*killer*/)
@@ -57,25 +61,40 @@ class npc_nightmare_illusion : public CreatureScript
                 me->DespawnOrUnsummon();
             }
 
-            void UpdateAI(uint32 const /*diff*/)
+            void UpdateAI(uint32 const diff)
             {
-                if (!nightmareTarget || !nightmareOwner || !nightmareTarget->isAlive() || !nightmareOwner->isAlive())
+                if (!nightmareTarget || !nightmareOwner)
                 {
                     me->DespawnOrUnsummon();
                     return;
                 }
+                if (Player* p = ObjectAccessor::GetPlayer(*me, nightmareTarget))
+                    if (!p->isAlive())
+                    {
+                        me->DespawnOrUnsummon();
+                        return;
+                    }
+                if (Unit* u = ObjectAccessor::GetUnit(*me, nightmareTarget))
+                    if (!u->isAlive())
+                    {
+                        me->DespawnOrUnsummon();
+                        return;
+                    }
                 if (aiSet)
                     return;
                 aiSet = true;
-                me->SetTarget(nightmareTarget->GetGUID());
-                DoCast(nightmareTarget, SPELL_WAKING_NIGHTMARE, true);
-                Position pos;
-                nightmareTarget->GetPosition(&pos);
-                me->GetMotionMaster()->Clear();
-                me->GetMotionMaster()->MovePoint(POINT_NIGHTMARE_TARGET, pos);
+                if (Unit* target = ObjectAccessor::GetUnit(*me, nightmareTarget))
+                {
+                    me->SetTarget(nightmareTarget);
+                    DoCast(target, SPELL_WAKING_NIGHTMARE, true);
+                    Position pos;
+                    target->GetPosition(&pos);
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MovePoint(POINT_NIGHTMARE_TARGET, pos);
+                }
             }
 
-            void SetNightmareTarget(Unit* owner, Unit* target)
+            void SetNightmareTarget(uint64 owner, uint64 target)
             {
                 nightmareOwner = owner;
                 nightmareTarget = target;
@@ -85,16 +104,20 @@ class npc_nightmare_illusion : public CreatureScript
             {
                 if (pointId == POINT_NIGHTMARE_TARGET)
                 {
-                    me->CastSpell(nightmareTarget, SPELL_CONSUME_SOUL, true);
-                    CAST_AI(BossAI, nightmareOwner->GetAI())->KilledUnit(nightmareTarget);
-                    me->DespawnOrUnsummon();
+                    if (Unit* target = ObjectAccessor::GetUnit(*me, nightmareTarget))
+                        if (Unit* owner = ObjectAccessor::GetUnit(*me, nightmareOwner))
+                        {
+                            me->CastSpell(target, SPELL_CONSUME_SOUL, true);
+                            CAST_AI(BossAI, owner->GetAI())->KilledUnit(target);
+                            me->DespawnOrUnsummon();
+                        }
                 }
             }
 
         protected:
             bool aiSet;
-            Unit* nightmareOwner;
-            Unit* nightmareTarget;
+            uint64 nightmareOwner;
+            uint64 nightmareTarget;
 
         private:
             InstanceScript* _instance;
@@ -246,11 +269,14 @@ class boss_hazzarah : public CreatureScript
                     if (Player* player = ObjectAccessor::GetPlayer(*me, guid))
                     {
                         Position pos;
-                        player->GetPosition(&pos);
-                        player->MovePosition(pos, 30, (float)rand_norm() * static_cast<float>(2 * M_PI));
+                        do
+                        {
+                            player->GetNearPosition(pos, 30, (float)(rand_norm() * 2 * M_PI));
+                        }
+                        while (player->GetDistance(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()) < 20);
                         if (TempSummon* summon = me->SummonCreature(52284, pos, TEMPSUMMON_DEAD_DESPAWN))
                             if (npc_nightmare_illusion::npc_nightmare_illusionAI* ai = (npc_nightmare_illusion::npc_nightmare_illusionAI*)summon->GetAI())
-                                ai->SetNightmareTarget(me, player);
+                                ai->SetNightmareTarget(me->GetGUID(), player->GetGUID());
                     }
                 }
 
