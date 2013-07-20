@@ -7166,7 +7166,6 @@ void SpellMgr::LoadDbcDataCorrections()
             // Intercept stun
             case 20253:
                 spellInfo->Attributes |= SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK;
-                spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
                 break;
             default:
                 break;
