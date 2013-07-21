@@ -6058,6 +6058,9 @@ void SpellMgr::LoadDbcDataCorrections()
             case 97645:
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(7);
                 break;
+            case 43550:
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_TARGET_ENEMY;
+                break;
             // ENDOF ZUL'AMAN SPELLS
             //
             // END TIME SPELLS
