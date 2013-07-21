@@ -215,7 +215,10 @@ void BattlegroundBFG::AddPlayer(Player* player)
     PlayerScores[player->GetGUID()] = score;
 }
 
-void BattlegroundBFG::RemovePlayer(Player* /*player*/, uint64 /*guid*/) { }
+void BattlegroundBFG::RemovePlayer(Player* player, uint64 guid, uint32 team)
+{
+    Battleground::RemovePlayer(player, guid, team);
+}
 void BattlegroundBFG::HandleAreaTrigger(Player * /*Source*/, uint32 /*Trigger*/)
 {
     // this is  wrong way to implement these things. On official it done by gameobject spell cast.
