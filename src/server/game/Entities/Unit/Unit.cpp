@@ -9860,6 +9860,20 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
     // Custom triggered spells
     switch (auraSpellInfo->Id)
     {
+        // Item - Death Knight T12 Blood 2P Bonus (wrong spellname, that's warrior item set)
+        case 105907:
+            if (!procSpell)
+                return false;
+            if (procSpell->Id != 12294 && !roll_chance_i(50))
+                return false;
+            break;
+        // Item - Mage T13 2P Bonus (Haste)
+        case 105788:
+            if (!procSpell)
+                return false;
+            if (procSpell->Id != 30451 && !roll_chance_i(50))
+                return false;
+            break;
         // Savage Defence
         case 62600:
         {

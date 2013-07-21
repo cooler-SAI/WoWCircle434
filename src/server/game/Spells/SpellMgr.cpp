@@ -2899,6 +2899,8 @@ void SpellMgr::LoadSpellCustomAttr()
             case 77661: // Searing Flame
             case 77489: // Echo of Light
             case 99132: // Divine Fire, Item - Priest T12 Healer 2P Bonus
+            case 99173: // Burning Wounds, Item - Rogue T12 2P Bonus
+            case 99002: // Fiery Claws, Item - Druid T12 Feral 2P Bonus
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER;
                 break;
             case 60256:
@@ -7177,6 +7179,13 @@ void SpellMgr::LoadDbcDataCorrections()
             case 20253:
                 spellInfo->Attributes |= SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK;
                 break;
+            case 64843:     // Divine Hymn
+            case 64901:     // Hymn of Hope
+                spellInfo->ChannelInterruptFlags &= ~CHANNEL_FLAG_DELAY;
+                break;
+            case 81093: // 
+                spellInfo->ProcCharges = 1;
+                break;
             default:
                 break;
         }
@@ -7197,10 +7206,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 6358: // Seduction
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
                 break;
-            case 64843:     // Divine Hymn
-            case 64901:     // Hymn of Hope
-                spellInfo->ChannelInterruptFlags &= ~CHANNEL_FLAG_DELAY;
-                break;
+            
             default:
                 break;
         }

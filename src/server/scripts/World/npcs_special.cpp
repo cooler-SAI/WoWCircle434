@@ -3111,7 +3111,7 @@ class npc_shadowy_apparition : public CreatureScript
                 if (!bCast && me->GetDistance(me->getVictim()) < 1.0f)
                 {
                     bCast = true;
-                    DoCast(me->getVictim(), 87532, true);
+                    me->CastSpell(me->getVictim(), 87532, true, NULL, NULL, (me->GetOwner() ? me->GetOwner()->GetGUID() : 0));
                     me->DespawnOrUnsummon();
                 }
             }

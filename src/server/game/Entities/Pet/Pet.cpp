@@ -1007,8 +1007,19 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float((petlevel * 4 - petlevel) + bonus_dmg));
                     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float((petlevel * 4 + petlevel) + bonus_dmg));
 
+                    if (Player* pOwner = m_owner->ToPlayer())
+                        m_modMeleeHitChance = pOwner->GetFloatValue(PLAYER_FIELD_UI_SPELL_HIT_MODIFIER);
+
+                    LearnPetScalingAuras();
                     break;
                 }
+                case 46954: // Shadowy Apparition
+
+                    if (Player* pOwner = m_owner->ToPlayer())
+                        m_modSpellHitChance = pOwner->GetFloatValue(PLAYER_FIELD_UI_SPELL_HIT_MODIFIER);
+
+                    LearnPetScalingAuras();
+                    break;
                 case 19833: //Snake Trap - Venomous Snake
                 {
                     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float((petlevel / 2) - 25));

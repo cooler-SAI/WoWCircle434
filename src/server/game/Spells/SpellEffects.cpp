@@ -794,7 +794,10 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     if (Unit* pOwner = m_caster->GetOwner())
                     {
                         apply_direct_bonus = false;
+                        
                         damage += 0.6f * pOwner->SpellBaseDamageBonusDone(m_spellSchoolMask);
+                        if (AuraEffect const* aurEff = pOwner->GetAuraEffect(15473, EFFECT_1))
+                            AddPct(damage, aurEff->GetAmount());
                     }
                 }
                 break;
@@ -5987,7 +5990,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    m_caster->ToPlayer()->ReduceSpellCooldown(2894, 1000); 
+                    m_caster->ToPlayer()->ReduceSpellCooldown(2894, 4000); 
                     break;
             }
         }
