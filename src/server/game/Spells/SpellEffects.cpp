@@ -1932,9 +1932,11 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
     switch (m_spellInfo->Id)
     {
         // Trap Launcher related spells
-        case 60192:
-        case 82939:
-        case 82941:
+        case 60192: // Freezing Trap
+        case 82939: // Explosive Trap
+        case 82941: // Ice Trap
+        case 82945: // Immolation Trap
+        case 82948: // Snake Trap
             // Remove aura
             m_caster->RemoveAurasDueToSpell(77769);
             break;
