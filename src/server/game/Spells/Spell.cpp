@@ -7259,6 +7259,12 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                 if (caster != target && caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->duel && target->GetTypeId() == TYPEID_PLAYER)
                     return false;
             }
+            // Glyph of Concussive Shot
+            else if (m_spellInfo->Id == 5116)
+            {
+                if (eff == EFFECT_1 && !m_caster->HasAura(56851))
+                    return false;
+            }
 
             if (target->GetEntry() == 5925)
                 return true;
