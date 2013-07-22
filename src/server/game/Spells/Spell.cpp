@@ -3903,7 +3903,10 @@ void Spell::_handle_immediate_phase()
             procAttacker |= PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS;
 
         // Proc the spells that have DEST target
-        m_originalCaster->ProcDamageAndSpell(NULL, procAttacker, 0, m_procEx | PROC_EX_NORMAL_HIT, 0, 0, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell);
+        Unit *target = NULL;
+        if (procAttacker & PROC_FLAG_DONE_TRAP_ACTIVATION)
+            target = m_targets.GetUnitTarget();
+        m_originalCaster->ProcDamageAndSpell(target, procAttacker, 0, m_procEx | PROC_EX_NORMAL_HIT, 0, 0, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell);
     }
 }
 

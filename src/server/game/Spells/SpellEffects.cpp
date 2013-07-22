@@ -1860,7 +1860,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
         if (spellInfo->GetExplicitTargetMask() & TARGET_FLAG_DEST_LOCATION)
             targets.SetDst(m_targets);
 
-        targets.SetUnitTarget(m_caster);
+        targets.SetUnitTarget(m_targets.GetUnitTarget());
     }
 
     CustomSpellValues values;
