@@ -10664,6 +10664,13 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                 return false;
             break;
         }
+        case 64803: // Entrapment
+        {
+            // Snake trap double proc handling
+            if (procSpell && procSpell->Id == 57879)
+                return false;
+            break;
+        }
     }
 
     if (cooldown && GetTypeId() == TYPEID_PLAYER && ToPlayer()->HasSpellCooldown(trigger_spell_id))
