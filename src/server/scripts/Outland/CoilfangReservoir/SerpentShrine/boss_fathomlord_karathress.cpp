@@ -38,40 +38,44 @@ EndScriptData */
 #define SAY_SLAY3                   -1548028
 #define SAY_DEATH                   -1548029
 
-//Karathress spells
-#define SPELL_CATACLYSMIC_BOLT          38441
-#define SPELL_POWER_OF_SHARKKIS         38455
-#define SPELL_POWER_OF_TIDALVESS        38452
-#define SPELL_POWER_OF_CARIBDIS         38451
-#define SPELL_ENRAGE                    24318
-#define SPELL_SEAR_NOVA                 38445
-#define SPELL_BLESSING_OF_THE_TIDES     38449
+enum Spells
+{
+    SPELL_CATACLYSMIC_BOLT              = 38441,
+    SPELL_POWER_OF_SHARKKIS             = 38455,
+    SPELL_POWER_OF_TIDALVESS            = 38452,
+    SPELL_POWER_OF_CARIBDIS             = 38451,
+    SPELL_ENRAGE                        = 24318,
+    SPELL_SEAR_NOVA                     = 38445,
+    SPELL_BLESSING_OF_THE_TIDES         = 38449,
 
-//Sharkkis spells
-#define SPELL_LEECHING_THROW            29436
-#define SPELL_THE_BEAST_WITHIN          38373
-#define SPELL_MULTISHOT                 38366
-#define SPELL_SUMMON_FATHOM_LURKER      38433
-#define SPELL_SUMMON_FATHOM_SPOREBAT    38431
-#define SPELL_PET_ENRAGE                19574
+    //Sharkkis spells
+    SPELL_LEECHING_THROW                = 29436,
+    SPELL_THE_BEAST_WITHIN              = 38373,
+    SPELL_MULTISHOT                     = 38366,
+    SPELL_SUMMON_FATHOM_LURKER          = 38433,
+    SPELL_SUMMON_FATHOM_SPOREBAT        = 38431,
+    SPELL_PET_ENRAGE                    = 19574,
 
-//Tidalvess spells
-#define SPELL_FROST_SHOCK               38234
-#define SPELL_SPITFIRE_TOTEM            38236
-#define SPELL_POISON_CLEANSING_TOTEM    38306
-// Spell obsolete
-// #define SPELL_POISON_CLEANSING_EFFECT   8167
-#define SPELL_EARTHBIND_TOTEM           38304
-#define SPELL_EARTHBIND_TOTEM_EFFECT    6474
-#define SPELL_WINDFURY_WEAPON           38184
+    //Tidalvess spells
+    SPELL_FROST_SHOCK                   = 38234,
+    SPELL_SPITFIRE_TOTEM                = 38236,
+    SPELL_POISON_CLEANSING_TOTEM        = 38306,
 
-//Caribdis Spells
-#define SPELL_WATER_BOLT_VOLLEY         38335
-#define SPELL_TIDAL_SURGE               38358
-#define SPELL_TIDAL_SURGE_FREEZE        38357
-#define SPELL_HEAL                      38330
-#define SPELL_SUMMON_CYCLONE            38337
-#define SPELL_CYCLONE_CYCLONE           29538
+    // Spell obsolete
+    //SPELL_POISON_CLEANSING_EFFECT     = 8167,
+    SPELL_EARTHBIND_TOTEM               = 38304,
+    SPELL_EARTHBIND_TOTEM_EFFECT        = 6474,
+    SPELL_WINDFURY_WEAPON               = 38184,
+
+    //Caribdis Spells
+    SPELL_WATER_BOLT_VOLLEY             = 38335,
+    SPELL_TIDAL_SURGE                   = 38358, // aoe
+    SPELL_TIDAL_SURGE_1                 = 38353, // aura with knockback and stun
+    SPELL_TIDAL_SURGE_2                 = 38357, // stun
+    SPELL_HEAL                          = 38330,
+    SPELL_SUMMON_CYCLONE                = 38337,
+    SPELL_CYCLONE_CYCLONE               = 29538,
+};
 
 //Yells and Quotes
 #define SAY_GAIN_BLESSING_OF_TIDES      "Your overconfidence will be your undoing! Guards, lend me your strength!"
@@ -678,9 +682,7 @@ public:
             //TidalSurge_Timer
             if (TidalSurge_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_TIDAL_SURGE);
-                // Hacky way to do it - won't trigger elseways
-                me->getVictim()->CastSpell(me->getVictim(), SPELL_TIDAL_SURGE_FREEZE, true);
+                DoCastAOE(SPELL_TIDAL_SURGE);
                 TidalSurge_Timer = 15000+rand()%5000;
             } else TidalSurge_Timer -= diff;
 
@@ -749,10 +751,40 @@ public:
     };
 };
 
+class spell_fathomguard_caribdis_tidal_surge : public SpellScriptLoader
+{
+    public:
+        spell_fathomguard_caribdis_tidal_surge() : SpellScriptLoader("spell_fathomguard_caribdis_tidal_surge") { }
+
+        class spell_fathomguard_caribdis_tidal_surge_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_fathomguard_caribdis_tidal_surge_SpellScript);
+
+            void HandleScript(SpellEffIndex /*effIndex*/)
+            {
+                if (!GetCaster() || !GetHitUnit())
+                    return;
+
+                GetHitUnit()->CastSpell(GetHitUnit(), SPELL_TIDAL_SURGE_1, true);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_fathomguard_caribdis_tidal_surge_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_fathomguard_caribdis_tidal_surge_SpellScript();
+        }
+};
+
 void AddSC_boss_fathomlord_karathress()
 {
     new boss_fathomlord_karathress();
     new boss_fathomguard_sharkkis();
     new boss_fathomguard_tidalvess();
     new boss_fathomguard_caribdis();
+    new spell_fathomguard_caribdis_tidal_surge();
 }
