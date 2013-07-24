@@ -2794,6 +2794,12 @@ void SpellMgr::LoadSpellCustomAttr()
                             if (!procInfo)
                                 continue;
 
+                            switch (procInfo->Id)
+                            {
+                                case 53365: // Rune of the Fallen Crusader
+                                case 51714: // Rune of Razorice
+                                    continue;
+                            }
                             // if proced directly from enchantment, not via proc aura
                             // NOTE: Enchant Weapon - Blade Ward also has proc aura spell and is proced directly
                             // however its not expected to stack so this check is good
