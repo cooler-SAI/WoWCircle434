@@ -139,8 +139,17 @@ class boss_isle_of_conquest : public CreatureScript
                         case EVENT_CHECK_ROOM:
                         {
                             float x = 0.0f, y = 0.0f;
-                            
+
                             me->GetPosition(x, y);
+
+                            float z = me->GetPositionZ();
+                            float home_z = me->GetHomePosition().GetPositionZ();
+
+                            if (z > home_z + 10.0f)
+                            {
+                                EnterEvadeMode();
+                                return;
+                            }
                             
                             switch (me->GetEntry())
                             {
