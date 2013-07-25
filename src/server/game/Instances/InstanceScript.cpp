@@ -285,6 +285,7 @@ void InstanceScript::DoRespawnGameObject(uint64 uiGuid, uint32 uiTimeToDespawn)
             return;
 
         go->SetRespawnTime(uiTimeToDespawn);
+        go->UpdateObjectVisibility();
     }
 }
 

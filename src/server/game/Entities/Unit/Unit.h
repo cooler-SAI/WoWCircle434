@@ -1558,6 +1558,9 @@ class Unit : public WorldObject
         bool virtual HasSpell(uint32 /*spellID*/) const { return false; }
         bool HasCrowdControlAuraType(AuraType type, uint32 excludeAura = 0) const;
         bool HasCrowdControlAura(Unit* excludeCasterChannel = NULL) const;
+        bool HasBreakableByDamageAuraType(AuraType type, uint32 excludeAura = 0) const;
+        bool HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel = NULL) const;
+
 
         bool HasStealthAura()      const { return HasAuraType(SPELL_AURA_MOD_STEALTH); }
         bool HasInvisibilityAura() const { return HasAuraType(SPELL_AURA_MOD_INVISIBILITY); }
@@ -1802,6 +1805,7 @@ class Unit : public WorldObject
         void RemoveAllAuras();
         void RemoveArenaAuras();
         void RemoveAllAurasOnDeath();
+        void RemoveNegativeAuras();
         void RemoveAllAurasRequiringDeadTarget();
         void RemoveAllAurasExceptType(AuraType type);
         void DelayOwnedAuras(uint32 spellId, uint64 caster, int32 delaytime);

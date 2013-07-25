@@ -82,11 +82,13 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Gnaw
             else if (spellproto->Id == 47481)
                 return DIMINISHING_CONTROLLED_STUN;
-            // Earthquake
+            // Earthquake (Trash, Ulduar)
             else if (spellproto->Id == 64697)
                 return DIMINISHING_NONE;
             // Summoning Disorientation
             else if (spellproto->Id == 32752)
+                return DIMINISHING_NONE;
+            else if (spellproto->SpellVisual[0] == 14153)
                 return DIMINISHING_NONE;
             break;
         }

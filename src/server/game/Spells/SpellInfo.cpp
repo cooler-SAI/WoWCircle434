@@ -3308,6 +3308,7 @@ bool SpellInfo::IsNeedToCheckSchoolImmune() const
         case 59752: // Every Man for Himself (racical)
         case 25912: // Holy Shock damage
         case 35395: // Crusader Strike
+        case 65547: // PvP Trinket, Trial of the Crusader
             return false;
         default:
             break;
