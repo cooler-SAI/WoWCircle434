@@ -1285,7 +1285,7 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                         break;
                     // Divine Hymn
                     case 64844:
-                        maxSize = 3;
+                        maxSize = 5;
                         power = POWER_HEALTH;
                         break;
                     // Hymn of Hope
