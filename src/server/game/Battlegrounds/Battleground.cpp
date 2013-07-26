@@ -1213,9 +1213,15 @@ void Battleground::AddPlayer(Player* player)
         if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_IGNORE_FACTION))
         {
             if (team == HORDE)
+            {
+                player->setFaction(2);
                 player->CastSpell(player, 200002, true);
+            }
             else
+            {
+                player->setFaction(1);
                 player->CastSpell(player, 200003, true);
+            }
         }
     }
 
@@ -2079,6 +2085,8 @@ void Battleground::RemovePlayer(Player* player, uint64 guid, uint32 team)
         return;
     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_IGNORE_FACTION))
     {
+        player->setFactionForRace(player->getRace());
+        player->InitDisplayIds();
         player->RemoveAurasDueToSpell(200002);
         player->RemoveAurasDueToSpell(200003);
     }

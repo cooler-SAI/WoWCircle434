@@ -3245,6 +3245,44 @@ class spell_gen_throw_torch : public SpellScriptLoader
         }
 };
 
+class spell_crossfaction_bg_restore_faction : public SpellScriptLoader
+{
+public:
+    spell_crossfaction_bg_restore_faction() : SpellScriptLoader("spell_crossfaction_bg_restore_faction") {}
+
+    class spell_crossfaction_bg_restore_faction_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_crossfaction_bg_restore_faction_AuraScript);
+
+    public:
+        spell_crossfaction_bg_restore_faction_AuraScript() : AuraScript() { }
+
+        bool Validate(SpellInfo const* /*spell*/)
+        {
+            return true;
+        }
+
+        void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Player* player = ObjectAccessor::GetPlayer(*GetTarget(), GetTarget()->GetGUID()))
+            {
+                player->setFactionForRace(player->getRace());
+                player->InitDisplayIds();
+            }
+        }
+
+        void Register()
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_crossfaction_bg_restore_faction_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_crossfaction_bg_restore_faction_AuraScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_absorb0_hitlimit1();
@@ -3313,4 +3351,5 @@ void AddSC_generic_spell_scripts()
     new spell_gen_torch_target_picker();
     new spell_gen_juggle_torch_catch();
     new spell_gen_throw_torch();
+    new spell_crossfaction_bg_restore_faction();
 }
