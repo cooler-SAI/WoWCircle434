@@ -125,7 +125,7 @@ void OpcodeTable::Initialize()
     DEFINE_OPCODE_HANDLER(CMSG_CALENDAR_EVENT_MODERATOR_STATUS,         STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleCalendarEventModeratorStatus);
     DEFINE_OPCODE_HANDLER(CMSG_CALENDAR_EVENT_REMOVE_INVITE,            STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleCalendarEventRemoveInvite );
     DEFINE_OPCODE_HANDLER(CMSG_CALENDAR_EVENT_RSVP,                     STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleCalendarEventRsvp         );
-    DEFINE_OPCODE_HANDLER(CMSG_CALENDAR_EVENT_SIGNUP,                   STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
+    DEFINE_OPCODE_HANDLER(CMSG_CALENDAR_EVENT_SIGNUP,                   STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleCalendarEventSignup       );
     DEFINE_OPCODE_HANDLER(CMSG_CALENDAR_EVENT_STATUS,                   STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleCalendarEventStatus       );
     DEFINE_OPCODE_HANDLER(CMSG_CALENDAR_GET_CALENDAR,                   STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleCalendarGetCalendar       );
     DEFINE_OPCODE_HANDLER(CMSG_CALENDAR_GET_EVENT,                      STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleCalendarGetEvent          );
