@@ -2727,7 +2727,8 @@ bool Aura::CanStackWith(Aura const* existingAura) const
                 return true;
 
         // same spell with same caster should not stack
-        return false;
+        if (!m_spellInfo->HasAura(SPELL_AURA_CONTROL_VEHICLE))
+            return false;
     }
 
     SpellSpecificType specificTypes[] = {SPELL_SPECIFIC_ASPECT, SPELL_SPECIFIC_WELL_FED};
