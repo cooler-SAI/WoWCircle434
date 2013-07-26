@@ -1658,12 +1658,17 @@ bool MovementInfo::AcceptClientChanges(Player* player, MovementInfo& client, Opc
                 // TODO: discard movement packets after the player is rooted
                 if (plMover->isAlive())
                 {
-                    plMover->EnvironmentalDamage(DAMAGE_FALL_TO_VOID, player->GetMaxHealth());
-                    // player can be alive if GM/etc
-                    // change the death state to CORPSE to prevent the death timer from
-                    // starting in the next player update
-                    if (!plMover->isAlive())
-                        plMover->KillPlayer();
+                    if (plMover->InBattleground())
+                    {
+                        plMover->EnvironmentalDamage(DAMAGE_FALL_TO_VOID, player->GetMaxHealth());
+                        // player can be alive if GM/etc
+                        // change the death state to CORPSE to prevent the death timer from
+                        // starting in the next player update
+                        if (!plMover->isAlive())
+                            plMover->KillPlayer();
+                    }
+                    else
+                        plMover->RepopAtGraveyard();
                 }
             }
         }
