@@ -3265,10 +3265,7 @@ public:
         void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             if (Player* player = ObjectAccessor::GetPlayer(*GetTarget(), GetTarget()->GetGUID()))
-            {
                 player->setFactionForRace(player->getRace());
-                player->InitDisplayIds();
-            }
         }
 
         void Register()

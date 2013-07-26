@@ -2086,7 +2086,6 @@ void Battleground::RemovePlayer(Player* player, uint64 guid, uint32 team)
     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_IGNORE_FACTION))
     {
         player->setFactionForRace(player->getRace());
-        player->InitDisplayIds();
         player->RemoveAurasDueToSpell(200002);
         player->RemoveAurasDueToSpell(200003);
     }

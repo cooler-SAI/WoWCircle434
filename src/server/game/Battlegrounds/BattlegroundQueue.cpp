@@ -167,7 +167,13 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, Battlegr
             if (!(*itr)->IsInvitedToBGInstanceGUID)
                 qHorde += (*itr)->Players.size();
         if (qAlliance == qHorde)
-            ginfo->Team = leader->GetTeam();
+        {
+            //ginfo->Team = leader->GetTeam();
+            if (urand(0,100) < 50)
+                ginfo->Team = HORDE;
+            else
+                ginfo->Team = ALLIANCE;
+        }
         else if (qAlliance < qHorde)
             ginfo->Team = ALLIANCE;
         else
