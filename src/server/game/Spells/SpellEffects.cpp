@@ -356,6 +356,15 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                 switch (m_spellInfo->Id)                     // better way to check unknown
                 { 
+                    case 109721: // Lightning Strike, Vial of Shadows (lfr)
+                        damage += int32(0.266f * m_caster->GetTotalAttackPowerValue(m_caster->getClass() == CLASS_HUNTER ? RANGED_ATTACK : BASE_ATTACK));
+                        break;
+                    case 107994: // Lightning Strike, Vial of Shadows (normal)
+                        damage += int32(0.3f * m_caster->GetTotalAttackPowerValue(m_caster->getClass() == CLASS_HUNTER ? RANGED_ATTACK : BASE_ATTACK));
+                        break;
+                    case 109724: // Lightning Strike, Vial of Shadows (heroic)
+                        damage += int32(0.339f * m_caster->GetTotalAttackPowerValue(m_caster->getClass() == CLASS_HUNTER ? RANGED_ATTACK : BASE_ATTACK));
+                        break;
                     case 105033: // Searing Blood, Yor'sahj The Unsleeping, Dragon Soul
                     case 108356:
                     case 108357:
@@ -785,7 +794,10 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     if (Unit* pOwner = m_caster->GetOwner())
                     {
                         apply_direct_bonus = false;
+                        
                         damage += 0.6f * pOwner->SpellBaseDamageBonusDone(m_spellSchoolMask);
+                        if (AuraEffect const* aurEff = pOwner->GetAuraEffect(15473, EFFECT_1))
+                            AddPct(damage, aurEff->GetAmount());
                     }
                 }
                 break;
@@ -1816,6 +1828,15 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                 }
                 return;
             }
+            // Faerie Fire (Feral) damage
+            case 91565:
+            {
+                if (m_caster->GetShapeshiftForm() == FORM_BEAR)
+                {
+                    m_caster->CastSpell(unitTarget, 60089, true);
+                }
+                break;
+            }
         }
     }
 
@@ -1839,7 +1860,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
         if (spellInfo->GetExplicitTargetMask() & TARGET_FLAG_DEST_LOCATION)
             targets.SetDst(m_targets);
 
-        targets.SetUnitTarget(m_caster);
+        targets.SetUnitTarget(m_targets.GetUnitTarget());
     }
 
     CustomSpellValues values;
@@ -1914,9 +1935,11 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
     switch (m_spellInfo->Id)
     {
         // Trap Launcher related spells
-        case 60192:
-        case 82939:
-        case 82941:
+        case 60192: // Freezing Trap
+        case 82939: // Explosive Trap
+        case 82941: // Ice Trap
+        case 82945: // Immolation Trap
+        case 82948: // Snake Trap
             // Remove aura
             m_caster->RemoveAurasDueToSpell(77769);
             break;
@@ -3352,6 +3375,10 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
     if (Player* modOwner = m_originalCaster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
+    // Item - Warlock T13 2P Bonus (Doomguard and Infernal)
+    if (AuraEffect const* aurEff = m_originalCaster->GetAuraEffect(105888, EFFECT_1))
+        duration += aurEff->GetAmount();
+
     TempSummon* summon = NULL;
 
     // determine how many units should be summoned
@@ -4446,54 +4473,60 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
         }
         case SPELLFAMILY_ROGUE:
         {
-            // Hemorrhage
-            if (m_spellInfo->SpellFamilyFlags[0] & 0x2000000)
+            switch (m_spellInfo->Id)
             {
-                if (m_caster->GetTypeId() == TYPEID_PLAYER)
-                    m_caster->ToPlayer()->AddComboPoints(unitTarget, 1, this);
-                // 45% more damage with daggers
-                if (m_caster->GetTypeId() == TYPEID_PLAYER)
-                    if (Item* item = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
-                        if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
-                            totalDamagePercentMod *= 1.45f;
-            }
-            // Ambush
-            else if (m_spellInfo->Id == 8676)
-            {
-                // 44.7% more damage with daggers
-                if (m_caster->GetTypeId() == TYPEID_PLAYER)
-                    if (Item* item = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
-                        if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
-                            totalDamagePercentMod *= 1.447f;
-            }
-            // Backstab
-            else if (m_spellInfo->Id == 53)
-            {
-                // Murderous Intent
-                if (unitTarget->HealthAbovePct(35) || effIndex != EFFECT_1)
+                case 1752: // Sinister Strike
+                case 84617: // Revealing Strike
+                    // Weighted Blades
+                    if (m_caster->HasAura(110211))
+                        totalDamagePercentMod *= 1.45f;
                     break;
-
-                if (AuraEffect const* aurEff = m_caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_ROGUE, 134, 0))
-                {
-                    int32 bp0 = aurEff->GetAmount();
-                    m_caster->CastCustomSpell(m_caster, 79132, &bp0, 0, 0, true);
-                }
-            }
-            // Fan of Knives
-            else if (m_spellInfo->Id == 51723)
-            {
-                if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                // Hemorrhage
+                case 16511:
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                        m_caster->ToPlayer()->AddComboPoints(unitTarget, 1, this);
+                    // 45% more damage with daggers
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                        if (Item* item = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
+                            if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
+                                totalDamagePercentMod *= 1.45f;
                     break;
+                // Ambush
+                case 8676:
+                    // 44.7% more damage with daggers
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                        if (Item* item = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
+                            if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
+                                totalDamagePercentMod *= 1.447f;
+                    break;
+                // Backstab
+                case 53:
+                    // Murderous Intent
+                    if (unitTarget->HealthAbovePct(35) || effIndex != EFFECT_1)
+                        break;
 
-                // Fan of Knives - Vile Poisons
-                if (AuraEffect * aur = m_caster->GetDummyAuraEffect(SPELLFAMILY_ROGUE, 857, 2))
-                {
-                    if (roll_chance_i(aur->GetAmount()))
+                    if (AuraEffect const* aurEff = m_caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_ROGUE, 134, 0))
                     {
-                        for (uint8 i = BASE_ATTACK; i < MAX_ATTACK; ++i)
-                            m_caster->ToPlayer()->CastItemCombatSpell(unitTarget, WeaponAttackType(i), PROC_FLAG_TAKEN_DAMAGE, PROC_EX_NORMAL_HIT);
+                        int32 bp0 = aurEff->GetAmount();
+                        m_caster->CastCustomSpell(m_caster, 79132, &bp0, 0, 0, true);
                     }
-                }
+                    break;
+                // Fan of Knives
+                case 51723:
+
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                        break;
+
+                    // Fan of Knives - Vile Poisons
+                    if (AuraEffect * aur = m_caster->GetDummyAuraEffect(SPELLFAMILY_ROGUE, 857, 2))
+                    {
+                        if (roll_chance_i(aur->GetAmount()))
+                        {
+                            for (uint8 i = BASE_ATTACK; i < MAX_ATTACK; ++i)
+                                m_caster->ToPlayer()->CastItemCombatSpell(unitTarget, WeaponAttackType(i), PROC_FLAG_TAKEN_DAMAGE, PROC_EX_NORMAL_HIT);
+                        }
+                    }
+                    break;
             }
             break;
         }
@@ -5973,7 +6006,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    m_caster->ToPlayer()->ReduceSpellCooldown(2894, 1000); 
+                    m_caster->ToPlayer()->ReduceSpellCooldown(2894, 4000); 
                     break;
             }
         }
@@ -6815,11 +6848,11 @@ void Spell::EffectSkinning(SpellEffIndex /*effIndex*/)
 
 void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
 {
+    if (!unitTarget)
+        return;
+
     if (effectHandleMode == SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
     {
-        if (!unitTarget)
-            return;
-
         float angle = unitTarget->GetRelativeAngle(m_caster);
         Position pos;
 
@@ -6836,13 +6869,13 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
 
     if (effectHandleMode == SPELL_EFFECT_HANDLE_HIT_TARGET)
     {
-        if (!unitTarget)
-            return;
-
         // not all charge effects used in negative spells
         if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER)
             m_caster->Attack(unitTarget, true);
     }
+
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        m_caster->ToPlayer()->SetFallInformation(0, unitTarget->GetPositionZ());
 }
 
 void Spell::EffectChargeDest(SpellEffIndex /*effIndex*/)

@@ -1658,6 +1658,12 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
 
                 switch (m_spellInfo->Id)
                 {
+                    // Vampiric Blood
+                    case 55233:
+                        // Item - Death Knight T13 Blood 4P Bonus
+                        if (caster->HasAura(105587))
+                            caster->CastSpell((Unit*)NULL, 105588, true);
+                        break;
                     // Shadow Infusion
                     case 91342:
                         if (GetStackAmount() == 5 && !caster->HasAura(93426))
@@ -1701,6 +1707,14 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_GENERIC:
                 switch (GetId())
                 {
+                    // Disrupting Shadows, Warlord Zon'ozz, Dragon Soul
+                    case 103434:
+                    case 104599:
+                    case 104600:
+                    case 104601:
+                        if (removeMode == AURA_REMOVE_BY_ENEMY_SPELL)
+                            target->CastSpell(target, 103948, true);
+                        break;
                     case 52418: // Carrying Seaforium
                         if (removeMode == AURA_REMOVE_BY_CANCEL)
                             target->CastSpell(target, 52417, true);
@@ -2268,12 +2282,21 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Tiger's Fury
                 case 5217:
                 {
+                    // Primal Madness
                     if (apply)
                     {
                         if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 2850, 1))
                         {
                             int32 bp = aurEff->GetAmount();
                             caster->CastCustomSpell(caster, 51178, &bp, 0, 0, true);
+                        }
+                    }
+                    else
+                    {
+                        if (!caster->HasAura(50334))
+                        {
+                            caster->RemoveAurasDueToSpell(80886);
+                            caster->RemoveAurasDueToSpell(80879);
                         }
                     }
                     break;
@@ -2676,6 +2699,7 @@ bool Aura::CanStackWith(Aura const* existingAura) const
                     return true;
                 case SPELL_AURA_MOD_DAMAGE_FROM_CASTER:                // Vendetta-like auras
                 case SPELL_AURA_BYPASS_ARMOR_FOR_CASTER:               // Find Weakness-like auras
+                case SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS:    // Hunter's Mark-like auras
                     return true;
                 default:
                     break;

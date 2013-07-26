@@ -916,14 +916,13 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             break;
         }
         case SPELL_AURA_MOD_INCREASE_HEALTH:
-            // Vampiric Blood
-            if (GetId() == 55233)
-                amount = GetBase()->GetUnitOwner()->CountPctFromMaxHealth(amount);
-            // Soulburn - Healthstone
-            else if (m_spellInfo->Id == 79437)
+            switch (GetId())
             {
-                if (GetBase()->GetUnitOwner())
-                    amount = GetBase()->GetUnitOwner()->CountPctFromMaxHealth(20);
+                case 55233: // Vampiric Blood
+                case 79437: // Soulburn - Healthstone
+                case 105588: // Vampiric Brood
+                    amount = GetBase()->GetUnitOwner()->CountPctFromMaxHealth(amount);
+                    break;
             }
             break;
         case SPELL_AURA_MOD_INCREASE_SPEED:
@@ -1026,6 +1025,82 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
         default:
             break;
     }
+
+    // Mixology - Effect value mod
+    if (caster && caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        if (GetSpellInfo()->SpellFamilyName == SPELLFAMILY_POTION && (
+            sSpellMgr->IsSpellMemberOfSpellGroup(GetId(), SPELL_GROUP_ELIXIR_BATTLE) ||
+            sSpellMgr->IsSpellMemberOfSpellGroup(GetId(), SPELL_GROUP_ELIXIR_GUARDIAN)))
+        {
+            if (caster->HasAura(53042) && caster->HasSpell(GetSpellInfo()->Effects[0].TriggerSpell))
+            {
+                switch (GetId())
+                {
+                    case 53749: // Guru's Elixir
+                        amount += 8;
+                        break;
+                    case 11328: // Elixir of Agility
+                        amount += 10;
+                        break;
+                    case 28497: // Elixir of Mighty Agility
+                    case 53747: // Elixir of Spirit
+                    case 54212: // Flask of Pure Mojo
+                    case 60340: // Elixir of Accuracy
+                    case 60341: // Elixir of Deadly Strikes
+                    case 60343: // Elixir of Mighty Defense
+                    case 60344: // Elixir of Expertise
+                    case 60345: // Elixir of Armor Piercing
+                    case 60346: // Elixir of Lightning Speed
+                    case 60347: // Elixir of Mighty Thoughts
+                        amount += 20;
+                        break;
+                    case 53752: // Lesser Flask of Toughness
+                    case 62380: // Lesser Flask of Resistance
+                        amount += 40;
+                        break;
+                    case 53755: // Flask of the Frost Wyrm
+                        amount += 47;
+                        break;
+                    case 53760: // Flask of Endless Rage
+                        amount += 64;
+                        break;
+                    case 53751: // Elixir of Mighty Fortitude
+                        amount += 200;
+                        break;
+                    case 53763: // Elixir of Protection
+                        amount += 280;
+                        break;
+                    case 53758: // Flask of Stoneblood
+                        amount += 320;
+                        break;
+                    // Cataclysm
+                    case 79469: // Flask of Steelskin
+                    case 79470: // Flask of the Draconic Mind
+                    case 79471: // Flask of the Winds
+                    case 79472: // Flask of Titanic Strength
+                    case 94160: // Flask of Flowing Water
+                        amount += 80;
+                        break;
+                    case 79635: // Flask of the Master
+                    case 79632: // Elixir of Mighty Speed
+                    case 79481: // Elixir of Impossible Accuracy
+                    case 79477: // Elixir of the Cobra
+                    case 79474: // Elixir of the Naga
+                    case 79468: // Ghost Elixir
+                        amount += 40;
+                        break;
+                    case 79480: // Elixir of Deep Earth
+                        amount += 345;
+                        break;
+                    case 79631: // Prismatic Elixir
+                        amount += 45;
+                        break;
+                }
+            }
+        }
+    }
+
     if (caster && DoneActualBenefit != 0.0f)
     {
         DoneActualBenefit *= caster->CalculateLevelPenalty(GetSpellInfo());
@@ -1049,7 +1124,11 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 int32 temp_damage = amount;
                 float temp_crit = 0.0f;
 
-                temp_damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), temp_damage, DOT, GetBase()->GetStackAmount());
+                if (GetAuraType() == SPELL_AURA_PERIODIC_HEAL)
+                    temp_damage = caster->SpellHealingBonusDone(target, GetSpellInfo(), temp_damage, DOT, GetBase()->GetStackAmount());
+                else
+                    temp_damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), temp_damage, DOT, GetBase()->GetStackAmount());
+                
                 temp_crit = caster->GetSpellCrit(target, GetSpellInfo(), SpellSchoolMask(GetSpellInfo()->SchoolMask));
                 
                 m_fixed_periodic.SetFixedDamage(temp_damage);
@@ -4111,6 +4190,7 @@ void AuraEffect::HandleModMechanicImmunity(AuraApplication const* aurApp, uint8 
     {
         case 42292: // PvP trinket
         case 59752: // Every Man for Himself
+        case 65547: // PvP trinket (Trial of Crusader)
             mechanic = IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK;
             // Actually we should apply immunities here, too, but the aura has only 100 ms duration, so there is practically no point
             break;
@@ -6890,6 +6970,28 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
         // Spell exist but require custom code
         switch (auraId)
         {
+            case 107851: // Focused Assault, Hagara, Dragon Soul
+            case 110900:
+            case 110899:
+            case 110898:
+                if (caster)
+                    if (Creature* pHagara = caster->ToCreature())
+                        if (Unit* pTarget = pHagara->getVictim())
+                        {
+                            if (!pHagara->GetMap()->IsHeroic())
+                                if (!pHagara->isInFront(pTarget) || !pHagara->IsWithinMeleeRange(pTarget))
+                                {
+                                    GetBase()->Remove();
+                                    return;
+                                }
+
+                            pHagara->CastSpell(pHagara->getVictim(), 107850, true);
+                        }
+                return;
+            case 105285: // Target, Hagara, Dragon Soul
+                if (caster)
+                    caster->CastSpell(target, triggerSpellId, true);
+                return;
             // Flood, Ancient Water Lord, Dragon Soul
             case 107797:
                 if (caster)
@@ -7080,6 +7182,11 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     {
         switch (GetSpellInfo()->Id)
         {
+            case 1120:  // Soul Drain
+            {
+                caster->CombatStart(target, true);
+                break;
+            }
             case 43093: case 31956: case 38801:  // Grievous Wound
             case 35321: case 38363: case 39215:  // Gushing Wound
                 if (target->IsFullHealth())
@@ -7274,9 +7381,6 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
 
     caster->CalcAbsorbResist(target, GetSpellInfo()->GetSchoolMask(), DOT, damage, &absorb, &resist, m_spellInfo);
 
-    if (target->GetHealth() < damage)
-        damage = uint32(target->GetHealth());
-
     caster->SendSpellNonMeleeDamageLog(target, GetId(), damage, GetSpellInfo()->GetSchoolMask(), absorb, resist, false, 0, crit);
 
     // Set trigger flag
@@ -7386,6 +7490,7 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
                 
                 // Field Dressing
                 target->ToPlayer()->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DOT, damage);
+                break;
             }
             case 29841: // Second Wind Rank 1
             case 29842: // Second Wind Rank 2

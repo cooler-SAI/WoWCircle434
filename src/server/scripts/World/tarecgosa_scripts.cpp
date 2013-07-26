@@ -393,10 +393,10 @@ class npc_hallegosa : public CreatureScript
 
             void JustRespawned()
             {
-
                 ScriptedAI::JustRespawned();
                 me->RemoveAllAuras();
                 me->SetCanFly(false);
+                curPoint = 0;
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             }
 

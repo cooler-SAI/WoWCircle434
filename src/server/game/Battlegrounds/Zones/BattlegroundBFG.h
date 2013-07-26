@@ -177,7 +177,7 @@ const float GILNEAS_BG_DoorPositions[4][8] =
     { 1396.15f, 977.014f, 0.33169f, 6.27043f, 0.0f, 0.0f, 0.006378f, -0.99998f },
 };
 
-const uint32 GILNEAS_BG_TickIntervals[4] = { 0, 12000, 6000, 1000 };
+const uint32 GILNEAS_BG_TickIntervals[4] = { 0, 8000, 3000, 1000 };
 const uint32 GILNEAS_BG_TickPoints[4]    = { 0, 10, 10, 30 };
 
 //Light, Water, Mine, Ally, Horde

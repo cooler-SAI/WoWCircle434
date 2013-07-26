@@ -770,6 +770,9 @@ void Channel::SendToAll(WorldPacket* data, uint64 p)
 
 void Channel::SendToAllButOne(WorldPacket* data, uint64 who)
 {
+    if (players.empty())
+        return;
+
     for (PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
     {
         if (i->first != who)

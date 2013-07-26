@@ -41,6 +41,11 @@ enum Adds
     NPC_SHADOWED_GLOBULE            = 57388,
     NPC_COBALT_GLOBULE              = 57384,
 
+    NPC_FLAIL_OF_GORATH             = 57877,
+    NPC_CLAW_OF_GORATH              = 57890,
+    NPC_TENTACLE_TOSS_STALKER       = 57836,
+    NPC_EYE_OF_GORATH               = 57875,
+
     // deathwing 56173 (boss)
     // deathwing 57962 (near boss)
     // deathwing 53879 (spine)
@@ -69,6 +74,7 @@ enum Spells
     // Twilight Siege Captain
     SPELL_TWILIGHT_SUBMISSION       = 108183,
     SPELL_TWILIGHT_VOLLEY           = 108172,
+    SPELL_TWILIGHT_PORTAL_BEAM      = 108096,
 
     // Crimson Globule
     SPELL_CRIMSON_BLOOD_OF_SHUMA    = 110750,
@@ -98,6 +104,28 @@ enum Spells
     SPELL_MANA_VOID_BURN            = 108222,
     SPELL_MANA_VOID_DUMMY           = 108224, // calculate power
     SPELL_MANA_DIFFUSION            = 108228,
+
+    // Flail of Go'rath
+    SPELL_SLUDGE_SPEW               = 110102,
+    SPELL_WILD_FLAIL                = 109199,
+    SPELL_BLOOD_OF_GORATH_DUMMY_1   = 109352,
+
+    // Claw of Go'rath
+    SPELL_OOZE_SPIT                 = 109396,
+    SPELL_TENTACLE_TOSS_AOE_1       = 109197, // select target for picking up
+    SPELL_TENTACLE_TOSS_SCRIPT_1    = 109233, // pick up
+    SPELL_TENTECLE_TOSS_VEHICLE     = 109214,
+    SPELL_TENTACLE_TOSS_AOE_2       = 109237, // select target to toss
+    SPELL_TENTACLE_TOSS_SUMMON      = 109238,
+    SPELL_TENTACLE_TOSS_SCRIPT_2    = 109243,
+    SPELL_TENTACLE_TOSS_FORCE       = 109241,
+    SPELL_TENTACLE_TOSS_JUMP        = 109240,
+    SPELL_TENTACLE_TOSS_DMG         = 109258,
+    SPELL_BLOOD_OF_GORATH_DUMMY_2   = 109365,
+
+    // Eye of Go'rath
+    SPELL_SHADOW_GAZE               = 109391,
+    SPELL_BLOOD_OF_GORATH_DUMMY_3   = 103932,
 };
 
 enum Events
@@ -135,6 +163,17 @@ enum Events
 
     // Cobalt Globule
     EVENT_MANA_VOID             = 14,
+
+    // Flail of Go'rath
+    EVENT_SLUDGE_SPEW           = 15,
+    EVENT_WILD_FLAIL            = 16,
+
+    // Claw of Go'rath
+    EVENT_OOZE_SPIT             = 16,
+    EVENT_TENTACLE_TOSS         = 17,
+
+    // Eye of Go'rath
+    EVENT_SHADOW_GAZE           = 18,
 };
 
 class npc_dragon_soul_ancient_water_lord : public CreatureScript
@@ -798,6 +837,240 @@ class npc_dragon_soul_cobalt_globule : public CreatureScript
         };
 };
 
+class npc_dragon_soul_flail_of_gorath : public CreatureScript
+{
+    public:
+        npc_dragon_soul_flail_of_gorath() : CreatureScript("npc_dragon_soul_flail_of_gorath") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_dragon_soul_flail_of_gorathAI (pCreature);
+        }
+
+        struct npc_dragon_soul_flail_of_gorathAI : public Scripted_NoMovementAI
+        {
+            npc_dragon_soul_flail_of_gorathAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+            {
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            }
+
+            void Reset()
+            {
+                events.Reset();
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+                events.ScheduleEvent(EVENT_SLUDGE_SPEW, urand(2000, 4000));
+                events.ScheduleEvent(EVENT_TENTACLE_TOSS, 10000);
+            }
+
+            void UpdateAI(uint32 const diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_SLUDGE_SPEW:
+                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                                DoCast(pTarget, SPELL_SLUDGE_SPEW);
+                            events.ScheduleEvent(EVENT_SLUDGE_SPEW, urand(6000, 8000));
+                            break;
+                        case EVENT_WILD_FLAIL:
+                            DoCastAOE(SPELL_WILD_FLAIL);
+                            events.ScheduleEvent(EVENT_WILD_FLAIL, urand(7000, 10000));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+        private:
+            EventMap events;
+        };
+};
+
+class npc_dragon_soul_claw_of_gorath : public CreatureScript
+{
+    public:
+        npc_dragon_soul_claw_of_gorath() : CreatureScript("npc_dragon_soul_claw_of_gorath") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_dragon_soul_claw_of_gorathAI (pCreature);
+        }
+
+        struct npc_dragon_soul_claw_of_gorathAI : public Scripted_NoMovementAI
+        {
+            npc_dragon_soul_claw_of_gorathAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+            {
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            }
+
+            void Reset()
+            {
+                events.Reset();
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+                events.ScheduleEvent(EVENT_OOZE_SPIT, 5000);
+                events.ScheduleEvent(EVENT_TENTACLE_TOSS, 10000);
+            }
+
+            /*void SpellHitTarget(Unit* victim, const SpellInfo* spellInfo)
+            {
+                if (spellInfo->Id == SPELL_TENTACLE_TOSS_AOE_1)
+                    events.RescheduleEvent(EVENT_TENTACLE_TOSS, 20000);
+            }*/
+
+            void UpdateAI(uint32 const diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_OOZE_SPIT:
+                            if (!me->IsWithinMeleeRange(me->getVictim()))
+                                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                                    DoCast(pTarget, SPELL_OOZE_SPIT);
+                            events.ScheduleEvent(EVENT_OOZE_SPIT, 4000);
+                            break;
+                        case EVENT_TENTACLE_TOSS:
+                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                                me->getVictim()->CastSpell(pTarget, SPELL_TENTACLE_TOSS_JUMP, true);
+                            events.ScheduleEvent(EVENT_TENTACLE_TOSS, 20000);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                DoMeleeAttackIfReady();
+            }
+
+        private:
+            EventMap events;
+        };
+};
+
+/*class npc_dragon_tentacle_toss_target : public CreatureScript
+{
+    public:
+        npc_dragon_tentacle_toss_target() : CreatureScript("npc_dragon_soul_tentacle_toss_target") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_dragon_soul_tentacle_toss_targetAI (pCreature);
+        }
+
+        struct npc_dragon_soul_tentacle_toss_targetAI : public Scripted_NoMovementAI
+        {
+            npc_dragon_soul_tentacle_toss_targetAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+            {
+            }
+
+            void IsSummonedBy(Unit* owner)
+            {
+                DoCastAOE(SPELL_TENTACLE_TOSS_AOE_1, true);
+            }
+        };
+};*/
+
+class npc_dragon_soul_eye_of_gorath : public CreatureScript
+{
+    public:
+        npc_dragon_soul_eye_of_gorath() : CreatureScript("npc_dragon_soul_eye_of_gorath") { }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_dragon_soul_eye_of_gorathAI (pCreature);
+        }
+
+        struct npc_dragon_soul_eye_of_gorathAI : public Scripted_NoMovementAI
+        {
+            npc_dragon_soul_eye_of_gorathAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+            {
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            }
+
+            void Reset()
+            {
+                events.Reset();
+            }
+
+            void EnterCombat(Unit* /*who*/)
+            {
+                events.ScheduleEvent(EVENT_SHADOW_GAZE, urand(3000, 5000));
+            }
+
+            void JustDied(Unit* /*killer*/)
+            {
+                me->DespawnOrUnsummon(5 * IN_MILLISECONDS);
+            }
+
+            void UpdateAI(uint32 const diff)
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (uint32 eventId = events.ExecuteEvent())
+                {
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        DoCast(pTarget, SPELL_SHADOW_GAZE);
+                    events.ScheduleEvent(EVENT_SHADOW_GAZE, urand(3000, 4000));
+                }
+            }
+
+        private:
+            EventMap events;
+        };
+};
+
+
 class npc_dragon_soul_teleport : public CreatureScript
 {
     public:
@@ -816,8 +1089,25 @@ class npc_dragon_soul_teleport : public CreatureScript
                         if (pInstance->GetBossState(DATA_MORCHOK) == DONE)
                             pPlayer->NearTeleportTo(teleportPos[1].GetPositionX(), teleportPos[1].GetPositionY(), teleportPos[1].GetPositionZ(), teleportPos[1].GetOrientation());
                         break;
+                    case NPC_VALEERA:
+                        if (pInstance->GetBossState(DATA_MORCHOK) == DONE)
+                            pPlayer->NearTeleportTo(teleportPos[2].GetPositionX(), teleportPos[2].GetPositionY(), teleportPos[2].GetPositionZ(), teleportPos[2].GetOrientation());
+                        break;
+                        break;
                     case NPC_TRAVEL_TO_WYRMREST_TEMPLE:
+                    case NPC_TRAVEL_TO_WYRMREST_BASE:
                         pPlayer->NearTeleportTo(teleportPos[0].GetPositionX(), teleportPos[0].GetPositionY(), teleportPos[0].GetPositionZ(), teleportPos[0].GetOrientation());
+                        break;
+                    case NPC_TRAVEL_TO_WYRMREST_SUMMIT:
+                        pPlayer->NearTeleportTo(teleportPos[3].GetPositionX(), teleportPos[3].GetPositionY(), teleportPos[3].GetPositionZ(), teleportPos[3].GetOrientation());
+                        break;
+                    case NPC_NETHESTRASZ:
+                        if (pInstance->GetBossState(DATA_YORSAHJ) == DONE && pInstance->GetBossState(DATA_ZONOZZ) == DONE)
+                            pPlayer->NearTeleportTo(teleportPos[3].GetPositionX(), teleportPos[3].GetPositionY(), teleportPos[3].GetPositionZ(), teleportPos[3].GetOrientation());
+                        break;
+                    case NPC_TRAVEL_TO_EYE_OF_ETERNITY:
+                        if (pInstance->GetBossState(DATA_YORSAHJ) == DONE && pInstance->GetBossState(DATA_ZONOZZ) == DONE)
+                            pPlayer->NearTeleportTo(teleportPos[4].GetPositionX(), teleportPos[4].GetPositionY(), teleportPos[4].GetPositionZ(), teleportPos[4].GetOrientation());
                         break;
                     default:
                         break;
@@ -963,7 +1253,9 @@ class spell_dragon_soul_cobalt_globule_mana_void : public SpellScriptLoader
             
                     bool operator()(WorldObject* unit)
                     {
-                        return (!unit->ToUnit() || unit->ToUnit()->getPowerType() != POWER_MANA);
+                        if (unit->GetTypeId() != TYPEID_PLAYER)
+                            return true;
+                        return (unit->ToPlayer()->getPowerType() != POWER_MANA);
                     }
             };
 
@@ -987,9 +1279,14 @@ void AddSC_dragon_soul()
     new npc_dragon_soul_dark_globule();
     new npc_dragon_soul_shadowed_globule();
     new npc_dragon_soul_cobalt_globule();
+    new npc_dragon_soul_flail_of_gorath();
+    new npc_dragon_soul_claw_of_gorath();
+    new npc_dragon_soul_eye_of_gorath();
     new npc_dragon_soul_teleport();
     new spell_dragon_soul_trigger_spell_from_aoe("spell_dragon_soul_ancient_water_lord_flood", SPELL_FLOOD);
     new spell_dragon_soul_trigger_spell_from_aoe("spell_dragon_soul_earthen_destroyer_boulder_smash", SPELL_BOULDER_SMASH);
     new spell_dragon_soul_shadowed_globule_deep_corruption();
     new spell_dragon_soul_cobalt_globule_mana_void();
+    //new spell_dragon_soul_trigger_spell_from_aoe("spell_dragon_soul_claw_of_gorath_tentacle_toss_aoe_1", SPELL_TENTACLE_TOSS_SCRIPT_1);
+    //new spell_dragon_soul_trigger_spell_from_aoe("spell_dragon_soul_claw_of_gorath_tentacle_toss_aoe_2", SPELL_TENTACLE_TOSS_SUMMON);
 }

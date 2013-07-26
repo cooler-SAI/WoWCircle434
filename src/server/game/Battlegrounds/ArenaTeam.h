@@ -106,7 +106,7 @@ struct ArenaTeamMember
     uint16 PersonalRating;
     uint16 MatchMakerRating;
 
-    void ModifyPersonalRating(Player* player, int32 mod, uint32 type);
+    void ModifyPersonalRating(Player* player, int32 mod, uint32 type, uint32 max_rating);
     void ModifyMatchmakerRating(int32 mod, uint32 slot);
 };
 

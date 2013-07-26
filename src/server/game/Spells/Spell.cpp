@@ -1224,10 +1224,13 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
     {
         for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
         {
-            if (Unit* unitTarget = (*itr)->ToUnit())
-                unitTargets.push_back(unitTarget);
-            else if (GameObject* gObjTarget = (*itr)->ToGameObject())
-                gObjTargets.push_back(gObjTarget);
+            if ((*itr))
+            {
+                if (Unit* unitTarget = (*itr)->ToUnit())
+                    unitTargets.push_back(unitTarget);
+                else if (GameObject* gObjTarget = (*itr)->ToGameObject())
+                    gObjTargets.push_back(gObjTarget);
+            }
         }
     }
 
@@ -1247,6 +1250,9 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                     case 99152: // Cauterizing Flame, Item - Priest Healer T12 4P Bonus
                     case 96966: // Blaze of Life, Eye of Blazing Power (Normal)
                     case 97136: // Blaze of Life, Eye of Blazing Power (Heroic)
+                    case 109825: // Nick of Time, Windward Heart (heroic)
+                    case 108000: // Nick of Time, Windward Heart (normal)
+                    case 109822: // Nick of Time, Windward Heart (lfr)
                         maxSize = 1;
                         power = POWER_HEALTH;
                         break;
@@ -1279,7 +1285,7 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                         break;
                     // Divine Hymn
                     case 64844:
-                        maxSize = 3;
+                        maxSize = 5;
                         power = POWER_HEALTH;
                         break;
                     // Hymn of Hope
@@ -2814,7 +2820,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                     unit->RemoveAurasByType(SPELL_AURA_MOD_STEALTH, NULL, NULL, 11327);
             }
             if (m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_BINARY) && !m_spellInfo->IsChanneled())
-                if (m_caster->IsSpellResisted(unit, m_spellSchoolMask, m_spellInfo))
+                if (m_originalCaster->IsSpellResisted(unit, m_spellSchoolMask, m_spellInfo))
                     return SPELL_MISS_RESIST;
         }
         else if (m_caster->IsFriendlyTo(unit))
@@ -2832,7 +2838,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                 if (m_caster->GetTypeId() == TYPEID_PLAYER)
                     m_caster->ToPlayer()->UpdatePvP(true);
             }
-            if (unit->isInCombat() && !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_NO_INITIAL_AGGRO))
+            if (unit->isInCombat() && !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_NO_INITIAL_AGGRO) && !m_spellInfo->IsIgnoringCombat())
             {
                 m_caster->SetInCombatState(unit->GetCombatTimer() > 0, unit);
                 unit->getHostileRefManager().threatAssist(m_caster, 0.0f);
@@ -2842,7 +2848,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
     else if (!m_spellInfo->IsPositive())
     {
         if (m_spellInfo->HasCustomAttribute(SPELL_ATTR0_CU_BINARY) && !m_spellInfo->IsChanneled())
-            if (m_caster->IsSpellResisted(unit, m_spellSchoolMask, m_spellInfo))
+            if (m_originalCaster->IsSpellResisted(unit, m_spellSchoolMask, m_spellInfo))
                 return SPELL_MISS_RESIST;
     }
 
@@ -2875,7 +2881,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         m_diminishLevel = DiminishingLevels(std::min(m_diminishLevel + unit->GetDiminishing(m_diminishGroup), int(DIMINISHING_LEVEL_IMMUNE)));
         DiminishingReturnsType type = GetDiminishingReturnsGroupType(m_diminishGroup);
         // Increase Diminishing on unit, current informations for actually casts will use values above
-        if ((type == DRTYPE_PLAYER && unit->GetCharmerOrOwnerPlayerOrPlayerItself()) || type == DRTYPE_ALL)
+        if ((type == DRTYPE_PLAYER && (unit->GetCharmerOrOwnerPlayerOrPlayerItself() || (unit->GetTypeId() == TYPEID_UNIT && unit->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_ALL_DIMINISH))) || type == DRTYPE_ALL)
             unit->IncrDiminishing(m_diminishGroup);
     }
 
@@ -3033,31 +3039,37 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
     // this is executed after spell proc spells on target hit
     // spells are triggered for each hit spell target
     // info confirmed with retail sniffs of permafrost and shadow weaving
-    if (!m_hitTriggerSpells.empty() && unit != m_caster)
+    if (!m_hitTriggerSpells.empty())
     {
         int _duration = 0;
-        for (HitTriggerSpellList::const_iterator i = m_hitTriggerSpells.begin(); i != m_hitTriggerSpells.end(); ++i)
+        for (HitTriggerSpellList::iterator i = m_hitTriggerSpells.begin(); i != m_hitTriggerSpells.end(); )
         {
-            if (CanExecuteTriggersOnHit(effMask, i->triggeredByAura) && roll_chance_i(i->chance))
+            if (CanExecuteTriggersOnHit(effMask, i->triggeredByAura))
             {
-                m_caster->CastSpell(unit, i->triggeredSpell, true);
-
-                // SPELL_AURA_ADD_TARGET_TRIGGER auras shouldn't trigger auras without duration
-                // set duration of current aura to the triggered spell
-                if (i->triggeredSpell->GetDuration() == -1)
+                if (roll_chance_i(i->chance))
                 {
-                    if (Aura* triggeredAur = unit->GetAura(i->triggeredSpell->Id, m_caster->GetGUID()))
+                    m_caster->CastSpell(unit, i->triggeredSpell, true);
+
+                    // SPELL_AURA_ADD_TARGET_TRIGGER auras shouldn't trigger auras without duration
+                    // set duration of current aura to the triggered spell
+                    if (i->triggeredSpell->GetDuration() == -1)
                     {
-                        // get duration from aura-only once
-                        if (!_duration)
+                        if (Aura* triggeredAur = unit->GetAura(i->triggeredSpell->Id, m_caster->GetGUID()))
                         {
-                            Aura* aur = unit->GetAura(m_spellInfo->Id, m_caster->GetGUID());
-                            _duration = aur ? aur->GetDuration() : -1;
+                            // get duration from aura-only once
+                            if (!_duration)
+                            {
+                                Aura* aur = unit->GetAura(m_spellInfo->Id, m_caster->GetGUID());
+                                _duration = aur ? aur->GetDuration() : -1;
+                            }
+                            triggeredAur->SetDuration(_duration);
                         }
-                        triggeredAur->SetDuration(_duration);
                     }
                 }
+                i = m_hitTriggerSpells.erase(i);
+                continue;
             }
+            ++i;
         }
     }
 
@@ -3895,7 +3907,10 @@ void Spell::_handle_immediate_phase()
             procAttacker |= PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS;
 
         // Proc the spells that have DEST target
-        m_originalCaster->ProcDamageAndSpell(NULL, procAttacker, 0, m_procEx | PROC_EX_NORMAL_HIT, 0, 0, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell);
+        Unit *target = NULL;
+        if (procAttacker & PROC_FLAG_DONE_TRAP_ACTIVATION)
+            target = m_targets.GetUnitTarget();
+        m_originalCaster->ProcDamageAndSpell(target, procAttacker, 0, m_procEx | PROC_EX_NORMAL_HIT, 0, 0, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell);
     }
 }
 
@@ -5416,7 +5431,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!IsTriggered() && !(m_spellInfo->AttributesEx2 & SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && VMAP::VMapFactory::checkSpellForLoS(m_spellInfo->Id) && !m_caster->IsWithinLOSInMap(target))
                         return SPELL_FAILED_LINE_OF_SIGHT;
 
-            if (!IsTriggered() && m_caster->IsVisionObscured(target))
+            if (!IsTriggered() && m_caster->IsVisionObscured(target, m_spellInfo))
                 return SPELL_FAILED_VISION_OBSCURED; // smoke bomb, camouflage...
         }
     }
@@ -6117,7 +6132,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_caster->IsInDisallowedMountForm())
                     return SPELL_FAILED_NOT_SHAPESHIFT;
 
-                if (m_caster->HasAuraType(SPELL_AURA_TRANSFORM))
+                // hex & mount
+                if (m_caster->HasAura(51514))
                     return SPELL_FAILED_CONFUSED;
 
                 break;
@@ -6294,7 +6310,7 @@ SpellCastResult Spell::CheckCasterAuras() const
                 dispel_immune |= SpellInfo::GetDispelMask(DispelType(m_spellInfo->Effects[i].MiscValue));
         }
         // immune movement impairment and loss of control
-        if (m_spellInfo->Id == 42292 || m_spellInfo->Id == 59752)
+        if (m_spellInfo->Id == 42292 || m_spellInfo->Id == 59752 || m_spellInfo->Id == 65547)
             mechanic_immune = IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK;
     }
 
@@ -7243,10 +7259,25 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                 caster = m_caster->GetMap()->GetGameObject(m_originalCasterGUID);
             if (!caster)
                 caster = m_caster;
+
+            // Sin and Punishment from duel bug
+            if (m_spellInfo->Id == 87204)
+            {
+                if (caster != target && caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->duel && target->GetTypeId() == TYPEID_PLAYER)
+                    return false;
+            }
+            // Glyph of Concussive Shot
+            else if (m_spellInfo->Id == 5116)
+            {
+                if (eff == EFFECT_1 && !m_caster->HasAura(56851))
+                    return false;
+            }
+
             if (target->GetEntry() == 5925)
                 return true;
             if (LOSAdditionalRules(target))
                 return true;
+ 
             if (m_targets.HasDst())
             {
                 float x, y, z;

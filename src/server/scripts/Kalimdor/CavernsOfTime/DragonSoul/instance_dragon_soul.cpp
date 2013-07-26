@@ -21,6 +21,10 @@ class instance_dragon_soul : public InstanceMapScript
 
                 uiMorchokGUID = 0;
                 uiKohcromGUID = 0;
+                uiZonozzGUID = 0;
+                uiHagaraGUID = 0;
+
+                bHagaraEvent = 0;
             }
 
             void OnPlayerEnter(Player* pPlayer)
@@ -39,7 +43,16 @@ class instance_dragon_soul : public InstanceMapScript
                     case NPC_KOHCROM:
                         uiKohcromGUID = pCreature->GetGUID();
                         break;
+                    case NPC_ZONOZZ:
+                        uiZonozzGUID = pCreature->GetGUID();
+                        break;
+                    case NPC_HAGARA:
+                        uiHagaraGUID = pCreature->GetGUID();
+                        break;
                     case NPC_TRAVEL_TO_WYRMREST_TEMPLE:
+                    case NPC_TRAVEL_TO_EYE_OF_ETERNITY:
+                    case NPC_TRAVEL_TO_WYRMREST_BASE:
+                    case NPC_TRAVEL_TO_WYRMREST_SUMMIT:
                         teleportGUIDs.push_back(pCreature->GetGUID());
                         break;
                     default:
@@ -51,27 +64,33 @@ class instance_dragon_soul : public InstanceMapScript
             {
             }
 
-            void OnGameObjectRemove(GameObject* pGo)
-            {
-            }
-
-            void SetData(uint32 type, uint32 data)
-            {
-            }
-
-            uint32 GetData(uint32 type)
-            {
-                return 0;
-            }
-
             uint64 GetData64(uint32 type)
             {
                 switch (type)
                 {
                     case DATA_MORCHOK: return uiMorchokGUID;
                     case DATA_KOHCROM: return uiKohcromGUID;
+                    case DATA_ZONOZZ: return uiZonozzGUID;
+                    case DATA_HAGARA: return uiHagaraGUID;
                     default: return 0;
                 }
+                return 0;
+            }
+
+            void SetData(uint32 type, uint32 data)
+            {   
+                if (type == DATA_HAGARA_EVENT)
+                {
+                    bHagaraEvent = data;
+                    SaveToDB();
+                }
+            }
+            
+            uint32 GetData(uint32 type)
+            {
+                if (type == DATA_HAGARA_EVENT)
+                    return bHagaraEvent;
+
                 return 0;
             }
 
@@ -112,7 +131,7 @@ class instance_dragon_soul : public InstanceMapScript
                 std::string str_data;
 
                 std::ostringstream saveStream;
-                saveStream << "D S " << GetBossSaveData();
+                saveStream << "D S " << GetBossSaveData() << bHagaraEvent << " ";
 
                 str_data = saveStream.str();
 
@@ -144,7 +163,15 @@ class instance_dragon_soul : public InstanceMapScript
                         if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
                             tmpState = NOT_STARTED;
                         SetBossState(i, EncounterState(tmpState));
-                    }} else OUT_LOAD_INST_DATA_FAIL;
+                    }
+                    
+                    uint32 tmpEvent;
+                    loadStream >> tmpEvent;
+                    if (tmpEvent != DONE) 
+                        tmpEvent = NOT_STARTED;
+                    bHagaraEvent = tmpEvent;
+
+                } else OUT_LOAD_INST_DATA_FAIL;
 
                 OUT_LOAD_INST_DATA_COMPLETE;
             }
@@ -154,8 +181,12 @@ class instance_dragon_soul : public InstanceMapScript
 
                 uint64 uiMorchokGUID;
                 uint64 uiKohcromGUID;
+                uint64 uiZonozzGUID;
+                uint64 uiHagaraGUID;
 
                 std::vector<uint64> teleportGUIDs;
+
+                uint32 bHagaraEvent;
                
         };
 };

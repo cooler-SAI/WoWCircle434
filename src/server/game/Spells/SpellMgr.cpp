@@ -82,7 +82,7 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Gnaw
             else if (spellproto->Id == 47481)
                 return DIMINISHING_CONTROLLED_STUN;
-            // Earthquake
+            // Earthquake (Trash, Ulduar)
             else if (spellproto->Id == 64697)
                 return DIMINISHING_NONE;
             // Black Plague
@@ -90,6 +90,8 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
                 return DIMINISHING_NONE;
             // Summoning Disorientation
             else if (spellproto->Id == 32752)
+                return DIMINISHING_NONE;
+            else if (spellproto->SpellVisual[0] == 14153)
                 return DIMINISHING_NONE;
             break;
         }
@@ -2797,6 +2799,12 @@ void SpellMgr::LoadSpellCustomAttr()
                             if (!procInfo)
                                 continue;
 
+                            switch (procInfo->Id)
+                            {
+                                case 53365: // Rune of the Fallen Crusader
+                                case 51714: // Rune of Razorice
+                                    continue;
+                            }
                             // if proced directly from enchantment, not via proc aura
                             // NOTE: Enchant Weapon - Blade Ward also has proc aura spell and is proced directly
                             // however its not expected to stack so this check is good
@@ -2902,6 +2910,8 @@ void SpellMgr::LoadSpellCustomAttr()
             case 77661: // Searing Flame
             case 77489: // Echo of Light
             case 99132: // Divine Fire, Item - Priest T12 Healer 2P Bonus
+            case 99173: // Burning Wounds, Item - Rogue T12 2P Bonus
+            case 99002: // Fiery Claws, Item - Druid T12 Feral 2P Bonus
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER;
                 break;
             case 60256:
@@ -3036,6 +3046,10 @@ void SpellMgr::LoadSpellCustomAttr()
             case 108571: // Stomp
             case 109033: // Stomp
             case 109034: // Stomp
+            case 103527: // Void Diffusion dmg
+            case 104605: // Void Diffusion dmg
+            case 108345: // Void Diffusion dmg
+            case 108346: // Void Diffusion dmg
                 // ONLY SPELLS WITH SPELLFAMILY_GENERIC and EFFECT_SCHOOL_DAMAGE
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 break;
@@ -6218,6 +6232,9 @@ void SpellMgr::LoadDbcDataCorrections()
             case 108220: // Deep Corruption
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
                 break;
+            case 108183: // Twilight Submission
+                spellInfo->MaxAffectedTargets = 1;
+                break;
             // Morchok
             case 103821: // Earthen Vortex
             case 110047:
@@ -6230,14 +6247,14 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_2].SetRadiusIndex(EFFECT_RADIUS_60_YARDS);
                 break;
             case 103178: // Earths Vengeance dmg
-                spellInfo->SetDurationIndex(18);
+                spellInfo->SetDurationIndex(618);
                 break;
             case 103534: // Danger
             case 103536: // Warning
             case 103541: // Safe
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
                 break;
-            // Yoe'sahj The Unsleeping
+            // Yor'sahj The Unsleeping
             case 105420: // Color Combine 1
             case 105435: // Color Combine 2
             case 105436: // Color Combine 3
@@ -6252,6 +6269,104 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 105534: // Mana Void dummy
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                break;
+            case 109390: // Deep Corruption dmg (trash)
+            case 105173: // Deep Corruption dmg
+            case 108347:
+            case 108348:
+            case 108349:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+                break;
+            case 108228: // Mana Diffusion
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+                break;
+            // Warlord Zon'ozz
+            case 109197: // Tentacle Toss aoe 1
+            case 109237: // Tentacle Toss aoe 2
+                spellInfo->MaxAffectedTargets = 1;
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+                break;
+            case 109240: // Tentacle Toss jump
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            case 104031: // Void Diffusion
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            case 104347: // Shadow Gaze
+            case 104602:
+            case 104603:
+            case 104604:
+                spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+                break;
+            case 104378: // Black Blood of Go'rath
+            case 110322:
+                spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+                break;
+            case 104377: // Black Blood of Go'rath
+            case 110306:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+                break;
+            // Hagara the Stormbinder
+            case 109393:
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ENEMY;
+                break;
+            case 109305: // Frozen Grasp
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_100_YARDS);
+                break;
+            case 109307: // Frozen Grasp grip
+                spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_JUMP_DEST;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+                break;
+            case 109315: // Icicle
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            case 105311: // Crystalline Tether
+            case 105482:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 105316: // Ice Lance dmg
+            case 107061:
+            case 107062:
+            case 107063:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 105256: // Frozen Tempest
+            case 109552:
+            case 109553:
+            case 109554:
+                spellInfo->Mechanic = 0;
+                break;
+            case 105367: // Lightning Conduit dummy 1
+                spellInfo->SetDurationIndex(39); // 2 secs
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_8_YARDS);
+                spellInfo->Effects[EFFECT_0].ChainTarget = 25;
+                break;
+            case 105371: // Lightning Conduit dummy 2
+                spellInfo->SetDurationIndex(39); // 2 secs
+                spellInfo->AttributesEx5 |= SPELL_ATTR5_HIDE_DURATION;
+                break;
+            case 107850: // Focused Assault dmg
+                spellInfo->SetRangeIndex(13); // 50000
+                break;
+            case 109325: // Frostflake
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 105289: // Shattered Ice
+            case 108567:
+            case 110887:
+            case 110888:
+                spellInfo->InterruptFlags = 0;
+                break;
+            case 105409: // Water Shield
+            case 109560:
+                spellInfo->Effects[EFFECT_2].Amplitude = 8000;
+                break;
+            case 109557: // Storm Pillars
+                spellInfo->MaxAffectedTargets = 1;
                 break;
             // ENDOF DRAGON SOUL SPELLS
             //
@@ -7075,6 +7190,24 @@ void SpellMgr::LoadDbcDataCorrections()
             case 60206:
                 spellInfo->Effects[EFFECT_2].SetRadiusIndex(EFFECT_RADIUS_10_YARDS);
                 break;
+            // Faerie Fire (Feral)
+            case 16857:
+                spellInfo->Attributes &= ~SPELL_ATTR0_ABILITY;
+                break;
+            // Charge stun
+            case 7922:
+            case 96273:
+            // Intercept stun
+            case 20253:
+                spellInfo->Attributes |= SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK;
+                break;
+            case 64843:     // Divine Hymn
+            case 64901:     // Hymn of Hope
+                spellInfo->ChannelInterruptFlags &= ~CHANNEL_FLAG_DELAY;
+                break;
+            case 81093: // 
+                spellInfo->ProcCharges = 1;
+                break;
             default:
                 break;
         }
@@ -7095,6 +7228,7 @@ void SpellMgr::LoadDbcDataCorrections()
             case 6358: // Seduction
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
                 break;
+            
             default:
                 break;
         }

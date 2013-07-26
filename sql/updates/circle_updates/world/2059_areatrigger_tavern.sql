@@ -1,0 +1,1 @@
+DELETE FROM `areatrigger_tavern` WHERE `id`=5637;

@@ -1,0 +1,1 @@
+INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `comment`) VALUES ('-2983', '-61922', 'Rogue - Sprint - Glyph of Blurred Speed removal');

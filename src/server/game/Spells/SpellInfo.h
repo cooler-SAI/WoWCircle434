@@ -486,6 +486,8 @@ public:
     bool CanPierceImmuneAura(SpellInfo const* aura) const;
     bool CanDispelAura(SpellInfo const* aura) const;
 
+    bool CanCritDamageClassNone() const;
+
     bool IsSingleTarget(Unit* caster = NULL) const;
     bool IsSingleTargetWith(SpellInfo const* spellInfo) const;
     bool IsAuraExclusiveBySpecificWith(SpellInfo const* spellInfo) const;

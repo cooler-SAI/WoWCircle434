@@ -267,7 +267,7 @@ SpellImplicitTargetInfo::StaticData  SpellImplicitTargetInfo::_data[TOTAL_SPELL_
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_AREA,    TARGET_CHECK_RAID,     TARGET_DIR_NONE},        // 56 TARGET_UNIT_CASTER_AREA_RAID
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_TARGET, TARGET_SELECT_CATEGORY_DEFAULT, TARGET_CHECK_RAID,     TARGET_DIR_NONE},        // 57 TARGET_UNIT_TARGET_RAID
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_NEARBY,  TARGET_CHECK_RAID,     TARGET_DIR_NONE},        // 58 TARGET_UNIT_NEARBY_RAID
-    {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_CONE,    TARGET_CHECK_ALLY,     TARGET_DIR_FRONT},       // 59 TARGET_UNIT_CONE_ALLY
+    {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_CONE,    TARGET_CHECK_RAID,     TARGET_DIR_FRONT},       // 59 TARGET_UNIT_CONE_ALLY
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_CASTER, TARGET_SELECT_CATEGORY_CONE,    TARGET_CHECK_ENTRY,    TARGET_DIR_FRONT},       // 60 TARGET_UNIT_CONE_ENTRY
     {TARGET_OBJECT_TYPE_UNIT, TARGET_REFERENCE_TYPE_TARGET, TARGET_SELECT_CATEGORY_AREA,    TARGET_CHECK_RAID_CLASS,TARGET_DIR_NONE},       // 61 TARGET_UNIT_TARGET_AREA_RAID_CLASS
     {TARGET_OBJECT_TYPE_NONE, TARGET_REFERENCE_TYPE_NONE,   TARGET_SELECT_CATEGORY_NYI,     TARGET_CHECK_DEFAULT,  TARGET_DIR_NONE},        // 62 TARGET_UNK_62
@@ -1107,7 +1107,7 @@ bool SpellInfo::IsExplicitDiscovery() const
     return ((Effects[0].Effect == SPELL_EFFECT_CREATE_RANDOM_ITEM
         || Effects[0].Effect == SPELL_EFFECT_CREATE_ITEM_2)
         && Effects[1].Effect == SPELL_EFFECT_SCRIPT_EFFECT)
-        || Id == 64323;
+        || Id == 64323 || Id == 101805;
 }
 
 bool SpellInfo::IsLootCrafting() const
@@ -1466,6 +1466,34 @@ bool SpellInfo::CanDispelAura(SpellInfo const* aura) const
     return true;
 }
 
+bool SpellInfo::CanCritDamageClassNone() const
+{
+    switch (Id)
+    {
+        case 379:   // Shaman - Earth Shield
+        case 73685: // Shaman - Unleash Elements - Unleash Life 
+
+        case 86958: // Shaman - Cleansing Waters
+        case 86961:
+
+        case 33778: // Druid - Lifebloom Final Bloom
+        case 22845: // Druid - Frenzied Regeneration
+
+        case 64844: // Priest - Divine Hymn
+
+        case 85222: // Paladin - Light of Dawn
+
+        case 94286: // Paladin - Protector of the Innocent proc
+        case 94288:
+        case 94289:
+
+        case 71607: // Item - Bauble of True Blood 10m
+        case 71646: // Item - Bauble of True Blood 25m
+            return true;
+    }
+    return false;
+}
+
 bool SpellInfo::IsSingleTarget(Unit* caster) const
 {
     // all other single target spells have if it has AttributesEx5
@@ -1517,7 +1545,6 @@ bool SpellInfo::IsAuraExclusiveBySpecificWith(SpellInfo const* spellInfo) const
     SpellSpecificType spellSpec2 = spellInfo->GetSpellSpecific();
     switch (spellSpec1)
     {
-        case SPELL_SPECIFIC_TRACKER:
         case SPELL_SPECIFIC_WARLOCK_ARMOR:
         case SPELL_SPECIFIC_WELL_FED:
         case SPELL_SPECIFIC_MAGE_ARMOR:
@@ -3169,6 +3196,13 @@ bool SpellInfo::IsIgnoringCombat() const
         case 79140:
         // Earth Shield
         case 379:
+        // Earthliving Weapon proc
+        case 51730:
+        // Ancestral Vigor
+        case 105284:
+        // Ancestral Fortitude
+        case 16177:
+        case 16236:
             return true;
         default: break;
     }
@@ -3280,6 +3314,7 @@ bool SpellInfo::IsNeedToCheckSchoolImmune() const
         case 59752: // Every Man for Himself (racical)
         case 25912: // Holy Shock damage
         case 35395: // Crusader Strike
+        case 65547: // PvP Trinket, Trial of the Crusader
             return false;
         default:
             break;

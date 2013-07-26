@@ -194,7 +194,7 @@ class npc_lycanthoth : public CreatureScript
             {
                 Unit* originalKiller = killer->GetCharmerOrOwnerOrSelf();
                 if (originalKiller && (originalKiller->GetTypeId() == TYPEID_PLAYER))
-                    killer->CastSpell(killer, (originalKiller->ToPlayer()->GetTeam() == TEAM_HORDE ? 74077 : 74078), true);
+                    killer->CastSpell(killer, (originalKiller->ToPlayer()->GetTeamId() == TEAM_HORDE ? 74077 : 74078), true);
             } 
         };
 };

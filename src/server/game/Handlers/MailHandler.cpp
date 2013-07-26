@@ -47,6 +47,13 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     uint8 items_count = recvData.ReadBits(5);              // attached items count
 
+    if (money > MAX_MONEY_FOR_MAIL)
+    {
+        GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_MAIL_ATTACHMENT_INVALID);
+        recvData.rfinish();                   // set to end to avoid warnings spam
+        return;
+    }
+
     if (items_count > MAX_MAIL_ITEMS)                       // client limit
     {
         GetPlayer()->SendMailResult(0, MAIL_SEND, MAIL_ERR_TOO_MANY_ATTACHMENTS);
