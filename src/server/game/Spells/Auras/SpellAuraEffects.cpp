@@ -7199,10 +7199,18 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
                 break;
             }
             case 603: // Bane of Doom
-                // There is a chance to summon an Ebon Imp when Bane of Doom does damage
-                if (caster && roll_chance_i(20))
-                    caster->CastSpell(caster, 18662, true);
+            {
+                if (!caster)
+                    break;
+
+                int32 chance = 20;
+                if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_WARLOCK, 195, EFFECT_0))
+                    chance += aurEff->GetAmount();
+
+                if (roll_chance_i(chance))
+                    caster->CastSpell(target, 18662, true);
                 break;
+            }
             // Lacerate
             case 33745:
                 if (caster && caster->GetTypeId() == TYPEID_PLAYER)

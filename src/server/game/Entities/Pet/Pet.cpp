@@ -955,6 +955,16 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         {
             switch (GetEntry())
             {
+                case 50675: // Ebon Imp
+                {
+                    if (Player* pOwner = m_owner->ToPlayer())
+                        m_modMeleeHitChance = pOwner->GetFloatValue(PLAYER_FIELD_UI_SPELL_HIT_MODIFIER);
+                    
+                    float bonusDmg = m_owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW) * 0.15f;
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 2.5f - (petlevel / 2) + bonusDmg));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 2.5f + (petlevel / 2) + bonusDmg));
+                    break;
+                }
                 case 11859: // Doom Guard
                 case 89: // Infernal
                     if (!HasAura(96101)) // Warlock Mastery
