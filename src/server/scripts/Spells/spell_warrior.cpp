@@ -347,14 +347,14 @@ public:
             return true;
         }
 
-        void HandleDamage(SpellEffIndex /*effIndex*/)
+        void HandleBeforeHit()
         {
             GetCaster()->RemoveAurasDueToSpell(SPELL_VICTORY_RUSH_AURA);
             GetCaster()->RemoveAurasDueToSpell(SPELL_VICTORY_RUSH_AURA_TWO);
         }
         void Register()
         {
-            OnEffectHitTarget += SpellEffectFn(spell_warr_victory_rush_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            BeforeHit += SpellHitFn(spell_warr_victory_rush_SpellScript::HandleBeforeHit);
         }
     };
     SpellScript* GetSpellScript() const
