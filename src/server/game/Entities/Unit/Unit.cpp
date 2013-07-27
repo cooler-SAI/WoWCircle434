@@ -9077,6 +9077,9 @@ bool Unit::HandleModifierAuraProc(Unit* victim, uint32 damage, AuraEffect* trigg
                 // Unholy Command
                 case 49588:
                 case 49589:
+                    if (victim && victim->GetOwner() && victim->GetOwner()->GetGUID() == GetGUID())
+                        return false;
+
                     triggered_spell_id = 90289;
                     break;
                 default:
