@@ -138,7 +138,7 @@ class boss_halfus_wyrmbreaker : public CreatureScript
 
         struct boss_halfus_wyrmbreakerAI : public BossAI
         {
-            boss_halfus_wyrmbreakerAI(Creature * creature) : BossAI(creature, DATA_HALFUS), summons(me)
+            boss_halfus_wyrmbreakerAI(Creature * creature) : BossAI(creature, DATA_HALFUS)
             {
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
@@ -154,8 +154,6 @@ class boss_halfus_wyrmbreaker : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
             }
 
-            EventMap events;
-            SummonList summons;
             Creature* netherscion;
             Creature* stormrider;
             Creature* slatedrake;
@@ -338,56 +336,23 @@ class boss_halfus_wyrmbreaker : public CreatureScript
 
             void KilledUnit(Unit* who)
             {
-                Talk(SAY_KILL);
+                if (who && who->GetTypeId() == TYPEID_PLAYER)
+                    Talk(SAY_KILL);
             };
-
-            void JustSummoned(Creature* summon)
-            {
-                summons.Summon(summon);
-            }
-
-            void SummonedCreatureDespawn(Creature* summon)
-            {
-                summons.Despawn(summon);
-            }
-
-            void JustReachedHome()
-            {
-                _JustReachedHome();
-                instance->SetBossState(DATA_HALFUS, FAIL);
-            }
 
             void DoAction(const int32 action)
             {
                 switch(action)
                 {
                     case ACTION_WHELPS_RELEASE:
+                    {
                         if (instance->GetBossState(DATA_HALFUS) != IN_PROGRESS)
                             return;
 
-                        if (!bWhelps)
-                            return;
-
-                        for (uint8 i = 0; i < 8; ++i)
-                        {
-                            Creature* whelpsN = whelps[i];
-                            if (!whelpsN)
-                                continue;
-
-                            whelpsN->SetReactState(REACT_AGGRESSIVE);
-                            whelpsN->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                            whelpsN->setFaction(16);
-
-                            if (Creature* proto = whelpsN->FindNearestCreature(NPC_PROTO_BEHEMOTH, 200.0f))
-                                whelpsN->CastSpell(proto, SPELL_ATROPHIC_POISON, false);
-
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                            {
-                                if (whelpsN->AI())
-                                    whelpsN->AI()->AttackStart(target);
-                            }
-                        }
+                        EntryCheckPredicate pred(NPC_ORPHANED_WHELP);
+                        summons.DoAction(ACTION_WHELPS_RELEASE, pred, 8); 
                         break;
+                    }
                     case ACTION_WHELP_DIED:
                         whelpcount++;
                         if (whelpcount == 8)
@@ -403,10 +368,9 @@ class boss_halfus_wyrmbreaker : public CreatureScript
 
             void JustDied(Unit* killer)
             {
-                summons.DespawnAll();
+                _JustDied();
                 if(Creature *Chogall = me->SummonCreature(NPC_CHOGALL_DLG, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 1, TEMPSUMMON_DEAD_DESPAWN, 0))
                     Chogall->AI()->DoAction(ACTION_AT_HALFUS_END);
-                _JustDied();
             }
 
             void SpellHit(Unit* caster, SpellInfo const* spell)
@@ -444,53 +408,30 @@ class boss_halfus_wyrmbreaker : public CreatureScript
                     events.ScheduleEvent(EVENT_FURIOUS_ROAR0, 1000);
                     if (me->HasAura(SPELL_SHADOW_WARPED))
                         events.ScheduleEvent(EVENT_SHADOW_NOVA, 7000);
+                    return;
                 }
 
-                while (uint32 eventId = events.ExecuteEvent())
+                if (uint32 eventId = events.ExecuteEvent())
                 {
                     switch (eventId)
                     {
-                    case EVENT_SHADOW_NOVA:
-                        //Хак, меняем скорость каста скилла
-                        if (me->HasAura(SPELL_CYCLONE_WINDS))
-                        {
-                            if (SpellInfo* spell = GET_SPELL(SPELL_SHADOW_NOVA))
-                                spell->SetCastTimeIndex(5);
-                            if (SpellInfo* spell = GET_SPELL(SPELL_SHADOW_NOVA_25))
-                                spell->SetCastTimeIndex(5);
-                            if (SpellInfo* spell = GET_SPELL(SPELL_SHADOW_NOVA_10H))
-                                spell->SetCastTimeIndex(5);
-                            if (SpellInfo* spell = GET_SPELL(SPELL_SHADOW_NOVA_25H))
-                                spell->SetCastTimeIndex(5);
-                        }
-                        else
-                        {
-                            if (SpellInfo* spell = GET_SPELL(SPELL_SHADOW_NOVA))
-                                spell->SetCastTimeIndex(2);
-                            if (SpellInfo* spell = GET_SPELL(SPELL_SHADOW_NOVA_25))
-                                spell->SetCastTimeIndex(2);
-                            if (SpellInfo* spell = GET_SPELL(SPELL_SHADOW_NOVA_10H))
-                                spell->SetCastTimeIndex(2);
-                            if (SpellInfo* spell = GET_SPELL(SPELL_SHADOW_NOVA_25H))
-                                spell->SetCastTimeIndex(2);
-                        }
-
-                        DoCast(me, SPELL_SHADOW_NOVA);
-                        events.ScheduleEvent(EVENT_SHADOW_NOVA, 7000);
-                        break;
-                    case EVENT_FURIOUS_ROAR1:
-                    case EVENT_FURIOUS_ROAR2:
-                        DoCast(me, SPELL_FURIOUS_ROAR);
-                        break;
-                    case EVENT_FURIOUS_ROAR0:
-                        DoCast(me, SPELL_FURIOUS_ROAR);
-                        events.ScheduleEvent(EVENT_FURIOUS_ROAR1, 1800);
-                        events.ScheduleEvent(EVENT_FURIOUS_ROAR2, 3200);
-                        events.ScheduleEvent(EVENT_FURIOUS_ROAR0, 30000);
-                        break;
-                    case EVENT_BERSERK:
-                        DoCast(me, SPELL_BERSERK);
-                        break;
+                        case EVENT_SHADOW_NOVA:
+                            DoCast(me, SPELL_SHADOW_NOVA);
+                            events.ScheduleEvent(EVENT_SHADOW_NOVA, 7000);
+                            break;
+                        case EVENT_FURIOUS_ROAR1:
+                        case EVENT_FURIOUS_ROAR2:
+                            DoCast(me, SPELL_FURIOUS_ROAR);
+                            break;
+                        case EVENT_FURIOUS_ROAR0:
+                            DoCast(me, SPELL_FURIOUS_ROAR);
+                            events.ScheduleEvent(EVENT_FURIOUS_ROAR1, 1800);
+                            events.ScheduleEvent(EVENT_FURIOUS_ROAR2, 3200);
+                            events.ScheduleEvent(EVENT_FURIOUS_ROAR0, 30000);
+                            break;
+                        case EVENT_BERSERK:
+                            DoCast(me, SPELL_BERSERK);
+                            break;
                     }
                 }
                 DoMeleeAttackIfReady();
@@ -599,6 +540,18 @@ class npc_orphaned_whelp : public CreatureScript
         {
             npc_orphaned_whelpAI(Creature * creature) : ScriptedAI(creature)
             {
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
                 pInstance = (InstanceScript*)creature->GetInstanceScript();
             }
 
@@ -615,49 +568,52 @@ class npc_orphaned_whelp : public CreatureScript
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->setFaction(35);
                 me->SetCanFly(false);
-                count = 0;
+            }
+
+            void DoAction(const int32 action)
+            {
+                if (action == ACTION_WHELPS_RELEASE)
+                {
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                    me->setFaction(16);
+                    if (Creature* proto = me->FindNearestCreature(NPC_PROTO_BEHEMOTH, 200.0f))
+                        DoCast(proto, SPELL_ATROPHIC_POISON, true);
+
+                    DoZoneInCombat();
+                }  
             }
 
             void JustDied(Unit* /*Killer*/)
             {
-                if (!pInstance)
-                    return;
-
-                if (Creature* pHalfus = me->FindNearestCreature(NPC_HALFUS_WYRMBREAKER, 100.0f))
+                 if (Creature* pHalfus = me->FindNearestCreature(NPC_HALFUS_WYRMBREAKER, 200.0f))
                     pHalfus->AI()->DoAction(ACTION_WHELP_DIED);
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-                if (!pInstance || !UpdateVictim())
-                    return;
-
-                DoMeleeAttackIfReady();
             }
         };
 };
 
 class go_whelp_cage : public GameObjectScript
 {
-public:
-    go_whelp_cage() : GameObjectScript("go_whelp_cage") {}
+    public:
+        go_whelp_cage() : GameObjectScript("go_whelp_cage") {}
 
-    bool OnGossipHello(Player* /*pPlayer*/, GameObject* pGo)
-    {       
-        InstanceScript* pInstance = pGo ? pGo->GetInstanceScript() : NULL;
-        if (!pInstance)
+        bool OnGossipHello(Player* /*pPlayer*/, GameObject* pGo)
+        {       
+            InstanceScript* pInstance = pGo ? pGo->GetInstanceScript() : NULL;
+            if (!pInstance)
+                return true;
+
+            if (Creature* halfus = ObjectAccessor::GetCreature(*pGo, pInstance->GetData64(DATA_HALFUS)))
+            {
+                halfus->AI()->DoAction(ACTION_WHELPS_RELEASE);
+                pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND);
+            }
             return false;
-
-        if (Creature* halfus = ObjectAccessor::GetCreature(*pGo, pInstance->GetData64(DATA_HALFUS)))
-        {
-            halfus->AI()->DoAction(ACTION_WHELPS_RELEASE);
-            pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND);
         }
-        return false;
-    }
 };
 
-class npc_halfus_dragon : public CreatureScript{
+class npc_halfus_dragon : public CreatureScript
+{
     public:
         npc_halfus_dragon() : CreatureScript("npc_halfus_dragon") { }
 
@@ -692,23 +648,25 @@ class npc_halfus_dragon : public CreatureScript{
                 {
                     switch (creature->GetEntry())
                     {
-                    case NPC_SLATE_DRAKE:
-                        creature->CastSpell(Halfus, SPELL_STONE_GRIP, false); 
-                        break;
-                    case NPC_NETHER_SCION:
-                        creature->CastSpell(Halfus, SPELL_NETHER_BLINDNESS, false);
-                        break;
-                    case NPC_STORM_RIDER:
-                        //creature->CastSpell(Halfus, SPELL_CYCLONE_WINDS_SUM, true);
-                        creature->CastSpell(Halfus, SPELL_CYCLONE_WINDS, false);
-                        break;
-                    case NPC_TIME_WARDEN:
-                        if (Creature* proto = creature->FindNearestCreature(NPC_PROTO_BEHEMOTH, 100.0f, true))
-                            creature->CastSpell(proto, SPELL_TIME_DILATION, false);
+                        case NPC_SLATE_DRAKE:
+                            creature->CastSpell(Halfus, SPELL_STONE_GRIP, false); 
+                            break;
+                        case NPC_NETHER_SCION:
+                            creature->CastSpell(Halfus, SPELL_NETHER_BLINDNESS, false);
+                            break;
+                        case NPC_STORM_RIDER:
+                            //creature->CastSpell(Halfus, SPELL_CYCLONE_WINDS_SUM, true);
+                            creature->CastSpell(Halfus, SPELL_CYCLONE_WINDS, false);
+                            break;
+                        case NPC_TIME_WARDEN:
+                            if (Creature* proto = creature->FindNearestCreature(NPC_PROTO_BEHEMOTH, 100.0f, true))
+                                creature->CastSpell(proto, SPELL_TIME_DILATION, false);
+                            break;
                     }
+
                     Halfus->CastSpell(creature, SPELL_BIND_WILL, true);
                     creature->SetReactState(REACT_AGGRESSIVE);
-                    if (Unit* target = Halfus->AI()->SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* target = Halfus->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                         creature->AI()->AttackStart(target);
                 }
                 break;
@@ -730,16 +688,12 @@ class npc_halfus_dragon : public CreatureScript{
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-                pInstance = creature->GetInstanceScript();
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
             }
-
-            InstanceScript* pInstance;
 
             void Reset()
             {
-                if (!pInstance)
-                    return;
-
                 me->SetReactState(REACT_PASSIVE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -751,37 +705,17 @@ class npc_halfus_dragon : public CreatureScript{
 
             void DoAction(const int32 action)
             {
-                switch (action)
+                if (action == ACTION_ACTIVE_GOSSIP)
                 {
-                case ACTION_ACTIVE_GOSSIP:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    break;
                 }
-            }
-
-            void UpdateAI(const uint32 uiDiff)
-            {
-                if (!pInstance || !UpdateVictim())
-                    return;
-
-                DoMeleeAttackIfReady();
             }
 
             void JustDied(Unit* killer)
             {
-                if (!pInstance)
-                    return;
-
-                if (Creature* Halfus = Unit::GetCreature(*me, pInstance->GetData64(DATA_HALFUS)))
-                {
-                    if(Aura* aura = Halfus->GetAura(SPELL_DRAGON_VENGEANCE))
-                        aura->SetStackAmount(aura->GetStackAmount() + 1);
-                    else
-                        me->AddAura(SPELL_DRAGON_VENGEANCE, Halfus);
-                }
-
+                DoCast(me, SPELL_DRAGON_VENGEANCE, true);
             }
         };
 };
@@ -821,28 +755,23 @@ class spell_halfus_fireball_barrage : public SpellScriptLoader
     public:
         spell_halfus_fireball_barrage() : SpellScriptLoader("spell_halfus_fireball_barrage") { }
 
-
         class spell_halfus_fireball_barrage_SpellScript : public SpellScript
         {
             PrepareSpellScript(spell_halfus_fireball_barrage_SpellScript);
 
-
             void HandleScript(SpellEffIndex /*effIndex*/)
             {
-                uint32 _spell;
-                if (!GetCaster())
+                if (!GetCaster() || !GetHitUnit())
                     return;
-                InstanceScript* pInstance;
+
+                InstanceScript* pInstance = NULL;
                 pInstance = GetCaster()->GetInstanceScript();
                 if (!pInstance)
                     return;
-                if (GetCaster()->HasAura(SPELL_TIME_DILATION))
-                    _spell = SPELL_FIREBALL_BARRAGE_M1;
-                else
-                    _spell = SPELL_FIREBALL_BARRAGE_M0;
-                if (Creature* pHalfus = ObjectAccessor::GetCreature(*GetCaster(), pInstance->GetData64(DATA_HALFUS)))
-                    if (Unit* pTarget = pHalfus->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                        GetCaster()->CastSpell(pTarget, _spell, true);
+
+                uint32 _spell = (GetCaster()->HasAura(SPELL_TIME_DILATION) ? SPELL_FIREBALL_BARRAGE_M0 : SPELL_FIREBALL_BARRAGE_M1);
+                
+                GetCaster()->CastSpell(GetHitUnit(), _spell, true);
 
             }
 

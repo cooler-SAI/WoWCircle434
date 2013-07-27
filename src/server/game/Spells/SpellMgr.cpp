@@ -5534,7 +5534,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
 
             // Halfus Wyrmbreaker
-            //
+            case 87683: // Dragon Vengeance
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            case 87609: // Atrophic Poison
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
             case 83710: // Furious Roar
             case 86169:
             case 86170:
@@ -5543,8 +5548,9 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[1].SetRadiusIndex(28);
                 spellInfo->Effects[2].SetRadiusIndex(28);
                 break;
-            case 83719: // Fireball Barrage T
-                spellInfo->Effects[0].TargetA = 1;
+            case 83719: // Fireball Barrage aoe
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->MaxAffectedTargets = 1;
                 break;
             case 83855: // Scorching Breath dmg
             case 86163:
