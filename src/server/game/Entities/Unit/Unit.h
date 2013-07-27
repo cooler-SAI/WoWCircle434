@@ -1339,6 +1339,7 @@ class Unit : public WorldObject
         bool isHunterPet() const{ return m_unitTypeMask & UNIT_MASK_HUNTER_PET; }
         bool isTotem() const    { return m_unitTypeMask & UNIT_MASK_TOTEM; }
         bool IsVehicle() const  { return m_unitTypeMask & UNIT_MASK_VEHICLE; }
+        bool isBattlegroundVehicle() const { return (GetTypeId() != TYPEID_PLAYER && GetMap()->IsBattleground() && (IsVehicle() || GetVehicle())); }
 
         bool IsPetGuardianStuff() const { return m_unitTypeMask & ( UNIT_MASK_SUMMON | UNIT_MASK_GUARDIAN | UNIT_MASK_PET | UNIT_MASK_HUNTER_PET | UNIT_MASK_TOTEM ); }
 
