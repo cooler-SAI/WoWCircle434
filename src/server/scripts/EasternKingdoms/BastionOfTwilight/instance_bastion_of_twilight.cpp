@@ -189,6 +189,8 @@ public:
                 return m_uiDialogs[6];
             case DATA_DLG_SINESTRA:
                 return m_uiDialogs[7];
+            case DATA_WIPE_COUNT:
+                return playerDied;
             }
             return 0;
         }

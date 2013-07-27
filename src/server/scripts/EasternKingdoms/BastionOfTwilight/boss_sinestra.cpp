@@ -339,7 +339,10 @@ class boss_sinestra : public CreatureScript
 
             bool AllowAchieve()
             {
-                return (pInstance && pInstance->GetData(DATA_WIPE_COUNT));
+                if (!pInstance)
+                    return false;
+
+                return (pInstance->GetData(DATA_WIPE_COUNT) == 0);
             }
 
             void DoAction(const int32 action)
