@@ -10712,6 +10712,34 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                 return false;
             break;
         }
+        case 81340: // Sudden Doom
+        {
+            // Death Knight T13 DPS 2P Bonus
+            if (AuraEffect * eff = GetAuraEffect(105609, 0))
+            {
+                if (roll_chance_i(eff->GetAmount()))
+                {
+                    Aura * sd_aura = AddAura(trigger_spell_id, this);
+                    sd_aura->SetModCharges(2);
+                    return true;
+                }
+            }
+            break;
+        }
+        case 59052: // Rime - Freezing Fog
+        {
+            // Death Knight T13 DPS 2P Bonus
+            if (AuraEffect * eff = GetAuraEffect(105609, 0))
+            {
+                if (roll_chance_i(eff->GetAmount() * 2))
+                {
+                    Aura * sd_aura = AddAura(trigger_spell_id, this);
+                    sd_aura->SetModCharges(2);
+                    return true;
+                }
+            }
+            break;
+        }
     }
 
     if (cooldown && GetTypeId() == TYPEID_PLAYER && ToPlayer()->HasSpellCooldown(trigger_spell_id))

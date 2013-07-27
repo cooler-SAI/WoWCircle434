@@ -853,6 +853,17 @@ void Aura::SetCharges(uint8 charges)
     SetNeedClientUpdateForTargets();
 }
 
+void Aura::SetModCharges(uint8 charges)
+{
+    SetCharges(charges);
+    for (uint8 i = EFFECT_0; i < EFFECT_2; ++i)
+    {
+        if (AuraEffect * eff = GetEffect(i))
+            if (SpellModifier* mod = eff->GetSpellModifier())
+                mod->charges = charges;
+    }
+}
+
 uint8 Aura::CalcMaxCharges(Unit* caster) const
 {
     uint32 maxProcCharges = m_spellInfo->ProcCharges;
