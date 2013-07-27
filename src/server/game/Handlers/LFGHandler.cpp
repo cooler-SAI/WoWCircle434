@@ -95,16 +95,16 @@ void WorldSession::HandleLfgLeaveOpcode(WorldPacket&  recvData)
 {
     ObjectGuid leaveGuid;
     uint32 roles, time, reason, instanceId;
-    recvData >> roles >> time >> reason >> instanceId;
-
+    
     Group* group = GetPlayer()->GetGroup();
     uint64 guid = GetPlayer()->GetGUID();
     uint64 gguid = group ? group->GetGUID() : guid;
 
-    recvData.read_skip<uint32>();                          // Always 8
-    recvData.read_skip<uint32>();                          // Join date
-    recvData.read_skip<uint32>();                          // Always 3
-    recvData.read_skip<uint32>();                          // Queue Id
+    recvData 
+        >> roles
+        >> time
+        >> reason 
+        >> instanceId;
 
     recvData
         .ReadByteMask(leaveGuid[4])
@@ -126,7 +126,7 @@ void WorldSession::HandleLfgLeaveOpcode(WorldPacket&  recvData)
         .ReadByteSeq(leaveGuid[5]);
 
     // Check cheating - only leader can leave the queue
-    if (!group || group->GetLeaderGUID() == guid)
+    if (!group || (group->GetLeaderGUID() == guid && leaveGuid == GetPlayer()->GetGUID()))
         sLFGMgr->LeaveLfg(gguid);
 }
 
