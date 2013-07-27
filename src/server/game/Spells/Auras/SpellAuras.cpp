@@ -853,7 +853,7 @@ void Aura::SetCharges(uint8 charges)
     SetNeedClientUpdateForTargets();
 }
 
-void Aura::SetModCharges(uint8 charges)
+void Aura::SetModCharges(int16 charges)
 {
     SetCharges(charges);
     for (uint8 i = EFFECT_0; i < EFFECT_2; ++i)

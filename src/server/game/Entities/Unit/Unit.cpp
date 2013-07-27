@@ -10719,8 +10719,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             {
                 if (roll_chance_i(eff->GetAmount()))
                 {
-                    Aura * sd_aura = AddAura(trigger_spell_id, this);
-                    sd_aura->SetModCharges(2);
+                    AddAuraWithModCharges(trigger_spell_id, this, 2);
                     return true;
                 }
             }
@@ -10733,8 +10732,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             {
                 if (roll_chance_i(eff->GetAmount() * 2))
                 {
-                    Aura * sd_aura = AddAura(trigger_spell_id, this);
-                    sd_aura->SetModCharges(2);
+                    AddAuraWithModCharges(trigger_spell_id, this, 2);
                     return true;
                 }
             }
@@ -19088,6 +19086,12 @@ Aura* Unit::AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target)
         return aura;
     }
     return NULL;
+}
+
+Aura* Unit::AddAuraWithModCharges(uint32 spellid, Unit *target, int16 charges)
+{
+    Aura * aura = AddAura(spellid, target);
+    aura->SetModCharges(charges);
 }
 
 void Unit::SetAuraStack(uint32 spellId, Unit* target, uint32 stack)
