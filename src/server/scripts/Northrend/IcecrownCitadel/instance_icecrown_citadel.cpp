@@ -354,6 +354,14 @@ class instance_icecrown_citadel : public InstanceMapScript
                     case NPC_GB_KORKRON_BATTLE_MAGE:
                         GbBattleMageGUID = creature->GetGUID();
                         break;
+                    case NPC_APOTHECARY_CANDITH_TOMAS:
+                        if (TeamInInstance == ALLIANCE)
+                            creature->UpdateEntry(NPC_BRAZIE_GETZ, ALLIANCE);
+                        break;
+                    case NPC_MORGAN_DAYBLAZE:
+                        if (TeamInInstance == ALLIANCE)
+                            creature->UpdateEntry(NPC_SHELY_STEELBOWELS, ALLIANCE);
+                        break;
                     default:
                         break;
                 }

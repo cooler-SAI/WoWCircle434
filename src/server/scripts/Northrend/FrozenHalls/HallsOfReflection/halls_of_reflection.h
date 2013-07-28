@@ -53,6 +53,9 @@ enum Creatures
     NPC_WAVE_RIFLEMAN                             = 38176,
     NPC_WAVE_PRIEST                               = 38175,
     NPC_WAVE_MAGE                                 = 38172,
+    
+    NPC_DARK_RANGER_LORALEN                       =37779,
+    NPC_ARHMAGE_KORELN                            =37582,
 };
 
 enum GameObjects
