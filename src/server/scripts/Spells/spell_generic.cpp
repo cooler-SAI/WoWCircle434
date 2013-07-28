@@ -3279,6 +3279,70 @@ public:
         return new spell_crossfaction_bg_restore_faction_AuraScript();
     }
 };
+class spell_crossfaction_bg_set_faction_h : public SpellScriptLoader
+{
+    public:
+        spell_crossfaction_bg_set_faction_h() : SpellScriptLoader("spell_crossfaction_bg_set_faction_h") {}
+
+        class spell_crossfaction_bg_set_faction_h_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_crossfaction_bg_set_faction_h_SpellScript);
+
+            bool Validate(SpellInfo const* /*SpellEntry*/)
+            {
+                return true;
+            }
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                if (Unit* target = GetHitPlayer())
+                    if (target->getFaction() != 2)
+                        target->setFaction(2);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_crossfaction_bg_set_faction_h_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_crossfaction_bg_set_faction_h_SpellScript();
+        }
+};
+class spell_crossfaction_bg_set_faction_a : public SpellScriptLoader
+{
+    public:
+        spell_crossfaction_bg_set_faction_a() : SpellScriptLoader("spell_crossfaction_bg_set_faction_a") {}
+
+        class spell_crossfaction_bg_set_faction_a_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_crossfaction_bg_set_faction_a_SpellScript);
+
+            bool Validate(SpellInfo const* /*SpellEntry*/)
+            {
+                return true;
+            }
+
+            void HandleDummy(SpellEffIndex /*effIndex*/)
+            {
+                if (Unit* target = GetHitPlayer())
+                    if (target->getFaction() != 1)
+                        target->setFaction(1);
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_crossfaction_bg_set_faction_a_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_crossfaction_bg_set_faction_a_SpellScript();
+        }
+};
 
 void AddSC_generic_spell_scripts()
 {
@@ -3349,4 +3413,6 @@ void AddSC_generic_spell_scripts()
     new spell_gen_juggle_torch_catch();
     new spell_gen_throw_torch();
     new spell_crossfaction_bg_restore_faction();
+    new spell_crossfaction_bg_set_faction_h();
+    new spell_crossfaction_bg_set_faction_a();
 }

@@ -1295,6 +1295,19 @@ void Battleground::EventPlayerLoggedIn(Player* player)
         }
     }
     m_Players[guid].OfflineRemoveTime = 0;
+    if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_IGNORE_FACTION))
+    {
+        if (player->GetBGTeam() == HORDE)
+        {
+            player->setFaction(2);
+            player->AddAura(200002, player);
+        }
+        else
+        {
+            player->setFaction(1);
+            player->AddAura(200003, player);
+        }
+    }
     PlayerAddedToBGCheckIfBGIsRunning(player);
     // if battleground is starting, then add preparation aura
     // we don't have to do that, because preparation aura isn't removed when player logs out
