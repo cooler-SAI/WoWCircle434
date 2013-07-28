@@ -4664,7 +4664,8 @@ int32 Unit::GetAuraAmountNoStack(AuraEffect const* effect) const
     AuraEffectList const& mTotalAuraList = GetAuraEffectsByType(auratype);
     for (AuraEffectList::const_iterator i = mTotalAuraList.begin(); i != mTotalAuraList.end(); ++i)
     {
-        if (sSpellMgr->CheckSpellGroupStackRules(effect->GetSpellInfo(), (*i)->GetSpellInfo()) == SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT)
+        if ( (effect != (*i) && effect->GetSpellInfo() == (*i)->GetSpellInfo()) || 
+            sSpellMgr->CheckSpellGroupStackRules(effect->GetSpellInfo(), (*i)->GetSpellInfo()) == SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT)
         {
             if (amount < 0)
             {
@@ -19092,6 +19093,7 @@ Aura* Unit::AddAuraWithModCharges(uint32 spellid, Unit *target, int16 charges)
 {
     Aura * aura = AddAura(spellid, target);
     aura->SetModCharges(charges);
+    return aura;
 }
 
 void Unit::SetAuraStack(uint32 spellId, Unit* target, uint32 stack)
