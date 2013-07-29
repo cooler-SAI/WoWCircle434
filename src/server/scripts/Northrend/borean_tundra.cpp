@@ -2396,7 +2396,6 @@ public:
             if (Player* player = me->GetPlayer(*me, uiPlayerGUID))
             {
                 me->SetInFront(player);
-                me->SendMovementFlagUpdate();
             }
             uiEventTimer = 3000;
             uiEventPhase = 1;
@@ -2447,10 +2446,7 @@ public:
                             case NPC_SALTY_JOHN_THORPE:
                                 DoScriptText(SAY_HIDDEN_CULTIST_4, me);
                                 if (Player* player = me->GetPlayer(*me, uiPlayerGUID))
-                                {
                                     me->SetInFront(player);
-                                    me->SendMovementFlagUpdate();
-                                }
                                 uiEventTimer = 3000;
                                 uiEventPhase = 3;
                                 break;

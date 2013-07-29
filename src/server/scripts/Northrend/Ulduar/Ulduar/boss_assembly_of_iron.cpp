@@ -919,7 +919,6 @@ class boss_stormcaller_brundir : public CreatureScript
                 me->RemoveAllAuras();
                 me->RemoveLootMode(LOOT_MODE_DEFAULT);
                 me->SetDisableGravity(false);
-                me->SendMovementFlagUpdate();
                 me->SetSpeed(MOVE_RUN, 1.42857f);
 
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_INTERRUPT, false);  // Should be interruptible unless overridden by spell (Overload)
@@ -1108,7 +1107,6 @@ class boss_stormcaller_brundir : public CreatureScript
                             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
                             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
                             me->SetDisableGravity(true);
-                            me->SendMovementFlagUpdate();
 
                             me->GetMotionMaster()->Initialize();
                             me->GetMotionMaster()->MovePoint(POINT_FLY, me->GetPositionX(), me->GetPositionY(), FINAL_FLIGHT_Z);
@@ -1152,13 +1150,11 @@ class boss_stormcaller_brundir : public CreatureScript
                         case EVENT_LIGHTNING_TENDRILS_GROUND:
                             me->SetSpeed(MOVE_RUN, 1.42857f);
                             me->SetDisableGravity(false);
-                            me->SendMovementFlagUpdate();
                             me->RemoveAurasDueToSpell(SPELL_LIGHTNING_TENDRILS);
                             me->RemoveAurasDueToSpell(SPELL_LIGHTNING_TENDRILS_VISUAL);
                             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
                             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
                             me->SetDisableGravity(false);
-                            me->SendMovementFlagUpdate();
                             DoStartMovement(me->getVictim());
                             me->getThreatManager().resetAllAggro();
                             events.ScheduleEvent(EVENT_LIGHTNING_TENDRILS_START, urand(40000, 80000));
