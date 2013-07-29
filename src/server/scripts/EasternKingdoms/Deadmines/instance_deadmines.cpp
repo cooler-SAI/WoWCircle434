@@ -71,8 +71,7 @@ class instance_deadmines : public InstanceMapScript
 			{
 				switch(pGo->GetEntry())
 				{
-				    case GO_FACTORY_DOOR:   
-					    break;
+				    case GO_FACTORY_DOOR:
 				    case GO_MAST_ROOM_DOOR:   
 				    case GO_FOUNDRY_DOOR:   
                         AddDoor(pGo, true);
