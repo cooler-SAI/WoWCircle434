@@ -20794,7 +20794,7 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
         return false;
     }
 
-    if (GetCurrency(currency, false) + count > GetCurrencyWeekCap(currency, false))
+    if (GetCurrencyWeekCap(currency, false) && (GetCurrencyOnWeek(currency, false) + count > GetCurrencyWeekCap(currency, false)))
     {
         SendBuyError(BUY_ERR_CANT_CARRY_MORE, vendorGuid, currency);
         return false;

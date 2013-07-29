@@ -242,12 +242,6 @@ void Player::ModifyCurrency(uint32 id, int32 count, bool printLog /* = true */, 
     if (newTotalCount < 0)
         newTotalCount = 0;
 
-    if (id == CURRENCY_TYPE_HONOR_POINTS || id == CURRENCY_TYPE_JUSTICE_POINTS)
-    {
-        newWeekCount = newTotalCount;
-        weekCap = 0;
-    }
-
     if (uint32(newTotalCount) != oldTotalCount)
     {
         if (itr->second.state != PLAYERCURRENCY_NEW)
@@ -366,17 +360,18 @@ uint32 Player::_GetCurrencyWeekCap(const CurrencyTypesEntry* currency) const
         }
         case CURRENCY_TYPE_HONOR_POINTS:
         {
-            uint32 honorcap = sWorld->getIntConfig(CONFIG_CURRENCY_MAX_HONOR_POINTS);
-            if (honorcap > 0)
-                cap = honorcap;
-            break;
+            //uint32 honorcap = sWorld->getIntConfig(CONFIG_CURRENCY_MAX_HONOR_POINTS);
+            //if (honorcap > 0)
+            //    cap = honorcap;
+            
+            return 0;
         }
         case CURRENCY_TYPE_JUSTICE_POINTS:
         {
-            uint32 justicecap = sWorld->getIntConfig(CONFIG_CURRENCY_MAX_JUSTICE_POINTS);
-            if (justicecap > 0)
-                cap = justicecap;
-            break;
+            //uint32 justicecap = sWorld->getIntConfig(CONFIG_CURRENCY_MAX_JUSTICE_POINTS);
+            //if (justicecap > 0)
+            //    cap = justicecap;
+            return 0;
         }
     }
 
