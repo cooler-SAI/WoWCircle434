@@ -719,6 +719,12 @@ void AddSC_boss_perotharn();
 void AddSC_boss_queen_azshara();
 void AddSC_boss_mannoroth();
 
+void AddSC_instance_hour_of_twilight(); // Hour of Twilight
+void AddSC_hour_of_twilight();
+void AddSC_boss_arcurion();
+void AddSC_boss_asira_dawnslayer();
+void AddSC_boss_archbishop_benedictus();
+
 void AddSC_instance_dragon_soul(); // Dragon Soul
 void AddSC_dragon_soul();
 void AddSC_boss_morchok();
@@ -1479,6 +1485,12 @@ void AddNorthrendScripts()
     AddSC_boss_perotharn();
     AddSC_boss_queen_azshara();
     AddSC_boss_mannoroth();
+
+    AddSC_instance_hour_of_twilight(); // Hour of Twilight
+    AddSC_hour_of_twilight();
+    AddSC_boss_arcurion();
+    AddSC_boss_asira_dawnslayer();
+    AddSC_boss_archbishop_benedictus();
 
     AddSC_instance_dragon_soul(); // Dragon Soul
     AddSC_dragon_soul();

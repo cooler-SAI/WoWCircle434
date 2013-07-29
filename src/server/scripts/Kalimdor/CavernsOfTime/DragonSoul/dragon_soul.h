@@ -17,6 +17,7 @@ enum Datas
     DATA_YORSAHJ        = 1,
     DATA_ZONOZZ         = 2,
     DATA_HAGARA         = 3,
+    DATA_ULTRAXION      = 4,
     DATA_KOHCROM        = 10,
     DATA_HAGARA_EVENT   = 11,
 };
@@ -28,6 +29,7 @@ enum CreatureIds
     NPC_YORSAHJ                     = 55312,
     NPC_ZONOZZ                      = 55308,
     NPC_HAGARA                      = 55689,
+    NPC_ULTRAXION                   = 55294,
 
     NPC_NETHESTRASZ                 = 57287, // teleport upstairs
     NPC_EIENDORMI                   = 57288, // teleport to Yor'sahj

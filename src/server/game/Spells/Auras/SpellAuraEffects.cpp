@@ -1549,7 +1549,9 @@ void AuraEffect::Update(uint32 diff, Unit* caster)
                         case 36946:
                             GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 81297, true);
                             break;
-
+                        case 103558: // Choking Smoke Bomb, Asira Dawnslayer, Hour of Twilight
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 103790, true);
+                            break;
                     }
                 }
             }

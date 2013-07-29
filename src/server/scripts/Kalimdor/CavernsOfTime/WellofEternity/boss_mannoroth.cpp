@@ -271,7 +271,7 @@ class boss_mannoroth : public CreatureScript
                     if (me->HealthBelowPctDamaged(88, damage))
                         damage = 0;
 
-                if (bEndEncounter)
+                if (damage >= me->GetHealth())
                     damage = 0;
             }
 

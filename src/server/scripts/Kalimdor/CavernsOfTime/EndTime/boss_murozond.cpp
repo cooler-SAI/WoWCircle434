@@ -191,9 +191,10 @@ class boss_murozond : public CreatureScript
                 DoZoneInCombat();
             }
 
-            void KilledUnit(Unit* /*who*/)
+            void KilledUnit(Unit* who)
             {
-                Talk(SAY_KILL);
+                if (who && who->GetTypeId() == TYPEID_PLAYER)
+                    Talk(SAY_KILL);
             }
 
             void CompleteEncounter()
@@ -229,6 +230,12 @@ class boss_murozond : public CreatureScript
             {
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SANDS_OF_THE_HOURGLASS);
                 BossAI::JustReachedHome();
+            }
+
+            void DamageTaken(Unit* /*who*/, uint32 &damage)
+            {
+                if (damage >= me->GetHealth())
+                    damage = 0;
             }
 
             void UpdateAI(const uint32 diff)
@@ -307,8 +314,7 @@ class boss_murozond : public CreatureScript
                                 pNozdormu->AI()->DoAction(ACTION_NOZDORMU);
                             instance->SetBossState(DATA_MUROZOND, DONE);
                             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SANDS_OF_THE_HOURGLASS);
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                                pTarget->Kill(me);
+                            me->DespawnOrUnsummon(3000);
                             break;
                         default:
                             break;

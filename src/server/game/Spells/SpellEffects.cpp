@@ -6912,6 +6912,8 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
         case 100292:
         case 100293:
         case 100294:
+        case 103684: // Wave of Virtue, Archbishop Benedictus, Hour of Twilight
+        case 103781: // Wave of Twilight, Archbishop Benedictus, Hour of Twilight
             if (!unitTarget)
                 break;
 

@@ -9471,6 +9471,10 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             case SPELLFAMILY_GENERIC:
                 switch (auraSpellInfo->Id)
                 {
+                    case 102726: // Mark of Silence, Asira Dawnslayer, Hour of Twilight
+                        if (Unit* pAsira = triggeredByAura->GetCaster())
+                            pAsira->CastSpell(this, 103597, true);
+                        return true;
                     case 99399: // Burning Wound, Ragnaros, Firelands
                     case 101238:
                     case 101239:
@@ -13008,24 +13012,6 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
         }
     }
 
-    // Deep Healing, Mastery Shaman
-    if (victim && victim->isAlive())
-    {
-        if (spellProto->SpellFamilyName == SPELLFAMILY_SHAMAN)
-        {
-            if (Aura* deepHealing = GetAura(77226))
-            {
-
-                float effectAmount = float(deepHealing->GetEffect(0)->GetAmount());
-                float mod = 100.0f - victim->GetHealthPct();
-                if (mod < 1.0f)
-                    mod = 1.0f;
-                float amount_pct = mod * effectAmount / 100.0f;
-                AddPct(DoneTotalMod, amount_pct);
-            }
-        }
-    }
-
     // Done fixed damage bonus auras
     int32 DoneAdvertisedBenefit = SpellBaseHealingBonusDone(spellProto->GetSchoolMask());
 
@@ -13198,6 +13184,19 @@ uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, u
     for (AuraEffectList::const_iterator i = mHealingGet.begin(); i != mHealingGet.end(); ++i)
         if (caster->GetGUID() == (*i)->GetCasterGUID() && (*i)->IsAffectingSpell(spellProto))
             AddPct(TakenTotalMod, (*i)->GetAmount());
+
+    // Deep Healing, Mastery Shaman
+    if (caster)
+        if (spellProto->SpellFamilyName == SPELLFAMILY_SHAMAN)
+            if (Aura* deepHealing = caster->GetAura(77226))
+            {
+                float effectAmount = float(deepHealing->GetEffect(0)->GetAmount());
+                float mod = 100.0f - GetHealthPct();
+                if (mod < 1.0f)
+                    mod = 1.0f;
+                float amount_pct = mod * effectAmount / 100.0f;
+                AddPct(TakenTotalMod, amount_pct);
+            }
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {

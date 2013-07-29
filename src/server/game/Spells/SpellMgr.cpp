@@ -90,6 +90,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
                 return DIMINISHING_NONE;
             else if (spellproto->SpellVisual[0] == 14153)
                 return DIMINISHING_NONE;
+            // Silence, Asira Dawnslayer, Hour of Twilight
+            else if (spellproto->Id == 103587)
+                return DIMINISHING_NONE;
             break;
         }
         // Event spells
@@ -6203,6 +6206,23 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // ENDOF WELL OF ETERNITY SPELLS
             //
+            // HOUR OF TWILIGHT SPELLS
+            //
+            // Arcurion
+            case 102480: // Icy Boulder aoe
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            // Archbishop Benedictus
+            case 103600: // Purifying Light targeting
+            case 103768: // Corrupting Twilight targeting
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                break;
+            case 103648: // Purifying Blast
+            case 103776: // Twilight Bolt
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+                break;
+            // ENDOF HOUR OF TWILIGHT SPELLS
             // DRAGON SOUL SPELLS
             //
             case 109247:
