@@ -1,4 +1,6 @@
 #include "ScriptPCH.h"
+#include "LFGMgr.h"
+#include "Group.h"
 #include "deadmines.h"
 
 
@@ -206,6 +208,16 @@ class boss_admiral_ripsnarl : public CreatureScript
 
             void JustDied(Unit* killer)
             {
+                Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                if (!players.isEmpty())
+                {
+                    Player* pPlayer = players.begin()->getSource();
+                    if (pPlayer && pPlayer->GetGroup())
+                        sLFGMgr->FinishDungeon(pPlayer->GetGroup()->GetGUID(), 326);
+                }
+                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    if (Player* pPlayer = itr->getSource())
+                        pPlayer->CompletedAchievement(sAchievementMgr->GetAchievement(IsHeroic() ? 5083 : 628));
                 _JustDied();
                 Talk(SAY_DEATH);
             }
@@ -238,10 +250,20 @@ class npc_vapor : public CreatureScript
         };
 };
 
-
+class achievement_deadmines_temp : public AchievementCriteriaScript
+{
+public:
+    achievement_deadmines_temp() : AchievementCriteriaScript("achievement_deadmines_temp") { }
+ 
+    bool OnCheck(Player* source, Unit* target)
+    {
+        return true;
+    }
+};
 
 void AddSC_boss_admiral_ripsnarl()
 {
     new boss_admiral_ripsnarl();
     new npc_vapor();
+    new achievement_deadmines_temp();
 }

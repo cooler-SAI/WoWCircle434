@@ -546,6 +546,43 @@ public:
     }
 };
 
+class npc_bt_instance_portal: public CreatureScript
+{
+public:
+    npc_bt_instance_portal() : CreatureScript("npc_bt_instance_portal") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_bt_instance_portal_AI(creature);
+    }
+
+    struct npc_bt_instance_portal_AI : public CreatureAI
+    {
+        npc_bt_instance_portal_AI(Creature* creature) : CreatureAI(creature) { }
+
+        void OnSpellClick(Unit* clicker)
+        {
+            if (InstanceScript* instance = me->GetInstanceScript())
+            {
+                AreaTriggerEntry const* at;
+                if (instance->GetBossState(DATA_CHOGALL) == DONE)
+                    at = sAreaTriggerStore.LookupEntry(6444);
+                else if (instance->GetBossState(DATA_COUNCIL) == DONE)
+                    at = sAreaTriggerStore.LookupEntry(6626);
+                else if (instance->GetBossState(DATA_VALIONA_THERALION) == DONE)
+                    at = sAreaTriggerStore.LookupEntry(6442);
+                else if (instance->GetBossState(DATA_HALFUS) == DONE)
+                    at = sAreaTriggerStore.LookupEntry(6437);
+                
+                if (at)
+                    clicker->NearTeleportTo(at->x, at->y, at->z, clicker->GetOrientation(), false);
+            }
+        }
+
+        void UpdateAI(uint32 const diff) { }
+    };
+};
+
 void AddSC_bastion_of_twilight()
 {
     new npc_twilight_portal_shaper();
@@ -559,4 +596,5 @@ void AddSC_bastion_of_twilight()
     new at_bt_council_2();
     new at_bt_council_3();
     new at_bt_chogall();
+    new npc_bt_instance_portal();
 }

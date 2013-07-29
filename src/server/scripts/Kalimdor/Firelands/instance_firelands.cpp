@@ -58,7 +58,7 @@ class instance_firelands : public InstanceMapScript
             void OnPlayerEnter(Player* pPlayer)
             {
                 if (!uiTeamInInstance)
-				    uiTeamInInstance = pPlayer->GetTeam();
+                    uiTeamInInstance = pPlayer->GetTeam();
             }
 
             void OnCreatureCreate(Creature* pCreature)
@@ -95,7 +95,7 @@ class instance_firelands : public InstanceMapScript
                     default:
                         break;
                 }
-		    }
+            }
 
             void OnGameObjectCreate(GameObject* pGo)
             {
@@ -133,7 +133,7 @@ class instance_firelands : public InstanceMapScript
                         uiRagnarosCache25 = pGo->GetGUID();
                         break;
                 }
-		    }
+            }
 
             void SetData(uint32 type, uint32 data)
             {
@@ -164,7 +164,7 @@ class instance_firelands : public InstanceMapScript
                         SaveToDB();
                     }
                 }
-		    }
+            }
 
             uint32 GetData(uint32 type)
             {
@@ -172,7 +172,7 @@ class instance_firelands : public InstanceMapScript
                     return uiRhyolithHealth;
                 else if (type == DATA_EVENT)
                     return uiEvent;
-			    return 0;
+                return 0;
             }
 
             uint64 GetData64(uint32 type)
@@ -194,8 +194,8 @@ class instance_firelands : public InstanceMapScript
 
             bool SetBossState(uint32 type, EncounterState state)
             {
-			    if (!InstanceScript::SetBossState(type, state))
-				    return false;
+                if (!InstanceScript::SetBossState(type, state))
+                    return false;
 
                 bool balerocAvailable = (GetBossState(DATA_SHANNOX)==DONE) && (GetBossState(DATA_RHYOLITH)==DONE) && (GetBossState(DATA_BETHTILAC)==DONE) && (GetBossState(DATA_ALYSRAZOR)==DONE);
 
@@ -222,7 +222,7 @@ class instance_firelands : public InstanceMapScript
                     break;
                 }
 
-			    return true;
+                return true;
             }
 
             bool CheckRequiredBosses(uint32 bossId, Player const* player = NULL) const
@@ -321,13 +321,13 @@ class instance_firelands : public InstanceMapScript
                 if (dataHead1 == 'F' && dataHead2 == 'L')
                 {
                     for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-				    {
-					    uint32 tmpState;
-					    loadStream >> tmpState;
-					    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-						    tmpState = NOT_STARTED;
-					    SetBossState(i, EncounterState(tmpState));
-				    }
+                    {
+                        uint32 tmpState;
+                        loadStream >> tmpState;
+                        if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                            tmpState = NOT_STARTED;
+                        SetBossState(i, EncounterState(tmpState));
+                    }
 
                     uint32 tempEvent = 0;
                     loadStream >> tempEvent;

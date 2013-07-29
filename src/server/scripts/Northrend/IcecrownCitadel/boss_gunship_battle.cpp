@@ -774,6 +774,8 @@ class npc_muradin_gunship : public CreatureScript
 
         bool OnGossipHello(Player* player, Creature* creature)
         {
+            bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
             InstanceScript* _instance = creature->GetInstanceScript();
             if (!_instance)
                 return false;
@@ -785,12 +787,12 @@ class npc_muradin_gunship : public CreatureScript
             {
                 if ((!player->GetGroup() || !player->GetGroup()->IsLeader(player->GetGUID())) && !player->isGameMaster())
                 {
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I'm not the raid leader...", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Я не рейд лидер..." : "I'm not the raid leader...", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
                     player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
                     return true;
                 }
 
-                player->ADD_GOSSIP_ITEM(0, "My companions are all accounted for, Muradin. Let's go!", 631, 1001);
+                player->ADD_GOSSIP_ITEM(0, ru ? "Мои товарищи готовы, Мурадин. Поехали!" : "My companions are all accounted for, Muradin. Let's go!", 631, 1001);
                 player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
                 return true;
             }
@@ -799,11 +801,13 @@ class npc_muradin_gunship : public CreatureScript
 
         bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
         {
+            bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
             player->PlayerTalkClass->ClearMenus();
             player->CLOSE_GOSSIP_MENU();
 
             if (action == GOSSIP_ACTION_INFO_DEF+2)
-                creature->MonsterSay("I'll wait for the raid leader", LANG_UNIVERSAL, player->GetGUID());
+                creature->MonsterSay(ru ? "Я буду ждать рейд лидера." : "I'll wait for the raid leader", LANG_UNIVERSAL, player->GetGUID());
 
             if (action == 1001)
             {
@@ -1936,15 +1940,19 @@ class npc_zafod_boombox : public CreatureScript
 
         bool OnGossipHello(Player* player, Creature* creature)
         {
+            bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
             // Maybe this isn't blizzlike but I can't find any spell in the DBCs
             if (player->GetItemCount(49278, false) == 0)
-                player->ADD_GOSSIP_ITEM(0, "Yeah, I'm sure that safety is your top priority. Give me a jetpack.", 631, 1);
+                player->ADD_GOSSIP_ITEM(0, ru ? "Да, я уверен, что безопасность является главным приоритетом. Дай мне ранец." : "Yeah, I'm sure that safety is your top priority. Give me a jetpack.", 631, 1);
             player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
             return true;
         }
 
         bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
         {
+            bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
             player->PlayerTalkClass->ClearMenus();
             player->CLOSE_GOSSIP_MENU();
             if (action == 1)
@@ -1953,7 +1961,7 @@ class npc_zafod_boombox : public CreatureScript
                 uint32 curItemCount = player->GetItemCount(49278, false);
                 if (curItemCount >= 1)
                 {
-                    creature->MonsterWhisper("You already have my jetpack!", player->GetGUIDLow());
+                    creature->MonsterWhisper(ru ? "У тебя уже есть мой ранец!" : "You already have my jetpack!", player->GetGUIDLow());
                     return false;
                 }
 
@@ -1983,6 +1991,8 @@ class npc_saurfang_gunship : public CreatureScript
 
         bool OnGossipHello(Player* player, Creature* creature)
         {
+            bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
             InstanceScript* _instance = creature->GetInstanceScript();
             if (!_instance)
                 return false;
@@ -1994,12 +2004,12 @@ class npc_saurfang_gunship : public CreatureScript
             {
                 if ((!player->GetGroup() || !player->GetGroup()->IsLeader(player->GetGUID())) && !player->isGameMaster())
                 {
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I'm not the raid leader...", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Я не рейд лидер..." : "I'm not the raid leader...", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
                     player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
                     return true;
                 }
 
-                player->ADD_GOSSIP_ITEM(0, "My companions are all accounted for, Saurfang. Let's go!", 631, 1001);
+                player->ADD_GOSSIP_ITEM(0, ru ? "Мои товарищи готовы, Саурфанг. Поехали!" : "My companions are all accounted for, Saurfang. Let's go!", 631, 1001);
                 player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
                 return true;
             }
@@ -2008,11 +2018,13 @@ class npc_saurfang_gunship : public CreatureScript
 
         bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
         {
+            bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
             player->PlayerTalkClass->ClearMenus();
             player->CLOSE_GOSSIP_MENU();
 
             if (action == GOSSIP_ACTION_INFO_DEF+2)
-                creature->MonsterSay("I'll wait for the raid leader.", LANG_UNIVERSAL, player->GetGUID());
+                creature->MonsterSay(ru ? "Я буду ждать рейд лидера." : "I'll wait for the raid leader.", LANG_UNIVERSAL, player->GetGUID());
 
             if (action == 1001)
             {

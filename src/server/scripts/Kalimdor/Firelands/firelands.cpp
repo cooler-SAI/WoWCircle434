@@ -1692,6 +1692,36 @@ class spell_firelands_siphon_essence : public SpellScriptLoader
         }
 };
 
+class npc_firelands_instance_portal : public CreatureScript
+{
+public:
+    npc_firelands_instance_portal() : CreatureScript("npc_firelands_instance_portal") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_firelands_instance_portalAI(creature);
+    }
+
+    struct npc_firelands_instance_portalAI : public CreatureAI
+    {
+        npc_firelands_instance_portalAI(Creature* creature) : CreatureAI(creature) { }
+
+        void OnSpellClick(Unit* clicker)
+        {
+            if (InstanceScript* instance = me->GetInstanceScript())
+                if (instance->GetBossState(DATA_BALEROC) != DONE)
+                    return;
+
+            if (me->GetEntry() == 54348)
+                clicker->NearTeleportTo(362.498f, -97.7795f, 78.3288f, 3.64774f, false);
+            else if (me->GetEntry() == 54367)
+                clicker->NearTeleportTo(-359.944f, 206.012f, 52.32f, 3.64774f, false);
+        }
+
+        void UpdateAI(uint32 const diff) { }
+    };
+};
+
 void AddSC_firelands()
 {
     new npc_firelands_ancient_core_hound();
@@ -1724,4 +1754,5 @@ void AddSC_firelands()
     new npc_firelands_circle_of_thorns_portal();
     new npc_firelands_volcanus();
     new spell_firelands_siphon_essence();
+    new npc_firelands_instance_portal();
 }

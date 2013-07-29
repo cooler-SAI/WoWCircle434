@@ -106,6 +106,7 @@ class instance_halls_of_origination : public InstanceMapScript
                 {
                     case GO_ORIGINATION_ELEVATOR:
                         uiOriginationElevatorGUID = go->GetGUID();
+                        go->SetPhaseMask(GetBossState(DATA_ANRAPHET) == DONE ? 1 : 2, true);
                         break;
                     case GO_ANHUUR_BRIDGE:
                     case GO_ANHUUR_ELEVATOR:
@@ -156,7 +157,14 @@ class instance_halls_of_origination : public InstanceMapScript
             {
                 if (!InstanceScript::SetBossState(type, state))
                     return false;
-                
+
+                switch (type)
+                {
+                    case DATA_ANRAPHET:
+                        if(GameObject* OriginationElevator = instance->GetGameObject(uiOriginationElevatorGUID))
+                            OriginationElevator->SetPhaseMask(PHASEMASK_NORMAL, true);
+                        break;
+                }
                 return true;
             }
 

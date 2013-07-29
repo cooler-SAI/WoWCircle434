@@ -635,6 +635,7 @@ void AddSC_boss_erunak_stonespeaker();
 void AddSC_boss_ozumat();
 
 void AddSC_instance_blackrock_caverns(); // Blackrock Caverns
+void AddSC_blackrock_caverns_teleport();
 void AddSC_boss_romogg_bonecrusher();
 void AddSC_boss_corla_herald_of_twilight();
 void AddSC_boss_karsh_steelbender();
@@ -1400,6 +1401,7 @@ void AddNorthrendScripts()
     AddSC_boss_ozumat();
 
     AddSC_instance_blackrock_caverns(); // Blackrock Caverns
+    AddSC_blackrock_caverns_teleport();
     AddSC_boss_romogg_bonecrusher();
     AddSC_boss_corla_herald_of_twilight();
     AddSC_boss_karsh_steelbender();

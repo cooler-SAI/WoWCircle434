@@ -7,7 +7,9 @@ static const DoorData doordata[] =
 {
     {GO_FACTORY_DOOR,   DATA_GLUBTOK,   DOOR_TYPE_PASSAGE,    BOUNDARY_NONE},
     {GO_MAST_ROOM_DOOR, DATA_HELIX,     DOOR_TYPE_PASSAGE,    BOUNDARY_NONE},
+    {GO_HEAVY_DOOR,     DATA_HELIX,     DOOR_TYPE_ROOM,       BOUNDARY_NONE},
     {GO_FOUNDRY_DOOR,   DATA_FOEREAPER, DOOR_TYPE_PASSAGE,    BOUNDARY_NONE},
+    {GO_HEAVY_DOOR_2,   DATA_FOEREAPER, DOOR_TYPE_ROOM,       BOUNDARY_NONE},
     {0, 0, DOOR_TYPE_ROOM, BOUNDARY_NONE},
 };
 
@@ -35,6 +37,9 @@ class instance_deadmines : public InstanceMapScript
                 uiAdmiralGUID = 0;
                 uiCaptainGUID = 0;
 
+                GoblinTeleporterGUID = 0;
+                HeavyDoorGUID = 0;
+                HeavyDoor2GUID = 0;
                 IronCladDoorGUID = 0;
                 DefiasCannonGUID = 0;
                 DoorLeverGUID = 0;
@@ -64,26 +69,26 @@ class instance_deadmines : public InstanceMapScript
                     case NPC_GLUBTOK:
                         uiGlubtokGUID = pCreature->GetGUID();
                         break;
-                    case NPC_HELIX:
+                    case NPC_HELIX_GEARBREAKER:
                         uiHelixGUID = pCreature->GetGUID();
                         break;
-                    case NPC_OAF:
+                    case NPC_LUMBERING_OAF:
                         uiOafGUID = pCreature->GetGUID();
                         break;
-                    case NPC_FOEREAPER:
+                    case NPC_FOE_REAPER_5000:
                         uiFoereaperGUID = pCreature->GetGUID();
                         break;
-                    case NPC_ADMIRAL:
+                    case NPC_ADMIRAL_RIPSNARL:
                         uiAdmiralGUID = pCreature->GetGUID();
                         break;
-                    case NPC_CAPTAIN:
+                    case NPC_CAPTAIN_COOKIE:
                         uiCaptainGUID = pCreature->GetGUID();
                         break;
                     case NPC_KAGTHA:
                         if (TeamInInstance == ALLIANCE)
                             pCreature->SetPhaseMask(2, true);
                         break;
-                    case NPC_SLINKY:
+                    case NPC_SLINKY_SHARPSHIV:
                         if (TeamInInstance == ALLIANCE)
                             pCreature->SetPhaseMask(2, true);
                         break;
@@ -91,7 +96,7 @@ class instance_deadmines : public InstanceMapScript
                         if (TeamInInstance == ALLIANCE)
                             pCreature->SetPhaseMask(2, true);
                         break;
-                    case NPC_REAPER_PR:
+                    case NPC_MAYHEM_REAPER:
                         if (TeamInInstance == ALLIANCE)
                             pCreature->SetPhaseMask(2, true);
                         break;
@@ -111,7 +116,7 @@ class instance_deadmines : public InstanceMapScript
                         if (TeamInInstance == HORDE)
                             pCreature->SetPhaseMask(2, true);
                         break;
-                    case NPC_CRIME_SCENE:
+                    case NPC_CRIME_SCENE_BOT:
                         if (TeamInInstance == HORDE)
                             pCreature->SetPhaseMask(2, true);
                         break;
@@ -122,19 +127,30 @@ class instance_deadmines : public InstanceMapScript
             {
                 switch(pGo->GetEntry())
                 {
-                    case GO_FACTORY_DOOR:   
-                    case GO_MAST_ROOM_DOOR:   
-                    case GO_FOUNDRY_DOOR:   
+                    case GO_HEAVY_DOOR:
+                        HeavyDoorGUID = pGo->GetGUID();
                         AddDoor(pGo, true);
                         break;
+                    case GO_HEAVY_DOOR_2:
+                        HeavyDoor2GUID = pGo->GetGUID();
+                        AddDoor(pGo, true);
+                        break;
+                    case GO_FACTORY_DOOR:
+                    case GO_MAST_ROOM_DOOR:
+                    case GO_FOUNDRY_DOOR:
+                        AddDoor(pGo, true);
+                        break;
+                    case GO_GOBLIN_TELEPORTER:
+                        GoblinTeleporterGUID = pGo->GetGUID();
+                        break;
                     case GO_IRONCLAD_DOOR:
-                        IronCladDoorGUID = pGo->GetGUID();  
+                        IronCladDoorGUID = pGo->GetGUID();
                         break;
-                    case GO_DEFIAS_CANNON:  
-                        DefiasCannonGUID = pGo->GetGUID();  
+                    case GO_DEFIAS_CANNON:
+                        DefiasCannonGUID = pGo->GetGUID();
                         break;
-                    case GO_DOOR_LEVER:     
-                        DoorLeverGUID = pGo->GetGUID();     
+                    case GO_DOOR_LEVER:
+                        DoorLeverGUID = pGo->GetGUID();
                         break;
                 }
             }
@@ -197,6 +213,38 @@ class instance_deadmines : public InstanceMapScript
                         return TeamInInstance;
                 }
                 return 0;
+            }
+            
+            bool SetBossState(uint32 type, EncounterState state)
+            {
+                if (!InstanceScript::SetBossState(type, state))
+                    return false;
+                    
+                switch (type)
+                {
+                case DATA_HELIX:
+                    if (state == IN_PROGRESS)
+                    {
+                        if (GameObject* go = instance->GetGameObject(HeavyDoorGUID))
+                            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    }
+                    else if (state == DONE)
+                        if (GameObject* go = instance->GetGameObject(HeavyDoorGUID))
+                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    break;
+                case DATA_FOEREAPER:
+                    if (state == IN_PROGRESS)
+                    {
+                        if (GameObject* go = instance->GetGameObject(HeavyDoor2GUID))
+                            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    }
+                    else if (state == DONE)
+                        if (GameObject* go = instance->GetGameObject(HeavyDoor2GUID))
+                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    break;
+                }
+
+                return true;
             }
 
             std::string GetSaveData()
@@ -262,6 +310,9 @@ class instance_deadmines : public InstanceMapScript
             uint64 FactoryDoorGUID;
             uint64 FoundryDoorGUID;
             uint64 MastRoomDoorGUID;
+            uint64 GoblinTeleporterGUID;
+            uint64 HeavyDoorGUID;
+            uint64 HeavyDoor2GUID;
             uint64 IronCladDoorGUID;
             uint64 DefiasCannonGUID;
             uint64 DoorLeverGUID;

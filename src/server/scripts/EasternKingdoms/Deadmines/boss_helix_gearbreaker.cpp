@@ -5,12 +5,12 @@
 //todo: реализовать прыжки хеликса, сделать получше бомбы
 enum ScriptTexts
 {
-    SAY_AGGRO    = 5,
-    SAY_KILL     = 1,
     SAY_DEATH    = 0,
+    SAY_KILL     = 1,
+    SAY_OAF_DEAD = 2,
     SAY_SPELL1   = 3,
     SAY_SPELL2   = 4,
-    SAY_OAF_DEAD = 2,
+    SAY_AGGRO    = 5,
 
     SAY_OAF1     = 0,
     SAY_OAF2     = 1,
