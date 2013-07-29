@@ -6273,6 +6273,10 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
                 break;
             // Warlord Zon'ozz
+            case 104031: // Void Diffusion debuff
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
             case 109197: // Tentacle Toss aoe 1
             case 109237: // Tentacle Toss aoe 2
                 spellInfo->MaxAffectedTargets = 1;
@@ -6280,9 +6284,6 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 109240: // Tentacle Toss jump
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
-                break;
-            case 104031: // Void Diffusion
-                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
                 break;
             case 104347: // Shadow Gaze
             case 104602:
@@ -6333,12 +6334,18 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Mechanic = 0;
                 break;
             case 105367: // Lightning Conduit dummy 1
-                spellInfo->SetDurationIndex(39); // 2 secs
-                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_8_YARDS);
-                spellInfo->Effects[EFFECT_0].ChainTarget = 25;
+                //spellInfo->SetDurationIndex(39); // 2 secs
+                //spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_10_YARDS);
+                //spellInfo->Effects[EFFECT_0].ChainTarget = 25;
+                spellInfo->SetDurationIndex(39); // 1 secs
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+                spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
+                spellInfo->Effects[EFFECT_1].Amplitude = 1000;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
             case 105371: // Lightning Conduit dummy 2
-                spellInfo->SetDurationIndex(39); // 2 secs
+                spellInfo->SetDurationIndex(39); // 1 secs
                 spellInfo->AttributesEx5 |= SPELL_ATTR5_HIDE_DURATION;
                 break;
             case 107850: // Focused Assault dmg
