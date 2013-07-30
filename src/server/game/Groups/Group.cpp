@@ -1930,6 +1930,13 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
                 SendMsgTo->SendResetInstanceFailed(0, instanceSave->GetMapId());
         }
 
+        if (map && map->IsRaid() && method == INSTANCE_RESET_CHANGE_DIFFICULTY)
+        {
+            if (InstanceMap* map_i = map->ToInstanceMap())
+                if (!map_i->HavePlayers())
+                    map_i->SetUnloadTimer(1);
+        }
+
         if (isEmpty || method == INSTANCE_RESET_GROUP_DISBAND || method == INSTANCE_RESET_CHANGE_DIFFICULTY)
         {
             // do not reset the instance, just unbind if others are permanently bound to it

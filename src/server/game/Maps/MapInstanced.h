@@ -46,7 +46,6 @@ class MapInstanced : public Map
             return(i == m_InstancedMaps.end() ? NULL : i->second);
         }
         bool DestroyInstance(InstancedMaps::iterator &itr);
-        bool DestroyInstance(uint32 instanceId);
 
         void AddGridMapReference(const GridCoord &p)
         {

@@ -19451,6 +19451,16 @@ void Player::ResetInstances(uint8 method, bool isRaid)
     {
         InstanceSave* p = itr->second.save;
         const MapEntry* entry = sMapStore.LookupEntry(itr->first);
+
+        InstanceSave* instanceSave = itr->second.save;
+        Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
+        if (map && map->IsRaid() && method == INSTANCE_RESET_CHANGE_DIFFICULTY)
+        {
+            if (InstanceMap* map_i = map->ToInstanceMap())
+                if (!map_i->HavePlayers())
+                    map_i->SetUnloadTimer(1);
+        }
+
         if (!entry || entry->IsRaid() != isRaid || !p->CanReset())
         {
             ++itr;
@@ -19468,7 +19478,6 @@ void Player::ResetInstances(uint8 method, bool isRaid)
         }
 
         // if the map is loaded, reset it
-        Map* map = sMapMgr->FindMap(p->GetMapId(), p->GetInstanceId());
         if (map && map->IsDungeon())
             if (!((InstanceMap*)map)->Reset(method))
             {

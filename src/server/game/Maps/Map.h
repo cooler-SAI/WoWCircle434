@@ -642,6 +642,8 @@ class InstanceMap : public Map
         uint32 GetMaxResetDelay() const;
 
         virtual void InitVisibilityDistance();
+
+        void SetUnloadTimer(uint32 val) { m_unloadTimer = val; }
     private:
         bool m_resetAfterUnload;
         bool m_unloadWhenEmpty;
