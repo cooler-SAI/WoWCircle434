@@ -18120,7 +18120,10 @@ void Unit::Kill(Unit* victim, bool durabilityLoss)
             owner->ProcDamageAndSpell(victim, PROC_FLAG_KILL, PROC_FLAG_NONE, PROC_EX_NONE, 0);
 
     if (victim->GetCreatureType() != CREATURE_TYPE_CRITTER)
-        ProcDamageAndSpell(victim, PROC_FLAG_KILL, PROC_FLAG_KILLED, PROC_EX_NONE, 0);
+    {
+        if (victim->GetEntry() != 19833 && victim->GetEntry() != 19921) // snake trap can't trigger PROC_FLAG_KILL
+            ProcDamageAndSpell(victim, PROC_FLAG_KILL, PROC_FLAG_KILLED, PROC_EX_NONE, 0);
+    }
 
     // Proc auras on death - must be before aura/combat remove
     victim->ProcDamageAndSpell(NULL, PROC_FLAG_DEATH, PROC_FLAG_NONE, PROC_EX_NONE, 0, 0, BASE_ATTACK, 0);
