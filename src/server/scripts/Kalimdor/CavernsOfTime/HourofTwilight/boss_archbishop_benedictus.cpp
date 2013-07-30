@@ -4,13 +4,11 @@
 
 enum ScriptTexts
 {
-    SAY_AGGRO   = 0,
-    SAY_DEATH   = 1,
-    SAY_EVENT_1 = 2,
-    SAY_EVENT_2 = 3,
-    SAY_EVENT_3 = 4,
-    SAY_KILL    = 5,
-    SAY_SPELL   = 6,
+    SAY_DEATH       = 0,
+    SAY_EVENT_1     = 1,
+    SAY_EVENT_2     = 2,
+    SAY_LIGHT       = 6,
+    SAY_TWILIGHT    = 4,
 };
 
 enum Spells
@@ -94,64 +92,6 @@ enum Actions
     ACTION_TWILIGHT = 2,
 };
 
-const Position sparkPos[55] = 
-{
-    {3606.72f, 278.965f, -120.066f, 0.f},
-    {3582.16f, 347.017f, -103.266f, 0.f},
-    {3559.45f, 309.341f, -112.844f, 4.78954f},
-    {3563.15f, 304.613f, -67.6215f, 0.f},
-    {3594.22f, 232.017f, -119.966f, 0.f},
-    {3511.56f, 223.406f, -120.064f, 4.33715f},
-    {3650.38f, 283.246f, -120.069f, 0.f},
-    {3558.38f, 243.214f, -82.2213f, 0.f},
-    {3557.03f, 266.382f, -83.5522f, 0.f},
-    {3617.41f, 245.964f, -101.917f, 0.f},
-    {3558.39f, 218.519f, -119.971f, 0.f},
-    {3673.7f, 297.641f, -114.694f, 0.f},
-    {3567.52f, 238.826f, -110.127f, 0.f},
-    {3513.29f, 253.806f, -112.54f, 0.f},
-    {3490.37f, 236.514f, -86.964f, 0.f},
-    {3600.0f, 308.602f, -80.4853f, 0.977007f},
-    {3567.42f, 264.861f, -83.1477f, 0.f},
-    {3516.71f, 320.299f, -74.2921f, 0.f},
-    {3526.16f, 307.196f, -112.54f, 0.f},
-    {3558.09f, 209.139f, -103.909f, 0.f},
-    {3483.07f, 264.76f, -59.5227f, 0.f},
-    {3592.08f, 238.804f, -87.0628f, 0.f},
-    {3541.43f, 205.904f, -86.0307f, 0.f},
-    {3677.23f, 277.703f, -118.382f, 0.f},
-    {3607.75f, 278.908f, -93.2823f, 0.f},
-    {3537.41f, 235.601f, -112.54f, 0.f},
-    {3705.94f, 296.691f, -98.6815f, 0.f},
-    {3536.73f, 329.964f, -83.5424f, 0.f},
-    {3496.33f, 345.441f, -78.1769f, 3.14159f},
-    {3541.89f, 250.286f, -52.8092f, 0.f},
-    {3525.11f, 338.845f, -105.34f, 0.f},
-    {3457.46f, 265.877f, -84.0479f, 0.791643f},
-    {3547.85f, 285.762f, -82.9028f, 0.f},
-    {3475.73f, 284.866f, -99.8377f, 0.f},
-    {3590.21f, 195.927f, -106.245f, 0.f},
-    {3586.22f, 309.804f, -120.063f, 0.f},
-    {3583.09f, 318.521f, -90.5986f, 0.f},
-    {3504.15f, 269.363f, -115.227f, 0.f},
-    {3548.88f, 329.049f, -120.062f, 0.f},
-    {3505.04f, 217.79f, -94.908f, 0.f},
-    {3522.99f, 282.682f, -44.5289f, 0.f},
-    {3499.63f, 294.16f, -45.8369f, 0.f},
-    {3555.95f, 322.845f, -83.6866f, 0.f},
-    {3712.71f, 279.667f, -101.811f, 0.f},
-    {3587.46f, 276.425f, -115.628f, 0.f},
-    {3581.41f, 243.791f, -82.3891f, 5.50833f},
-    {3503.89f, 315.76f, -120.056f, 0.f},
-    {3599.55f, 208.035f, -89.1302f, 0.f},
-    {3492.69f, 328.587f, -106.538f, 0.f},
-    {3518.57f, 213.663f, -98.4859f, 0.f},
-    {3488.35f, 266.621f, -120.061f, 0.f},
-    {3499.28f, 235.29f, -55.3261f, 0.f},
-    {3520.5f, 204.995f, -79.7515f, 0.f},
-    {3521.93f, 217.024f, -59.3911f, 0.f}
-};
-
 class boss_archbishop_benedictus : public CreatureScript
 {
     public:
@@ -205,11 +145,9 @@ class boss_archbishop_benedictus : public CreatureScript
 
             void EnterCombat(Unit* /*who*/)
             {
-                Talk(SAY_AGGRO);
-
                 bPhase = false;
 
-                events.ScheduleEvent(EVENT_PURIFYING_LIGHT, 10000);
+                //events.ScheduleEvent(EVENT_PURIFYING_LIGHT, 10000);
                 events.ScheduleEvent(EVENT_SMITE, urand(1000, 2000));
                 events.ScheduleEvent(EVENT_RIGHTEOUS_SNEAR, urand(5000, 10000));
 
@@ -227,12 +165,6 @@ class boss_archbishop_benedictus : public CreatureScript
                 }
             }
 
-            void KilledUnit(Unit* who)
-            {
-                if (who && who->GetTypeId() == TYPEID_PLAYER)
-                    Talk(SAY_KILL);
-            }
-
             void JustDied(Unit* /*killer*/)
             {
                 _JustDied();
@@ -247,8 +179,6 @@ class boss_archbishop_benedictus : public CreatureScript
             void JustSummoned(Creature* summon)
             {
                 BossAI::JustSummoned(summon);
-                if (summon->GetEntry() == NPC_TWILIGHT_SPARK)
-                    summon->SetPhaseMask(2, true);
                 //if (summon->GetEntry() == NPC_PURIFYING_LIGHT)
                 //    summon->EnterVehicle(me, -1, true);
             }
@@ -295,7 +225,7 @@ class boss_archbishop_benedictus : public CreatureScript
                             break;
                         case EVENT_CONTINUE:
                             DoCast(me, SPELL_TRANSFORM, true);
-                            events.ScheduleEvent(EVENT_CORRUPTING_TWILIGHT, 10000);
+                            //events.ScheduleEvent(EVENT_CORRUPTING_TWILIGHT, 10000);
                             events.ScheduleEvent(EVENT_TWILIGHT_BLAST, urand(1000, 2000));
                             events.ScheduleEvent(EVENT_TWILIGHT_SNEAR, urand(5000, 10000));
                             break;
