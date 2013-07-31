@@ -731,6 +731,7 @@ void AddSC_boss_morchok();
 void AddSC_boss_yorsahj_the_unsleeping();
 void AddSC_boss_warlord_zonozz();
 void AddSC_boss_hagara_the_stormbinder();
+void AddSC_boss_ultraxion();
 
 // battlegrounds
 
@@ -1498,6 +1499,7 @@ void AddNorthrendScripts()
     AddSC_boss_yorsahj_the_unsleeping();
     AddSC_boss_warlord_zonozz();
     AddSC_boss_hagara_the_stormbinder();
+    AddSC_boss_ultraxion();
 
 #endif
 }

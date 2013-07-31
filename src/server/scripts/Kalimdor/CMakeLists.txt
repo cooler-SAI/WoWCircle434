@@ -78,6 +78,7 @@ set(scripts_STAT_SRCS
   Kalimdor/CavernsOfTime/DragonSoul/boss_yorsahj_the_unsleeping.cpp
   Kalimdor/CavernsOfTime/DragonSoul/boss_warlord_zonozz.cpp
   Kalimdor/CavernsOfTime/DragonSoul/boss_hagara.cpp
+  Kalimdor/CavernsOfTime/DragonSoul/boss_ultraxion.cpp
   Kalimdor/CavernsOfTime/DragonSoul/instance_dragon_soul.cpp
   Kalimdor/CavernsOfTime/DragonSoul/dragon_soul.cpp
   Kalimdor/CavernsOfTime/DragonSoul/dragon_soul.h

@@ -23,6 +23,7 @@ class instance_dragon_soul : public InstanceMapScript
                 uiKohcromGUID = 0;
                 uiZonozzGUID = 0;
                 uiHagaraGUID = 0;
+                uiUltraxionGUID = 0;
 
                 bHagaraEvent = 0;
             }
@@ -49,6 +50,9 @@ class instance_dragon_soul : public InstanceMapScript
                     case NPC_HAGARA:
                         uiHagaraGUID = pCreature->GetGUID();
                         break;
+                    case NPC_ULTRAXION:
+                        uiUltraxionGUID = pCreature->GetGUID();
+                        break;
                     case NPC_TRAVEL_TO_WYRMREST_TEMPLE:
                     case NPC_TRAVEL_TO_EYE_OF_ETERNITY:
                     case NPC_TRAVEL_TO_WYRMREST_BASE:
@@ -60,8 +64,10 @@ class instance_dragon_soul : public InstanceMapScript
                 }
             }
 
-            void OnGameObjectCreate(GameObject* pGo)
+            void OnCreatureRemove(Creature* pCreature)
             {
+                if (pCreature->GetEntry() == NPC_ULTRAXION)
+                    uiUltraxionGUID = 0;
             }
 
             uint64 GetData64(uint32 type)
@@ -72,6 +78,7 @@ class instance_dragon_soul : public InstanceMapScript
                     case DATA_KOHCROM: return uiKohcromGUID;
                     case DATA_ZONOZZ: return uiZonozzGUID;
                     case DATA_HAGARA: return uiHagaraGUID;
+                    case DATA_ULTRAXION: return uiUltraxionGUID;
                     default: return 0;
                 }
                 return 0;
@@ -183,6 +190,7 @@ class instance_dragon_soul : public InstanceMapScript
                 uint64 uiKohcromGUID;
                 uint64 uiZonozzGUID;
                 uint64 uiHagaraGUID;
+                uint64 uiUltraxionGUID;
 
                 std::vector<uint64> teleportGUIDs;
 

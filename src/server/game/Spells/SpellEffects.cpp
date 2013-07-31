@@ -2421,7 +2421,7 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
     m_damage += newDamage;
 }
 
-void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
+void Spell::EffectHeal(SpellEffIndex effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
         return;
@@ -2439,6 +2439,16 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
 
         switch (m_spellInfo->Id)
         {
+            case 105996: // Essence of Dreams, Ultraxion, Dragon Soul
+            {
+                uint32 count = 0;
+                for (std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+                    if (ihit->effectMask & (1<<effIndex))
+                        ++count;
+
+                addhealth /= count; 
+                break;
+            }
             // Bloodthrist
             case 23880:
                 if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(23881))

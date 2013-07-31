@@ -41,6 +41,12 @@ enum CreatureIds
     NPC_TRAVEL_TO_MAELSTORM         = 57443, //
     NPC_TRAVEL_TO_DECK              = 57378, //
     NPC_DASNURIMI                   = 58153, // trader
+    NPC_YSERA_THE_AWAKENED          = 56665,
+    NPC_ALEXTRASZA_THE_LIFE_BINDER  = 56630,
+    NPC_KALECGOS                    = 56664,
+    NPC_THRALL_1                    = 56667, // near summit
+    NPC_NOZDORMU_THE_TIMELESS_ONE   = 56666,
+    NPC_THE_DRAGON_SOUL             = 56668, // near summit
 };
 
 enum GameObjects
@@ -53,6 +59,17 @@ enum SharedSpells
 {
     SPELL_TELEPORT_VISUAL_ACTIVE    = 108203,
     SPELL_TELEPORT_VISUAL_DISABLED  = 108227,
+    
+    SPELL_CHARGING_UP_LIFE          = 108490,
+    SPELL_CHARGING_UP_MAGIC         = 108491,
+    SPELL_CHARGING_UP_EARTH         = 108492,
+    SPELL_CHARGING_UP_TIME          = 108493,
+    SPELL_CHARGING_UP_DREAMS        = 108494,
+    SPELL_WARD_OF_TIME              = 108160,
+    SPELL_WARD_OF_EARTH             = 108161,
+    SPELL_WARD_OF_MAGIC             = 108162,
+    SPELL_WARD_OF_LIFE              = 108163,
+    SPELL_WARD_OF_DREAMS            = 108164,
 };
 
 const Position teleportPos[5] =
@@ -62,6 +79,12 @@ const Position teleportPos[5] =
     {-1743.647827f, -1835.132568f, -220.51f, 4.53f}, // Warlord Zon'ozz
     {-1781.188477f, -2375.122559f, 341.35f, 4.43f},  // Wyrmrest Summit
     {13629.356445f, 13612.099609f, 123.49f, 3.14f},  // Hagara
+};
+
+const Position ultraxionPos[2] = 
+{
+    {-1564.f, -2369.f, 250.083f, 3.28122f}, // spawn
+    {-1699.469971f, -2388.030029f, 340.192993f, 3.21552f} // move to
 };
 
 #endif

@@ -3050,6 +3050,10 @@ void SpellMgr::LoadSpellCustomAttr()
             case 104605: // Void Diffusion dmg
             case 108345: // Void Diffusion dmg
             case 108346: // Void Diffusion dmg
+            case 106375: // Unstable Twilight
+            case 109182: // Unstable Twilight
+            case 109183: // Unstable Twilight
+            case 109184: // Unstable Twilight
                 // ONLY SPELLS WITH SPELLFAMILY_GENERIC and EFFECT_SCHOOL_DAMAGE
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 break;
@@ -6370,6 +6374,7 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 107850: // Focused Assault dmg
                 spellInfo->SetRangeIndex(13); // 50000
+                spellInfo->Effects[EFFECT_0].BasePoints = 100;
                 break;
             case 109325: // Frostflake
                 spellInfo->MaxAffectedTargets = 1;
@@ -6386,6 +6391,16 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 109557: // Storm Pillars
                 spellInfo->MaxAffectedTargets = 1;
+                break;
+            // Ultraxion
+            case 106374: // Unstable Twilight aoe 1
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 109176: // Unstable Twilight aoe 2
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 105900: // Essence of Dreams
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
                 break;
             // ENDOF DRAGON SOUL SPELLS
             //

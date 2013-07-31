@@ -1118,6 +1118,50 @@ class npc_dragon_soul_teleport : public CreatureScript
         }
 };
 
+#define GOSSIP_OPTION_1 "Begin charging."
+
+class npc_dragon_soul_thrall : public CreatureScript
+{
+    public:
+        npc_dragon_soul_thrall() : CreatureScript("npc_dragon_soul_thrall") { }
+
+        bool OnGossipHello(Player* pPlayer, Creature* pCreature)
+        {
+            if (pPlayer->isInCombat())
+                return true;
+
+            if (InstanceScript* pInstance = pCreature->GetInstanceScript())
+            {
+                if (pInstance->GetBossState(DATA_HAGARA) == DONE &&
+                    pInstance->GetBossState(DATA_ULTRAXION) != DONE &&
+                    !pInstance->GetData64(DATA_ULTRAXION))
+                {
+                    pPlayer->ADD_GOSSIP_ITEM(0, GOSSIP_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    pPlayer->SEND_GOSSIP_MENU(1, pCreature->GetGUID());
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*sender*/, uint32 action)
+        {
+            pPlayer->PlayerTalkClass->SendCloseGossip();
+            if (InstanceScript* pInstance = pCreature->GetInstanceScript())
+            {
+                if (pInstance->GetBossState(DATA_HAGARA) == DONE &&
+                    pInstance->GetBossState(DATA_ULTRAXION) != DONE &&
+                    !pInstance->GetData64(DATA_ULTRAXION))
+                {
+                    if (Creature* pUltraxion = pCreature->SummonCreature(NPC_ULTRAXION, ultraxionPos[0]))
+                        pUltraxion->SetPhaseMask(17, true);
+                    pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                }
+            }
+            return true;
+        }
+};
+
 class spell_dragon_soul_trigger_spell_from_aoe : public SpellScriptLoader
 {
     public:
@@ -1283,6 +1327,7 @@ void AddSC_dragon_soul()
     new npc_dragon_soul_claw_of_gorath();
     new npc_dragon_soul_eye_of_gorath();
     new npc_dragon_soul_teleport();
+    new npc_dragon_soul_thrall();
     new spell_dragon_soul_trigger_spell_from_aoe("spell_dragon_soul_ancient_water_lord_flood", SPELL_FLOOD);
     new spell_dragon_soul_trigger_spell_from_aoe("spell_dragon_soul_earthen_destroyer_boulder_smash", SPELL_BOULDER_SMASH);
     new spell_dragon_soul_shadowed_globule_deep_corruption();

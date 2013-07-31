@@ -43,7 +43,7 @@ void CreatureAI::Talk(uint8 id, uint64 WhisperGuid, uint32 range)
 {
     TextRange _range = TextRange(range);
     if (range == TEXT_RANGE_NORMAL)
-        _range = (me->GetMap()->IsDungeon() ? TEXT_RANGE_AREA : TEXT_RANGE_NORMAL);
+        _range = (me->GetMap()->IsDungeon() ? TEXT_RANGE_ZONE : TEXT_RANGE_NORMAL);
     sCreatureTextMgr->SendChat(me, id, WhisperGuid, CHAT_MSG_ADDON, LANG_ADDON, _range);
 }
 

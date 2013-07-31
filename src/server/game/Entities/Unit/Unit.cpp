@@ -5370,6 +5370,10 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                case 105900: // Essence of Dreams, Ultraxion, Dragon Soul
+                    basepoints0 = damage;
+                    triggered_spell_id = 105996;
+                    break;
                 case 108007: // Indomitable, Indomitable Pride (normal)
                 case 109785: // Indomitable, Indomitable Pride (lfr)
                 case 109786: // Indomitable, Indomitable Pride (heroic)
