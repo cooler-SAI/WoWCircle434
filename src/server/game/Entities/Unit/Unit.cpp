@@ -12687,9 +12687,8 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
     switch (spellProto->DmgClass)
     {
         case SPELL_DAMAGE_CLASS_NONE:
-            if (spellProto->CanCritDamageClassNone())
-                break;
-            return 0.0;
+            if (!spellProto->CanCritDamageClassNone())
+                return 0.0;
         case SPELL_DAMAGE_CLASS_MAGIC:
         {
             // exeption is healthstone and heal potions
