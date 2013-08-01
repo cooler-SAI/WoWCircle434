@@ -1796,7 +1796,7 @@ class spell_hagara_the_stormbinder_icy_tomb_aoe : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                if (GetCaster())
+                if (!GetCaster())
                     return;
 
                 if (!GetCaster()->getVictim())
