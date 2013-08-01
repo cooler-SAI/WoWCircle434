@@ -172,6 +172,7 @@ enum MiscData
     DATA_MAIN_WAVE          = 8,
     ACTION_CRYSTAL_DIED     = 9,
     DATA_CRYSTAL_OVERLOADED = 10,
+    DATA_PHASE              = 11,
 };
 
 const Position centerPos = {13587.4f, 13612.0f, 122.43f, 5.93f};
@@ -390,6 +391,9 @@ class boss_hagara_the_stormbinder: public CreatureScript
             void Reset()
             {
                 _Reset();
+
+                DespawnCreatures(NPC_ICE_WAVE);
+
                 bEvent = false;
                 phase = 0;
                 specialPhase = false;
@@ -451,6 +455,13 @@ class boss_hagara_the_stormbinder: public CreatureScript
                     if (crystalCount == 0)
                         SpecialPhaseEnd();
                 }
+            }
+
+            uint32 GetData(uint32 type)
+            {
+                if (type == DATA_PHASE)
+                    return (uint32)phase;
+                return 0;
             }
 
             void JustDied(Unit* /*killer*/)
@@ -843,6 +854,8 @@ class boss_hagara_the_stormbinder: public CreatureScript
                         
                 DespawnCreatures(NPC_ICE_WAVE);
                 summons.DespawnEntry(NPC_CRYSTAL_CONDUCTOR);
+                summons.DespawnEntry(NPC_BOUND_LIGHTNING_ELEMENTAL);
+                summons.DespawnEntry(NPC_FROZEN_BINDING_CRYSTAL);
 
                 me->SetReactState(REACT_AGGRESSIVE);
                 AttackStart(me->getVictim());
@@ -2032,6 +2045,14 @@ class spell_hagara_the_stormbinder_lightning_conduit : public SpellScriptLoader
                 if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
                     return;
 
+                Creature* pHagara = NULL;
+                pHagara = GetCaster()->FindNearestCreature(NPC_HAGARA, 200.0f, true);
+                if (!pHagara)
+                    return;
+
+                if (pHagara->AI()->GetData(DATA_PHASE) != 10)
+                    return;
+
                 std::list<Player*> players;
                 AnyPlayerOrCrystalCheck check(GetTarget(), 10.0f);
                 Trinity::PlayerListSearcher<AnyPlayerOrCrystalCheck> searcher(GetTarget(), players, check); 
@@ -2058,6 +2079,9 @@ class spell_hagara_the_stormbinder_lightning_conduit : public SpellScriptLoader
                     bool operator()(Player* u)
                     {
                         if (u->GetGUID() == _obj->GetGUID())
+                            return false;
+
+                        if (u->HasAura(SPELL_LIGHTNING_CONDUIT_DUMMY_1))
                             return false;
 
                         if (!u->isAlive())
