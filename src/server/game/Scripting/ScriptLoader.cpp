@@ -95,6 +95,7 @@ void AddSC_npc_taxi();
 void AddSC_npc_companions();
 void AddSC_achievement_scripts();
 void AddSC_tarecgosa_scripts();
+void AddSC_fangs_of_father_scripts();
 
 //eastern kingdoms
 void AddSC_alterac_valley();                 //Alterac Valley
@@ -846,6 +847,7 @@ void AddWorldScripts()
     AddSC_npc_companions();
     AddSC_achievement_scripts();
     AddSC_tarecgosa_scripts();
+    AddSC_fangs_of_father_scripts();
     AddSC_chat_log();
 #endif
 }
