@@ -7242,6 +7242,9 @@ void SpellMgr::LoadDbcDataCorrections()
             case 81093: // 
                 spellInfo->ProcCharges = 1;
                 break;
+            case 109669: // Shadow Breath, Lord Hiram Creed
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                break;
             default:
                 break;
         }
