@@ -1717,7 +1717,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
         case 106368:
             if (!player)
                 return SPELL_CAST_OK;
-            return ((map_id == 967 & area_id == 5928) ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA);
+            return (area_id == 5928) ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         case 103755: // Twilight Epiphany, Archbishop Benedictus, Hour of Twilight
             return ((map_id == 940 && area_id == 5845) ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA);
         case 103534: // Danger, Morchok, Dragon Soul
