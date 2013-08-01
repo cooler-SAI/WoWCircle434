@@ -229,8 +229,7 @@ class boss_ultraxion: public CreatureScript
                 if (action == ACTION_TWILIGHT_ERUPTION)
                 {
                     unstableCount = 7;
-                    events.Reset();
-                    events.ScheduleEvent(EVENT_UNSTABLE_MONSTROSITY, 1000);
+                    events.RescheduleEvent(EVENT_UNSTABLE_MONSTROSITY, 1000);
                 }
             }
 
@@ -400,14 +399,18 @@ class boss_ultraxion: public CreatureScript
                                     me->RemoveAura(SPELL_UNSTABLE_MONSTROSITY_5);
                                     DoCast(me, SPELL_UNSTABLE_MONSTROSITY_6, true);
                                     break;
-                                case 7:
-                                    Talk(SAY_BERSERK);
-                                    DoCast(SPELL_TWILIGHT_ERUPTION);
-                                    return;
                                 default:
                                     break;
                             }
-                            events.ScheduleEvent(EVENT_UNSTABLE_MONSTROSITY, MINUTE * IN_MILLISECONDS);
+                            if (unstableCount >= 7)
+                            {
+                                Talk(SAY_BERSERK);
+                                DoCast(SPELL_TWILIGHT_ERUPTION);
+                                me->DespawnOrUnsummon(8000);
+                                return;
+                            }
+                            else
+                                events.ScheduleEvent(EVENT_UNSTABLE_MONSTROSITY, MINUTE * IN_MILLISECONDS);
                             break;
                         case EVENT_HOUR_OF_TWILIGHT:
                             Talk(SAY_TWILIGHT);
