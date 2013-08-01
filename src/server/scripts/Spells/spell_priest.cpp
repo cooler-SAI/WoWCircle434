@@ -366,7 +366,7 @@ class spell_pri_vampiric_touch : public SpellScriptLoader
 
                 if (AuraEffect const* aurEff = GetCaster()->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PRIEST, 1869, EFFECT_1))
                     if (roll_chance_i(aurEff->GetSpellInfo()->Effects[EFFECT_0].BasePoints))
-                        dispelInfo->GetDispeller()->CastSpell(dispelInfo->GetDispeller(), PRIEST_SPELL_VAMPIRIC_TOUCH_DISPEL, true);
+                        dispelInfo->GetDispeller()->CastSpell(dispelInfo->GetDispeller(), PRIEST_SPELL_VAMPIRIC_TOUCH_DISPEL, true, 0, aurEff, GetCaster()->GetGUID());
 
             }
 
