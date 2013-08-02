@@ -1891,7 +1891,7 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
     // we assume that when the difficulty changes, all instances that can be reset will be
     Difficulty diff = GetDifficulty(isRaid);
 
-    for (BoundInstancesMap::iterator itr = m_boundInstances[diff].begin(); itr != m_boundInstances[diff].end();)
+    for (BoundInstancesMap::iterator itr = m_boundInstances[(isRaid ? RAID_DIFFICULTY_10MAN_NORMAL : diff)].begin(); itr != m_boundInstances[(isRaid ? RAID_DIFFICULTY_10MAN_NORMAL : diff)].end();)
     {
         InstanceSave* instanceSave = itr->second.save;
         const MapEntry* entry = sMapStore.LookupEntry(itr->first);
@@ -1946,8 +1946,8 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
                 CharacterDatabase.PExecute("DELETE FROM group_instance WHERE instance = '%u'", instanceSave->GetInstanceId());
 
             // i don't know for sure if hash_map iterators
-            m_boundInstances[diff].erase(itr);
-            itr = m_boundInstances[diff].begin();
+            m_boundInstances[(isRaid ? RAID_DIFFICULTY_10MAN_NORMAL : diff)].erase(itr);
+            itr = m_boundInstances[(isRaid ? RAID_DIFFICULTY_10MAN_NORMAL : diff)].begin();
             // this unloads the instance save unless online players are bound to it
             // (eg. permanent binds or GM solo binds)
             instanceSave->RemoveGroup(this);

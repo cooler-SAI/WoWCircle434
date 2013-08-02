@@ -19447,7 +19447,7 @@ void Player::ResetInstances(uint8 method, bool isRaid)
     // we assume that when the difficulty changes, all instances that can be reset will be
     Difficulty diff = GetDifficulty(isRaid);
 
-    for (BoundInstancesMap::iterator itr = m_boundInstances[diff].begin(); itr != m_boundInstances[diff].end();)
+    for (BoundInstancesMap::iterator itr = m_boundInstances[(isRaid ? RAID_DIFFICULTY_10MAN_NORMAL : diff)].begin(); itr != m_boundInstances[(isRaid ? RAID_DIFFICULTY_10MAN_NORMAL : diff)].end();)
     {
         InstanceSave* p = itr->second.save;
         const MapEntry* entry = sMapStore.LookupEntry(itr->first);
@@ -19490,7 +19490,7 @@ void Player::ResetInstances(uint8 method, bool isRaid)
             SendResetInstanceSuccess(p->GetMapId());
 
         p->DeleteFromDB();
-        m_boundInstances[diff].erase(itr++);
+        m_boundInstances[(isRaid ? RAID_DIFFICULTY_10MAN_NORMAL : diff)].erase(itr++);
 
         // the following should remove the instance save from the manager and delete it as well
         p->RemovePlayer(this);
