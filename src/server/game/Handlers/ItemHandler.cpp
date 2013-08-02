@@ -1167,7 +1167,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
     }
 
     // maybe not correct check  (it is better than nothing)
-    if (item->GetTemplate()->MaxCount > 0)
+    if (item->GetTemplate()->MaxCount > 0 || item->IsConjuredConsumable())
     {
         _player->SendEquipError(EQUIP_ERR_CANT_WRAP_UNIQUE, item, NULL);
         return;

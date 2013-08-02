@@ -7254,6 +7254,9 @@ void SpellMgr::LoadDbcDataCorrections()
             case 109669: // Shadow Breath, Lord Hiram Creed
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
                 break;
+            case 16602: // Shahram
+                spellInfo->SetDurationIndex(4); // 120 seconds
+                break;
             default:
                 break;
         }

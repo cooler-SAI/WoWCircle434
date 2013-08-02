@@ -1071,6 +1071,7 @@ class WorldSession
         time_t timelastReloadUi;
         time_t timeLastServerCommand;
         time_t timeCharEnumOpcode;
+        time_t timeLastArenaTeamCommand;
 };
 #endif
 /// @}
