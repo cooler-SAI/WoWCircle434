@@ -5579,6 +5579,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!procSpell)
                         return false;
 
+                    if (!victim)
+                        return false;
+
+                    if (GetGUID() == victim->GetGUID())
+                        return false;
+
                     if (procFlag & PROC_FLAG_DONE_PERIODIC)
                     {
                         if (!roll_chance_i(10))
