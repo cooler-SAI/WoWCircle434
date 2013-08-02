@@ -6402,6 +6402,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 105900: // Essence of Dreams
                 spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
                 break;
+            case 106371: // Hour of Twilight
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 103327;
+                spellInfo->Effects[EFFECT_1].TriggerSpell = 106174;
+                break;
             // ENDOF DRAGON SOUL SPELLS
             //
             // Camouflage

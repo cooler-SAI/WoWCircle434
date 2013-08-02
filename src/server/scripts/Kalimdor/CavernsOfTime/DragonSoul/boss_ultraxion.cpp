@@ -82,6 +82,9 @@ enum Spells
 
     SPELL_TIMELOOP                          = 105984,
     SPELL_TIMELOOP_HEAL                     = 105992,
+
+    SPELL_ULTRAXION_ACHIEVEMENT_AURA        = 109188,
+    SPELL_ULTRAXION_AHCIEVEMENT_FAILED      = 109194,
 };
 
 enum Events
@@ -200,6 +203,7 @@ class boss_ultraxion: public CreatureScript
             {
                 Talk(SAY_AGGRO);
 
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ULTRAXION_ACHIEVEMENT_AURA);
                 RemoveEncounterAuras();
                 DeleteGameObjects(GO_GIFT_OF_LIFE);
                 DeleteGameObjects(GO_ESSENCE_OF_DREAMS);
@@ -222,6 +226,22 @@ class boss_ultraxion: public CreatureScript
 
                 DoZoneInCombat();
                 instance->SetBossState(DATA_ULTRAXION, IN_PROGRESS);
+            }
+
+            bool AllowAchieve()
+            {
+                Map::PlayerList const &playerList = instance->instance->GetPlayers();
+                if (!playerList.isEmpty())
+                {
+                    for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
+                        if (Player* pPlayer = itr->getSource())
+                        {
+                            if (Aura const* aur = pPlayer->GetAura(SPELL_ULTRAXION_ACHIEVEMENT_AURA))
+                                if (aur->GetStackAmount() > 1)
+                                    return false;
+                        }
+                }
+                return true;                
             }
 
             void DoAction(const int32 action)
@@ -248,6 +268,7 @@ class boss_ultraxion: public CreatureScript
                 {
                     pThrall->InterruptNonMeleeSpells(true);
                     pThrall->RemoveAllAuras();
+                    pThrall->AI()->DoAction(1); // ACTION_ULTRAXION_WIN
                 }
                 if (Creature* pYsera = me->FindNearestCreature(NPC_YSERA_THE_AWAKENED, 300.0f))
                 {
@@ -282,6 +303,12 @@ class boss_ultraxion: public CreatureScript
                 if (type == POINT_MOTION_TYPE)
                     if (data == POINT_MOVE)
                     {
+                        Map::PlayerList const &playerList = instance->instance->GetPlayers();
+                            if (!playerList.isEmpty())
+                                for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
+                                    if (Player* pPlayer = itr->getSource())
+                                        me->SendUpdateToPlayer(pPlayer);
+
                         phase = 0;
                         me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -323,11 +350,20 @@ class boss_ultraxion: public CreatureScript
                             events.ScheduleEvent(EVENT_MOVE, 7000);
                             break;
                         case EVENT_MOVE:
+                        {
                             me->SetVisible(true);
+
+                            Map::PlayerList const &playerList = instance->instance->GetPlayers();
+                            if (!playerList.isEmpty())
+                                for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
+                                    if (Player* pPlayer = itr->getSource())
+                                        me->SendUpdateToPlayer(pPlayer);
+
                             Talk(SAY_INTRO_1);
                             me->GetMotionMaster()->MovePoint(POINT_MOVE, ultraxionPos[1]);
                             events.ScheduleEvent(EVENT_TALK_1, 13000);
                             break;
+                        }
                         case EVENT_TALK_1:
                             Talk(SAY_INTRO_2);
                             break;
@@ -554,13 +590,17 @@ class spell_ultraxion_twilight_instability : public SpellScriptLoader
             class AuraCheck
             {
                 public:
-                    AuraCheck(uint32 spellId, bool present) : _spellId(spellId) {}
+                    AuraCheck(uint32 spellId, bool present) : _spellId(spellId), _present(present) {}
             
                     bool operator()(WorldObject* unit)
                     {
                         if (!unit->ToUnit())
                             return true;
-                        return (unit->ToUnit()->HasAura(_spellId) == _present);
+
+                        if (_present)
+                            return unit->ToUnit()->HasAura(_spellId);
+                        else
+                            return !unit->ToUnit()->HasAura(_spellId);
                     }
 
                 private:
@@ -611,36 +651,40 @@ class spell_ultraxion_hour_of_twilight_dmg : public SpellScriptLoader
                 if (!GetCaster())
                     return;
 
+                targets.remove_if(AuraCheck(SPELL_HEROIC_WILL, true));
                 targets.remove_if(AuraCheck(SPELL_LOOMING_DARKNESS_DUMMY, false));
             }
 
-            void HandleDamage(SpellEffIndex effIndex)
+            void FilterTargetsAchievement(std::list<WorldObject*>& targets)
             {
-                if (!GetCaster() || !GetHitUnit())
+                if (!GetCaster())
                     return;
 
-                if (GetCaster()->GetMap()->IsHeroic())
-                    GetHitUnit()->CastSpell(GetHitUnit(), SPELL_LOOMING_DARKNESS_DUMMY, true);
+                targets.remove_if(AuraCheck(SPELL_HEROIC_WILL, true));
             }
 
             void Register()
             {
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_ultraxion_hour_of_twilight_dmg_SpellScript::FilterTargetsDamage, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_ultraxion_hour_of_twilight_dmg_SpellScript::FilterTargetsDarkness, EFFECT_1, TARGET_UNIT_SRC_AREA_ENTRY);
-                OnEffectHitTarget += SpellEffectFn(spell_ultraxion_hour_of_twilight_dmg_SpellScript::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_ultraxion_hour_of_twilight_dmg_SpellScript::FilterTargetsAchievement, EFFECT_2, TARGET_UNIT_SRC_AREA_ENTRY);
             }
 
         private:
             class AuraCheck
             {
                 public:
-                    AuraCheck(uint32 spellId, bool present) : _spellId(spellId) {}
+                    AuraCheck(uint32 spellId, bool present) : _spellId(spellId), _present(present) {}
             
                     bool operator()(WorldObject* unit)
                     {
                         if (!unit->ToUnit())
                             return true;
-                        return (unit->ToUnit()->HasAura(_spellId) == _present);
+
+                        if (_present)
+                            return unit->ToUnit()->HasAura(_spellId);
+                        else 
+                            return !unit->ToUnit()->HasAura(_spellId);
                     }
 
                 private:
@@ -706,6 +750,9 @@ class spell_ultraxion_fading_light : public SpellScriptLoader
                     return;
 
                 targets.remove_if(DPSCheck());
+                if (Creature* pUltraxion = GetCaster()->ToCreature())
+                    if (Unit* pTarget = pUltraxion->AI()->SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 0.0f, true))
+                        targets.remove(pTarget);
 
                 uint32 min_players = 1;
                 switch (GetCaster()->GetMap()->GetDifficulty())
@@ -952,6 +999,25 @@ class spell_ultraxion_time_loop : public SpellScriptLoader
         }
 };
 
+typedef boss_ultraxion::boss_ultraxionAI UltraxionAI;
+
+class achievement_minutes_to_midnight : public AchievementCriteriaScript
+{
+    public:
+        achievement_minutes_to_midnight() : AchievementCriteriaScript("achievement_minutes_to_midnight") { }
+
+        bool OnCheck(Player* source, Unit* target)
+        {
+            if (!target)
+                return false;
+
+            if (UltraxionAI* ultraxionAI = CAST_AI(UltraxionAI, target->GetAI()))
+                return ultraxionAI->AllowAchieve();
+
+            return false;
+        }
+};
+
 void AddSC_boss_ultraxion()
 {
     new boss_ultraxion();
@@ -962,4 +1028,5 @@ void AddSC_boss_ultraxion()
     new spell_ultraxion_last_defender_of_azeroth_dummy();
     new spell_ultraxion_heroic_will();
     new spell_ultraxion_time_loop();
+    new achievement_minutes_to_midnight();
 }

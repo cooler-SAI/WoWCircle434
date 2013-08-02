@@ -6750,13 +6750,6 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
             {
                 switch (auraId)
                 {
-                    // Hour of Twilight, Ultraxion, Dragon Soul
-                    case 106371:
-                        if (caster)
-                            if (Creature* pUltraxion = caster->ToCreature())
-                                if (Unit* pTarget = pUltraxion->AI()->SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 0.0f, true))
-                                    pUltraxion->CastSpell(pTarget, 105925, true);
-                        return;
                     // Earth's Vengeance, Morchok, Dragon Soul
                     case 103176:
                     {
@@ -6972,6 +6965,16 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
         // Spell exist but require custom code
         switch (auraId)
         {
+            // Hour of Twilight, Ultraxion, Dragon Soul
+            case 106371:
+            case 109415:
+            case 109416:
+            case 109417:
+                if (caster)
+                    if (Creature* pUltraxion = caster->ToCreature())
+                        if (Unit* pTarget = pUltraxion->AI()->SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 0.0f, true))
+                            pUltraxion->CastSpell(pTarget, 105925, true);
+                        return;
             case 107851: // Focused Assault, Hagara, Dragon Soul
             case 110900:
             case 110899:

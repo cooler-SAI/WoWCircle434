@@ -174,6 +174,15 @@ enum Events
 
     // Eye of Go'rath
     EVENT_SHADOW_GAZE           = 18,
+
+    // Thrall
+    EVENT_TALK_ULTRAXION_WIN_1  = 19,
+    EVENT_TALK_ULTRAXION_WIN_2  = 20,
+};
+
+enum Actions
+{
+    ACTION_ULTRAXION_WIN    = 1,
 };
 
 class npc_dragon_soul_ancient_water_lord : public CreatureScript
@@ -1160,6 +1169,52 @@ class npc_dragon_soul_thrall : public CreatureScript
             }
             return true;
         }
+
+        CreatureAI* GetAI(Creature* pCreature) const
+        {
+            return new npc_dragon_soul_thrallAI (pCreature);
+        }
+
+        struct npc_dragon_soul_thrallAI : public ScriptedAI
+        {
+            npc_dragon_soul_thrallAI(Creature* pCreature) : ScriptedAI(pCreature)
+            {
+            }
+
+            void DoAction(const int32 action)
+            {
+                if (action == ACTION_ULTRAXION_WIN)
+                    events.ScheduleEvent(EVENT_TALK_ULTRAXION_WIN_1, 10000);
+            }
+
+            void UpdateAI(uint32 const diff)
+            {
+                events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+                
+                if (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_TALK_ULTRAXION_WIN_1:
+                            if (Creature* pAlextrasza = me->FindNearestCreature(NPC_ALEXTRASZA_THE_LIFE_BINDER, 300.0f))
+                                pAlextrasza->AI()->Talk(2); // SAY_ULTRAXION_WIN
+                            events.ScheduleEvent(EVENT_TALK_ULTRAXION_WIN_2, 15000);
+                            break;
+                        case EVENT_TALK_ULTRAXION_WIN_2:
+                            Talk(1);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
+        private:
+            EventMap events;
+        };
 };
 
 class spell_dragon_soul_trigger_spell_from_aoe : public SpellScriptLoader
