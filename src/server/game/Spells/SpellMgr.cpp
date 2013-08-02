@@ -3270,6 +3270,11 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->RecoveryTime = 0;
                 spellInfo->CategoryRecoveryTime = 604800000; 
                 break;
+            // wrong dbc, 3 days cooldown
+            case 60893: // Northrend Alchemy Research
+                spellInfo->RecoveryTime = 0;
+                spellInfo->CategoryRecoveryTime = 259200000; 
+                break;
             // wrong dbc, 1 day cooldown 
             case 80243: // Transmute: Truegold
             case 61288: // Minor Inscription Research
