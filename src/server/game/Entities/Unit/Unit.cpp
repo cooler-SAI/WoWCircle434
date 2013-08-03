@@ -3694,6 +3694,13 @@ void Unit::RemoveAurasByType(AuraType auraType, uint64 casterGUID, Aura* exceptA
     }
 }
 
+void Unit::RemoveDotsNotSWD()
+{
+    RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, 0, 32409);         // SW:D shall not be removed.
+    RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT, 0, 0, 49016); // Unholy Frenzy is except too
+    RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);    
+}
+
 void Unit::RemoveAurasWithAttribute(uint32 flags)
 {
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
@@ -6271,9 +6278,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 {
                     if (!target)
                         return false;
-                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, target->GetAura(32409)); // SW:D shall not be removed.
-                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                    target->RemoveDotsNotSWD();
                     return true;
                 }
                 // Glyph of Icy Veins
@@ -6718,9 +6723,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 {
                     if (!target)
                         return false;
-                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, target->GetAura(32409)); // SW:D shall not be removed.
-                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                    target->RemoveDotsNotSWD();
                     return true;
                 }
             }

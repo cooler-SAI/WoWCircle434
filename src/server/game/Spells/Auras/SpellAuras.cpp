@@ -1541,14 +1541,12 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 switch (GetId())
                 {
                     // Blind
-                    case  2094:
+                    case 2094:
                     {
                         // Glyph of Blind
                         if (caster && caster->HasAura(91299))
                         {
-                            target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, 0, 32409);
-                            target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-                            target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                            target->RemoveDotsNotSWD();
                         }
                         break;
                     }

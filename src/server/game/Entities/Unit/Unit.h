@@ -1796,6 +1796,7 @@ class Unit : public WorldObject
         void RemoveAurasDueToSpellBySteal(uint32 spellId, uint64 casterGUID, Unit* stealer);
         void RemoveAurasDueToItemSpell(uint32 spellId, uint64 castItemGuid);
         void RemoveAurasByType(AuraType auraType, uint64 casterGUID = 0, Aura* aura = NULL, uint32 exceptAuraId = 0, bool negative = true, bool positive = true);
+        void RemoveDotsNotSWD();
         void RemoveNotOwnSingleTargetAuras(uint32 newPhase = 0x0);
         void RemoveAurasWithInterruptFlags(uint32 flag, uint32 except = 0);
         void RemoveAurasWithAttribute(uint32 flags);
