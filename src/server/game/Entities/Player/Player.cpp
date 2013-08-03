@@ -10281,11 +10281,12 @@ bool Player::HasItemOrGemWithLimitCategoryEquipped(uint32 limitCategory, uint32 
     return false;
 }
 
-bool Player::CheckArmorSpecializationItemConditions(SpellInfo const* spellInfo) const
+bool Player::CheckArmorSpecializationItemConditions(uint32 spellId) const
 {
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR8_ARMOR_SPECIALIZATION))
         return false;
-
+    
     uint8 count = 0;
 
     if (SpellEquippedItemsEntry const* listItems = spellInfo->GetSpellEquippedItems())
@@ -10313,8 +10314,8 @@ bool Player::CheckArmorSpecializationItemConditions(SpellInfo const* spellInfo) 
 
 void Player::UpdateArmorSpecializations(uint8 Slot)
 {
-    uint32 specilaztionSpell = ArmorSpecializationSpellToClass[getClass()];
-    if (!specilaztionSpell)
+    uint32 specializationSpell = ArmorSpecializationSpellToClass[getClass()];
+    if (!specializationSpell)
         return;
 
     switch (Slot)
@@ -10339,38 +10340,26 @@ void Player::UpdateArmorSpecializations(uint8 Slot)
         if (ArmorSpecializationTree[i].Class != getClass())
             continue;
 
-        spellId =  ArmorSpecializationTree[i].spellId;
+        spellId = ArmorSpecializationTree[i].spellId;
 
         RemoveAurasDueToSpell(spellId);
 
-
-        if (!ArmorSpecializationTree[i].Tree && GetPrimaryTalentTree(GetActiveSpec()) == 0 ||
-            ArmorSpecializationTree[i].Tree && ArmorSpecializationTree[i].Tree != GetPrimaryTalentTree(GetActiveSpec()) ||
-            ArmorSpecializationTree[i].Form && this->GetShapeshiftForm() != ArmorSpecializationTree[i].Form)
+        if (!HasSpell(specializationSpell))
             continue;
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR8_ARMOR_SPECIALIZATION))
-        {
-            sLog->outError(LOG_FILTER_PLAYER, "Player::UpdateArmorSpecializations: unexistent or wrong spell %u for class %u",
-                spellId, ArmorSpecializationTree[i].Class);
-            continue;
-        }
-
-        if (!HasSpell(specilaztionSpell))
-        {
-            RemoveAurasDueToSpell(spellInfo->Id);
-            continue;
-        }
-
-        if (!CheckArmorSpecializationItemConditions(spellInfo))
+        if (ArmorSpecializationTree[i].Tree != 0 &&
+            ArmorSpecializationTree[i].Tree != GetPrimaryTalentTree(GetActiveSpec()))
             continue;
 
-        if (!HasAura(ArmorSpecializationTree[i].spellId))
-        {
-            CastSpell(this, spellInfo->Id, true);
-            break;
-        }
+        if (ArmorSpecializationTree[i].Form != 0 &&
+            ArmorSpecializationTree[i].Form != GetShapeshiftForm())
+            continue;
+
+        if (!CheckArmorSpecializationItemConditions(spellId))
+            continue;
+
+        if (!HasAura(spellId))
+            CastSpell(this, spellId, true);
     }
 }
 

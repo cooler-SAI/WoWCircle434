@@ -2235,7 +2235,7 @@ class Player : public Unit, public GridObject<Player>
         void UpdateAllRunesRegen();
 
         void UpdateArmorSpecializations(uint8 Slot = NULL);
-        bool CheckArmorSpecializationItemConditions(SpellInfo const* spellInfo) const;
+        bool CheckArmorSpecializationItemConditions(uint32 spellId) const;
 
         bool CanSwitch() const;
         bool IsInWorgenForm() const { return HasAuraType(SPELL_AURA_WORGEN_ALTERED_FORM); }

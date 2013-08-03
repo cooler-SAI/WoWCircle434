@@ -7815,7 +7815,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         }
                     }
                     triggered_spell_id = 96890;
-                    target = victim;
+                    target = this;
                     break;
                 }
                 // Item - Paladin T12 Holy 4P Bonus
