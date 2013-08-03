@@ -15578,6 +15578,10 @@ int32 Unit::ModSpellDuration(SpellInfo const* spellProto, Unit const* target, in
     if (duration < 0)
         return duration;
 
+    // Channeled spells does not affected by modifer duration
+    if (spellProto->HasAttribute(SPELL_ATTR1_CHANNELED_1))
+        return duration;
+
     // cut duration only of negative effects
     if (!positive)
     {
