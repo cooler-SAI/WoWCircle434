@@ -104,6 +104,7 @@ class boss_anraphet : public CreatureScript
                 Talk(SAY_DEATH);
                 if (instance)
                     instance->SetBossState(DATA_ANRAPHET, DONE);
+                me->SummonGameObject(GO_ORIGINATION_ELEVATOR, -505.522f, 193.411f, 79.2668f, 3.14159f, 0, 0, 0, 0, 7200);
             }
             
             void KilledUnit(Unit* who)

@@ -336,6 +336,7 @@ class boss_lady_deathwhisper : public CreatureScript
                         }
                     }
                 }
+                me->SummonGameObject(GO_LADY_DEATHWHISPER_ELEVATOR, -645.179f, 2211.62f, 51.6f, 3.13822f, 0, 0, 0, 0, 7200);
 
                 _JustDied();
             }

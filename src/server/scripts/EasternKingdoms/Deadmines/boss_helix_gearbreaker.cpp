@@ -80,6 +80,11 @@ const Position helixcrewPos[4] =
     {-285.63f,-504.04f,60.16f, 0.0f}
 };
 
+const Position oafPos[1] = 
+{
+    {-302.361f, -516.346f, 52.0315f, 0.174533f},
+};
+
 class boss_helix_gearbreaker : public CreatureScript
 {
     public:
@@ -112,6 +117,16 @@ class boss_helix_gearbreaker : public CreatureScript
             void Reset() 
             {
                 _Reset();
+
+                me->SummonCreature(NPC_LUMBERING_OAF, oafPos[0]);
+            }
+
+            void SummonedCreatureDies(Creature* summon, Unit* killer)
+            {
+                if (summon->GetEntry() == NPC_LUMBERING_OAF)
+                {
+                    Talk(SAY_OAF_DEAD);
+                }
             }
 
             void EnterCombat(Unit* /*who*/)
