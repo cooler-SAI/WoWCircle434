@@ -16,21 +16,23 @@ enum ScriptTexts
 
 enum Spells
 {
-    SPELL_OFF_LINE            = 88348,
-    SPELL_REAPER_STRIKE        = 88490,
-    SPELL_REAPER_STRIKE_H    = 91717,
+    SPELL_OFF_LINE          = 88348,
+    SPELL_ZERO_POWER        = 87239,
+    SPELL_RED_EYES          = 24263,
+    SPELL_REAPER_STRIKE     = 88490,
+    SPELL_REAPER_STRIKE_H   = 91717,
     SPELL_SAFETY            = 88522,
-    SPELL_SAFETY_H            = 91720,
-    SPELL_HARVEST            = 88495,
-    SPELL_HARVEST_AURA        = 88497,
-    SPELL_HARVEST_DMG        = 88501,
-    SPELL_HARVEST_DMG_H        = 91719,
-    SPELL_HARVEST_SWEEP        = 88521,
-    SPELL_HARVEST_SWEEP_H    = 91718,
-    SPELL_OVERDRIVE            = 88481,
-    SPELL_OVERDRIVE_DMG        = 88484,
-    SPELL_OVERDRIVE_DMG_H    = 91716,
-    SPELL_TARGET_BUNNY        = 71371, //rocket artillery
+    SPELL_SAFETY_H          = 91720,
+    SPELL_HARVEST           = 88495,
+    SPELL_HARVEST_AURA      = 88497,
+    SPELL_HARVEST_DMG       = 88501,
+    SPELL_HARVEST_DMG_H     = 91719,
+    SPELL_HARVEST_SWEEP     = 88521,
+    SPELL_HARVEST_SWEEP_H   = 91718,
+    SPELL_OVERDRIVE         = 88481,
+    SPELL_OVERDRIVE_DMG     = 88484,
+    SPELL_OVERDRIVE_DMG_H   = 91716,
+    SPELL_TARGET_BUNNY      = 71371, //rocket artillery
 };
 
 enum Adds

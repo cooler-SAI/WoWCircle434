@@ -4114,9 +4114,34 @@ void SpellMgr::LoadDbcDataCorrections()
             // ENDOF THRONE OF THE TIDES SPELLS
             //
             // DEADMINES SPELLS
+            // Admiral Ripsnarl
+            case 88736: // Taste for Blood
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+                spellInfo->ProcChance = 0;
+                spellInfo->ProcFlags = 0;
+                break;
+            case 95647: // Ripsnarl Achievement Aura
+                spellInfo->AttributesEx3 = SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+                break;
             // Captain Cookie
             case 89250: // Summon Cauldron
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                break;
+            case 89268: // Throw Food Targeting
+            case 89740: 
+            case 90561:
+            case 90562:
+            case 90582:
+            case 90583:
+            case 90563:
+            case 90584:
+            case 90564:
+            case 90585:
+            case 90565:
+            case 90586:
+                spellInfo->MaxAffectedTargets = 1;
+                spellInfo->AttributesEx3 = SPELL_ATTR3_ONLY_TARGET_PLAYERS;
                 break;
             // ENDOF DEADMINES
             // BLACKROCK CAVERNS SPELLS

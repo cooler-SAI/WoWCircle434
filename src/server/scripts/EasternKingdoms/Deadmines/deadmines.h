@@ -25,14 +25,14 @@ enum NPCs
 
 enum Data
 {
-    DATA_GLUBTOK      = 1,
-    DATA_HELIX        = 2,
-    DATA_FOEREAPER    = 3,
-    DATA_ADMIRAL      = 4,
-    DATA_CAPTAIN      = 5,
-    DATA_VANESSA      = 6,
-    DATA_CANNON_EVENT = 7,
-    DATA_OAF          = 8,
+    DATA_GLUBTOK      = 0,
+    DATA_HELIX        = 1,
+    DATA_FOEREAPER    = 2,
+    DATA_ADMIRAL      = 3,
+    DATA_CAPTAIN      = 4,
+    DATA_VANESSA      = 5,
+    DATA_CANNON_EVENT = 6,
+    DATA_OAF          = 7,
 };
 
 enum GameObjects

@@ -42,7 +42,7 @@ class instance_deadmines : public InstanceMapScript
                 State = CANNON_NOT_USED;
 			};
 
-			void OnCreatureCreate(Creature *pCreature, bool)
+			void OnCreatureCreate(Creature *pCreature)
 			{
 				switch (pCreature->GetEntry())
 				{
@@ -67,7 +67,7 @@ class instance_deadmines : public InstanceMapScript
 				}
 			}
 
-			void OnGameObjectCreate(GameObject* pGo, bool)
+			void OnGameObjectCreate(GameObject* pGo)
 			{
 				switch(pGo->GetEntry())
 				{
