@@ -169,16 +169,9 @@ class boss_captain_cookie : public CreatureScript
                         events.ScheduleEvent(EVENT_CAULDRON_1, 2000);
             }
 
-            void EnterEvadeMode()
-            {
-                me->ExitVehicle();
-                ScriptedAI::EnterEvadeMode();
-            }
-
             void JustDied(Unit* killer)
             {
                 _JustDied();
-                me->ExitVehicle();
             }
 
             void UpdateAI(const uint32 diff)
@@ -204,7 +197,8 @@ class boss_captain_cookie : public CreatureScript
                             break;
                         case EVENT_CAULDRON_2:
                             if (Creature* pCauldron = me->FindNearestCreature(NPC_CAULDRON, 20.0f))
-                                me->EnterVehicle(pCauldron);
+                                //me->EnterVehicle(pCauldron);
+                                me->GetMotionMaster()->MoveJump(pCauldron->GetPositionX(), pCauldron->GetPositionX(), pCauldron->GetPositionX(), 5, 10);
                             events.ScheduleEvent(EVENT_THROW_FOOD, 3000);
                             break;
                         case EVENT_THROW_FOOD:
