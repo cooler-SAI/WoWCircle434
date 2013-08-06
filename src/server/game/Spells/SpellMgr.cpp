@@ -7282,6 +7282,9 @@ void SpellMgr::LoadDbcDataCorrections()
             case 16602: // Shahram
                 spellInfo->SetDurationIndex(4); // 120 seconds
                 break;
+            case 85509: // Denounce
+                spellInfo->Effects[0].BasePoints = -10000;
+                break;
             default:
                 break;
         }
