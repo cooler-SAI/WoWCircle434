@@ -1891,10 +1891,26 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
     // we assume that when the difficulty changes, all instances that can be reset will be
     Difficulty diff = GetDifficulty(isRaid);
 
-    for (BoundInstancesMap::iterator itr = m_boundInstances[(isRaid ? RAID_DIFFICULTY_10MAN_NORMAL : diff)].begin(); itr != m_boundInstances[(isRaid ? RAID_DIFFICULTY_10MAN_NORMAL : diff)].end();)
+    // Unload all raid maps
+    for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
+        for (BoundInstancesMap::iterator itr = m_boundInstances[i].begin(); itr != m_boundInstances[i].end(); ++ itr)
+        {
+            InstanceSave* instanceSave = itr->second.save;
+            Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
+            if (map && map->IsRaid() && method == INSTANCE_RESET_CHANGE_DIFFICULTY)
+            {
+                if (InstanceMap* map_i = map->ToInstanceMap())
+                    if (!map_i->HavePlayers())
+                        map_i->SetUnloadTimer(1);
+            }
+        }
+
+    for (BoundInstancesMap::iterator itr = m_boundInstances[diff].begin(); itr != m_boundInstances[diff].end();)
     {
         InstanceSave* instanceSave = itr->second.save;
         const MapEntry* entry = sMapStore.LookupEntry(itr->first);
+        Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
+
         if (!entry || entry->IsRaid() != isRaid || (!instanceSave->CanReset() && method != INSTANCE_RESET_GROUP_DISBAND))
         {
             ++itr;
@@ -1913,7 +1929,6 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
 
         bool isEmpty = true;
         // if the map is loaded, reset it
-        Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
         if (map && map->IsDungeon() && !(method == INSTANCE_RESET_GROUP_DISBAND && !instanceSave->CanReset()))
         {
             if (instanceSave->CanReset())
@@ -1930,13 +1945,6 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
                 SendMsgTo->SendResetInstanceFailed(0, instanceSave->GetMapId());
         }
 
-        if (map && map->IsRaid() && method == INSTANCE_RESET_CHANGE_DIFFICULTY)
-        {
-            if (InstanceMap* map_i = map->ToInstanceMap())
-                if (!map_i->HavePlayers())
-                    map_i->SetUnloadTimer(1);
-        }
-
         if (isEmpty || method == INSTANCE_RESET_GROUP_DISBAND || method == INSTANCE_RESET_CHANGE_DIFFICULTY)
         {
             // do not reset the instance, just unbind if others are permanently bound to it
@@ -1946,8 +1954,8 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
                 CharacterDatabase.PExecute("DELETE FROM group_instance WHERE instance = '%u'", instanceSave->GetInstanceId());
 
             // i don't know for sure if hash_map iterators
-            m_boundInstances[(isRaid ? RAID_DIFFICULTY_10MAN_NORMAL : diff)].erase(itr);
-            itr = m_boundInstances[(isRaid ? RAID_DIFFICULTY_10MAN_NORMAL : diff)].begin();
+            m_boundInstances[diff].erase(itr);
+            itr = m_boundInstances[diff].begin();
             // this unloads the instance save unless online players are bound to it
             // (eg. permanent binds or GM solo binds)
             instanceSave->RemoveGroup(this);
