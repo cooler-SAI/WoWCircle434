@@ -13142,7 +13142,8 @@ uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, u
     if (maxval)
         AddPct(TakenTotalMod, maxval);
 
-    if (spellProto->SpellFamilyName == SPELLFAMILY_SHAMAN)
+    if (spellProto->SpellFamilyName == SPELLFAMILY_SHAMAN 
+    || spellProto->Id == 52042) // Healing Stream Totem tick
     {
         // Nature's Blessing
         if (AuraEffect * aur = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 2012, 0))
