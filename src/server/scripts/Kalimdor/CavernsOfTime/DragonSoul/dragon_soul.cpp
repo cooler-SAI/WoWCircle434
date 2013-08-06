@@ -1162,7 +1162,7 @@ class npc_dragon_soul_thrall : public CreatureScript
                     pInstance->GetBossState(DATA_ULTRAXION) != DONE &&
                     !pInstance->GetData64(DATA_ULTRAXION))
                 {
-                    if (Creature* pUltraxion = pCreature->SummonCreature(NPC_ULTRAXION, ultraxionPos[0]))
+                    if (Creature* pUltraxion = pCreature->SummonCreature(NPC_ULTRAXION, ultraxionPos[1]))
                         pUltraxion->SetPhaseMask(17, true);
                     pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 }
@@ -1190,9 +1190,6 @@ class npc_dragon_soul_thrall : public CreatureScript
             void UpdateAI(uint32 const diff)
             {
                 events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
                 
                 if (uint32 eventId = events.ExecuteEvent())
                 {

@@ -93,15 +93,15 @@ enum Events
     EVENT_YSERA_TALK            = 2,
     EVENT_MOVE                  = 3,
     EVENT_TALK_1                = 4,
-    EVENT_CHECK_PLAYERS         = 5,
-    EVENT_UNSTABLE_MONSTROSITY  = 6,
-    EVENT_HOUR_OF_TWILIGHT      = 7,
-    EVENT_CHECK_TARGET          = 8,
-    EVENT_THRALL                = 9,
-    EVENT_ALEXTRASZA            = 10,
-    EVENT_YSERA                 = 11,
-    EVENT_KALECGOS              = 12,
-    EVENT_NOZDORMU              = 13,
+    EVENT_UNSTABLE_MONSTROSITY  = 5,
+    EVENT_HOUR_OF_TWILIGHT      = 6,
+    EVENT_CHECK_TARGET          = 7,
+    EVENT_THRALL                = 8,
+    EVENT_ALEXTRASZA            = 9,
+    EVENT_YSERA                 = 10,
+    EVENT_KALECGOS              = 11,
+    EVENT_NOZDORMU              = 12,
+    EVENT_END_TALK              = 13,
 };
 
 enum Adds
@@ -116,8 +116,6 @@ enum Actions
 {
     ACTION_TWILIGHT_ERUPTION    = 1,
 };
-
-#define POINT_MOVE 1
 
 class boss_ultraxion: public CreatureScript
 {
@@ -148,7 +146,6 @@ class boss_ultraxion: public CreatureScript
                 me->setActive(true);
                 me->SetReactState(REACT_DEFENSIVE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                checkTimer = 5000;
                 unstableCount = 0;
             }
 
@@ -196,7 +193,6 @@ class boss_ultraxion: public CreatureScript
                 DeleteGameObjects(GO_SOURCE_OF_MAGIC);
 
                 events.ScheduleEvent(EVENT_CHARGING_UP, 1000);
-                events.ScheduleEvent(EVENT_CHECK_PLAYERS, 5000);
             }
 
             void EnterCombat(Unit* who)
@@ -298,27 +294,8 @@ class boss_ultraxion: public CreatureScript
                     Talk(SAY_KILL);
             }
 
-            void MovementInform(uint32 type, uint32 data)
-            {
-                if (type == POINT_MOTION_TYPE)
-                    if (data == POINT_MOVE)
-                    {
-                        Map::PlayerList const &playerList = instance->instance->GetPlayers();
-                            if (!playerList.isEmpty())
-                                for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
-                                    if (Player* pPlayer = itr->getSource())
-                                        me->SendUpdateToPlayer(pPlayer);
-
-                        phase = 0;
-                        me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    }
-            }
-
             void UpdateAI(const uint32 diff)
             {
-                CheckPlayers(diff);
-
                 if (!UpdateVictim() && !phase)
                     return;
 
@@ -353,19 +330,17 @@ class boss_ultraxion: public CreatureScript
                         {
                             me->SetVisible(true);
 
-                            Map::PlayerList const &playerList = instance->instance->GetPlayers();
-                            if (!playerList.isEmpty())
-                                for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
-                                    if (Player* pPlayer = itr->getSource())
-                                        me->SendUpdateToPlayer(pPlayer);
-
                             Talk(SAY_INTRO_1);
-                            me->GetMotionMaster()->MovePoint(POINT_MOVE, ultraxionPos[1]);
                             events.ScheduleEvent(EVENT_TALK_1, 13000);
                             break;
                         }
                         case EVENT_TALK_1:
                             Talk(SAY_INTRO_2);
+                            events.ScheduleEvent(EVENT_END_TALK, 10000);
+                            break;
+                        case EVENT_END_TALK:
+                            phase = 0;
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             break;
                         case EVENT_CHECK_TARGET:
                             if (!me->IsWithinMeleeRange(me->getVictim()))
@@ -465,58 +440,6 @@ class boss_ultraxion: public CreatureScript
 
             uint8 unstableCount;
             uint8 phase;
-            uint32 checkTimer;
-
-            void CheckPlayers(const uint32 diff)
-            {
-                if (checkTimer <= diff)
-                {
-                    if (!me->FindNearestPlayer(300.0f))
-                    {
-                        checkTimer = 300000;
-                        events.Reset();
-
-                        if (Creature* pThrall = me->FindNearestCreature(NPC_THRALL_1, 300.0f))
-                        {
-                            pThrall->InterruptNonMeleeSpells(true);
-                            pThrall->RemoveAllAuras();
-                            pThrall->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                        }
-                        if (Creature* pYsera = me->FindNearestCreature(NPC_YSERA_THE_AWAKENED, 300.0f))
-                        {
-                            pYsera->InterruptNonMeleeSpells(true);
-                            pYsera->RemoveAllAuras();
-                        }
-                        if (Creature* pAlextrasza = me->FindNearestCreature(NPC_ALEXTRASZA_THE_LIFE_BINDER, 300.0f))
-                        {
-                            pAlextrasza->InterruptNonMeleeSpells(true);
-                            pAlextrasza->RemoveAllAuras();
-                        }
-                        if (Creature* pNozdormu = me->FindNearestCreature(NPC_NOZDORMU_THE_TIMELESS_ONE, 300.0f))
-                        {
-                            pNozdormu->InterruptNonMeleeSpells(true);
-                            pNozdormu->RemoveAllAuras();
-                        }
-                        if (Creature* pKalecgos = me->FindNearestCreature(NPC_KALECGOS, 300.0f))
-                        {
-                            pKalecgos->InterruptNonMeleeSpells(true);
-                            pKalecgos->RemoveAllAuras();
-                        }
-
-                        RemoveEncounterAuras();
-                        DeleteGameObjects(GO_GIFT_OF_LIFE);
-                        DeleteGameObjects(GO_ESSENCE_OF_DREAMS);
-                        DeleteGameObjects(GO_SOURCE_OF_MAGIC);
-
-                        instance->SetBossState(DATA_ULTRAXION, NOT_STARTED);
-                        me->DespawnOrUnsummon(3000);
-                        return;
-                    }
-                    checkTimer = 5000;
-                }
-                else
-                    checkTimer -= diff;
-            }
 
             void DespawnCreatures(uint32 entry)
             {
