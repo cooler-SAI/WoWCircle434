@@ -1134,6 +1134,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 m_fixed_periodic.SetFixedDamage(temp_damage);
                 m_fixed_periodic.SetCriticalChance(temp_crit);
                 hasFixedPeriodic = true;
+                amount = temp_damage;
             }
         }
     }
