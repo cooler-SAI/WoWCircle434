@@ -12197,7 +12197,10 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
             // Revealing Strike for direct damage abilities
             if (spellProto->AttributesEx & SPELL_ATTR1_REQ_COMBO_POINTS1 && damagetype != DOT)
                 if (AuraEffect* aurEff = victim->GetAuraEffect(84617, 2, GetGUID()))
+                {
                     DoneTotalMod *= (100.0f + aurEff->GetAmount()) / 100.0f;
+                    victim->RemoveAura(aurEff->GetBase());
+                }
             break;
         }
         case SPELLFAMILY_MAGE:
