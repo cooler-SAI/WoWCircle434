@@ -4113,9 +4113,9 @@ void SpellMgr::LoadDbcDataCorrections()
             // ENDOF THRONE OF THE TIDES SPELLS
             //
             // DEADMINES SPELLS
-            // Captain Cookie
-            case 89250: // Summon Cauldron
-                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+            // Admiral Ripsnarl
+            case 88840: // Vanish
+                spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(125);
                 break;
             // ENDOF DEADMINES
             // BLACKROCK CAVERNS SPELLS
@@ -7207,6 +7207,9 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 81093: // 
                 spellInfo->ProcCharges = 1;
+                break;
+            case 96619: // Rupture Line (Grilek)
+                spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13);
                 break;
             default:
                 break;

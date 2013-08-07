@@ -169,8 +169,10 @@ class instance_lost_city_of_the_tolvir : public InstanceMapScript
                 Encounter[type] = data;
 
                 bool SiamatAvailable = (GetData(DATA_GENERAL_HUSAM)==DONE) && (GetData(DATA_LOCKMAW)==DONE) && (GetData(DATA_HIGH_PROPHET_BARIM)==DONE);
+                bool SiamatAvailableHeroic = (GetData(DATA_GENERAL_HUSAM)==DONE) && (GetData(DATA_LOCKMAW)==DONE) && (GetData(DATA_AUGH)==DONE) && (GetData(DATA_HIGH_PROPHET_BARIM)==DONE);
+                bool IsHeroic = instance->GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC;
 
-                if (SiamatAvailable)
+                if (IsHeroic && SiamatAvailableHeroic || !IsHeroic && SiamatAvailable)
                     if (Encounter[DATA_SIAMAT] != DONE)
                         BosesIsDone = true;
 

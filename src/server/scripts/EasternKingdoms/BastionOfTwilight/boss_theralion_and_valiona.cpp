@@ -480,6 +480,7 @@ class boss_theralion : public CreatureScript
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_ZONE_DMG_25H);
                 me->SetCanFly(false);
                 me->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
+                me->GetMotionMaster()->MoveFall();
                 summons.DespawnAll();
                 Talk(SAY_THERALION_DEATH);
                 instance->SetData(DATA_HEALTH_VALIONA_THERALION, 0);
@@ -748,6 +749,7 @@ class boss_valiona : public CreatureScript
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_ZONE_DMG_25H);
                 me->SetCanFly(false);
                 me->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
+                me->GetMotionMaster()->MoveFall();
                 summons.DespawnAll();
                 Talk(SAY_VALIONA_DEATH);
                 instance->SetData(DATA_HEALTH_VALIONA_THERALION, 0);

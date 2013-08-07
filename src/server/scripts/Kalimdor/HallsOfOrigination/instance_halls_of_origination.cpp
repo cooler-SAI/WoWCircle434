@@ -106,6 +106,10 @@ class instance_halls_of_origination : public InstanceMapScript
                 {
                     case GO_ORIGINATION_ELEVATOR:
                         uiOriginationElevatorGUID = go->GetGUID();
+                        if (GetBossState(DATA_ANRAPHET) != DONE)
+                            go->Delete();
+                        else
+                            uiOriginationElevatorGUID = go->GetGUID();
                         break;
                     case GO_ANHUUR_BRIDGE:
                     case GO_ANHUUR_ELEVATOR:

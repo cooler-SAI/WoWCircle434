@@ -501,12 +501,10 @@ class instance_icecrown_citadel : public InstanceMapScript
                             AddDoor(go, true);
                         break;
                     case GO_LADY_DEATHWHISPER_ELEVATOR:
-                        LadyDeathwisperElevatorGUID = go->GetGUID();
-                        /* if (GetBossState(DATA_LADY_DEATHWHISPER) == DONE)
-                        {
-                            go->SetUInt32Value(GAMEOBJECT_LEVEL, 0);
-                            go->SetGoState(GO_STATE_READY);
-                        } */
+                        if (GetBossState(DATA_LADY_DEATHWHISPER) != DONE)
+                            go->Delete();
+                        else
+                            LadyDeathwisperElevatorGUID = go->GetGUID();
                         break;
                     case GO_SAURFANG_S_DOOR:
                         DeathbringerSaurfangDoorGUID = go->GetGUID();

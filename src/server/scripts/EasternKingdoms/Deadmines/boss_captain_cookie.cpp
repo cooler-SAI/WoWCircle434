@@ -1,4 +1,6 @@
 #include "ScriptPCH.h"
+#include "LFGMgr.h"
+#include "Group.h"
 #include "deadmines.h"
 
 enum Spells
@@ -9,40 +11,24 @@ enum Spells
     SPELL_NAUSEATED         = 89732,
     SPELL_NAUSEATED_H       = 92066,
     SPELL_ROTTEN_AURA       = 89734,
-    SPELL_ROTTEN_AURA_H     = 95513,
     SPELL_ROTTEN_AURA_DMG   = 89734,
-    SPELL_ROTTEN_AURA_DMG_H = 92065,
     SPELL_CAULDRON          = 89250,
     SPELL_CAULDRON_VISUAL   = 89251,
     SPELL_CAULDRON_FIRE     = 89252,
 
-
     SPELL_THROW_FOOD_01     = 90557,
-    SPELL_THROW_FOOD_01_H   = 92059,
     SPELL_THROW_FOOD_02     = 90560,
-    SPELL_THROW_FOOD_02_H   = 92060,
     SPELL_THROW_FOOD_03     = 90603,
-    SPELL_THROW_FOOD_03_H   = 92840,
     SPELL_THROW_FOOD_04     = 89739,
-    SPELL_THROW_FOOD_04_H   = 92838,
     SPELL_THROW_FOOD_05     = 90605,
-    SPELL_THROW_FOOD_05_H   = 92844,
     SPELL_THROW_FOOD_06     = 90556,
-    SPELL_THROW_FOOD_06_H   = 92058,
     SPELL_THROW_FOOD_07     = 90680,
-    SPELL_THROW_FOOD_07_H   = 92842,
     SPELL_THROW_FOOD_08     = 90559,
-    SPELL_THROW_FOOD_08_H   = 92062,
     SPELL_THROW_FOOD_09     = 90602,
-    SPELL_THROW_FOOD_09_H   = 92841,
     SPELL_THROW_FOOD_10     = 89263,
-    SPELL_THROW_FOOD_10_H   = 92057,
     SPELL_THROW_FOOD_11     = 90604,
-    SPELL_THROW_FOOD_11_H   = 92839,
     SPELL_THROW_FOOD_12     = 90555,
-    SPELL_THROW_FOOD_12_H   = 92063,
     SPELL_THROW_FOOD_13     = 90606,
-    SPELL_THROW_FOOD_13_H   = 92843,
 };
 
 enum Adds
@@ -68,12 +54,29 @@ enum Adds
 
 enum Events
 {
-    EVENT_THROW_FOOD    = 1,
+    EVENT_THROW_FOOD        = 1,
 };
 
 const Position notePos = {-74.3611f, -820.014f, 40.3714f, 0.0f};
 
-const Position captaincookiePos = {-64.07f, -820.27f, 41.17f, 0.0f};
+const uint32 GOOD_FOOD[] = {
+    SPELL_THROW_FOOD_01,
+    SPELL_THROW_FOOD_02,
+    SPELL_THROW_FOOD_06,
+    SPELL_THROW_FOOD_07,
+    SPELL_THROW_FOOD_08,
+    SPELL_THROW_FOOD_10,
+    SPELL_THROW_FOOD_12,
+};
+const uint32 BAD_FOOD[] = {
+    SPELL_THROW_FOOD_03,
+    SPELL_THROW_FOOD_04,
+    SPELL_THROW_FOOD_05,
+    SPELL_THROW_FOOD_07,
+    SPELL_THROW_FOOD_09,
+    SPELL_THROW_FOOD_11,
+    SPELL_THROW_FOOD_13,
+};
 
 class boss_captain_cookie : public CreatureScript
 {
@@ -101,39 +104,47 @@ class boss_captain_cookie : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-                me->SetReactState(REACT_PASSIVE);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                if (instance->GetBossState(DATA_ADMIRAL) == DONE)
+                    me->SetReactState(REACT_AGGRESSIVE);
+                else
+                    me->SetReactState(REACT_PASSIVE);
+                DoCast(SPELL_WHO_IS_THAT);
                 me->setActive(true);
             }
 
             void Reset()
             {
                 _Reset();
-                DoCast(SPELL_WHO_IS_THAT);
-            }
-
-            void MoveInLineOfSight(Unit* who)
-            {
-                if (instance->GetBossState(DATA_ADMIRAL) != DONE)
-                    return;
-
-                if (me->GetDistance(who) > 5.0f)
-                    return;
-
-                DoZoneInCombat();
+                nextFoodWillBeGood = false;
             }
 
             void EnterCombat(Unit* who)
             {
-                me->RemoveAurasDueToSpell(SPELL_WHO_IS_THAT);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                //me->GetMotionMaster()->MoveJump(captaincookiePos.GetPositionX(), captaincookiePos.GetPositionY(), captaincookiePos.GetPositionZ(), 40.0f, 20.0f);
-                me->CastSpell(centershipPos.GetPositionX(), centershipPos.GetPositionY(), centershipPos.GetPositionZ(), SPELL_CAULDRON, true);
+                if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                {
+                    me->RemoveAurasDueToSpell(SPELL_WHO_IS_THAT);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                    DoCastAOE(SPELL_CAULDRON, true);
+                }
                 events.ScheduleEvent(EVENT_THROW_FOOD, 5000);
                 instance->SetBossState(DATA_CAPTAIN, IN_PROGRESS);
             }
 
             void JustDied(Unit* killer)
             {
+                Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                if (!players.isEmpty())
+                {
+                    Player* pPlayer = players.begin()->getSource();
+                    if (pPlayer && pPlayer->GetGroup())
+                        sLFGMgr->FinishDungeon(pPlayer->GetGroup()->GetGUID(), 326);
+                }
+                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    if (Player* pPlayer = itr->getSource())
+                        pPlayer->CompletedAchievement(sAchievementMgr->GetAchievement(IsHeroic() ? 5083 : 628));
+
                 _JustDied();
             }
 
@@ -154,55 +165,34 @@ class boss_captain_cookie : public CreatureScript
                         case EVENT_THROW_FOOD:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             {
-                                switch (urand(1, 13))
-                                {
-                                case 1:
-                                    DoCast(target, DUNGEON_MODE(SPELL_THROW_FOOD_01, SPELL_THROW_FOOD_01_H));
-                                    break;
-                                case 2:
-                                    DoCast(target, DUNGEON_MODE(SPELL_THROW_FOOD_02, SPELL_THROW_FOOD_02_H));
-                                    break;
-                                case 3:
-                                    DoCast(target, DUNGEON_MODE(SPELL_THROW_FOOD_03, SPELL_THROW_FOOD_03_H));
-                                    break;
-                                case 4:
-                                    DoCast(target, DUNGEON_MODE(SPELL_THROW_FOOD_04, SPELL_THROW_FOOD_04_H));
-                                    break;
-                                case 5:
-                                    DoCast(target, DUNGEON_MODE(SPELL_THROW_FOOD_05, SPELL_THROW_FOOD_05_H));
-                                    break;
-                                case 6:
-                                    DoCast(target, DUNGEON_MODE(SPELL_THROW_FOOD_06, SPELL_THROW_FOOD_06_H));
-                                    break;
-                                case 7:
-                                    // саммонится непонятный мурлок, пока отключу
-                                    //DoCast(target, DUNGEON_MODE(SPELL_THROW_FOOD_07, SPELL_THROW_FOOD_07_H));
-                                    //break;
-                                case 8:
-                                    DoCast(target, DUNGEON_MODE(SPELL_THROW_FOOD_08, SPELL_THROW_FOOD_08_H));
-                                    break;
-                                case 9:
-                                    DoCast(target, DUNGEON_MODE(SPELL_THROW_FOOD_09, SPELL_THROW_FOOD_09_H));
-                                    break;
-                                case 10:
-                                    DoCast(target, DUNGEON_MODE(SPELL_THROW_FOOD_10, SPELL_THROW_FOOD_10_H));
-                                    break;
-                                case 11:
-                                    DoCast(target, DUNGEON_MODE(SPELL_THROW_FOOD_11, SPELL_THROW_FOOD_11_H));
-                                    break;
-                                case 12:
-                                    DoCast(target, DUNGEON_MODE(SPELL_THROW_FOOD_12, SPELL_THROW_FOOD_12_H));
-                                    break;
-                                case 13:
-                                    DoCast(target, DUNGEON_MODE(SPELL_THROW_FOOD_13, SPELL_THROW_FOOD_13_H));
-                                    break;
-                                }
+                                uint32 nextFoodIndex = urand(0, 6);
+                                if (nextFoodWillBeGood)
+                                    DoCast(target, GOOD_FOOD[nextFoodIndex]);
+                                else
+                                    DoCast(target, BAD_FOOD[nextFoodIndex]);
+                                nextFoodWillBeGood = !nextFoodWillBeGood;
                             }
                             events.ScheduleEvent(EVENT_THROW_FOOD, 2100);
                             break;
                     }
                 }
             }
+
+            void MovementInform(uint32 type, uint32 id)
+            {
+                switch (id)
+                {
+                case POINT_CAPTAIN_ENTER_DECK:
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->RemoveAurasDueToSpell(SPELL_WHO_IS_THAT);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                    DoCastAOE(SPELL_CAULDRON, true);
+                    break;
+                }
+            }
+        protected:
+            bool nextFoodWillBeGood;
         };
 };
 
@@ -235,7 +225,7 @@ class npc_captain_cookie_cauldron : public CreatureScript
                 uiSeatTimer = 1000;
             }
 
-            void EnterCombat(Unit* /*who*/) {}
+            void EnterCombat(Unit* /*who*/) { }
 
             void UpdateAI(const uint32 diff) 
             {
@@ -269,7 +259,7 @@ class npc_captain_cookie_good_food : public CreatureScript
             InstanceScript* pInstance = pCreature->GetInstanceScript();
             if (!pInstance)
                 return false;
-            if (pInstance->GetData(DATA_CAPTAIN) != IN_PROGRESS)
+            if (pInstance->GetBossState(DATA_CAPTAIN) != IN_PROGRESS)
                 return false;
             switch (pInstance->instance->GetDifficulty())
             {
@@ -298,8 +288,6 @@ class npc_captain_cookie_good_food : public CreatureScript
             {
                 if (!pInstance)
                     return;
-
-                DoCast(DUNGEON_MODE(SPELL_ROTTEN_AURA, SPELL_ROTTEN_AURA_H));
             }
 
             void JustDied(Unit* killer)
@@ -314,7 +302,7 @@ class npc_captain_cookie_good_food : public CreatureScript
                 if (!pInstance)
                     return;
 
-                if (pInstance->GetData(DATA_CAPTAIN) != IN_PROGRESS)
+                if (pInstance->GetBossState(DATA_CAPTAIN) != IN_PROGRESS)
                     me->DespawnOrUnsummon();
             }
      
@@ -336,7 +324,7 @@ class npc_captain_cookie_bad_food : public CreatureScript
             InstanceScript* pInstance = pCreature->GetInstanceScript();
             if (!pInstance)
                 return false;
-            if (pInstance->GetData(DATA_CAPTAIN) != IN_PROGRESS)
+            if (pInstance->GetBossState(DATA_CAPTAIN) != IN_PROGRESS)
                 return false;
             switch (pInstance->instance->GetDifficulty())
             {
@@ -365,6 +353,8 @@ class npc_captain_cookie_bad_food : public CreatureScript
             {
                 if (!pInstance)
                     return;
+
+                DoCast(SPELL_ROTTEN_AURA);
             }
 
             void JustDied(Unit* killer)
@@ -379,7 +369,7 @@ class npc_captain_cookie_bad_food : public CreatureScript
                 if (!pInstance)
                     return;
 
-                if (pInstance->GetData(DATA_CAPTAIN) != IN_PROGRESS)
+                if (pInstance->GetBossState(DATA_CAPTAIN) != IN_PROGRESS)
                     me->DespawnOrUnsummon();
             }
      

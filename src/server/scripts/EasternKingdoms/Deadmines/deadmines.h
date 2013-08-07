@@ -66,6 +66,14 @@ enum Sounds
     SOUND_DESTROYDOOR = 3079,
 };
 
+enum InstancePoints
+{
+    POINT_CAPTAIN_ENTER_DECK    = 1,
+};
+
 const Position centershipPos = {-63.167f, -819.315f, 41.27f, 6.25f};
+
+const Position captaincookieEnterPos = {-74.3611f, -820.014f, 40.3714f, 0.0f}; // TODO: CHANGE!
+const Position captaincookiePos = {-64.07f, -820.27f, 41.17f, 0.0f};
 
 #endif

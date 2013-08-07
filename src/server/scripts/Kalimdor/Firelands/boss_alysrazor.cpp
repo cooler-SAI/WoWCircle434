@@ -240,10 +240,10 @@ Position const initiatePos[8] =
 
 Position const wormPos[4] = 
 {
-	{-24.179f, -311.185f, 53.12f, 1.0f},
-	{-75.952f, -296.170f, 55.57f, 4.0f},
-	{-71.017f, -255.195f, 55.80f, 0.2f},
-	{-17.180f, -257.636f, 55.15f, 2.0f},
+    {-24.179f, -311.185f, 53.12f, 1.0f},
+    {-75.952f, -296.170f, 55.57f, 4.0f},
+    {-71.017f, -255.195f, 55.80f, 0.2f},
+    {-17.180f, -257.636f, 55.15f, 2.0f},
 };
 
 const Position broodmotherPos[6] =
@@ -1749,14 +1749,14 @@ class spell_alysrazor_molten_feather : public SpellScriptLoader
         {
             PrepareAuraScript(spell_alysrazor_molten_feather_AuraScript);
 
-			void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
                 if (!GetTarget())
                     return;
 
-				//GetTarget()->SetPower(POWER_ALTERNATE_POWER, 0);
+                //GetTarget()->SetPower(POWER_ALTERNATE_POWER, 0);
 
-				if (GetTarget()->HasAura(SPELL_MOLTEN_FEATHER_PRI))
+                if (GetTarget()->HasAura(SPELL_MOLTEN_FEATHER_PRI))
                     GetTarget()->RemoveAura(SPELL_MOLTEN_FEATHER_PRI);
                 if (GetTarget()->HasAura(SPELL_MOLTEN_FEATHER_MAG))
                     GetTarget()->RemoveAura(SPELL_MOLTEN_FEATHER_MAG);
@@ -1780,7 +1780,7 @@ class spell_alysrazor_molten_feather : public SpellScriptLoader
 
             void Register()
             {
-				AfterEffectRemove += AuraEffectRemoveFn(spell_alysrazor_molten_feather_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_MOD_INCREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+                AfterEffectRemove += AuraEffectRemoveFn(spell_alysrazor_molten_feather_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_MOD_INCREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
             }
         };
 

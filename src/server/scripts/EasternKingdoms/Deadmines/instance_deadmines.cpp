@@ -83,6 +83,11 @@ class instance_deadmines : public InstanceMapScript
                         break;
                     case NPC_CAPTAIN_COOKIE:
                         uiCaptainGUID = pCreature->GetGUID();
+                        if (GetBossState(DATA_ADMIRAL) == DONE)
+                        {
+                            pCreature->NearTeleportTo(captaincookieEnterPos.GetPositionX(), captaincookieEnterPos.GetPositionY(), captaincookieEnterPos.GetPositionZ(), captaincookieEnterPos.GetOrientation());
+                            pCreature->SetReactState(REACT_AGGRESSIVE);
+                        }
                         break;
                     case NPC_KAGTHA:
                         if (TeamInInstance == ALLIANCE)
@@ -242,6 +247,10 @@ class instance_deadmines : public InstanceMapScript
                         if (GameObject* go = instance->GetGameObject(HeavyDoor2GUID))
                             go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     break;
+                case DATA_ADMIRAL:
+                    if (state == DONE)
+                        if (Creature* cookie = instance->GetCreature(uiCaptainGUID))
+                            cookie->GetMotionMaster()->MovePoint(POINT_CAPTAIN_ENTER_DECK, captaincookieEnterPos);
                 }
 
                 return true;
