@@ -13142,8 +13142,7 @@ uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, u
     if (maxval)
         AddPct(TakenTotalMod, maxval);
 
-    if (spellProto->SpellFamilyName == SPELLFAMILY_SHAMAN 
-    || spellProto->Id == 52042) // Healing Stream Totem tick
+    if (spellProto->SpellFamilyName == SPELLFAMILY_SHAMAN)
     {
         // Nature's Blessing
         if (AuraEffect * aur = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, 2012, 0))
@@ -13210,7 +13209,9 @@ uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, u
 
     // Deep Healing, Mastery Shaman
     if (caster)
-        if (spellProto->SpellFamilyName == SPELLFAMILY_SHAMAN)
+        if (spellProto->SpellFamilyName == SPELLFAMILY_SHAMAN
+            || spellProto->Id == 52042) // Healing Stream Totem tick
+        {
             if (Aura* deepHealing = caster->GetAura(77226))
             {
                 float effectAmount = float(deepHealing->GetEffect(0)->GetAmount());
@@ -13220,6 +13221,7 @@ uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, u
                 float amount_pct = mod * effectAmount / 100.0f;
                 AddPct(TakenTotalMod, amount_pct);
             }
+        }
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {

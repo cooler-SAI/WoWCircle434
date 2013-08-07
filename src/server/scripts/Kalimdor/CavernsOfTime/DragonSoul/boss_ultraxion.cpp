@@ -417,8 +417,6 @@ class boss_ultraxion: public CreatureScript
                             {
                                 Talk(SAY_BERSERK);
                                 DoCast(SPELL_TWILIGHT_ERUPTION);
-                                me->DespawnOrUnsummon(8000);
-                                return;
                             }
                             else
                                 events.ScheduleEvent(EVENT_UNSTABLE_MONSTROSITY, MINUTE * IN_MILLISECONDS);

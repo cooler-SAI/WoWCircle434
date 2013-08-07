@@ -6433,6 +6433,9 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
                 break;
             case 106371: // Hour of Twilight
+            case 109415:
+            case 109416:
+            case 109417:
                 spellInfo->Effects[EFFECT_0].TriggerSpell = 103327;
                 spellInfo->Effects[EFFECT_1].TriggerSpell = 106174;
                 break;

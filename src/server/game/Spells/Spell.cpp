@@ -6551,7 +6551,7 @@ SpellCastResult Spell::CheckRange(bool strict)
 
         if (range_type == SPELL_RANGE_RANGED)
         {
-            if (m_caster->IsWithinMeleeRange(target))
+            if (m_caster->IsWithinMeleeRange(target) && target->GetEntry() != 55294) // Ultraxion
                 return !(_triggeredCastFlags & TRIGGERED_DONT_REPORT_CAST_ERROR) ? SPELL_FAILED_TOO_CLOSE : SPELL_FAILED_DONT_REPORT;
         }
         else if (min_range && m_caster->IsWithinCombatRange(target, min_range)) // skip this check if min_range = 0

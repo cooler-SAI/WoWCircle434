@@ -847,6 +847,7 @@ class boss_hagara_the_stormbinder: public CreatureScript
                 events.CancelEvent(EVENT_WATERY_ENTRENCHMENT);
                 events.CancelEvent(EVENT_STORM_PILLARS);
                 events.CancelEvent(EVENT_FROSTFLAKE);
+                events.CancelEvent(EVENT_END_SPECIAL_PHASE);
 
                 me->RemoveAura(RAID_MODE(SPELL_WATER_SHIELD, SPELL_WATER_SHIELD_25, SPELL_WATER_SHIELD_10H, SPELL_WATER_SHIELD_25H));
                 me->RemoveAura(RAID_MODE(SPELL_FROZEN_TEMPEST, SPELL_FROZEN_TEMPEST_25, SPELL_FROZEN_TEMPEST_10H, SPELL_FROZEN_TEMPEST_25H));
