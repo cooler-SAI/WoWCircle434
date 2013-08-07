@@ -41,7 +41,8 @@ enum WarriorSpells
     SPELL_BLOODTHIRST                       = 23885,
     SPELL_VICTORY_RUSH                      = 34428,
     SPELL_VICTORY_RUSH_AURA                 = 82368,
-    SPELL_VICTORY_RUSH_AURA_TWO             = 32216
+    SPELL_VICTORY_RUSH_AURA_TWO             = 32216,
+    SPELL_COLOSSUS_SMASH                    = 86346
 };
 
 /// Updated 4.3.4
@@ -363,6 +364,44 @@ public:
     }
 };
 
+class spell_warr_colossus_smash : public SpellScriptLoader
+{
+public:
+    spell_warr_colossus_smash() : SpellScriptLoader("spell_warr_colossus_smash") { }
+
+    class spell_warr_colossus_smash_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_warr_colossus_smash_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellEntry*/)
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_COLOSSUS_SMASH))
+                return false;
+            return true;
+        }
+
+        void HandleAfterHit()
+        {
+            Unit * caster = GetCaster();
+            Unit * target = GetHitUnit();
+            if (caster && target)
+            {
+                caster->AddAura(SPELL_COLOSSUS_SMASH, target);
+            }
+        }
+
+        void Register()
+        {
+            AfterHit += SpellHitFn(spell_warr_colossus_smash_SpellScript::HandleAfterHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_warr_colossus_smash_SpellScript();
+    }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     new spell_warr_last_stand();
@@ -373,4 +412,5 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_bloodthirst();
     new spell_warr_whirlwind();
     new spell_warr_victory_rush();
+    new spell_warr_colossus_smash();
 }
