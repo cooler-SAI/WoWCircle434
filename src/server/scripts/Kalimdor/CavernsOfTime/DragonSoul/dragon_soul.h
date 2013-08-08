@@ -13,13 +13,18 @@
 
 enum Datas
 {
-    DATA_MORCHOK        = 0,
-    DATA_YORSAHJ        = 1,
-    DATA_ZONOZZ         = 2,
-    DATA_HAGARA         = 3,
-    DATA_ULTRAXION      = 4,
-    DATA_KOHCROM        = 10,
-    DATA_HAGARA_EVENT   = 11,
+    DATA_MORCHOK            = 0,
+    DATA_YORSAHJ            = 1,
+    DATA_ZONOZZ             = 2,
+    DATA_HAGARA             = 3,
+    DATA_ULTRAXION          = 4,
+    DATA_BLACKHORN          = 5,
+    DATA_KOHCROM            = 10,
+    DATA_HAGARA_EVENT       = 11,
+    DATA_LESSER_CACHE_10N   = 12,
+    DATA_LESSER_CACHE_25N   = 13,
+    DATA_LESSER_CACHE_10H   = 14,
+    DATA_LESSER_CACHE_25H   = 15,
 };
 
 enum CreatureIds
@@ -30,6 +35,8 @@ enum CreatureIds
     NPC_ZONOZZ                      = 55308,
     NPC_HAGARA                      = 55689,
     NPC_ULTRAXION                   = 55294,
+    NPC_BLACKHORN                   = 56427,
+    NPC_GORIONA                     = 56781,
 
     NPC_NETHESTRASZ                 = 57287, // teleport upstairs
     NPC_EIENDORMI                   = 57288, // teleport to Yor'sahj
@@ -51,8 +58,13 @@ enum CreatureIds
 
 enum GameObjects
 {
-    GO_INNER_WALL           = 209596,
-    GO_THE_FOCUSING_IRIS    = 210132,
+    GO_INNER_WALL                       = 209596,
+    GO_THE_FOCUSING_IRIS                = 210132,
+    GO_LESSER_CACHE_OF_THE_ASPECTS_LFR  = 210221,
+    GO_LESSER_CACHE_OF_THE_ASPECTS_10N  = 210160,
+    GO_LESSER_CACHE_OF_THE_ASPECTS_25N  = 210161,
+    GO_LESSER_CACHE_OF_THE_ASPECTS_10H  = 210162,
+    GO_LESSER_CACHE_OF_THE_ASPECTS_25H  = 210163,
 };
 
 enum SharedSpells
@@ -84,7 +96,7 @@ const Position teleportPos[5] =
 const Position ultraxionPos[2] = 
 {
     {-1564.f, -2369.f, 250.083f, 3.28122f}, // spawn
-    {-1699.469971f, -2388.030029f, 340.192993f, 3.21552f} // move to
+    {-1699.469971f, -2388.030029f, 355.192993f, 3.21552f} // move to
 };
 
 #endif

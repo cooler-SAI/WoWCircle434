@@ -286,6 +286,22 @@ class boss_ultraxion: public CreatureScript
                     pKalecgos->InterruptNonMeleeSpells(true);
                     pKalecgos->RemoveAllAuras();
                 }
+
+                switch (GetDifficulty())
+                {
+                    case RAID_DIFFICULTY_10MAN_NORMAL:
+                        instance->DoRespawnGameObject(instance->GetData64(DATA_LESSER_CACHE_10N), DAY);
+                        break;
+                    case RAID_DIFFICULTY_25MAN_NORMAL:
+                        instance->DoRespawnGameObject(instance->GetData64(DATA_LESSER_CACHE_25N), DAY);
+                        break;
+                    case RAID_DIFFICULTY_10MAN_HEROIC:
+                        instance->DoRespawnGameObject(instance->GetData64(DATA_LESSER_CACHE_10H), DAY);
+                        break;
+                    case RAID_DIFFICULTY_25MAN_HEROIC:
+                        instance->DoRespawnGameObject(instance->GetData64(DATA_LESSER_CACHE_25H), DAY);
+                        break;
+                }
             }
 
             void KilledUnit(Unit* victim)
@@ -498,6 +514,9 @@ class spell_ultraxion_twilight_instability : public SpellScriptLoader
                 if (!GetCaster() || !GetHitUnit())
                     return;
 
+                if (GetCaster()->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
                 GetCaster()->CastSpell(GetHitUnit(), SPELL_TWILIGHT_INSTABILITY_DMG, true);
             }
 
@@ -636,7 +655,7 @@ class spell_ultraxion_fading_light : public SpellScriptLoader
 
                 Aura* aura = aurEff->GetBase();
 
-                uint32 duration = urand((GetCaster()->GetMap()->IsHeroic() ? 3000 : 5000), 10000);
+                uint32 duration = urand((GetCaster()->GetMap()->IsHeroic() ? 3000 : 5000), 9000);
                 aura->SetDuration(duration);
                 aura->SetMaxDuration(duration);
             }
@@ -644,8 +663,12 @@ class spell_ultraxion_fading_light : public SpellScriptLoader
             void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
                 if (GetTarget())
+                {    
                     if (GetTarget()->HasAura(SPELL_TWILIGHT_SHIFT))
                         GetTarget()->CastSpell(GetTarget(), SPELL_FADING_LIGHT_KILL, true);
+                    else if (GetTarget()->HasAura(SPELL_HEROIC_WILL))
+                        GetTarget()->CastSpell(GetTarget(), SPELL_TWILIGHT_SHIFT, true);
+                }
             }
 
             void Register()
