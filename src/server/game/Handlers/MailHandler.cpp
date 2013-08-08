@@ -645,8 +645,6 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
             if (ObjectMgr::CheckPlayerName(senderName, false) != CHAR_NAME_SUCCESS)
                 continue;
         }
-        else
-            continue;
 
         // skip deleted or not delivered (deliver delay not expired) mails
         if ((*itr)->state == MAIL_STATE_DELETED || cur_time < (*itr)->deliver_time)
