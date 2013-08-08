@@ -130,6 +130,15 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     Player* player = _player;
 
+    // not send if sender name is not valid
+    std::string senderName(player->GetName());
+    
+    if (!normalizePlayerName(senderName))
+        return;
+            
+    if (ObjectMgr::CheckPlayerName(senderName, false) != CHAR_NAME_SUCCESS)
+        return;
+
     if (player->getLevel() < sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ))
     {
         SendNotification(GetTrinityString(LANG_MAIL_SENDER_REQ), sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ));
@@ -625,6 +634,19 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
             realCount += 1;
             continue;
         }
+
+        // skip if sender name is not valid
+        if (Player * sender = sObjectMgr->GetPlayerByLowGUID((*itr)->sender))
+        {
+            std::string senderName(sender->GetName());
+            if (!normalizePlayerName(senderName))
+                continue;
+            
+            if (ObjectMgr::CheckPlayerName(senderName, false) != CHAR_NAME_SUCCESS)
+                continue;
+        }
+        else
+            continue;
 
         // skip deleted or not delivered (deliver delay not expired) mails
         if ((*itr)->state == MAIL_STATE_DELETED || cur_time < (*itr)->deliver_time)
