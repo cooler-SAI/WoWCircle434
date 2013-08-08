@@ -599,7 +599,7 @@ private:
         bool operator < (const RankInfo& rank) const { return m_rights > rank.GetRights(); }
         bool operator == (const RankInfo& rank) const { return m_rights == rank.GetRights(); }
 
-        uint32 GetBankMoneyPerDay() const { return m_rankId == GR_GUILDMASTER ? GUILD_WITHDRAW_MONEY_UNLIMITED : m_bankMoneyPerDay; }
+        uint32 GetBankMoneyPerDay() const { return m_rankId == GR_GUILDMASTER ? GUILD_WITHDRAW_MONEY_UNLIMITED : m_bankMoneyPerDay * 10000; }
         void SetBankMoneyPerDay(uint32 money);
 
         inline uint32 GetBankTabRights(uint8 tabId) const { return tabId < GUILD_BANK_MAX_TABS ? m_bankTabRightsAndSlots[tabId].rights : 0; }

@@ -1438,7 +1438,7 @@ void Guild::HandleGuildRanks(WorldSession* session) const
             rankData << uint32(rankInfo->GetBankTabRights(j));
         }
 
-        rankData << uint32(rankInfo->GetBankMoneyPerDay());
+        rankData << uint32(rankInfo->GetBankMoneyPerDay() / 10000);
         rankData << uint32(rankInfo->GetRights());
         rankData << WriteBuffer(rankInfo->GetName().c_str(), nameSize);
 
