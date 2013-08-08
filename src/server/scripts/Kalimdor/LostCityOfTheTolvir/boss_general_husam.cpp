@@ -138,11 +138,11 @@ public:
             lSummons.Summon(summoned);
         }
 
-		void KilledUnit(Unit* victim)
-		{
-			if (victim->GetTypeId() == TYPEID_PLAYER)
-			Talk(YELL_KILL_PLAYER);
-		}
+        void KilledUnit(Unit* victim)
+        {
+            if (victim->GetTypeId() == TYPEID_PLAYER)
+            Talk(YELL_KILL_PLAYER);
+        }
 
         void JustDied(Unit* /*killer*/)
         {
