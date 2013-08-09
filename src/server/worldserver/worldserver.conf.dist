@@ -2991,3 +2991,10 @@ Vip.Rate.Exchange.Triumph.In.Frost = 1
 
 DisconnectToleranceInterval = 0
 DisableRestart = 0
+
+# Antispam Settings
+# It's only for mail now
+# Timer is in seconds
+Antispam.Mail.Enabled = 0
+Antispam.Mail.Timer = 3600
+Antispam.Mail.Count = 10

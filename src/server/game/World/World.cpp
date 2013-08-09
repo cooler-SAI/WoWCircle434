@@ -1291,6 +1291,11 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_VIP_EXCHANGE_FROST_COMMAND] = ConfigMgr::GetBoolDefault("Vip.Exchange.Frost.Command",false);
     m_int_configs[CONFIG_VIP_RATE_EXHANGE_HONOR_IN_ARENA]  = ConfigMgr::GetIntDefault("Vip.Rate.Exchange.Honor.In.Arena", 1);
     m_int_configs[CONFIG_VIP_RATE_EXHANGE_TRIUMPH_IN_FROST]  = ConfigMgr::GetIntDefault("Vip.Rate.Exchange.Triumph.In.Frost", 1);
+
+    // Antispam
+    m_bool_configs[CONFIG_ANTISPAM_ENABLED] = ConfigMgr::GetBoolDefault("Antispam.Mail.Enabled", false);
+    m_int_configs[CONFIG_ANTISPAM_MAIL_TIMER] = ConfigMgr::GetIntDefault("Antispam.Mail.Timer", 3600) * IN_MILLISECONDS;
+    m_int_configs[CONFIG_ANTISPAM_MAIL_COUNT] = ConfigMgr::GetIntDefault("Antispam.Mail.Count", 10);
 }
 
 extern void LoadGameObjectModelList();

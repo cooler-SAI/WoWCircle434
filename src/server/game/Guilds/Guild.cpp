@@ -3488,15 +3488,16 @@ void Guild::CompleteGuildChallenge(uint8 type)
         return;
     
     uint32 add_exp = reward[type].Expirience;
-    uint32 add_gold = (cur_count > 0) ? reward[type].Gold2 : reward[type].Gold;
+    uint64 add_gold = (cur_count > 0) ? reward[type].Gold2 : reward[type].Gold;
+    add_gold *= 10000;
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
    
     // Add Money
-    _ModifyBankMoney(trans, reward[type].Gold, true);
+    _ModifyBankMoney(trans, add_gold, true);
 
     // Add XP
-    GiveXP(reward[type].Expirience, NULL);
+    GiveXP(add_exp, NULL);
 
     m_guildChallenges[type]++;
     

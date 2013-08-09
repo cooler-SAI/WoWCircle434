@@ -107,6 +107,10 @@ timeLastChannelModerCommand(0), timeLastChannelOwnerCommand(0), timeLastChannelS
 timeLastChannelUnmuteCommand(0), timeLastChannelKickCommand(0), timelastReloadUi(0), timeLastServerCommand(0), timeCharEnumOpcode(0),
 timeLastArenaTeamCommand(0)
 {
+    // Antispam
+    m_uiAntispamMailSentCount = 0;
+    m_uiAntispamMailSentTimer = 0;
+
     _warden = NULL;
     _filterAddonMessages = false;
 
@@ -269,6 +273,10 @@ void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 /// Update the WorldSession (triggered by World update)
 bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 {
+    /// Antispam Timer update
+    if (sWorld->getBoolConfig(CONFIG_ANTISPAM_ENABLED))
+        UpdateAntispamTimer(diff);
+
     /// Update Timeout timer.
     UpdateTimeOutTime(diff);
 
