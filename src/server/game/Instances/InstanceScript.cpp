@@ -502,7 +502,7 @@ void InstanceScript::UpdateEncounterState(EncounterCreditType type, uint32 credi
     {
         DungeonEncounter const* encounter = *itr;
         if (encounter->creditType == type && encounter->creditEntry == creditEntry &&
-            encounter->difficulty == -1 || (encounter->difficulty == instance->GetDifficulty()))
+            (encounter->difficulty == -1 || (encounter->difficulty == instance->GetDifficulty())))
         {
             completedEncounters |= 1 << encounter->dbcEntry->encounterIndex;
             if (encounter->lastEncounterDungeon)
