@@ -575,11 +575,13 @@ void BattlegroundIC::UpdateNodeWorldState(ICNodePoint* nodePoint)
         nodePoint->nodeState = NODE_STATE_CONTROLLED_H;
     else if (nodePoint->gameobject_entry == nodePoint->banners[BANNER_H_CONTESTED])
         nodePoint->nodeState = NODE_STATE_CONFLICT_H;
+    else
+        nodePoint->nodeState = NODE_STATE_UNCONTROLLED;
 
     uint32 worldstate = nodePoint->worldStates[nodePoint->nodeState];
 
     // with this we are sure we dont bug the client
-    for (uint8 i = 0; i < 4; ++i)
+    for (uint8 i = 0; i < 5; ++i)
         UpdateWorldState(nodePoint->worldStates[i], 0);
 
     UpdateWorldState(worldstate, 1);
