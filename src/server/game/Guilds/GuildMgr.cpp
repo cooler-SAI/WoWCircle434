@@ -131,6 +131,14 @@ void GuildMgr::ResetReputationCaps()
         itr->second->ResetWeeklyReputation();
 }
 
+void GuildMgr::ResetGuildChallenges()
+{
+    CharacterDatabase.PExecute("UPDATE guild_challenge SET dungeonCount=0, raidCount=0, RBGCount=0");
+
+    for (GuildContainer::iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
+        itr->second->ResetGuildChallenge();
+}
+
 void GuildMgr::LoadGuilds()
 {
     // 1. Load all guilds
@@ -451,8 +459,29 @@ void GuildMgr::LoadGuilds()
             itr->second->GetNewsLog().LoadFromDB(CharacterDatabase.Query(stmt));
         }
     }*/
+    // 11. Loading Guild Challenges data
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading guild challenges...");
+    {
+        QueryResult result = CharacterDatabase.Query("SELECT guildId, dungeonCount, raidCount, RBGCount FROM guild_challenge");
 
-    // 11. Validate loaded guild data
+        if (!result)
+        {
+            sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 guild challenges.");
+        }
+        else
+        {
+            do
+            {
+                Field* fields = result->Fetch();
+                uint32 guildId = fields[0].GetUInt32();
+
+                if (Guild* guild = GetGuildById(guildId))
+                    guild->LoadGuildChallenge(fields);
+            }
+            while (result->NextRow());
+        }
+    }
+    // 12. Validate loaded guild data
     sLog->outInfo(LOG_FILTER_GENERAL, "Validating data of loaded guilds...");
     {
         uint32 oldMSTime = getMSTime();

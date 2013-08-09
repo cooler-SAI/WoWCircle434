@@ -896,24 +896,27 @@ void WorldSession::HandleGuildSetGuildMaster(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildRequestChallengeUpdate(WorldPacket& /*recvPacket*/)
 {
-    GuildChallengeRewardData const& reward = sObjectMgr->GetGuildChallengeRewardData();
+    if (Guild* guild = sGuildMgr->GetGuildById(_player->GetGuildId()))
+    {
+        GuildChallengeRewardData const& reward = sObjectMgr->GetGuildChallengeRewardData();
 
-    WorldPacket data(SMSG_GUILD_CHALLENGE_UPDATED, 5*4*4);
+        WorldPacket data(SMSG_GUILD_CHALLENGE_UPDATED, 5*4*4);
 
-    for (uint8 i = 0; i < CHALLENGE_MAX; ++i)
-        data << uint32(reward[i].Expirience);
+        for (uint8 i = 0; i < CHALLENGE_MAX; ++i)
+            data << uint32(reward[i].Expirience);
 
-    for (uint8 i = 0; i < CHALLENGE_MAX; ++i)
-        data << uint32(reward[i].Gold);
+        for (uint8 i = 0; i < CHALLENGE_MAX; ++i)
+            data << uint32(reward[i].Gold);
 
-    for (uint8 i = 0; i < CHALLENGE_MAX; ++i)
-        data << uint32(reward[i].ChallengeCount);
+        for (uint8 i = 0; i < CHALLENGE_MAX; ++i)
+            data << uint32(reward[i].ChallengeCount);
 
-    for (uint8 i = 0; i < CHALLENGE_MAX; ++i)
-        data << uint32(reward[i].Gold2);
+        for (uint8 i = 0; i < CHALLENGE_MAX; ++i)
+            data << uint32(reward[i].Gold2);
 
-    for (uint8 i = 0; i < CHALLENGE_MAX; ++i)
-        data << uint32(0);        // Current Count
+        for (uint8 i = 0; i < CHALLENGE_MAX; ++i)
+            data << uint32(guild->GetGuildChallenge(i));        // Current Count
 
-    SendPacket(&data);
+        SendPacket(&data);
+    }
 }

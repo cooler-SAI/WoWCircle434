@@ -1995,7 +1995,6 @@ void World::Update(uint32 diff)
     {
         if (m_updateTimeSum > m_int_configs[CONFIG_INTERVAL_LOG_UPDATE])
         {
-            sLog->outDebug(LOG_FILTER_GENERAL, "Update time diff: %u. Players online: %u.", m_updateTimeSum / m_updateTimeCount, GetActiveSessionCount());
             LoginDatabase.PExecute("UPDATE realmlist set online=%u where id=%u", GetActiveSessionCount(), realmID);
             m_updateTimeSum = m_updateTime;
             m_updateTimeCount = 1;
@@ -2031,6 +2030,7 @@ void World::Update(uint32 diff)
     {
         ResetWeeklyQuests();
         sGuildMgr->ResetReputationCaps();
+        sGuildMgr->ResetGuildChallenges();
     }
 
     if (m_gameTime > m_NextRandomBGReset)
@@ -2164,7 +2164,6 @@ void World::Update(uint32 diff)
     if (m_timers[WUPDATE_PINGDB].Passed())
     {
         m_timers[WUPDATE_PINGDB].Reset();
-        sLog->outDebug(LOG_FILTER_GENERAL, "Ping MySQL to keep connection alive");
         CharacterDatabase.KeepAlive();
         LoginDatabase.KeepAlive();
         WorldDatabase.KeepAlive();
@@ -2640,7 +2639,6 @@ void World::ShutdownMsg(bool show, Player* player)
         ServerMessageType msgid = (m_ShutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_TIME : SERVER_MSG_SHUTDOWN_TIME;
 
         SendServerMessage(msgid, str.c_str(), player);
-        sLog->outDebug(LOG_FILTER_GENERAL, "Server is %s in %s", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"), str.c_str());
     }
 
     if (m_ShutdownTimer == 2)
@@ -2664,8 +2662,6 @@ void World::ShutdownCancel()
     m_ShutdownTimer = 0;
     m_ExitCode = SHUTDOWN_EXIT_CODE;                       // to default value
     SendServerMessage(msgid);
-
-    sLog->outDebug(LOG_FILTER_GENERAL, "Server %s cancelled.", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"));
 }
 
 /// Send a server message to the user(s)
@@ -2761,8 +2757,6 @@ void World::SendAutoBroadcast()
             << WriteBuffer(msg.c_str(), msgSize);
         sWorld->SendGlobalMessage(&data);
     }
-
-    sLog->outDebug(LOG_FILTER_GENERAL, "AutoBroadcast: '%s'", msg.c_str());
 }
 
 void World::UpdateRealmCharCount(uint32 accountId)

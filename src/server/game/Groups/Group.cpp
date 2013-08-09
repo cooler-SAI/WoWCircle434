@@ -2383,15 +2383,20 @@ void Group::ToggleGroupMemberFlag(member_witerator slot, uint8 flag, bool apply)
 
 bool Group::IsGuildGroup(uint32 guildId, bool AllInSameMap, bool AllInSameInstanceId)
 {
+    if (!guildId)
+        return false;
+
     uint32 mapId = 0;
     uint32 InstanceId = 0;
     uint32 count = 0;
     std::vector<Player*> members;
     // First we populate the array
     for (GroupReference *itr = GetFirstMember(); itr != NULL; itr = itr->next()) // Loop trought all members
+    {
         if (Player *player = itr->getSource())
             if (player->GetGuildId() == guildId) // Check if it has a guild
                 members.push_back(player);
+    }
 
     bool ret = false;
     count = members.size();

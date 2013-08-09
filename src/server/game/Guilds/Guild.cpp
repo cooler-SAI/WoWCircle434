@@ -1108,6 +1108,7 @@ Guild::Guild() : m_id(0), m_leaderGuid(0), m_createdDate(0), m_accountsNumber(0)
     m_achievementMgr(this), _newsLog(this), _level(1), _experience(0), _todayExperience(0)
 {
     memset(&m_bankEventLog, 0, (GUILD_BANK_MAX_TABS + 1) * sizeof(LogHolder*));
+    memset(m_guildChallenges, 0, sizeof(m_guildChallenges));
 }
 
 Guild::~Guild()
@@ -3223,7 +3224,7 @@ void Guild::GainReputationForXP(uint32 rep, Player* player)
     }
 }
 
-void Guild::GiveXP(uint32 xp, Player* source)
+void Guild::GiveXP(uint32 xp, Player* source /*=NULL*/)
 {
     if (!sWorld->getBoolConfig(CONFIG_GUILD_LEVELING_ENABLED))
         return;
@@ -3231,12 +3232,14 @@ void Guild::GiveXP(uint32 xp, Player* source)
     if (GetLevel() >= sWorld->getIntConfig(CONFIG_GUILD_MAX_LEVEL))
         xp = 0; // SMSG_GUILD_XP_GAIN is always sent, even for no gains
 
+    uint32 xp_cap = sWorld->getIntConfig(CONFIG_GUILD_DAILY_XP_CAP) + CalculateXPCapFromChallenge();
     if (GetLevel() < GUILD_EXPERIENCE_UNCAPPED_LEVEL)
-        xp = std::min(xp, sWorld->getIntConfig(CONFIG_GUILD_DAILY_XP_CAP) - uint32(_todayExperience));
+        xp = std::min(xp,  xp_cap - uint32(_todayExperience));
 
     WorldPacket data(SMSG_GUILD_XP_GAIN, 8);
     data << uint64(xp);
-    source->GetSession()->SendPacket(&data);
+    if (source)
+        source->GetSession()->SendPacket(&data);
 
     if (!xp)
         return;
@@ -3244,18 +3247,21 @@ void Guild::GiveXP(uint32 xp, Player* source)
     _experience += xp;
     _todayExperience += xp;
 
-    Member* member = GetMember(source->GetGUID());
+    if (source)
     {
-        ASSERT(member != NULL);
+        Member* member = GetMember(source->GetGUID());
+        {
+            ASSERT(member != NULL);
 
-        member->AddXPContrib(xp);
-        member->AddXPContribWeek(xp);
+            member->AddXPContrib(xp);
+            member->AddXPContribWeek(xp);
 
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_MEMBER_XP);
-        stmt->setUInt64(0, member->GetXPContrib());
-        stmt->setUInt64(1, member->GetXPContribWeek());
-        stmt->setUInt32(2, source->GetGUIDLow());
-        CharacterDatabase.Execute(stmt);
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GUILD_MEMBER_XP);
+            stmt->setUInt64(0, member->GetXPContrib());
+            stmt->setUInt64(1, member->GetXPContribWeek());
+            stmt->setUInt32(2, source->GetGUIDLow());
+            CharacterDatabase.Execute(stmt);
+        }
     }
 
     uint32 oldLevel = GetLevel();
@@ -3447,4 +3453,74 @@ void Guild::GuildNewsLog::BuildNewsData(WorldPacket& data)
         data << uint32(it->second.EventType);
         data.AppendPackedTime(it->second.Date);
     }
+}
+
+void Guild::LoadGuildChallenge(Field* fields)
+{
+    m_guildChallenges[CHALLENGE_DUNGEON] = fields[1].GetUInt8();
+    m_guildChallenges[CHALLENGE_RAID] = fields[2].GetUInt8();
+    m_guildChallenges[CHALLENGE_RATED_BG] = fields[3].GetUInt8();
+}
+
+void Guild::ResetGuildChallenge()
+{
+    m_guildChallenges[CHALLENGE_DUNGEON] = 0;
+    m_guildChallenges[CHALLENGE_RAID] = 0;
+    m_guildChallenges[CHALLENGE_RATED_BG] = 0;
+}
+
+uint32 Guild::GetGuildChallenge(uint8 type) const
+{
+    if (type >= CHALLENGE_MAX)
+        return 0;
+     return m_guildChallenges[type];
+}
+
+void Guild::CompleteGuildChallenge(uint8 type)
+{
+    if (type >= CHALLENGE_MAX)
+        return;
+
+    GuildChallengeRewardData const& reward = sObjectMgr->GetGuildChallengeRewardData();
+    uint32 max_count = reward[type].ChallengeCount;
+    uint32 cur_count = m_guildChallenges[type];
+    if (cur_count >= max_count)
+        return;
+    
+    uint32 add_exp = reward[type].Expirience;
+    uint32 add_gold = (cur_count > 0) ? reward[type].Gold2 : reward[type].Gold;
+
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+   
+    // Add Money
+    _ModifyBankMoney(trans, reward[type].Gold, true);
+
+    // Add XP
+    GiveXP(reward[type].Expirience, NULL);
+
+    m_guildChallenges[type]++;
+    
+    trans->PAppend("REPLACE INTO guild_challenge (guildId, dungeonCount, raidCount, RBGCount) VALUES (%u, %u, %u, %u)", 
+        m_id, m_guildChallenges[CHALLENGE_DUNGEON], m_guildChallenges[CHALLENGE_RAID], m_guildChallenges[CHALLENGE_RATED_BG]);
+    
+    CharacterDatabase.CommitTransaction(trans);
+
+    WorldPacket data(SMSG_GUILD_CHALLENGE_COMPLETED, 5 * 4);
+
+    data << uint32(type); // type
+    data << uint32(add_gold); // gold
+    data << uint32(m_guildChallenges[type]); // current
+    data << uint32(add_exp); // exp
+    data << uint32(max_count); // max
+
+    BroadcastPacket(&data);
+}
+
+uint32 Guild::CalculateXPCapFromChallenge() const
+{
+    uint32 ret = 0;
+    GuildChallengeRewardData const& reward = sObjectMgr->GetGuildChallengeRewardData();
+    for (uint8 i = 0; i < CHALLENGE_MAX; ++i)
+        ret += reward[i].Expirience * m_guildChallenges[i];
+    return ret;
 }

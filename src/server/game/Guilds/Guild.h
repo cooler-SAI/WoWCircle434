@@ -849,7 +849,7 @@ public:
     // Guild leveling
 
     uint32 GetLevel() const { return _level; }
-    void GiveXP(uint32 xp, Player* source);
+    void GiveXP(uint32 xp, Player* source = NULL);
     uint64 GetExperience() const { return _experience; }
     uint64 GetTodayExperience() const { return _todayExperience; }
     void ResetDailyExperience();
@@ -858,6 +858,12 @@ public:
     void GainReputationForXP(uint32 rep, Player* player);
 
     EmblemInfo const& GetEmblemInfo() const { return m_emblemInfo; }
+
+    void LoadGuildChallenge(Field* fields);
+    void ResetGuildChallenge();
+    void CompleteGuildChallenge(uint8 type);
+    uint32 GetGuildChallenge(uint8 type) const;
+    uint32 CalculateXPCapFromChallenge() const;
 
 protected:
     uint32 m_id;
@@ -885,6 +891,8 @@ protected:
     uint32 _level;
     uint64 _experience;
     uint64 _todayExperience;
+
+    uint32 m_guildChallenges[CHALLENGE_MAX];
 
 private:
     inline uint32 _GetRanksSize() const { return uint32(m_ranks.size()); }
