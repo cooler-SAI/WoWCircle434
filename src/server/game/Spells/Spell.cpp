@@ -6206,10 +6206,39 @@ SpellCastResult Spell::CheckCast(bool strict)
         default: break;
     }
 
-    // Shapeshift & hex/etc
-    if (m_spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT) && m_caster->HasAuraWithMechanic(1 << MECHANIC_POLYMORPH))
+    // hex
+    if (m_caster->HasAuraWithMechanic(1 << MECHANIC_POLYMORPH))
     {
-        return SPELL_FAILED_CHARMED;
+        // Shapeshift
+        if (m_spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT))
+            return SPELL_FAILED_CHARMED;
+
+        // Teleport
+        if (m_spellInfo->HasEffect(SPELL_EFFECT_TELEPORT_UNITS))
+            return SPELL_FAILED_CHARMED;
+
+        // Summon totem
+        if (m_spellInfo->HasAttribute(SPELL_ATTR7_SUMMON_TOTEM) || m_spellInfo->HasEffect(SPELL_EFFECT_CAST_BUTTON))
+            return SPELL_FAILED_CHARMED;
+
+        // Fishing
+        if (m_spellInfo->HasAttribute(SPELL_ATTR1_IS_FISHING))
+            return SPELL_FAILED_CHARMED;
+
+        // Death Knight - Outbreak
+        if (m_spellInfo->Id == 77575)
+            return SPELL_FAILED_CHARMED;
+
+        // Drink
+        switch (m_spellInfo->GetSpellSpecific())
+        {
+            case SPELL_SPECIFIC_DRINK:
+            case SPELL_SPECIFIC_FOOD:
+            case SPELL_SPECIFIC_FOOD_AND_DRINK:
+                return SPELL_FAILED_CHARMED;
+        default:
+            break;
+        }
     }
 
     // check trade slot case (last, for allow catch any another cast problems)
