@@ -40,8 +40,7 @@ enum WarriorSpells
     ICON_ID_SUDDEN_DEATH                    = 1989,
     SPELL_BLOODTHIRST                       = 23885,
     SPELL_VICTORY_RUSH                      = 34428,
-    SPELL_VICTORY_RUSH_AURA                 = 82368,
-    SPELL_VICTORY_RUSH_AURA_TWO             = 32216,
+    SPELL_VICTORY_RUSH_AURA                 = 32216,
     SPELL_COLOSSUS_SMASH                    = 86346
 };
 
@@ -351,7 +350,6 @@ public:
         void HandleBeforeHit()
         {
             GetCaster()->RemoveAurasDueToSpell(SPELL_VICTORY_RUSH_AURA);
-            GetCaster()->RemoveAurasDueToSpell(SPELL_VICTORY_RUSH_AURA_TWO);
         }
         void Register()
         {
