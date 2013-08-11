@@ -817,7 +817,8 @@ void Aura::RefreshTimers()
 {
     m_maxDuration = CalcMaxDuration();
     bool resetPeriodic = true;
-    if (m_spellInfo->AttributesEx8 & SPELL_ATTR8_DONT_RESET_PERIODIC_TIMER)
+    if ((m_spellInfo->SpellFamilyName >= SPELLFAMILY_MAGE && m_spellInfo->SpellFamilyName <= SPELLFAMILY_SHAMAN) ||
+        m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
     {
         int32 minAmplitude = m_maxDuration;
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -836,7 +837,6 @@ void Aura::RefreshTimers()
     if (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER)
         resetPeriodic = false;
      
-
     RefreshDuration(false);
     Unit* caster = GetCaster();
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
