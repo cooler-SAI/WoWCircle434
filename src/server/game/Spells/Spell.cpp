@@ -5593,10 +5593,17 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && m_spellInfo->SpellFamilyFlags[0] == 0x2000)
                 {
                     Unit* target = m_targets.GetUnitTarget();
+
                     if (!target || (target->IsFriendlyTo(m_caster) && target->GetCreatureType() != CREATURE_TYPE_UNDEAD))
                         return SPELL_FAILED_BAD_TARGETS;
-                    if (!target->IsFriendlyTo(m_caster) && !m_caster->HasInArc(static_cast<float>(M_PI), target))
-                        return SPELL_FAILED_UNIT_NOT_INFRONT;
+
+                    if (!target->IsFriendlyTo(m_caster))
+                    {
+                        if (!m_caster->HasInArc(static_cast<float>(M_PI), target))
+                            return SPELL_FAILED_UNIT_NOT_INFRONT;
+                        if (!m_caster->_IsValidAttackTarget(target, GetSpellInfo()))
+                            return SPELL_FAILED_BAD_TARGETS;
+                    }
                 }
                 // Have Group, Will Travel
                 else if (m_spellInfo->Id == 83967)
