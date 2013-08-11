@@ -7288,6 +7288,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 85509: // Denounce
                 spellInfo->Effects[0].BasePoints = -10000;
                 break;
+            // Shadow Fiend
+            case 34433:
+                spellInfo->Effects[EFFECT_0].MiscValueB = 1561;
+                break;
             default:
                 break;
         }
