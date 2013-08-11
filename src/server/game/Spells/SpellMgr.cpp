@@ -93,6 +93,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Silence, Asira Dawnslayer, Hour of Twilight
             else if (spellproto->Id == 103587)
                 return DIMINISHING_NONE;
+            // Glyph of Intimidating Shout
+            else if (spellproto->Id == 95199)
+                return DIMINISHING_LIMITONLY;
             break;
         }
         // Event spells
@@ -7293,6 +7296,11 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 16870: // Clearcasting
                 spellInfo->Effects[EFFECT_0].SpellClassMask[0] &= ~ 0x10000; // remove Ravage
+                break;
+            case 95199: // Intimidating Shout - Glyph of Intimidating Shout
+                spellInfo->ProcFlags = 0;
+                spellInfo->ProcChance = 0;
+                break;
             default:
                 break;
         }

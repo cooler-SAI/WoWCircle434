@@ -2163,6 +2163,25 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     break;
             }
             break;
+        case SPELLFAMILY_WARRIOR:
+        {
+            if (!caster)
+                break;
+
+            // Intimidating Shout - Glyph of Intimidating Shout
+            if (GetId() == 5246 && caster->HasAura(63327))
+            {
+                if (apply)
+                {
+                    caster->CastSpell(target, 95199, true);
+                }
+                else
+                {
+                    caster->RemoveAurasDueToSpell(95199, caster->GetGUID());
+                }
+            }
+            break;
+        }
         case SPELLFAMILY_PRIEST:
             if (!caster)
                 break;
