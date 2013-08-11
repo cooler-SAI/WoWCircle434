@@ -7288,10 +7288,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 85509: // Denounce
                 spellInfo->Effects[0].BasePoints = -10000;
                 break;
-            // Shadow Fiend
-            case 34433:
+            case 34433: // Shadow Fiend
                 spellInfo->Effects[EFFECT_0].MiscValueB = 1561;
                 break;
+            case 16870: // Clearcasting
+                spellInfo->Effects[EFFECT_0].SpellClassMask[0] &= ~ 0x10000; // remove Ravage
             default:
                 break;
         }
