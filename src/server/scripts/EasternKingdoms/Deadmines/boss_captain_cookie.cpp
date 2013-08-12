@@ -198,7 +198,7 @@ class boss_captain_cookie : public CreatureScript
                         case EVENT_CAULDRON_2:
                             if (Creature* pCauldron = me->FindNearestCreature(NPC_CAULDRON, 20.0f))
                                 //me->EnterVehicle(pCauldron);
-                                me->GetMotionMaster()->MoveJump(pCauldron->GetPositionX(), pCauldron->GetPositionX(), pCauldron->GetPositionX(), 5, 10);
+                                me->GetMotionMaster()->MoveJump(pCauldron->GetPositionX(), pCauldron->GetPositionY(), pCauldron->GetPositionZ(), 5, 10);
                             events.ScheduleEvent(EVENT_THROW_FOOD, 3000);
                             break;
                         case EVENT_THROW_FOOD:
