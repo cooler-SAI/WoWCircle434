@@ -16,18 +16,18 @@ class go_defias_cannon : public GameObjectScript
 
         bool OnGossipHello(Player* pPlayer, GameObject* pGo)
         {
-		    InstanceScript* pInstance = pGo->GetInstanceScript();
-		    if (!pInstance)
-			    return false;
-		    //if (pInstance->GetData(DATA_CANNON_EVENT) != CANNON_NOT_USED)
-			    //return false ;
+            InstanceScript* pInstance = pGo->GetInstanceScript();
+            if (!pInstance)
+                return false;
+            //if (pInstance->GetData(DATA_CANNON_EVENT) != CANNON_NOT_USED)
+                //return false ;
 
-		    pInstance->SetData(DATA_CANNON_EVENT, CANNON_BLAST_INITIATED);
-		    return false;
+            pInstance->SetData(DATA_CANNON_EVENT, CANNON_BLAST_INITIATED);
+            return false;
         }
 };
 
 void AddSC_deadmines()
 {
-	new go_defias_cannon();
+    new go_defias_cannon();
 }

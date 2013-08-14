@@ -4146,6 +4146,10 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->MaxAffectedTargets = 1;
                 spellInfo->AttributesEx3 = SPELL_ATTR3_ONLY_TARGET_PLAYERS;
                 break;
+            // Vanessa Vancleef
+            case 92620: // Backslash targeting
+                spellInfo->MaxAffectedTargets =1;
+                break;
             // ENDOF DEADMINES
             // BLACKROCK CAVERNS SPELLS
             //
