@@ -98,9 +98,19 @@ class spell_sha_fire_nova : public SpellScriptLoader
                     }
                 }
             }
+            SpellCastResult HandleCheckCast()
+            {
+                UnitList targets;
+                Trinity::AnyUnitHavingBuffInObjectRangeCheck u_check(GetCaster(), GetCaster(), 100, SHAMAN_SPELL_FLAME_SHOCK, false);
+                Trinity::UnitListSearcher<Trinity::AnyUnitHavingBuffInObjectRangeCheck> searcher(GetCaster(), targets, u_check);
+                GetCaster()->VisitNearbyObject(100, searcher);
+                
+                return targets.size() == 0 ? SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW : SPELL_CAST_OK;
+            }
 
             void Register()
             {
+                OnCheckCast += SpellCheckCastFn(spell_sha_fire_nova_SpellScript::HandleCheckCast);
                 OnEffectHitTarget += SpellEffectFn(spell_sha_fire_nova_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
         };
