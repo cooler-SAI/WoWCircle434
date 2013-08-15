@@ -179,6 +179,8 @@ class boss_warlord_zonozz: public CreatureScript
             {
                 _Reset();
 
+                me->SetReactState(REACT_AGGRESSIVE);
+
                 bAchieve = false;
                 phaseCount = 0;
 
@@ -209,6 +211,8 @@ class boss_warlord_zonozz: public CreatureScript
 
                 bAchieve = false;
                 phaseCount = 0;
+
+                me->SetReactState(REACT_AGGRESSIVE);
 
                 Talk(SAY_AGGRO);
                 DoCastAOE(SPELL_ZONOZZ_WHISPER_AGGRO, true);

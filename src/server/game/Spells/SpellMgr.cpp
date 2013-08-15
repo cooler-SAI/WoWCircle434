@@ -6334,6 +6334,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
                 break;
             // Warlord Zon'ozz
+            case 103527: // Void Diffusion dmg
+            case 104605:
+            case 108345:
+            case 108346:
+                spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REFLECTED;
+                break;
             case 104031: // Void Diffusion debuff
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
                 spellInfo->Effects[EFFECT_0].TargetB = 0;
