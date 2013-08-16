@@ -13103,10 +13103,17 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
         if (AuraEffect const* aurEff = GetAuraEffect(99263, EFFECT_0))
             AddPct(DoneTotalMod, aurEff->GetAmount());
 
-    // Glyph of Earth Shield
+    // Earth Shield
     if (spellProto->Id == 379)
-        if (AuraEffect* aur = GetAuraEffect(63279, 0))
+    {
+        // Glyph of Earth Shield
+        if (AuraEffect const* aur = GetAuraEffect(63279, EFFECT_0))
             AddPct(DoneTotalMod, aur->GetAmount());
+
+        // Purification
+        if (AuraEffect const* aurEff = GetAuraEffect(16213, EFFECT_0))
+            AddPct(DoneTotalMod, aurEff->GetAmount());
+    }
 
     // use float as more appropriate for negative values and percent applying
     float heal = float(int32(healamount) + DoneTotal) * DoneTotalMod;
