@@ -684,7 +684,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         if (aura)
                         {
                             uint32 pdamage = aura->GetAmount() > 0 ? aura->GetAmount() : 0;
-                            pdamage = m_caster->SpellDamageBonusDone(unitTarget, aura->GetSpellInfo(), pdamage, DOT);
                             pdamage = unitTarget->SpellDamageBonusTaken(m_caster, aura->GetSpellInfo(), pdamage, DOT);
                             damage += pdamage * aura->GetTotalTicks() * 0.6f;
                             apply_direct_bonus = false;
