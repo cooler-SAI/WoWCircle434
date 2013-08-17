@@ -1522,7 +1522,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // Divine Touch
                         if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3021, 0))
                         {
-                            int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * caster->SpellHealingBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), DOT) / 100;
+                            int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * GetEffect(0)->GetAmount() / 100;
                             caster->CastCustomSpell(target, 63544, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
                         }
                         break;
@@ -1613,8 +1613,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_HUNTER, 536, EFFECT_0))
                         {
                             // haste doesn't affect serpent sting so we can use static value for ticks
-                            int32 basepoints0 = caster->SpellDamageBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), DOT);
-                            basepoints0 *= 5 * aurEff->GetAmount() / 100.0f;
+                            int32 basepoints0 = GetEffect(0)->GetAmount() * 5 * aurEff->GetAmount() / 100.0f;
                             caster->CastCustomSpell(target, 83077, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
                         }
                         break;
@@ -2245,7 +2244,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // Gift of the Earthmother
                         if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 3186, 0))
                         {
-                            int32 bp0 = aurEff->GetAmount() * GetEffect(EFFECT_0)->GetTotalTicks() * caster->SpellHealingBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), DOT) / 100; 
+                            int32 bp0 = aurEff->GetAmount() * GetEffect(EFFECT_0)->GetTotalTicks() * GetEffect(0)->GetAmount() / 100; 
                             caster->CastCustomSpell(target, 64801, &bp0, 0, 0, true);
                         }
                     }
