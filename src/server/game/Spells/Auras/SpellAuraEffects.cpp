@@ -4136,6 +4136,8 @@ void AuraEffect::HandleModStateImmunityMask(AuraApplication const* aurApp, uint8
         {
             target->ApplySpellImmune(GetId(), IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, apply);
             target->ApplySpellImmune(GetId(), IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK_DEST, apply);
+            target->ApplySpellImmune(GetId(), IMMUNITY_EFFECT, SPELL_EFFECT_JUMP_DEST, apply);
+            target->ApplySpellImmune(GetId(), IMMUNITY_ID, 49560, apply);   // Glyph of Resilient Grip hack
             return;
         }
         default:
