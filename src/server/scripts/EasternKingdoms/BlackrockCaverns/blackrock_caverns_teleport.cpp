@@ -1,61 +1,37 @@
-#include "ScriptedGossip.h"
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
+#include "ScriptPCH.h"
 #include "blackrock_caverns.h"
-#include "Spell.h"
 
-#define GOSSIP_SENDER_PORT 645
-
-class bc_teleport : public GameObjectScript
+class blackrock_caverns_teleport: public CreatureScript
 {
-    public:
-        bc_teleport() : GameObjectScript("bc_teleport") { }
+public:
+    blackrock_caverns_teleport() : CreatureScript("blackrock_caverns_teleport") { }
 
-        bool OnGossipHello(Player* player, GameObject* go)
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new blackrock_caverns_teleport_AI(creature);
+    }
+
+    struct blackrock_caverns_teleport_AI : public CreatureAI
+    {
+       blackrock_caverns_teleport_AI(Creature* creature) : CreatureAI(creature) { }
+
+        void OnSpellClick(Unit* clicker)
         {
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Teleport Inicio", GOSSIP_SENDER_PORT, 1);
-            if (InstanceScript* instance = go->GetInstanceScript())
-            {
-                if (instance->GetData(DATA_ROMOGG) == DONE)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Teleport Boss 1", GOSSIP_SENDER_PORT, 2);
-                if (instance->GetData(DATA_CORLA) == DONE)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Teleport Boss 2", GOSSIP_SENDER_PORT, 3);
-                if (instance->GetData(DATA_KARSH) == DONE)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Teleport Boss 3 y 4", GOSSIP_SENDER_PORT, 4);
+            if (InstanceScript* instance = me->GetInstanceScript())
+                if (instance->GetData(DATA_KARSH) != DONE)
+                    return;
 
-             }
-
-            player->SEND_GOSSIP_MENU(go->GetGOInfo()->GetGossipMenuId(), go->GetGUID());
-            return true;
+            if (me->GetDBTableGUIDLow() == 327777)
+                clicker->NearTeleportTo(284.838f, 840.364f, 95.920f, 3.881242f, false);
+            else if (me->GetDBTableGUIDLow() == 327776)
+                clicker->NearTeleportTo(233.555f, 1128.875f, 205.569f, 3.551373f, false);
         }
 
-        bool OnGossipSelect(Player* player, GameObject* /*go*/, uint32 sender, uint32 action)
-        {
-            player->PlayerTalkClass->ClearMenus();
-            player->CLOSE_GOSSIP_MENU();
-
-            if (player->isInCombat())
-            {
-                return true;
-            }
-
-            if (sender == GOSSIP_SENDER_PORT)
-            { 
-                if (action==1)
-                   player->TeleportTo(645,233.02f,1128.43f,205.56f,3.40f);
-                if (action==2)
-                   player->TeleportTo(645,308.03f,951.24f,191.16f,6.21f);
-                if (action==3)
-                   player->TeleportTo(645,530.54f,863.57f,134.98f,3.15f);
-                if (action==4)
-                   player->TeleportTo(645,210.67f,713.62f,105.20f,4.50f);
-
-            }
-            return true;
-        }
+        void UpdateAI(uint32 const diff) { }
+    };
 };
 
-void AddSC_bc_teleport()
+void AddSC_blackrock_caverns_teleport()
 {
-    new bc_teleport();
+    new blackrock_caverns_teleport();
 }

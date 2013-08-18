@@ -201,7 +201,7 @@ std::string CreateDumpString(char const* tableName, QueryResult result)
 {
     if (!tableName || !result) return "";
     std::ostringstream ss;
-    ss << "INSERT INTO "<< _TABLE_SIM_ << tableName << _TABLE_SIM_ << " VALUES (";
+    ss << "INSERT INTO " << _TABLE_SIM_ << tableName << _TABLE_SIM_ << " VALUES (";
     Field* fields = result->Fetch();
     for (uint32 i = 0; i < result->GetFieldCount(); ++i)
     {
@@ -322,13 +322,13 @@ bool PlayerDumpWriter::DumpTable(std::string& dump, uint32 guid, char const*tabl
                     break;
                 case DTT_CHARACTER:
                 {
-                    if (result->GetFieldCount() <= 64)          // avoid crashes on next check
+                    if (result->GetFieldCount() <= 66)          // avoid crashes on next check
                     {
                         sLog->outFatal(LOG_FILTER_GENERAL, "PlayerDumpWriter::DumpTable - Trying to access non-existing or wrong positioned field (`deleteInfos_Account`) in `characters` table.");
                         return false;
                     }
 
-                    if (result->Fetch()[64].GetUInt32())        // characters.deleteInfos_Account - if filled error
+                    if (result->Fetch()[66].GetUInt32())        // characters.deleteInfos_Account - if filled error
                         return false;
                     break;
                 }
@@ -535,10 +535,10 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                 if (!changenth(line, 2, chraccount))        // characters.account update
                     ROLLBACK(DUMP_FILE_BROKEN);
 
-                race = uint8(atol(getnth(line, 4).c_str()));
-                playerClass = uint8(atol(getnth(line, 5).c_str()));
-                gender = uint8(atol(getnth(line, 6).c_str()));
-                level = uint8(atol(getnth(line, 7).c_str()));
+                race = uint8(atol(getnth(line, 5).c_str()));
+                playerClass = uint8(atol(getnth(line, 6).c_str()));
+                gender = uint8(atol(getnth(line, 7).c_str()));
+                level = uint8(atol(getnth(line, 8).c_str()));
                 if (name == "")
                 {
                     // check if the original name already exists
@@ -549,7 +549,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
                     if (result)
-                        if (!changenth(line, 38, "1"))       // characters.at_login set to "rename on login"
+                        if (!changenth(line, 39, "1"))       // characters.at_login set to "rename on login"
                             ROLLBACK(DUMP_FILE_BROKEN);
                 }
                 else if (!changenth(line, 3, name.c_str())) // characters.name
@@ -558,9 +558,9 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                 const char null[5] = "NULL";
                 if (!changenth(line, 66, null))             // characters.deleteInfos_Account
                     ROLLBACK(DUMP_FILE_BROKEN);
-                if (!changenth(line, 65, null))             // characters.deleteInfos_Name
+                if (!changenth(line, 67, null))             // characters.deleteInfos_Name
                     ROLLBACK(DUMP_FILE_BROKEN);
-                if (!changenth(line, 64, null))             // characters.deleteDate
+                if (!changenth(line, 68, null))             // characters.deleteDate
                     ROLLBACK(DUMP_FILE_BROKEN);
                 break;
             }

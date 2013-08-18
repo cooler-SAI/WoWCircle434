@@ -42,6 +42,7 @@ set(scripts_STAT_SRCS
   EasternKingdoms/ZulGurub/boss_wushoolay.cpp
   EasternKingdoms/ZulGurub/boss_zanzil.cpp
   EasternKingdoms/ZulGurub/instance_zulgurub.cpp
+  EasternKingdoms/ZulGurub/zulgurub.cpp
   EasternKingdoms/ZulGurub/zulgurub.h
   EasternKingdoms/wetlands.cpp
   EasternKingdoms/arathi_highlands.cpp

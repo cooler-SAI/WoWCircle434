@@ -1058,6 +1058,7 @@ void World::LoadConfigSettings(bool reload)
     m_float_configs[CONFIG_LISTEN_RANGE_YELL]      = ConfigMgr::GetFloatDefault("ListenRange.Yell", 300.0f);
 
     m_bool_configs[CONFIG_BATTLEGROUND_CAST_DESERTER]                = ConfigMgr::GetBoolDefault("Battleground.CastDeserter", true);
+    m_bool_configs[CONFIG_BATTLEGROUND_IGNORE_FACTION]               = ConfigMgr::GetBoolDefault("Battleground.IgnoreFaction", false);
     m_bool_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE]       = ConfigMgr::GetBoolDefault("Battleground.QueueAnnouncer.Enable", false);
     m_bool_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY]   = ConfigMgr::GetBoolDefault("Battleground.QueueAnnouncer.PlayerOnly", false);
     m_int_configs[CONFIG_BATTLEGROUND_INVITATION_TYPE]               = ConfigMgr::GetIntDefault ("Battleground.InvitationType", 0);
@@ -1504,6 +1505,9 @@ void World::SetInitialWorldSettings()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Creature Data...");
     sObjectMgr->LoadCreatures();
 
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Temporary Summon Data...");
+    sObjectMgr->LoadTempSummons();                               // must be after LoadCreatureTemplates() and LoadGameObjectTemplates()
+	
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading pet levelup spells...");
     sSpellMgr->LoadPetLevelupSpellMap();
 
@@ -1788,6 +1792,9 @@ void World::SetInitialWorldSettings()
     m_gameTime = time(NULL);
     m_startTime = m_gameTime;
 
+    LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES(%u, %u, 0, '%s')",
+                           realmID, uint32(m_startTime), _FULLVERSION);       // One-time query
+
     m_timers[WUPDATE_WEATHERS].SetInterval(1*IN_MILLISECONDS);
     m_timers[WUPDATE_RESETCAP].SetInterval(1*IN_MILLISECONDS);
     m_timers[WUPDATE_AUCTIONS].SetInterval(MINUTE*IN_MILLISECONDS);
@@ -2000,7 +2007,7 @@ void World::Update(uint32 diff)
     {
         if (m_updateTimeSum > m_int_configs[CONFIG_INTERVAL_LOG_UPDATE])
         {
-            LoginDatabase.PExecute("UPDATE realmlist set online=%u where id=%u", GetActiveSessionCount(), realmID);
+            //LoginDatabase.PExecute("UPDATE realmlist set online=%u where id=%u", GetActiveSessionCount(), realmID);
             m_updateTimeSum = m_updateTime;
             m_updateTimeCount = 1;
         }
@@ -2100,6 +2107,15 @@ void World::Update(uint32 diff)
         uint32 maxOnlinePlayers = GetMaxPlayerCount();
 
         m_timers[WUPDATE_UPTIME].Reset();
+
+        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_UPTIME_PLAYERS);
+
+        stmt->setUInt32(0, tmpDiff);
+        stmt->setUInt16(1, uint16(maxOnlinePlayers));
+        stmt->setUInt32(2, realmID);
+        stmt->setUInt32(3, uint32(m_startTime));
+
+        LoginDatabase.Execute(stmt);
     }
 
     /// <li> Clean logs table
@@ -2398,20 +2414,46 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, std::string dura
     PreparedQueryResult resultAccounts = PreparedQueryResult(NULL); //used for kicking
     PreparedStatement* stmt = NULL;
 
+    if (mode == BAN_ACCOUNT_ID)
+    {
+        uint32 account = atoi(nameOrIP.c_str());
+        SQLTransaction trans = LoginDatabase.BeginTransaction();
+        // make sure there is only one active ban
+        stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
+        stmt->setUInt32(0, account);
+        trans->Append(stmt);
+        // No SQL injection with prepared statements
+        stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_AUTO_BANNED);
+        stmt->setUInt32(0, account);
+        stmt->setUInt32(1, ConfigMgr::GetIntDefault("RealmID", 0));
+        stmt->setUInt32(2, duration_secs);
+        stmt->setString(3, author);
+        stmt->setString(4, reason);
+        trans->Append(stmt);
+
+        if (WorldSession* sess = FindSession(account))
+            if (std::string(sess->GetPlayerName()) != author)
+                sess->KickPlayer();
+
+        LoginDatabase.CommitTransaction(trans);
+        return BAN_SUCCESS;
+    }
+
     ///- Update the database with ban information
     switch (mode)
     {
          case BAN_IP:
              // No SQL injection with prepared statements
              stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_IP);
-             stmt->setString(0, nameOrIP);
-             resultAccounts = LoginDatabase.Query(stmt);
-             stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_IP_BANNED);
-             stmt->setString(0, nameOrIP);
-             stmt->setUInt32(1, duration_secs);
-             stmt->setString(2, author);
-             stmt->setString(3, reason);
-             LoginDatabase.Execute(stmt);
+            stmt->setString(0, nameOrIP);
+            resultAccounts = LoginDatabase.Query(stmt);
+            stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_IP_BANNED);
+            stmt->setString(0, nameOrIP);
+            stmt->setUInt32(1, ConfigMgr::GetIntDefault("RealmID", 0));
+            stmt->setUInt32(2, duration_secs);
+            stmt->setString(3, author);
+            stmt->setString(4, reason);
+            LoginDatabase.Execute(stmt);
              break;
          case BAN_ACCOUNT:
              // No SQL injection with prepared statements
@@ -2488,6 +2530,16 @@ bool World::RemoveBanAccount(BanMode mode, std::string nameOrIP)
             account = sObjectMgr->GetPlayerAccountIdByPlayerName(nameOrIP);
 
         if (!account)
+            return false;
+
+        QueryResult result = LoginDatabase.PQuery("SELECT realm FROM account_banned WHERE id = '%u' AND active = '1'", account);
+        if (!result)
+            return false;
+
+        Field *fields = result->Fetch();
+        uint32 realmID = fields[0].GetUInt32();
+
+        if (realmID != ConfigMgr::GetIntDefault("RealmID", 0))
             return false;
 
         //NO SQL injection as account is uint32

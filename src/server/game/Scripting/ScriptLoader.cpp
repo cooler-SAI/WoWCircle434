@@ -85,6 +85,7 @@ void AddSC_wp_commandscript();
 void AddSC_areatrigger_scripts();
 void AddSC_emerald_dragons();
 void AddSC_generic_creature();
+void AddSC_on_duel();
 void AddSC_go_scripts();
 void AddSC_guards();
 void AddSC_item_scripts();
@@ -257,6 +258,7 @@ void AddSC_boss_renataki();
 void AddSC_boss_venoxis();
 void AddSC_boss_wushoolay();
 void AddSC_boss_zanzil();
+void AddSC_zulgurub();
 void AddSC_instance_zulgurub();
 //void AddSC_alterac_mountains();
 void AddSC_arathi_highlands();
@@ -455,6 +457,7 @@ void AddSC_boss_kologarn();
 void AddSC_boss_auriaya();              
 void AddSC_boss_hodir();
 void AddSC_boss_freya();
+void AddSC_boss_yogg_saron();
 void AddSC_boss_mimiron();
 void AddSC_boss_thorim();
 void AddSC_boss_general_vezax();
@@ -621,6 +624,9 @@ void AddSC_shattrath_city();
 void AddSC_terokkar_forest();
 void AddSC_zangarmarsh();
 
+// Events
+void AddSC_event_childrens_week();
+
 // Cataclysm Scripts
 void AddSC_instance_throne_of_the_tides(); // Throne of the Tides
 void AddSC_throne_of_the_tides();
@@ -630,6 +636,7 @@ void AddSC_boss_erunak_stonespeaker();
 void AddSC_boss_ozumat();
 
 void AddSC_instance_blackrock_caverns(); // Blackrock Caverns
+void AddSC_blackrock_caverns_teleport();
 void AddSC_boss_romogg_bonecrusher();
 void AddSC_boss_corla_herald_of_twilight();
 void AddSC_boss_karsh_steelbender();
@@ -760,6 +767,7 @@ void AddScripts()
     AddKalimdorScripts();
     AddOutlandScripts();
     AddNorthrendScripts();
+    AddEventScripts();
     AddBattlegroundScripts();
     AddOutdoorPvPScripts();
     AddCustomScripts();
@@ -837,6 +845,7 @@ void AddWorldScripts()
     AddSC_areatrigger_scripts();
     AddSC_emerald_dragons();
     AddSC_generic_creature();
+    AddSC_on_duel();
     AddSC_go_scripts();
     AddSC_guards();
     AddSC_item_scripts();
@@ -1013,6 +1022,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_venoxis();
     AddSC_boss_wushoolay();
     AddSC_boss_zanzil();
+    AddSC_zulgurub();
     AddSC_instance_zulgurub();
 
     //AddSC_alterac_mountains();
@@ -1308,6 +1318,7 @@ void AddNorthrendScripts()
     AddSC_boss_auriaya();              
     AddSC_boss_hodir();
     AddSC_boss_freya();
+    AddSC_boss_yogg_saron();
     AddSC_boss_mimiron();
     AddSC_boss_thorim();
     AddSC_boss_general_vezax();
@@ -1399,6 +1410,7 @@ void AddNorthrendScripts()
     AddSC_boss_ozumat();
 
     AddSC_instance_blackrock_caverns(); // Blackrock Caverns
+    AddSC_blackrock_caverns_teleport();
     AddSC_boss_romogg_bonecrusher();
     AddSC_boss_corla_herald_of_twilight();
     AddSC_boss_karsh_steelbender();
@@ -1503,6 +1515,13 @@ void AddNorthrendScripts()
     AddSC_boss_hagara_the_stormbinder();
     AddSC_boss_ultraxion();
 
+#endif
+}
+
+void AddEventScripts()
+{
+#ifdef SCRIPTS
+    AddSC_event_childrens_week();
 #endif
 }
 

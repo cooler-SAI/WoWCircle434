@@ -1,132 +1,123 @@
-#include "ScriptPCH.h"
 #include "baradin_hold.h"
+#include "InstanceScript.h"
+#include "ScriptMgr.h"
+#include "Player.h"
+#include "ObjectAccessor.h"
+#include "ScriptedCreature.h"
 
 enum Spells
 {
-    SPELL_FEL_FIRESTORM       = 88972,
-    SPELL_CONSUMING_DARKNESS  = 88954,
-    SPELL_METEOR_SLASH        = 88942,
-    SPELL_BERSERK             = 47008,
+   SPELL_CONSUMING_DARKNESS      = 88954,
+   SPELL_FEL_FIRESTORM           = 88972,
+   SPELL_METEOR_SLASH            = 88942,
+   SPELL_BERSERK                 = 47008,
+   SPELL_FEL_FLAMES_DAMAGE       = 88999
 };
 
-enum ePhases
+enum Events
 {
-    PHASE_1,
-    PHASE_2,
+   EVENT_CONSUMING_DARKNESS = 1,
+   EVENT_METEOR_SLASH       = 2,
+   EVENT_BERSERK            = 3,
 };
 
 class boss_argaloth : public CreatureScript
 {
     public:
         boss_argaloth() : CreatureScript("boss_argaloth") { }
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new boss_argalothAI(pCreature);
-        }
-
+ 
         struct boss_argalothAI : public BossAI
         {
-            boss_argalothAI(Creature* pCreature) : BossAI(pCreature, DATA_ARGALOTH) 
+            boss_argalothAI(Creature* creature) : BossAI(creature, DATA_ARGALOTH), summons(me)
             {
-                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-				me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-				me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-				me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-				me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-				me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-				me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-				me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
-				me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
-				me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-				me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-				me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
+                instance = creature->GetInstanceScript();
             }
 
-            uint8 Phase, PhaseCount;
-
-            uint32 SlashTimer;
-            uint32 ConsumingDarknessTimer;
-            uint32 BerserkTimer;
-            uint32 ResetPhaseTimer;
+            private:
+                InstanceScript* instance;
+                EventMap events;
+                uint8 phase;
+                SummonList summons;
 
             void Reset()
             {
                 _Reset();
-
-                PhaseCount = 0;
-                SlashTimer = 10000;
-                ConsumingDarknessTimer = 15000;
-                BerserkTimer = 360000;
-                Phase = PHASE_1;
+                events.ScheduleEvent(EVENT_CONSUMING_DARKNESS, 24 *IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_METEOR_SLASH, 14 *IN_MILLISECONDS);
+                events.ScheduleEvent(EVENT_BERSERK, 300 *IN_MILLISECONDS);
+                summons.DespawnAll();
+                phase = 0;
             }
 
-            void EnterCombat(Unit* attacker)
+            void JustSummoned(Creature* summon)
             {
-                instance->SetBossState(DATA_ARGALOTH, IN_PROGRESS);
+                switch (summon->GetEntry())
+                {
+                    case NPC_FEL_FLAMES:
+                        summon->CastSpell(summon, SPELL_FEL_FLAMES_DAMAGE, true);
+                        break;
+                }
+                summons.Summon(summon);
             }
-
-            void JustDied(Unit* killer)
+                        
+            void JustReachedHome()
             {
-                _JustDied();
+                Reset();
             }
-
-            void UpdateAI(const uint32 diff)
+ 
+            void KilledUnit(Unit* victim){}
+ 
+            void MoveInLineOfSight(Unit* who){}
+ 
+            void UpdateAI(uint32 const diff)
             {
                 if (!UpdateVictim())
                     return;
 
-                if(SlashTimer <= diff && Phase == PHASE_1)
+                events.Update(diff);
+ 
+                while (uint32 eventId = events.ExecuteEvent())
                 {
-                    DoCastVictim(SPELL_METEOR_SLASH);
-                    SlashTimer = 15000;
-                } else SlashTimer -= diff;
-
-                if(ConsumingDarknessTimer <= diff && Phase == PHASE_1)
-                {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                        DoCast(target, SPELL_CONSUMING_DARKNESS, true);
-                    ConsumingDarknessTimer = 15000;
-                } else ConsumingDarknessTimer -= diff;
-
-                if(BerserkTimer <= diff && Phase == PHASE_1)
-                {
-                    DoCast(me, SPELL_BERSERK);
-                    BerserkTimer = 360000;
-                } else BerserkTimer -= diff;
-
-                if (HealthBelowPct(67) && Phase == PHASE_1 && PhaseCount == 0)
-                {
-                    PhaseCount++;
-                    Phase = PHASE_2;
-                    me->SetReactState(REACT_PASSIVE);
-                    me->AttackStop();
-                    DoCastAOE(SPELL_FEL_FIRESTORM);
-                    ResetPhaseTimer = 16500;
+                    switch (eventId)
+                    {
+                        case EVENT_CONSUMING_DARKNESS:
+                            {
+                                CustomSpellValues values;
+                                values.AddSpellMod(SPELLVALUE_MAX_TARGETS, RAID_MODE(3, 8, 3, 8));
+                                me->CastCustomSpell(SPELL_CONSUMING_DARKNESS, values, NULL, TRIGGERED_FULL_MASK, NULL, NULL, me->GetGUID());
+                                events.RescheduleEvent(EVENT_CONSUMING_DARKNESS, 24 * IN_MILLISECONDS);
+                                break;
+                            }
+                        case EVENT_METEOR_SLASH:
+                            DoCast(me->getVictim(), SPELL_METEOR_SLASH);
+                            events.RescheduleEvent(EVENT_METEOR_SLASH, 14 * IN_MILLISECONDS);
+                            break;
+                        case EVENT_BERSERK:
+                            DoCast(me, SPELL_BERSERK);
+                            events.RescheduleEvent(EVENT_BERSERK, 300 * IN_MILLISECONDS);
+                            break;
+                    }
                 }
 
-                if (HealthBelowPct(34) && Phase == PHASE_1 && PhaseCount == 1)
+                if (me->GetHealthPct() <= 66.6f && phase == 0)
                 {
-                    PhaseCount++;
-                    Phase = PHASE_2;
-                    me->SetReactState(REACT_PASSIVE);
-                    me->AttackStop();
-                    DoCastAOE(SPELL_FEL_FIRESTORM);
-                    ResetPhaseTimer = 16500;
+                    DoCast(me, SPELL_FEL_FIRESTORM);
+                    phase = 1;
                 }
-
-                if(ResetPhaseTimer <= diff)
+                else if (me->GetHealthPct() <= 33.3f && phase == 1)
                 {
-                    Phase = PHASE_1;
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    SlashTimer = 10000;
-                    ConsumingDarknessTimer = 15000;
-                    ResetPhaseTimer = 360000;
-                } else ResetPhaseTimer -= diff;
-
+                    DoCast(me, SPELL_FEL_FIRESTORM);
+                    phase = 2;
+                }
+                                
                 DoMeleeAttackIfReady();
             }
         };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new boss_argalothAI(creature);
+        }
 };
 
 void AddSC_boss_argaloth()

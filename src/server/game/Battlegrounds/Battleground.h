@@ -198,6 +198,7 @@ enum BattlegroundQueueTypeId
     BATTLEGROUND_QUEUE_2v2      = 10,
     BATTLEGROUND_QUEUE_3v3      = 11,
     BATTLEGROUND_QUEUE_5v5      = 12,
+    BATTLEGROUND_QUEUE_RBG      = 13,	
     MAX_BATTLEGROUND_QUEUE_TYPES
 };
 
@@ -626,6 +627,10 @@ class Battleground
         uint32 GetTeamScore(uint32 TeamID) const;
 
         virtual uint32 GetPrematureWinner();
+		
+        bool IsRBG() { return m_rbgFlag; }
+        void SetRBG(bool enable) { m_rbgFlag = enable; }
+
     protected:
         // this method is called, when BG cannot spawn its own spirit guide, or something is wrong, It correctly ends Battleground
         void EndNow();
@@ -646,7 +651,7 @@ class Battleground
         // Scorekeeping
         BattlegroundScoreMap PlayerScores;                // Player scores
         // must be implemented in BG subclass
-        virtual void RemovePlayer(Player* /*player*/, uint64 /*guid*/, uint32 /*team*/) {}
+        virtual void RemovePlayer(Player* player, uint64 guid, uint32 team);
 
         // Player lists, those need to be accessible by inherited classes
         BattlegroundPlayerMap  m_Players;
@@ -765,5 +770,7 @@ class Battleground
         float m_TeamStartLocO[BG_TEAMS_COUNT];
         float m_StartMaxDist;
         uint32 ScriptId;
+
+        bool m_rbgFlag;
 };
 #endif

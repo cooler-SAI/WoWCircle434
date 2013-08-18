@@ -391,6 +391,7 @@ bool Group::AddMember(Player* player)
                                     m_dbStoreId, GUID_LOPART(member.guid), member.flags, member.group, member.roles);
 
     SendUpdate();
+    SendRaidMarkerUpdateToPlayer(player->GetGUID());
     sScriptMgr->OnGroupAddMember(this, player->GetGUID());
 
     if (player)
@@ -579,6 +580,7 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod &method /*= GROUP_REMOV
         }
 
         SendUpdate();
+        SendRaidMarkerUpdateToPlayer(guid, true);
 
         if (isLFGGroup() && GetMembersCount() == 1)
         {
@@ -727,6 +729,12 @@ void Group::Disband(bool hideDestroy /* = false */)
 
         _homebindIfInstance(player);
     }
+
+    SetGroupMarkerMask(0x20);
+    SendRaidMarkerUpdate();
+    RemoveMarker();
+    RemoveAllMarkerFromList();
+
     RollId.clear();
     m_memberSlots.clear();
 
@@ -804,7 +812,7 @@ void Group::SendLootStartRollToPlayer(uint32 countDown, uint32 mapId, Player* p,
     p->GetSession()->SendPacket(&data);
 }
 
-void Group::SendLootRoll(uint64 sourceGuid, uint64 targetGuid, uint8 rollNumber, uint8 rollType, Roll const& roll)
+void Group::SendLootRoll(uint64 sourceGuid, uint64 targetGuid, uint32 rollNumber, uint8 rollType, Roll const& roll)
 {
     WorldPacket data(SMSG_LOOT_ROLL, (8+4+8+4+4+4+1+1+1));
     data << uint64(sourceGuid);                             // guid of the item rolled
@@ -828,7 +836,7 @@ void Group::SendLootRoll(uint64 sourceGuid, uint64 targetGuid, uint8 rollNumber,
     }
 }
 
-void Group::SendLootRollWon(uint64 sourceGuid, uint64 targetGuid, uint8 rollNumber, uint8 rollType, Roll const& roll)
+void Group::SendLootRollWon(uint64 sourceGuid, uint64 targetGuid, uint32 rollNumber, uint8 rollType, Roll const& roll)
 {
     WorldPacket data(SMSG_LOOT_ROLL_WON, (8+4+4+4+4+8+1+1));
     data << uint64(sourceGuid);                             // guid of the item rolled
@@ -955,7 +963,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
                             continue;
 
                         if (itr->second == PASS)
-                            SendLootRoll(newitemGUID, p->GetGUID(), 128, ROLL_PASS, *r);
+                            SendLootRoll(newitemGUID, p->GetGUID(), -1, ROLL_PASS, *r);
                     }
                 }
 
@@ -1098,7 +1106,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
                         continue;
 
                     if (itr->second == PASS)
-                        SendLootRoll(newitemGUID, p->GetGUID(), 128, ROLL_PASS, *r);
+                        SendLootRoll(newitemGUID, p->GetGUID(), -1, ROLL_PASS, *r);
                     else
                         SendLootStartRollToPlayer(60000, lootedObject->GetMapId(), p, p->CanRollForItemInLFG(item, lootedObject) == EQUIP_ERR_OK, *r);
                 }
@@ -1161,7 +1169,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
                     continue;
 
                 if (itr->second == PASS)
-                    SendLootRoll(newitemGUID, p->GetGUID(), 128, ROLL_PASS, *r);
+                    SendLootRoll(newitemGUID, p->GetGUID(), -1, ROLL_PASS, *r);
                 else
                     SendLootStartRollToPlayer(60000, lootedObject->GetMapId(), p, p->CanRollForItemInLFG(item, lootedObject) == EQUIP_ERR_OK, *r);
             }
@@ -1235,7 +1243,7 @@ void Group::CountRollVote(uint64 playerGUID, uint64 Guid, uint8 Choice)
     switch (Choice)
     {
         case ROLL_PASS:                                     // Player choose pass
-            SendLootRoll(0, playerGUID, 128, ROLL_PASS, *roll);
+            SendLootRoll(0, playerGUID, -1, ROLL_PASS, *roll);
             ++roll->totalPass;
             itr->second = PASS;
             break;
@@ -1245,12 +1253,12 @@ void Group::CountRollVote(uint64 playerGUID, uint64 Guid, uint8 Choice)
             itr->second = NEED;
             break;
         case ROLL_GREED:                                    // player choose Greed
-            SendLootRoll(0, playerGUID, 128, ROLL_GREED, *roll);
+            SendLootRoll(0, playerGUID, -1, ROLL_GREED, *roll);
             ++roll->totalGreed;
             itr->second = GREED;
             break;
         case ROLL_DISENCHANT:                               // player choose Disenchant
-            SendLootRoll(0, playerGUID, 128, ROLL_DISENCHANT, *roll);
+            SendLootRoll(0, playerGUID, -1, ROLL_DISENCHANT, *roll);
             ++roll->totalGreed;
             itr->second = DISENCHANT;
             break;
@@ -1448,6 +1456,69 @@ void Group::SendTargetIconList(WorldSession* session)
     }
 
     session->SendPacket(&data);
+}
+
+void Group::SendRaidMarkerUpdate()
+{
+    WorldPacket data(SMSG_RAID_MARKERS_CHANGED, 4);
+    data << uint32(m_markerMask);
+
+    for (member_witerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
+    {
+        Player* player = ObjectAccessor::FindPlayer(itr->guid);
+        if (!player || !player->GetSession())
+            continue;
+
+        player->GetSession()->SendPacket(&data);
+    }
+}
+
+void Group::SendRaidMarkerUpdateToPlayer(uint64 playerGUID, bool remove)
+{
+    Player* player = ObjectAccessor::FindPlayer(playerGUID);
+    if (!player || !player->GetSession())
+        return;
+
+    WorldPacket data(SMSG_RAID_MARKERS_CHANGED, 4);
+    data << uint32(remove ? 0 : m_markerMask);
+    player->GetSession()->SendPacket(&data);
+}
+
+DynamicObject* Group::GetMarkerGuidBySpell(uint32 spell)
+{
+    if (!m_dynObj.empty())
+    {
+        for (DynObjectList::const_iterator i = m_dynObj.begin(); i != m_dynObj.end(); ++i)
+        {
+            DynamicObject* dynObj = ObjectAccessor::GetObjectInWorld(*i, (DynamicObject*)NULL);
+            if (!dynObj)
+                continue;
+
+            if (dynObj->GetEntry() == spell)
+                return dynObj;
+        }
+    }
+
+    return NULL;
+}
+
+void Group::RemoveMarker()
+{
+    for (uint32 spell = 0; spell < 5; ++spell)
+    {
+        uint32 mask = 1 << spell;
+        uint32 spellId = 84996 + spell;
+
+        if (HasMarker(mask))
+            continue;
+
+        DynamicObject* dynObject = GetMarkerGuidBySpell(spellId);
+        if (!dynObject)
+            continue;
+
+        RemoveMarkerFromList(dynObject->GetGUID());
+        dynObject->RemoveFromWorld();
+    }
 }
 
 void Group::SendUpdate()

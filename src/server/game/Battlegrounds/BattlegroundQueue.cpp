@@ -155,6 +155,61 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, Battlegr
 
     ginfo->Players.clear();
 
+    if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_IGNORE_FACTION))
+    {
+        bool found = false;
+        BGFreeSlotQueueContainer& bgQueues = sBattlegroundMgr->GetBGFreeSlotQueueStore(BgTypeId);
+        for (BGFreeSlotQueueContainer::iterator itr = bgQueues.begin(); itr != bgQueues.end();)
+        {
+            Battleground* bg = *itr; ++itr;
+            if (!bg->isRated() && bg->GetTypeID() == BgTypeId && bg->GetBracketId() == bracketId &&
+                bg->GetStatus() > STATUS_WAIT_QUEUE && bg->GetStatus() < STATUS_WAIT_LEAVE)
+            {
+                int32 hordeFree = bg->GetFreeSlotsForTeam(HORDE);
+                int32 aliFree   = bg->GetFreeSlotsForTeam(ALLIANCE);
+                if (hordeFree == aliFree)
+                {
+                    if (urand(0,100) < 50)
+                        ginfo->Team = HORDE;
+                    else
+                        ginfo->Team = ALLIANCE;
+                }
+                else if (hordeFree > aliFree)
+                    ginfo->Team = HORDE;
+                else
+                    ginfo->Team = ALLIANCE;
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+        {
+            uint32 qHorde = 0;
+            uint32 qAlliance = 0;
+            GroupsQueueType::const_iterator itr;
+            for (itr = m_QueuedGroups[bracketId][BG_QUEUE_NORMAL_ALLIANCE].begin(); itr != m_QueuedGroups[bracketId][BG_QUEUE_NORMAL_ALLIANCE].end(); ++itr)
+                if (!(*itr)->IsInvitedToBGInstanceGUID)
+                    qAlliance += (*itr)->Players.size();
+            for (itr = m_QueuedGroups[bracketId][BG_QUEUE_NORMAL_HORDE].begin(); itr != m_QueuedGroups[bracketId][BG_QUEUE_NORMAL_HORDE].end(); ++itr)
+                if (!(*itr)->IsInvitedToBGInstanceGUID)
+                    qHorde += (*itr)->Players.size();
+            if (qAlliance == qHorde)
+            {
+                if (qAlliance == 0)
+                    ginfo->Team = leader->GetTeam();
+                else
+                    if (urand(0,100) < 50)
+                        ginfo->Team = HORDE;
+                    else
+                        ginfo->Team = ALLIANCE;
+            }
+            else if (qAlliance < qHorde)
+                ginfo->Team = ALLIANCE;
+            else
+                ginfo->Team = HORDE;
+        }
+    }
+
     //compute index (if group is premade or joined a rated match) to queues
     uint32 index = 0;
     if (!isRated && !isPremade)

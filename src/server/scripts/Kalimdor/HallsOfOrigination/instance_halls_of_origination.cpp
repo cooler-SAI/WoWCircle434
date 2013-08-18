@@ -10,7 +10,7 @@ static const DoorData doorData[] =
     {GO_DOOR_ULDUM_15,              DATA_TEMPLE_GUARDIAN_ANHUUR, DOOR_TYPE_PASSAGE, BOUNDARY_NONE},
     {GO_ANHUUR_ELEVATOR,            DATA_TEMPLE_GUARDIAN_ANHUUR, DOOR_TYPE_PASSAGE, BOUNDARY_NONE},
     {GO_VAULT_OF_LIGHTS_ENTR_DOOR,  DATA_ANRAPHET,               DOOR_TYPE_PASSAGE, BOUNDARY_NONE},
-    {0,                0,                                        DOOR_TYPE_ROOM,    BOUNDARY_NONE} // END
+    {0, 0, DOOR_TYPE_ROOM, BOUNDARY_NONE} // END
 };
 
 class instance_halls_of_origination : public InstanceMapScript
@@ -106,6 +106,10 @@ class instance_halls_of_origination : public InstanceMapScript
                 {
                     case GO_ORIGINATION_ELEVATOR:
                         uiOriginationElevatorGUID = go->GetGUID();
+                        if (GetBossState(DATA_ANRAPHET) != DONE)
+                            go->Delete();
+                        else
+                            uiOriginationElevatorGUID = go->GetGUID();
                         break;
                     case GO_ANHUUR_BRIDGE:
                     case GO_ANHUUR_ELEVATOR:
@@ -156,7 +160,7 @@ class instance_halls_of_origination : public InstanceMapScript
             {
                 if (!InstanceScript::SetBossState(type, state))
                     return false;
-                
+
                 return true;
             }
 

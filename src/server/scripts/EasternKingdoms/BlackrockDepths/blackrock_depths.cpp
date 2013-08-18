@@ -21,6 +21,14 @@
 #include "ScriptedGossip.h"
 #include "blackrock_depths.h"
 
+#define GOSSIP_SENDER_BLACKROCK_DEPTHS 230
+
+Position blackrock_depths_locs[] = {
+    { 447.014f, 18.592f,  -70.806f, 5.555023f },
+    { 933.953f, -284.598f, -49.937f, 1.448187f },
+    { 800.465f, -245.611f, -43.303f, 2.506725f },
+};
+
 //go_shadowforge_brazier
 class go_shadowforge_brazier : public GameObjectScript
 {
@@ -1321,6 +1329,41 @@ public:
     };
 };
 
+class go_abandoned_mole_machine : public GameObjectScript
+{
+    public:
+        go_abandoned_mole_machine() : GameObjectScript("go_abandoned_mole_machine"){ }
+
+        bool OnGossipHello(Player* player, GameObject* go)
+        {
+            bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
+            if (InstanceScript* instance = go->GetInstanceScript())
+            {
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Отправиться в жилой квартал." : "Teleport to The Domicile.", GOSSIP_SENDER_BLACKROCK_DEPTHS, 2);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Отправиться в Тенегорн." : "Teleport to Shadowforge City.", GOSSIP_SENDER_BLACKROCK_DEPTHS, 1);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Отправиться в тюремный блок." : "Teleport to Detention Block.", GOSSIP_SENDER_BLACKROCK_DEPTHS, 0);
+            }
+
+            player->SEND_GOSSIP_MENU(player->GetGossipTextId(go), go->GetGUID());
+            return true;
+        }
+
+        bool OnGossipSelect(Player* player, GameObject* /*go*/, uint32 sender, uint32 action)
+        {
+            player->PlayerTalkClass->ClearMenus();
+            player->CLOSE_GOSSIP_MENU();
+
+            if (action >= 4)
+                return false;
+
+            Position loc = blackrock_depths_locs[action];
+            if (!player->isInCombat())
+                player->NearTeleportTo(loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), loc.GetOrientation(), false);
+            return true;
+        }
+};
+
 void AddSC_blackrock_depths()
 {
     new go_shadowforge_brazier();
@@ -1330,6 +1373,7 @@ void AddSC_blackrock_depths()
     new npc_kharan_mighthammer();
     new npc_lokhtos_darkbargainer();
     new npc_rocknot();
+    new go_abandoned_mole_machine ();
     // Fix us
     /*new npc_dughal_stormwing();
       new npc_tobias_seecher();

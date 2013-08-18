@@ -170,17 +170,33 @@ public:
                 case NPC_LICH_KING_EVENT:
                     uiLichKingEvent = creature->GetGUID();
                     break;
-                case NPC_JAINA_PART1:
-                    uiJainaPart1 = creature->GetGUID();
-                    break;
                 case NPC_SYLVANAS_PART1:
-                    uiSylvanasPart1 = creature->GetGUID();
+                    if (uiTeamInInstance == ALLIANCE)
+                    creature->UpdateEntry(NPC_JAINA_PART1, ALLIANCE);
+                    break;
+                case NPC_DARK_RANGER_LORALEN:
+                    if (uiTeamInInstance == ALLIANCE)
+                    creature->UpdateEntry(NPC_ARHMAGE_KORELN, ALLIANCE);
                     break;
             }
         }
 
+            void OnPlayerEnter(Player* player)
+            {
+                if (!uiTeamInInstance)
+                    uiTeamInInstance = player->GetTeam();
+            }
+
         void OnGameObjectCreate(GameObject* go)
         {
+             if (!uiTeamInInstance)
+             {
+                  Map::PlayerList const &players = instance->GetPlayers();
+                  if (!players.isEmpty())
+                      if (Player* player = players.begin()->getSource())
+                          uiTeamInInstance = player->GetTeam();
+             }
+
             // TODO: init state depending on encounters
             switch (go->GetEntry())
             {

@@ -2108,6 +2108,14 @@ AutoBroadcast.Timer = 60000
 Battleground.CastDeserter = 1
 
 #
+#    Battleground.IgnoreFaction
+#        Description: Allows members of different factions to be grouped in the same team.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Battleground.IgnoreFaction = 1
+
+#
 #    Battleground.QueueAnnouncer.Enable
 #        Description: Announce battleground queue status to chat.
 #        Default:     0 - (Disabled)

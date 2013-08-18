@@ -129,7 +129,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
         (object->GetTypeId() == TYPEID_PLAYER && object != _player && !object->ToPlayer()->CanShareQuest(questId)))
     {
         _player->PlayerTalkClass->SendCloseGossip();
-        _player->SaveToDB();
+        //_player->SaveToDB();
         _player->SetDivider(0);
         return;
     }
@@ -555,8 +555,8 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
                 _player->PlayerTalkClass->SendQuestGiverOfferReward(quest, playerGuid, !autoCompleteMode);
         }
     }
-    if (_player)
-	 _player->SaveToDB();
+   // if (_player)
+  // _player->SaveToDB();
 }
 
 void WorldSession::HandleQuestgiverQuestAutoLaunch(WorldPacket& /*recvPacket*/)
