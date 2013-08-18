@@ -320,6 +320,8 @@ class boss_sinestra : public CreatureScript
 
                 summons.DoZoneInCombat(NPC_PULSING_TWILIGHT_EGG);
 
+                phase = 0;
+
                 events.ScheduleEvent(EVENT_CALL_FLAMES, 1500);
                 events.ScheduleEvent(EVENT_FLAME_BREATH, 25000);
                 events.ScheduleEvent(EVENT_SUMMON_ORB, 27000);
@@ -327,13 +329,20 @@ class boss_sinestra : public CreatureScript
                 events.ScheduleEvent(EVENT_WRACK, 15000);
                 events.ScheduleEvent(EVENT_MELEE_CHECK, 5000);
 
-
                 Talk(SAY_SINESTRA_AGGRO);
 
                 if (!pInstance)
                     return;
                 DoZoneInCombat();
                 pInstance->SetBossState(DATA_SINESTRA, IN_PROGRESS);
+            }
+
+            bool AllowAchieve()
+            {
+                if (!pInstance)
+                    return false;
+
+                return (pInstance->GetData(DATA_WIPE_COUNT) == 0);
             }
 
             void DoAction(const int32 action)
@@ -1437,6 +1446,23 @@ class spell_sinestra_twilight_essence : public SpellScriptLoader
         }
 };
 
+class achievement_i_cant_hear_you_over_the_sound_of_how_awesome_i_am : public AchievementCriteriaScript
+{
+    public:
+        achievement_i_cant_hear_you_over_the_sound_of_how_awesome_i_am() : AchievementCriteriaScript("achievement_i_cant_hear_you_over_the_sound_of_how_awesome_i_am") { }
+
+        bool OnCheck(Player* source, Unit* target)
+        {
+            if (!target)
+                return false;
+
+            if (boss_sinestra::boss_sinestraAI* sinestraAI = CAST_AI(boss_sinestra::boss_sinestraAI, target->GetAI()))
+                return sinestraAI->AllowAchieve();
+
+            return false;
+        }
+};
+
 void AddSC_boss_sinestra()
 {
     new boss_sinestra();
@@ -1457,4 +1483,5 @@ void AddSC_boss_sinestra()
     new spell_sinestra_pyrrhic_focus();
     new spell_sinestra_twilight_slicer();
     new spell_sinestra_twilight_essence();
+    new achievement_i_cant_hear_you_over_the_sound_of_how_awesome_i_am();
 }

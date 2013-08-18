@@ -1375,7 +1375,6 @@ public:
             creature->CastSpell(player, SPELL_QUEST_CREDIT, true);
             CAST_AI(npc_crusade_recruit::npc_crusade_recruitAI, (creature->AI()))->m_uiPhase = 1;
             creature->SetInFront(player);
-            creature->SendMovementFlagUpdate();
         }
 
         return true;

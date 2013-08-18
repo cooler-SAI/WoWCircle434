@@ -342,16 +342,15 @@ class spell_dru_lifebloom : public SpellScriptLoader
                     if (AuraEffect const* aurEff = GetEffect(EFFECT_1))
                     {
                         // final heal
-                        int32 healAmount = aurEff->GetAmount();
+                        int32 healAmount = aurEff->GetAmount() / aurEff->GetBase()->GetStackAmount();
+                        int32 dispell_stacks = dispelInfo->GetRemovedCharges();
                         if (Unit* caster = GetCaster())
                         {
-                            healAmount = caster->SpellHealingBonusDone(target, GetSpellInfo(), healAmount, HEAL, dispelInfo->GetRemovedCharges());
-                            healAmount = target->SpellHealingBonusTaken(caster, GetSpellInfo(), healAmount, HEAL, dispelInfo->GetRemovedCharges());
-                            target->CastCustomSpell(target, DRUID_LIFEBLOOM_FINAL_HEAL, &healAmount, NULL, NULL, true, NULL, NULL, GetCasterGUID());
+                            target->CastCustomSpell(target, DRUID_LIFEBLOOM_FINAL_HEAL, &healAmount, &dispell_stacks, NULL, true, NULL, NULL, GetCasterGUID());
                             return;
                         }
 
-                        target->CastCustomSpell(target, DRUID_LIFEBLOOM_FINAL_HEAL, &healAmount, NULL, NULL, true, NULL, NULL, GetCasterGUID());
+                        target->CastCustomSpell(target, DRUID_LIFEBLOOM_FINAL_HEAL, &healAmount, &dispell_stacks, NULL, true, NULL, NULL, GetCasterGUID());
                     }
                 }
             }

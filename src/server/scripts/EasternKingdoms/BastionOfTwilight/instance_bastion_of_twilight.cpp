@@ -14,7 +14,6 @@ static const DoorData doordata[] =
     {DOOR_CHOGALL_ENTRANCE, DATA_CHOGALL,           DOOR_TYPE_ROOM,     BOUNDARY_NONE},
     {GO_CHOGALL_FLOOR,      DATA_CHOGALL,           DOOR_TYPE_PASSAGE,  BOUNDARY_NONE},
     {GO_SINESTRA_DOOR,      DATA_SINESTRA,          DOOR_TYPE_ROOM,     BOUNDARY_NONE},
-    (0,                     0,                      DOOR_TYPE_ROOM,     BOUNDARY_NONE),              
 };
 
 class instance_bastion_of_twilight : public InstanceMapScript
@@ -46,53 +45,40 @@ public:
             uiChogallGUID = 0;
             uiChogallFloorGUID = 0;
             memset(m_uiDialogs, 0, sizeof(m_uiDialogs));
-        }
-
-        void OnPlayerEnter(Player* player)
-        {
-            if (!uiTeamInInstance)
-                uiTeamInInstance = player->GetTeam();
+            playerDied = 0;
         }
 
         void OnCreatureCreate(Creature* creature)
         {
-            if (!uiTeamInInstance)
-            {
-                Map::PlayerList const &players = instance->GetPlayers();
-                if (!players.isEmpty())
-                    if (Player* player = players.begin()->getSource())
-                        uiTeamInInstance = player->GetTeam();
-            }
-
             switch (creature->GetEntry())
             {
-            case NPC_HALFUS_WYRMBREAKER:
-                uiWyrmbreakerGUID = creature->GetGUID();
-                break;
-            case NPC_VALIONA:
-                uiValionaGUID = creature->GetGUID();
-                break;
-            case NPC_THERALION:
-                uiTheralionGUID = creature->GetGUID();
-                break;
-            case NPC_FELUDIUS:
-                uiFeludiusGUID = creature->GetGUID();
-                break;
-            case NPC_IGNACIOUS:
-                uiIgnaciousGUID = creature->GetGUID();
-                break;
-            case NPC_ARION:
-                uiArionGUID = creature->GetGUID();
-                break;
-            case NPC_TERRASTRA:
-                uiTerrastraGUID = creature->GetGUID();
-                break;
-            case NPC_MONSTROSITY:
-                uiMonstrosityGUID = creature->GetGUID();
-                break;
-            case NPC_CHOGALL:
-                uiChogallGUID = creature->GetGUID();
-                break;
+                case NPC_HALFUS_WYRMBREAKER:
+                    uiWyrmbreakerGUID = creature->GetGUID();
+                    break;
+                case NPC_VALIONA:
+                    uiValionaGUID = creature->GetGUID();
+                    break;
+                case NPC_THERALION:
+                    uiTheralionGUID = creature->GetGUID();
+                    break;
+                case NPC_FELUDIUS:
+                    uiFeludiusGUID = creature->GetGUID();
+                    break;
+                case NPC_IGNACIOUS:
+                    uiIgnaciousGUID = creature->GetGUID();
+                    break;
+                case NPC_ARION:
+                    uiArionGUID = creature->GetGUID();
+                    break;
+                case NPC_TERRASTRA:
+                    uiTerrastraGUID = creature->GetGUID();
+                    break;
+                case NPC_MONSTROSITY:
+                    uiMonstrosityGUID = creature->GetGUID();
+                    break;
+                case NPC_CHOGALL:
+                    uiChogallGUID = creature->GetGUID();
+                    break;
             }
         }
 
@@ -140,6 +126,18 @@ public:
                     AddDoor(pGo, true);
                     uiChogallFloorGUID = pGo->GetGUID();
                     break;
+                }
+            }
+        }
+
+        void OnUnitDeath(Unit* unit)
+        {
+            if (unit->GetTypeId() == TYPEID_PLAYER && GetBossState(DATA_SINESTRA) == IN_PROGRESS)
+            {
+                if (playerDied == 0)
+                {
+                    playerDied = 1;
+                    SaveToDB();
                 }
             }
         }
@@ -194,6 +192,8 @@ public:
                 return m_uiDialogs[6];
             case DATA_DLG_SINESTRA:
                 return m_uiDialogs[7];
+            case DATA_WIPE_COUNT:
+                return playerDied;
             }
             return 0;
         }
@@ -205,19 +205,19 @@ public:
 
             switch (type)
             {
-            case DATA_HALFUS:
-                break;
-            case DATA_VALIONA_THERALION:
-                break;
-            case DATA_COUNCIL:
-                break;
-            case DATA_CHOGALL:
-                break;
-            case DATA_SINESTRA:
-                break;
-            default:
-                break;
-             }
+                case DATA_HALFUS:
+                    break;
+                case DATA_VALIONA_THERALION:
+                    break;
+                case DATA_COUNCIL:
+                    break;
+                case DATA_CHOGALL:
+                    break;
+                case DATA_SINESTRA:
+                    break;
+                default:
+                    break;
+            }
             return true;
         }
 
@@ -270,24 +270,24 @@ public:
         
             switch (bossId)
             {
-            case DATA_VALIONA_THERALION:
-                if (GetBossState(DATA_HALFUS) != DONE)
-                    return false;
-                break;
-            case DATA_COUNCIL:
-                if (GetBossState(DATA_VALIONA_THERALION) != DONE)
-                    return false;
-                break;
-            case DATA_CHOGALL:
-                if (GetBossState(DATA_COUNCIL) != DONE)
-                    return false;
-                break;
-            case DATA_SINESTRA:
-                if (GetBossState(DATA_CHOGALL) != DONE)
-                    return false;
-                break;
-            default:   
-                break;
+                case DATA_VALIONA_THERALION:
+                    if (GetBossState(DATA_HALFUS) != DONE)
+                        return false;
+                    break;
+                case DATA_COUNCIL:
+                    if (GetBossState(DATA_VALIONA_THERALION) != DONE)
+                        return false;
+                    break;
+                case DATA_CHOGALL:
+                    if (GetBossState(DATA_COUNCIL) != DONE)
+                        return false;
+                    break;
+                case DATA_SINESTRA:
+                    if (GetBossState(DATA_CHOGALL) != DONE)
+                        return false;
+                    break;
+                default:   
+                    break;
             }
             return true;
         }
@@ -307,7 +307,7 @@ public:
             std::string str_data;
 
             std::ostringstream saveStream;
-            saveStream << "B T " << GetBossSaveData() << GetDialogSaveData();
+            saveStream << "B T " << GetBossSaveData() << GetDialogSaveData() << playerDied << " ";
 
             str_data = saveStream.str();
 
@@ -348,15 +348,19 @@ public:
                         tmpDlg = NOT_STARTED;
                     m_uiDialogs[i] = tmpDlg;
                 }
-            } else OUT_LOAD_INST_DATA_FAIL;
+
+                loadStream >> playerDied;
+
+
+            } 
+            else 
+                OUT_LOAD_INST_DATA_FAIL;
 
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
         private:
             uint64 uiWyrmbreakerGUID;
-            uint32 uiTeamInInstance;
-            uint32 m_uiEncounter[MAX_ENCOUNTER];
             uint32 m_uiDialogs[8];
             uint64 uiValionaGUID;
             uint64 uiTheralionGUID;
@@ -376,6 +380,7 @@ public:
             uint64 uiDoorCouncilExitGUID;
             uint64 uiDoorChogallEntranceGUID;
             uint64 uiChogallFloorGUID;
+            uint32 playerDied;
     };
 };
 void AddSC_instance_bastion_of_twilight()

@@ -1,21 +1,39 @@
 #include "ScriptPCH.h"
-#include "LFGMgr.h"
-#include "Group.h"
 #include "deadmines.h"
 
 enum Spells
 {
-    SPELL_WHO_IS_THAT       = 89339,
-    SPELL_SETIATED          = 89267,
-    SPELL_SETIATED_H        = 92834,
-    SPELL_NAUSEATED         = 89732,
-    SPELL_NAUSEATED_H       = 92066,
-    SPELL_ROTTEN_AURA       = 89734,
-    SPELL_ROTTEN_AURA_DMG   = 89734,
-    SPELL_CAULDRON          = 89250,
-    SPELL_CAULDRON_VISUAL   = 89251,
-    SPELL_CAULDRON_FIRE     = 89252,
+    SPELL_WHO_IS_THAT                       = 89339,
+    SPELL_SETIATED                          = 89267,
+    SPELL_SETIATED_H                        = 92834,
+    SPELL_NAUSEATED                         = 89732,
+    SPELL_NAUSEATED_H                       = 92066,
+    SPELL_ROTTEN_AURA                       = 89734,
+    SPELL_ROTTEN_AURA_H                     = 95513,
+    SPELL_ROTTEN_AURA_DMG                   = 89734,
+    SPELL_ROTTEN_AURA_DMG_H                 = 92065,
+    SPELL_CAULDRON                          = 89250,
+    SPELL_CAULDRON_VISUAL                   = 89251,
+    SPELL_CAULDRON_FIRE                     = 89252,
 
+
+    SPELL_THROW_FOOD_TARGETING_CORN         = 89268,
+    SPELL_THROW_FOOD_TARGETING_ROTTEN_CORN  = 89740,
+    SPELL_THROW_FOOD_TARGETING_MELON        = 90561,
+    SPELL_THROW_FOOD_TARGETING_ROTTEN_MELON = 90582,
+    SPELL_THROW_FOOD_TARGETING_STEAK        = 90562,
+    SPELL_THROW_FOOD_TARGETING_ROTTEN_STEAK = 90583,
+    SPELL_THROW_FOOD_TARGETING_MYSTERY_MEAT = 90563,
+    SPELL_THROW_FOOD_TARGETING_ROTTEN_MM    = 90584,
+    SPELL_THROW_FOOD_TARGETING_LOAF         = 90564,
+    SPELL_THROW_FOOD_TARGETING_ROTTEN_LOAF  = 90585,
+    SPELL_THROW_FOOD_TARGETING_BUN          = 90565,
+    SPELL_THROW_FOOD_TARGETING_ROTTEN_BUN   = 90586,
+
+
+    SPELL_THROW_FOOD        = 89263,
+    SPELL_THROW_FOOD_FORCE  = 89269,
+    SPELL_THROW_FOOD_BACK   = 89264,
     SPELL_THROW_FOOD_01     = 90557,
     SPELL_THROW_FOOD_02     = 90560,
     SPELL_THROW_FOOD_03     = 90603,
@@ -54,29 +72,32 @@ enum Adds
 
 enum Events
 {
-    EVENT_THROW_FOOD        = 1,
+    EVENT_THROW_FOOD    = 1,
+    EVENT_CAULDRON_1    = 2,
+    EVENT_CAULDRON_2    = 3,
+    EVENT_MOVE          = 4,
 };
 
-const Position notePos = {-74.3611f, -820.014f, 40.3714f, 0.0f};
+const uint32 ThrowFoodSpells[12] = 
+{
+    SPELL_THROW_FOOD_TARGETING_CORN,
+    SPELL_THROW_FOOD_TARGETING_ROTTEN_CORN,
+    SPELL_THROW_FOOD_TARGETING_MELON,
+    SPELL_THROW_FOOD_TARGETING_ROTTEN_MELON,
+    SPELL_THROW_FOOD_TARGETING_STEAK,
+    SPELL_THROW_FOOD_TARGETING_ROTTEN_STEAK,
+    SPELL_THROW_FOOD_TARGETING_MYSTERY_MEAT,
+    SPELL_THROW_FOOD_TARGETING_ROTTEN_MM,
+    SPELL_THROW_FOOD_TARGETING_LOAF,
+    SPELL_THROW_FOOD_TARGETING_ROTTEN_LOAF,
+    SPELL_THROW_FOOD_TARGETING_BUN,
+    SPELL_THROW_FOOD_TARGETING_ROTTEN_BUN
+};
 
-const uint32 GOOD_FOOD[] = {
-    SPELL_THROW_FOOD_01,
-    SPELL_THROW_FOOD_02,
-    SPELL_THROW_FOOD_06,
-    SPELL_THROW_FOOD_07,
-    SPELL_THROW_FOOD_08,
-    SPELL_THROW_FOOD_10,
-    SPELL_THROW_FOOD_12,
-};
-const uint32 BAD_FOOD[] = {
-    SPELL_THROW_FOOD_03,
-    SPELL_THROW_FOOD_04,
-    SPELL_THROW_FOOD_05,
-    SPELL_THROW_FOOD_07,
-    SPELL_THROW_FOOD_09,
-    SPELL_THROW_FOOD_11,
-    SPELL_THROW_FOOD_13,
-};
+#define POINT_MOVE  1
+
+const Position cauldronPos = {-64.07f, -820.27f, 41.17f, 0.0f};
+const Position movePos = {-71.292213f, -819.792297f, 40.51f, 0.04f};
 
 class boss_captain_cookie : public CreatureScript
 {
@@ -104,48 +125,54 @@ class boss_captain_cookie : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                if (instance->GetBossState(DATA_ADMIRAL) == DONE)
-                    me->SetReactState(REACT_AGGRESSIVE);
-                else
-                    me->SetReactState(REACT_PASSIVE);
-                DoCast(SPELL_WHO_IS_THAT);
                 me->setActive(true);
             }
 
             void Reset()
             {
                 _Reset();
-                nextFoodWillBeGood = false;
+                me->SetReactState(REACT_AGGRESSIVE);
+                DoCast(SPELL_WHO_IS_THAT);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            }
+
+            void MoveInLineOfSight(Unit* who)
+            {
+                if (instance->GetBossState(DATA_ADMIRAL) != DONE)
+                    return;
+
+                if (me->GetDistance(who) > 5.0f)
+                    return;
+
+                BossAI::MoveInLineOfSight(who);
             }
 
             void EnterCombat(Unit* who)
             {
-                if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
-                {
-                    me->RemoveAurasDueToSpell(SPELL_WHO_IS_THAT);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                    DoCastAOE(SPELL_CAULDRON, true);
-                }
-                events.ScheduleEvent(EVENT_THROW_FOOD, 5000);
+                me->RemoveAura(SPELL_WHO_IS_THAT);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->AttackStop();
+                me->SetReactState(REACT_PASSIVE);
+
+                events.ScheduleEvent(EVENT_MOVE, 1000);
+
+                DoZoneInCombat();
                 instance->SetBossState(DATA_CAPTAIN, IN_PROGRESS);
+            }
+
+            void MovementInform(uint32 type, uint32 data)
+            {
+                if (type == POINT_MOTION_TYPE)
+                    if (data == POINT_MOVE)
+                        events.ScheduleEvent(EVENT_CAULDRON_1, 2000);
             }
 
             void JustDied(Unit* killer)
             {
-                Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                if (!players.isEmpty())
-                {
-                    Player* pPlayer = players.begin()->getSource();
-                    if (pPlayer && pPlayer->GetGroup())
-                        sLFGMgr->FinishDungeon(pPlayer->GetGroup()->GetGUID(), 326);
-                }
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                    if (Player* pPlayer = itr->getSource())
-                        pPlayer->CompletedAchievement(sAchievementMgr->GetAchievement(IsHeroic() ? 5083 : 628));
-
                 _JustDied();
+
+                if (IsHeroic())
+                    me->SummonCreature(NPC_NOTE, notePos);
             }
 
             void UpdateAI(const uint32 diff)
@@ -162,37 +189,26 @@ class boss_captain_cookie : public CreatureScript
                 {
                     switch (eventId)
                     {
+                        case EVENT_MOVE:
+                            me->GetMotionMaster()->MovePoint(POINT_MOVE, movePos);
+                            break;
+                        case EVENT_CAULDRON_1:
+                            me->CastSpell(centershipPos.GetPositionX(), centershipPos.GetPositionY(), centershipPos.GetPositionZ(), SPELL_CAULDRON, true);
+                            events.ScheduleEvent(EVENT_CAULDRON_2, 2000);
+                            break;
+                        case EVENT_CAULDRON_2:
+                            if (Creature* pCauldron = me->FindNearestCreature(NPC_CAULDRON, 20.0f))
+                                //me->EnterVehicle(pCauldron);
+                                me->GetMotionMaster()->MoveJump(pCauldron->GetPositionX(), pCauldron->GetPositionY(), pCauldron->GetPositionZ(), 5, 10);
+                            events.ScheduleEvent(EVENT_THROW_FOOD, 3000);
+                            break;
                         case EVENT_THROW_FOOD:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                            {
-                                uint32 nextFoodIndex = urand(0, 6);
-                                if (nextFoodWillBeGood)
-                                    DoCast(target, GOOD_FOOD[nextFoodIndex]);
-                                else
-                                    DoCast(target, BAD_FOOD[nextFoodIndex]);
-                                nextFoodWillBeGood = !nextFoodWillBeGood;
-                            }
-                            events.ScheduleEvent(EVENT_THROW_FOOD, 2100);
+                            DoCastAOE(ThrowFoodSpells[urand(0, 11)]);
+                            events.ScheduleEvent(EVENT_THROW_FOOD, 4000);
                             break;
                     }
                 }
             }
-
-            void MovementInform(uint32 type, uint32 id)
-            {
-                switch (id)
-                {
-                case POINT_CAPTAIN_ENTER_DECK:
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveAurasDueToSpell(SPELL_WHO_IS_THAT);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                    DoCastAOE(SPELL_CAULDRON, true);
-                    break;
-                }
-            }
-        protected:
-            bool nextFoodWillBeGood;
         };
 };
 
@@ -211,35 +227,14 @@ class npc_captain_cookie_cauldron : public CreatureScript
             npc_captain_cookie_cauldronAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
                 me->SetReactState(REACT_PASSIVE);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             }
-
-            bool bReady;
-            uint32 uiSeatTimer;
 
             void Reset() 
             {
                 DoCast(me, SPELL_CAULDRON_VISUAL, true);
                 DoCast(me, SPELL_CAULDRON_FIRE);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-                bReady = false;
-                uiSeatTimer = 1000;
-            }
-
-            void EnterCombat(Unit* /*who*/) { }
-
-            void UpdateAI(const uint32 diff) 
-            {
-                if (!bReady)
-                {
-                    if (uiSeatTimer <= diff)
-                    {
-                        bReady = true;
-                        if (me->GetOwner())
-                            me->GetOwner()->EnterVehicle(me);
-                    }
-                    else
-                        uiSeatTimer -= diff;
-                }
             }
         };
 };
@@ -258,45 +253,28 @@ class npc_captain_cookie_good_food : public CreatureScript
         {
             InstanceScript* pInstance = pCreature->GetInstanceScript();
             if (!pInstance)
-                return false;
+                return true;
             if (pInstance->GetBossState(DATA_CAPTAIN) != IN_PROGRESS)
-                return false;
-            switch (pInstance->instance->GetDifficulty())
-            {
-            case DUNGEON_DIFFICULTY_NORMAL:
-                pPlayer->CastSpell(pPlayer, SPELL_SETIATED, true);
-                break;
-            case DUNGEON_DIFFICULTY_HEROIC:
-                pPlayer->CastSpell(pPlayer, SPELL_SETIATED_H, true);
-                break;
-            }
+                return true;
+
+            pPlayer->CastSpell(pPlayer, (pPlayer->GetMap()->IsHeroic() ? SPELL_SETIATED_H : SPELL_SETIATED), true);
+
             pCreature->DespawnOrUnsummon();
-            return false;
+            return true;
         }
 
         struct npc_captain_cookie_good_foodAI : public ScriptedAI
         {
-            npc_captain_cookie_good_foodAI(Creature *c) : ScriptedAI(c) 
+            npc_captain_cookie_good_foodAI(Creature* pCreature) : ScriptedAI(pCreature) 
             {
-                pInstance = c->GetInstanceScript();
+                pInstance = pCreature->GetInstanceScript();
             }
-     
-            InstanceScript* pInstance;
-            EventMap events;
-
-            void Reset()
-            {
-                if (!pInstance)
-                    return;
-            }
-
+    
             void JustDied(Unit* killer)
             {
-                if (!pInstance)
-                    return;
-
                 me->DespawnOrUnsummon();
             }
+
             void UpdateAI(const uint32 diff)
             {
                 if (!pInstance)
@@ -305,6 +283,9 @@ class npc_captain_cookie_good_food : public CreatureScript
                 if (pInstance->GetBossState(DATA_CAPTAIN) != IN_PROGRESS)
                     me->DespawnOrUnsummon();
             }
+
+        private:
+            InstanceScript* pInstance;
      
         };
 };
@@ -323,47 +304,28 @@ class npc_captain_cookie_bad_food : public CreatureScript
         {
             InstanceScript* pInstance = pCreature->GetInstanceScript();
             if (!pInstance)
-                return false;
+                return true;
             if (pInstance->GetBossState(DATA_CAPTAIN) != IN_PROGRESS)
-                return false;
-            switch (pInstance->instance->GetDifficulty())
-            {
-                case DUNGEON_DIFFICULTY_NORMAL:
-                    pPlayer->CastSpell(pPlayer, SPELL_NAUSEATED, true);
-                    break;
-                case DUNGEON_DIFFICULTY_HEROIC:
-                    pPlayer->CastSpell(pPlayer, SPELL_NAUSEATED_H, true);
-                    break;
-            }
+                return true;
+
+            pPlayer->CastSpell(pPlayer, (pPlayer->GetMap()->IsHeroic() ? SPELL_NAUSEATED_H : SPELL_NAUSEATED), true);
+            
             pCreature->DespawnOrUnsummon();
-            return false;
+            return true;
         }
 
         struct npc_captain_cookie_bad_foodAI : public ScriptedAI
         {
-            npc_captain_cookie_bad_foodAI(Creature *c) : ScriptedAI(c) 
+            npc_captain_cookie_bad_foodAI(Creature* pCreature) : ScriptedAI(pCreature) 
             {
-                pInstance = c->GetInstanceScript();
-            }
-     
-            InstanceScript* pInstance;
-            EventMap events;
-
-            void Reset()
-            {
-                if (!pInstance)
-                    return;
-
-                DoCast(SPELL_ROTTEN_AURA);
+                pInstance = pCreature->GetInstanceScript();
             }
 
             void JustDied(Unit* killer)
             {
-                if (!pInstance)
-                    return;
-
                 me->DespawnOrUnsummon();
             }
+
             void UpdateAI(const uint32 diff)
             {
                 if (!pInstance)
@@ -372,7 +334,8 @@ class npc_captain_cookie_bad_food : public CreatureScript
                 if (pInstance->GetBossState(DATA_CAPTAIN) != IN_PROGRESS)
                     me->DespawnOrUnsummon();
             }
-     
+        private:
+            InstanceScript* pInstance;
         };
 };
 
@@ -438,6 +401,42 @@ class spell_captain_cookie_nauseated : public SpellScriptLoader
         }
 };
 
+class spell_captain_cookie_throw_food_targeting : public SpellScriptLoader
+{
+    public:
+        spell_captain_cookie_throw_food_targeting() : SpellScriptLoader("spell_captain_cookie_throw_food_targeting") { }
+
+        class spell_captain_cookie_throw_food_targeting_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_captain_cookie_throw_food_targeting_SpellScript);
+
+            void HandleAfterHit()
+            {
+                if (!GetCaster() || !GetHitUnit())
+                    return;
+
+                uint32 spellId = 0;
+
+                if (SpellInfo const* spellInfo = GetSpellInfo())
+                    spellId = spellInfo->Effects[EFFECT_0].BasePoints;
+                if (!sSpellMgr->GetSpellInfo(spellId))
+                    return;
+
+                GetCaster()->CastSpell(GetHitUnit(), spellId);
+            }
+
+            void Register()
+            {
+                AfterHit += SpellHitFn(spell_captain_cookie_throw_food_targeting_SpellScript::HandleAfterHit);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_captain_cookie_throw_food_targeting_SpellScript();
+        }
+};
+
 void AddSC_boss_captain_cookie()
 {
     new boss_captain_cookie();
@@ -446,4 +445,5 @@ void AddSC_boss_captain_cookie()
     new npc_captain_cookie_bad_food();
     new spell_captain_cookie_setiated();
     new spell_captain_cookie_nauseated();
+    new spell_captain_cookie_throw_food_targeting();
 }

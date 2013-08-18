@@ -99,17 +99,20 @@ enum Events
     EVENT_TANTRUM_1             = 9,
     EVENT_TANTRUM_2             = 10,
     EVENT_TANTRUM_3             = 11,
-    EVENT_END_TANTRUM           = 12,
-    EVENT_SLUDGE_SPEW           = 13,
-    EVENT_WILD_FLAIL            = 14,
-    EVENT_OOZE_SPIT             = 15,
-    EVENT_SHADOW_GAZE           = 16,
+    EVENT_END_TANTRUM_1         = 12,
+    EVENT_END_TANTRUM_2         = 13,
+    EVENT_SLUDGE_SPEW           = 14,
+    EVENT_WILD_FLAIL            = 15,
+    EVENT_OOZE_SPIT             = 16,
+    EVENT_SHADOW_GAZE           = 17,
 };
 
 enum MiscData
 {
-    POINT_VOID      = 1,
-    DATA_ACHIEVE    = 2,
+    POINT_VOID          = 1,
+    DATA_ACHIEVE        = 2,
+    DATA_PHASE_COUNT    = 3,
+    DATA_VOID           = 4,
 };
 
 const Position centerPos = {-1769.329956f, -1916.869995f, -226.28f, 0.0f};
@@ -161,6 +164,7 @@ class boss_warlord_zonozz: public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
                 me->setActive(true);
                 bIntro = false;
+                phaseCount = 0;
             }
 
             void InitializeAI()
@@ -175,9 +179,10 @@ class boss_warlord_zonozz: public CreatureScript
             {
                 _Reset();
 
-                bAchieve = false;
-
                 me->SetReactState(REACT_AGGRESSIVE);
+
+                bAchieve = false;
+                phaseCount = 0;
 
                 instance->DoRemoveAurasDueToSpellOnPlayers(RAID_MODE(SPELL_BLACK_BLOOD_OF_GORATH, SPELL_BLACK_BLOOD_OF_GORATH_25));
             }
@@ -194,19 +199,6 @@ class boss_warlord_zonozz: public CreatureScript
                 BossAI::MoveInLineOfSight(who);
             }
 
-            void SpellHit(Unit* /*who*/, const SpellInfo* spellInfo)
-            {
-                if (spellInfo->Id == SPELL_VOID_DIFFUSION_DEBUFF)
-                {
-                    me->RemoveAura(RAID_MODE(SPELL_FOCUSED_ANGER, SPELL_FOCUSED_ANGER_25, SPELL_FOCUSED_ANGER_10H, SPELL_FOCUSED_ANGER_25H));
-                    events.CancelEvent(EVENT_DISRUPTING_SHADOWS);
-                    events.CancelEvent(EVENT_PSYCHIC_DRAIN);
-                    events.CancelEvent(EVENT_FOCUSED_ANGER);
-                    events.CancelEvent(EVENT_VOID_OF_THE_UNMAKING);
-                    events.ScheduleEvent(EVENT_TANTRUM_1, 1500);
-                }
-            }
-
             void EnterCombat(Unit* who)
             {
 
@@ -218,6 +210,9 @@ class boss_warlord_zonozz: public CreatureScript
                 }
 
                 bAchieve = false;
+                phaseCount = 0;
+
+                me->SetReactState(REACT_AGGRESSIVE);
 
                 Talk(SAY_AGGRO);
                 DoCastAOE(SPELL_ZONOZZ_WHISPER_AGGRO, true);
@@ -290,11 +285,29 @@ class boss_warlord_zonozz: public CreatureScript
             {
                 if (type == DATA_ACHIEVE)
                     bAchieve = (bool)data;
+                else if (type == DATA_VOID)
+                {   
+                    me->CastCustomSpell(SPELL_VOID_DIFFUSION_DEBUFF, SPELLVALUE_AURA_STACK, data, me, true);
+                    me->RemoveAura(RAID_MODE(SPELL_FOCUSED_ANGER, SPELL_FOCUSED_ANGER_25, SPELL_FOCUSED_ANGER_10H, SPELL_FOCUSED_ANGER_25H));
+                    events.CancelEvent(EVENT_DISRUPTING_SHADOWS);
+                    events.CancelEvent(EVENT_PSYCHIC_DRAIN);
+                    events.CancelEvent(EVENT_FOCUSED_ANGER);
+                    events.CancelEvent(EVENT_VOID_OF_THE_UNMAKING);
+                    events.ScheduleEvent(EVENT_TANTRUM_1, 1500);
+                    phaseCount++;
+                }
             }
 
             bool AllowAchieve()
             {
                 return bAchieve;
+            }
+
+            uint32 GetData(uint32 type)
+            {
+                if (type == DATA_PHASE_COUNT)
+                    return phaseCount;
+                return 0;
             }
 
             void KilledUnit(Unit* victim)
@@ -386,9 +399,14 @@ class boss_warlord_zonozz: public CreatureScript
                                 default:
                                     break;
                             }
-                            events.ScheduleEvent(EVENT_END_TANTRUM, 30000);
+                            events.ScheduleEvent(EVENT_END_TANTRUM_1, 11000);
+                            events.ScheduleEvent(EVENT_END_TANTRUM_2, 30000);
                             break;
-                        case EVENT_END_TANTRUM:
+                        case EVENT_END_TANTRUM_1:
+                            me->SetReactState(REACT_AGGRESSIVE);
+                            AttackStart(me->getVictim());
+                            break;
+                        case EVENT_END_TANTRUM_2:
                             if (!IsHeroic())
                                 summons.DespawnEntry(NPC_EYE_OF_GORATH);
                             me->RemoveAura(RAID_MODE(SPELL_VOID_OF_THE_UNMAKING_PREVENT, SPELL_VOID_OF_THE_UNMAKING_PREVENT_25, SPELL_VOID_OF_THE_UNMAKING_PREVENT_10H, SPELL_VOID_OF_THE_UNMAKING_PREVENT_25H));
@@ -396,8 +414,6 @@ class boss_warlord_zonozz: public CreatureScript
                             events.ScheduleEvent(EVENT_FOCUSED_ANGER, 6000);
                             events.ScheduleEvent(EVENT_DISRUPTING_SHADOWS, 6000);
                             events.ScheduleEvent(EVENT_PSYCHIC_DRAIN, 21000);
-                            me->SetReactState(REACT_AGGRESSIVE);
-                            AttackStart(me->getVictim());
                             break;
                         default:
                             break;
@@ -410,6 +426,7 @@ class boss_warlord_zonozz: public CreatureScript
         private:
             bool bIntro;
             bool bAchieve;
+            uint32 phaseCount;
 
             void SpawnRandomTentacles(uint32 max_eyes, uint32 max_flails, uint32 max_claws)
             {
@@ -420,40 +437,14 @@ class boss_warlord_zonozz: public CreatureScript
                 if (max_claws > 2)
                     max_claws = 2;
 
-                std::list<Position> eyes;
-                std::list<Position> flails;
-                std::list<Position> claws;
-
-                for (uint8 i = 0; i < 8; ++i)
-                    eyes.push_back(tentaclePos[i]);
-                for (uint8 i = 8; i < 12; ++i)
-                    flails.push_back(tentaclePos[i]);
-                for (uint8 i = 12; i < 14; ++i)
-                    claws.push_back(tentaclePos[i]);
-
-                if (max_eyes)
-                {
-                    Trinity::Containers::RandomResizeList(eyes, max_eyes);
-                    if (!eyes.empty())
-                        for (std::list<Position>::const_iterator itr = eyes.begin(); itr != eyes.end(); ++itr)
-                            me->SummonCreature(NPC_EYE_OF_GORATH, (*itr), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
-                }
+                for (uint8 i = 0; i < max_eyes; ++i)
+                    me->SummonCreature(NPC_EYE_OF_GORATH, tentaclePos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
                 
-                if (max_flails)
-                {
-                    Trinity::Containers::RandomResizeList(flails, max_flails);
-                    if (!flails.empty())
-                        for (std::list<Position>::const_iterator itr = flails.begin(); itr != flails.end(); ++itr)
-                            me->SummonCreature(NPC_FLAIL_OF_GORATH, (*itr), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
-                }
-
-                if (max_claws)
-                {
-                    Trinity::Containers::RandomResizeList(claws, max_claws);
-                    if (!claws.empty())
-                        for (std::list<Position>::const_iterator itr = claws.begin(); itr != claws.end(); ++itr)
-                            me->SummonCreature(NPC_CLAW_OF_GORATH, (*itr), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
-                }
+                for (uint8 i = 8; i < (8 + max_flails); ++i)
+                    me->SummonCreature(NPC_FLAIL_OF_GORATH, tentaclePos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                
+                for (uint8 i = 12; i < (12 + max_claws); ++i)
+                    me->SummonCreature(NPC_CLAW_OF_GORATH, tentaclePos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
             }
         };
 };
@@ -532,7 +523,7 @@ class npc_warlord_zonozz_void_of_the_unmaking : public CreatureScript
                                 break;
                             }
 
-                            if (Player* pPlayer = me->FindNearestPlayer(3.0f))
+                            if (Player* pPlayer = me->FindNearestPlayer(5.0f))
                             {
                                 if (Aura const* aur = me->GetAura(SPELL_VOID_DIFFUSION_BUFF))
                                 {
@@ -547,21 +538,23 @@ class npc_warlord_zonozz_void_of_the_unmaking : public CreatureScript
                                 DoCastAOE(SPELL_VOID_DIFFUSION_DMG);
                                 me->StopMoving();
                                 float ang = me->GetAngle(pPlayer->GetPositionX(), pPlayer->GetPositionY());
+
+                                if (me->NormalizeOrientation(me->GetOrientation() - ang) < (M_PI / 4.0f))
+                                    ang = me->GetOrientation();
+
                                 _MovePosition(200.0f, ang + M_PI);
                                 
                                 //me->GetMotionMaster()->MovePoint(POINT_VOID, pos);
                                 events.ScheduleEvent(EVENT_UPDATE_AURA, 4000);
                                 events.ScheduleEvent(EVENT_CHECK_DISTANCE, 4000);
                             }
-                            else if (me->FindNearestCreature(NPC_ZONOZZ, 1.0f))
+                            else if (Creature* pZonozz = me->FindNearestCreature(NPC_ZONOZZ, 5.0f))
                             {
                                 uint8 stacks = 1;
                                 if (Aura const* aur = me->GetAura(SPELL_VOID_DIFFUSION_BUFF))
                                     stacks = aur->GetStackAmount();
 
-                                int32 bp = stacks * 5;
-                                
-                                me->CastCustomSpell(SPELL_VOID_DIFFUSION_DEBUFF, SPELLVALUE_AURA_STACK, stacks, me, true);
+                                pZonozz->AI()->SetData(DATA_VOID, stacks);
                                 events.Reset();
                                 me->StopMoving();
                                 me->DespawnOrUnsummon(2000);
@@ -768,6 +761,43 @@ class spell_warlord_zonozz_whisper : public SpellScriptLoader
         }
 };
 
+class spell_warlord_zonozz_disrupting_shadows : public SpellScriptLoader
+{
+    public:
+        spell_warlord_zonozz_disrupting_shadows() : SpellScriptLoader("spell_warlord_zonozz_disrupting_shadows") { }
+
+        class spell_warlord_zonozz_disrupting_shadows_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_warlord_zonozz_disrupting_shadows_SpellScript);
+
+            void FilterTargets(std::list<WorldObject*>& targets)
+            {
+                if (!GetCaster())
+                    return;
+
+                if (targets.size() <= 1)
+                    return;
+
+                if (Creature* pZonozz = GetCaster()->ToCreature())
+                    if (Unit* pTank = pZonozz->getVictim())
+                        targets.remove(pTank);
+
+                uint32 max_targets = (GetCaster()->GetMap()->Is25ManRaid() ? 5 : 2);
+                Trinity::Containers::RandomResizeList(targets, max_targets);
+            }
+
+            void Register()
+            {
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_warlord_zonozz_disrupting_shadows_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_warlord_zonozz_disrupting_shadows_SpellScript();
+        }
+};
+
 typedef boss_warlord_zonozz::boss_warlord_zonozzAI ZonozzAI;
 
 class achievement_ping_pong_champion : public AchievementCriteriaScript
@@ -793,5 +823,6 @@ void AddSC_boss_warlord_zonozz()
     new npc_warlord_zonozz_void_of_the_unmaking();
     new npc_warlord_zonozz_tentacle();
     new spell_warlord_zonozz_whisper();
+    new spell_warlord_zonozz_disrupting_shadows();
     new achievement_ping_pong_champion();
 }

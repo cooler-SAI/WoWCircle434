@@ -1020,7 +1020,7 @@ public:
                     if (Unit* car = Unit::GetCreature(*me, carGUID))
                     {
                         me->SetInFront(car);
-                        me->SendMovementFlagUpdate();
+
                     }
                     me->MonsterSay(SAY_SCARLET_MINER1, LANG_UNIVERSAL, 0);
                     SetRun(true);
@@ -1031,7 +1031,6 @@ public:
                     if (Unit* car = Unit::GetCreature(*me, carGUID))
                     {
                         me->SetInFront(car);
-                        me->SendMovementFlagUpdate();
                         car->Relocate(car->GetPositionX(), car->GetPositionY(), me->GetPositionZ() + 1);
                         car->StopMoving();
                         car->RemoveAura(SPELL_CART_DRAG);

@@ -2348,8 +2348,6 @@ bool AchievementMgr<T>::CanUpdateCriteria(AchievementCriteriaEntry const* criter
         case 4961:  // arena honnorable kills 5 vs 5
         case 4960:  // arena honnorable kills 3 vs 3
         case 4959:  // arena honnorable kills 2 vs 2
-        case 16025: // 1st sinestra
-        case 15472: // I cant hear you... sinestra
         case 15427: // 1st 25lvl guild
             return false;
          break;

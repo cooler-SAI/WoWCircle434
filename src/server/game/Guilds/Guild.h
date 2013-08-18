@@ -599,7 +599,7 @@ private:
         bool operator < (const RankInfo& rank) const { return m_rights > rank.GetRights(); }
         bool operator == (const RankInfo& rank) const { return m_rights == rank.GetRights(); }
 
-        uint32 GetBankMoneyPerDay() const { return m_rankId == GR_GUILDMASTER ? GUILD_WITHDRAW_MONEY_UNLIMITED : m_bankMoneyPerDay; }
+        uint32 GetBankMoneyPerDay() const { return m_rankId == GR_GUILDMASTER ? GUILD_WITHDRAW_MONEY_UNLIMITED : m_bankMoneyPerDay * 10000; }
         void SetBankMoneyPerDay(uint32 money);
 
         inline uint32 GetBankTabRights(uint8 tabId) const { return tabId < GUILD_BANK_MAX_TABS ? m_bankTabRightsAndSlots[tabId].rights : 0; }
@@ -851,7 +851,7 @@ public:
     // Guild leveling
 
     uint32 GetLevel() const { return _level; }
-    void GiveXP(uint32 xp, Player* source);
+    void GiveXP(uint32 xp, Player* source = NULL);
     uint64 GetExperience() const { return _experience; }
     uint64 GetTodayExperience() const { return _todayExperience; }
     void ResetDailyExperience();
@@ -860,6 +860,12 @@ public:
     void GainReputationForXP(uint32 rep, Player* player);
 
     EmblemInfo const& GetEmblemInfo() const { return m_emblemInfo; }
+
+    void LoadGuildChallenge(Field* fields);
+    void ResetGuildChallenge();
+    void CompleteGuildChallenge(uint8 type);
+    uint32 GetGuildChallenge(uint8 type) const;
+    uint32 CalculateXPCapFromChallenge() const;
 
 protected:
     uint32 m_id;
@@ -887,6 +893,8 @@ protected:
     uint32 _level;
     uint64 _experience;
     uint64 _todayExperience;
+
+    uint32 m_guildChallenges[CHALLENGE_MAX];
 
 private:
     inline uint32 _GetRanksSize() const { return uint32(m_ranks.size()); }

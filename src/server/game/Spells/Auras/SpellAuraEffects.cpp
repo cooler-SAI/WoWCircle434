@@ -1134,6 +1134,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 m_fixed_periodic.SetFixedDamage(temp_damage);
                 m_fixed_periodic.SetCriticalChance(temp_crit);
                 hasFixedPeriodic = true;
+                amount = temp_damage;
             }
         }
     }
@@ -1549,7 +1550,9 @@ void AuraEffect::Update(uint32 diff, Unit* caster)
                         case 36946:
                             GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 81297, true);
                             break;
-
+                        case 103558: // Choking Smoke Bomb, Asira Dawnslayer, Hour of Twilight
+                            GetCaster()->CastSpell(d_owner->GetPositionX(), d_owner->GetPositionY(), d_owner->GetPositionZ(), 103790, true);
+                            break;
                     }
                 }
             }
@@ -4140,6 +4143,8 @@ void AuraEffect::HandleModStateImmunityMask(AuraApplication const* aurApp, uint8
         {
             target->ApplySpellImmune(GetId(), IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, apply);
             target->ApplySpellImmune(GetId(), IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK_DEST, apply);
+            target->ApplySpellImmune(GetId(), IMMUNITY_EFFECT, SPELL_EFFECT_JUMP_DEST, apply);
+            target->ApplySpellImmune(GetId(), IMMUNITY_ID, 49560, apply);   // Glyph of Resilient Grip hack
             return;
         }
         default:
@@ -6970,6 +6975,16 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
         // Spell exist but require custom code
         switch (auraId)
         {
+            // Hour of Twilight, Ultraxion, Dragon Soul
+            case 106371:
+            case 109415:
+            case 109416:
+            case 109417:
+                if (caster)
+                    if (Creature* pUltraxion = caster->ToCreature())
+                        if (Unit* pTarget = pUltraxion->AI()->SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 0.0f, true))
+                            pUltraxion->CastSpell(pTarget, 105925, true);
+                        return;
             case 107851: // Focused Assault, Hagara, Dragon Soul
             case 110900:
             case 110899:
@@ -7206,10 +7221,18 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
                 break;
             }
             case 603: // Bane of Doom
-                // There is a chance to summon an Ebon Imp when Bane of Doom does damage
-                if (caster && roll_chance_i(20))
-                    caster->CastSpell(caster, 18662, true);
+            {
+                if (!caster)
+                    break;
+
+                int32 chance = 20;
+                if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_WARLOCK, 195, EFFECT_0))
+                    chance += aurEff->GetAmount();
+
+                if (roll_chance_i(chance))
+                    caster->CastSpell(target, 18662, true);
                 break;
+            }
             // Lacerate
             case 33745:
                 if (caster && caster->GetTypeId() == TYPEID_PLAYER)

@@ -817,7 +817,9 @@ void Aura::RefreshTimers()
 {
     m_maxDuration = CalcMaxDuration();
     bool resetPeriodic = true;
-    if (m_spellInfo->AttributesEx8 & SPELL_ATTR8_DONT_RESET_PERIODIC_TIMER)
+    if ((m_spellInfo->HasAura(SPELL_AURA_PERIODIC_DAMAGE) || m_spellInfo->HasAura(SPELL_AURA_PERIODIC_LEECH) || m_spellInfo->HasAura(SPELL_AURA_PERIODIC_HEAL)) && 
+        ((m_spellInfo->SpellFamilyName >= SPELLFAMILY_MAGE && m_spellInfo->SpellFamilyName <= SPELLFAMILY_SHAMAN) ||
+        m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT))
     {
         int32 minAmplitude = m_maxDuration;
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -836,7 +838,6 @@ void Aura::RefreshTimers()
     if (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER)
         resetPeriodic = false;
      
-
     RefreshDuration(false);
     Unit* caster = GetCaster();
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -851,6 +852,17 @@ void Aura::SetCharges(uint8 charges)
     m_procCharges = charges;
     m_isUsingCharges = m_procCharges != 0;
     SetNeedClientUpdateForTargets();
+}
+
+void Aura::SetModCharges(int16 charges)
+{
+    SetCharges(charges);
+    for (uint8 i = EFFECT_0; i < EFFECT_2; ++i)
+    {
+        if (AuraEffect * eff = GetEffect(i))
+            if (SpellModifier* mod = eff->GetSpellModifier())
+                mod->charges = charges;
+    }
 }
 
 uint8 Aura::CalcMaxCharges(Unit* caster) const
@@ -1478,8 +1490,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // Improved Devouring Plague
                         if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3790, 0))
                         {
-                            uint32 damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), DOT);
-                            damage = target->SpellDamageBonusTaken(caster, GetSpellInfo(), damage, DOT);
+                            uint32 damage = target->SpellDamageBonusTaken(caster, GetSpellInfo(), GetEffect(0)->GetAmount(), DOT);
                             int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * int32(damage) / 100;
 
                             caster->CastCustomSpell(target, 63675, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
@@ -1511,7 +1522,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // Divine Touch
                         if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 3021, 0))
                         {
-                            int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * caster->SpellHealingBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), DOT) / 100;
+                            int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * GetEffect(0)->GetAmount() / 100;
                             caster->CastCustomSpell(target, 63544, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
                         }
                         break;
@@ -1530,14 +1541,12 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 switch (GetId())
                 {
                     // Blind
-                    case  2094:
+                    case 2094:
                     {
                         // Glyph of Blind
                         if (caster && caster->HasAura(91299))
                         {
-                            target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, 0, 32409);
-                            target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-                            target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                            target->RemoveDotsNotSWD();
                         }
                         break;
                     }
@@ -1604,8 +1613,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_HUNTER, 536, EFFECT_0))
                         {
                             // haste doesn't affect serpent sting so we can use static value for ticks
-                            int32 basepoints0 = caster->SpellDamageBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), DOT);
-                            basepoints0 *= 5 * aurEff->GetAmount() / 100.0f;
+                            int32 basepoints0 = GetEffect(0)->GetAmount() * 5 * aurEff->GetAmount() / 100.0f;
                             caster->CastCustomSpell(target, 83077, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
                         }
                         break;
@@ -2155,6 +2163,25 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     break;
             }
             break;
+        case SPELLFAMILY_WARRIOR:
+        {
+            if (!caster)
+                break;
+
+            // Intimidating Shout - Glyph of Intimidating Shout
+            if (GetId() == 5246 && caster->HasAura(63327))
+            {
+                if (apply)
+                {
+                    caster->CastSpell(target, 95199, true);
+                }
+                else
+                {
+                    caster->RemoveAurasDueToSpell(95199, caster->GetGUID());
+                }
+            }
+            break;
+        }
         case SPELLFAMILY_PRIEST:
             if (!caster)
                 break;
@@ -2218,7 +2245,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // Gift of the Earthmother
                         if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 3186, 0))
                         {
-                            int32 bp0 = aurEff->GetAmount() * GetEffect(EFFECT_0)->GetTotalTicks() * caster->SpellHealingBonusDone(target, GetSpellInfo(), GetEffect(0)->GetAmount(), DOT) / 100; 
+                            int32 bp0 = aurEff->GetAmount() * GetEffect(EFFECT_0)->GetTotalTicks() * GetEffect(0)->GetAmount() / 100; 
                             caster->CastCustomSpell(target, 64801, &bp0, 0, 0, true);
                         }
                     }
@@ -2728,7 +2755,8 @@ bool Aura::CanStackWith(Aura const* existingAura) const
                 return true;
 
         // same spell with same caster should not stack
-        return false;
+        if (!m_spellInfo->HasAura(SPELL_AURA_CONTROL_VEHICLE))
+            return false;
     }
 
     SpellSpecificType specificTypes[] = {SPELL_SPECIFIC_ASPECT, SPELL_SPECIFIC_WELL_FED};

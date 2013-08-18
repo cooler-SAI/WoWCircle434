@@ -244,12 +244,10 @@ class boss_queen_azshara : public CreatureScript
                             {
                                 if (Creature* pAdd = ObjectAccessor::GetCreature(*me, addsGUIDs[i]))
                                 {
+                                    pAdd->SetReactState(REACT_AGGRESSIVE);
                                     pAdd->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                                    {
-                                        pAdd->AI()->AttackStart(pTarget);
-                                        pAdd->AI()->DoAction(ACTION_ATTACK);
-                                    }
+                                    DoZoneInCombat(pAdd);
+                                    pAdd->AI()->DoAction(ACTION_ATTACK);
                                 }
                             }
                             events.ScheduleEvent(EVENT_TOTAL_OBEDIENCE, urand(10000, 20000));

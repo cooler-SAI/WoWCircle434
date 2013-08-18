@@ -55,7 +55,7 @@ void MapInstanced::Update(const uint32 t)
 
     while (i != m_InstancedMaps.end())
     {
-        if (i->second->CanUnload(t) || (i->second->IsRaid() && !i->second->HavePlayers()))
+        if (i->second->CanUnload(t))
         {
             if (!DestroyInstance(i))                             // iterator incremented
             {

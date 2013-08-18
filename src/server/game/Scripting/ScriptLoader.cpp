@@ -96,6 +96,7 @@ void AddSC_npc_taxi();
 void AddSC_npc_companions();
 void AddSC_achievement_scripts();
 void AddSC_tarecgosa_scripts();
+void AddSC_fangs_of_father_scripts();
 
 //eastern kingdoms
 void AddSC_alterac_valley();                 //Alterac Valley
@@ -726,12 +727,19 @@ void AddSC_boss_perotharn();
 void AddSC_boss_queen_azshara();
 void AddSC_boss_mannoroth();
 
+void AddSC_instance_hour_of_twilight(); // Hour of Twilight
+void AddSC_hour_of_twilight();
+void AddSC_boss_arcurion();
+void AddSC_boss_asira_dawnslayer();
+void AddSC_boss_archbishop_benedictus();
+
 void AddSC_instance_dragon_soul(); // Dragon Soul
 void AddSC_dragon_soul();
 void AddSC_boss_morchok();
 void AddSC_boss_yorsahj_the_unsleeping();
 void AddSC_boss_warlord_zonozz();
 void AddSC_boss_hagara_the_stormbinder();
+void AddSC_boss_ultraxion();
 
 // battlegrounds
 
@@ -848,6 +856,7 @@ void AddWorldScripts()
     AddSC_npc_companions();
     AddSC_achievement_scripts();
     AddSC_tarecgosa_scripts();
+    AddSC_fangs_of_father_scripts();
     AddSC_chat_log();
 #endif
 }
@@ -1492,12 +1501,19 @@ void AddNorthrendScripts()
     AddSC_boss_queen_azshara();
     AddSC_boss_mannoroth();
 
+    AddSC_instance_hour_of_twilight(); // Hour of Twilight
+    AddSC_hour_of_twilight();
+    AddSC_boss_arcurion();
+    AddSC_boss_asira_dawnslayer();
+    AddSC_boss_archbishop_benedictus();
+
     AddSC_instance_dragon_soul(); // Dragon Soul
     AddSC_dragon_soul();
     AddSC_boss_morchok();
     AddSC_boss_yorsahj_the_unsleeping();
     AddSC_boss_warlord_zonozz();
     AddSC_boss_hagara_the_stormbinder();
+    AddSC_boss_ultraxion();
 
 #endif
 }

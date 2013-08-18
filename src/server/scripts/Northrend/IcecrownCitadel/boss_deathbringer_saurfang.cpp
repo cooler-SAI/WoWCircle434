@@ -632,7 +632,6 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_4, 24000);   // cast
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_5, 30000);   // move
                         me->SetDisableGravity(false);
-                        me->SendMovementFlagUpdate();
                         me->Relocate(me->GetPositionX(), me->GetPositionY(), 539.2917f);
                         me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 539.2917f, 0.0f);
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
@@ -841,7 +840,6 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                         me->RemoveAurasDueToSpell(SPELL_GRIP_OF_AGONY);
                         Talk(SAY_OUTRO_ALLIANCE_1);
                         me->SetDisableGravity(false);
-                        me->SendMovementFlagUpdate();
                         me->Relocate(me->GetPositionX(), me->GetPositionY(), 539.2917f);
                         me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 539.2917f, 0.0f);
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)

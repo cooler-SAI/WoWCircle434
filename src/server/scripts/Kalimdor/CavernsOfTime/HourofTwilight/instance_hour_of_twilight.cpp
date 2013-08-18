@@ -5,118 +5,102 @@
 
 static const DoorData doordata[] = 
 {
-    {0, 0, DOOR_TYPE_ROOM, BOUNDARY_NONE},
+    {GO_ICEWALL_1, DATA_ARCURION,   DOOR_TYPE_ROOM,     BOUNDARY_NONE},
+    {GO_ICEWALL_2, DATA_ARCURION,   DOOR_TYPE_PASSAGE,  BOUNDARY_NONE},
+    {GO_GATE,      DATA_BENEDICTUS, DOOR_TYPE_ROOM,     BOUNDARY_NONE}
 };
 
 class instance_hour_of_twilight : public InstanceMapScript
 {
-public:
-    instance_hour_of_twilight() : InstanceMapScript("instance_hour_of_twilight", 940) { }
+    public:
+        instance_hour_of_twilight() : InstanceMapScript("instance_hour_of_twilight", 940) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
-    {
-        return new instance_hour_of_twilight_InstanceMapScript(map);
-    }
-
-    struct instance_hour_of_twilight_InstanceMapScript : public InstanceScript
-    {
-        instance_hour_of_twilight_InstanceMapScript(Map* map) : InstanceScript(map)
+        InstanceScript* GetInstanceScript(InstanceMap* map) const
         {
-            SetBossNumber(MAX_ENCOUNTER);
-            LoadDoorData(doordata);
+            return new instance_hour_of_twilight_InstanceMapScript(map);
         }
 
-        void OnPlayerEnter(Player* pPlayer)
+        struct instance_hour_of_twilight_InstanceMapScript : public InstanceScript
         {
-            if (!uiTeamInInstance)
-				uiTeamInInstance = pPlayer->GetTeam();
-        }
-
-        void OnCreatureCreate(Creature* pCreature)
-        {
-		}
-
-        void OnGameObjectCreate(GameObject* pGo)
-        {
-		}
-
-        void OnGameObjectRemove(GameObject* pGo)
-		{
-		}
-
-        void SetData(uint32 type, uint32 data)
-        {
-		}
-
-        uint32 GetData(uint32 type)
-        {
-			return 0;
-        }
-
-        uint64 GetData64(uint32 type)
-        {
-            return 0;
-        }
-
-        bool SetBossState(uint32 type, EncounterState state)
-        {
-			if (!InstanceScript::SetBossState(type, state))
-				return false;
-
-			return true;
-        }
-
-        std::string GetSaveData()
-        {
-            OUT_SAVE_INST_DATA;
-
-            std::string str_data;
-
-            std::ostringstream saveStream;
-            saveStream << "H o T " << GetBossSaveData();
-
-            str_data = saveStream.str();
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return str_data;
-        }
-
-        void Load(const char* in)
-        {
-            if (!in)
+            instance_hour_of_twilight_InstanceMapScript(Map* map) : InstanceScript(map)
             {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
+                SetBossNumber(MAX_ENCOUNTER);
+                LoadDoorData(doordata);
             }
 
-            OUT_LOAD_INST_DATA(in);
-
-            char dataHead1, dataHead2, dataHead3;
-
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2 >> dataHead3;
-
-            if (dataHead1 == 'H' && dataHead2 == 'o' && dataHead3 == 'T')
+            void OnGameObjectCreate(GameObject* pGo)
             {
-                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-				{
-					uint32 tmpState;
-					loadStream >> tmpState;
-					if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-						tmpState = NOT_STARTED;
-					SetBossState(i, EncounterState(tmpState));
-				}} else OUT_LOAD_INST_DATA_FAIL;
+                switch (pGo->GetEntry())
+                {
+                    case GO_ICEWALL_1:
+                    case GO_ICEWALL_2:
+                    case GO_GATE:
+                        AddDoor(pGo, true);
+                        break;
+                    default:
+                        break;
+                }
+		    }
 
-            OUT_LOAD_INST_DATA_COMPLETE;
-        }
+            bool SetBossState(uint32 type, EncounterState state)
+            {
+			    if (!InstanceScript::SetBossState(type, state))
+				    return false;                    
 
-        private:
-            uint32 uiTeamInInstance;
-           
-    };
+			    return true;
+            }
+
+            std::string GetSaveData()
+            {
+                OUT_SAVE_INST_DATA;
+
+                std::string str_data;
+
+                std::ostringstream saveStream;
+                saveStream << "H o T " << GetBossSaveData();
+
+                str_data = saveStream.str();
+
+                OUT_SAVE_INST_DATA_COMPLETE;
+                return str_data;
+            }
+
+            void Load(const char* in)
+            {
+                if (!in)
+                {
+                    OUT_LOAD_INST_DATA_FAIL;
+                    return;
+                }
+
+                OUT_LOAD_INST_DATA(in);
+
+                char dataHead1, dataHead2, dataHead3;
+
+                std::istringstream loadStream(in);
+                loadStream >> dataHead1 >> dataHead2 >> dataHead3;
+
+                if (dataHead1 == 'H' && dataHead2 == 'o' && dataHead3 == 'T')
+                {
+                    for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+				    {
+					    uint32 tmpState;
+					    loadStream >> tmpState;
+					    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+						    tmpState = NOT_STARTED;
+					    SetBossState(i, EncounterState(tmpState));
+				    }
+                } else OUT_LOAD_INST_DATA_FAIL;
+
+                OUT_LOAD_INST_DATA_COMPLETE;
+            }
+
+            private:
+               
+        };
 };
 
 void AddSC_instance_hour_of_twilight()
 {
-	   new instance_hour_of_twilight();
+    new instance_hour_of_twilight();
 }

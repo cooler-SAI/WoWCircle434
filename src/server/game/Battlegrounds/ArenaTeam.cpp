@@ -757,7 +757,7 @@ void ArenaTeam::MemberLost(Player* player, uint32 againstMatchmakerRating, int32
         {
             // Update personal rating
             int32 mod = GetRatingMod(itr->PersonalRating, againstMatchmakerRating, itr->MatchMakerRating, false);
-            itr->ModifyPersonalRating(player, mod, GetType(), GetRating());
+            itr->ModifyPersonalRating(player, mod, GetType(), itr->MatchMakerRating);
 
             // Update matchmaker rating
             itr->ModifyMatchmakerRating(MatchmakerRatingChange, GetSlot());
@@ -783,7 +783,7 @@ void ArenaTeam::OfflineMemberLost(uint64 guid, uint32 againstMatchmakerRating, i
         {
             // update personal rating
             int32 mod = GetRatingMod(itr->PersonalRating, againstMatchmakerRating, itr->MatchMakerRating, false);
-            itr->ModifyPersonalRating(NULL, mod, GetType(), GetRating());
+            itr->ModifyPersonalRating(NULL, mod, GetType(), itr->MatchMakerRating);
 
             // update matchmaker rating
             itr->ModifyMatchmakerRating(MatchmakerRatingChange, GetSlot());
@@ -805,7 +805,7 @@ void ArenaTeam::MemberWon(Player* player, uint32 againstMatchmakerRating, int32 
         {
             // update personal rating
             int32 mod = GetRatingMod(itr->PersonalRating, againstMatchmakerRating, itr->MatchMakerRating, true);
-            itr->ModifyPersonalRating(player, mod, GetType(), GetRating());
+            itr->ModifyPersonalRating(player, mod, GetType(), itr->MatchMakerRating);
 
             // update matchmaker rating
             itr->ModifyMatchmakerRating(MatchmakerRatingChange, GetSlot());

@@ -471,6 +471,8 @@ class boss_alysrazor : public CreatureScript
                 Talk(SAY_DEATH);
                 RemoveEncounterAuras();
 
+                instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+
                 AddSmoulderingAura(me);
             }
             
@@ -510,7 +512,6 @@ class boss_alysrazor : public CreatureScript
                     DoCast(me, SPELL_MOLTING_2, true);
                     me->AttackStop();
                     me->SetReactState(REACT_PASSIVE);
-                    DoCastAOE(SPELL_FULL_POWER, true);
                     
                     std::list<Creature*> creatureList;
                     me->GetCreatureListWithEntryInGrid(creatureList, NPC_DULL_PYRESHELL_FOCUS, 300.0f);
@@ -1388,27 +1389,18 @@ class npc_alysrazor_voracious_hatchling : public CreatureScript // 53509
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
                 pInstance = me->GetInstanceScript();
+                me->SetReactState(REACT_PASSIVE);
                 bDespawn = false;
             }
-
-            EventMap events;
-            InstanceScript* pInstance;
-            bool bDespawn;
 
             void IsSummonedBy(Unit* summoner)
             {
                 me->ModifyAuraState(AURA_STATE_UNKNOWN22, true);
-                if (Unit* pTarget = me->FindNearestPlayer(300.0f, true))
-                {
-                    AttackStart(pTarget);
-                    DoCast(pTarget, SPELL_IMPRINTED);
-                    pTarget->CastSpell(me, SPELL_IMPRINTED_TAUNT, true);
-                    events.ScheduleEvent(EVENT_EAT_WORM, 1000);
-                    events.ScheduleEvent(EVENT_HUNGRY, 9000);
-                    events.ScheduleEvent(EVENT_GUSHING_WOUND, 15000);
-                }
+                
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
+
+                events.ScheduleEvent(EVENT_START_COMBAT, 2000);
             }
 
             void UpdateAI(const uint32 diff)
@@ -1436,6 +1428,18 @@ class npc_alysrazor_voracious_hatchling : public CreatureScript // 53509
                 {
                     switch (eventId)
                     {
+                        case EVENT_START_COMBAT:
+                            me->SetReactState(REACT_AGGRESSIVE);
+                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_NEAREST, 0, 0.0f, true))
+                            {
+                                AttackStart(pTarget);
+                                DoCast(pTarget, SPELL_IMPRINTED);
+                                pTarget->CastSpell(me, SPELL_IMPRINTED_TAUNT, true);
+                                events.ScheduleEvent(EVENT_EAT_WORM, 1000);
+                                events.ScheduleEvent(EVENT_HUNGRY, 9000);
+                                events.ScheduleEvent(EVENT_GUSHING_WOUND, 15000);
+                            }
+                            break;
                         case EVENT_GUSHING_WOUND:
                             //DoCast(me->getVictim(), SPELL_GUSHING_WOUND);
                             events.ScheduleEvent(EVENT_GUSHING_WOUND, 60000);
@@ -1464,6 +1468,11 @@ class npc_alysrazor_voracious_hatchling : public CreatureScript // 53509
 
                 DoMeleeAttackIfReady();
             }
+
+        private:
+            EventMap events;
+            InstanceScript* pInstance;
+            bool bDespawn;
         };
 };
 

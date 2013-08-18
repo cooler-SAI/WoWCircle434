@@ -1339,6 +1339,7 @@ class Unit : public WorldObject
         bool isHunterPet() const{ return m_unitTypeMask & UNIT_MASK_HUNTER_PET; }
         bool isTotem() const    { return m_unitTypeMask & UNIT_MASK_TOTEM; }
         bool IsVehicle() const  { return m_unitTypeMask & UNIT_MASK_VEHICLE; }
+        bool isBattlegroundVehicle() const { return (GetTypeId() != TYPEID_PLAYER && GetMap()->IsBattleground() && (IsVehicle() || GetVehicle())); }
 
         bool IsPetGuardianStuff() const { return m_unitTypeMask & ( UNIT_MASK_SUMMON | UNIT_MASK_GUARDIAN | UNIT_MASK_PET | UNIT_MASK_HUNTER_PET | UNIT_MASK_TOTEM ); }
 
@@ -1602,6 +1603,7 @@ class Unit : public WorldObject
         void CastCustomSpell(uint32 spellId, CustomSpellValues const &value, Unit* victim = NULL, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = NULL, AuraEffect const* triggeredByAura = NULL, uint64 originalCaster = 0);
         Aura* AddAura(uint32 spellId, Unit* target);
         Aura* AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target);
+        Aura *AddAuraWithModCharges(uint32 spellid, Unit *target, int16 charges);
         void SetAuraStack(uint32 spellId, Unit* target, uint32 stack);
         void SendPlaySpellVisualKit(uint32 id, uint32 impact);
 
@@ -1794,6 +1796,7 @@ class Unit : public WorldObject
         void RemoveAurasDueToSpellBySteal(uint32 spellId, uint64 casterGUID, Unit* stealer);
         void RemoveAurasDueToItemSpell(uint32 spellId, uint64 castItemGuid);
         void RemoveAurasByType(AuraType auraType, uint64 casterGUID = 0, Aura* aura = NULL, uint32 exceptAuraId = 0, bool negative = true, bool positive = true);
+        void RemoveDotsNotSWD();
         void RemoveNotOwnSingleTargetAuras(uint32 newPhase = 0x0);
         void RemoveAurasWithInterruptFlags(uint32 flag, uint32 except = 0);
         void RemoveAurasWithAttribute(uint32 flags);

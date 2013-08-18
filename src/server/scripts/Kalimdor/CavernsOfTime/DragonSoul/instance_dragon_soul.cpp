@@ -23,6 +23,8 @@ class instance_dragon_soul : public InstanceMapScript
                 uiKohcromGUID = 0;
                 uiZonozzGUID = 0;
                 uiHagaraGUID = 0;
+                uiUltraxionGUID = 0;
+                memset(uiLesserCacheofTheAspects, 0, sizeof(uiLesserCacheofTheAspects));
 
                 bHagaraEvent = 0;
             }
@@ -49,6 +51,9 @@ class instance_dragon_soul : public InstanceMapScript
                     case NPC_HAGARA:
                         uiHagaraGUID = pCreature->GetGUID();
                         break;
+                    case NPC_ULTRAXION:
+                        uiUltraxionGUID = pCreature->GetGUID();
+                        break;
                     case NPC_TRAVEL_TO_WYRMREST_TEMPLE:
                     case NPC_TRAVEL_TO_EYE_OF_ETERNITY:
                     case NPC_TRAVEL_TO_WYRMREST_BASE:
@@ -60,8 +65,31 @@ class instance_dragon_soul : public InstanceMapScript
                 }
             }
 
+            void OnCreatureRemove(Creature* pCreature)
+            {
+                if (pCreature->GetEntry() == NPC_ULTRAXION)
+                    uiUltraxionGUID = 0;
+            }
+
             void OnGameObjectCreate(GameObject* pGo)
             {
+                switch (pGo->GetEntry())
+                {
+                    case GO_LESSER_CACHE_OF_THE_ASPECTS_10N:
+                        uiLesserCacheofTheAspects[0] = pGo->GetGUID();
+                        break;
+                    case GO_LESSER_CACHE_OF_THE_ASPECTS_25N:
+                        uiLesserCacheofTheAspects[1] = pGo->GetGUID();
+                        break;
+                    case GO_LESSER_CACHE_OF_THE_ASPECTS_10H:
+                        uiLesserCacheofTheAspects[2] = pGo->GetGUID();
+                        break;
+                    case GO_LESSER_CACHE_OF_THE_ASPECTS_25H:
+                        uiLesserCacheofTheAspects[3] = pGo->GetGUID();
+                        break;
+                    default:
+                        break;
+                }
             }
 
             uint64 GetData64(uint32 type)
@@ -72,6 +100,11 @@ class instance_dragon_soul : public InstanceMapScript
                     case DATA_KOHCROM: return uiKohcromGUID;
                     case DATA_ZONOZZ: return uiZonozzGUID;
                     case DATA_HAGARA: return uiHagaraGUID;
+                    case DATA_ULTRAXION: return uiUltraxionGUID;
+                    case DATA_LESSER_CACHE_10N: return uiLesserCacheofTheAspects[0];
+                    case DATA_LESSER_CACHE_25N: return uiLesserCacheofTheAspects[1];
+                    case DATA_LESSER_CACHE_10H: return uiLesserCacheofTheAspects[2];
+                    case DATA_LESSER_CACHE_25H: return uiLesserCacheofTheAspects[3];
                     default: return 0;
                 }
                 return 0;
@@ -183,6 +216,8 @@ class instance_dragon_soul : public InstanceMapScript
                 uint64 uiKohcromGUID;
                 uint64 uiZonozzGUID;
                 uint64 uiHagaraGUID;
+                uint64 uiUltraxionGUID;
+                uint64 uiLesserCacheofTheAspects[4];
 
                 std::vector<uint64> teleportGUIDs;
 

@@ -404,6 +404,29 @@ class WorldSession
         uint32 GetRecruiterId() const { return recruiterId; }
         bool IsARecruiter() const { return isRecruiter; }
 
+        // Antispam Functions
+        void UpdateAntispamTimer(uint32 diff)
+        {
+            if (m_uiAntispamMailSentTimer <= diff)
+            {
+                m_uiAntispamMailSentTimer = sWorld->getIntConfig(CONFIG_ANTISPAM_MAIL_TIMER);
+                m_uiAntispamMailSentCount = 0;
+            }
+            else
+                m_uiAntispamMailSentTimer -= diff;
+        }
+
+        bool UpdateAntispamCount()
+        {
+            if (!sWorld->getBoolConfig(CONFIG_ANTISPAM_ENABLED))
+                return true;
+
+            m_uiAntispamMailSentCount++;
+            if (m_uiAntispamMailSentCount > sWorld->getIntConfig(CONFIG_ANTISPAM_MAIL_COUNT))
+                return false;
+            return true;
+        }
+
     public:                                                 // opcodes handlers
 
         void Handle_NOT_NEED(WorldPacket& recvPacket);      // not used without log
@@ -834,8 +857,9 @@ class WorldSession
 
         // Looking for Dungeon/Raid
         void HandleLfgSetCommentOpcode(WorldPacket& recvData);
-        void HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& recvData);
-        void HandleLfgPartyLockInfoRequestOpcode(WorldPacket& recvData);
+        void HandleLfgGetLockInfoOpcode(WorldPacket& recvData);
+        void SendLfgPlayerLockInfo();
+        void SendLfgPartyLockInfo(); 
         void HandleLfgJoinOpcode(WorldPacket& recvData);
         void HandleLfgLeaveOpcode(WorldPacket& recvData);
         void HandleLfgSetRolesOpcode(WorldPacket& recvData);
@@ -846,8 +870,7 @@ class WorldSession
         void HandleLfrLeaveOpcode(WorldPacket& recvData);
         void HandleLfgGetStatus(WorldPacket& recv_data);
 
-        void SendLfgUpdatePlayer(LfgUpdateData const& updateData);
-        void SendLfgUpdateParty(LfgUpdateData const& updateData);
+        void SendLfgUpdateStatus(LfgUpdateData const& updateData, bool party); 
         void SendLfgRoleChosen(uint64 guid, uint8 roles);
         void SendLfgRoleCheckUpdate(LfgRoleCheck const& pRoleCheck);
         void SendLfgLfrList(bool update);
@@ -1063,6 +1086,12 @@ class WorldSession
         time_t timelastReloadUi;
         time_t timeLastServerCommand;
         time_t timeCharEnumOpcode;
+        time_t timeLastArenaTeamCommand;
+
+        // Antispam
+        uint32 m_uiAntispamMailSentCount;
+        uint32 m_uiAntispamMailSentTimer;
+
 };
 #endif
 /// @}

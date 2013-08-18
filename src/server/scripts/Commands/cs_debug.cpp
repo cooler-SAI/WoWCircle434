@@ -110,6 +110,7 @@ public:
             { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "", NULL },
             { "phase",          SEC_MODERATOR,      false, &HandleDebugPhaseCommand,           "", NULL },
             { "currencycap",    SEC_ADMINISTRATOR,  false, NULL,          "", debugResetCapCommandTable },
+            { "hasaura",        SEC_ADMINISTRATOR,  false, &HandleDebugHasAuraCommand,         "", NULL },
 
             // stats debug
             { "spellpower",     SEC_ADMINISTRATOR,  false, &HandleDebugModifySpellpowerCommand,     "", NULL },
@@ -313,7 +314,7 @@ public:
             return false;
 
         LfgUpdateType error = LfgUpdateType(atoi(result));
-        handler->GetSession()->SendLfgUpdatePlayer(LfgUpdateData(error));
+        handler->GetSession()->SendLfgUpdateStatus(LfgUpdateData(error), false);
         return true;
     }
 
@@ -1531,6 +1532,62 @@ public:
 
         int32 Value = (int32)atoi(cval);
         player->ApplySpellPowerBonus(Value, true);
+        return true;
+    }
+
+    static bool HandleDebugHasAuraCommand(ChatHandler* handler, const char* args)
+    {
+        if (!*args)
+            return false;
+
+        char* cval = strtok((char*)args, " ");
+
+        if (!cval)
+            return false;
+
+        char *name = strtok(NULL, "/n");
+        Unit* unit = NULL;
+        Player *player = NULL;
+
+        if (name)
+        {
+            handler->extractPlayerTarget(name, &player);
+            if (player)
+                unit = player;
+        }
+
+
+        if (!unit)
+        {
+            handler->getSelectedUnit();
+            if (!unit)
+                unit = handler->GetSession()->GetPlayer();
+        }
+
+        int32 auraid = (int32)atoi(cval);
+
+        if (Aura * aura = unit->GetAura(auraid))
+        {
+            std::ostringstream ss_name;
+
+            bool talent = GetTalentSpellCost(aura->GetId()) > 0;
+
+            char const* talentStr = handler->GetTrinityString(LANG_TALENT);
+            char const* passiveStr = handler->GetTrinityString(LANG_PASSIVE);
+
+            AuraApplication * app = aura->GetApplicationOfTarget(unit->GetGUID());
+
+            ss_name << "|cffffffff|Hspell:" << aura->GetId() << "|h[" << aura->GetSpellInfo()->SpellName << "]|h|r";
+
+            handler->PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, aura->GetId(), (handler->GetSession() ? ss_name.str().c_str() : name),
+                aura->GetEffectMask(), aura->GetCharges(), aura->GetStackAmount(), app ? app->GetSlot() : 0,
+                aura->GetDuration(), aura->GetMaxDuration(), (aura->IsPassive() ? passiveStr : ""),
+                (talent ? talentStr : ""), IS_PLAYER_GUID(aura->GetCasterGUID()) ? "player" : "creature",
+                GUID_LOPART(aura->GetCasterGUID()));
+        }
+        else
+            handler->PSendSysMessage("unit %s doesn't have aura %i", unit->GetName(), auraid);
+
         return true;
     }
 

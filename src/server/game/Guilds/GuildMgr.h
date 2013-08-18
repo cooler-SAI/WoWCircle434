@@ -62,6 +62,8 @@ public:
         return NULL;
     }
 
+    void ResetGuildChallenges();
+
 protected:
     uint32 NextGuildId;
     GuildContainer GuildStore;

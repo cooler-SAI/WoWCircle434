@@ -36,6 +36,9 @@ enum Spells
     SPELL_SHATTERED_ICE             = 105289,
     SPELL_FOCUSED_ASSAULT           = 107851,
     SPELL_FROZEN_TEMPEST            = 105256,
+    SPELL_FROZEN_TEMPEST_25         = 109552,
+    SPELL_FROZEN_TEMPEST_10H        = 109553,
+    SPELL_FROZEN_TEMPEST_25H        = 109554,
     SPELL_ICICLE                    = 109315,
     SPELL_ICICLE_AURA               = 92201, // ?
     SPELL_ICE_WAVE                  = 105265,
@@ -45,11 +48,14 @@ enum Spells
     SPELL_FROSTFLAKE                = 109325,
     SPELL_FEEDBACK                  = 108934,
     SPELL_WATER_SHIELD              = 105409,
+    SPELL_WATER_SHIELD_25           = 109560,
+    SPELL_WATER_SHIELD_10H          = 109561,
+    SPELL_WATER_SHIELD_25H          = 109562,
     SPELL_LIGHTNING_STORM           = 105465,
     SPELL_LIGHTNING_STORM_DUMMY     = 105467,
     SPELL_CRYSTALLINE_TETHER_2      = 105482,
     SPELL_LIGHTNING_ROD_1           = 105343, // visual
-    SPELL_LIGHTNING_ROD_2           = 109810, // visual
+    SPELL_LIGHTNING_ROD_2           = 109180, // visual
     SPELL_OVERLOAD_1                = 105487,
     SPELL_OVERLOAD_2                = 105481, // by elemental
     SPELL_LIGHTNING_CONDUIT_AOE     = 105377,
@@ -133,6 +139,7 @@ enum Events
     EVENT_STORM_PILLARS,
     EVENT_BERSERK,
     EVENT_WATERY_ENTRENCHMENT,
+    EVENT_END_SPECIAL_PHASE,
 
 
     // Stormborn Myrmidon
@@ -165,6 +172,7 @@ enum MiscData
     DATA_MAIN_WAVE          = 8,
     ACTION_CRYSTAL_DIED     = 9,
     DATA_CRYSTAL_OVERLOADED = 10,
+    DATA_PHASE              = 11,
 };
 
 const Position centerPos = {13587.4f, 13612.0f, 122.43f, 5.93f};
@@ -383,6 +391,9 @@ class boss_hagara_the_stormbinder: public CreatureScript
             void Reset()
             {
                 _Reset();
+
+                DespawnCreatures(NPC_ICE_WAVE);
+
                 bEvent = false;
                 phase = 0;
                 specialPhase = false;
@@ -442,39 +453,15 @@ class boss_hagara_the_stormbinder: public CreatureScript
                 {
                     crystalCount--;
                     if (crystalCount == 0)
-                    {
-                        specialPhase = false;
-                        events.CancelEvent(EVENT_ICICLE);
-                        events.CancelEvent(EVENT_WATERY_ENTRENCHMENT);
-                        events.CancelEvent(EVENT_STORM_PILLARS);
-                        events.CancelEvent(EVENT_FROSTFLAKE);
-                        me->RemoveAllAuras();
-                        DespawnCreatures(NPC_ICE_WAVE);
-                        summons.DespawnEntry(NPC_CRYSTAL_CONDUCTOR);
-                        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_WATERY_ENTRENCHMENT);
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        AttackStart(me->getVictim());
-                        DoCast(me, SPELL_FEEDBACK, true);
-                        events.ScheduleEvent(EVENT_ICE_LANCE, 12000);
-                        events.ScheduleEvent(EVENT_ICY_TOMB, 20000);
-                        events.ScheduleEvent(EVENT_FOCUSED_ASSAULT, 15000);
-                        events.ScheduleEvent(EVENT_SHATTERED_ICE, urand(20000, 30500));
-                        if (phase == 10)
-                        {
-                            events.ScheduleEvent(EVENT_FROZEN_TEMPEST_1, 62000);
-                            me->RemoveAura(SPELL_HAGARA_LIGHTNING_AXES);
-                            DoCast(me, SPELL_HAGARA_FROST_AXES, true);
-                        }
-                        else if (phase == 11)
-                        {
-                            events.ScheduleEvent(EVENT_ELECTRICAL_STORM_1, 62000);
-                            me->RemoveAura(SPELL_HAGARA_FROST_AXES);
-                            DoCast(me, SPELL_HAGARA_LIGHTNING_AXES, true);
-                        }
-                        phase = 0;
-
-                    }
+                        SpecialPhaseEnd();
                 }
+            }
+
+            uint32 GetData(uint32 type)
+            {
+                if (type == DATA_PHASE)
+                    return (uint32)phase;
+                return 0;
             }
 
             void JustDied(Unit* /*killer*/)
@@ -704,6 +691,7 @@ class boss_hagara_the_stormbinder: public CreatureScript
                             events.ScheduleEvent(EVENT_ICE_WAVE, 6000);
                             events.ScheduleEvent(EVENT_ICICLE, 2000);
                             events.ScheduleEvent(EVENT_WATERY_ENTRENCHMENT, 7000);
+                            events.ScheduleEvent(EVENT_END_SPECIAL_PHASE, 305000);
                             if (IsHeroic())
                                 events.ScheduleEvent(EVENT_FROSTFLAKE, urand(2000, 5000));
                             break;
@@ -795,20 +783,32 @@ class boss_hagara_the_stormbinder: public CreatureScript
                             crystalCount = 4;
                             phase = 10;
                             Talk(SAY_LIGHTNING);
-                            for (uint8 i = 0; i < 4; ++i)
-                                if (Creature* pCronductor = me->SummonCreature(NPC_CRYSTAL_CONDUCTOR, crystalconductorPos[i]))
-                                    pCronductor->CastSpell(me, SPELL_CRYSTALLINE_TETHER_2);
-
-                            if (GetDifficulty() == RAID_DIFFICULTY_10MAN_HEROIC)
+                            switch (GetDifficulty())
                             {
-                                crystalCount += 4;
-                                for (uint8 i = 0; i < 4; ++i)
-                                    if (Creature* pCronductor = me->SummonCreature(NPC_CRYSTAL_CONDUCTOR, crystalconductorPos[i + 4]))
-                                        pCronductor->CastSpell(me, SPELL_CRYSTALLINE_TETHER_2);
+                                case RAID_DIFFICULTY_10MAN_NORMAL:
+                                    for (uint8 i = 0; i < 4; ++i)
+                                        if (Creature* pCronductor = me->SummonCreature(NPC_CRYSTAL_CONDUCTOR, crystalconductorPos[i + 4]))
+                                            pCronductor->CastSpell(me, SPELL_CRYSTALLINE_TETHER_2);
+                                    break;
+                                case RAID_DIFFICULTY_10MAN_HEROIC:
+                                    crystalCount += 4;
+                                    for (uint8 i = 0; i < 4; ++i)
+                                        if (Creature* pCronductor = me->SummonCreature(NPC_CRYSTAL_CONDUCTOR, crystalconductorPos[i + 4]))
+                                            pCronductor->CastSpell(me, SPELL_CRYSTALLINE_TETHER_2);
+                                // no break
+                                case RAID_DIFFICULTY_25MAN_NORMAL:
+                                case RAID_DIFFICULTY_25MAN_HEROIC:
+                                    for (uint8 i = 0; i < 4; ++i)
+                                        if (Creature* pCronductor = me->SummonCreature(NPC_CRYSTAL_CONDUCTOR, crystalconductorPos[i]))
+                                            pCronductor->CastSpell(me, SPELL_CRYSTALLINE_TETHER_2);
+                                    break;
                             }
-
+                            
                             me->SummonCreature(NPC_BOUND_LIGHTNING_ELEMENTAL, circlePos[0][3]);
+                            
                             DoCast(me, SPELL_WATER_SHIELD);
+                            
+                            events.ScheduleEvent(EVENT_END_SPECIAL_PHASE, 305000);
                             if (IsHeroic())
                                 events.ScheduleEvent(EVENT_STORM_PILLARS, 5000);
                             break;
@@ -816,6 +816,13 @@ class boss_hagara_the_stormbinder: public CreatureScript
                             if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                                 DoCastAOE(SPELL_STORM_PILLARS, true);
                             events.ScheduleEvent(EVENT_STORM_PILLARS, urand(5000, 10000));
+                            break;
+                        case EVENT_END_SPECIAL_PHASE:
+                            crystalCount = 0;
+                            summons.DespawnEntry(NPC_CRYSTAL_CONDUCTOR);
+                            summons.DespawnEntry(NPC_BOUND_LIGHTNING_ELEMENTAL);
+                            summons.DespawnEntry(NPC_FROZEN_BINDING_CRYSTAL);
+                            SpecialPhaseEnd();
                             break;
                         default:
                             break;
@@ -832,6 +839,49 @@ class boss_hagara_the_stormbinder: public CreatureScript
             uint8 phase;
             uint8 summonCount;
             uint8 crystalCount;
+
+            void SpecialPhaseEnd()
+            {
+                specialPhase = false;
+                events.CancelEvent(EVENT_ICICLE);
+                events.CancelEvent(EVENT_WATERY_ENTRENCHMENT);
+                events.CancelEvent(EVENT_STORM_PILLARS);
+                events.CancelEvent(EVENT_FROSTFLAKE);
+                events.CancelEvent(EVENT_END_SPECIAL_PHASE);
+
+                me->RemoveAura(RAID_MODE(SPELL_WATER_SHIELD, SPELL_WATER_SHIELD_25, SPELL_WATER_SHIELD_10H, SPELL_WATER_SHIELD_25H));
+                me->RemoveAura(RAID_MODE(SPELL_FROZEN_TEMPEST, SPELL_FROZEN_TEMPEST_25, SPELL_FROZEN_TEMPEST_10H, SPELL_FROZEN_TEMPEST_25H));
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_WATERY_ENTRENCHMENT);
+                        
+                DespawnCreatures(NPC_ICE_WAVE);
+                summons.DespawnEntry(NPC_CRYSTAL_CONDUCTOR);
+                summons.DespawnEntry(NPC_BOUND_LIGHTNING_ELEMENTAL);
+                summons.DespawnEntry(NPC_FROZEN_BINDING_CRYSTAL);
+
+                me->SetReactState(REACT_AGGRESSIVE);
+                AttackStart(me->getVictim());
+
+                DoCast(me, SPELL_FEEDBACK, true);
+
+                events.ScheduleEvent(EVENT_ICE_LANCE, 12000);
+                events.ScheduleEvent(EVENT_ICY_TOMB, 20000);
+                events.ScheduleEvent(EVENT_FOCUSED_ASSAULT, 15000);
+                events.ScheduleEvent(EVENT_SHATTERED_ICE, urand(20000, 30500));
+                
+                if (phase == 10)
+                {
+                    events.ScheduleEvent(EVENT_FROZEN_TEMPEST_1, 62000);
+                    me->RemoveAura(SPELL_HAGARA_LIGHTNING_AXES);
+                    DoCast(me, SPELL_HAGARA_FROST_AXES, true);
+                }
+                else if (phase == 11)
+                {
+                    events.ScheduleEvent(EVENT_ELECTRICAL_STORM_1, 62000);
+                    me->RemoveAura(SPELL_HAGARA_FROST_AXES);
+                    DoCast(me, SPELL_HAGARA_LIGHTNING_AXES, true);
+                }
+                phase = 0;
+            }
 
             void DespawnCreatures(uint32 entry)
             {
@@ -1616,8 +1666,12 @@ class npc_hagara_the_stormbinder_crystal_conductor : public CreatureScript
 
                 if (uint32 eventId = events.ExecuteEvent())
                 {
-                    if (Player* pPlayer = me->FindNearestPlayer(8.0f))
+                    if (Player* pPlayer = me->FindNearestPlayer(10.0f))
                         DoCast(pPlayer, SPELL_LIGHTNING_CONDUIT_DUMMY_1, true);
+
+                    
+                    
+
                     events.ScheduleEvent(EVENT_CHECK_PLAYERS, 1000);
                 }
             }
@@ -1756,7 +1810,7 @@ class spell_hagara_the_stormbinder_icy_tomb_aoe : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                if (GetCaster())
+                if (!GetCaster())
                     return;
 
                 if (!GetCaster()->getVictim())
@@ -1915,58 +1969,6 @@ class spell_hagara_the_stormbinder_ice_lance_target : public SpellScriptLoader
         }
 };
 
-class spell_hagara_the_stormbinder_crystal_conduit_target : public SpellScriptLoader
-{ 
-    public:
-        spell_hagara_the_stormbinder_crystal_conduit_target() : SpellScriptLoader("spell_hagara_the_stormbinder_crystal_conduit_target") { }
-
-        class spell_hagara_the_stormbinder_crystal_conduit_target_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_hagara_the_stormbinder_crystal_conduit_target_SpellScript);
-
-            void FilterTargets(std::list<WorldObject*>& targets)
-            {
-                if (!GetCaster())
-                    return;
-
-                if (targets.empty())
-                    return;
-
-                targets.remove_if(PlayerOrCrystal());
-                targets.remove(GetCaster());
-            }
-        
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hagara_the_stormbinder_crystal_conduit_target_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_TARGET_ANY);
-            }
-
-        private:
-            class PlayerOrCrystal
-            {
-                public:
-                    PlayerOrCrystal() {}
-            
-                    bool operator()(WorldObject* unit)
-                    {
-                        if (unit->GetTypeId() != TYPEID_PLAYER && unit->GetEntry() != NPC_CRYSTAL_CONDUCTOR)
-                            return true;
-
-                        if (Creature* pCreature = unit->ToCreature())
-                            if (pCreature->AI()->GetData(DATA_CRYSTAL_OVERLOADED))
-                                return true;
-
-                        return false;
-                    }
-            };
-        };
-       
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_hagara_the_stormbinder_crystal_conduit_target_SpellScript();
-        }
-};
-
 class spell_hagara_the_stormbinder_storm_pillars : public SpellScriptLoader
 {
     public:
@@ -2027,6 +2029,83 @@ class spell_hagara_the_stormbinder_frostflake : public SpellScriptLoader
         }
 };
 
+class spell_hagara_the_stormbinder_lightning_conduit : public SpellScriptLoader
+{
+    public:
+        spell_hagara_the_stormbinder_lightning_conduit() : SpellScriptLoader("spell_hagara_the_stormbinder_lightning_conduit") { }
+
+        class spell_hagara_the_stormbinder_lightning_conduit_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_hagara_the_stormbinder_lightning_conduit_AuraScript);
+
+            void HandlePeriodicTick(AuraEffect const* aurEff)
+            {
+                if (!GetCaster() || !GetTarget())
+                    return;
+
+                if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
+                    return;
+
+                Creature* pHagara = NULL;
+                pHagara = GetCaster()->FindNearestCreature(NPC_HAGARA, 200.0f, true);
+                if (!pHagara)
+                    return;
+
+                if (pHagara->AI()->GetData(DATA_PHASE) != 10)
+                    return;
+
+                std::list<Player*> players;
+                AnyPlayerOrCrystalCheck check(GetTarget(), 10.0f);
+                Trinity::PlayerListSearcher<AnyPlayerOrCrystalCheck> searcher(GetTarget(), players, check); 
+                GetTarget()->VisitNearbyObject(10.0f, searcher);
+
+                if (!players.empty())
+                    for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                        GetTarget()->CastSpell((*itr), SPELL_LIGHTNING_CONDUIT_DUMMY_1, true);
+
+                if (Creature* pCrystal = GetTarget()->FindNearestCreature(NPC_CRYSTAL_CONDUCTOR, 10.0f))
+                    GetTarget()->CastSpell(pCrystal, SPELL_LIGHTNING_CONDUIT_DUMMY_1, true);
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_hagara_the_stormbinder_lightning_conduit_AuraScript::HandlePeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+            }
+
+        private:
+            class AnyPlayerOrCrystalCheck
+            {
+                public:
+                    AnyPlayerOrCrystalCheck(WorldObject const* obj, float range) : _obj(obj), _range(range) {}
+                    bool operator()(Player* u)
+                    {
+                        if (u->GetGUID() == _obj->GetGUID())
+                            return false;
+
+                        if (u->HasAura(SPELL_LIGHTNING_CONDUIT_DUMMY_1))
+                            return false;
+
+                        if (!u->isAlive())
+                            return false;
+
+                        if (!_obj->IsWithinDistInMap(u, _range))
+                            return false;
+
+                        return true;
+                    }
+
+                private:
+                    WorldObject const* _obj;
+                    float _range;
+            };
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_hagara_the_stormbinder_lightning_conduit_AuraScript();
+        }
+};
+
 void AddSC_boss_hagara_the_stormbinder()
 {
     new boss_hagara_the_stormbinder();
@@ -2048,7 +2127,7 @@ void AddSC_boss_hagara_the_stormbinder()
     new spell_hagara_the_stormbinder_icy_tomb_dummy();
     new spell_hagara_the_stormbinder_icy_tomb();
     new spell_hagara_the_stormbinder_ice_lance_target();
-    new spell_hagara_the_stormbinder_crystal_conduit_target();
     new spell_hagara_the_stormbinder_storm_pillars();
     new spell_hagara_the_stormbinder_frostflake();
+    new spell_hagara_the_stormbinder_lightning_conduit();
 }

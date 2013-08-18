@@ -10318,11 +10318,12 @@ bool Player::HasItemOrGemWithLimitCategoryEquipped(uint32 limitCategory, uint32 
     return false;
 }
 
-bool Player::CheckArmorSpecializationItemConditions(SpellInfo const* spellInfo) const
+bool Player::CheckArmorSpecializationItemConditions(uint32 spellId) const
 {
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR8_ARMOR_SPECIALIZATION))
         return false;
-
+    
     uint8 count = 0;
 
     if (SpellEquippedItemsEntry const* listItems = spellInfo->GetSpellEquippedItems())
@@ -10350,8 +10351,8 @@ bool Player::CheckArmorSpecializationItemConditions(SpellInfo const* spellInfo) 
 
 void Player::UpdateArmorSpecializations(uint8 Slot)
 {
-    uint32 specilaztionSpell = ArmorSpecializationSpellToClass[getClass()];
-    if (!specilaztionSpell)
+    uint32 specializationSpell = ArmorSpecializationSpellToClass[getClass()];
+    if (!specializationSpell)
         return;
 
     switch (Slot)
@@ -10376,38 +10377,26 @@ void Player::UpdateArmorSpecializations(uint8 Slot)
         if (ArmorSpecializationTree[i].Class != getClass())
             continue;
 
-        spellId =  ArmorSpecializationTree[i].spellId;
+        spellId = ArmorSpecializationTree[i].spellId;
 
         RemoveAurasDueToSpell(spellId);
 
-
-        if (!ArmorSpecializationTree[i].Tree && GetPrimaryTalentTree(GetActiveSpec()) == 0 ||
-            ArmorSpecializationTree[i].Tree && ArmorSpecializationTree[i].Tree != GetPrimaryTalentTree(GetActiveSpec()) ||
-            ArmorSpecializationTree[i].Form && this->GetShapeshiftForm() != ArmorSpecializationTree[i].Form)
+        if (!HasSpell(specializationSpell))
             continue;
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR8_ARMOR_SPECIALIZATION))
-        {
-            sLog->outError(LOG_FILTER_PLAYER, "Player::UpdateArmorSpecializations: unexistent or wrong spell %u for class %u",
-                spellId, ArmorSpecializationTree[i].Class);
-            continue;
-        }
-
-        if (!HasSpell(specilaztionSpell))
-        {
-            RemoveAurasDueToSpell(spellInfo->Id);
-            continue;
-        }
-
-        if (!CheckArmorSpecializationItemConditions(spellInfo))
+        if (ArmorSpecializationTree[i].Tree != 0 &&
+            ArmorSpecializationTree[i].Tree != GetPrimaryTalentTree(GetActiveSpec()))
             continue;
 
-        if (!HasAura(ArmorSpecializationTree[i].spellId))
-        {
-            CastSpell(this, spellInfo->Id, true);
-            break;
-        }
+        if (ArmorSpecializationTree[i].Form != 0 &&
+            ArmorSpecializationTree[i].Form != GetShapeshiftForm())
+            continue;
+
+        if (!CheckArmorSpecializationItemConditions(spellId))
+            continue;
+
+        if (!HasAura(spellId))
+            CastSpell(this, spellId, true);
     }
 }
 
@@ -19500,10 +19489,27 @@ void Player::ResetInstances(uint8 method, bool isRaid)
     // we assume that when the difficulty changes, all instances that can be reset will be
     Difficulty diff = GetDifficulty(isRaid);
 
+    // Unload all raid maps
+    for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
+        for (BoundInstancesMap::iterator itr = m_boundInstances[i].begin(); itr != m_boundInstances[i].end(); ++ itr)
+        {
+            InstanceSave* instanceSave = itr->second.save;
+            Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
+            if (map && map->IsRaid() && method == INSTANCE_RESET_CHANGE_DIFFICULTY)
+            {
+                if (InstanceMap* map_i = map->ToInstanceMap())
+                    if (!map_i->HavePlayers())
+                        map_i->SetUnloadTimer(1);
+            }
+        }
+
     for (BoundInstancesMap::iterator itr = m_boundInstances[diff].begin(); itr != m_boundInstances[diff].end();)
     {
         InstanceSave* p = itr->second.save;
         const MapEntry* entry = sMapStore.LookupEntry(itr->first);
+        InstanceSave* instanceSave = itr->second.save;
+        Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
+        
         if (!entry || entry->IsRaid() != isRaid || !p->CanReset())
         {
             ++itr;
@@ -19521,7 +19527,6 @@ void Player::ResetInstances(uint8 method, bool isRaid)
         }
 
         // if the map is loaded, reset it
-        Map* map = sMapMgr->FindMap(p->GetMapId(), p->GetInstanceId());
         if (map && map->IsDungeon())
             if (!((InstanceMap*)map)->Reset(method))
             {
@@ -20847,7 +20852,7 @@ bool Player::BuyCurrencyFromVendorSlot(uint64 vendorGuid, uint32 vendorSlot, uin
         return false;
     }
 
-    if (GetCurrency(currency, false) + count > GetCurrencyWeekCap(currency, false))
+    if (GetCurrencyWeekCap(currency, false) && (GetCurrencyOnWeek(currency, false) + count > GetCurrencyWeekCap(currency, false)))
     {
         SendBuyError(BUY_ERR_CANT_CARRY_MORE, vendorGuid, currency);
         return false;
