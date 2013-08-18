@@ -112,6 +112,7 @@ class boss_helix_gearbreaker : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
                 me->setActive(true);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             }
             
             void Reset() 
@@ -119,6 +120,7 @@ class boss_helix_gearbreaker : public CreatureScript
                 _Reset();
 
                 me->SummonCreature(NPC_LUMBERING_OAF, oafPos[0]);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             }
 
             void SummonedCreatureDies(Creature* summon, Unit* killer)
@@ -126,6 +128,7 @@ class boss_helix_gearbreaker : public CreatureScript
                 if (summon->GetEntry() == NPC_LUMBERING_OAF)
                 {
                     Talk(SAY_OAF_DEAD);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                 }
             }
 
