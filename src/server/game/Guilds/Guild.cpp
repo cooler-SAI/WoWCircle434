@@ -3515,6 +3515,10 @@ void Guild::CompleteGuildChallenge(uint8 type)
     data << uint32(max_count); // max
 
     BroadcastPacket(&data);
+
+    // Achievements
+    GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE, 1, 0, 0, NULL, NULL);
+    GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE_TYPE, type, 1, 0, NULL, NULL);
 }
 
 uint32 Guild::CalculateXPCapFromChallenge() const

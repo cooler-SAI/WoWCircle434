@@ -575,6 +575,20 @@ struct AchievementCriteriaEntry
             uint32 count;
         } kill_creature_type_guild;
 
+        // ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE_TYPE = 138
+        struct
+        {
+            uint32 challenge_type;
+            uint32 count;
+        } guild_challenge_complete_type;
+
+        // ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE = 139
+        struct
+        {
+            uint32 unused;
+            uint32 count;
+        } guild_challenge_complete;
+
         struct
         {
             uint32  unused;
