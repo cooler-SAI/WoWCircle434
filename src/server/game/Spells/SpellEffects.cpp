@@ -2557,6 +2557,11 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
                 addhealth = m_caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL, m_spellValue->EffectBasePoints[1]);
                 break;
             }
+            // Word of Glory
+            case 85673:
+            {
+                break;
+            }
             default:
                 addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
                 break;
