@@ -688,6 +688,8 @@ class boss_sara : public CreatureScript
 
             void DamageTaken(Unit* /*attacker*/, uint32& damage)
             {
+                if (_events.IsInPhase(PHASE_TRANSFORM) && damage >= me->GetHealth())
+                    damage = 0;
                 if (_events.IsInPhase(PHASE_ONE) && damage >= me->GetHealth())
                 {
                     damage = 0;

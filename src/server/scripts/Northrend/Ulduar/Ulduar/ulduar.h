@@ -211,7 +211,7 @@ enum UlduarNPCs
     NPC_SANITY_WELL                         = 33991,
     NPC_DESCEND_INTO_MADNESS                = 34072,
     NPC_MARKED_IMMORTAL_GUARDIAN            = 36064,
-	
+
     // Algalon the Observer
     NPC_BRANN_BRONZBEARD_ALG                = 34064,
     NPC_AZEROTH                             = 34246,
@@ -366,8 +366,8 @@ enum UlduarTeleportSpells
     SPELL_ANTECHAMBER_TELEPORT          = 64030,
     SPELL_SHATTERED_WALKWAY_TELEPORT    = 64029,
     SPELL_CONSERVATORY_TELEPORT         = 64024,
-    SPELL_SPARK_OF_IMAGINATION_TELEPORT = 64025,    // NIY
-    SPELL_DESCENT_INTO_MADNESS_TELEPORT = 64027     // NIY
+    SPELL_SPARK_OF_IMAGINATION_TELEPORT = 64025,
+    SPELL_DESCENT_INTO_MADNESS_TELEPORT = 64027
 };
 
 enum UlduarData

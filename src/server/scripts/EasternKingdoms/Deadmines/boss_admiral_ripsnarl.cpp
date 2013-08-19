@@ -148,6 +148,26 @@ class boss_admiral_ripsnarl : public CreatureScript
                 me->SetVisible(true);
 
                 stage = 0;
+                SetFog(false);
+            }
+
+            void SetFog(bool enabled)
+            {
+                std::list<Creature*> dummies;
+                GetCreatureListWithEntryInGrid(dummies, me, NPC_DUMMY_1, 75);
+                for (std::list<Creature*>::const_iterator itr = dummies.begin(); itr != dummies.end(); ++itr)
+                    if (enabled)
+                        (*itr)->CastSpell(*itr, SPELL_FOG_1, true);
+                    else
+                        (*itr)->RemoveAurasDueToSpell(SPELL_FOG_1);
+
+                std::list<Creature*> bigDummies;
+                GetCreatureListWithEntryInGrid(bigDummies, me, NPC_DUMMY_2, 75);
+                for (std::list<Creature*>::const_iterator itr = bigDummies.begin(); itr != bigDummies.end(); ++itr)
+                    if (enabled)
+                        (*itr)->CastSpell(*itr, SPELL_FOG_2, true);
+                    else
+                        (*itr)->RemoveAurasDueToSpell(SPELL_FOG_2);
             }
 
             void EnterCombat(Unit* who) 
@@ -162,6 +182,7 @@ class boss_admiral_ripsnarl : public CreatureScript
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RIPSNARL_ACHIEVEMENT);
                 instance->DoResetAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, ACHIEVEMENT_CRITERIA_CONDITION_UNK13, 28179);
                 DoZoneInCombat();
+                SetFog(false);
                 instance->SetBossState(DATA_ADMIRAL, IN_PROGRESS);
             }
 
@@ -175,6 +196,7 @@ class boss_admiral_ripsnarl : public CreatureScript
             {
                 _JustDied();
                 Talk(SAY_DEATH);
+                SetFog(false);
 
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RIPSNARL_ACHIEVEMENT);
             }
@@ -201,6 +223,7 @@ class boss_admiral_ripsnarl : public CreatureScript
                     EnterSpecialPhase();
                     for (uint8 i = 0; i < 38; i++)
                         me->SummonCreature(NPC_DUMMY_1, dummyPos[i]);
+                 SetFog(true);
                     return;
                 }
                 else if (me->HealthBelowPct(50) && stage == 1)
@@ -385,7 +408,7 @@ class spell_admiral_ripsnarl_coalesce : public SpellScriptLoader
                 if (!GetCaster())
                     return;
 
-                if (Creature* pAdmiral = GetCaster()->FindNearestCreature(NPC_ADMIRAL, 100.0f))
+                if (Creature* pAdmiral = GetCaster()->FindNearestCreature(NPC_ADMIRAL_RIPSNARL, 100.0f))
                     pAdmiral->AI()->DoAction(ACTION_COALESCE);
             }
 
