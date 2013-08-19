@@ -7581,6 +7581,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         int32 bp0 = int32(CalculatePct(GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + crIds[i]), 25));
                         CastCustomSpell(this, spellIds[i], &bp0, 0, 0, true);
                     }
+                    // Item - Rogue T13 2P Bonus
+                    if (HasAura(105849))
+                        CastSpell(this, 105864, true);
 
                     if (!redirectTarget)
                         break;
