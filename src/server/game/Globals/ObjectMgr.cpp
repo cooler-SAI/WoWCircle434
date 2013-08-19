@@ -9096,7 +9096,7 @@ void ObjectMgr::LoadGuildChallengeRewardInfo()
         return;
     }
 
-    _challengeRewardData.reserve(result->GetRowCount());
+    _challengeRewardData.resize(result->GetRowCount());
 
     uint32 count = 0;
 
