@@ -502,6 +502,7 @@ void AddSC_instance_halls_of_reflection();   // Halls of Reflection
 void AddSC_halls_of_reflection();
 void AddSC_boss_falric();
 void AddSC_boss_marwyn();
+void AddSC_boss_lich_king_hr();
 void AddSC_instance_icecrown_citadel(); // Icecrown Citadel
 void AddSC_icecrown_citadel();
 void AddSC_icecrown_citadel_teleport();
@@ -1355,6 +1356,7 @@ void AddNorthrendScripts()
     AddSC_halls_of_reflection();
     AddSC_boss_falric();
     AddSC_boss_marwyn();
+    AddSC_boss_lich_king_hr();
     AddSC_instance_icecrown_citadel(); // Icecrown Citadel
     AddSC_icecrown_citadel();
     AddSC_icecrown_citadel_teleport();

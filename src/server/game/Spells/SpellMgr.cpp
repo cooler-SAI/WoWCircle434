@@ -2844,7 +2844,7 @@ void SpellMgr::LoadSpellCustomAttr()
         if (!spellInfo->_IsPositiveEffect(EFFECT_2, false))
             spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE_EFF2;
 
-        if (spellInfo->SpellVisual[0] == 3879)
+        if (spellInfo->SpellVisual[0] == 3879 || spellInfo->Id == 74117)
             spellInfo->AttributesCu |= SPELL_ATTR0_CU_CONE_BACK;
 
         ////////////////////////////////////
