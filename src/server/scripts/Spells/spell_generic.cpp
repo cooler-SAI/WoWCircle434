@@ -3245,6 +3245,61 @@ class spell_gen_throw_torch : public SpellScriptLoader
         }
 };
 
+enum ICSeaforiumSpells
+{
+    SPELL_BOMB_CREDIT_1 = 68366,
+    SPELL_BOMB_CREDIT_2 = 68367, // huge
+};
+
+class spell_gen_ic_seaforium_blast : public SpellScriptLoader
+{
+    public:
+        spell_gen_ic_seaforium_blast() : SpellScriptLoader("spell_gen_ic_seaforium_blast") {}
+
+        class spell_gen_ic_seaforium_blast_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_gen_ic_seaforium_blast_SpellScript);
+
+            bool Validate(SpellInfo const* /*spell*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_BOMB_CREDIT_1))
+                    return false;
+                if (!sSpellMgr->GetSpellInfo(SPELL_BOMB_CREDIT_2))
+                    return false;
+                return true;
+            }
+
+            bool Load()
+            {
+                return GetOriginalCaster()->GetTypeId() == TYPEID_PLAYER;
+            }
+
+            void AchievementCredit(SpellEffIndex /*effIndex*/)
+            {
+                if (Unit* originalCaster = GetOriginalCaster())
+                    if (GameObject* go = GetHitGObj())
+                        if (go->GetGOInfo()->type == GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING)
+                        {
+                            if (m_scriptSpellId == 66676 || m_scriptSpellId == 67814)
+                                originalCaster->CastSpell(originalCaster, SPELL_BOMB_CREDIT_1, true);
+                            else if (m_scriptSpellId == 66672 || m_scriptSpellId ==  67813)
+                                originalCaster->CastSpell(originalCaster, SPELL_BOMB_CREDIT_2, true);
+                        }
+
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_gen_ic_seaforium_blast_SpellScript::AchievementCredit, EFFECT_1, SPELL_EFFECT_GAMEOBJECT_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_gen_ic_seaforium_blast_SpellScript();
+        }
+};
+
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_absorb0_hitlimit1();
@@ -3313,4 +3368,5 @@ void AddSC_generic_spell_scripts()
     new spell_gen_torch_target_picker();
     new spell_gen_juggle_torch_catch();
     new spell_gen_throw_torch();
+    new spell_gen_ic_seaforium_blast();
 }
