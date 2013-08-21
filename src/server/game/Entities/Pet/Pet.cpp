@@ -955,6 +955,16 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         {
             switch (GetEntry())
             {
+                case 50675: // Ebon Imp
+                {
+                    if (Player* pOwner = m_owner->ToPlayer())
+                        m_modMeleeHitChance = pOwner->GetFloatValue(PLAYER_FIELD_UI_SPELL_HIT_MODIFIER) + pOwner->GetRatingBonusValue(CR_HIT_SPELL);
+                    
+                    float bonusDmg = m_owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW) * 0.15f;
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 2.5f - (petlevel / 2) + bonusDmg));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 2.5f + (petlevel / 2) + bonusDmg));
+                    break;
+                }
                 case 11859: // Doom Guard
                 case 89: // Infernal
                     if (!HasAura(96101)) // Warlock Mastery
@@ -1008,7 +1018,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float((petlevel * 4 + petlevel) + bonus_dmg));
 
                     if (Player* pOwner = m_owner->ToPlayer())
-                        m_modMeleeHitChance = pOwner->GetFloatValue(PLAYER_FIELD_UI_SPELL_HIT_MODIFIER);
+                        m_modMeleeHitChance = pOwner->GetFloatValue(PLAYER_FIELD_UI_SPELL_HIT_MODIFIER) + pOwner->GetRatingBonusValue(CR_HIT_SPELL);
 
                     LearnPetScalingAuras();
                     break;
@@ -1016,7 +1026,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 case 46954: // Shadowy Apparition
 
                     if (Player* pOwner = m_owner->ToPlayer())
-                        m_modSpellHitChance = pOwner->GetFloatValue(PLAYER_FIELD_UI_SPELL_HIT_MODIFIER);
+                        m_modSpellHitChance = pOwner->GetFloatValue(PLAYER_FIELD_UI_SPELL_HIT_MODIFIER) + pOwner->GetRatingBonusValue(CR_HIT_SPELL);
 
                     LearnPetScalingAuras();
                     break;
@@ -1104,8 +1114,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 {
                     if (Player* pOwner = m_owner->ToPlayer())
                     {
-                        m_modMeleeHitChance = pOwner->GetFloatValue(PLAYER_FIELD_UI_HIT_MODIFIER);
-                        m_baseSpellCritChance = pOwner->GetFloatValue(PLAYER_CRIT_PERCENTAGE);
+                        m_modMeleeHitChance = pOwner->GetFloatValue(PLAYER_FIELD_UI_HIT_MODIFIER) + pOwner->GetRatingBonusValue(CR_HIT_MELEE);
+                        m_baseSpellCritChance = pOwner->GetFloatValue(PLAYER_CRIT_PERCENTAGE) + pOwner->GetRatingBonusValue(CR_HIT_SPELL);
                     }
 
                     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 0.75f * m_owner->GetFloatValue(UNIT_FIELD_MINDAMAGE));

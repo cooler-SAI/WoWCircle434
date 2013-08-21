@@ -93,6 +93,12 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
                 return DIMINISHING_NONE;
             else if (spellproto->SpellVisual[0] == 14153)
                 return DIMINISHING_NONE;
+            // Silence, Asira Dawnslayer, Hour of Twilight
+            else if (spellproto->Id == 103587)
+                return DIMINISHING_NONE;
+            // Glyph of Intimidating Shout
+            else if (spellproto->Id == 95199)
+                return DIMINISHING_LIMITONLY;
             break;
         }
         // Event spells
@@ -207,7 +213,7 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
                 return DIMINISHING_DISORIENT;
             // Bad Manner (Pet Monkey)
             else if (spellproto->Id == 90337)
-                return DIMINISHING_STUN;
+                return DIMINISHING_CONTROLLED_STUN;
             break;
         }
         case SPELLFAMILY_PALADIN:
@@ -3050,6 +3056,10 @@ void SpellMgr::LoadSpellCustomAttr()
             case 104605: // Void Diffusion dmg
             case 108345: // Void Diffusion dmg
             case 108346: // Void Diffusion dmg
+            case 106375: // Unstable Twilight
+            case 109182: // Unstable Twilight
+            case 109183: // Unstable Twilight
+            case 109184: // Unstable Twilight
                 // ONLY SPELLS WITH SPELLFAMILY_GENERIC and EFFECT_SCHOOL_DAMAGE
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 break;
@@ -3265,6 +3275,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 75146: // Dream of Azshara
                 spellInfo->RecoveryTime = 0;
                 spellInfo->CategoryRecoveryTime = 604800000; 
+                break;
+            // wrong dbc, 3 days cooldown
+            case 60893: // Northrend Alchemy Research
+                spellInfo->RecoveryTime = 0;
+                spellInfo->CategoryRecoveryTime = 259200000; 
                 break;
             // wrong dbc, 1 day cooldown 
             case 80243: // Transmute: Truegold
@@ -4113,9 +4128,38 @@ void SpellMgr::LoadDbcDataCorrections()
             // ENDOF THRONE OF THE TIDES SPELLS
             //
             // DEADMINES SPELLS
-            // Captain Cookie
-            case 89250: // Summon Cauldron
-                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+            // Admiral Ripsnarl
+            case 88840: // Vanish
+                spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(125);
+                break;
+            case 88736: // Taste for Blood
+                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+                spellInfo->ProcChance = 0;
+                spellInfo->ProcFlags = 0;
+                break;
+            case 95647: // Ripsnarl Achievement Aura
+                spellInfo->AttributesEx3 = SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+                break;
+                break;
+            case 89268: // Throw Food Targeting
+            case 89740: 
+            case 90561:
+            case 90562:
+            case 90582:
+            case 90583:
+            case 90563:
+            case 90584:
+            case 90564:
+            case 90585:
+            case 90565:
+            case 90586:
+                spellInfo->MaxAffectedTargets = 1;
+                spellInfo->AttributesEx3 = SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+                break;
+            // Vanessa Vancleef
+            case 92620: // Backslash targeting
+                spellInfo->MaxAffectedTargets =1;
                 break;
             // ENDOF DEADMINES
             // BLACKROCK CAVERNS SPELLS
@@ -5545,7 +5589,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
 
             // Halfus Wyrmbreaker
-            //
+            case 87683: // Dragon Vengeance
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            case 87609: // Atrophic Poison
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
             case 83710: // Furious Roar
             case 86169:
             case 86170:
@@ -5554,8 +5603,9 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[1].SetRadiusIndex(28);
                 spellInfo->Effects[2].SetRadiusIndex(28);
                 break;
-            case 83719: // Fireball Barrage T
-                spellInfo->Effects[0].TargetA = 1;
+            case 83719: // Fireball Barrage aoe
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->MaxAffectedTargets = 1;
                 break;
             case 83855: // Scorching Breath dmg
             case 86163:
@@ -6211,6 +6261,23 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // ENDOF WELL OF ETERNITY SPELLS
             //
+            // HOUR OF TWILIGHT SPELLS
+            //
+            // Arcurion
+            case 102480: // Icy Boulder aoe
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            // Archbishop Benedictus
+            case 103600: // Purifying Light targeting
+            case 103768: // Corrupting Twilight targeting
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                break;
+            case 103648: // Purifying Blast
+            case 103776: // Twilight Bolt
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+                break;
+            // ENDOF HOUR OF TWILIGHT SPELLS
             // DRAGON SOUL SPELLS
             //
             case 109247:
@@ -6281,6 +6348,16 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
                 break;
             // Warlord Zon'ozz
+            case 103527: // Void Diffusion dmg
+            case 104605:
+            case 108345:
+            case 108346:
+                spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REFLECTED;
+                break;
+            case 104031: // Void Diffusion debuff
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                break;
             case 109197: // Tentacle Toss aoe 1
             case 109237: // Tentacle Toss aoe 2
                 spellInfo->MaxAffectedTargets = 1;
@@ -6288,9 +6365,6 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 109240: // Tentacle Toss jump
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
-                break;
-            case 104031: // Void Diffusion
-                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
                 break;
             case 104347: // Shadow Gaze
             case 104602:
@@ -6341,16 +6415,23 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Mechanic = 0;
                 break;
             case 105367: // Lightning Conduit dummy 1
-                spellInfo->SetDurationIndex(39); // 2 secs
-                spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_8_YARDS);
-                spellInfo->Effects[EFFECT_0].ChainTarget = 25;
+                //spellInfo->SetDurationIndex(39); // 2 secs
+                //spellInfo->Effects[EFFECT_0].SetRadiusIndex(EFFECT_RADIUS_10_YARDS);
+                //spellInfo->Effects[EFFECT_0].ChainTarget = 25;
+                spellInfo->SetDurationIndex(39); // 1 secs
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+                spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_PERIODIC_DUMMY;
+                spellInfo->Effects[EFFECT_1].Amplitude = 1000;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
             case 105371: // Lightning Conduit dummy 2
-                spellInfo->SetDurationIndex(39); // 2 secs
+                spellInfo->SetDurationIndex(39); // 1 secs
                 spellInfo->AttributesEx5 |= SPELL_ATTR5_HIDE_DURATION;
                 break;
             case 107850: // Focused Assault dmg
                 spellInfo->SetRangeIndex(13); // 50000
+                spellInfo->Effects[EFFECT_0].BasePoints = 100;
                 break;
             case 109325: // Frostflake
                 spellInfo->MaxAffectedTargets = 1;
@@ -6367,6 +6448,23 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 109557: // Storm Pillars
                 spellInfo->MaxAffectedTargets = 1;
+                break;
+            // Ultraxion
+            case 106374: // Unstable Twilight aoe 1
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 109176: // Unstable Twilight aoe 2
+                spellInfo->MaxAffectedTargets = 1;
+                break;
+            case 105900: // Essence of Dreams
+                spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
+                break;
+            case 106371: // Hour of Twilight
+            case 109415:
+            case 109416:
+            case 109417:
+                spellInfo->Effects[EFFECT_0].TriggerSpell = 103327;
+                spellInfo->Effects[EFFECT_1].TriggerSpell = 106174;
                 break;
             // ENDOF DRAGON SOUL SPELLS
             //
@@ -7207,6 +7305,28 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             case 81093: // 
                 spellInfo->ProcCharges = 1;
+                break;
+            case 96619: // Rupture Line (Grilek)
+                spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13);
+                break;
+            case 109669: // Shadow Breath, Lord Hiram Creed
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+                break;
+            case 16602: // Shahram
+                spellInfo->SetDurationIndex(4); // 120 seconds
+                break;
+            case 85509: // Denounce
+                spellInfo->Effects[0].BasePoints = -10000;
+                break;
+            case 34433: // Shadow Fiend
+                spellInfo->Effects[EFFECT_0].MiscValueB = 1561;
+                break;
+            case 16870: // Clearcasting
+                spellInfo->Effects[EFFECT_0].SpellClassMask[0] &= ~ 0x10000; // remove Ravage
+                break;
+            case 95199: // Intimidating Shout - Glyph of Intimidating Shout
+                spellInfo->ProcFlags = 0;
+                spellInfo->ProcChance = 0;
                 break;
             default:
                 break;

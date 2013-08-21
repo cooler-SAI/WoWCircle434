@@ -347,7 +347,7 @@ void Unit::Update(uint32 p_time)
         SendThreatListUpdate();
 
     // update combat timer only for players and pets (only pets with PetAI)
-    if (isInCombat() && (GetTypeId() == TYPEID_PLAYER || (ToCreature()->isPet() && IsControlledByPlayer())))
+    if (isInCombat() && (GetTypeId() == TYPEID_PLAYER || (ToCreature()->isPet() && IsControlledByPlayer()) || ToCreature()->isBattlegroundVehicle()))
     {
         // Check UNIT_STATE_MELEE_ATTACKING or UNIT_STATE_CHASE (without UNIT_STATE_FOLLOW in this case) so pets can reach far away
         // targets without stopping half way there and running off.
@@ -3694,6 +3694,13 @@ void Unit::RemoveAurasByType(AuraType auraType, uint64 casterGUID, Aura* exceptA
     }
 }
 
+void Unit::RemoveDotsNotSWD()
+{
+    RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, 0, 32409);         // SW:D shall not be removed.
+    RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT, 0, 0, 49016); // Unholy Frenzy is except too
+    RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);    
+}
+
 void Unit::RemoveAurasWithAttribute(uint32 flags)
 {
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
@@ -4664,7 +4671,8 @@ int32 Unit::GetAuraAmountNoStack(AuraEffect const* effect) const
     AuraEffectList const& mTotalAuraList = GetAuraEffectsByType(auratype);
     for (AuraEffectList::const_iterator i = mTotalAuraList.begin(); i != mTotalAuraList.end(); ++i)
     {
-        if (sSpellMgr->CheckSpellGroupStackRules(effect->GetSpellInfo(), (*i)->GetSpellInfo()) == SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT)
+        if ( (effect != (*i) && effect->GetSpellInfo() == (*i)->GetSpellInfo()) || 
+            sSpellMgr->CheckSpellGroupStackRules(effect->GetSpellInfo(), (*i)->GetSpellInfo()) == SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT)
         {
             if (amount < 0)
             {
@@ -5369,6 +5377,10 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         {
             switch (dummySpell->Id)
             {
+                case 105900: // Essence of Dreams, Ultraxion, Dragon Soul
+                    basepoints0 = damage;
+                    triggered_spell_id = 105996;
+                    break;
                 case 108007: // Indomitable, Indomitable Pride (normal)
                 case 109785: // Indomitable, Indomitable Pride (lfr)
                 case 109786: // Indomitable, Indomitable Pride (heroic)
@@ -5572,6 +5584,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 101056:
                 {
                     if (!procSpell)
+                        return false;
+
+                    if (!victim)
+                        return false;
+
+                    if (GetGUID() == victim->GetGUID())
                         return false;
 
                     if (procFlag & PROC_FLAG_DONE_PERIODIC)
@@ -6260,9 +6278,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 {
                     if (!target)
                         return false;
-                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, target->GetAura(32409)); // SW:D shall not be removed.
-                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                    target->RemoveDotsNotSWD();
                     return true;
                 }
                 // Glyph of Icy Veins
@@ -6707,9 +6723,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 {
                     if (!target)
                         return false;
-                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, target->GetAura(32409)); // SW:D shall not be removed.
-                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                    target->RemoveDotsNotSWD();
                     return true;
                 }
             }
@@ -7804,7 +7818,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         }
                     }
                     triggered_spell_id = 96890;
-                    target = victim;
+                    target = this;
                     break;
                 }
                 // Item - Paladin T12 Holy 4P Bonus
@@ -9079,6 +9093,9 @@ bool Unit::HandleModifierAuraProc(Unit* victim, uint32 damage, AuraEffect* trigg
                 // Unholy Command
                 case 49588:
                 case 49589:
+                    if (victim && victim->GetOwner() && victim->GetOwner()->GetGUID() == GetGUID())
+                        return false;
+
                     triggered_spell_id = 90289;
                     break;
                 default:
@@ -9469,6 +9486,10 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             case SPELLFAMILY_GENERIC:
                 switch (auraSpellInfo->Id)
                 {
+                    case 102726: // Mark of Silence, Asira Dawnslayer, Hour of Twilight
+                        if (Unit* pAsira = triggeredByAura->GetCaster())
+                            pAsira->CastSpell(this, 103597, true);
+                        return true;
                     case 99399: // Burning Wound, Ragnaros, Firelands
                     case 101238:
                     case 101239:
@@ -10711,6 +10732,32 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                 return false;
             break;
         }
+        case 81340: // Sudden Doom
+        {
+            // Death Knight T13 DPS 2P Bonus
+            if (AuraEffect * eff = GetAuraEffect(105609, 0))
+            {
+                if (roll_chance_i(eff->GetAmount()))
+                {
+                    AddAuraWithModCharges(trigger_spell_id, this, 2);
+                    return true;
+                }
+            }
+            break;
+        }
+        case 59052: // Rime - Freezing Fog
+        {
+            // Death Knight T13 DPS 2P Bonus
+            if (AuraEffect * eff = GetAuraEffect(105609, 0))
+            {
+                if (roll_chance_i(eff->GetAmount() * 2))
+                {
+                    AddAuraWithModCharges(trigger_spell_id, this, 2);
+                    return true;
+                }
+            }
+            break;
+        }
     }
 
     if (cooldown && GetTypeId() == TYPEID_PLAYER && ToPlayer()->HasSpellCooldown(trigger_spell_id))
@@ -11106,7 +11153,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     //if (GetTypeId() == TYPEID_UNIT)
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
 
-    if (GetTypeId() == TYPEID_UNIT && !ToCreature()->isPet())
+    if (GetTypeId() == TYPEID_UNIT && !ToCreature()->isPet() && !ToCreature()->isBattlegroundVehicle())
     {
         // should not let player enter combat by right clicking target - doesn't helps
         SetInCombatWith(victim);
@@ -12152,7 +12199,10 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
             // Revealing Strike for direct damage abilities
             if (spellProto->AttributesEx & SPELL_ATTR1_REQ_COMBO_POINTS1 && damagetype != DOT)
                 if (AuraEffect* aurEff = victim->GetAuraEffect(84617, 2, GetGUID()))
+                {
                     DoneTotalMod *= (100.0f + aurEff->GetAmount()) / 100.0f;
+                    victim->RemoveAura(aurEff->GetBase());
+                }
             break;
         }
         case SPELLFAMILY_MAGE:
@@ -12486,7 +12536,7 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
     {
         int32 mult = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_AOE_DAMAGE_AVOIDANCE, spellProto->SchoolMask);
         AddPct(TakenTotalMod, mult);
-        if (GetTypeId() == TYPEID_UNIT)
+        if (caster->GetTypeId() == TYPEID_UNIT)
         {
             int32 u_mult = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CREATURE_AOE_DAMAGE_AVOIDANCE, spellProto->SchoolMask);
             AddPct(TakenTotalMod, u_mult);
@@ -12624,9 +12674,16 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
     if ((spellProto->AttributesEx2 & SPELL_ATTR2_CANT_CRIT))
         return false;
 
-    // Chimera Shot - Healing can crit, other spells - not
-    if (spellProto->Id != 53353 && spellProto->HasEffect(SPELL_EFFECT_HEAL_PCT))
-        return false;
+    switch (spellProto->Id)
+    {
+        case 53353: // Chimera Shot - Healing can crit, other spells - not
+        case 34428: // Victory Rush
+            break;
+        default:
+            if (spellProto->HasEffect(SPELL_EFFECT_HEAL_PCT))
+                return false;
+            break;
+    }
 
     float crit_chance = GetSpellCrit(victim, spellProto, schoolMask, attackType);
 
@@ -12655,9 +12712,8 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
     switch (spellProto->DmgClass)
     {
         case SPELL_DAMAGE_CLASS_NONE:
-            if (spellProto->CanCritDamageClassNone())
-                break;
-            return 0.0;
+            if (!spellProto->CanCritDamageClassNone())
+                return 0.0;
         case SPELL_DAMAGE_CLASS_MAGIC:
         {
             // exeption is healthstone and heal potions
@@ -12980,24 +13036,6 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
         }
     }
 
-    // Deep Healing, Mastery Shaman
-    if (victim && victim->isAlive())
-    {
-        if (spellProto->SpellFamilyName == SPELLFAMILY_SHAMAN)
-        {
-            if (Aura* deepHealing = GetAura(77226))
-            {
-
-                float effectAmount = float(deepHealing->GetEffect(0)->GetAmount());
-                float mod = 100.0f - victim->GetHealthPct();
-                if (mod < 1.0f)
-                    mod = 1.0f;
-                float amount_pct = mod * effectAmount / 100.0f;
-                AddPct(DoneTotalMod, amount_pct);
-            }
-        }
-    }
-
     // Done fixed damage bonus auras
     int32 DoneAdvertisedBenefit = SpellBaseHealingBonusDone(spellProto->GetSchoolMask());
 
@@ -13067,10 +13105,17 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
         if (AuraEffect const* aurEff = GetAuraEffect(99263, EFFECT_0))
             AddPct(DoneTotalMod, aurEff->GetAmount());
 
-    // Glyph of Earth Shield
+    // Earth Shield
     if (spellProto->Id == 379)
-        if (AuraEffect* aur = GetAuraEffect(63279, 0))
+    {
+        // Glyph of Earth Shield
+        if (AuraEffect const* aur = GetAuraEffect(63279, EFFECT_0))
             AddPct(DoneTotalMod, aur->GetAmount());
+
+        // Purification
+        if (AuraEffect const* aurEff = GetAuraEffect(16213, EFFECT_0))
+            AddPct(DoneTotalMod, aurEff->GetAmount());
+    }
 
     // use float as more appropriate for negative values and percent applying
     float heal = float(int32(healamount) + DoneTotal) * DoneTotalMod;
@@ -13170,6 +13215,22 @@ uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, u
     for (AuraEffectList::const_iterator i = mHealingGet.begin(); i != mHealingGet.end(); ++i)
         if (caster->GetGUID() == (*i)->GetCasterGUID() && (*i)->IsAffectingSpell(spellProto))
             AddPct(TakenTotalMod, (*i)->GetAmount());
+
+    // Deep Healing, Mastery Shaman
+    if (caster)
+        if (spellProto->SpellFamilyName == SPELLFAMILY_SHAMAN
+            || spellProto->Id == 52042) // Healing Stream Totem tick
+        {
+            if (Aura* deepHealing = caster->GetAura(77226))
+            {
+                float effectAmount = float(deepHealing->GetEffect(0)->GetAmount());
+                float mod = 100.0f - GetHealthPct();
+                if (mod < 1.0f)
+                    mod = 1.0f;
+                float amount_pct = mod * effectAmount / 100.0f;
+                AddPct(TakenTotalMod, amount_pct);
+            }
+        }
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
@@ -13664,7 +13725,7 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
     {
         int32 mult = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_AOE_DAMAGE_AVOIDANCE, spellProto->SchoolMask);
         AddPct(TakenTotalMod, mult);
-        if (GetTypeId() == TYPEID_UNIT)
+        if (attacker->GetTypeId() == TYPEID_UNIT)
         {
             int32 u_mult = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CREATURE_AOE_DAMAGE_AVOIDANCE, spellProto->SchoolMask);
             AddPct(TakenTotalMod, u_mult);
@@ -14045,7 +14106,7 @@ void Unit::SendMountResult(MountResult error)
 void Unit::SetInCombatWith(Unit* enemy)
 {
     Unit* eOwner = enemy->GetCharmerOrOwnerOrSelf();
-    if (eOwner->IsPvP())
+    if (eOwner->IsPvP() || eOwner->isBattlegroundVehicle())
     {
         SetInCombatState(true, enemy);
         return;
@@ -15235,6 +15296,9 @@ bool Unit::CanHaveThreatList() const
     //if (ToCreature()->IsVehicle())
     //    return false;
 
+    if (ToCreature()->isBattlegroundVehicle())
+        return false;
+
     // summons can not have a threat list, unless they are controlled by a creature
     if (HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLABLE_GUARDIAN) && IS_PLAYER_GUID(((Pet*)this)->GetOwnerGUID()))
         return false;
@@ -15530,6 +15594,10 @@ int32 Unit::ModSpellDuration(SpellInfo const* spellProto, Unit const* target, in
 {
     // don't mod permanent auras duration
     if (duration < 0)
+        return duration;
+
+    // Channeled spells does not affected by modifer duration
+    if (spellProto->HasAttribute(SPELL_ATTR1_CHANNELED_1))
         return duration;
 
     // cut duration only of negative effects
@@ -16902,8 +16970,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                             break;
 
                         SpellNonMeleeDamage damageInfo(this, target, spellInfo->Id, spellInfo->SchoolMask);
-                        uint32 newDamage = SpellDamageBonusDone(target, spellInfo, triggeredByAura->GetAmount(), SPELL_DIRECT_DAMAGE);
-                        newDamage = target->SpellDamageBonusTaken(this, spellInfo, newDamage, SPELL_DIRECT_DAMAGE);
+                        uint32 newDamage = target->SpellDamageBonusTaken(this, spellInfo, triggeredByAura->GetAmount(), SPELL_DIRECT_DAMAGE);
                         CalculateSpellDamageTaken(&damageInfo, newDamage, spellInfo);
                         DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);
                         SendSpellNonMeleeDamageLog(&damageInfo);
@@ -18123,7 +18190,10 @@ void Unit::Kill(Unit* victim, bool durabilityLoss)
             owner->ProcDamageAndSpell(victim, PROC_FLAG_KILL, PROC_FLAG_NONE, PROC_EX_NONE, 0);
 
     if (victim->GetCreatureType() != CREATURE_TYPE_CRITTER)
-        ProcDamageAndSpell(victim, PROC_FLAG_KILL, PROC_FLAG_KILLED, PROC_EX_NONE, 0);
+    {
+        if (victim->GetEntry() != 19833 && victim->GetEntry() != 19921) // snake trap can't trigger PROC_FLAG_KILL
+            ProcDamageAndSpell(victim, PROC_FLAG_KILL, PROC_FLAG_KILLED, PROC_EX_NONE, 0);
+    }
 
     // Proc auras on death - must be before aura/combat remove
     victim->ProcDamageAndSpell(NULL, PROC_FLAG_DEATH, PROC_FLAG_NONE, PROC_EX_NONE, 0, 0, BASE_ATTACK, 0);
@@ -19089,6 +19159,13 @@ Aura* Unit::AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target)
         return aura;
     }
     return NULL;
+}
+
+Aura* Unit::AddAuraWithModCharges(uint32 spellid, Unit *target, int16 charges)
+{
+    Aura * aura = AddAura(spellid, target);
+    aura->SetModCharges(charges);
+    return aura;
 }
 
 void Unit::SetAuraStack(uint32 spellId, Unit* target, uint32 stack)

@@ -1702,6 +1702,30 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     // spell checks
     switch (Id)
     {
+        case 105896:
+        case 105900:
+        case 105903:
+        case 105984:
+        case 106224:
+        case 106226:
+        case 106227:
+        case 106080:
+        case 106108:
+        case 105925:
+        case 110070:
+        case 110069: 
+        case 110068: 
+        case 109075: 
+        case 110080:
+        case 110079:
+        case 110078:
+        case 106498:
+        case 106368:
+            if (!player)
+                return SPELL_CAST_OK;
+            return (area_id == 5928) ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
+        case 103755: // Twilight Epiphany, Archbishop Benedictus, Hour of Twilight
+            return ((map_id == 940 && area_id == 5845) ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA);
         case 103534: // Danger, Morchok, Dragon Soul
         case 103536: // Warning, Morchok, Dragon Soul
         case 103541: // Safe, Morchok, Dragon Soul
@@ -3295,6 +3319,8 @@ bool SpellInfo::IsRequireAdditionalTargetCheck() const
     switch (Id)
     {
         case 2812: // Holy Wrath
+            return false;
+        case 103327: // Hour of Twilight dmg, Ultraxion, Dragon Soul
             return false;
         default:
             break;

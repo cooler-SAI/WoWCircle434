@@ -102,12 +102,20 @@ public:
 
         void OnCreatureCreate(Creature* creature)
         {
+            if (!TeamInInstance)
+            {
+                Map::PlayerList const &players = instance->GetPlayers();
+                if (!players.isEmpty())
+                    if (Player* player = players.begin()->getSource())
+                        TeamInInstance = player->GetTeam();
+            }
+
             switch(creature->GetEntry())
             {
                 // Coliseum Announcer || Only NPC_JAEREN must be spawned.
                 case NPC_JAEREN:
                     if (TeamInInstance == ALLIANCE)
-                        creature->UpdateEntry(NPC_ARELAS);
+                        creature->UpdateEntry(NPC_ARELAS, ALLIANCE);
                     uiAnnouncerGUID = creature->GetGUID();
                     break;
                 case NPC_TIRION:

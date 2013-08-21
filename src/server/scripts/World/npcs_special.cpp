@@ -4072,6 +4072,62 @@ class npc_gurthalak_tentacle_of_the_old_ones : public CreatureScript
         };
 };
 
+enum ShahramEnums
+{
+    SPELL_FLAMES_OF_SHAHRAM     = 16596,
+
+    EVENT_SHAHRAM_CAST          = 1
+};
+
+class npc_shahram : public CreatureScript
+{
+    public:
+        npc_shahram() : CreatureScript("npc_shahram") { }
+
+        struct npc_shahramAI : public ScriptedAI
+        {
+            npc_shahramAI(Creature* creature) : ScriptedAI(creature)
+            {
+            }
+
+            void IsSummonedBy(Unit* /*summoner*/)
+            {
+                _events.Reset();
+                _events.ScheduleEvent(EVENT_SHAHRAM_CAST, 1000);
+            }
+
+            void UpdateAI(uint32 const diff)
+            {
+                _events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                while (uint32 eventId = _events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_SHAHRAM_CAST:
+                            DoCastAOE(SPELL_FLAMES_OF_SHAHRAM + urand(0,5));
+                            return;
+                        default:
+                            break;
+                    }
+                }
+
+                DoMeleeAttackIfReady();
+            }
+
+        private:
+            EventMap _events;
+        };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_shahramAI(creature);
+        }
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -4120,4 +4176,5 @@ void AddSC_npcs_special()
     new npc_custom_caster_guard();
     new npc_searing_totem();
     new npc_gurthalak_tentacle_of_the_old_ones();
+    new npc_shahram();
 }

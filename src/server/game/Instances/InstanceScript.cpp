@@ -27,6 +27,8 @@
 #include "Log.h"
 #include "LFGMgr.h"
 #include "Group.h"
+#include "Guild.h"
+#include "GuildMgr.h"
 
 void InstanceScript::SaveToDB()
 {
@@ -500,7 +502,7 @@ void InstanceScript::UpdateEncounterState(EncounterCreditType type, uint32 credi
     {
         DungeonEncounter const* encounter = *itr;
         if (encounter->creditType == type && encounter->creditEntry == creditEntry &&
-            encounter->difficulty == -1 || (encounter->difficulty == instance->GetDifficulty()))
+            (encounter->difficulty == -1 || (encounter->difficulty == instance->GetDifficulty())))
         {
             completedEncounters |= 1 << encounter->dbcEntry->encounterIndex;
             if (encounter->lastEncounterDungeon)
@@ -511,23 +513,28 @@ void InstanceScript::UpdateEncounterState(EncounterCreditType type, uint32 credi
         }
     }
 
+    bool bLfg = false;
+    bool bGuild = false;
     if (dungeonId)
     {
         Map::PlayerList const& players = instance->GetPlayers();
         for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
-        {
             if (Player* player = i->getSource())
-            {
                 if (Group* grp = player->GetGroup())
                 {
-                    if (grp->isLFGGroup())
+                    if (grp->isLFGGroup() && !bLfg)
                     {
+                        bLfg = true;
                         sLFGMgr->FinishDungeon(grp->GetGUID(), dungeonId);
-                        return;
+                    }
+                    
+                    if (grp->IsGuildGroup(player->GetGuildId()) && !bGuild)
+                    {
+                        bGuild = true;
+                        if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
+                            guild->CompleteGuildChallenge(instance->IsRaid() ? CHALLENGE_RAID : CHALLENGE_DUNGEON);
                     }
                 }
-            }
-        }
     }
 }
 

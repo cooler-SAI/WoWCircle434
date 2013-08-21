@@ -13,26 +13,28 @@ enum CannonState
 
 enum NPCs
 {
-    NPC_GLUBTOK     = 47162,
-    NPC_HELIX       = 47296,
-    NPC_OAF         = 47297,
-    NPC_FOEREAPER   = 43778,
-    NPC_ADMIRAL     = 47626,
-    NPC_CAPTAIN     = 47739,
-    NPC_VANESSA     = 49541,
-    NPC_NOTE        = 49564,
+    NPC_GLUBTOK         = 47162,
+    NPC_HELIX           = 47296,
+    NPC_OAF             = 47297,
+    NPC_FOEREAPER       = 43778,
+    NPC_ADMIRAL         = 47626,
+    NPC_CAPTAIN         = 47739,
+    NPC_VANESSA         = 49541,
+    NPC_NOTE            = 49564,
+    NPC_VANESSA_SITTING = 49429,
 };
 
 enum Data
 {
-    DATA_GLUBTOK      = 1,
-    DATA_HELIX        = 2,
-    DATA_FOEREAPER    = 3,
-    DATA_ADMIRAL      = 4,
-    DATA_CAPTAIN      = 5,
-    DATA_VANESSA      = 6,
-    DATA_CANNON_EVENT = 7,
-    DATA_OAF          = 8,
+    DATA_GLUBTOK        = 0,
+    DATA_HELIX          = 1,
+    DATA_FOEREAPER      = 2,
+    DATA_ADMIRAL        = 3,
+    DATA_CAPTAIN        = 4,
+    DATA_VANESSA        = 5,
+    DATA_CANNON_EVENT   = 6,
+    DATA_OAF            = 7,
+    DATA_VANESSA_EVENT  = 8,
 };
 
 enum GameObjects
@@ -52,5 +54,9 @@ enum Sounds
 };
 
 const Position centershipPos = {-63.167f, -819.315f, 41.27f, 6.25f};
+const Position notePos = {-74.3611f, -820.014f, 40.3714f, 4.01426f};
+const Position vanessaPos = {-75.5851f, -819.964f, 47.0673f, 6.17846f};
+
+
 
 #endif

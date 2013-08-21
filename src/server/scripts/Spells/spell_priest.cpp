@@ -43,7 +43,8 @@ enum PriestSpells
     PRIEST_SHADOWFORM_VISUAL_WITH_GLYPH         = 107904,
     PRIEST_GLYPH_OF_SHADOW                      = 107906,
     PRIEST_IMPROVED_DEVOURING_PLAGUE_DAMAGE     = 63675,
-    PRIEST_IMPROVED_DEVOURING_PLAGUE_HEAL       = 75999
+    PRIEST_IMPROVED_DEVOURING_PLAGUE_HEAL       = 75999,
+    PRIEST_SILENCE_INTERRUPT                    = 32747
 };
 
 // Guardian Spirit
@@ -366,7 +367,7 @@ class spell_pri_vampiric_touch : public SpellScriptLoader
 
                 if (AuraEffect const* aurEff = GetCaster()->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PRIEST, 1869, EFFECT_1))
                     if (roll_chance_i(aurEff->GetSpellInfo()->Effects[EFFECT_0].BasePoints))
-                        dispelInfo->GetDispeller()->CastSpell(dispelInfo->GetDispeller(), PRIEST_SPELL_VAMPIRIC_TOUCH_DISPEL, true);
+                        dispelInfo->GetDispeller()->CastSpell(dispelInfo->GetDispeller(), PRIEST_SPELL_VAMPIRIC_TOUCH_DISPEL, true, 0, aurEff, GetCaster()->GetGUID());
 
             }
 
@@ -491,6 +492,34 @@ class spell_pri_improved_devouring_plague : public SpellScriptLoader
     }
 };
 
+class spell_pri_silence : public SpellScriptLoader
+{
+public:
+    spell_pri_silence() : SpellScriptLoader("spell_pri_silence") {}
+
+    class spell_pri_silence_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pri_silence_SpellScript);
+
+        void HandleBeforeHit()
+        {
+            if (Unit* target = GetExplTargetUnit())
+                if (target->GetTypeId() != TYPEID_PLAYER)
+                    GetCaster()->CastSpell(target, PRIEST_SILENCE_INTERRUPT, true);
+            
+        }
+        void Register()
+        {
+            BeforeHit += SpellHitFn(spell_pri_silence_SpellScript::HandleBeforeHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_pri_silence_SpellScript();
+    }
+};
+
 void AddSC_priest_spell_scripts()
 {
     new spell_pri_guardian_spirit();
@@ -504,4 +533,5 @@ void AddSC_priest_spell_scripts()
     new spell_pri_shadow_word_death();
     new spell_pri_shadowform();
     new spell_pri_improved_devouring_plague();
+    new spell_pri_silence();
 }

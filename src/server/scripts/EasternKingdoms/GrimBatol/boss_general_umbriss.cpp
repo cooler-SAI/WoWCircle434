@@ -6,10 +6,10 @@ enum ScriptTexts
     SAY_AGGRO    = 0,
     SAY_KILL     = 1,
     SAY_DEATH    = 2,
-    SAY_BLITZ    = 3,	
+    SAY_BLITZ    = 3,    
     SAY_ADDS     = 4,
-    SAY_EVENT_1  = 5,	
-    SAY_EVENT_2  = 6,	
+    SAY_EVENT_1  = 5,    
+    SAY_EVENT_2  = 6,    
 };
 
 enum Spells

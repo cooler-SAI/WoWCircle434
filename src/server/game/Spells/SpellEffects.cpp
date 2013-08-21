@@ -684,7 +684,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         if (aura)
                         {
                             uint32 pdamage = aura->GetAmount() > 0 ? aura->GetAmount() : 0;
-                            pdamage = m_caster->SpellDamageBonusDone(unitTarget, aura->GetSpellInfo(), pdamage, DOT);
                             pdamage = unitTarget->SpellDamageBonusTaken(m_caster, aura->GetSpellInfo(), pdamage, DOT);
                             damage += pdamage * aura->GetTotalTicks() * 0.6f;
                             apply_direct_bonus = false;
@@ -2421,7 +2420,7 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
     m_damage += newDamage;
 }
 
-void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
+void Spell::EffectHeal(SpellEffIndex effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
         return;
@@ -2439,6 +2438,16 @@ void Spell::EffectHeal(SpellEffIndex /*effIndex*/)
 
         switch (m_spellInfo->Id)
         {
+            case 105996: // Essence of Dreams, Ultraxion, Dragon Soul
+            {
+                uint32 count = 0;
+                for (std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+                    if (ihit->effectMask & (1<<effIndex))
+                        ++count;
+
+                addhealth /= count; 
+                break;
+            }
             // Bloodthrist
             case 23880:
                 if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(23881))
@@ -2602,8 +2611,11 @@ void Spell::EffectHealPct(SpellEffIndex /*effIndex*/)
         return;
 
     // Victory Rush
-    if (m_spellInfo->Id == 34428 && m_originalCaster->HasAura(82368))
+    if (m_spellInfo->Id == 34428 && m_caster->HasAura(82368))
+    {
         damage = 5;
+        m_caster->RemoveAurasDueToSpell(82368);
+    }
 
     // Rune Tap - Party
     if (m_spellInfo->Id == 59754 && unitTarget == m_caster)
@@ -6980,6 +6992,8 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
         case 100292:
         case 100293:
         case 100294:
+        case 103684: // Wave of Virtue, Archbishop Benedictus, Hour of Twilight
+        case 103781: // Wave of Twilight, Archbishop Benedictus, Hour of Twilight
             if (!unitTarget)
                 break;
 

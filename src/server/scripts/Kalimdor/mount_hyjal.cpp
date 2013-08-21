@@ -29,7 +29,7 @@ class npc_garr : public CreatureScript
     public:
         npc_garr() : CreatureScript("npc_garr") { }
 
-		CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const
         {
             return new npc_garrAI(creature);
         }
@@ -51,7 +51,7 @@ class npc_garr : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
             }
-			
+            
             EventMap events;
 
             void Reset()
@@ -122,14 +122,14 @@ class npc_garr_firesworn : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-				me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
                 me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
                 me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
             }
-			
+            
             EventMap events;
 
             void Reset()
@@ -148,7 +148,7 @@ class npc_garr_firesworn : public CreatureScript
             }
 
             void UpdateAI(const uint32 diff)
-			{
+            {
                 if (!UpdateVictim())
                     return;
                 
@@ -188,7 +188,7 @@ class npc_lycanthoth : public CreatureScript
             npc_lycanthothAI(Creature* creature) : ScriptedAI(creature)
             {
             }
-			
+            
 
             void JustDied(Unit* killer)
             {

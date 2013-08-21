@@ -2003,7 +2003,7 @@ class Player : public Unit, public GridObject<Player>
 
         void AddSpellMod(SpellModifier* mod, bool apply);
         bool IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod, Spell* spell = NULL);
-        template <class T> T ApplySpellMod(uint32 spellId, SpellModOp op, T &basevalue, Spell* spell = NULL);
+        template <class T> T ApplySpellMod(uint32 spellId, SpellModOp op, T &basevalue, Spell* spell = NULL, bool removestacks = true);
         void RemoveSpellMods(Spell* spell);
         void RestoreSpellMods(Spell* spell, uint32 ownerAuraId = 0, Aura* aura = NULL);
         void RestoreAllSpellMods(uint32 ownerAuraId = 0, Aura* aura = NULL);
@@ -2236,7 +2236,7 @@ class Player : public Unit, public GridObject<Player>
         void UpdateAllRunesRegen();
 
         void UpdateArmorSpecializations(uint8 Slot = NULL);
-        bool CheckArmorSpecializationItemConditions(SpellInfo const* spellInfo) const;
+        bool CheckArmorSpecializationItemConditions(uint32 spellId) const;
 
         bool CanSwitch() const;
         bool IsInWorgenForm() const { return HasAuraType(SPELL_AURA_WORGEN_ALTERED_FORM); }
@@ -3418,7 +3418,7 @@ void AddItemsSetItem(Player*player, Item* item);
 void RemoveItemsSetItem(Player*player, ItemTemplate const* proto);
 
 // "the bodies of template functions must be made available in a header file"
-template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T &basevalue, Spell* spell)
+template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T &basevalue, Spell* spell, bool removestacks)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
@@ -3456,7 +3456,8 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T &bas
             totalmul += CalculatePct(1.0f, mod->value);
         }
 
-        DropModCharge(mod, spell);
+        if (removestacks)
+            DropModCharge(mod, spell);
     }
     float diff = (float)basevalue * (totalmul - 1.0f) + (float)totalflat;
     if (op == SPELLMOD_CASTING_TIME || op == SPELLMOD_DURATION)

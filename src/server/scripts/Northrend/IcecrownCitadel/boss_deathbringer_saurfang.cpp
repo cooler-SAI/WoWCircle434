@@ -632,7 +632,6 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_4, 24000);   // cast
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_5, 30000);   // move
                         me->SetDisableGravity(false);
-                        me->SendMovementFlagUpdate();
                         me->Relocate(me->GetPositionX(), me->GetPositionY(), 539.2917f);
                         me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 539.2917f, 0.0f);
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
@@ -766,10 +765,12 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
 
         bool OnGossipHello(Player* player, Creature* creature)
         {
+            bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+        
             InstanceScript* instance = creature->GetInstanceScript();
             if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && creature->GetPositionZ() > 300.0f)
             {
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "We are ready to go, High Overlord. The Lich King must fall!", 631, -ACTION_START_EVENT);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Мы готовы, верховный правитель. Король Лич падет!" : "We are ready to go, High Overlord. The Lich King must fall!", 631, -ACTION_START_EVENT);
                 player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             }
 
@@ -839,7 +840,6 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                         me->RemoveAurasDueToSpell(SPELL_GRIP_OF_AGONY);
                         Talk(SAY_OUTRO_ALLIANCE_1);
                         me->SetDisableGravity(false);
-                        me->SendMovementFlagUpdate();
                         me->Relocate(me->GetPositionX(), me->GetPositionY(), 539.2917f);
                         me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 539.2917f, 0.0f);
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
@@ -916,10 +916,12 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
 
         bool OnGossipHello(Player* player, Creature* creature)
         {
+            bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
             InstanceScript* instance = creature->GetInstanceScript();
             if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && creature->GetPositionZ() > 300.0f)
             {
-                player->ADD_GOSSIP_ITEM(0, "Let it begin...", 631, -ACTION_START_EVENT + 1);
+                player->ADD_GOSSIP_ITEM(0, ru ? "Пора начинать..." : "Let it begin...", 631, -ACTION_START_EVENT + 1);
                 player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             }
 

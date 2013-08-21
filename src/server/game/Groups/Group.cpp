@@ -1962,10 +1962,26 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
     // we assume that when the difficulty changes, all instances that can be reset will be
     Difficulty diff = GetDifficulty(isRaid);
 
+    // Unload all raid maps
+    for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
+        for (BoundInstancesMap::iterator itr = m_boundInstances[i].begin(); itr != m_boundInstances[i].end(); ++ itr)
+        {
+            InstanceSave* instanceSave = itr->second.save;
+            Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
+            if (map && map->IsRaid() && method == INSTANCE_RESET_CHANGE_DIFFICULTY)
+            {
+                if (InstanceMap* map_i = map->ToInstanceMap())
+                    if (!map_i->HavePlayers())
+                        map_i->SetUnloadTimer(1);
+            }
+        }
+
     for (BoundInstancesMap::iterator itr = m_boundInstances[diff].begin(); itr != m_boundInstances[diff].end();)
     {
         InstanceSave* instanceSave = itr->second.save;
         const MapEntry* entry = sMapStore.LookupEntry(itr->first);
+        Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
+
         if (!entry || entry->IsRaid() != isRaid || (!instanceSave->CanReset() && method != INSTANCE_RESET_GROUP_DISBAND))
         {
             ++itr;
@@ -1984,7 +2000,6 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* SendMsgTo)
 
         bool isEmpty = true;
         // if the map is loaded, reset it
-        Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
         if (map && map->IsDungeon() && !(method == INSTANCE_RESET_GROUP_DISBAND && !instanceSave->CanReset()))
         {
             if (instanceSave->CanReset())
@@ -2439,15 +2454,20 @@ void Group::ToggleGroupMemberFlag(member_witerator slot, uint8 flag, bool apply)
 
 bool Group::IsGuildGroup(uint32 guildId, bool AllInSameMap, bool AllInSameInstanceId)
 {
+    if (!guildId)
+        return false;
+
     uint32 mapId = 0;
     uint32 InstanceId = 0;
     uint32 count = 0;
     std::vector<Player*> members;
     // First we populate the array
     for (GroupReference *itr = GetFirstMember(); itr != NULL; itr = itr->next()) // Loop trought all members
+    {
         if (Player *player = itr->getSource())
             if (player->GetGuildId() == guildId) // Check if it has a guild
                 members.push_back(player);
+    }
 
     bool ret = false;
     count = members.size();

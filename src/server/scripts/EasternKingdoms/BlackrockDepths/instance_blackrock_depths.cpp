@@ -38,6 +38,16 @@ enum eEnums
     NPC_DOOMREL             = 9039,
     NPC_MAGMUS              = 9938,
     NPC_MOIRA               = 8929,
+    // horde
+    NPC_EXECUTIONER_NEZKAR  = 45823,
+    NPC_THALTRAK_PROUDTUSK  = 45821,
+    NPC_GALAMAV_MARKSMAN    = 45839,
+    NPC_RAZALBLADE          = 45820,
+    // alliance
+    NPC_MORGAN              = 45903,
+    NPC_JALINDA_SPRIG       = 45892,
+    NPC_ORALIUS             = 45891,
+    NPC_PROSPECTOR_SEYMOUR  = 45894,
 
     GO_ARENA1               = 161525,
     GO_ARENA2               = 161522,
@@ -79,6 +89,8 @@ public:
         uint32 encounter[MAX_ENCOUNTER];
         std::string str_data;
 
+        uint32 TeamInInstance;
+
         uint64 EmperorGUID;
         uint64 PhalanxGUID;
         uint64 MagmusGUID;
@@ -117,6 +129,8 @@ public:
         {
             memset(&encounter, 0, sizeof(encounter));
 
+            TeamInInstance = 0;
+
             EmperorGUID = 0;
             PhalanxGUID = 0;
             MagmusGUID = 0;
@@ -154,8 +168,22 @@ public:
                 TombBossGUIDs[i] = 0;
         }
 
+        void OnPlayerEnter(Player* player)
+        {
+            if (!TeamInInstance)
+                TeamInInstance = player->GetTeam();
+        }
+
         void OnCreatureCreate(Creature* creature)
         {
+            if (!TeamInInstance)
+            {
+                Map::PlayerList const &players = instance->GetPlayers();
+                if (!players.isEmpty())
+                    if (Player* player = players.begin()->getSource())
+                        TeamInInstance = player->GetTeam();
+            }
+
             switch (creature->GetEntry())
             {
             case NPC_EMPEROR: EmperorGUID = creature->GetGUID(); break;
@@ -172,6 +200,22 @@ public:
                 MagmusGUID = creature->GetGUID();
                 if (!creature->isAlive())
                     HandleGameObject(GetData64(DATA_THRONE_DOOR), true); // if Magmus is dead open door to last boss
+                break;
+            case NPC_EXECUTIONER_NEZKAR:
+                if (TeamInInstance == ALLIANCE)
+                    creature->UpdateEntry(NPC_MORGAN, ALLIANCE);
+                break;
+            case NPC_THALTRAK_PROUDTUSK:
+                if (TeamInInstance == ALLIANCE)
+                    creature->UpdateEntry(NPC_JALINDA_SPRIG, ALLIANCE);
+                break;
+            case NPC_GALAMAV_MARKSMAN:
+                if (TeamInInstance == ALLIANCE)
+                    creature->UpdateEntry(NPC_ORALIUS, ALLIANCE);
+                break;
+            case NPC_RAZALBLADE:
+                if (TeamInInstance == ALLIANCE)
+                    creature->UpdateEntry(NPC_PROSPECTOR_SEYMOUR, ALLIANCE);
                 break;
             }
         }
@@ -294,6 +338,8 @@ public:
                 return encounter[5];
             case DATA_GHOSTKILL:
                 return GhostKillCount;
+            case DATA_TEAM_IN_INSTANCE:
+                return TeamInInstance;
             }
             return 0;
         }

@@ -4993,7 +4993,7 @@ SpellCastResult Spell::CheckRuneCost(uint32 runeCostID)
     {
         runeCost[i] = src->RuneCost[i];
         if (Player* modOwner = m_caster->GetSpellModOwner())
-            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, runeCost[i], this);
+            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, runeCost[i], this, false);
     }
 
     runeCost[RUNE_DEATH] = MAX_RUNES;                       // calculated later
@@ -5594,10 +5594,17 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && m_spellInfo->SpellFamilyFlags[0] == 0x2000)
                 {
                     Unit* target = m_targets.GetUnitTarget();
+
                     if (!target || (target->IsFriendlyTo(m_caster) && target->GetCreatureType() != CREATURE_TYPE_UNDEAD))
                         return SPELL_FAILED_BAD_TARGETS;
-                    if (!target->IsFriendlyTo(m_caster) && !m_caster->HasInArc(static_cast<float>(M_PI), target))
-                        return SPELL_FAILED_UNIT_NOT_INFRONT;
+
+                    if (!target->IsFriendlyTo(m_caster))
+                    {
+                        if (!m_caster->HasInArc(static_cast<float>(M_PI), target))
+                            return SPELL_FAILED_UNIT_NOT_INFRONT;
+                        if (!m_caster->_IsValidAttackTarget(target, GetSpellInfo()))
+                            return SPELL_FAILED_BAD_TARGETS;
+                    }
                 }
                 // Have Group, Will Travel
                 else if (m_spellInfo->Id == 83967)
@@ -6207,10 +6214,39 @@ SpellCastResult Spell::CheckCast(bool strict)
         default: break;
     }
 
-    // Shapeshift & hex/etc
-    if (m_spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT) && m_caster->HasAuraWithMechanic(1 << MECHANIC_POLYMORPH))
+    // hex
+    if (m_caster->HasAuraWithMechanic(1 << MECHANIC_POLYMORPH))
     {
-        return SPELL_FAILED_CHARMED;
+        // Shapeshift
+        if (m_spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT))
+            return SPELL_FAILED_CHARMED;
+
+        // Teleport
+        if (m_spellInfo->HasEffect(SPELL_EFFECT_TELEPORT_UNITS))
+            return SPELL_FAILED_CHARMED;
+
+        // Summon totem
+        if (m_spellInfo->HasAttribute(SPELL_ATTR7_SUMMON_TOTEM) || m_spellInfo->HasEffect(SPELL_EFFECT_CAST_BUTTON))
+            return SPELL_FAILED_CHARMED;
+
+        // Fishing
+        if (m_spellInfo->HasAttribute(SPELL_ATTR1_IS_FISHING))
+            return SPELL_FAILED_CHARMED;
+
+        // Death Knight - Outbreak
+        if (m_spellInfo->Id == 77575)
+            return SPELL_FAILED_CHARMED;
+
+        // Drink
+        switch (m_spellInfo->GetSpellSpecific())
+        {
+            case SPELL_SPECIFIC_DRINK:
+            case SPELL_SPECIFIC_FOOD:
+            case SPELL_SPECIFIC_FOOD_AND_DRINK:
+                return SPELL_FAILED_CHARMED;
+        default:
+            break;
+        }
     }
 
     // check trade slot case (last, for allow catch any another cast problems)
@@ -6378,6 +6414,10 @@ SpellCastResult Spell::CheckCasterAuras() const
     else if (unitflag & UNIT_FLAG_SILENCED && m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE)
         prevented_reason = SPELL_FAILED_SILENCED;
     else if (unitflag & UNIT_FLAG_PACIFIED && m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY)
+        prevented_reason = SPELL_FAILED_PACIFIED;
+
+    // Barkskin & Hex hotfix 4.3 patch http://eu.battle.net/wow/ru/blog/10037151
+    if (m_spellInfo->Id == 22812 && m_caster->HasAura(51514))
         prevented_reason = SPELL_FAILED_PACIFIED;
 
     // Attr must make flag drop spell totally immune from all effects
@@ -6548,7 +6588,7 @@ SpellCastResult Spell::CheckRange(bool strict)
 
         if (range_type == SPELL_RANGE_RANGED)
         {
-            if (m_caster->IsWithinMeleeRange(target))
+            if (m_caster->IsWithinMeleeRange(target) && target->GetEntry() != 55294) // Ultraxion
                 return !(_triggeredCastFlags & TRIGGERED_DONT_REPORT_CAST_ERROR) ? SPELL_FAILED_TOO_CLOSE : SPELL_FAILED_DONT_REPORT;
         }
         else if (min_range && m_caster->IsWithinCombatRange(target, min_range)) // skip this check if min_range = 0
@@ -7272,6 +7312,9 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                 if (eff == EFFECT_1 && !m_caster->HasAura(56851))
                     return false;
             }
+            // Colossus Smash (Battle, Berserker Stance)
+            else if (m_spellInfo->Id == 86346 && eff == EFFECT_1)
+                return false;
 
             if (target->GetEntry() == 5925)
                 return true;

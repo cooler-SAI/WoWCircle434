@@ -1213,9 +1213,15 @@ void Battleground::AddPlayer(Player* player)
         if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_IGNORE_FACTION))
         {
             if (team == HORDE)
+            {
+                player->setFaction(2);
                 player->CastSpell(player, 200002, true);
+            }
             else
+            {
+                player->setFaction(1);
                 player->CastSpell(player, 200003, true);
+            }
         }
     }
 
@@ -1289,6 +1295,19 @@ void Battleground::EventPlayerLoggedIn(Player* player)
         }
     }
     m_Players[guid].OfflineRemoveTime = 0;
+    if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_IGNORE_FACTION))
+    {
+        if (player->GetBGTeam() == HORDE)
+        {
+            player->setFaction(2);
+            player->AddAura(200002, player);
+        }
+        else
+        {
+            player->setFaction(1);
+            player->AddAura(200003, player);
+        }
+    }
     PlayerAddedToBGCheckIfBGIsRunning(player);
     // if battleground is starting, then add preparation aura
     // we don't have to do that, because preparation aura isn't removed when player logs out
@@ -2079,7 +2098,31 @@ void Battleground::RemovePlayer(Player* player, uint64 guid, uint32 team)
         return;
     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_IGNORE_FACTION))
     {
+        player->setFactionForRace(player->getRace());
         player->RemoveAurasDueToSpell(200002);
         player->RemoveAurasDueToSpell(200003);
+    }
+}
+
+void Battleground::RelocateDeadPlayers(uint64 queueIndex)
+{
+    // Those who are waiting to resurrect at this node are taken to the closest own node's graveyard
+    std::vector<uint64>& ghostList = m_ReviveQueue[queueIndex];
+    if (!ghostList.empty())
+    {
+        WorldSafeLocsEntry const* closestGrave = NULL;
+        for (std::vector<uint64>::const_iterator itr = ghostList.begin(); itr != ghostList.end(); ++itr)
+        {
+            Player* player = ObjectAccessor::FindPlayer(*itr);
+            if (!player)
+                continue;
+
+            if (!closestGrave)
+                closestGrave = GetClosestGraveYard(player);
+
+            if (closestGrave)
+                player->TeleportTo(GetMapId(), closestGrave->x, closestGrave->y, closestGrave->z, player->GetOrientation());
+        }
+        ghostList.clear();
     }
 }

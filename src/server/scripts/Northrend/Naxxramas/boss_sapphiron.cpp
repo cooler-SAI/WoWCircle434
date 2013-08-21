@@ -298,7 +298,6 @@ public:
                         case EVENT_LIFTOFF:
                             me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
                             me->SetDisableGravity(true);
-                            me->SendMovementFlagUpdate();
                             events.ScheduleEvent(EVENT_ICEBOLT, 1500);
                             iceboltCount = RAID_MODE(2, 3);
                             return;
@@ -342,7 +341,6 @@ public:
                         case EVENT_LAND:
                             me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
                             me->SetDisableGravity(false);
-                            me->SendMovementFlagUpdate();
                             events.ScheduleEvent(EVENT_GROUND, 1500);
                             return;
                         case EVENT_GROUND:

@@ -98,9 +98,19 @@ class spell_sha_fire_nova : public SpellScriptLoader
                     }
                 }
             }
+            SpellCastResult HandleCheckCast()
+            {
+                UnitList targets;
+                Trinity::AnyUnitHavingBuffInObjectRangeCheck u_check(GetCaster(), GetCaster(), 100, SHAMAN_SPELL_FLAME_SHOCK, false);
+                Trinity::UnitListSearcher<Trinity::AnyUnitHavingBuffInObjectRangeCheck> searcher(GetCaster(), targets, u_check);
+                GetCaster()->VisitNearbyObject(100, searcher);
+                
+                return targets.size() == 0 ? SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW : SPELL_CAST_OK;
+            }
 
             void Register()
             {
+                OnCheckCast += SpellCheckCastFn(spell_sha_fire_nova_SpellScript::HandleCheckCast);
                 OnEffectHitTarget += SpellEffectFn(spell_sha_fire_nova_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
         };
@@ -516,13 +526,13 @@ public:
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             Unit* caster = GetCaster();
-            if(!caster)
+            if (!caster)
                 return;
             Player* plr = caster->ToPlayer();
-            if(!plr)
+            if (!plr)
                 return;
 
-            if(!GetExplTargetUnit())
+            if (!GetExplTargetUnit())
                 return;
 
             Item *weapons[2];
@@ -530,7 +540,7 @@ public:
             weapons[1] = plr->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
             for(int i = 0; i < 2; i++)
             {
-                if(!weapons[i])
+                if (!weapons[i])
                     continue;
 
                 uint32 unleashSpell = 0;
@@ -570,9 +580,53 @@ public:
                 }
             }
         }
+        SpellCastResult HandleCheckCast()
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return SPELL_FAILED_DONT_REPORT;
+            Player* plr = caster->ToPlayer();
+            if (!plr)
+                return SPELL_FAILED_DONT_REPORT;
+
+            if (!GetExplTargetUnit())
+                return SPELL_FAILED_BAD_TARGETS;
+
+            Item *weapons[2];
+            weapons[0] = plr->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+            weapons[1] = plr->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+            bool found_enchantment = false;
+            for(int i = 0; i < 2; i++)
+            {
+                if (!weapons[i])
+                    continue;
+
+                int32 enchant = weapons[i]->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT);
+
+                if (enchant == 0)
+                    continue;
+
+                found_enchantment = true;
+
+                switch (enchant)
+                {
+                    case 5: // Flametongue Weapon
+                    case 2: // Frostbrand Weapon
+                    case 3021: // Rockbiter Weapon
+                    case 283: // Windfury Weapon
+                    {
+                        if (!plr->IsValidAttackTarget(GetExplTargetUnit()))
+                            return SPELL_FAILED_BAD_TARGETS;
+                        break;
+                    }
+                }
+            }
+            return found_enchantment == false ? SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW : SPELL_CAST_OK;
+        }
 
         void Register()
         {
+            OnCheckCast += SpellCheckCastFn(spell_sha_unleash_elements_SpellScript::HandleCheckCast);
             OnEffectHit += SpellEffectFn(spell_sha_unleash_elements_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };

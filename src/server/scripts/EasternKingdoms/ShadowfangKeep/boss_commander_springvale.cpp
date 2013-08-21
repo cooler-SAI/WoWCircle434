@@ -6,15 +6,12 @@
 #include"SpellScript.h"
 #include"SpellAuraEffects.h"
 
-#define SAY_AGGRO "Intruders in the keep! To arms!"
-#define SAY_DEATH "Our vigilance is eternal..."
-//    Commander Springvale yells: Cowards! I will not fall so easily into your trap!
-//    Commander Springvale yells: One step closer to victory!
-//    Commander Springvale yells: Repel the intruders!
-//    Commander Springvale yells: The attackers weaken!
-
 enum ScriptTexts
 {
+    SAY_AGGRO = 0,
+    SAY_DEATH = 1,
+    SAY_KILL  = 2,
+    SAY_ADDS  = 3,
 };
 
 enum Spells
@@ -118,15 +115,20 @@ class boss_commander_springvale : public CreatureScript
                 events.ScheduleEvent(EVENT_MALEFIC_STRIKE, 9000);
                 events.ScheduleEvent(EVENT_DESECRATION, 15000);
                 instance->SetBossState(DATA_SPRINGVALE, IN_PROGRESS);
-                me->MonsterYell(SAY_AGGRO, 0, 0);
+                Talk(SAY_AGGRO);
                 DoZoneInCombat();
             }
-            
+
+            void KilledUnit(Unit* who)
+            {
+                Talk(SAY_KILL);
+            }
+
             void JustDied(Unit* pWho)
             {
                 _JustDied();
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_WORD_OF_SHAME);
-                me->MonsterYell(SAY_DEATH, 0, 0);
+                Talk(SAY_DEATH);
             }
 
             void UpdateAI(const uint32 uiDiff)
@@ -152,6 +154,7 @@ class boss_commander_springvale : public CreatureScript
                         events.ScheduleEvent(EVENT_MALEFIC_STRIKE, 9000);
                         break;
                     case EVENT_ADDS:
+                        Talk(SAY_ADDS);
                         me->SummonCreature(NPC_SPRINGVALE_OFFICER, addSpawnPos[0],TEMPSUMMON_CORPSE_DESPAWN, 10000);
                         me->SummonCreature(NPC_SPRINGVALE_GUARD, addSpawnPos[1],TEMPSUMMON_CORPSE_DESPAWN, 10000);
                         events.ScheduleEvent(EVENT_ADDS, 45000);
