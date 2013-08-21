@@ -5612,8 +5612,22 @@ SpellCastResult Spell::CheckCast(bool strict)
                     case 83967:
                     {
                         Map* pMap = m_caster->GetMap();
-                        if (!pMap || pMap->Instanceable())
+                        if (!pMap)
                             return SPELL_FAILED_SPELL_UNAVAILABLE;
+
+                        if (pMap->IsDungeon())
+                        {
+                            if (InstanceMap* iMap = pMap->ToInstanceMap())
+                                if (InstanceScript* pInstance = iMap->GetInstanceScript())
+                                    if (pInstance->IsEncounterInProgress())
+                                        return SPELL_FAILED_SPELL_UNAVAILABLE;
+
+                            if (!m_caster->FindNearestCreature(SUMMON_ENABLER_STALKER, 10.0f))
+                                return SPELL_FAILED_SPELL_UNAVAILABLE;
+                        }
+                        else if (pMap->IsBattlegroundOrArena())
+                            return SPELL_FAILED_SPELL_UNAVAILABLE;
+
                         break;
                     }
                     // Awaken Peon

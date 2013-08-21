@@ -40,6 +40,7 @@
 #include <list>
 
 #define WORLD_TRIGGER   12999
+#define SUMMON_ENABLER_STALKER 53488
 
 enum SpellInterruptFlags
 {

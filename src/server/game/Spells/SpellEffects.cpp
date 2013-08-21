@@ -1301,10 +1301,10 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
 
                             // Don't summon self
                             if (!pPlayer || pPlayer->GetGUID() == m_caster->GetGUID())
-                                return;
+                                continue;
 
                             if (!pPlayer->isAlive() || !pPlayer->IsInWorld())
-                                return;
+                                continue;
 
                             float x, y, z;
                             m_caster->GetPosition(x, y, z);
