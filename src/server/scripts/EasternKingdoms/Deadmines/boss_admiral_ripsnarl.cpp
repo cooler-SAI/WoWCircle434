@@ -58,13 +58,12 @@ enum Events
 {
     EVENT_SWIPE             = 1,
     EVENT_CONTINUE          = 2,
-    EVENT_THRIST_OF_BLOOD   = 3,
-    EVENT_GO_FOR_THE_THROAT = 4,
-    EVENT_SUMMON_VAPOR      = 5,
-    EVENT_SWIRLING_VAPOR    = 6,
-    EVENT_CONDENSING_VAPOR  = 7,
-    EVENT_FREEZING_VAPOR    = 8,
-    EVENT_COALESCE          = 9,
+    EVENT_GO_FOR_THE_THROAT = 3,
+    EVENT_SUMMON_VAPOR      = 4,
+    EVENT_SWIRLING_VAPOR    = 5,
+    EVENT_CONDENSING_VAPOR  = 6,
+    EVENT_FREEZING_VAPOR    = 7,
+    EVENT_COALESCE          = 8,
 };
 
 #define ACTION_COALESCE 1
@@ -175,7 +174,6 @@ class boss_admiral_ripsnarl : public CreatureScript
                 Talk(SAY_AGGRO);
 
                 events.ScheduleEvent(EVENT_SWIPE, urand(5000, 10000));
-                events.ScheduleEvent(EVENT_THRIST_OF_BLOOD, urand(5000, 7000));
                 if (IsHeroic())
                     events.ScheduleEvent(EVENT_GO_FOR_THE_THROAT, urand(5000, 10000));
 
@@ -223,7 +221,8 @@ class boss_admiral_ripsnarl : public CreatureScript
                     EnterSpecialPhase();
                     for (uint8 i = 0; i < 38; i++)
                         me->SummonCreature(NPC_DUMMY_1, dummyPos[i]);
-                 SetFog(true);
+                    events.ScheduleEvent(EVENT_SUMMON_VAPOR, 5000);
+                    SetFog(true);
                     return;
                 }
                 else if (me->HealthBelowPct(50) && stage == 1)
@@ -259,7 +258,6 @@ class boss_admiral_ripsnarl : public CreatureScript
                         case EVENT_CONTINUE:
                             me->SetVisible(true);
                             me->SetReactState(REACT_AGGRESSIVE);
-                            events.ScheduleEvent(EVENT_THRIST_OF_BLOOD, urand(5000, 7000));
                             if (IsHeroic())
                                 events.ScheduleEvent(EVENT_GO_FOR_THE_THROAT, urand(5000, 10000));
                             
@@ -269,14 +267,15 @@ class boss_admiral_ripsnarl : public CreatureScript
                                 DoCast(pTarget, SPELL_GO_FOR_THE_THROAT);
                             }
                             break;
-                        case EVENT_THRIST_OF_BLOOD:
-                            DoCast(me, SPELL_THRIST_OF_BLOOD_AURA);
-                            events.ScheduleEvent(EVENT_THRIST_OF_BLOOD, urand(7000, 9000));
-                            break;
                         case EVENT_GO_FOR_THE_THROAT:
                             if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                                 DoCast(pTarget, SPELL_GO_FOR_THE_THROAT);
                             events.ScheduleEvent(EVENT_GO_FOR_THE_THROAT, urand(10000, 20000));
+                            break;
+                        case EVENT_SUMMON_VAPOR:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0, true))
+                                DoCast(target, SPELL_VAPOR_SUMMON);
+                            events.ScheduleEvent(EVENT_SUMMON_VAPOR, 5000);
                             break;
                     }
                 }
@@ -292,17 +291,12 @@ class boss_admiral_ripsnarl : public CreatureScript
             {
                 me->AttackStop();
                 me->SetReactState(REACT_PASSIVE);
-                events.CancelEvent(EVENT_THRIST_OF_BLOOD);
                 events.CancelEvent(EVENT_GO_FOR_THE_THROAT);
                 me->SetVisible(false);
                 
                 DoResetThreat();
 
                 me->RemoveAurasDueToSpell(SPELL_THRIST_OF_BLOOD_AURA);
-
-                for (uint8 i = 0; i < 3; i++)
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                        DoCast(target, SPELL_VAPOR_SUMMON);
 
                 Talk(SAY_SPELL4);
 

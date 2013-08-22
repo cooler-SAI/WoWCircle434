@@ -293,7 +293,7 @@ enum UlduarGameObjects
     GO_BRAIN_ROOM_DOOR_1                    = 194635,
     GO_BRAIN_ROOM_DOOR_2                    = 194636,
     GO_BRAIN_ROOM_DOOR_3                    = 194637,
-	
+
     // Algalon the Observer
     GO_CELESTIAL_PLANETARIUM_ACCESS_10      = 194628,
     GO_CELESTIAL_PLANETARIUM_ACCESS_25      = 194752,
@@ -317,7 +317,7 @@ enum EventIds
     EVENT_ACTIVATE_SANITY_WELL          = 21432,
     EVENT_HODIRS_PROTECTIVE_GAZE_PROC   = 21437,
 };
-	
+
 enum LeviathanActions
 {
     ACTION_TOWER_OF_STORM_DESTROYED     = 1,
@@ -413,7 +413,7 @@ enum UlduarData
     DATA_ILLUSION,
     DATA_DRIVE_ME_CRAZY,
     DATA_KEEPERS_COUNT,
-	
+
     // Algalon the Observer
     DATA_ALGALON_SUMMON_STATE,
     DATA_SIGILDOOR_01,

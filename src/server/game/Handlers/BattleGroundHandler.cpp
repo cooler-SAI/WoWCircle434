@@ -762,6 +762,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket & recvData)
         sLog->outDebug(LOG_FILTER_BATTLEGROUND, "Battleground: arena join as group start");
         sLog->outDebug(LOG_FILTER_BATTLEGROUND, "Battleground: arena team id %u, leader %s queued with matchmaker rating %u for type %u", _player->GetArenaTeamId(arenaslot), _player->GetName(), matchmakerRating, arenatype);
         bg->SetRated(true);
+        bg->SetArenaorBGType(true);
         ginfo = bgQueue.AddGroup(_player, grp, bgTypeId, bracketEntry, arenatype, true, false, arenaRating, matchmakerRating, ateamId);
         avgTime = bgQueue.GetAverageQueueWaitTime(ginfo, bracketEntry->GetBracketId());
     }
@@ -781,6 +782,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket & recvData)
 
         // add to queue
         uint32 queueSlot = member->AddBattlegroundQueueId(bgQueueTypeId);
+        member->AddBattlegroundQueueJoinTime(bgTypeId, ginfo->JoinTime);
         WorldPacket data; // send status packet (in queue)
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, member, queueSlot, STATUS_WAIT_QUEUE, avgTime, 0, arenatype);
         member->GetSession()->SendPacket(&data);

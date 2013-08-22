@@ -4132,15 +4132,8 @@ void SpellMgr::LoadDbcDataCorrections()
             case 88840: // Vanish
                 spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(125);
                 break;
-            case 88736: // Taste for Blood
-                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
-                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
-                spellInfo->ProcChance = 0;
-                spellInfo->ProcFlags = 0;
-                break;
             case 95647: // Ripsnarl Achievement Aura
                 spellInfo->AttributesEx3 = SPELL_ATTR3_ONLY_TARGET_PLAYERS;
-                break;
                 break;
             case 89268: // Throw Food Targeting
             case 89740: 

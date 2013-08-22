@@ -1166,18 +1166,6 @@ enum TrinityStrings
     LANG_TITANIUM_SEAL_USE              = 11190,
     LANG_TITANIUM_SEAL_UP               = 11191,    
     LANG_TITANIUM_SEAL_DOWN             = 11192,
-
-    // Ulduar Locales (reserved: 12000 - 12049)
-    LANG_ULD_TEL_BASE_CAMP              = 12000, // Teleport to the Expedition Base Camp
-    LANG_ULD_TEL_FORM_GROUNDS           = 12001, // Teleport to the Formation Grounds
-    LANG_ULD_TEL_COLOS_FORGE            = 12002, // Teleport to the Colossal Forge
-    LANG_ULD_TEL_SCRAPYARD              = 12003, // Teleport to the Scrapyard
-    LANG_ULD_TEL_ANTCHAMBER             = 12004, // Teleport to the Antechamber of Ulduar
-    LANG_ULD_TEL_SHATTERED              = 12005, // Teleport to the Shattered Walkway
-    LANG_ULD_TEL_CONSERVATORY           = 12006, // Teleport to the Conservatory of Life
-    LANG_ULD_TEL_IMAGINATION            = 12007, // Teleport to the Spark of Imagination
-    LANG_ULD_TEL_DESCENT                = 12008, // Teleport to the Descent into Madness
-    LANG_ULD_RAZOR_GOSSIP               = 12009, // Activate Harpoons! (boss Razorscale)
  
     // Icecrown Citadel Locales (reserved: 13050 - 13099)
     LANG_ICC_RING_ALREADY_HAVE              = 13050,

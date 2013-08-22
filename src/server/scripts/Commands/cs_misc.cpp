@@ -1786,7 +1786,7 @@ public:
             return false;
 
         char const* muteReason = strtok(NULL, "\r");
-        std::string muteReasonStr = "No reason";
+        std::string muteReasonStr = "не указана.";
         if (muteReason != NULL)
             muteReasonStr = muteReason;
 
@@ -1834,13 +1834,13 @@ public:
 
         std::string announce;
 
-        announce = "The character '";
+        announce = "Чат персонажа '";
         announce += nameStr;
-        announce += "' was muted for ";
+        announce +=  "' был заблокирован на ";
         announce += delayStr;
-        announce += " minutes by the character '";
+        announce += " минут(у) модератором '";
         announce += handler->GetSession()? handler->GetSession()->GetPlayerName(): "";
-        announce += "'. The reason is: ";
+        announce += "'. Причина: ";
         announce += muteReasonStr;
         
         char buff[2048];

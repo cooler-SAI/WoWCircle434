@@ -2941,6 +2941,10 @@ class Player : public Unit, public GridObject<Player>
         float GetAverageItemLevel();
         bool isDebugAreaTriggers;
 
+        // spectator
+        typedef std::list<std::string> StringList;
+        std::vector<StringList*> twovtwo;
+
         void ClearWhisperWhiteList() { WhisperList.clear(); }
         void AddWhisperWhiteList(uint64 guid) { WhisperList.push_back(guid); }
         bool IsInWhisperWhiteList(uint64 guid);

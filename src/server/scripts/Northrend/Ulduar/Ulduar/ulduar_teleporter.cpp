@@ -31,26 +31,28 @@ class ulduar_teleporter : public GameObjectScript
 
         bool OnGossipHello(Player* player, GameObject* gameObject)
         {
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr->GetTrinityStringForDBCLocale(LANG_ULD_TEL_BASE_CAMP), GOSSIP_SENDER_ULDUAR_PORT, SPELL_BASE_CAMP_TELEPORT);
+            bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Переместиться в Главный лагерь экспедиции." : "Teleport to the Expedition Base Camp.", GOSSIP_SENDER_ULDUAR_PORT, SPELL_BASE_CAMP_TELEPORT);
             if (InstanceScript* instance = gameObject->GetInstanceScript())
             {
                 if (instance->GetData(DATA_COLOSSUS) == 2) //count of 2 collossus death
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr->GetTrinityStringForDBCLocale(LANG_ULD_TEL_FORM_GROUNDS), GOSSIP_SENDER_ULDUAR_PORT, SPELL_FORMATION_GROUNDS_TELEPORT);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Переместиться на Плац." : "Teleport to the Formation Grounds.", GOSSIP_SENDER_ULDUAR_PORT, SPELL_FORMATION_GROUNDS_TELEPORT);
                 if (instance->GetBossState(BOSS_LEVIATHAN) == DONE)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr->GetTrinityStringForDBCLocale(LANG_ULD_TEL_COLOS_FORGE), GOSSIP_SENDER_ULDUAR_PORT, SPELL_COLOSSAL_FORGE_TELEPORT);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Переместиться в Гигантскую кузню." : "Teleport to the Colossal Forge.", GOSSIP_SENDER_ULDUAR_PORT, SPELL_COLOSSAL_FORGE_TELEPORT);
                 if (instance->GetBossState(BOSS_XT002) == DONE)
                 {
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr->GetTrinityStringForDBCLocale(LANG_ULD_TEL_SCRAPYARD), GOSSIP_SENDER_ULDUAR_PORT, SPELL_SCRAPYARD_TELEPORT);
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr->GetTrinityStringForDBCLocale(LANG_ULD_TEL_ANTCHAMBER), GOSSIP_SENDER_ULDUAR_PORT, SPELL_ANTECHAMBER_TELEPORT);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Переместиться на Мусорную свалку." : "Teleport to the Scrapyard.", GOSSIP_SENDER_ULDUAR_PORT, SPELL_SCRAPYARD_TELEPORT);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Переместиться в Вестибюль.": "Teleport to the Antechamber of Ulduar.", GOSSIP_SENDER_ULDUAR_PORT, SPELL_ANTECHAMBER_TELEPORT);
                 }
                 if (instance->GetBossState(BOSS_KOLOGARN) == DONE)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr->GetTrinityStringForDBCLocale(LANG_ULD_TEL_SHATTERED), GOSSIP_SENDER_ULDUAR_PORT, SPELL_SHATTERED_WALKWAY_TELEPORT);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Переместиться в Разрушенную аллею.": "Teleport to the Shattered Walkway.", GOSSIP_SENDER_ULDUAR_PORT, SPELL_SHATTERED_WALKWAY_TELEPORT);
                 if (instance->GetBossState(BOSS_AURIAYA) == DONE)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr->GetTrinityStringForDBCLocale(LANG_ULD_TEL_CONSERVATORY), GOSSIP_SENDER_ULDUAR_PORT, SPELL_CONSERVATORY_TELEPORT);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Переместиться в Консерваторию." : "Teleport to the Conservatory of Life.", GOSSIP_SENDER_ULDUAR_PORT, SPELL_CONSERVATORY_TELEPORT);
                 if (instance->GetData(DATA_TRAM) == DONE || instance->GetBossState(BOSS_MIMIRON) == DONE)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr->GetTrinityStringForDBCLocale(LANG_ULD_TEL_IMAGINATION), GOSSIP_SENDER_ULDUAR_PORT, SPELL_SPARK_OF_IMAGINATION_TELEPORT);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Переместиться в зал Искры воображения.": "Teleport to the Spark of Imagination.", GOSSIP_SENDER_ULDUAR_PORT, SPELL_SPARK_OF_IMAGINATION_TELEPORT);
                 if (instance->GetBossState(BOSS_VEZAX) == DONE)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr->GetTrinityStringForDBCLocale(LANG_ULD_TEL_DESCENT), GOSSIP_SENDER_ULDUAR_PORT, SPELL_DESCENT_INTO_MADNESS_TELEPORT);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Переместиться в тюрьму Йогг-Сарона." : "Teleport to the Descent into Madness.", GOSSIP_SENDER_ULDUAR_PORT, SPELL_DESCENT_INTO_MADNESS_TELEPORT);
             }
 
             player->SEND_GOSSIP_MENU(player->GetGossipTextId(gameObject), gameObject->GetGUID());

@@ -86,6 +86,8 @@ void BattlegroundMgr::Update(uint32 diff)
     for (BattlegroundDataContainer::iterator itr1 = bgDataStore.begin(); itr1 != bgDataStore.end(); ++itr1)
     {
         BattlegroundContainer& bgs = itr1->second.m_Battlegrounds;
+        if (!bgs.size())
+            continue;
         BattlegroundContainer::iterator itrDelete = bgs.begin();
         // first one is template and should not be deleted
         for (BattlegroundContainer::iterator itr = ++itrDelete; itr != bgs.end();)

@@ -2271,6 +2271,8 @@ bool WorldObject::canSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
         // Alive players can see dead players in some cases, but other objects can't do that
         if (Player const* thisPlayer = ToPlayer())
         {
+            if (thisPlayer->InArena() && thisPlayer->HasAura(8326) && !obj->ToUnit()->HasAura(8326) && CanDetect(obj, ignoreStealth))
+                return true;
             if (Player const* objPlayer = obj->ToPlayer())
             {
                 if (thisPlayer->GetTeam() != objPlayer->GetTeam() || !thisPlayer->IsGroupVisibleFor(objPlayer))
@@ -2282,6 +2284,10 @@ bool WorldObject::canSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
         else
             return false;
     }
+    else if (const Player* thisPlayer = ToPlayer())
+        if (obj->ToUnit())
+            if(thisPlayer->InArena() && thisPlayer->HasAura(8326) && obj->ToUnit()->HasAura(8326) && !thisPlayer->IsInPartyWith(obj->ToUnit()))
+                return false;
 
     if (obj->IsInvisibleDueToDespawn())
         return false;
