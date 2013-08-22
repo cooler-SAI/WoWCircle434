@@ -7327,6 +7327,17 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     triggered_spell_id = 32747;
                     break;
                 }
+                // Glyph of Regrowth
+                case 54743:
+                {
+                    if (GetHealthPct() < 50.0f)
+                    {
+                        if (Aura * aur = victim->GetAura(procSpell->Id, GetGUID()))
+                            aur->RefreshDuration(false);
+                    }
+
+                    return true;
+                }
                 // Item - Druid T10 Balance 4P Bonus
                 case 70723:
                 {
