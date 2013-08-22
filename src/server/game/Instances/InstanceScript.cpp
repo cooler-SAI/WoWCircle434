@@ -448,6 +448,17 @@ void InstanceScript::DoNearTeleportPlayers(const Position pos, bool casting /*=f
                 pPlayer->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), casting);
 }
 
+void InstanceScript::DoKilledMonsterKredit(uint32 questId, uint32 entry, uint64 guid/* =0*/)
+{
+    Map::PlayerList const &plrList = instance->GetPlayers();
+    
+    if (!plrList.isEmpty())
+        for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
+            if (Player* pPlayer = i->getSource())
+                if (pPlayer->GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)
+                    pPlayer->KilledMonsterCredit(entry, guid);
+}
+
 bool InstanceScript::CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/ /*= NULL*/, uint32 /*miscvalue1*/ /*= 0*/)
 {
     sLog->outError(LOG_FILTER_GENERAL, "Achievement system call InstanceScript::CheckAchievementCriteriaMeet but instance script for map %u not have implementation for achievement criteria %u",

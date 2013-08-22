@@ -207,6 +207,8 @@ class InstanceScript : public ZoneScript
 
         void DoNearTeleportPlayers(const Position pos, bool casting = false);
 
+        void DoKilledMonsterKredit(uint32 questId, uint32 entry, uint64 guid = 0);
+
         // Return wether server allow two side groups or not
         bool ServerAllowsTwoSideGroups() { return sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP); }
 
