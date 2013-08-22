@@ -1914,6 +1914,7 @@ class Unit : public WorldObject
         // set withDelayed to true to interrupt delayed spells too
         // delayed+channeled spells are always interrupted
         void InterruptNonMeleeSpells(bool withDelayed, uint32 spellid = 0, bool withInstant = true);
+        void InterruptNonMeleeSpellsExcept(bool withDelayed, uint32 except, bool withInstant = true);
 
         Spell* GetCurrentSpell(CurrentSpellTypes spellType) const { return m_currentSpells[spellType]; }
         Spell* GetCurrentSpell(uint32 spellType) const { return m_currentSpells[spellType]; }

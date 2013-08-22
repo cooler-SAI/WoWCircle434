@@ -2979,6 +2979,21 @@ void Unit::InterruptNonMeleeSpells(bool withDelayed, uint32 spell_id, bool withI
         InterruptSpell(CURRENT_CHANNELED_SPELL, true, true);
 }
 
+void Unit::InterruptNonMeleeSpellsExcept(bool withDelayed, uint32 except, bool withInstant)
+{
+    // generic spells are interrupted if they are not finished or delayed
+    if (m_currentSpells[CURRENT_GENERIC_SPELL] && m_currentSpells[CURRENT_GENERIC_SPELL]->m_spellInfo->Id != except)
+        InterruptSpell(CURRENT_GENERIC_SPELL, withDelayed, withInstant);
+
+    // autorepeat spells are interrupted if they are not finished or delayed
+    if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL] && m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id != except)
+        InterruptSpell(CURRENT_AUTOREPEAT_SPELL, withDelayed, withInstant);
+
+    // channeled spells are interrupted if they are not finished, even if they are delayed
+    if (m_currentSpells[CURRENT_CHANNELED_SPELL] && m_currentSpells[CURRENT_CHANNELED_SPELL]->m_spellInfo->Id != except)
+        InterruptSpell(CURRENT_CHANNELED_SPELL, true, true);
+}
+
 Spell* Unit::FindCurrentSpellBySpellId(uint32 spell_id) const
 {
     for (uint32 i = 0; i < CURRENT_MAX_SPELL; i++)
