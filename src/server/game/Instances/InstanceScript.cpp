@@ -568,6 +568,9 @@ bool InstanceScript::CanUseResurrection()
     if (!instance)
         return true;
 
+    if (!instance->IsRaid())
+        return true;
+
     if (!IsEncounterInProgress())
         return true;
 
