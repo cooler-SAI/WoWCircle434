@@ -6021,8 +6021,15 @@ SpellCastResult Spell::CheckCast(bool strict)
                             return SPELL_FAILED_NOT_IN_BATTLEGROUND;
                 break;
             case SPELL_EFFECT_RESURRECT:
-                if (m_spellInfo->HasAttribute(SPELL_ATTR8_BATTLE_RESURRECTION) && m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->HasAura(97821))
-                    return SPELL_FAILED_TARGET_CANNOT_BE_RESURRECTED;
+                if (m_spellInfo->HasAttribute(SPELL_ATTR8_BATTLE_RESURRECTION))
+                {
+                    if (InstanceScript* pInstance = m_caster->GetInstanceScript())
+                        if (!pInstance->CanUseResurrection())
+                            return SPELL_FAILED_IN_COMBAT_RES_LIMIT_REACHED;
+
+                    if (m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->HasAura(97821))
+                        return SPELL_FAILED_TARGET_CANNOT_BE_RESURRECTED;
+                }
                 break;
             default:
                 break;

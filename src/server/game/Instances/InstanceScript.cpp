@@ -217,6 +217,9 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
             SaveToDB();
         }
 
+        // Clear resurrections count
+        ResetResurrectionsCount();
+
         for (uint32 type = 0; type < MAX_DOOR_TYPES; ++type)
             for (DoorSet::iterator i = bossInfo->door[type].begin(); i != bossInfo->door[type].end(); ++i)
                 UpdateDoorState(*i);
@@ -558,4 +561,17 @@ void InstanceScript::UpdatePhasing()
     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
         if (Player* player = itr->getSource())
             player->GetPhaseMgr().NotifyConditionChanged(phaseUdateData);
+}
+
+bool InstanceScript::CanUseResurrection()
+{
+    if (!instance)
+        return true;
+
+    if (!IsEncounterInProgress())
+        return true;
+
+    uint8 max_count = (instance->Is25ManRaid() ? 3 : 1);
+
+    return (resurrections < max_count);
 }

@@ -136,7 +136,7 @@ typedef std::map<uint32 /*entry*/, MinionInfo> MinionInfoMap;
 class InstanceScript : public ZoneScript
 {
     public:
-        explicit InstanceScript(Map* map) : instance(map), completedEncounters(0) {}
+        explicit InstanceScript(Map* map) : instance(map), completedEncounters(0), resurrections(0) {}
 
         virtual ~InstanceScript() {}
 
@@ -239,6 +239,10 @@ class InstanceScript : public ZoneScript
         // ReCheck PhaseTemplate related conditions
         void UpdatePhasing();
 
+        void UpdateResurrectionsCount() { resurrections++; }
+        bool CanUseResurrection();
+        void ResetResurrectionsCount() { resurrections = 0; }
+
     protected:
         void SetBossNumber(uint32 number) { bosses.resize(number); }
         void LoadDoorData(DoorData const* data);
@@ -257,5 +261,6 @@ class InstanceScript : public ZoneScript
         DoorInfoMap doors;
         MinionInfoMap minions;
         uint32 completedEncounters; // completed encounter mask, bit indexes are DungeonEncounter.dbc boss numbers, used for packets
+        uint8 resurrections;
 };
 #endif

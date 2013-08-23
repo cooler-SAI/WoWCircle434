@@ -6603,6 +6603,10 @@ void Spell::EffectResurrect(SpellEffIndex effIndex)
     if (target->IsRessurectRequested())       // already have one active request
         return;
 
+    if (m_spellInfo->HasAttribute(SPELL_ATTR8_BATTLE_RESURRECTION))
+        if (InstanceScript* pInstance = target->GetInstanceScript())
+            pInstance->UpdateResurrectionsCount();
+
     uint32 health = target->CountPctFromMaxHealth(damage);
     uint32 mana   = CalculatePct(target->GetMaxPower(POWER_MANA), damage);
 
