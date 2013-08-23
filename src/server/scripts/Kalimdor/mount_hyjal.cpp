@@ -172,8 +172,7 @@ class npc_garr_firesworn : public CreatureScript
             }   
         };
 }; 
-
-class npc_lycanthoth : public CreatureScript
+/* class npc_lycanthoth : public CreatureScript
 {
     public:
         npc_lycanthoth() : CreatureScript("npc_lycanthoth") { }
@@ -197,7 +196,7 @@ class npc_lycanthoth : public CreatureScript
                     killer->CastSpell(killer, (originalKiller->ToPlayer()->GetTeamId() == TEAM_HORDE ? 74077 : 74078), true);
             } 
         };
-};
+}; */
 
 class npc_marion_wormswing : public CreatureScript
 {
@@ -232,7 +231,7 @@ class npc_marion_wormswing : public CreatureScript
         };
 };
 
-class go_harpy_signal_fire : public GameObjectScript
+/* class go_harpy_signal_fire : public GameObjectScript
 {
     public:
         go_harpy_signal_fire() : GameObjectScript("go_harpy_signal_fire") {}
@@ -243,7 +242,7 @@ class go_harpy_signal_fire : public GameObjectScript
                 pGo->SummonCreature(41112, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 60000);
             return false;
         }
-};
+}; */
 
 class at_king_of_the_spider_hill : public AreaTriggerScript
 {
@@ -262,8 +261,8 @@ void AddSC_mount_hyjal()
 {
     new npc_garr();
     new npc_garr_firesworn();
-    new npc_lycanthoth();
+    // new npc_lycanthoth();
     new npc_marion_wormswing();
-    new go_harpy_signal_fire();
+    // new go_harpy_signal_fire();
     new at_king_of_the_spider_hill();
 }

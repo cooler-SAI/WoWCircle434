@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "DatabaseEnv.h"
 #include "Guild.h"
 #include "GuildMgr.h"
@@ -1626,11 +1625,11 @@ void Guild::HandleInviteMember(WorldSession* session, const std::string& name)
         return;
     }
     // Invited player cannot be in another guild
-    /*if (pInvitee->GetGuildId())
+    if (pInvitee->GetGuildId())
     {
-        SendCommandResult(session, GUILD_INVITE, ERR_ALREADY_IN_GUILD_S, name);
+        SendCommandResult(session, GUILD_INVITE_S, ERR_ALREADY_IN_GUILD_S, name);
         return;
-    }*/
+    }
     // Invited player cannot be invited
     if (pInvitee->GetGuildIdInvited())
     {
@@ -3326,7 +3325,7 @@ void Guild::GiveXP(uint32 xp, Player* source /*=NULL*/)
             }
         }
 
-        //GetNewsLog().AddNewEvent(GUILD_NEWS_LEVEL_UP, time(NULL), 0, 0, _level);
+        GetNewsLog().AddNewEvent(GUILD_NEWS_LEVEL_UP, time(NULL), 0, 0, _level);
         GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_GUILD_LEVEL, GetLevel(), 0, 0, NULL, source);
 
         ++oldLevel;
@@ -3370,7 +3369,7 @@ void Guild::ResetWeeklyReputation()
 
 void Guild::GuildNewsLog::AddNewEvent(GuildNews eventType, time_t date, uint64 playerGuid, uint32 flags, uint32 data)
 {
-    /*uint32 id = _newsLog.size();
+    uint32 id = _newsLog.size();
 
     GuildNewsEntry& log = _newsLog[id];
     log.EventType = eventType;
@@ -3391,14 +3390,14 @@ void Guild::GuildNewsLog::AddNewEvent(GuildNews eventType, time_t date, uint64 p
 
     WorldPacket packet;
     BuildNewsData(id, log, packet);
-    GetGuild()->BroadcastPacket(&packet);*/
+    GetGuild()->BroadcastPacket(&packet);
 }
 
 void Guild::GuildNewsLog::LoadFromDB(PreparedQueryResult result)
 {
     if (!result)
         return;
-    /*do
+    do
     {
         Field* fields = result->Fetch();
         uint32 id = fields[0].GetInt32();
@@ -3409,7 +3408,7 @@ void Guild::GuildNewsLog::LoadFromDB(PreparedQueryResult result)
         log.Flags = fields[4].GetInt32();
         log.Date = time_t(fields[5].GetInt32());
     }
-    while (result->NextRow());*/
+    while (result->NextRow());
 }
 
 void Guild::GuildNewsLog::BuildNewsData(uint32 id, GuildNewsEntry& guildNew, WorldPacket& data)

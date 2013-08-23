@@ -7321,6 +7321,11 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->ProcFlags = 0;
                 spellInfo->ProcChance = 0;
                 break;
+            case 48760: // Occulus portals
+            case 49305:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_DEST_DB;
+                break;
             default:
                 break;
         }

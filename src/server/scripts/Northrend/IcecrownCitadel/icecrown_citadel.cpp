@@ -1200,8 +1200,6 @@ class boss_sister_svalna : public CreatureScript
                 if (spell->Id == SPELL_HURL_SPEAR && me->HasAura(SPELL_AETHER_SHIELD))
                 {
                     me->RemoveAurasDueToSpell(SPELL_AETHER_SHIELD);
-                    me->RemoveAurasDueToSpell(SPELL_DIVINE_SURGE);
-                    me->CastSpell(me, Is25ManRaid() ? SPELL_AETHER_BURST_25 : SPELL_AETHER_BURST_10, true);
                     Talk(EMOTE_SVALNA_BROKEN_SHIELD, caster->GetGUID());
                 }
             }
@@ -1267,7 +1265,6 @@ class boss_sister_svalna : public CreatureScript
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, -SPELL_IMPALING_SPEAR))
                             {
                                 DoCast(me, SPELL_AETHER_SHIELD);
-                                DoCast(me, SPELL_DIVINE_SURGE);
                                 DoCast(target, SPELL_IMPALING_SPEAR);
                             }
                             events.ScheduleEvent(EVENT_IMPALING_SPEAR, urand(20000, 25000));

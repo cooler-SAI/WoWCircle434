@@ -15,9 +15,6 @@ class spectator : public CreatureScript
         typedef std::list<std::string> StringList;
         std::vector<StringList*> twovtwo;
         std::vector<StringList*> threevthree;
-        //std::vector<StringList*>::iterator string_iter;
-        uint32 HONOR_COST;
-        //std::string name[2];
     void CleanUp(Player * player)
     {
         for(std::vector<StringList*>::iterator itr = player->twovtwo.begin(); itr != player->twovtwo.end();)
@@ -72,15 +69,11 @@ class spectator : public CreatureScript
                         std::string name = plr->GetName();
                         if (team1 == teamid)
                         {
-                            //sLog.outError("%s added to team1s", name);
                             team1s->push_back(name);
-                            //sLog.outError("%s added to team1s", team1s->rbegin());
                         }
                         else if (team2 == teamid)
                         {
-                            //sLog.outError("%s added to team2s", name);
                             team2s->push_back(name);
-                            //sLog.outError("%s added to team1s", team2s->rbegin());
                         }
                     }
                     if (at->GetType() == 2) 
@@ -114,8 +107,6 @@ class spectator : public CreatureScript
         player->CastSpell(player, 8326, true);
         player->SetBattlegroundId(pl->GetBattlegroundId(), pl->GetBattlegroundTypeId());
         player->SetBattlegroundEntryPoint();
-                    
-        //player->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, (float)1.0);   //see radius of death player?
 
         // set and clear other
         player->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND);
@@ -127,27 +118,19 @@ class spectator : public CreatureScript
         player->TeleportTo(pl->GetMapId(), x, y, z, player->GetAngle(pl), TELE_TO_GM_MODE);
         player->CastSpell(player, 8326, true);
         player->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-//       player->ModifyHonorPoints(0-HONOR_COST);
         CleanUp(player);
     }
 
     bool OnGossipHello(Player* player, Creature* pCreature)
     {
-        //HONOR_COST = sWorld->getIntConfig(CONFIG_ARENA_SPECTATOR_PRICE_HONOR);
+        bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+ 
         if (player->InBattlegroundQueue())
         {
-            pCreature->MonsterWhisper("Выйти с очередей на арены/бг!", player->GetGUID(), true);
+            pCreature->MonsterWhisper(ru ? "Выйти с очередей на арены/бг!" : "Come up with queues at the arena/BG!", player->GetGUID(), true);
             player->CLOSE_GOSSIP_MENU();
             return false;
         }
-        /*if (player->GetHonorPoints() < HONOR_COST)
-        {
-            char honorprice[80];
-            snprintf (honorprice, 80, "Вам необходимо %u хонора", HONOR_COST);
-            pCreature->MonsterWhisper(honorprice, player->GetGUID(), true);
-            player->CLOSE_GOSSIP_MENU();
-            return false;
-        }*/
         
         int8 var = Doscan();
         player->PlayerTalkClass->GetGossipMenu().ClearMenu();
@@ -156,13 +139,13 @@ class spectator : public CreatureScript
             case 0:
             {
                 //"Никого нет на арене, идите спать";
-                player->ADD_GOSSIP_ITEM( 7, "Арена пуста", GOSSIP_SENDER_MAIN, 1224);
+                player->ADD_GOSSIP_ITEM( 7, ru ? "Арена пуста." : "Arena is empty.", GOSSIP_SENDER_MAIN, 1224);
                 break;
             }
             default:
             {
                 //"Ввести никнейм"
-                player->ADD_GOSSIP_ITEM_EXTENDED(0, "Введите ник для просмотра", GOSSIP_SENDER_MAIN, 1001, "", 0, true);
+                player->ADD_GOSSIP_ITEM_EXTENDED(0, ru ? "Введите ник для просмотра." : "Enter a nickname for view.", GOSSIP_SENDER_MAIN, 1001, "", 0, true);
                 if (var & 1)
                 {
                     player->ADD_GOSSIP_ITEM(0, "2x2", GOSSIP_SENDER_MAIN, 1002);
@@ -174,13 +157,15 @@ class spectator : public CreatureScript
                 player->twovtwo = twovtwo;
             }
         }
-        player->ADD_GOSSIP_ITEM( 4, "Счастливого пути!", GOSSIP_SENDER_MAIN, 1224);
+        player->ADD_GOSSIP_ITEM( 4,  ru ? "Счастливого пути!" : "Fare you well!", GOSSIP_SENDER_MAIN, 1224);
         player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE,pCreature->GetGUID());
         return true;
     }
                 
     bool OnGossipSelect(Player* player, Creature* pCreature, uint32 sender, uint32 action)
     {
+        bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
         player->PlayerTalkClass->GetGossipMenu().ClearMenu();
         if (player->InBattlegroundQueue())
             return false;
@@ -196,8 +181,6 @@ class spectator : public CreatureScript
                 break;
             case 1003:
                 player->twovtwo = threevthree;
-            /*case 1002:
-                player->twovtwo = twovtwo;*/
             default:
             {
                 if (action < 1000)
@@ -206,7 +189,6 @@ class spectator : public CreatureScript
                     if(player->twovtwo.size() && player->twovtwo[action]->size())
                         if (Player* pl = sObjectMgr->GetPlayerByLowGUID(sObjectMgr->GetPlayerGUIDByName(*player->twovtwo[action]->begin())))
                             TeleportTo(player, pl);
-                    //player->SetPhaseMask(pl->GetPhaseMask(), true);
                 }
                 else
                 {
@@ -227,7 +209,6 @@ class spectator : public CreatureScript
                             moar = true;
                             break;
                         }
-                        //string_iter = twovtwo.begin();
                         if(!(*string_iter)->size())
                             continue;
                         StringList::iterator str_str_iter= (*string_iter)->begin();
@@ -237,13 +218,12 @@ class spectator : public CreatureScript
                             str+= ", ";
                             str+= *str_str_iter;
                         }
-                        //snprintf( TitleCost, 80,     "%s, %s", str_str_iter, (++str_str_iter == (*string_iter)->end() ? "": str_str_iter));
                         player->ADD_GOSSIP_ITEM(11, str, GOSSIP_SENDER_MAIN, (i++));
                         ++j;
                     }
                     if (moar)
-                        player->ADD_GOSSIP_ITEM( 7, "Еще", GOSSIP_SENDER_MAIN, 1300+i);
-                    player->ADD_GOSSIP_ITEM( 4, "Вернуться", GOSSIP_SENDER_MAIN, 1225);
+                        player->ADD_GOSSIP_ITEM( 7, ru ? "Еще..." : "More...", GOSSIP_SENDER_MAIN, 1300+i);
+                    player->ADD_GOSSIP_ITEM( 4, ru ? "Return" : "Return", GOSSIP_SENDER_MAIN, 1225);
                     player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE,pCreature->GetGUID());
                     break;
                 }
