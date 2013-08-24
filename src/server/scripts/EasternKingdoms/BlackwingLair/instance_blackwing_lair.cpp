@@ -33,11 +33,6 @@ Blackwing Lair Encounter:
 8 - boss_nefarian.cpp
 */
 
-/*
-DOOR_TYPE_PASSAGE -- open after kill
-DOOR_TYPE_ROOM  -- close in combat
-*/
-
 DoorData const doordata[] =
 {
     {GO_DOOR_0,    BOSS_RAZORGORE,    DOOR_TYPE_ROOM,     BOUNDARY_NONE},

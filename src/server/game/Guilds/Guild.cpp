@@ -1141,7 +1141,7 @@ bool Guild::Create(Player* pLeader, const std::string& name)
     m_leaderGuid = pLeader->GetGUID();
     m_name = name;
     m_info = "";
-    m_motd = "No message set.";
+    m_motd = "Сообщение не установлено.";
     m_bankMoney = 0;
     m_createdDate = ::time(NULL);
     _level = 1;
