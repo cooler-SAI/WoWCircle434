@@ -5971,6 +5971,19 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
             }
             break;
         }
+        case SPELLFAMILY_WARLOCK:
+        {
+            if (!(mode & AURA_EFFECT_HANDLE_REAL))
+                break;
+            
+            // Glyph of Voidwalker
+            if (m_spellInfo->Id == 56247 && caster->GetTypeId() == TYPEID_PLAYER)
+            {
+                if (Guardian * pet = caster->ToPlayer()->GetPet())
+                    pet->UpdateMaxHealth();
+            }
+            break;
+        }
         case SPELLFAMILY_DEATHKNIGHT:
         {
             if (!(mode & AURA_EFFECT_HANDLE_REAL))
