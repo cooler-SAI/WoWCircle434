@@ -178,6 +178,8 @@ enum Events
     // Thrall
     EVENT_TALK_ULTRAXION_WIN_1  = 19,
     EVENT_TALK_ULTRAXION_WIN_2  = 20,
+    EVENT_SPAWN_SHIP            = 21,
+    EVENT_SPAWN_NPC             = 22,
 };
 
 enum Actions
@@ -1202,6 +1204,27 @@ class npc_dragon_soul_thrall : public CreatureScript
                             break;
                         case EVENT_TALK_ULTRAXION_WIN_2:
                             Talk(1);
+                            events.ScheduleEvent(EVENT_SPAWN_SHIP, 15000);
+                            break;
+                        case EVENT_SPAWN_SHIP:
+                            if (InstanceScript* pInstance = me->GetInstanceScript())
+                            {
+                                if (GameObject* pShip = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(DATA_ALLIANCE_SHIP)))
+                                    pShip->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED);
+                            }
+                            events.ScheduleEvent(EVENT_SPAWN_NPC, 8000);
+                            break;
+                        case EVENT_SPAWN_NPC:
+                            if (InstanceScript* pInstance = me->GetInstanceScript())
+                            {
+                                if (Creature* pSwayze = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_SWAYZE)))
+                                {
+                                    pSwayze->SetVisible(true);
+                                    pSwayze->AI()->Talk(9);
+                                }
+                                if (Creature* pReevs = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_REEVS)))
+                                    pReevs->SetVisible(true);
+                            }
                             break;
                         default:
                             break;

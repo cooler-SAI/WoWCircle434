@@ -1896,6 +1896,14 @@ void Unit::CalcHealAbsorb(Unit* victim, const SpellInfo* healSpell, uint32 &heal
 
         RemainingHeal -= currentAbsorb;
 
+        // Consuming Shroud, Warmaster Blackhorn, Dragon Soul
+        if ((*i)->GetSpellInfo()->Id == 110214 || (*i)->GetSpellInfo()->Id == 110598)
+            if (victim)
+            {
+                int32 bp0 = (RemainingHeal > 0 ? (healAmount - RemainingHeal) : healAmount);
+                victim->CastCustomSpell((Unit*)NULL, 110215, &bp0, NULL, NULL, true);
+            }
+
         // Reduce shield amount
         (*i)->SetAmount((*i)->GetAmount() - currentAbsorb);
         // Need remove it later

@@ -55,6 +55,10 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T &owner)
                 if (i_target->GetPositionZ() > 100.0f)
                     return;
             break;
+        case 56923: // Twilight Sapper
+            if ((&owner)->GetMotionMaster()->GetMotionSlot(MOTION_SLOT_CONTROLLED))
+                return;
+            break;
     }
 
 

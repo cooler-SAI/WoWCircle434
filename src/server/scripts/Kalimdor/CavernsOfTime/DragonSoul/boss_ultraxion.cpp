@@ -302,6 +302,8 @@ class boss_ultraxion: public CreatureScript
                         instance->DoRespawnGameObject(instance->GetData64(DATA_LESSER_CACHE_25H), DAY);
                         break;
                 }
+
+                me->DespawnOrUnsummon(3000);
             }
 
             void KilledUnit(Unit* victim)

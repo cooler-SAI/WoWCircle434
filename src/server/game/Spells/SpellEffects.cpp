@@ -351,6 +351,20 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         if (ihit->effectMask & (1<<effIndex))
                             ++count;
 
+                    switch (m_spellInfo->Id)
+                    {
+                        case 107439: // Twilight Barrage
+                        case 109203: // Twilight Barrage
+                        case 109204: // Twilight Barrage
+                        case 109205: // Twilight Barrage
+                        case 106401: // Twilight Onslaught
+                        case 108862: // Twilight Onslaught
+                        case 109226: // Twilight Onslaught
+                        case 109227: // Twilight Onslaught
+                            ++count; // + ship
+                            break;
+                    }
+
                     damage /= count;                    // divide to all targets
                 }
 
@@ -2666,6 +2680,10 @@ void Spell::EffectHealthLeech(SpellEffIndex effIndex)
     if (!unitTarget || !unitTarget->isAlive() || damage < 0)
         return;
 
+    // Siphon Vitality, Warmaster Blackhorn, Dragon Soul
+    if (m_spellInfo->Id == 110312)
+        damage = unitTarget->CountPctFromCurHealth(20);
+
     damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
     damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
 
@@ -4360,7 +4378,7 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
             unitTarget->getThreatManager().setCurrentVictim(forcedVictim);
 
     if (unitTarget->GetTypeId() == TYPEID_UNIT && unitTarget->ToCreature()->IsAIEnabled 
-    && (!unitTarget->ToCreature()->HasReactState(REACT_PASSIVE) || unitTarget->IsPetGuardianStuff()))
+    && (!unitTarget->ToCreature()->HasReactState(REACT_PASSIVE) || (unitTarget->IsPetGuardianStuff() && IS_PLAYER_GUID(unitTarget->GetCharmerOrOwnerGUID()))))
     {
         // taken from case COMMAND_ATTACK:                        //spellid=1792  //ATTACK PetHandler.cpp
         if (CharmInfo* charmInfo = unitTarget->GetCharmInfo())

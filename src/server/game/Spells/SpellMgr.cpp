@@ -3058,6 +3058,14 @@ void SpellMgr::LoadSpellCustomAttr()
             case 109182: // Unstable Twilight
             case 109183: // Unstable Twilight
             case 109184: // Unstable Twilight
+            case 107439: // Twilight Barrage
+            case 109203: // Twilight Barrage
+            case 109204: // Twilight Barrage
+            case 109205: // Twilight Barrage
+            case 106401: // Twilight Onslaught
+            case 108862: // Twilight Onslaught
+            case 109226: // Twilight Onslaught
+            case 109227: // Twilight Onslaught
                 // ONLY SPELLS WITH SPELLFAMILY_GENERIC and EFFECT_SCHOOL_DAMAGE
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 break;
@@ -6452,6 +6460,37 @@ void SpellMgr::LoadDbcDataCorrections()
             case 109417:
                 spellInfo->Effects[EFFECT_0].TriggerSpell = 103327;
                 spellInfo->Effects[EFFECT_1].TriggerSpell = 106174;
+                break;
+            // Warmaster Blackhorn
+            case 107558: // Degeneration
+            case 108861:
+            case 109207:
+            case 109208:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            case 107567: // Brutal Strike
+            case 109209:
+            case 109210:
+            case 109211:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            case 109204: // Twilight Barrage
+            case 109205:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            case 107588: // Twilight Onslaught
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                break;
+            case 108038: // Harpoon
+                spellInfo->SetRangeIndex(13); // 5000 yards
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            case 107518: // Detonate
+                spellInfo->Effects[EFFECT_2].Effect = 0;
+                break;
+            case 108046: // Shockwave
+            case 110137:
+                spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
                 break;
             // ENDOF DRAGON SOUL SPELLS
             //

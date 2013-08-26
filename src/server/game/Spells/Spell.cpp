@@ -1066,7 +1066,7 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
     SpellTargetObjectTypes objectType = targetType.GetObjectType();
     SpellTargetCheckTypes selectionType = targetType.GetCheckType();
     ConditionList* condList = m_spellInfo->Effects[effIndex].ImplicitTargetConditions;
-    float coneAngle = M_PI*2/3;
+    float coneAngle = ((m_caster->GetTypeId() == TYPEID_PLAYER) ? M_PI * (2.0f / 3.0f) : M_PI / 2.0f);
     float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster, NULL, GetSpellInfo()->IsPositive()) * m_spellValue->RadiusMod;
 
     if (uint32 containerTypeMask = GetSearcherTypeMask(objectType, condList))
@@ -8321,7 +8321,7 @@ bool WorldObjectSpellConeTargetCheck::operator()(WorldObject* target)
     {
         if (!_caster->isInFront(target, _coneAngle))
         {
-            if (_caster->GetDistance2d(target) > 3.0f || !_caster->isInFront(target, M_PI))
+            if (_caster->GetTypeId() != TYPEID_PLAYER || _caster->GetDistance2d(target) > 3.0f || !_caster->isInFront(target, M_PI))
                 return false;
         }
     }

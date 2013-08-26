@@ -24,6 +24,11 @@ class instance_dragon_soul : public InstanceMapScript
                 uiZonozzGUID = 0;
                 uiHagaraGUID = 0;
                 uiUltraxionGUID = 0;
+
+                uiAllianceShipGUID = 0;
+                uiSwayzeGUID = 0;
+                uiReevsGUID = 0;
+
                 memset(uiLesserCacheofTheAspects, 0, sizeof(uiLesserCacheofTheAspects));
 
                 bHagaraEvent = 0;
@@ -53,6 +58,26 @@ class instance_dragon_soul : public InstanceMapScript
                         break;
                     case NPC_ULTRAXION:
                         uiUltraxionGUID = pCreature->GetGUID();
+                        break;
+                    case NPC_SKY_CAPTAIN_SWAYZE:
+                        if (pCreature->GetPositionZ() > 200.0f)
+                        {
+                            uiSwayzeGUID = pCreature->GetGUID();
+                            if (GetBossState(DATA_ULTRAXION) == DONE)
+                                pCreature->SetVisible(true);
+                            else
+                                pCreature->SetVisible(false);
+                        }
+                        break;
+                    case NPC_KAANU_REEVS:
+                        if (pCreature->GetPositionZ() > 200.0f)
+                        {
+                            uiReevsGUID = pCreature->GetGUID();
+                            if (GetBossState(DATA_ULTRAXION) == DONE)
+                                pCreature->SetVisible(true);
+                            else
+                                pCreature->SetVisible(false);
+                        }
                         break;
                     case NPC_TRAVEL_TO_WYRMREST_TEMPLE:
                     case NPC_TRAVEL_TO_EYE_OF_ETERNITY:
@@ -87,6 +112,12 @@ class instance_dragon_soul : public InstanceMapScript
                     case GO_LESSER_CACHE_OF_THE_ASPECTS_25H:
                         uiLesserCacheofTheAspects[3] = pGo->GetGUID();
                         break;
+                    case GO_ALLIANCE_SHIP:
+                        uiAllianceShipGUID = pGo->GetGUID();
+                        if (GetBossState(DATA_ULTRAXION) == DONE)
+                            pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED);
+                        pGo->UpdateObjectVisibility();
+                        break;
                     default:
                         break;
                 }
@@ -105,6 +136,9 @@ class instance_dragon_soul : public InstanceMapScript
                     case DATA_LESSER_CACHE_25N: return uiLesserCacheofTheAspects[1];
                     case DATA_LESSER_CACHE_10H: return uiLesserCacheofTheAspects[2];
                     case DATA_LESSER_CACHE_25H: return uiLesserCacheofTheAspects[3];
+                    case DATA_SWAYZE: return uiSwayzeGUID;
+                    case DATA_REEVS: return uiReevsGUID;
+                    case DATA_ALLIANCE_SHIP: return uiAllianceShipGUID;
                     default: return 0;
                 }
                 return 0;
@@ -217,6 +251,10 @@ class instance_dragon_soul : public InstanceMapScript
                 uint64 uiZonozzGUID;
                 uint64 uiHagaraGUID;
                 uint64 uiUltraxionGUID;
+                uint64 uiAllianceShipGUID;
+                uint64 uiSwayzeGUID;
+                uint64 uiReevsGUID;
+
                 uint64 uiLesserCacheofTheAspects[4];
 
                 std::vector<uint64> teleportGUIDs;
