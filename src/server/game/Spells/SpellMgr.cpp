@@ -2909,12 +2909,13 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
                 break;
             case 2818: // Deadly Poison
+            case 12654: // Ignite
             case 31803: // Censure
             case 77661: // Searing Flame
             case 77489: // Echo of Light
+            case 99002: // Fiery Claws, Item - Druid T12 Feral 2P Bonus
             case 99132: // Divine Fire, Item - Priest T12 Healer 2P Bonus
             case 99173: // Burning Wounds, Item - Rogue T12 2P Bonus
-            case 99002: // Fiery Claws, Item - Druid T12 Feral 2P Bonus
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER;
                 break;
             case 60256:

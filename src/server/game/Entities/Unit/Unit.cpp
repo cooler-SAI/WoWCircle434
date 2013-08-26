@@ -6313,10 +6313,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 11120:
                 case 12846:
                 {
-                    if (AuraEffect const *aurEff = GetAuraEffect(12654, EFFECT_0, GetGUID()))
-                        if (!aurEff->GetTickNumber())
-                            return false;
-
                     Unit* original_caster = GetProcOwner();
                     if (!original_caster)
                         return false;
