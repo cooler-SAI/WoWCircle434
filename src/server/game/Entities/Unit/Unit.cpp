@@ -307,6 +307,7 @@ Unit::~Unit()
         if (m_currentSpells[i])
         {
             m_currentSpells[i]->SetReferencedFromCurrent(false);
+            m_currentSpells[i]->SetExecutedCurrently(false);
             m_currentSpells[i] = NULL;
         }
 
