@@ -14628,10 +14628,6 @@ bool Unit::IsAlwaysDetectableFor(WorldObject const* seer) const
     if (WorldObject::IsAlwaysDetectableFor(seer))
         return true;
 
-    // Hunter's Mark
-    if (HasAura(1130, seer->GetGUID()) && !HasAura(11327))
-        return true;
-
     return false;
 }
 
@@ -21162,6 +21158,8 @@ void Unit::RemoveBattlegroundStartingAuras()
             ++iter;
     }
 }
+
+
 
 void Unit::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
 {
