@@ -459,10 +459,13 @@ bool Creature::UpdateEntry(uint32 Entry, uint32 team, const CreatureData* data)
     }
 
     // TODO: Shouldn't we check whether or not the creature is in water first?
-    if (cInfo->InhabitType & INHABIT_WATER && IsInWater())
-         AddUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
-    else
-        RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
+    if (cInfo->InhabitType & INHABIT_WATER)
+    {
+        if (IsInWater())
+            AddUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
+        else
+            RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
+    }
 
     return true;
 }
@@ -475,17 +478,6 @@ void Creature::Update(uint32 diff)
         AI()->JustRespawned();
         if (m_vehicleKit)
             m_vehicleKit->Reset();
-    }
-
-    if (IsInWater())
-    {
-        if (canSwim())
-            AddUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
-    }
-    else
-    {
-        if (canWalk())
-            RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
     }
 
     /*// Set the movement flags if the creature is in that mode. (Only fly if actually in air, only swim if in water, etc)
