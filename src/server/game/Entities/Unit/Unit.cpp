@@ -14132,7 +14132,7 @@ void Unit::SendMountResult(MountResult error)
 void Unit::SetInCombatWith(Unit* enemy)
 {
     Unit* eOwner = enemy->GetCharmerOrOwnerOrSelf();
-    if (eOwner->IsPvP() || eOwner->isBattlegroundVehicle())
+    if (eOwner->IsPvP() || (eOwner->ToCreature() && eOwner->ToCreature()->isBattlegroundVehicle()))
     {
         SetInCombatState(true, enemy);
         return;

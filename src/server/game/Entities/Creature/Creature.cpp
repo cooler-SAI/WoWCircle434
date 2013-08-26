@@ -2880,3 +2880,24 @@ Unit* Creature::SelectNearestHostileUnitInAggroRange(bool useLOS) const
 
     return target;
 }
+
+bool Creature::isBattlegroundVehicle() const
+{
+    switch (GetEntry())
+    {
+        case 28781: // Battleground Demolisher, SotA
+        case 27894: // Antipersonnel Cannon, SotA
+        case 34944: // Keep Cannon, IC
+        case 35273: // Glaive Thrower H, IC
+        case 34802: // Glaive Thrower A, IC
+        case 34775: // Demolisher, IC
+        case 35069: // Siege Engine H, IC
+        case 34776: // Siege Engine A, IC
+        case 34793: // Catapult, IC
+        case 34935: // Gunship Cannon H, IC
+        case 34929: // Gunship Cannon A, IC
+            return true;
+    }
+
+    return false;
+}
