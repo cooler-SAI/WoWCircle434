@@ -4831,10 +4831,6 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
     // bones will be deleted by corpse/bones deleting thread shortly
     sObjectAccessor->ConvertCorpseForPlayer(playerguid);
 
-    if (uint32 guildId = GetGuildIdFromDB(playerguid))
-        if (Guild* guild = sGuildMgr->GetGuildById(guildId))
-            guild->DeleteMember(guid);
-
     // remove from arena teams
     LeaveAllArenaTeams(playerguid);
 
@@ -4853,6 +4849,10 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
         // Completely remove from the database
         case CHAR_DELETE_REMOVE:
         {
+            if (uint32 guildId = GetGuildIdFromDB(playerguid))
+                if (Guild* guild = sGuildMgr->GetGuildById(guildId))
+                    guild->DeleteMember(guid);
+
             SQLTransaction trans = CharacterDatabase.BeginTransaction();
             QueryResult resultMail = CharacterDatabase.PQuery("SELECT id,messageType,mailTemplateId,sender,subject,body,money,has_items FROM mail WHERE receiver='%u' AND has_items<>0 AND cod<>0", guid);
             if (resultMail)

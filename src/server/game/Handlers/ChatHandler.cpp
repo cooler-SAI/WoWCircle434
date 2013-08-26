@@ -325,6 +325,15 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         } break;
         case CHAT_MSG_WHISPER:
         {
+            time_t now = time(NULL);
+            if (now - timeLastWhisperCommand < 1)
+            {
+                SendNotification("You have sent too many whisper messages in a short time interval.");
+                return;
+            }
+            else
+                timeLastWhisperCommand = now;
+
             if (sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ))
             {
                 SendNotification(GetTrinityString(LANG_WHISPER_REQ), sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ));
@@ -337,7 +346,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 break;
             }
 
-            Player* receiver = sObjectAccessor->FindPlayerByName(to.c_str());
+            Player* receiver = sObjectAccessor->FindPlayerByName(to);
             bool senderIsPlayer = AccountMgr::IsPlayerAccount(GetSecurity());
             bool receiverIsPlayer = AccountMgr::IsPlayerAccount(receiver ? receiver->GetSession()->GetSecurity() : SEC_PLAYER);
             if (!receiver || (senderIsPlayer && !receiverIsPlayer && !receiver->isAcceptWhispers() && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
@@ -652,7 +661,7 @@ void WorldSession::HandleAddonMessagechatOpcode(WorldPacket& recvData)
         {
             if (!normalizePlayerName(targetName))
                 break;
-            Player* receiver = sObjectAccessor->FindPlayerByName(targetName.c_str());
+            Player* receiver = sObjectAccessor->FindPlayerByName(targetName);
             if (!receiver)
                 break;
 

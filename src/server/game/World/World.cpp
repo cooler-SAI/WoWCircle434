@@ -2499,7 +2499,7 @@ bool World::RemoveBanAccount(BanMode mode, std::string nameOrIP)
 /// Ban an account or ban an IP address, duration will be parsed using TimeStringToSecs if it is positive, otherwise permban
 BanReturn World::BanCharacter(std::string name, std::string duration, std::string reason, std::string author)
 {
-    Player* pBanned = sObjectAccessor->FindPlayerByName(name.c_str());
+    Player* pBanned = sObjectAccessor->FindPlayerByName(name);
     uint32 guid = 0;
 
     uint32 duration_secs = TimeStringToSecs(duration);
@@ -2540,7 +2540,7 @@ BanReturn World::BanCharacter(std::string name, std::string duration, std::strin
 /// Remove a ban from a character
 bool World::RemoveBanCharacter(std::string name)
 {
-    Player* pBanned = sObjectAccessor->FindPlayerByName(name.c_str());
+    Player* pBanned = sObjectAccessor->FindPlayerByName(name);
     uint32 guid = 0;
 
     /// Pick a player to ban if not online

@@ -115,7 +115,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket & recvData)
         return;
     }
 
-    Player* player = sObjectAccessor->FindPlayerByName(memberName.c_str());
+    Player* player = sObjectAccessor->FindPlayerByName(memberName);
 
     // no player
     if (!player)
@@ -763,6 +763,12 @@ void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket& recvData)
     if (!group)
         return;
 
+    time_t now = time(NULL);
+    if (now - timeLastChangeSubGroupCommand < 2)
+        return;
+    else
+       timeLastChangeSubGroupCommand = now;
+
     std::string name;
     uint8 groupNr;
     recvData >> name;
@@ -778,7 +784,7 @@ void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket& recvData)
     if (!group->HasFreeSlotSubGroup(groupNr))
         return;
 
-    Player* movedPlayer = sObjectAccessor->FindPlayerByName(name.c_str());
+    Player* movedPlayer = sObjectAccessor->FindPlayerByName(name);
     uint64 guid;
 
     if (movedPlayer)

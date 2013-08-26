@@ -1327,7 +1327,7 @@ public:
                 me->StopMoving();
                 me->SetDisableGravity(false);
                 me->SetCanFly(false);
-                me->RemoveAllAuras();
+                me->AI()->EnterEvadeMode();
                 me->GetMotionMaster()->MoveFall();
             }
         }

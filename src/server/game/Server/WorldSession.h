@@ -1095,6 +1095,9 @@ class WorldSession
         time_t timeLastServerCommand;
         time_t timeCharEnumOpcode;
         time_t timeLastArenaTeamCommand;
+        time_t timeLastWhisperCommand;
+        time_t timeLastCalendarInvCommand;
+        time_t timeLastChangeSubGroupCommand;
 
         // Antispam
         uint32 m_uiAntispamMailSentCount;

@@ -2555,7 +2555,7 @@ public:
         {
             name = TargetName;
             normalizePlayerName(name);
-            player = sObjectAccessor->FindPlayerByName(name.c_str());
+            player = sObjectAccessor->FindPlayerByName(name);
         }
 
         if (!player)
@@ -2614,7 +2614,7 @@ public:
         {
             name = targetName;
             normalizePlayerName(name);
-            player = sObjectAccessor->FindPlayerByName(name.c_str());
+            player = sObjectAccessor->FindPlayerByName(name);
         }
         else // If no name was entered - use target
         {
