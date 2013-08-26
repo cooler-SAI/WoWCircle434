@@ -5622,6 +5622,11 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             return false;
 
                         triggered_spell_id = procSpell->Id;
+
+                        // Fulmination
+                        if (procSpell->Id == 88767)
+                            basepoints0 = damage;
+
                         break;
                     }
                     break;
