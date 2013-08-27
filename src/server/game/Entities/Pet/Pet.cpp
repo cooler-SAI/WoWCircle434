@@ -920,13 +920,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     {
         case SUMMON_PET:
         {
-            //the damage bonus used for pets is either fire or shadow damage, whatever is higher
-            uint32 fire  = m_owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FIRE);
-            uint32 shadow = m_owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_SHADOW);
-            uint32 val  = (fire > shadow) ? fire : shadow;
-            SetBonusDamage(int32 (val * 0.15f));
-            //bonusAP += val * 0.57;
-
             if (IsPetGhoul())
             {
                 CastSpell(this, 47466, true);   // Self Stun
@@ -957,8 +950,10 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
             {
                 case 50675: // Ebon Imp
                 {
-                    if (Player* pOwner = m_owner->ToPlayer())
-                        m_modMeleeHitChance = pOwner->GetFloatValue(PLAYER_FIELD_UI_SPELL_HIT_MODIFIER) + pOwner->GetRatingBonusValue(CR_HIT_SPELL);
+                    if (!HasAura(96101)) // Warlock Mastery
+                        CastSpell(this, 96101, true);
+
+                    LearnPetScalingAuras();
                     
                     float bonusDmg = m_owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW) * 0.15f;
                     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 2.5f - (petlevel / 2) + bonusDmg));
@@ -970,13 +965,10 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                     if (!HasAura(96101)) // Warlock Mastery
                         CastSpell(this, 96101, true);
 
+                    SetBonusDamage(m_owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW));
+
                     LearnPetScalingAuras();
                     break;
-                case 510: // mage Water Elemental
-                {
-                    SetBonusDamage(int32(m_owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST) * 0.33f));
-                    break;
-                }
                 case 1964: //force of nature
                 {
                     if (!pInfo)
@@ -1001,9 +993,18 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         SetCreateHealth(40*petlevel);
                         SetCreateMana(28 + 10*petlevel);
                     }
-                    SetBonusDamage(int32(m_owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE) * 0.5f));
-                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 4 - petlevel));
-                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 4 + petlevel));
+                    uint32 _spd = m_owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
+                    SetBonusDamage(_spd);
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(int32(_spd * 0.5f) - (petlevel * 4 - petlevel)));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(int32(_spd * 0.5f) + (petlevel * 4 - petlevel)));
+                    
+                    // Guardian gains hit and spellhit from pet scaling auras
+                    // Need to calculate crit, haste and penetration
+                    // Temporary use 89953 aura (warlock scaling)
+                    if (!HasAura(89953))
+                        CastSpell(this, 89953, true);
+
+                    LearnPetScalingAuras();
                     break;
                 }
                 case 19668: // Shadowfiend
@@ -1051,8 +1052,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                     if (m_owner->GetAuraEffect(63271, 0)) // Glyph of Feral Spirit
                         dmg_multiplier = 0.6f;
 
-                    SetBonusDamage(int32(m_owner->GetTotalAttackPowerValue(BASE_ATTACK) * dmg_multiplier));
-
                     // 14AP == 1dps, wolf's strike speed == 2s so dmg = basedmg + AP / 14 * 2
                     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float((petlevel * 4 - petlevel) + (m_owner->GetTotalAttackPowerValue(BASE_ATTACK) * dmg_multiplier * 2 / 14)));
                     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float((petlevel * 4 + petlevel) + (m_owner->GetTotalAttackPowerValue(BASE_ATTACK) * dmg_multiplier * 2 / 14)));
@@ -1066,9 +1065,17 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         CastSpell(this, 61783, true);
                     break;
                 }
+                case 45322: // Frostfire Orb
+                case 30702: // Flame Orb
+                case 44214: // Flame Orb
+                case 44199: // Ring of Frost
+                    if (Player* pOwner = m_owner->ToPlayer())
+                        m_modSpellHitChance = pOwner->GetFloatValue(PLAYER_FIELD_UI_SPELL_HIT_MODIFIER) + pOwner->GetRatingBonusValue(CR_HIT_SPELL);
+
+                    LearnPetScalingAuras();
+                    break;
                 case 31216: // Mirror Image
                 {
-                    SetBonusDamage(int32(m_owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST) * 0.33f));
                     // Stolen Mirror Images should have mage display id instead of dkay
                     if (m_owner->getSimulacrumTarget())
                         SetDisplayId(m_owner->getSimulacrumTarget()->GetDisplayId());
@@ -1086,6 +1093,10 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                     // Clone Me!
                     m_owner->CastSpell(this, 45204, true);
                     m_owner->CastSpell(this, 41055, true);
+
+                    SetBonusDamage(m_owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST));
+
+                    LearnPetScalingAuras();
                     break;
                 }
                 case 27829: // Ebon Gargoyle
@@ -1104,7 +1115,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 case 28017: // Bloodworms
                 {
                     SetCreateHealth(4 * petlevel);
-                    SetBonusDamage(int32(m_owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.006f));
                     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - 30 - (petlevel / 4)));
                     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel - 30 + (petlevel / 4)));
                     break;

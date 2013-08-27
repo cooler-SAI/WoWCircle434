@@ -370,6 +370,11 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                 switch (m_spellInfo->Id)                     // better way to check unknown
                 { 
+                    // Mirror Image, Frost Bolt
+                    case 59638:
+                        if (m_caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                            damage += int32(((Guardian*)m_caster)->GetBonusDamage() * 0.25f);
+                        break;
                     case 109721: // Lightning Strike, Vial of Shadows (lfr)
                         damage += int32(0.266f * m_caster->GetTotalAttackPowerValue(m_caster->getClass() == CLASS_HUNTER ? RANGED_ATTACK : BASE_ATTACK));
                         break;
@@ -449,21 +454,15 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     // Shaman, Fire Elemental, Fire Nova
                     case 12470:
                     {
-                        if (Unit* owner = m_caster->GetOwner())
-                        {
-                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
-                            damage += spd;
-                        }
+                        if (m_caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                            damage += ((Guardian*)m_caster)->GetBonusDamage();
                         break;
                     }
                     // Shaman, Fire Elemental, Fire Shield
                     case 13376:
                     {
-                        if (Unit* owner = m_caster->GetOwner())
-                        {
-                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
-                            damage += spd * 0.032f;
-                        }
+                        if (m_caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                            damage += ((Guardian*)m_caster)->GetBonusDamage() * 0.032f;
                         break;
                     }
                     // Decimation Blade, Baleroc
@@ -524,6 +523,8 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     {
                         // about +4 base spell dmg per level
                         damage = (m_caster->getLevel() - 60) * 4 + 60;
+                        if (m_caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                            damage += ((Guardian*)m_caster)->GetBonusDamage() * 0.23f;
                         break;
                     }
                     // Ancient Fury
@@ -606,14 +607,11 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             {
                 switch (m_spellInfo->Id)
                 {
-                    // Doom Bolt
+                    // Warlock, Doomguard, Doom Bolt
                     case 85692:
                     {
-                        if (Unit* owner = m_caster->GetOwner())
-                        {
-                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
-                            damage += spd * 1.36f;
-                        }
+                        if (m_caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                            damage += ((Guardian*)m_caster)->GetBonusDamage() * 1.36f;
                         break;
                     }
                     // Firebolt
@@ -977,16 +975,26 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             {
                 switch (m_spellInfo->Id)
                 {
+                    // Mirror Image, Fire Blast
+                    case 59637:
+                        if (m_caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                            damage += int32(((Guardian*)m_caster)->GetBonusDamage() * 0.15f);
+                        break;
+                    // Water Elemental, Water Bolt
+                    case 31707:
+                        if (Unit* pOwner = m_caster->GetOwner())
+                            damage += int32(pOwner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST) * 0.833f);
+                        break;
+                    // Water Elemental, Freeze
+                    case 33395:
+                        if (Unit* pOwner = m_caster->GetOwner())
+                            damage += int32(pOwner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST) * 0.029f);
+                        break;
                     // Shaman, Fire Elemental, Fire Blast
                     case 57984:
-                    {
-                        if (Unit* owner = m_caster->GetOwner())
-                        {
-                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
-                            damage += spd * 0.429f;
-                        }
+                        if (m_caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                            damage += ((Guardian*)m_caster)->GetBonusDamage() * 0.429f;
                         break;
-                    }
                     case 71757: // Deep Freeze should deal damage to permanently stun-immune targets.
                         if (unitTarget->GetTypeId() != TYPEID_UNIT || !(unitTarget->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(44572), 0)))
                             return;
