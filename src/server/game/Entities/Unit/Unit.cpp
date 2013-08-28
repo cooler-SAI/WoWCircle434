@@ -10794,6 +10794,12 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             }
             break;
         }
+        case 81585: // Chakra: Serenity Renew update proc
+        {
+            if (procSpell->IsTargetingArea())
+                return false;
+            break;
+        }
     }
 
     if (cooldown && GetTypeId() == TYPEID_PLAYER && ToPlayer()->HasSpellCooldown(trigger_spell_id))
