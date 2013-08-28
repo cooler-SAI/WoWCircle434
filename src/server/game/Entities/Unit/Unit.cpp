@@ -16867,7 +16867,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         // only auras that has triggered spell should proc from fully absorbed damage
         if (procExtra & PROC_EX_ABSORB && isVictim)
         {
-            if (damage || spellProto->HasCCAura() || spellProto->Effects[EFFECT_0].TriggerSpell || spellProto->Effects[EFFECT_1].TriggerSpell || spellProto->Effects[EFFECT_2].TriggerSpell)
+            if (damage || spellProto->HasCustomAttribute(SPELL_ATTR0_CU_AURA_CC) || spellProto->Effects[EFFECT_0].TriggerSpell || spellProto->Effects[EFFECT_1].TriggerSpell || spellProto->Effects[EFFECT_2].TriggerSpell)
                 active = true;
         }
         if (!IsTriggeredAtSpellProcEvent(target, triggerData.aura, procSpell, procFlag, procExtra, attType, isVictim, active, triggerData.spellProcEvent))
