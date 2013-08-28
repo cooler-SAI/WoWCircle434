@@ -1241,7 +1241,22 @@ ContentLevels GetContentLevelsForMapAndZone(uint32 mapid, uint32 zoneId)
 {
     mapid = GetVirtualMapForMapAndZone(mapid, zoneId);
     if (mapid < 2)
-        return CONTENT_1_60;
+    {
+        switch (zoneId)
+        {
+            case 5144: // Vaj'shir
+            case 5145:
+            case 4815:
+            case 4816:
+            case 5146:
+            case 5034: // Uldum
+            case 5052: // Deepholm
+            case 616:  // Mount Hyjal
+                return CONTENT_81_85;
+            default:
+                return CONTENT_1_60;
+        }
+    }
 
     MapEntry const* mapEntry = sMapStore.LookupEntry(mapid);
     if (!mapEntry)
