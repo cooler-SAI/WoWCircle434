@@ -2438,7 +2438,14 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spell)
         return SPELL_MISS_NONE;
 
     if (spell->IsInterruptSpell())
+    {
+        // only deflect works here
+        int32 deflect_chance = GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS);
+        if (roll_chance_i(deflect_chance))
+            return SPELL_MISS_DEFLECT;
+
         return SPELL_MISS_NONE;
+    }
 
     SpellSchoolMask schoolMask = spell->GetSchoolMask();
     // PvP - PvE spell misschances per leveldif > 2
