@@ -255,14 +255,15 @@ enum Events
     // Shambling Horror
     EVENT_SHOCKWAVE                 = 58,
     EVENT_ENRAGE                    = 59,
+    EVENT_ATTACK_START              = 60,
 
     // Raging Spirit
-    EVENT_SOUL_SHRIEK               = 60,
+    EVENT_SOUL_SHRIEK               = 61,
 
     // Strangulate Vehicle (Harvest Soul)
-    EVENT_TELEPORT                  = 61,
-    EVENT_MOVE_TO_LICH_KING         = 62,
-    EVENT_DESPAWN_SELF              = 63,
+    EVENT_TELEPORT                  = 62,
+    EVENT_MOVE_TO_LICH_KING         = 63,
+    EVENT_DESPAWN_SELF              = 64,
 };
 
 enum EventGroups
@@ -710,7 +711,9 @@ class boss_the_lich_king : public CreatureScript
                     case NPC_SHAMBLING_HORROR:
                     case NPC_DRUDGE_GHOUL:
                         summon->CastSpell(summon, SPELL_RISEN_WITCH_DOCTOR_SPAWN, true);
-                        summon->SetReactState(REACT_PASSIVE);
+                        summon->SetReactState(REACT_AGGRESSIVE);
+                        if (Unit* victim = me->SelectVictim())
+                            AttackStart(victim);
                         summon->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
                         summon->m_Events.AddEvent(new StartMovementEvent(me, summon), summon->m_Events.CalculateTime(5000));
                         break;
@@ -819,6 +822,7 @@ class boss_the_lich_king : public CreatureScript
                         Talk(SAY_LK_REMORSELESS_WINTER);
                         SendMusicToPlayers(MUSIC_SPECIAL);
                         DoCast(me, SPELL_REMORSELESS_WINTER_1);
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                         events.DelayEvents(62500, EVENT_GROUP_BERSERK); // delay berserk timer, its not ticking during phase transitions
                         events.ScheduleEvent(EVENT_QUAKE, 62500, 0, PHASE_TRANSITION);
                         events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 4000, 0, PHASE_TRANSITION);
@@ -834,6 +838,7 @@ class boss_the_lich_king : public CreatureScript
                         Talk(SAY_LK_REMORSELESS_WINTER);
                         SendMusicToPlayers(MUSIC_SPECIAL);
                         DoCast(me, SPELL_REMORSELESS_WINTER_2);
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                         summons.DespawnEntry(NPC_VALKYR_SHADOWGUARD);
                         events.DelayEvents(62500, EVENT_GROUP_BERSERK); // delay berserk timer, its not ticking during phase transitions
                         events.ScheduleEvent(EVENT_QUAKE_2, 62500, 0, PHASE_TRANSITION);
@@ -977,6 +982,7 @@ class boss_the_lich_king : public CreatureScript
                         case EVENT_QUAKE:
                             events.SetPhase(PHASE_TWO);
                             me->ClearUnitState(UNIT_STATE_CASTING);  // clear state to ensure check in DoCastAOE passes
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                             DoCastAOE(SPELL_QUAKE);
                             SendMusicToPlayers(MUSIC_SPECIAL);
                             Talk(SAY_LK_QUAKE);
@@ -984,6 +990,7 @@ class boss_the_lich_king : public CreatureScript
                         case EVENT_QUAKE_2:
                             events.SetPhase(PHASE_THREE);
                             me->ClearUnitState(UNIT_STATE_CASTING);  // clear state to ensure check in DoCastAOE passes
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                             DoCastAOE(SPELL_QUAKE);
                             SendMusicToPlayers(MUSIC_SPECIAL);
                             Talk(SAY_LK_QUAKE);
@@ -1326,6 +1333,7 @@ class npc_shambling_horror_icc : public CreatureScript
                 _events.Reset();
                 _events.ScheduleEvent(EVENT_SHOCKWAVE, urand(20000, 25000));
                 _events.ScheduleEvent(EVENT_ENRAGE, urand(11000, 14000));
+                _events.ScheduleEvent(EVENT_ATTACK_START, 5000);
             }
 
             void DamageTaken(Unit* /*attacker*/, uint32& damage)
@@ -1358,6 +1366,11 @@ class npc_shambling_horror_icc : public CreatureScript
                         case EVENT_ENRAGE:
                             DoCast(me, SPELL_ENRAGE);
                             _events.ScheduleEvent(EVENT_ENRAGE, urand(20000, 25000));
+                            break;
+                        case EVENT_ATTACK_START:
+                            me->SetReactState(REACT_AGGRESSIVE);
+                            if (Unit* victim = me->SelectVictim())
+                                AttackStart(victim);
                             break;
                         default:
                             break;
@@ -1683,6 +1696,8 @@ class npc_strangulate_vehicle : public CreatureScript
                                 {
                                     Position pos;
                                     lichKing->GetNearPosition(pos, float(rand_norm()) * 5.0f  + 7.5f, lichKing->GetAngle(me));
+                                    Position offset = { 0, 0, 20, 0 };
+                                    pos.RelocateOffset(offset);
                                     me->GetMotionMaster()->MovePoint(0, pos);
                                 }
                             }

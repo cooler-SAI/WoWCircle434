@@ -1003,43 +1003,43 @@ class npc_gluttonous_abomination : public CreatureScript
 
 class npc_dream_portal : public CreatureScript
 {
-    public:
-        npc_dream_portal() : CreatureScript("npc_dream_portal") { }
+public:
+    npc_dream_portal() : CreatureScript("npc_dream_portal") { }
 
-        struct npc_dream_portalAI : public CreatureAI
+    struct npc_dream_portalAI : public CreatureAI
+    {
+        npc_dream_portalAI(Creature* creature) : CreatureAI(creature),
+             _used(false)
         {
-            npc_dream_portalAI(Creature* creature) : CreatureAI(creature),
-                _used(false)
-            {
-            }
-
-            void OnSpellClick(Unit* /*clicker*/, bool& result)
-            {
-                if (!result)
-                    return;
-
-                _used = true;
-                me->DespawnOrUnsummon();
-            }
-
-            uint32 GetData(uint32 type) const
-            {
-                return (type == MISSED_PORTALS && _used) ? 0 : 1;
-            }
-
-            void UpdateAI(uint32 const /*diff*/)
-            {
-                UpdateVictim();
-            }
-
-        private:
-            bool _used;
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return GetIcecrownCitadelAI<npc_dream_portalAI>(creature);
         }
+
+        void DoAction(int32 const action)
+        {
+            if (action != EVENT_SPELLCLICK)
+                return;
+
+            _used = true;
+            me->DespawnOrUnsummon();
+        }
+
+        uint32 GetData(uint32 type)
+        {
+            return (type == MISSED_PORTALS && _used) ? 0 : 1;
+        }
+
+        void UpdateAI(uint32 const /*diff*/)
+        {
+            UpdateVictim();
+        }
+
+    private:
+        bool _used;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetIcecrownCitadelAI<npc_dream_portalAI>(creature);
+    }
 };
 
 class npc_dream_cloud : public CreatureScript

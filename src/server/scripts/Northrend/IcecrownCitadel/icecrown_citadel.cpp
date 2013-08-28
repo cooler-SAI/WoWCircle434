@@ -2506,7 +2506,7 @@ class npc_sindragosas_ward : public CreatureScript
                 if (action == ACTION_START_GAUNTLET)
                     if (!_isEventInProgressOrDone)
                         if (!IsAnyPlayerOutOfRange())
-                            DoZoneInCombat(me, 150.0f);
+                            DoZoneInCombat(me, 500.0f);
             }
 
             void EnterCombat(Unit* /*attacker*/)
