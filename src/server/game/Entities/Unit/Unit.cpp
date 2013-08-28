@@ -12880,16 +12880,6 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
                             break;
                         }
                         break;
-                    case SPELLFAMILY_WARRIOR:
-                        // Victory Rush
-                        if (spellProto->SpellFamilyFlags[1] & 0x100)
-                        {
-                            // Glyph of Victory Rush
-                            if (AuraEffect const* aurEff = GetAuraEffect(58382, 0))
-                                crit_chance += aurEff->GetAmount();
-                            break;
-                        }
-                        break;
                     case SPELLFAMILY_HUNTER:
                         // Improved Kill Command
                         if (spellProto->SpellFamilyFlags[1] & 0x00000800)

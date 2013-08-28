@@ -353,7 +353,7 @@ public:
         }
         void Register()
         {
-            BeforeHit += SpellHitFn(spell_warr_victory_rush_SpellScript::HandleBeforeHit);
+            OnCast += SpellCastFn(spell_warr_victory_rush_SpellScript::HandleBeforeHit);
         }
     };
     SpellScript* GetSpellScript() const
