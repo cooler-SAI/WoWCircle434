@@ -1137,7 +1137,7 @@ namespace Trinity
             if (!me->IsWithinDistInMap(u, m_range))
                 return false;
 
-            if (!me->canSeeOrDetect(u))
+            if (!me->IsValidAttackTarget(u))
                 return false;
 
             if (u->HasCrowdControlAura())
