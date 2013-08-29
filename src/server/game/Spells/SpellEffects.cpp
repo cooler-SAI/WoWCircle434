@@ -983,7 +983,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     // Water Elemental, Water Bolt
                     case 31707:
                         if (Unit* pOwner = m_caster->GetOwner())
-                            damage += int32(pOwner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST) * 0.833f);
+                            damage += int32(pOwner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST) * 0.42f);
                         break;
                     // Water Elemental, Freeze
                     case 33395:
@@ -3419,8 +3419,9 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
     // Item - Warlock T13 2P Bonus (Doomguard and Infernal)
-    if (AuraEffect const* aurEff = m_originalCaster->GetAuraEffect(105888, EFFECT_1))
-        duration += aurEff->GetAmount() * 1000;
+    if (entry == 11859)
+        if (AuraEffect const* aurEff = m_originalCaster->GetAuraEffect(105888, EFFECT_1))
+            duration += aurEff->GetAmount() * 1000;
 
     TempSummon* summon = NULL;
 
