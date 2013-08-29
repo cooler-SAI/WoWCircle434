@@ -3420,7 +3420,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
     // Item - Warlock T13 2P Bonus (Doomguard and Infernal)
     if (AuraEffect const* aurEff = m_originalCaster->GetAuraEffect(105888, EFFECT_1))
-        duration += aurEff->GetAmount();
+        duration += aurEff->GetAmount() * 1000;
 
     TempSummon* summon = NULL;
 
