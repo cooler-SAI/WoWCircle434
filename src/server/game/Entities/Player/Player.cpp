@@ -3462,10 +3462,14 @@ void Player::SendInitialSpells()
 
     for (PlayerSpellMap::const_iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
     {
-        if (itr->second->state == PLAYERSPELL_REMOVED)
+        PlayerSpell* playerSpell = itr->second;
+        if (!playerSpell)
+            continue;
+        
+        if (playerSpell->state == PLAYERSPELL_REMOVED)
             continue;
 
-        if (!itr->second->active || itr->second->disabled)
+        if (!playerSpell->active || playerSpell->disabled)
             continue;
 
         data << uint32(itr->first);
@@ -9511,6 +9515,30 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
         case 5449:
             if (bg && bg->GetTypeID(true) == BATTLEGROUND_BFG)
                 bg->FillInitialWorldStates(data);
+            else
+            {
+                data << uint32(0x6e7) << uint32(0x0);       //  7 1767 //LIGHTHOUSE map state (A)
+                data << uint32(0x6e8) << uint32(0x0);       //  8 1768 //LIGHTHOUSE map state (H)
+                data << uint32(0x6e9) << uint32(0x0);       //  9 1769 //LIGHTHOUSE map state (CON A)
+                data << uint32(0x6ea) << uint32(0x0);       // 10 1770 //LIGHTHOUSE map state (CON H)
+                data << uint32(0x6ec) << uint32(0x0);       // 11 1772 //WATERWORKS state (A)
+                data << uint32(0x6ed) << uint32(0x0);       // 12 1773 //WATERWORKS state (H)
+                data << uint32(0x6ee) << uint32(0x0);       // 13 1774 //WATERWORKS state (CON A)
+                data << uint32(0x6ef) << uint32(0x0);       // 14 1775 //WATERWORKS state (CON H)
+                data << uint32(0x6f0) << uint32(0x0);       // 15 1776 alliance resources
+                data << uint32(0x6f1) << uint32(0x0);       // 16 1777 horde resources
+                data << uint32(0x6f2) << uint32(0x0);       // 17 1778 horde bases
+                data << uint32(0x6f3) << uint32(0x0);       // 18 1779 alliance bases
+                data << uint32(0x6f4) << uint32(0x7d0);     // 19 1780 max resources (2000)
+                data << uint32(0x6f6) << uint32(0x0);       // 20 1782 //MINE map state (A)
+                data << uint32(0x6f7) << uint32(0x0);       // 21 1783 //MINE map state (H)
+                data << uint32(0x6f8) << uint32(0x0);       // 22 1784 //MINE map state (CON A)
+                data << uint32(0x6f9) << uint32(0x0);       // 23 1785 //MINE map state (CON H)
+                data << uint32(0x732) << uint32(0x1);       // 24 1842 //LIGHTHOUSE map icon (NONE)
+                data << uint32(0x735) << uint32(0x1);       // 35 1845 //WATERWORKS map icon (NONE)
+                data << uint32(0x736) << uint32(0x1);       // 25 1846 //MINE map icon (NONE)
+                data << uint32(0x7a3) << uint32(0x708);     // 26 1955 warning limit (1800)
+            }
             break;
         // Halls of Reflection
         case 4820:

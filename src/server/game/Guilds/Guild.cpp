@@ -3249,9 +3249,8 @@ void Guild::GiveXP(uint32 xp, Player* source /*=NULL*/)
 
     if (source)
     {
-        Member* member = GetMember(source->GetGUID());
+        if (Member* member = GetMember(source->GetGUID()))
         {
-            ASSERT(member != NULL);
 
             member->AddXPContrib(xp);
             member->AddXPContribWeek(xp);
