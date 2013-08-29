@@ -2440,7 +2440,7 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spell)
     if (spell->IsInterruptSpell())
     {
         // only deflect works here
-        int32 deflect_chance = GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS);
+        int32 deflect_chance = victim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS);
         if (roll_chance_i(deflect_chance))
             return SPELL_MISS_DEFLECT;
 
