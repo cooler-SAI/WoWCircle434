@@ -1265,6 +1265,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_GENERIC:
                 switch (GetId())
                 {
+                    // PvP Trinket
+                    case 42292:
+                        if (target && target->GetTypeId() == TYPEID_PLAYER)
+                            target->CastSpell(target, (target->ToPlayer()->GetTeam() == ALLIANCE ? 97403 : 97404), true);
+                        break;
                     // Magma, Echo of Baine
                     case 101619:
                         if (target && target->GetTypeId() == TYPEID_PLAYER && !target->HasAura(101866))
