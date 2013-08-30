@@ -1345,6 +1345,12 @@ void Guardian::UpdateSpellHitChance()
             m_modSpellHitChance = (*i)->GetAmount();
         }
     }
+
+    // Some pets have not spellhit in scaling auras
+    // Water Elemental
+    if (GetEntry() == 510)
+        if (Player* pOwner = m_owner->ToPlayer())
+            m_modSpellHitChance = pOwner->GetFloatValue(PLAYER_FIELD_UI_SPELL_HIT_MODIFIER) + pOwner->GetRatingBonusValue(CR_HIT_SPELL);
 }
 
 void Guardian::UpdateExpertise()
