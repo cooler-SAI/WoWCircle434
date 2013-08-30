@@ -3773,7 +3773,7 @@ void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase)
     AuraList& scAuras = GetSingleCastAuras();
     for (AuraList::const_iterator itr = scAuras.begin(); itr != scAuras.end(); ++itr)
         if (Aura* aura = *itr)
-            if (aura->GetUnitOwner() != this && !aura->GetUnitOwner()->InSamePhase(newPhase))
+            if (aura->GetUnitOwner() != this && !aura->GetUnitOwner()->InSamePhase(newPhase) && !aura->IsRemoved())
                 tempList.push_back(aura);
 
     if (!tempList.empty())
