@@ -2,6 +2,7 @@
 #define DEF_DRAGONSOUL_H
 // 109247 - ds nerf real
 // 109251 - ds nerf dummy
+// 109255 - ds nerf dummy
 // 108202 - temple teleport
 // 108263 - ship teleport
 // 106094 - eye teleport +

@@ -78,6 +78,8 @@ enum Spells
     SPELL_ENGINE_FIRE                   = 107799,
     SPELL_DECK_FIRE                     = 109445, // 109245
     SPELL_DECK_FIRE_DMG                 = 110095,
+    SPELL_DECK_FIRE_PERIODIC            = 110092,
+    SPELL_DECK_FIRE_SPAWN               = 109470,
     SPELL_MASSIVE_EXPLOSION             = 108132,
     SPELL_HEAVY_SLUG                    = 108010,
     SPELL_ARTILLERY_BARRAGE             = 108040,
@@ -577,6 +579,8 @@ class npc_warmaster_blackhorn_goriona: public CreatureScript
                 }
                 else if (action == ACTION_SECOND_PHASE)
                 {
+                    phase = 1;
+
                     me->InterruptNonMeleeSpells(false);
 
                     events.CancelEvent(EVENT_TWILIGHT_ONSLAUGHT);
@@ -603,17 +607,17 @@ class npc_warmaster_blackhorn_goriona: public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                if (IsHeroic() && me->HealthBelowPct(90) && phase == 0)
+                if (IsHeroic() && me->HealthBelowPct(90) && phase == 1)
                 {
-                    phase = 1;
+                    phase = 2;
 
                     me->GetMotionMaster()->MovePoint(POINT_LAND, gorionaPos[7].GetPositionX(), gorionaPos[7].GetPositionY(), gorionaPos[7].GetPositionZ());
 
                     return;
                 }
-                else if (me->HealthBelowPct(20) && phase != 2)
+                else if (me->HealthBelowPct(20) && phase != 3)
                 {
-                    phase = 2;
+                    phase = 3;
 
                     events.CancelEvent(EVENT_TWILIGHT_ONSLAUGHT);
                     events.CancelEvent(EVENT_BROADSIDE);
