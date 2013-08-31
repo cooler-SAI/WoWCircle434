@@ -2438,7 +2438,14 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spell)
         return SPELL_MISS_NONE;
 
     if (spell->IsInterruptSpell())
+    {
+        // only deflect works here
+        int32 deflect_chance = GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS);
+        if (roll_chance_i(deflect_chance))
+            return SPELL_MISS_DEFLECT;
+
         return SPELL_MISS_NONE;
+    }
 
     SpellSchoolMask schoolMask = spell->GetSchoolMask();
     // PvP - PvE spell misschances per leveldif > 2
@@ -10796,6 +10803,12 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             }
             break;
         }
+        case 81585: // Chakra: Serenity Renew update proc
+        {
+            if (procSpell->IsTargetingArea())
+                return false;
+            break;
+        }
     }
 
     if (cooldown && GetTypeId() == TYPEID_PLAYER && ToPlayer()->HasSpellCooldown(trigger_spell_id))
@@ -12873,16 +12886,6 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
                                  if (victim->HealthAbovePct(80))
                                     crit_chance += predatory->GetAmount();
                             }
-                            break;
-                        }
-                        break;
-                    case SPELLFAMILY_WARRIOR:
-                        // Victory Rush
-                        if (spellProto->SpellFamilyFlags[1] & 0x100)
-                        {
-                            // Glyph of Victory Rush
-                            if (AuraEffect const* aurEff = GetAuraEffect(58382, 0))
-                                crit_chance += aurEff->GetAmount();
                             break;
                         }
                         break;
@@ -16870,7 +16873,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         // only auras that has triggered spell should proc from fully absorbed damage
         if (procExtra & PROC_EX_ABSORB && isVictim)
         {
-            if (damage || spellProto->HasCCAura() || spellProto->Effects[EFFECT_0].TriggerSpell || spellProto->Effects[EFFECT_1].TriggerSpell || spellProto->Effects[EFFECT_2].TriggerSpell)
+            if (damage || spellProto->HasCustomAttribute(SPELL_ATTR0_CU_AURA_CC) || spellProto->Effects[EFFECT_0].TriggerSpell || spellProto->Effects[EFFECT_1].TriggerSpell || spellProto->Effects[EFFECT_2].TriggerSpell)
                 active = true;
         }
         if (!IsTriggeredAtSpellProcEvent(target, triggerData.aura, procSpell, procFlag, procExtra, attType, isVictim, active, triggerData.spellProcEvent))
