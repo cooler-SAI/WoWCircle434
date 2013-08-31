@@ -1651,6 +1651,8 @@ void AuraEffect::UpdatePeriodic(Unit* caster)
                         case 59911: // Tenacity (vehicle)
                            GetBase()->RefreshDuration();
                            break;
+                            if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+                                return;
                         case 66823: case 67618: case 67619: case 67620: // Paralytic Toxin
                             // Get 0 effect aura
                             if (AuraEffect* slow = GetBase()->GetEffect(0))
@@ -1771,7 +1773,10 @@ void AuraEffect::PeriodicTick(AuraApplication * aurApp, Unit* caster) const
 
 void AuraEffect::HandleProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
 {
-    // TODO: effect script handlers here
+    bool prevented = GetBase()->CallScriptEffectProcHandlers(const_cast<AuraEffect const*>(this), const_cast<AuraApplication const*>(aurApp), eventInfo);
+    if (prevented)
+        return;
+
     switch (GetAuraType())
     {
         case SPELL_AURA_PROC_TRIGGER_SPELL:
@@ -1792,6 +1797,8 @@ void AuraEffect::HandleProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
         default:
             break;
     }
+	
+    GetBase()->CallScriptAfterEffectProcHandlers(const_cast<AuraEffect const*>(this), const_cast<AuraApplication const*>(aurApp), eventInfo);
 }
 
 void AuraEffect::CleanupTriggeredSpells(Unit* target)

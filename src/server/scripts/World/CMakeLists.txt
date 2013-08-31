@@ -14,6 +14,7 @@ set(scripts_STAT_SRCS
   World/areatrigger_scripts.cpp
   World/boss_emerald_dragons.cpp
   World/chat_log.cpp
+  World/duel_scripts.cpp
   World/go_scripts.cpp
   World/guards.cpp
   World/item_scripts.cpp
@@ -21,6 +22,7 @@ set(scripts_STAT_SRCS
   World/npc_innkeeper.cpp
   World/npc_professions.cpp
   World/npc_taxi.cpp
+  World/spectator.cpp
   World/npc_companions.cpp
   World/npcs_special.cpp
   World/tarecgosa_scripts.cpp

@@ -367,9 +367,40 @@ public:
 
 };
 
+class npc_stonecore_instance_portal: public CreatureScript
+{
+public:
+    npc_stonecore_instance_portal() : CreatureScript("npc_stonecore_instance_portal") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_stonecore_instance_portal_AI(creature);
+    }
+
+    struct npc_stonecore_instance_portal_AI : public CreatureAI
+    {
+       npc_stonecore_instance_portal_AI(Creature* creature) : CreatureAI(creature) { }
+
+        void OnSpellClick(Unit* clicker)
+        {
+            if (InstanceScript* instance = me->GetInstanceScript())
+                if (instance->GetBossState(DATA_SLABHIDE) != DONE)
+                    return;
+
+            if (me->GetEntry() == 51396)
+                clicker->NearTeleportTo(1313.197f, 1236.351f, 246.957f, 4.733236f, false);
+            else if (me->GetEntry() == 51397)
+                clicker->NearTeleportTo(853.575f, 999.710f, 317.326f, 4.591864f, false);
+        }
+
+        void UpdateAI(uint32 const diff) { }
+    };
+};
+
 void AddSC_the_stonecore()
 {
     new mob_crystalspawn_giant();
     new mob_impp();
     new mob_millhouse_manastorm();
+    new npc_stonecore_instance_portal();
 }

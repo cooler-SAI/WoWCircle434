@@ -103,8 +103,6 @@ const Position cavePos[4] =
     {-11522.52f, -1610.81f, 44.41f, 0.0f}
 };
 
-
-
 class boss_kilnara : public CreatureScript
 {
     public:
@@ -170,6 +168,7 @@ class boss_kilnara : public CreatureScript
             {
                 _JustDied();
                 Talk(SAY_DEATH);
+                summons.DespawnAll();
             }
 
             void JustSummoned(Creature* summon)

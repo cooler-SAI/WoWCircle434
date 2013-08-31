@@ -371,7 +371,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     }
 
     if (caster->GetTypeId() == TYPEID_PLAYER && 
-        !caster->ToPlayer()->HasActiveSpell(spellId) &&
+        !caster->ToPlayer()->HasActiveSpell(spellId) && !spellInfo->IsRaidMarker() &&
          spellId != 101603 && // Hack for Throw Totem, Echo of Baine 
          spellId != 1843) // Hack for disarm. Client sends the spell instead of gameobjectuse.
     {
@@ -387,7 +387,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     /*if (mover->GetTypeId() == TYPEID_PLAYER)
     {
         // not have spell in spellbook or spell passive and not casted by client
-        if ((!mover->ToPlayer()->HasActiveSpell(spellId) || spellInfo->IsPassive()) &&
+        if (((!mover->ToPlayer()->HasActiveSpell(spellId) || spellInfo->IsPassive()) && !spellInfo->IsRaidMarker()) &&
             spellId != 101603) // Hack for Throw Totem, Echo of Baine
         {
             //cheater? kick? ban?

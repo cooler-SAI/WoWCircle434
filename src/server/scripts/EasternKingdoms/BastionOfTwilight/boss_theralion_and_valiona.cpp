@@ -16,10 +16,8 @@ enum TheralionScriptTexts
     SAY_THERALION_INTRO_2    = 1,
     SAY_THERALION_KILL        = 2,
     SAY_THERALION_DEATH        = 3,
-    SAY_THERALION_DAZ1        = 4,
-    SAY_THERALION_DAZ2        = 5,
-    SAY_THERALION_MAGIC1    = 6,
-    SAY_THERALION_MAGIC2    = 7,
+    SAY_THERALION_DAZ        = 4,
+    SAY_THERALION_MAGIC    = 5,
 };
 
 enum Spells
@@ -200,6 +198,10 @@ enum Events
     EVENT_TWILIGHT_SENTRY                = 26,
     EVENT_TWILIGHT_SHIFT_STACK            = 27,
     EVENT_BERSERK                        = 28,
+    EVENT_VALIONA_INTRO_1           = 29,
+    EVENT_VALIONA_INTRO_2                     = 30,
+    EVENT_THERALION_INTRO_1            = 31,
+    EVENT_THERALION_INTRO_2                     = 32,
 };
 
 const Position valionatheralionlandPos = {-740.86f, -681.37f, 831.89f};
@@ -455,6 +457,8 @@ class boss_theralion : public CreatureScript
                 if (Creature* pValiona = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_VALIONA)))
                     if (!pValiona->isInCombat())
                         pValiona->SetInCombatWithZone();
+                events.ScheduleEvent(EVENT_THERALION_INTRO_1, 6000);
+                events.ScheduleEvent(EVENT_THERALION_INTRO_2, 16000);
                 instance->SetBossState(DATA_VALIONA_THERALION, IN_PROGRESS);
             }
 
@@ -476,6 +480,7 @@ class boss_theralion : public CreatureScript
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_ZONE_DMG_25H);
                 me->SetCanFly(false);
                 me->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
+                me->GetMotionMaster()->MoveFall();
                 summons.DespawnAll();
                 Talk(SAY_THERALION_DEATH);
                 instance->SetData(DATA_HEALTH_VALIONA_THERALION, 0);
@@ -528,6 +533,12 @@ class boss_theralion : public CreatureScript
                 {
                     switch (eventId)
                     {
+                    case EVENT_THERALION_INTRO_1:
+                        Talk(SAY_THERALION_INTRO_1);
+                        break;
+                    case EVENT_THERALION_INTRO_2:
+                        Talk(SAY_THERALION_INTRO_2);
+                        break;
                     case EVENT_BERSERK:
                         DoCast(me, SPELL_BERSERK);
                         break;
@@ -545,6 +556,7 @@ class boss_theralion : public CreatureScript
                         events.ScheduleEvent(EVENT_FABOLOUS_FLAMES, urand(14000, 16000));
                         break;
                     case EVENT_ENGULFING_MAGIC:
+                        Talk(SAY_THERALION_MAGIC);
                         me->CastCustomSpell(SPELL_ENGULFING_MAGIC, SPELLVALUE_MAX_TARGETS, RAID_MODE(1, 1, 3, 3), 0, false);
                         events.ScheduleEvent(EVENT_ENGULFING_MAGIC, urand(30000, 40000));
                         break;
@@ -555,7 +567,7 @@ class boss_theralion : public CreatureScript
                         break;
                      case EVENT_DAZZLING_DESTRUCTION_1:
                         events.CancelEvent(EVENT_TWILIGHT_BLAST);
-                        Talk(SAY_THERALION_DAZ1);
+                        Talk(SAY_THERALION_DAZ);
                         events.ScheduleEvent(EVENT_THERALION_ON, 6000);
                         
                         /*if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
@@ -737,11 +749,14 @@ class boss_valiona : public CreatureScript
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_ZONE_DMG_25H);
                 me->SetCanFly(false);
                 me->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
+                me->GetMotionMaster()->MoveFall();
                 summons.DespawnAll();
                 Talk(SAY_VALIONA_DEATH);
                 instance->SetData(DATA_HEALTH_VALIONA_THERALION, 0);
                 if (Creature* pTheralion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_THERALION)))
                     Killer->Kill(pTheralion);
+                if(Creature *Chogall = me->SummonCreature(NPC_CHOGALL_DLG, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 1, TEMPSUMMON_DEAD_DESPAWN, 0))
+                    Chogall->AI()->DoAction(ACTION_AT_VALIONA_THERALION_END);
             }
             
             void JustSummoned(Creature* summon)
@@ -806,6 +821,8 @@ class boss_valiona : public CreatureScript
                         pUnstableTwilight->SetPhaseMask(16, true);
                 if (Creature* pTwilightPortal = me->SummonCreature(NPC_COLLAPSING_TWILIGHT_PORTAL, collapsingtwilightportalPos))
                     pTwilightPortal->SetPhaseMask(16, true);
+                events.ScheduleEvent(EVENT_VALIONA_INTRO_1, 0);
+                events.ScheduleEvent(EVENT_VALIONA_INTRO_2, 14000);
                 instance->SetData(DATA_HEALTH_VALIONA_THERALION, me->GetMaxHealth());
                 instance->SetBossState(DATA_VALIONA_THERALION, IN_PROGRESS);
                 DoZoneInCombat();
@@ -875,6 +892,12 @@ class boss_valiona : public CreatureScript
                 {
                     switch (eventId)
                     {
+                    case EVENT_VALIONA_INTRO_1:
+                        Talk(SAY_VALIONA_INTRO_1);
+                        break;
+                    case EVENT_VALIONA_INTRO_2:
+                        Talk(SAY_VALIONA_INTRO_2);
+                        break;
                     case EVENT_BERSERK:
                         DoCast(me, SPELL_BERSERK);
                         break;
@@ -887,6 +910,7 @@ class boss_valiona : public CreatureScript
                         events.ScheduleEvent(EVENT_TWILIGHT_SHIFT_STACK, urand(19000, 20000));
                         break;
                     case EVENT_BLACKOUT:
+                            Talk(SAY_VALIONA_BLACKOUT);
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                             DoCast(target, SPELL_BLACKOUT);
                         events.ScheduleEvent(EVENT_BLACKOUT, urand(28000, 31000));

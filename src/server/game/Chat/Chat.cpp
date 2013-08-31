@@ -649,7 +649,7 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
     data->Initialize(SMSG_MESSAGECHAT, 5 + size);
 
     *data << uint8(type);
-    if ((type != CHAT_MSG_CHANNEL && type != CHAT_MSG_WHISPER) || language == LANG_ADDON)
+    if ((type != CHAT_MSG_CHANNEL && type != CHAT_MSG_WHISPER && type != CHAT_MSG_BATTLEGROUND && type != CHAT_MSG_BATTLEGROUND_LEADER) || language == LANG_ADDON)
         *data << uint32(language);
     else
         *data << uint32(LANG_UNIVERSAL);

@@ -52,11 +52,10 @@ enum eActions
 
 enum eTexts
 {
-    SAY_START                                  = -1877004,
-    SAY_KNEEL_DOWN                             = -1877005,
-    SAY_DEATH                                  = -1877006,
-    SAY_KILL_PLAYER_1                          = -1877023,
-    SAY_KILL_PLAYER_2                          = -1877024,
+    SAY_AGGRO                                  = 0,
+    SAY_KNEEL_DOWN                             = 1,
+    SAY_DEATH                                  = 2,
+    SAY_KILL_PLAYER                            = 3,
 };
 
 enum ePhases
@@ -141,7 +140,7 @@ public:
                     if (Creature* blaze = Unit::GetCreature(*me, instance->GetData64(DATA_BLAZE)))
                         blaze->AI()->DoAction(ACTION_REPENTANCE_START);
 
-                DoScriptText(SAY_KNEEL_DOWN, me);
+                Talk(SAY_KNEEL_DOWN);
                 me->CastSpell(me, SPELL_REPENTANCE_START, false);
                 events.ScheduleEvent(EVENT_REPENTANCE, 1500, 0, PHASE_REPENTANCE);
                 return;
@@ -170,7 +169,7 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            DoScriptText(SAY_DEATH, me);
+            Talk(SAY_DEATH);
             events.Reset();
             lSummons.DespawnAll();
 
@@ -190,7 +189,7 @@ public:
             if (IsHeroic())
                 events.ScheduleEvent(EVENT_SUMMON_BLAZE_OF_THE_HEAVENS, 3000);
 
-            DoScriptText(SAY_START, me);
+            Talk(SAY_AGGRO);
             events.SetPhase(PHASE_BARIM);
             events.ScheduleEvent(EVENT_FIFTY_LASHINGS, 5000, 0, PHASE_BARIM);
             events.ScheduleEvent(EVENT_HEAVENS_FURY, 5000, 0, PHASE_BARIM);
@@ -200,7 +199,7 @@ public:
         void KilledUnit(Unit* victim)
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
-                DoScriptText(RAND(SAY_KILL_PLAYER_1, SAY_KILL_PLAYER_2), me);
+            Talk(SAY_KILL_PLAYER);
         }
 
         void DamageTaken(Unit* /*done_by*/, uint32 & /*damage*/)

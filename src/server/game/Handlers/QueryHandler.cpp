@@ -255,6 +255,8 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleNpcTextQueryOpcode(WorldPacket & recvData)
 {
+    bool ru = GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
     uint32 textID;
     uint64 guid;
 
@@ -273,8 +275,8 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket & recvData)
         for (uint32 i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
         {
             data << float(0);
-            data << "Greetings $N";
-            data << "Greetings $N";
+            data << (ru ? "Приветствую, $N." : "Greetings, $N.");
+            data << (ru ? "Приветствую, $N." : "Greetings, $N.");
             data << uint32(0);
             data << uint32(0);
             data << uint32(0);

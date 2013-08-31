@@ -5,10 +5,13 @@
 //todo: реализовать reroure power, low health, корректный double attack
 enum ScriptTexts
 {
+    //chimaeron
     SAY_AGGRO       = 0,
     SAY_MASSACRE    = 1,
     SAY_OFFLINE     = 2,
     SAY_ONLINE      = 3,
+    //bile o tron 800
+    SAY_BILE_O_TRON_START = 0,
 };
 
 enum Spells
@@ -320,17 +323,22 @@ class boss_chimaeron : public CreatureScript
         };
 };
 
-#define GOSSIP_MENU_1 666660
+#define GOSSIP_MENU_1 16565
 #define GOSSIP_OPTION_1 "I suppose you'll be needing a key for this cage? Wait, don't tell me. The horrific gibbering monster behind me ate it, right?"
-#define GOSSIP_MENU_2 666661
+#define GOSSIP_OPTION_1_RU "Я полагаю, тебе нужен ключ от этой клетки? Погоди, ничего не говори. Невероятно ужасный монстр позади меня съел его, не так ли?"
+#define GOSSIP_MENU_2 16593
 #define GOSSIP_OPTION_2 "You were trapped, as I recall. This situation seems oddly similar."
-#define GOSSIP_MENU_3 666662
+#define GOSSIP_OPTION_2_RU "Ты оказался в ловушке, как я понимаю. Эта ситуация кажется подозрительно похожей."
+#define GOSSIP_MENU_3 16594
 #define GOSSIP_OPTION_3 "Gnomes in Lava Suits, for example."
-#define GOSSIP_MENU_4 666663
+#define GOSSIP_OPTION_3_RU "Гнома в лава-костюме, например."
+#define GOSSIP_MENU_4 16595
 #define GOSSIP_OPTION_4 "No, I, uh, haven't seen it. You were saying?"
-#define GOSSIP_MENU_5 666664
+#define GOSSIP_OPTION_4_RU "Нет, я, э-э, не видел его. Так что ты говорил?"
+#define GOSSIP_MENU_5 16596
 #define GOSSIP_OPTION_5 "Restrictions? What restrictions?"
-#define GOSSIP_MENU_6 666665
+#define GOSSIP_OPTION_5_RU "Условия? Что за условия?"
+#define GOSSIP_MENU_6 16597
 
 class npc_finkle_einhorn : public CreatureScript
 {
@@ -339,18 +347,22 @@ class npc_finkle_einhorn : public CreatureScript
 
         bool OnGossipHello(Player* pPlayer, Creature* pCreature)
         {
+            bool ru = pPlayer->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+          
             InstanceScript* pInstance = pCreature->GetInstanceScript();
             if (!pInstance)
                 return false;
             if (pInstance->GetData(DATA_CHIMAERON) == IN_PROGRESS || pInstance->GetData(DATA_BILE_O_TRON_800) == 1)
                 return false;
-            pPlayer->ADD_GOSSIP_ITEM(0, GOSSIP_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            pPlayer->ADD_GOSSIP_ITEM(0, ru ? GOSSIP_OPTION_1_RU : GOSSIP_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
             pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_1, pCreature->GetGUID());
             return true;
         }
 
          bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
         {
+            bool ru = pPlayer->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+        
             InstanceScript* pInstance = pCreature->GetInstanceScript();
             if (!pInstance)
                 return false;
@@ -358,19 +370,19 @@ class npc_finkle_einhorn : public CreatureScript
             switch (uiAction)
             {
             case GOSSIP_ACTION_INFO_DEF+1:
-                pPlayer->ADD_GOSSIP_ITEM(0, GOSSIP_OPTION_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                pPlayer->ADD_GOSSIP_ITEM(0, ru ? GOSSIP_OPTION_2_RU : GOSSIP_OPTION_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
                 pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_2, pCreature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                pPlayer->ADD_GOSSIP_ITEM(0, GOSSIP_OPTION_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
+                pPlayer->ADD_GOSSIP_ITEM(0, ru ? GOSSIP_OPTION_3_RU : GOSSIP_OPTION_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
                 pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_3, pCreature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+3:
-                pPlayer->ADD_GOSSIP_ITEM(0, GOSSIP_OPTION_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4);
+                pPlayer->ADD_GOSSIP_ITEM(0, ru ? GOSSIP_OPTION_4_RU : GOSSIP_OPTION_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4);
                 pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_4, pCreature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+4:
-                pPlayer->ADD_GOSSIP_ITEM(0, GOSSIP_OPTION_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+5);
+                pPlayer->ADD_GOSSIP_ITEM(0, ru ? GOSSIP_OPTION_5_RU : GOSSIP_OPTION_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+5);
                 pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_5, pCreature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+5:
@@ -383,8 +395,6 @@ class npc_finkle_einhorn : public CreatureScript
             return true;
         }
 };
-
-#define SAY_BILE_O_TRON_START "The Bile-O-Tron springs to life and begins to emit a foul smelling substance."
 
 class npc_bile_o_tron_800 : public CreatureScript
 {
@@ -423,7 +433,7 @@ class npc_bile_o_tron_800 : public CreatureScript
                 switch(action)
                 {
                 case ACTION_BILE_O_TRON_START:
-                    me->MonsterTextEmote(SAY_BILE_O_TRON_START, 0, false);
+                    Talk(SAY_BILE_O_TRON_START);
                     DoCast(me, SPELL_FINKLES_MIXTURE_VISUAL, true);
                     me->GetMotionMaster()->MovePoint(1, bilePos[0]);
                     break;
