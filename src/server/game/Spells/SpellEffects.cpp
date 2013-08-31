@@ -353,10 +353,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                     switch (m_spellInfo->Id)
                     {
-                        case 107439: // Twilight Barrage
-                        case 109203: // Twilight Barrage
-                        case 109204: // Twilight Barrage
-                        case 109205: // Twilight Barrage
                         case 106401: // Twilight Onslaught
                         case 108862: // Twilight Onslaught
                         case 109226: // Twilight Onslaught
