@@ -646,12 +646,17 @@ class boss_ragnaros_firelands : public CreatureScript
                     Talk(SAY_DROP);
                     DoCast(me, SPELL_SUBMERGE, true);
 
-                    uint8 side = urand(0, 1);
+                    uint8 side = urand(0, 2);
 
                     if (Creature* pStalker = me->SummonCreature(NPC_SPLITTING_BLOW, sulfurasPos[side], TEMPSUMMON_TIMED_DESPAWN, 20000))
                     {
                         me->SetFacingToObject(pStalker);
-                        DoCast(pStalker, (side == 1 ? SPELL_SPLITTING_BLOW_1 : SPELL_SPLITTING_BLOW_3));
+                        if (side == 2)
+                            DoCast(pStalker, SPELL_SPLITTING_BLOW_1);
+                        else if (side == 1)
+                            DoCast(pStalker, SPELL_SPLITTING_BLOW_2);
+                        else
+                            DoCast(pStalker, SPELL_SPLITTING_BLOW_3);
                     }
                     for (uint8 i = 0; i < 8; ++i)
                     {
@@ -687,12 +692,17 @@ class boss_ragnaros_firelands : public CreatureScript
                     Talk(SAY_DROP);
                     DoCast(me, SPELL_SUBMERGE, true);
 
-                    uint8 side = urand(0, 1);
+                    uint8 side = urand(0, 2);
 
                     if (Creature* pStalker = me->SummonCreature(NPC_SPLITTING_BLOW, sulfurasPos[side], TEMPSUMMON_TIMED_DESPAWN, 20000))
                     {
                         me->SetFacingToObject(pStalker);
-                        DoCast(pStalker, (side == 1 ? SPELL_SPLITTING_BLOW_1 : SPELL_SPLITTING_BLOW_3));
+                        if (side == 2)
+                            DoCast(pStalker, SPELL_SPLITTING_BLOW_1);
+                        else if (side == 1)
+                            DoCast(pStalker, SPELL_SPLITTING_BLOW_2);
+                        else
+                            DoCast(pStalker, SPELL_SPLITTING_BLOW_3);
                     }
                     for (uint8 i = 0; i < 8; ++i)
                     {

@@ -115,6 +115,8 @@ class spectator : public CreatureScript
         y = pl->GetPositionY();
         z = pl->GetPositionZ()+0.2f;
 
+        pl->GetBattleground()->AddSpectator(player);
+
         player->TeleportTo(pl->GetMapId(), x, y, z, player->GetAngle(pl), TELE_TO_GM_MODE);
         player->CastSpell(player, 8326, true);
         player->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
@@ -127,7 +129,7 @@ class spectator : public CreatureScript
  
         if (player->InBattlegroundQueue())
         {
-            pCreature->MonsterWhisper(ru ? "Выйти с очередей на арены/бг!" : "Come up with queues at the arena/BG!", player->GetGUID(), true);
+            pCreature->MonsterWhisper(ru ? "Выйти с очередей на арены/бг!" : "Exit arena/BG queues!", player->GetGUID(), true);
             player->CLOSE_GOSSIP_MENU();
             return false;
         }
@@ -145,7 +147,7 @@ class spectator : public CreatureScript
             default:
             {
                 //"Ввести никнейм"
-                player->ADD_GOSSIP_ITEM_EXTENDED(0, ru ? "Введите ник для просмотра." : "Enter a nickname for view.", GOSSIP_SENDER_MAIN, 1001, "", 0, true);
+                player->ADD_GOSSIP_ITEM_EXTENDED(0, ru ? "Введите ник для просмотра." : "Enter a nickname to spectate.", GOSSIP_SENDER_MAIN, 1001, "", 0, true);
                 if (var & 1)
                 {
                     player->ADD_GOSSIP_ITEM(0, "2x2", GOSSIP_SENDER_MAIN, 1002);
@@ -157,8 +159,8 @@ class spectator : public CreatureScript
                 player->twovtwo = twovtwo;
             }
         }
-        player->ADD_GOSSIP_ITEM( 4,  ru ? "Счастливого пути!" : "Fare you well!", GOSSIP_SENDER_MAIN, 1224);
-        player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE,pCreature->GetGUID());
+        player->ADD_GOSSIP_ITEM( 4,  ru ? "Счастливого пути!" : "Farewell!", GOSSIP_SENDER_MAIN, 1224);
+        player->SEND_GOSSIP_MENU(800001,pCreature->GetGUID());
         return true;
     }
                 
@@ -223,7 +225,7 @@ class spectator : public CreatureScript
                     }
                     if (moar)
                         player->ADD_GOSSIP_ITEM( 7, ru ? "Еще..." : "More...", GOSSIP_SENDER_MAIN, 1300+i);
-                    player->ADD_GOSSIP_ITEM( 4, ru ? "Return" : "Return", GOSSIP_SENDER_MAIN, 1225);
+                    player->ADD_GOSSIP_ITEM( 4, ru ? "Назад" : "Back", GOSSIP_SENDER_MAIN, 1225);
                     player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE,pCreature->GetGUID());
                     break;
                 }

@@ -446,6 +446,8 @@ class Battleground
         typedef std::map<uint64, BattlegroundPlayer> BattlegroundPlayerMap;
         BattlegroundPlayerMap const& GetPlayers() const { return m_Players; }
         uint32 GetPlayersSize() const { return m_Players.size(); }
+        std::list<Player*> const& GetSpectators() const { return m_Spectators; }
+        uint32 GetSpectatorsSize() const { return m_Spectators.size(); }
 
         typedef std::map<uint64, BattlegroundScore*> BattlegroundScoreMap;
         BattlegroundScoreMap::const_iterator GetPlayerScoresBegin() const { return PlayerScores.begin(); }
@@ -591,6 +593,9 @@ class Battleground
         void HandleTriggerBuff(uint64 go_guid);
         void SetHoliday(bool is_holiday);
 
+        void AddSpectator(Player* player) { m_Spectators.push_back(player); }
+        void RemoveSpectator(Player* player) { m_Spectators.remove(player); }
+
         // TODO: make this protected:
         typedef std::vector<uint64> BGObjects;
         typedef std::vector<uint64> BGCreatures;
@@ -625,7 +630,8 @@ class Battleground
         // Arena team ids by team
         uint32 m_ArenaTeamIds[BG_TEAMS_COUNT];
         // Player lists, those need to be accessible by inherited classes
-        BattlegroundPlayerMap  m_Players;
+        BattlegroundPlayerMap m_Players;
+        std::list<Player*> m_Spectators;
 
         virtual uint64 GetFlagPickerGUID(int32 /*team*/ = -1) const { return 0; }
         virtual void SetDroppedFlagGUID(uint64 /*guid*/, int32 /*team*/ = -1) {}
