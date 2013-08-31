@@ -464,6 +464,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
     
         if (!bg)
             return;
+    }
 
     // get real bg type
     bgTypeId = bg->GetTypeID();
