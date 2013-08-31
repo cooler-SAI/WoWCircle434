@@ -817,9 +817,7 @@ void Aura::RefreshTimers()
 {
     m_maxDuration = CalcMaxDuration();
     bool resetPeriodic = true;
-    if ((m_spellInfo->HasAura(SPELL_AURA_PERIODIC_DAMAGE) || m_spellInfo->HasAura(SPELL_AURA_PERIODIC_LEECH) || m_spellInfo->HasAura(SPELL_AURA_PERIODIC_HEAL)) && 
-        ((m_spellInfo->SpellFamilyName >= SPELLFAMILY_MAGE && m_spellInfo->SpellFamilyName <= SPELLFAMILY_SHAMAN) ||
-        m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT))
+    if (m_spellInfo->AttributesEx8 & SPELL_ATTR8_DONT_RESET_PERIODIC_TIMER)
     {
         int32 minAmplitude = m_maxDuration;
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)

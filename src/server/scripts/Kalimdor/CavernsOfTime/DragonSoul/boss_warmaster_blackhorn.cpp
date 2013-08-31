@@ -1257,6 +1257,8 @@ class npc_warmaster_blackhorn_skyfire: public CreatureScript
                 me->SetReactState(REACT_PASSIVE);
                 pInstance = me->GetInstanceScript();
                 bLowHealth = false;
+                me->SetMaxHealth(RAID_MODE(4000000, 10000000, 6000000, 15000000));
+                me->SetHealth(RAID_MODE(4000000, 10000000, 6000000, 15000000));
             }
 
             void DamageTaken(Unit* /*owner*/, uint32 &damage)
@@ -1536,15 +1538,22 @@ class spell_warmaster_blackhorn_twilight_barrage_dmg : public SpellScriptLoader
                 if (!GetCaster())
                     return;
 
+                if (!targets.empty())
+                    for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
+                        if (SpellInfo const* spell = GetSpellInfo())
+                            targets.remove_if(ImmuneCheck(GetSpellInfo()));
+
                 if (targets.empty())
+                {
                     if (Creature* pBlackhorn = GetCaster()->FindNearestCreature(NPC_BLACKHORN, 300.0f))
                         pBlackhorn->AI()->DoAction(ACTION_DECK);
 
-                if (Creature* pShip = GetCaster()->FindNearestCreature(NPC_SKYFIRE, 300.0f))
-                {
-                    int32 bp0 = GetSpellInfo()->Effects[EFFECT_0].BasePoints;
-                    bp0 /= targets.size() + 1;
-                    GetCaster()->CastCustomSpell(pShip, SPELL_TWILIGHT_BARRAGE_DMG_2, &bp0, NULL, NULL, true);
+                    if (Creature* pShip = GetCaster()->FindNearestCreature(NPC_SKYFIRE, 300.0f))
+                    {
+                        int32 bp0 = GetSpellInfo()->Effects[EFFECT_0].BasePoints;
+                        bp0 *= 1.5f;
+                        GetCaster()->CastCustomSpell(pShip, SPELL_TWILIGHT_BARRAGE_DMG_2, &bp0, NULL, NULL, true);
+                    }
                 }
             }
 
@@ -1552,6 +1561,27 @@ class spell_warmaster_blackhorn_twilight_barrage_dmg : public SpellScriptLoader
             {
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_warmaster_blackhorn_twilight_barrage_dmg_SpellScript::FilterTargetsDamage, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
             }
+
+            class ImmuneCheck
+            {
+                public:
+                    ImmuneCheck(SpellInfo const* spellInfo) : _spellInfo(spellInfo) {}
+            
+                    bool operator()(WorldObject* unit)
+                    {
+                        if (unit->GetTypeId() != TYPEID_PLAYER)
+                            return true;
+
+                        if (Unit* pTarget = unit->ToUnit())
+                            if (pTarget->IsImmunedToSpell(_spellInfo) || pTarget->HasAura(31224) || pTarget->HasAura(19263))
+                                return true;
+
+                        return false;
+                    }
+
+            private:
+                SpellInfo const* _spellInfo;
+            };
         };
 
         SpellScript* GetSpellScript() const

@@ -353,10 +353,6 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                     switch (m_spellInfo->Id)
                     {
-                        case 107439: // Twilight Barrage
-                        case 109203: // Twilight Barrage
-                        case 109204: // Twilight Barrage
-                        case 109205: // Twilight Barrage
                         case 106401: // Twilight Onslaught
                         case 108862: // Twilight Onslaught
                         case 109226: // Twilight Onslaught
@@ -3419,7 +3415,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
     // Item - Warlock T13 2P Bonus (Doomguard and Infernal)
-    if (entry == 11859)
+    if (entry == 11859 || entry == 89)
         if (AuraEffect const* aurEff = m_originalCaster->GetAuraEffect(105888, EFFECT_1))
             duration += aurEff->GetAmount() * 1000;
 
