@@ -307,6 +307,7 @@ Unit::~Unit()
         if (m_currentSpells[i])
         {
             m_currentSpells[i]->SetReferencedFromCurrent(false);
+            m_currentSpells[i]->SetExecutedCurrently(false);
             m_currentSpells[i] = NULL;
         }
 
@@ -5621,6 +5622,11 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             return false;
 
                         triggered_spell_id = procSpell->Id;
+
+                        // Fulmination
+                        if (procSpell->Id == 88767)
+                            basepoints0 = damage;
+
                         break;
                     }
                     break;
@@ -6307,10 +6313,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 11120:
                 case 12846:
                 {
-                    if (AuraEffect const *aurEff = GetAuraEffect(12654, EFFECT_0, GetGUID()))
-                        if (!aurEff->GetTickNumber())
-                            return false;
-
                     Unit* original_caster = GetProcOwner();
                     if (!original_caster)
                         return false;
@@ -14134,7 +14136,7 @@ void Unit::SendMountResult(MountResult error)
 void Unit::SetInCombatWith(Unit* enemy)
 {
     Unit* eOwner = enemy->GetCharmerOrOwnerOrSelf();
-    if (eOwner->IsPvP() || eOwner->isBattlegroundVehicle())
+    if (eOwner->IsPvP() || (eOwner->ToCreature() && eOwner->ToCreature()->isBattlegroundVehicle()))
     {
         SetInCombatState(true, enemy);
         return;
@@ -14628,10 +14630,6 @@ bool Unit::IsAlwaysVisibleFor(WorldObject const* seer) const
 bool Unit::IsAlwaysDetectableFor(WorldObject const* seer) const
 {
     if (WorldObject::IsAlwaysDetectableFor(seer))
-        return true;
-
-    // Hunter's Mark
-    if (HasAura(1130, seer->GetGUID()) && !HasAura(11327))
         return true;
 
     return false;
@@ -20432,13 +20430,14 @@ bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool tel
         if (GetTypeId() == TYPEID_PLAYER)
             GetMap()->PlayerRelocation(ToPlayer(), x, y, z, orientation);
         else
+        {
             GetMap()->CreatureRelocation(ToCreature(), x, y, z, orientation);
+            // code block for underwater state update
+            UpdateUnderwaterState(GetMap(), x, y, z);
+        }
     }
     else if (turn)
         UpdateOrientation(orientation);
-
-    // code block for underwater state update
-    UpdateUnderwaterState(GetMap(), x, y, z);
 
     return (relocated || turn);
 }
@@ -21197,6 +21196,8 @@ void Unit::RemoveBattlegroundStartingAuras()
             ++iter;
     }
 }
+
+
 
 void Unit::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
 {
