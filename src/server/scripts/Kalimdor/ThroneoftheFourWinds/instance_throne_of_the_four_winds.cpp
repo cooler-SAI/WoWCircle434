@@ -29,28 +29,28 @@ public:
         void OnPlayerEnter(Player* pPlayer)
         {
             if (!uiTeamInInstance)
-				uiTeamInInstance = pPlayer->GetTeam();
+                uiTeamInInstance = pPlayer->GetTeam();
         }
 
         void OnCreatureCreate(Creature* pCreature)
         {
-		}
+        }
 
         void OnGameObjectCreate(GameObject* pGo)
         {
-		}
+        }
 
         void OnGameObjectRemove(GameObject* pGo)
-		{
-		}
+        {
+        }
 
         void SetData(uint32 type, uint32 data)
         {
-		}
+        }
 
         uint32 GetData(uint32 type)
         {
-			return 0;
+            return 0;
         }
 
         uint64 GetData64(uint32 type)
@@ -60,10 +60,10 @@ public:
 
         bool SetBossState(uint32 type, EncounterState state)
         {
-			if (!InstanceScript::SetBossState(type, state))
-				return false;
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
 
-			return true;
+            return true;
         }
 
         std::string GetSaveData()
@@ -99,13 +99,13 @@ public:
             if (dataHead1 == 'T' && dataHead2 == 'o' && dataHead2 == 't' && dataHead2 == 'F' && dataHead2 == 'W')
             {
                 for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-				{
-					uint32 tmpState;
-					loadStream >> tmpState;
-					if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-						tmpState = NOT_STARTED;
-					SetBossState(i, EncounterState(tmpState));
-				}} else OUT_LOAD_INST_DATA_FAIL;
+                {
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                        tmpState = NOT_STARTED;
+                    SetBossState(i, EncounterState(tmpState));
+                }} else OUT_LOAD_INST_DATA_FAIL;
 
             OUT_LOAD_INST_DATA_COMPLETE;
         }
@@ -118,5 +118,5 @@ public:
 
 void AddSC_instance_throne_of_the_four_winds()
 {
-	   new instance_throne_of_the_four_winds();
+       new instance_throne_of_the_four_winds();
 }

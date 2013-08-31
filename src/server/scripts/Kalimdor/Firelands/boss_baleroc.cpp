@@ -413,9 +413,9 @@ class spell_baleroc_shards_of_torment_aoe : public SpellScriptLoader
             }
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
-			{
-				if(!GetCaster() || !GetHitUnit())
-					return;
+            {
+                if(!GetCaster() || !GetHitUnit())
+                    return;
 
                 GetCaster()->CastSpell(GetHitUnit(), SPELL_SHARDS_OF_TORMENT, true);
             }
@@ -489,9 +489,9 @@ class spell_baleroc_tormented_aoe : public SpellScriptLoader
             PrepareSpellScript(spell_baleroc_tormented_aoe_SpellScript);
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
-			{
-				if (!GetCaster() || !GetHitUnit())
-					return;
+            {
+                if (!GetCaster() || !GetHitUnit())
+                    return;
 
                 if ((GetCaster() == GetHitUnit()) ||  GetHitUnit()->HasAura(SPELL_TORMENTED_25H))
                     return;

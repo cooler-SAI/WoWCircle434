@@ -85,6 +85,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Earthquake (Trash, Ulduar)
             else if (spellproto->Id == 64697)
                 return DIMINISHING_NONE;
+            // Black Plague
+            else if (spellproto->Id == 64155)
+                return DIMINISHING_NONE;
             // Summoning Disorientation
             else if (spellproto->Id == 32752)
                 return DIMINISHING_NONE;
@@ -866,7 +869,7 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const* spellPr
         active = true;
 
     // Always trigger for this
-    if (procFlags & (PROC_FLAG_KILLED | PROC_FLAG_KILL | PROC_FLAG_DEATH))
+    if (procFlags & (PROC_FLAG_KILLED | PROC_FLAG_KILL | PROC_FLAG_DEATH | PROC_FLAG_JUMP))
         return true;
 
     if (spellProcEvent)     // Exist event data
@@ -3735,6 +3738,14 @@ void SpellMgr::LoadDbcDataCorrections()
                 // that will be clear if we get more spells with problem like this
                 spellInfo->AttributesEx |= SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY;
                 break;
+            case 61791: // Ride Vehicle (Yogg-Saron)
+                // TODO: remove this when basepoints of all Ride Vehicle auras are calculated correctly
+                spellInfo->Effects[0].BasePoints = 1;
+                break;
+            case 64468: // Empowering Shadows (Yogg-Saron)
+            case 64486: // Empowering Shadows (Yogg-Saron)
+                spellInfo->MaxAffectedTargets = 3;  // same for both modes?
+                break;
             case 62301: // Cosmic Smash (Algalon the Observer)
                 spellInfo->MaxAffectedTargets = 1;
                 break;
@@ -4131,18 +4142,11 @@ void SpellMgr::LoadDbcDataCorrections()
             //
             // DEADMINES SPELLS
             // Admiral Ripsnarl
-            case 88736: // Taste for Blood
-                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
-                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
-                spellInfo->ProcChance = 0;
-                spellInfo->ProcFlags = 0;
+            case 88840: // Vanish
+                spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(125);
                 break;
             case 95647: // Ripsnarl Achievement Aura
                 spellInfo->AttributesEx3 = SPELL_ATTR3_ONLY_TARGET_PLAYERS;
-                break;
-            // Captain Cookie
-            case 89250: // Summon Cauldron
-                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
                 break;
             case 89268: // Throw Food Targeting
             case 89740: 
@@ -6124,6 +6128,9 @@ void SpellMgr::LoadDbcDataCorrections()
             case 97645:
                 spellInfo->Effects[EFFECT_0].SetRadiusIndex(7);
                 break;
+            case 43550:
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_UNIT_TARGET_ENEMY;
+                break;
             // ENDOF ZUL'AMAN SPELLS
             //
             // END TIME SPELLS
@@ -7336,6 +7343,9 @@ void SpellMgr::LoadDbcDataCorrections()
             case 81093: // 
                 spellInfo->ProcCharges = 1;
                 break;
+            case 96619: // Rupture Line (Grilek)
+                spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13);
+                break;
             case 109669: // Shadow Breath, Lord Hiram Creed
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
                 break;
@@ -7354,6 +7364,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 95199: // Intimidating Shout - Glyph of Intimidating Shout
                 spellInfo->ProcFlags = 0;
                 spellInfo->ProcChance = 0;
+                break;
+            case 48760: // Occulus portals
+            case 49305:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_DEST_DB;
                 break;
             default:
                 break;

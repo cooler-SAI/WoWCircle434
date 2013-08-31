@@ -97,7 +97,7 @@ const uint32 ThrowFoodSpells[12] =
 #define POINT_MOVE  1
 
 const Position cauldronPos = {-64.07f, -820.27f, 41.17f, 0.0f};
-const Position movePos = {-71.292213f, -819.792297f, 40.51f, 0.04f};
+const Position movePos = {-64.07f, -820.27f, 41.17f, 0.04f};
 
 class boss_captain_cookie : public CreatureScript
 {
@@ -172,7 +172,7 @@ class boss_captain_cookie : public CreatureScript
                 _JustDied();
 
                 if (IsHeroic())
-                    me->SummonCreature(NPC_NOTE, notePos);
+                    me->SummonCreature(NPC_NOTE_FROM_VANESSA, notePos);
             }
 
             void UpdateAI(const uint32 diff)

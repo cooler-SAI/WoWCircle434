@@ -3,17 +3,19 @@
 
 static const DoorData doordata[] = 
 {
-    {GO_VENOXIS_EXIT,           DATA_VENOXIS,            DOOR_TYPE_ROOM,     BOUNDARY_NONE},
-    {GO_MANDOKIR_EXIT1,         DATA_MANDOKIR,           DOOR_TYPE_ROOM,     BOUNDARY_NONE},
-    {GO_MANDOKIR_EXIT2,         DATA_MANDOKIR,           DOOR_TYPE_ROOM,     BOUNDARY_NONE},
-    {GO_MANDOKIR_EXIT3,         DATA_MANDOKIR,           DOOR_TYPE_ROOM,     BOUNDARY_NONE},
-    {GO_MANDOKIR_EXIT4,         DATA_MANDOKIR,           DOOR_TYPE_ROOM,     BOUNDARY_NONE},
-    {GO_MANDOKIR_EXIT5,         DATA_MANDOKIR,           DOOR_TYPE_ROOM,     BOUNDARY_NONE},
-    {GO_ZANZIL_EXIT,            DATA_ZANZIL,             DOOR_TYPE_ROOM,     BOUNDARY_NONE},
-    {GO_KILNARA_EXIT,           DATA_KILNARA,            DOOR_TYPE_ROOM,     BOUNDARY_NONE},
-    {0,                         0,                       DOOR_TYPE_ROOM,     BOUNDARY_NONE},
+    {GO_VENOXIS_EXIT,              DATA_VENOXIS,                DOOR_TYPE_ROOM,     BOUNDARY_NONE},
+    {GO_MANDOKIR_EXIT1,            DATA_MANDOKIR,               DOOR_TYPE_ROOM,     BOUNDARY_NONE},
+    {GO_MANDOKIR_EXIT2,            DATA_MANDOKIR,               DOOR_TYPE_ROOM,     BOUNDARY_NONE},
+    {GO_MANDOKIR_EXIT3,            DATA_MANDOKIR,               DOOR_TYPE_ROOM,     BOUNDARY_NONE},
+    {GO_MANDOKIR_EXIT4,            DATA_MANDOKIR,               DOOR_TYPE_ROOM,     BOUNDARY_NONE},
+    {GO_MANDOKIR_EXIT5,            DATA_MANDOKIR,               DOOR_TYPE_ROOM,     BOUNDARY_NONE},
+    {GO_ZANZIL_EXIT,               DATA_ZANZIL,                 DOOR_TYPE_ROOM,     BOUNDARY_NONE},
+    {GO_KILNARA_EXIT,              DATA_KILNARA,                DOOR_TYPE_ROOM,     BOUNDARY_NONE},
+    {GO_THE_CACHE_OF_MADNESS_DOOR, DATA_CACHE_OF_MADNESS_BOSS,  DOOR_TYPE_ROOM,     BOUNDARY_NONE},
+    {0,                                0,                       DOOR_TYPE_ROOM,     BOUNDARY_NONE}
 };
 
+typedef std::list<WorldObject*> ObjectList;
 class instance_zulgurub : public InstanceMapScript
 {
     public:
@@ -30,51 +32,69 @@ class instance_zulgurub : public InstanceMapScript
             {
                 SetBossNumber(EncounterCount);
                 LoadDoorData(doordata);
-                venoxisGUID     = 0;
-                mandokirGUID    = 0;
-                kilnaraGUID     = 0;
-                zanzilGUID      = 0;
-                jindoGUID       = 0;
-                hazzarahGUID    = 0;
-                renatakiGUID    = 0;
-                wushoolayGUID   = 0;
-                grilekGUID      = 0;
-                uiBosses        = 0;
+                venoxisGUID            = 0;
+                mandokirGUID           = 0;
+                kilnaraGUID            = 0;
+                zanzilGUID             = 0;
+                jindoGUID              = 0;
+                cacheOfMadnessBossGUID = 0;
+                uiBosses               = 0;
+
+                cacheOfMadnessSummonerGUID = 0;
+
+                for (uint32 type = 0; type < ARTIFACT_TYPE_COUNT; ++type)
+                {
+                    uint32 count = ARTIFACT_GUIDS_BY_TYPE[type][0];
+                    int selected = rand() % count;
+                    randomArtifactGUID[type] = ARTIFACT_GUIDS_BY_TYPE[type][selected + 1];
+                }
+                artifactsActivated = 0;
             }
-    
+
             void OnCreatureCreate(Creature* creature)
             {
                 switch (creature->GetEntry())
                 {
-                   case NPC_VENOXIS:
-                      venoxisGUID = creature->GetGUID();
-                      break;
-                   case NPC_MANDOKIR:
-                      mandokirGUID = creature->GetGUID();
-                      break;
-                   case NPC_KILNARA:
-                      kilnaraGUID = creature->GetGUID();
-                      break;
-                   case NPC_ZANZIL:
-                      zanzilGUID = creature->GetGUID();
-                      break;
-                   case NPC_JINDO:
-                      jindoGUID = creature->GetGUID();
-                      break;
-                   case NPC_HAZZARAH:
-                      hazzarahGUID = creature->GetGUID();
-                      break;
-                   case NPC_RENATAKI:
-                      renatakiGUID = creature->GetGUID();
-                      break;
-                   case NPC_WUSHOOLAY:
-                      wushoolayGUID = creature->GetGUID();
-                      break;
-                   case NPC_GRILEK:
-                      grilekGUID = creature->GetGUID();
-                      break;
-                   default:
-                      break;
+                    case NPC_VENOXIS:
+                       venoxisGUID = creature->GetGUID();
+                       break;
+                    case NPC_MANDOKIR:
+                       mandokirGUID = creature->GetGUID();
+                       break;
+                    case NPC_KILNARA:
+                       kilnaraGUID = creature->GetGUID();
+                       break;
+                    case NPC_ZANZIL:
+                       zanzilGUID = creature->GetGUID();
+                       break;
+                    case NPC_HAZZARAH:
+                    case NPC_RENATAKI:
+                    case NPC_WUSHOOLAY:
+                    case NPC_GRILEK:
+                       cacheOfMadnessBossGUID = creature->GetGUID();
+                       break;
+                    case NPC_JINDO:
+                       jindoGUID = creature->GetGUID();
+                       break;
+                    case NPC_CACHE_OF_MADNESS_SUMMONER:
+                        if (creature->GetDBTableGUIDLow() == CACHE_OF_MADNESS_SUMMONER_GUID)
+                            cacheOfMadnessSummonerGUID = creature->GetGUID();
+                    case NPC_ARTIFACT_DWARVEN:
+                    case NPC_ARTIFACT_ELVEN:
+                    case NPC_ARTIFACT_TROLL:
+                    case NPC_ARTIFACT_FOSSIL:
+                        {
+                            uint32 entry = creature->GetEntry();
+                            uint32 type;
+                            for (type = 0; type < ARTIFACT_TYPE_COUNT; ++type)
+                                if (entry == ARTIFACT_ENTRIES[type])
+                                    break;
+                            if (randomArtifactGUID[type] == creature->GetDBTableGUIDLow())
+                                randomArtifactGUID[type] = creature->GetGUID();
+                            break;
+                        }
+                    default:
+                        break;
                 }
             }
             
@@ -109,12 +129,109 @@ class instance_zulgurub : public InstanceMapScript
                 return true;
             }
 
+            void SetData(uint32 type, uint32 value)
+            {
+                switch (type)
+                {
+                    case DATA_ARTIFACTS_ACTIVATED:
+                        artifactsActivated = value;
+                        if (artifactsActivated == 4)
+                        {
+                            EncounterState state = GetBossState(DATA_CACHE_OF_MADNESS_BOSS);
+                            if (state == NOT_STARTED || state == TO_BE_DECIDED)
+                                events.ScheduleEvent(EVENT_CACHE_OF_MADNESS_START_SUMMON, 5 * IN_MILLISECONDS);
+                        }
+                    default:
+                        break;
+                }
+                return;
+            }
             uint32 GetData(uint32 type)
             {
-                if (type == DATA_BOSSES)
-                    return uiBosses;
+                switch (type)
+                {
+                    case DATA_BOSSES:
+                        return uiBosses;
+                    case DATA_ARTIFACTS_ACTIVATED:
+                        return artifactsActivated;
+                    default:
+                        break;
+                }
                 return 0;
             }
+
+            void Update(uint32 diff)
+            {
+                if (!instance->HavePlayers())
+                    return;
+
+                events.Update(diff);
+
+                switch (events.ExecuteEvent())
+                {
+                    case EVENT_CACHE_OF_MADNESS_START_SUMMON:
+                        if (Creature* summoner = instance->GetCreature(cacheOfMadnessSummonerGUID))
+                        {
+                            summoner->CastSpell(summoner, CACHE_OF_MADNESS_SUMMON_VISUAL, false);
+                            events.ScheduleEvent(EVENT_CACHE_OF_MADNESS_SHATTER_ARTIFACTS, 10 * IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_CACHE_OF_MADNESS_SUMMON, 17 * IN_MILLISECONDS);
+                        }
+                        break;
+                    case EVENT_CACHE_OF_MADNESS_SHATTER_ARTIFACTS:
+                        if (Creature* summoner = instance->GetCreature(cacheOfMadnessSummonerGUID))
+                        {
+                            ObjectList* units = GetWorldObjectsInDist(summoner, 50);
+                            for (ObjectList::const_iterator itr = units->begin(); itr != units->end(); ++itr)
+                            {
+                                if (!(*itr) || (*itr)->GetTypeId() != TYPEID_UNIT)
+                                    continue;
+
+                                Creature* nearby = (*itr)->ToCreature();
+                                uint32 nearbyId = nearby->GetEntry();
+
+                                if (nearbyId == NPC_ARTIFACT_ACTIVE_DWARVEN ||
+                                    nearbyId == NPC_ARTIFACT_ACTIVE_ELVEN ||
+                                    nearbyId == NPC_ARTIFACT_ACTIVE_TROLL ||
+                                    nearbyId == NPC_ARTIFACT_ACTIVE_FOSSIL)
+                                {
+                                    nearby->CastSpell(nearby, CACHE_OF_MADNESS_SHATTER_ARTIFACT);
+                                    nearby->DespawnOrUnsummon(1.5f * IN_MILLISECONDS);
+                                }
+                            }
+                        }
+                        break;
+                    case EVENT_CACHE_OF_MADNESS_SUMMON:
+                        if (Creature* summoner = instance->GetCreature(cacheOfMadnessSummonerGUID))
+                        {
+                            uint32 bossIndex = rand() % CACHE_OF_MADNESS_BOSSES_COUNT;
+                            uint32 bossId = CACHE_OF_MADNESS_BOSSES[bossIndex];
+                            Position pos;
+                            summoner->GetPosition(&pos);
+                            summoner->SummonCreature(bossId, pos, TEMPSUMMON_MANUAL_DESPAWN);
+                            events.ScheduleEvent(EVENT_CACHE_OF_MADNESS_HIDE_PORTAL, 5 * IN_MILLISECONDS);
+                        }
+                        break;
+                    case EVENT_CACHE_OF_MADNESS_HIDE_PORTAL:
+                        if (Creature* summoner = instance->GetCreature(cacheOfMadnessSummonerGUID))
+                        {
+                            summoner->RemoveAurasDueToSpell(97081);
+                        }
+                    default:
+                        break;
+                }
+            }
+            ObjectList* GetWorldObjectsInDist(WorldObject* obj, float dist)
+            {
+                ObjectList* targets = new ObjectList();
+                if (obj)
+                {
+                    Trinity::AllWorldObjectsInRange u_check(obj, dist);
+                    Trinity::WorldObjectListSearcher<Trinity::AllWorldObjectsInRange> searcher(obj, *targets, u_check);
+                    obj->VisitNearbyObject(dist, searcher);
+                }
+                return targets;
+            }
+
             uint64 GetData64(uint32 type)
             {
                 switch (type)
@@ -129,14 +246,16 @@ class instance_zulgurub : public InstanceMapScript
                         return zanzilGUID;
                     case DATA_JINDO:
                         return jindoGUID;
-                    case DATA_HAZZARAH:
-                        return hazzarahGUID;
-                    case DATA_RENATAKI:
-                        return renatakiGUID;
-                    case DATA_WUSHOOLAY:
-                        return wushoolayGUID;
-                    case DATA_GRILEK:
-                        return grilekGUID;
+                    case DATA_CACHE_OF_MADNESS_BOSS:
+                        return cacheOfMadnessBossGUID;
+                    case DATA_ARTIFACT_DWARVEN:
+                        return randomArtifactGUID[0];
+                    case DATA_ARTIFACT_ELVEN:
+                        return randomArtifactGUID[1];
+                    case DATA_ARTIFACT_TROLL:
+                        return randomArtifactGUID[2];
+                    case DATA_ARTIFACT_FOSSIL:
+                        return randomArtifactGUID[3];
                     default:
                         break;
 
@@ -198,10 +317,15 @@ class instance_zulgurub : public InstanceMapScript
              uint64 kilnaraGUID;
              uint64 zanzilGUID;
              uint64 jindoGUID;
-             uint64 hazzarahGUID;
-             uint64 renatakiGUID;
-             uint64 wushoolayGUID;
-             uint64 grilekGUID;
+             uint64 cacheOfMadnessBossGUID;
+
+             uint64 cacheOfMadnessSummonerGUID;
+             
+             uint64 randomArtifactGUID[ARTIFACT_TYPE_COUNT];
+             uint32 artifactsActivated;
+
+             EventMap events;
+
              uint32 uiBosses; 
         };
 };

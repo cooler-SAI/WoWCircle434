@@ -156,7 +156,8 @@ void LFGGroupScript::OnRemoveMember(Group* group, uint64 guid, RemoveMethod meth
     {
         if (method == GROUP_REMOVEMETHOD_LEAVE && state == LFG_STATE_DUNGEON &&
             players >= LFG_GROUP_KICK_VOTES_NEEDED)
-            player->CastSpell(player, LFG_SPELL_DUNGEON_DESERTER, true);
+            if (sWorld->getBoolConfig(CONFIG_LFG_CASTDESERTER))
+                player->CastSpell(player, LFG_SPELL_DUNGEON_DESERTER, true);
         //else if (state == LFG_STATE_BOOT)
             // Update internal kick cooldown of kicked
 

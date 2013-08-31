@@ -129,13 +129,13 @@ public:
 
         std::string announce;
 
-        announce = "The character '";
+        announce = "Персонаж '";
         announce += name.c_str();
-        announce += "' was banned for ";
+        announce += "был заблокирован на";
         announce += durationStr;
-        announce += " by the character '";
+        announce += "администратором '";
         announce += handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : "";
-        announce += "'. The reason is: ";
+        announce += "'. Причина: ";
         announce += reasonStr;
         
         char buff[2048];
@@ -157,6 +157,8 @@ public:
 
     static bool HandleBanHelper(BanMode mode, char const* args, ChatHandler* handler)
     {
+        bool ru = handler->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
         if (!*args)
             return false;
 
@@ -228,17 +230,17 @@ public:
         std::string announce;
 
         if (mode == BAN_CHARACTER)
-            announce = "The character '";
+            announce = "Персонаж '";
         else if (mode == BAN_IP)
-            announce = "The IP '";
+            announce = "IP адрес '";
         else
-            announce = "Account '";
+            announce = "Аккаунт '";
         announce += nameOrIP.c_str();
-        announce += "' was banned for ";
+        announce += "' был заблокирован ";
         announce += durationStr;
-        announce += " by the character '";
+        announce += " администратором '";
         announce += handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : "";
-        announce += "'. The reason is: ";
+        announce += "'. Причина: ";
         announce += reasonStr;
         
         char buff[2048];

@@ -37,6 +37,7 @@
 #include "Util.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "RatedBattleground.h"
 
 namespace Trinity
 {
@@ -217,6 +218,8 @@ Battleground::Battleground()
     StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_WS_START_ONE_MINUTE;
     StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_WS_START_HALF_MINUTE;
     StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_WS_HAS_BEGUN;
+
+    m_rbgFlag = false;
 }
 
 Battleground::~Battleground()
@@ -252,7 +255,7 @@ void Battleground::Update(uint32 diff)
     if (!PreUpdateImpl(diff))
         return;
 
-    if (!GetPlayersSize())
+    if (!GetPlayersSize() && !GetSpectatorsSize())
     {
         //BG is empty
         // if there are no players invited, delete BG
@@ -636,7 +639,7 @@ inline Player* Battleground::_GetPlayerForTeam(uint32 teamId, BattlegroundPlayer
     {
         uint32 team = itr->second.Team;
         if (!team)
-            team = player->GetTeam();
+            team = player->GetBGTeam();
         if (team != teamId)
             player = NULL;
     }
@@ -884,7 +887,7 @@ void Battleground::EndBattleground(uint32 winner)
             if (!guildAwarded)
             {
                 guildAwarded = true;
-                if (uint32 guildId = GetBgMap()->GetOwnerGuildId(player->GetTeam()))
+                if (uint32 guildId = GetBgMap()->GetOwnerGuildId(player->GetBGTeam()))
                     if (Guild* guild = sGuildMgr->GetGuildById(guildId))
                     {
                         guild->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, 1, 0, 0, NULL, player);
@@ -893,6 +896,8 @@ void Battleground::EndBattleground(uint32 winner)
                     }
             }
 
+            if (IsRBG())
+                player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_BATTLEGROUND, GetMapId());
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, BattlegroundMgr::GetBgQuestId(GetTypeID(true), winner));
              
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, 1);
@@ -910,6 +915,15 @@ void Battleground::EndBattleground(uint32 winner)
 
         sBattlegroundMgr->FinishAndSendPvpLogDataPacket(&pvpLogData, this, &buff, player);
 
+        if (IsRBG())
+        {
+            uint32 loser = winner == HORDE ? ALLIANCE : HORDE;
+            player->getRBG()->FinishGame(team == winner, GetArenaMatchmakerRating(team == winner ? loser : winner));
+
+            if (team == winner)
+                player->ModifyCurrency(CURRENCY_TYPE_CONQUEST_META_BG, RatedBattleground::ConquestPointReward);
+        }
+		
         WorldPacket data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player, player->GetBattlegroundQueueIndex(bgQueueTypeId), STATUS_IN_PROGRESS, player->GetBattlegroundQueueJoinTime(GetTypeID()), 0, GetArenaType());
         player->GetSession()->SendPacket(&data);
@@ -994,7 +1008,7 @@ void Battleground::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPac
         {
             player->ClearAfkReports();
 
-            if (!team) team = player->GetTeam();
+            if (!team) team = player->GetBGTeam();
 
             // if arena, remove the specific arena auras
             if (isArena())
@@ -1155,21 +1169,21 @@ void Battleground::AddPlayer(Player* player)
 
     player->RemoveAurasByType(SPELL_AURA_MOUNTED);
     player->RemoveAurasByType(SPELL_AURA_FLY);
-
+	
     // add arena specific auras
     if (isArena())
     {
         player->RemoveArenaEnchantments(TEMP_ENCHANTMENT_SLOT);
         if (team == ALLIANCE)                                // gold
         {
-            if (player->GetTeam() == HORDE)
+            if (player->GetBGTeam() == HORDE)
                 player->CastSpell(player, SPELL_HORDE_GOLD_FLAG, true);
             else
                 player->CastSpell(player, SPELL_ALLIANCE_GOLD_FLAG, true);
         }
         else                                                // green
         {
-            if (player->GetTeam() == HORDE)
+            if (player->GetBGTeam() == HORDE)
                 player->CastSpell(player, SPELL_HORDE_GREEN_FLAG, true);
             else
                 player->CastSpell(player, SPELL_ALLIANCE_GREEN_FLAG, true);
@@ -1195,6 +1209,19 @@ void Battleground::AddPlayer(Player* player)
         {
             player->CastSpell(player, SPELL_PREPARATION, true);   // reduces all mana cost of spells.
             SendCountdownTimer();
+        }
+        if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_IGNORE_FACTION))
+        {
+            if (team == HORDE)
+            {
+                player->setFaction(2);
+                player->CastSpell(player, 200002, true);
+            }
+            else
+            {
+                player->setFaction(1);
+                player->CastSpell(player, 200003, true);
+            }
         }
     }
 
@@ -1248,6 +1275,7 @@ void Battleground::AddOrSetPlayerToCorrectBgGroup(Player* player, uint32 team)
                 {
                     group->ChangeLeader(playerGuid);
                     group->SendUpdate();
+                    group->SendRaidMarkerUpdateToPlayer(playerGuid);
                 }
         }
     }
@@ -1267,6 +1295,19 @@ void Battleground::EventPlayerLoggedIn(Player* player)
         }
     }
     m_Players[guid].OfflineRemoveTime = 0;
+    if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_IGNORE_FACTION))
+    {
+        if (player->GetBGTeam() == HORDE)
+        {
+            player->setFaction(2);
+            player->AddAura(200002, player);
+        }
+        else
+        {
+            player->setFaction(1);
+            player->AddAura(200003, player);
+        }
+    }
     PlayerAddedToBGCheckIfBGIsRunning(player);
     // if battleground is starting, then add preparation aura
     // we don't have to do that, because preparation aura isn't removed when player logs out
@@ -1276,6 +1317,7 @@ void Battleground::EventPlayerLoggedIn(Player* player)
 void Battleground::EventPlayerLoggedOut(Player* player)
 {
     uint64 guid = player->GetGUID();
+    RemoveSpectator(player);
     if (!IsPlayerInBattleground(guid))  // Check if this player really is in battleground (might be a GM who teleported inside)
         return;
 
@@ -1836,7 +1878,7 @@ void Battleground::HandleKillPlayer(Player* victim, Player* killer)
             if (!creditedPlayer || creditedPlayer == killer)
                 continue;
 
-            if (creditedPlayer->GetTeam() == killer->GetTeam() && creditedPlayer->IsAtGroupRewardDistance(victim))
+            if (creditedPlayer->GetBGTeam() == killer->GetBGTeam() && creditedPlayer->IsAtGroupRewardDistance(victim))
                 UpdatePlayerScore(creditedPlayer, SCORE_HONORABLE_KILLS, 1);
         }
     }
@@ -1955,7 +1997,7 @@ void Battleground::SetBgRaid(uint32 TeamID, Group* bg_raid)
 
 WorldSafeLocsEntry const* Battleground::GetClosestGraveYard(Player* player)
 {
-    return sObjectMgr->GetClosestGraveYard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetTeam());
+    return sObjectMgr->GetClosestGraveYard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetBGTeam());
 }
 
 bool Battleground::IsTeamScoreInRange(uint32 team, uint32 minScore, uint32 maxScore) const
@@ -2048,6 +2090,19 @@ void Battleground::CalculatingMatchmakingRating(ArenaTeam* winnerTeam, ArenaTeam
             // Arena lost => reset the win_rated_arena having the "no_lose" condition
             player->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA, ACHIEVEMENT_CRITERIA_CONDITION_NO_LOSE);
         }
+    }
+}
+
+void Battleground::RemovePlayer(Player* player, uint64 guid, uint32 team)
+{
+    if (!player)
+        return;
+    RemoveSpectator(player);
+    if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_IGNORE_FACTION))
+    {
+        player->setFactionForRace(player->getRace());
+        player->RemoveAurasDueToSpell(200002);
+        player->RemoveAurasDueToSpell(200003);
     }
 }
 

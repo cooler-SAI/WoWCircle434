@@ -342,6 +342,29 @@ class EventMap
                 _phase = 0;
         }
 
+        /**
+        * @name AddPhase
+        * @brief Activates the given phase (bitwise).
+        * @param phase Phase which should be activated. Values: 1 - 8
+        */
+        void AddPhase(uint8 phase)
+        {
+            if (phase && phase < 8)
+                _phase |= (1 << (phase + 24));
+        }
+
+        /**
+        * @name RemovePhase
+        * @brief Deactivates the given phase (bitwise).
+        * @param phase Phase which should be deactivated. Values: 1 - 8.
+        */
+        void RemovePhase(uint8 phase)
+        {
+            if (phase && phase < 8)
+                _phase &= ~(1 << (phase + 24));
+        }
+
+
         // Creates new event entry in map with given id, time, group if given (1 - 8) and phase if given (1 - 8)
         // 0 for group/phase means it belongs to no group or runs in all phases
         void ScheduleEvent(uint32 eventId, uint32 time, uint32 groupId = 0, uint32 phase = 0)
