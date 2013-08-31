@@ -24,6 +24,7 @@
 #include "Battleground.h"
 #include "BattlegroundQueue.h"
 #include <ace/Singleton.h>
+#include "RatedBattlegroundQueue.h"
 
 typedef std::map<uint32, Battleground*> BattlegroundContainer;
 typedef std::set<uint32> BattlegroundClientIdsContainer;
@@ -132,15 +133,15 @@ class BattlegroundMgr
                 return itr->second;
             return BATTLEGROUND_WS;
         }
+        typedef std::map<BattlegroundTypeId, BattlegroundData> BattlegroundDataContainer;
+
+        BattlegroundDataContainer bgDataStore;
 
     private:
         bool CreateBattleground(CreateBattlegroundData& data);
         uint32 CreateClientVisibleInstanceId(BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id);
         static bool IsArenaType(BattlegroundTypeId bgTypeId);
         BattlegroundTypeId GetRandomBG(BattlegroundTypeId id);
-
-        typedef std::map<BattlegroundTypeId, BattlegroundData> BattlegroundDataContainer;
-        BattlegroundDataContainer bgDataStore;
 
         BattlegroundQueue m_BattlegroundQueues[MAX_BATTLEGROUND_QUEUE_TYPES];
 

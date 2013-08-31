@@ -460,6 +460,7 @@ public:
     bool NeedsToBeTriggeredByCaster() const;
 
     bool IsPassive() const;
+    bool IsRaidMarker() const;	
     bool IsAutocastable() const;
     bool IsStackableWithRanks() const;
     bool IsPassiveStackableWithRanks() const;

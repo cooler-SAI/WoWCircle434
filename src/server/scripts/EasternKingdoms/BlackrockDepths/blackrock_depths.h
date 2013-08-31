@@ -56,5 +56,7 @@ enum eTypes
     DATA_SF_BRAZIER_N       = 25,
     DATA_SF_BRAZIER_S       = 26,
     DATA_MOIRA              = 27,
+
+    DATA_TEAM_IN_INSTANCE   = 28,
 };
 #endif

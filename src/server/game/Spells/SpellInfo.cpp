@@ -490,6 +490,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
         {
             int32 level = caster->getLevel();
             if (target && _spellInfo->IsPositiveEffect(_effIndex) && (Effect == SPELL_EFFECT_APPLY_AURA))
+	if (target)
                 level = target->getLevel();
 
             if (GtSpellScalingEntry const* gtScaling = sGtSpellScalingStore.LookupEntry((_spellInfo->ScalingClass != -1 ? _spellInfo->ScalingClass - 1 : MAX_CLASSES - 1) * 100 + level - 1))
@@ -501,7 +502,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
                     multiplier *= (1.0f - _spellInfo->CoefBase) * (float)(level - 1) / (float)(_spellInfo->CoefLevelBase - 1) + _spellInfo->CoefBase;
 
                 float preciseBasePoints = ScalingMultiplier * multiplier;
-                if (DeltaScalingMultiplier)
+                if (DeltaScalingMultiplier/* && target*/)
                 {
                     float delta = DeltaScalingMultiplier * ScalingMultiplier * multiplier * 0.5f;
                     preciseBasePoints += frand(-delta, delta);
@@ -1220,6 +1221,11 @@ bool SpellInfo::IsPassive() const
     return Attributes & SPELL_ATTR0_PASSIVE;
 }
 
+bool SpellInfo::IsRaidMarker() const
+{
+    return AttributesEx8 & SPELL_ATTR8_RAID_MARKER;
+}
+
 bool SpellInfo::IsAutocastable() const
 {
     if (Attributes & SPELL_ATTR0_PASSIVE)
@@ -1781,7 +1787,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
             if (!mapEntry)
                 return SPELL_FAILED_INCORRECT_AREA;
 
-            return mapEntry->IsBattleArena() && player && player->InBattleground() ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
+            return mapEntry->IsBattlegroundOrArena() && player && player->InBattleground() ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         }
         case 32727:                                         // Arena Preparation
         {
@@ -1813,7 +1819,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
                 case SPELL_AURA_FLY:
                 case SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED:
                 {
-                    if (!player->IsKnowHowFlyIn(map_id, zone_id, Id))
+                    if (!player->IsKnowHowFlyIn(map_id, zone_id, Id) && Id != 70766) // Dream Portal on Valithria
                         return SPELL_FAILED_INCORRECT_AREA;
                     break;
                 }

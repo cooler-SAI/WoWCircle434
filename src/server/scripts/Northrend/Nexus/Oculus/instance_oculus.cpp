@@ -19,6 +19,7 @@
 #include "ScriptedCreature.h"
 #include "InstanceScript.h"
 #include "oculus.h"
+#include "Player.h"
 
 #define MAX_ENCOUNTER 4
 
@@ -136,28 +137,36 @@ public:
                 case NPC_BELGARISTRASZ:
                     belgaristraszGUID = creature->GetGUID();
                     if (GetBossState(DATA_DRAKOS_EVENT) == DONE)
+                    {
                         creature->SetWalk(true),
                         creature->GetMotionMaster()->MovePoint(0, 941.453f, 1044.1f, 359.967f),
                         creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    }
                     break;
                 case NPC_ETERNOS:
                     eternosGUID = creature->GetGUID();
                     if (GetBossState(DATA_DRAKOS_EVENT) == DONE)
+                    {
                         creature->SetWalk(true),
                         creature->GetMotionMaster()->MovePoint(0, 943.202f, 1059.35f, 359.967f),
                         creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    }
                     break;
                 case NPC_VERDISA:
                     verdisaGUID = creature->GetGUID();
                     if (GetBossState(DATA_DRAKOS_EVENT) == DONE)
+                    {
                         creature->SetWalk(true),
                         creature->GetMotionMaster()->MovePoint(0, 949.188f, 1032.91f, 359.967f),
                         creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    }
                     break;
                 case NPC_GREATER_WHELP:
                     if (GetBossState(DATA_UROM_EVENT) == DONE)
+                    {
                         creature->SetPhaseMask(1, true);
                         gwhelpList.push_back(creature->GetGUID());
+                    }
                     break;
             }
         }
@@ -208,9 +217,13 @@ public:
                     break;
                 case DATA_UROM_EVENT:
                     if (state == DONE)
+                    {
                         if (Creature* eregos = instance->GetCreature(eregosGUID))
+                        {
                             eregos->SetPhaseMask(1, true);
                             GreaterWhelps();
+                        }
+                    }
                     break;
                 case DATA_EREGOS_EVENT:
                     if (state == DONE)
@@ -231,7 +244,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type)
+        uint32 GetData(uint32 type) const
         {
             switch (type)
             {
@@ -243,7 +256,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier)
+        uint64 GetData64(uint32 identifier) const
         {
             switch (identifier)
             {
@@ -287,10 +300,8 @@ public:
                 return;
 
             for (std::list<uint64>::const_iterator itr = gwhelpList.begin(); itr != gwhelpList.end(); ++itr)
-            {
                 if (Creature* gwhelp = instance->GetCreature(*itr))
                     gwhelp->SetPhaseMask(1, true);
-            }
         }
 
         std::string GetSaveData()

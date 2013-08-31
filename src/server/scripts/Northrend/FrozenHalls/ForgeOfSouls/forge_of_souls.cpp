@@ -113,8 +113,6 @@ enum Events
 };
 
 /****************************************SYLVANAS************************************/
-#define GOSSIP_SYLVANAS_ITEM    "What would you have of me, Banshee Queen?"
-#define GOSSIP_JAINA_ITEM       "What would you have of me, my lady?"
 
 enum Yells
 {
@@ -239,13 +237,15 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
+        bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
         if (creature->isQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (creature->GetEntry() == NPC_JAINA_PART1)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_JAINA_ITEM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Какие будут распоряжения, моя леди?" : "What would you have of me, my lady?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
         else
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SYLVANAS_ITEM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Какие будут распоряжения, королева банши?" : "What would you have of me, Banshee Queen?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
         player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
         return true;
@@ -376,13 +376,15 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
+        bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
         if (creature->isQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (creature->GetEntry() == NPC_JAINA_PART1)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_JAINA_ITEM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Какие будут распоряжения, моя леди?" : "What would you have of me, my lady?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
         else
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SYLVANAS_ITEM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Какие будут распоряжения, королева банши?" : "What would you have of me, Banshee Queen?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
         player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
         return true;

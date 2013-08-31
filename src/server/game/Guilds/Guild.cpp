@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "DatabaseEnv.h"
 #include "Guild.h"
 #include "GuildMgr.h"
@@ -27,6 +26,7 @@
 #include "SocialMgr.h"
 #include "Log.h"
 #include "AccountMgr.h"
+#include "CalendarMgr.h"
 
 #define MAX_GUILD_BANK_TAB_TEXT_LEN 500
 #define EMBLEM_PRICE 10 * GOLD
@@ -1141,7 +1141,7 @@ bool Guild::Create(Player* pLeader, const std::string& name)
     m_leaderGuid = pLeader->GetGUID();
     m_name = name;
     m_info = "";
-    m_motd = "No message set.";
+    m_motd = "Сообщение не установлено.";
     m_bankMoney = 0;
     m_createdDate = ::time(NULL);
     _level = 1;
@@ -1625,11 +1625,11 @@ void Guild::HandleInviteMember(WorldSession* session, const std::string& name)
         return;
     }
     // Invited player cannot be in another guild
-    /*if (pInvitee->GetGuildId())
+    if (pInvitee->GetGuildId())
     {
-        SendCommandResult(session, GUILD_INVITE, ERR_ALREADY_IN_GUILD_S, name);
+        SendCommandResult(session, GUILD_INVITE_S, ERR_ALREADY_IN_GUILD_S, name);
         return;
-    }*/
+    }
     // Invited player cannot be invited
     if (pInvitee->GetGuildIdInvited())
     {
@@ -1749,6 +1749,8 @@ void Guild::HandleLeaveMember(WorldSession* session)
 
         SendCommandResult(session, GUILD_QUIT_S, ERR_GUILD_COMMAND_SUCCESS, m_name);
     }
+
+    sCalendarMgr->RemovePlayerGuildEventsAndSignups(player->GetGUID(), GetId());
 }
 
 void Guild::HandleRemoveMember(WorldSession* session, uint64 guid)
@@ -2442,6 +2444,39 @@ void Guild::BroadcastPacket(WorldPacket* packet) const
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
         if (Player* player = itr->second->FindPlayer())
             player->GetSession()->SendPacket(packet);
+}
+
+void Guild::MassInviteToEvent(WorldSession* session, uint32 minLevel, uint32 maxLevel, uint32 minRank)
+{
+    uint32 count = 0;
+
+    WorldPacket data(SMSG_CALENDAR_FILTER_GUILD);
+    data << uint32(count); // count placeholder
+
+    for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
+    {
+        // not sure if needed, maybe client checks it as well
+        if (count >= CALENDAR_MAX_INVITES)
+        {
+            if (Player* player = session->GetPlayer())
+                sCalendarMgr->SendCalendarCommandResult(player->GetGUID(), CALENDAR_ERROR_INVITES_EXCEEDED);
+            return;
+        }
+
+        Member* member = itr->second;
+        uint32 level = Player::GetLevelFromDB(member->GetGUID());
+
+        if (member->GetGUID() != session->GetPlayer()->GetGUID() && level >= minLevel && level <= maxLevel && member->IsRankNotLower(minRank))
+        {
+            data.appendPackGUID(member->GetGUID());
+            data << uint8(0); // unk
+            ++count;
+        }
+    }
+
+    data.put<uint32>(0, count);
+
+    session->SendPacket(&data);
 }
 
 // Members handling
@@ -3289,7 +3324,7 @@ void Guild::GiveXP(uint32 xp, Player* source /*=NULL*/)
             }
         }
 
-        //GetNewsLog().AddNewEvent(GUILD_NEWS_LEVEL_UP, time(NULL), 0, 0, _level);
+        GetNewsLog().AddNewEvent(GUILD_NEWS_LEVEL_UP, time(NULL), 0, 0, _level);
         GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_GUILD_LEVEL, GetLevel(), 0, 0, NULL, source);
 
         ++oldLevel;
@@ -3333,7 +3368,7 @@ void Guild::ResetWeeklyReputation()
 
 void Guild::GuildNewsLog::AddNewEvent(GuildNews eventType, time_t date, uint64 playerGuid, uint32 flags, uint32 data)
 {
-    /*uint32 id = _newsLog.size();
+    uint32 id = _newsLog.size();
 
     GuildNewsEntry& log = _newsLog[id];
     log.EventType = eventType;
@@ -3354,14 +3389,14 @@ void Guild::GuildNewsLog::AddNewEvent(GuildNews eventType, time_t date, uint64 p
 
     WorldPacket packet;
     BuildNewsData(id, log, packet);
-    GetGuild()->BroadcastPacket(&packet);*/
+    GetGuild()->BroadcastPacket(&packet);
 }
 
 void Guild::GuildNewsLog::LoadFromDB(PreparedQueryResult result)
 {
     if (!result)
         return;
-    /*do
+    do
     {
         Field* fields = result->Fetch();
         uint32 id = fields[0].GetInt32();
@@ -3372,7 +3407,7 @@ void Guild::GuildNewsLog::LoadFromDB(PreparedQueryResult result)
         log.Flags = fields[4].GetInt32();
         log.Date = time_t(fields[5].GetInt32());
     }
-    while (result->NextRow());*/
+    while (result->NextRow());
 }
 
 void Guild::GuildNewsLog::BuildNewsData(uint32 id, GuildNewsEntry& guildNew, WorldPacket& data)

@@ -60,6 +60,7 @@ class PlayerSocial;
 class SpellCastTargets;
 class UpdateMask;
 class PhaseMgr;
+class RatedBattleground;
 
 typedef std::deque<Mail*> PlayerMails;
 
@@ -2564,6 +2565,7 @@ class Player : public Unit, public GridObject<Player>
 
         void SetBGTeam(uint32 team) { m_bgData.bgTeam = team; }
         uint32 GetBGTeam() const { return m_bgData.bgTeam ? m_bgData.bgTeam : GetTeam(); }
+        TeamId GetBGTeamId() const { return (m_bgData.bgTeam ? m_bgData.bgTeam : GetTeam()) == ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE; }
 
         void LeaveBattleground(bool teleportToEntryPoint = true);
         bool CanJoinToBattleground() const;
@@ -2623,6 +2625,7 @@ class Player : public Unit, public GridObject<Player>
             m_lastFallTime = time;
             m_lastFallZ = z;
         }
+        void HandleJump(MovementInfo const& movementInfo);
         void HandleFall(MovementInfo const& movementInfo);
 
         bool IsKnowHowFlyIn(uint32 mapid, uint32 zone, uint32 spellId = 0) const;
@@ -2787,6 +2790,8 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetLastPetNumber() const { return m_lastpetnumber; }
         void SetLastPetNumber(uint32 petnumber) { m_lastpetnumber = petnumber; }
 
+        RatedBattleground* getRBG() { return m_rbg; }
+
         /*********************************************************/
         /***                   GROUP SYSTEM                    ***/
         /*********************************************************/
@@ -2873,7 +2878,6 @@ class Player : public Unit, public GridObject<Player>
         void SendCurrencyWeekCap(const CurrencyTypesEntry* currency) const;
         void FinishWeek();
         void ResetCurrencyWeekCap(SQLTransaction* trans = NULL);
-        uint32 GetRBGPersonalRating() const;
 
         /// modify currency flag
         void ModifyCurrencyFlag(uint32 id, uint8 flag);
@@ -2936,6 +2940,10 @@ class Player : public Unit, public GridObject<Player>
 
         float GetAverageItemLevel();
         bool isDebugAreaTriggers;
+
+        // spectator
+        typedef std::list<std::string> StringList;
+        std::vector<StringList*> twovtwo;
 
         void ClearWhisperWhiteList() { WhisperList.clear(); }
         void AddWhisperWhiteList(uint64 guid) { WhisperList.push_back(guid); }
@@ -3396,6 +3404,8 @@ class Player : public Unit, public GridObject<Player>
 
         PhaseMgr phaseMgr;
 
+        RatedBattleground* m_rbg;
+		
         uint32 _heal_done[SAVE_FOR_SECONDS];
         uint32 _damage_done[SAVE_FOR_SECONDS];
         uint32 _damage_taken[SAVE_FOR_SECONDS];

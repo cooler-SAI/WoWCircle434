@@ -84,6 +84,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
     {
         case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
         case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
+        case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_BATTLEGROUND:		
         case ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING:
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:          // only hardcoded list
         case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
@@ -1125,7 +1126,8 @@ void AchievementMgr<T>::UpdateAchievementCriteria(AchievementCriteriaTypes type,
         switch (type)
         {
             // std. case: increment at 1
-            case ACHIEVEMENT_CRITERIA_TYPE_NUMBER_OF_TALENT_RESETS:
+            case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_BATTLEGROUND:			
+            case ACHIEVEMENT_CRITERIA_TYPE_NUMBER_OF_TALENT_RESETS:			
             case ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL:
             case ACHIEVEMENT_CRITERIA_TYPE_CREATE_AUCTION:
             case ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS:    /* FIXME: for online player only currently */
@@ -1440,7 +1442,6 @@ void AchievementMgr<T>::UpdateAchievementCriteria(AchievementCriteriaTypes type,
             case ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK:
             case ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE:
             case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE:
-            case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_BATTLEGROUND:
                 break;                                   // Not implemented yet :(
         }
 
@@ -1481,6 +1482,7 @@ bool AchievementMgr<T>::IsCompletedCriteria(AchievementCriteriaEntry const* achi
     switch (AchievementCriteriaTypes(achievementCriteria->type))
     {
         case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
+        case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_BATTLEGROUND:
             return progress->counter >= achievementCriteria->win_bg.winCount;
         case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
             return progress->counter >= achievementCriteria->kill_creature.creatureCount;
@@ -1597,8 +1599,6 @@ bool AchievementMgr<T>::IsCompletedCriteria(AchievementCriteriaEntry const* achi
             return progress->counter >= achievementCriteria->buy_guild_bank_slots.slotsCount;
         case ACHIEVEMENT_CRITERIA_TYPE_EARN_GUILD_ACHIEVEMENT_POINTS:
             return progress->counter >= achievementCriteria->earn_guild_achievement_points.pointsCount;
-        case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_BATTLEGROUND:
-            return progress->counter >= achievementCriteria->win_rated_battleground.winCount;
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_GUILD:
             return progress->counter >= achievementCriteria->complete_quests_guild.questCount;
         case ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_TABARD:
@@ -1891,9 +1891,9 @@ void AchievementMgr<Player>::CompletedAchievement(AchievementEntry const* achiev
     if (achievement->flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
         return;
 
-    //if (achievement->flags & ACHIEVEMENT_FLAG_SHOW_IN_GUILD_NEWS)
-        //if (Guild* guild = sGuildMgr->GetGuildById(referencePlayer->GetGuildId()))
-            //guild->GetNewsLog().AddNewEvent(GUILD_NEWS_PLAYER_ACHIEVEMENT, time(NULL), referencePlayer->GetGUID(), achievement->flags & ACHIEVEMENT_FLAG_SHOW_IN_GUILD_HEADER, achievement->ID);
+    if (achievement->flags & ACHIEVEMENT_FLAG_SHOW_IN_GUILD_NEWS)
+        if (Guild* guild = sGuildMgr->GetGuildById(referencePlayer->GetGuildId()))
+            guild->GetNewsLog().AddNewEvent(GUILD_NEWS_PLAYER_ACHIEVEMENT, time(NULL), referencePlayer->GetGUID(), achievement->flags & ACHIEVEMENT_FLAG_SHOW_IN_GUILD_HEADER, achievement->ID);
 
     if (!GetOwner()->GetSession()->PlayerLoading())
         SendAchievementEarned(achievement);
@@ -1970,9 +1970,9 @@ void AchievementMgr<Guild>::CompletedAchievement(AchievementEntry const* achieve
     if (achievement->flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
         return;
 
-    //if (achievement->flags & ACHIEVEMENT_FLAG_SHOW_IN_GUILD_NEWS)
-        //if (Guild* guild = sGuildMgr->GetGuildById(referencePlayer->GetGuildId()))
-            //guild->GetNewsLog().AddNewEvent(GUILD_NEWS_GUILD_ACHIEVEMENT, time(NULL), 0, achievement->flags & ACHIEVEMENT_FLAG_SHOW_IN_GUILD_HEADER, achievement->ID);
+    if (achievement->flags & ACHIEVEMENT_FLAG_SHOW_IN_GUILD_NEWS && referencePlayer)
+        if (Guild* guild = sGuildMgr->GetGuildById(referencePlayer->GetGuildId()))
+            guild->GetNewsLog().AddNewEvent(GUILD_NEWS_GUILD_ACHIEVEMENT, time(NULL), 0, achievement->flags & ACHIEVEMENT_FLAG_SHOW_IN_GUILD_HEADER, achievement->ID);
 
     SendAchievementEarned(achievement);
     CompletedAchievementData& ca = m_completedAchievements[achievement->ID];
@@ -2398,6 +2398,7 @@ bool AchievementMgr<T>::RequirementsSatisfied(AchievementCriteriaEntry const *ac
         case ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL:
         case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA:
         case ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS:
+        case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_BATTLEGROUND:
             if (!miscValue1)
                 return false;
             break;

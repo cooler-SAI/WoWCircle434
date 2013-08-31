@@ -32,16 +32,16 @@ enum eCreatures
 
 enum eTexts
 {
-    AUGH_SAY_INTRO_1                    = -1877007,
-    AUGH_SAY_INTRO_2                    = -1877008,
-    LOCKMAW_EMOTE_FRENZI                = -1877009,
-    AUGH_EMOTE_KILL_CROCK               = -1877014,
-    AUGH_SAY_HOW_YOU_KILL_CROCK         = -1877015,
-    AUGH_SAY_AUGH_SMART                 = -1877016,
-    AUGH_SAY_AUGH_BOSS                  = -1877017,
-    AUGH_SAY_AUGH_STEAL                 = -1877018,
-    AUGH_SAY_AUGH_BAD                   = -1877019,
-    AUGH_SAY_AAA                        = -1877020,
+    LOCKMAW_EMOTE_FRENZI                = 0,
+    AUGH_SAY_INTRO_1                    = 0,
+    AUGH_SAY_INTRO_2                    = 1,
+    AUGH_EMOTE_KILL_CROCK               = 2,
+    AUGH_SAY_HOW_YOU_KILL_CROCK         = 3,
+    AUGH_SAY_AUGH_SMART                 = 4,
+    AUGH_SAY_AUGH_BOSS                  = 5,
+    AUGH_SAY_AUGH_STEAL                 = 6,
+    AUGH_SAY_AUGH_BAD                   = 7,
+    AUGH_SAY_AAA                        = 8,
 };
 
 enum ePhases
@@ -194,7 +194,7 @@ public:
             {
                 Rage = true;
                 DoCast(SPELL_VENOMOUS_RAGE);
-                DoScriptText(LOCKMAW_EMOTE_FRENZI, me);
+                Talk(LOCKMAW_EMOTE_FRENZI);
             }
 
             events.Update(diff);
@@ -367,7 +367,7 @@ public:
         void EnterCombat(Unit* /*pWho*/)
         {
             if (Active)
-                DoScriptText(AUGH_SAY_INTRO_1, me);
+            Talk(AUGH_SAY_INTRO_1);
         }
 
         void UpdateAI(const uint32 /*diff*/)
@@ -384,7 +384,7 @@ public:
                     me->CombatStop();
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     me->CastSpell(me, SPELL_SMOKE_BOMB, false);
-                    DoScriptText(AUGH_SAY_INTRO_2, me);
+                    Talk(AUGH_SAY_INTRO_2);
                     me->DespawnOrUnsummon(2000);
                 }
 
@@ -672,7 +672,7 @@ public:
             {
                 uiIntroPhase = 0;
                 Intro = true;
-                DoScriptText(AUGH_EMOTE_KILL_CROCK, me);
+                Talk(AUGH_EMOTE_KILL_CROCK);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
                 me->SetVisible(true);
                 me->SetHomePosition(AughPos);
@@ -712,15 +712,15 @@ public:
                     {
                         case 0:
                             uiIntroTimer = 5000;
-                            DoScriptText(AUGH_SAY_HOW_YOU_KILL_CROCK, me);
+                            Talk(AUGH_SAY_HOW_YOU_KILL_CROCK);
                             break;
                         case 1:
-                            DoScriptText(AUGH_SAY_AUGH_SMART, me);
+                            Talk(AUGH_SAY_AUGH_SMART);
                             uiIntroTimer = 9000;
                             break;
                         case 2:
                             {
-                                DoScriptText(AUGH_SAY_AUGH_BOSS, me);
+                                Talk(AUGH_SAY_AUGH_BOSS);
                                 uiIntroTimer = 5000;
 
                                 if (IsHeroic())
@@ -731,11 +731,11 @@ public:
                             }
                             break;
                         case 3:
-                            DoScriptText(AUGH_SAY_AUGH_STEAL, me);
+                            Talk(AUGH_SAY_AUGH_STEAL);
                             uiIntroTimer = 7000;
                             break;
                         case 4:
-                            DoScriptText(AUGH_SAY_AUGH_BAD, me);
+                            Talk(AUGH_SAY_AUGH_BAD);
                             Intro = false;
                             break;
                     }
@@ -785,7 +785,7 @@ public:
                         events.ScheduleEvent(EVENT_SMOKE_BOMB, urand(7000, 15000));
                         break;
                     case EVENT_SAY_AAA:
-                        DoScriptText(AUGH_SAY_AAA, me);
+                        Talk(AUGH_SAY_AAA);
                         events.ScheduleEvent(EVENT_SAY_AAA, urand(15000, 35000));
                         break;
                 }

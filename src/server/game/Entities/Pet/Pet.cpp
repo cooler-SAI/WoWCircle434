@@ -640,8 +640,14 @@ void Creature::Regenerate(Powers power)
         }
         case POWER_ENERGY:
         {
-            // For deathknight's ghoul.
-            addvalue = 1;
+            uint32 entry = GetEntry();
+            if (entry == 32535 || entry == 30161 || entry == 31752)
+                addvalue = 24;
+            else
+            {
+                // For deathknight's ghoul.
+                addvalue = 1;
+            }
             break;
         }
         default:

@@ -1095,6 +1095,13 @@ AllowTickets = 1
 
 DungeonFinder.OptionsMask = 1
 
+#
+#     DungeonFinder.CastDeserter
+#        Description: Cast Deserter spell at players who leave DF-parties while the dungeons is in progress.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+DungeonFinder.CastDeserter = 0
 
 #
 #   DBC.EnforceItemAttributes
@@ -2106,6 +2113,14 @@ AutoBroadcast.Timer = 60000
 #                     0 - (Disabled)
 
 Battleground.CastDeserter = 1
+
+#
+#    Battleground.IgnoreFaction
+#        Description: Allows members of different factions to be grouped in the same team.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Battleground.IgnoreFaction = 1
 
 #
 #    Battleground.QueueAnnouncer.Enable
