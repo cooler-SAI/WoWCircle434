@@ -72,8 +72,10 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
     commentSize = recvData.ReadBits(9);
     numDungeons = recvData.ReadBits(24);
     if (!numDungeons)
+    {
         recvData.rfinish();
         return;
+    }
 
     recvData.read(comment, commentSize);
 

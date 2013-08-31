@@ -36,6 +36,7 @@ enum ScalingAuras
     SHAMAN_SCALING              = 61783, // All Hit Chance, Spell Hit Chance, All Damage Done
     WARLOCK_SCALING_6           = 89953, // All Hit chance, Attack Speed, Magic Resistance 
     PRIEST_SCALING_5            = 89962, // All Critical Chance, Magic Resistance, Crit Damage Bonus
+    MAGE_SCALING_5              = 89764, // All Critical Chance, Attack Speed, Magic Resistance
 };
 
 class spell_pet_stat_calculate : public SpellScriptLoader
@@ -221,6 +222,11 @@ class spell_pet_stat_calculate : public SpellScriptLoader
                     case PRIEST_SCALING_5:
                         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_stat_calculate_AuraScript::CalculateAmountSpellCrit, EFFECT_0, SPELL_AURA_MOD_CRIT_PCT);
                         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_stat_calculate_AuraScript::CalculateAmountSpellPenetration, EFFECT_1, SPELL_AURA_MOD_TARGET_RESISTANCE);
+                        break;
+                    case MAGE_SCALING_5:
+                        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_stat_calculate_AuraScript::CalculateAmountSpellCrit, EFFECT_0, SPELL_AURA_MOD_CRIT_PCT);
+                        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_stat_calculate_AuraScript::CalculateAmountHasteSpell, EFFECT_1, SPELL_AURA_MELEE_SLOW);
+                        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_stat_calculate_AuraScript::CalculateAmountSpellPenetration, EFFECT_2, SPELL_AURA_MOD_TARGET_RESISTANCE);
                         break;
                     default:
                         break;

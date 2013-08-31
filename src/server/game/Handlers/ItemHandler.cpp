@@ -1451,8 +1451,10 @@ void WorldSession::HandleTransmogrifyItems(WorldPacket& recvData)
     uint32 count = recvData.ReadBits(22);
 
     if (count >= EQUIPMENT_SLOT_END)
+    {
         recvData.rfinish();
         return;
+    }
 
     std::vector<ObjectGuid> itemGuids(count, ObjectGuid(0));
     std::vector<uint32> newEntries(count, 0);
@@ -1635,14 +1637,18 @@ void WorldSession::HandleReforgeItemOpcode(WorldPacket& recvData)
         .ReadByteSeq(guid[5]);
 
     if (!player->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_REFORGER))
+    {
         SendReforgeResult(false);
         return;
+    }
 
     Item* item = player->GetItemByPos(bag, slot);
 
     if (!item)
+    {
         SendReforgeResult(false);
         return;
+    }
 
     if (item->GetEnchantmentId(REFORGE_ENCHANTMENT_SLOT) && reforgeEntry)
     {
@@ -1662,8 +1668,10 @@ void WorldSession::HandleReforgeItemOpcode(WorldPacket& recvData)
 
     ItemReforgeEntry const* stats = sItemReforgeStore.LookupEntry(reforgeEntry);
     if (!stats)
+    {   
         SendReforgeResult(false);
         return;
+    }
 
     if (!item->GetReforgableStat(ItemModType(stats->SourceStat)) || item->GetReforgableStat(ItemModType(stats->FinalStat))) // Cheating, you cant reforge to a stat that the item already has, nor reforge from a stat that the item does not have
     {

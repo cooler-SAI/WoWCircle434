@@ -765,6 +765,7 @@ class npc_warmaster_blackhorn_twilight_assault_drake: public CreatureScript
                 if (action == ACTION_HARPOON_END)
                 {
                     me->InterruptNonMeleeSpells(false);
+                    me->RemoveAura(SPELL_HARPOON);
                     Movement::MoveSplineInit init(*me);
                     G3D::Vector3 point;
                     switch (wave)
@@ -1004,7 +1005,6 @@ class npc_warmaster_blackhorn_skyfire_harpoon_gun: public CreatureScript
             npc_warmaster_blackhorn_skyfire_harpoon_gunAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
             {             
                 me->SetReactState(REACT_PASSIVE);
-                lastDrake = NULL;
                 drakeEntry = 0;
             }
 
@@ -1017,23 +1017,15 @@ class npc_warmaster_blackhorn_skyfire_harpoon_gun: public CreatureScript
             {
                 if (action == ACTION_HARPOON)
                 {
-                    if (lastDrake && lastDrake->isAlive() && lastDrake->GetEntry() == drakeEntry)
-                        DoCast(lastDrake, SPELL_HARPOON);
-                    else
-                    {
-                        if (Creature* drake = FindAssaultDrake(drakeEntry))
-                        {
-                            lastDrake = drake;
-                            DoCast(lastDrake, SPELL_HARPOON);
-                        }
-                    }
+                    if (Creature* drake = FindAssaultDrake(drakeEntry))
+                        DoCast(drake, SPELL_HARPOON);
+
                     events.ScheduleEvent(EVENT_HARPOON_END, (IsHeroic() ? 20000 : 25000));
                 }
                 else if (action == ACTION_END_BATTLE)
                 {
                     me->InterruptNonMeleeSpells(true);
                     events.Reset();
-                    lastDrake = NULL;
                     EnterEvadeMode();
                 }
             }
@@ -1044,16 +1036,13 @@ class npc_warmaster_blackhorn_skyfire_harpoon_gun: public CreatureScript
 
                 if (uint32 eventId = events.ExecuteEvent())
                 {
-                    me->InterruptNonMeleeSpells(true);
-                    if (lastDrake && lastDrake->isAlive())
-                        lastDrake->AI()->DoAction(ACTION_HARPOON_END);
+                    ReleaseAssaultDrake(drakeEntry);
                     //DoCast(me, SPELL_RELOADING);
                 }
             }
 
         private:
             EventMap events;
-            Creature* lastDrake;
             uint32 drakeEntry;
 
             Creature* FindAssaultDrake(uint32 entry)
@@ -1067,6 +1056,16 @@ class npc_warmaster_blackhorn_skyfire_harpoon_gun: public CreatureScript
                                 return (*itr);
 
                 return NULL;
+            }
+
+            void ReleaseAssaultDrake(uint32 entry)
+            {
+                std::list<Creature*> creatures;
+                me->GetCreatureListWithEntryInGrid(creatures, entry, 200.0f);
+                if (!creatures.empty())
+                    for (std::list<Creature*>::const_iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                        if ((*itr)->HasAura(SPELL_HARPOON, me->GetGUID()))
+                            (*itr)->AI()->DoAction(ACTION_HARPOON_END);
             }
         };
 };

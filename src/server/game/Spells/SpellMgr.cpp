@@ -2921,7 +2921,11 @@ void SpellMgr::LoadSpellCustomAttr()
             case 99173: // Burning Wounds, Item - Rogue T12 2P Bonus
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER;
                 break;
-            case 60256:
+            case 45257: // Using Steam Tonk Controller
+            case 45440: // Steam Tonk Controller
+            case 49352: // Crashin' Thrashin' Racer Controller
+            case 75111: // Blue Crashin' Thrashin' Racer Controller
+            case 60256: // Collect Sample
                 //Crashes client on pressing ESC (Maybe because of ReqSpellFocus and GameObject)
                 spellInfo->AttributesEx4 &= ~SPELL_ATTR4_TRIGGERED;
                 break;
