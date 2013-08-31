@@ -680,7 +680,8 @@ bool AuthSocket::_HandleLogonProof()
                         uint32 acc_id = (*loginfail)[0].GetUInt32();
                         stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_AUTO_BANNED);
                         stmt->setUInt32(0, acc_id);
-                        stmt->setUInt32(1, WrongPassBanTime);
+                        stmt->setUInt32(1, 0);
+                        stmt->setUInt32(2, WrongPassBanTime);
                         LoginDatabase.Execute(stmt);
 
                         sLog->outDebug(LOG_FILTER_AUTHSERVER, "'%s:%d' [AuthChallenge] account %s got banned for '%u' seconds because it failed to authenticate '%u' times",

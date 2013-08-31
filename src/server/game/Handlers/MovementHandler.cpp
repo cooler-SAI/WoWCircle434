@@ -271,6 +271,16 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvPacket)
             if (Unit *charmer = mover->GetCharmer())
                 if (charmer->GetTypeId() == TYPEID_PLAYER)
                     plrMover = (Player*)charmer;
+    
+    bool jump = recvPacket.GetOpcode() == MSG_MOVE_JUMP && plrMover && !plrMover->isInFlight() && !plrMover->IsUnderWater();
+
+    if (jump)
+    {
+        if (!movementInfo.Check(plrMover, recvPacket.GetOpcode()))
+            return;
+
+        plrMover->HandleJump(movementInfo);
+    }
 
     bool fall = recvPacket.GetOpcode() == MSG_MOVE_FALL_LAND && plrMover && !plrMover->isInFlight() && !vehMover;
 

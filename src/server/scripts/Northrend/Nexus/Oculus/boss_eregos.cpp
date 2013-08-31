@@ -34,9 +34,12 @@ enum Events
 
 enum Says
 {
-    SAY_AGGRO = 0,
-    SAY_ENRAGE = 1,
-    SAY_DEATH = 2
+    SAY_SPAWN           = 0,
+    SAY_AGGRO           = 1,
+    SAY_ENRAGE          = 2,
+    SAY_KILL            = 3,
+    SAY_DEATH           = 4,
+    SAY_SHIELD          = 5,
 };
 
 enum Spells
@@ -82,7 +85,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new boss_eregosAI (creature);
+        return new boss_eregosAI(creature);
     }
 
     struct boss_eregosAI : public BossAI
@@ -101,6 +104,11 @@ public:
             DoAction(ACTION_SET_NORMAL_EVENTS);
         }
 
+        void KilledUnit(Unit* /*victim*/)
+        {
+            Talk(SAY_KILL);
+        }
+
         void EnterCombat(Unit* /*who*/)
         {
             _EnterCombat();
@@ -117,7 +125,7 @@ public:
                 _amberVoid = false;
         }
 
-        uint32 GetData(uint32 type)
+        uint32 GetData(uint32 type) const
         {
            switch (type)
            {
@@ -133,7 +141,7 @@ public:
             return 0;
         }
 
-        void DoAction(const int32 action)
+        void DoAction(int32 const action)
         {
             if (action != ACTION_SET_NORMAL_EVENTS)
                 return;
@@ -176,6 +184,7 @@ public:
                 events.Reset();
                 _phase = (me->GetHealthPct() < 60.0f  && me->GetHealthPct() > 20.0f) ? PHASE_FIRST_PLANAR : PHASE_SECOND_PLANAR;
 
+                Talk(SAY_SHIELD);
                 DoCast(SPELL_PLANAR_SHIFT);
 
                 // not sure about the amount, and if we should despawn previous spawns (dragon trashs)
@@ -185,7 +194,7 @@ public:
             }
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 const diff)
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -201,7 +210,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_ARCANE_BARRAGE:
-                        DoCast(me->getVictim(), SPELL_ARCANE_BARRAGE);
+                        DoCastVictim(SPELL_ARCANE_BARRAGE);
                         events.ScheduleEvent(EVENT_ARCANE_BARRAGE, urand(3, 10) * IN_MILLISECONDS, 0, PHASE_NORMAL);
                         break;
                     case EVENT_ARCANE_VOLLEY:

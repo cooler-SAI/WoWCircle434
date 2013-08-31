@@ -2,17 +2,14 @@
 #include"Spell.h"
 #include"shadowfang_keep.h"
 
-
-#define SAY_AGGRO "Thalli ho! The hunt begins!"
-#define SAY_DEATH "Killed by lowly commoners, how droll..."
-#define SAY_ASPHYXIATE "This is just too easy..."
-#define SAY_STAY_OF_EXECUTION "HA! Let's at least keep it interesting."
-#define SAY_DARK_ARCHANGEL_FORM "I grow tired of this hunt... Time to die!"
-#define SAY_KILL1 "Pathetic."
-#define SAY_KILL2 "There was no sport in that kill."
-
 enum ScriptTexts
 {
+    SAY_AGGRO                = 0,
+    SAY_DEATH                = 1,
+    SAY_ASPHYXIATE           = 2,
+    SAY_STAY_OF_EXECUTION    = 3,
+    SAY_DARK_ARCHANGEL_FORM  = 4,
+    SAY_KILL                 = 5,
 };
 
 enum Events
@@ -82,7 +79,7 @@ class boss_baron_ashbury : public CreatureScript
 
             void EnterCombat(Unit* pWho)
             {
-                me->MonsterYell(SAY_AGGRO, 0, 0);
+                Talk(SAY_AGGRO);
                 events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, urand(8000, 9000));
                 events.ScheduleEvent(EVENT_ASPHYXIATE, 30000);
                 if (IsHeroic())
@@ -108,14 +105,14 @@ class boss_baron_ashbury : public CreatureScript
 
             void KilledUnit(Unit* who)
             {
-                me->MonsterYell(urand(0, 1)? SAY_KILL1: SAY_KILL2, 0, 0);
+                Talk(SAY_KILL);
             }
 
             void JustDied(Unit* pWho)
             {
                 _JustDied();
 
-                me->MonsterYell(SAY_DEATH, 0, 0);
+                Talk(SAY_DEATH);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_WRACKING_PAIN);
             }
             
@@ -130,7 +127,7 @@ class boss_baron_ashbury : public CreatureScript
                     {
                         events.Reset();
                         bArchangel = true;
-                        me->MonsterYell(SAY_DARK_ARCHANGEL_FORM, 0, 0);
+                        Talk(SAY_DARK_ARCHANGEL_FORM);
                         DoCast(me, SPELL_DARK_ARCHANGEL_FORM);
                         events.ScheduleEvent(EVENT_CALAMITY, 3000);
                     }
@@ -153,13 +150,13 @@ class boss_baron_ashbury : public CreatureScript
                         case EVENT_ASPHYXIATE:
                             bCombo = true;
                             events.DelayEvents(7000);
-                            me->MonsterYell(SAY_ASPHYXIATE, 0, 0);
+                            Talk(SAY_ASPHYXIATE);
                             DoCast(DUNGEON_MODE(SPELL_ASPHYXIATE, SPELL_ASPHYXIATE_H));
                             events.ScheduleEvent(EVENT_STAY_OF_EXECUTION, 6100);
                             events.ScheduleEvent(EVENT_ASPHYXIATE, 45000);
                             break;
                         case EVENT_STAY_OF_EXECUTION:
-                            me->MonsterYell(SAY_STAY_OF_EXECUTION, 0, 0);
+                            Talk(SAY_STAY_OF_EXECUTION);
                             DoCast(SelectTarget(SELECT_TARGET_NEAREST), SPELL_STAY_OF_EXECUTION);
                             bCombo = false;
                             break;

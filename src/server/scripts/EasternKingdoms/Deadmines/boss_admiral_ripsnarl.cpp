@@ -58,13 +58,12 @@ enum Events
 {
     EVENT_SWIPE             = 1,
     EVENT_CONTINUE          = 2,
-    EVENT_THRIST_OF_BLOOD   = 3,
-    EVENT_GO_FOR_THE_THROAT = 4,
-    EVENT_SUMMON_VAPOR      = 5,
-    EVENT_SWIRLING_VAPOR    = 6,
-    EVENT_CONDENSING_VAPOR  = 7,
-    EVENT_FREEZING_VAPOR    = 8,
-    EVENT_COALESCE          = 9,
+    EVENT_GO_FOR_THE_THROAT = 3,
+    EVENT_SUMMON_VAPOR      = 4,
+    EVENT_SWIRLING_VAPOR    = 5,
+    EVENT_CONDENSING_VAPOR  = 6,
+    EVENT_FREEZING_VAPOR    = 7,
+    EVENT_COALESCE          = 8,
 };
 
 #define ACTION_COALESCE 1
@@ -148,6 +147,26 @@ class boss_admiral_ripsnarl : public CreatureScript
                 me->SetVisible(true);
 
                 stage = 0;
+                SetFog(false);
+            }
+
+            void SetFog(bool enabled)
+            {
+                std::list<Creature*> dummies;
+                GetCreatureListWithEntryInGrid(dummies, me, NPC_DUMMY_1, 75);
+                for (std::list<Creature*>::const_iterator itr = dummies.begin(); itr != dummies.end(); ++itr)
+                    if (enabled)
+                        (*itr)->CastSpell(*itr, SPELL_FOG_1, true);
+                    else
+                        (*itr)->RemoveAurasDueToSpell(SPELL_FOG_1);
+
+                std::list<Creature*> bigDummies;
+                GetCreatureListWithEntryInGrid(bigDummies, me, NPC_DUMMY_2, 75);
+                for (std::list<Creature*>::const_iterator itr = bigDummies.begin(); itr != bigDummies.end(); ++itr)
+                    if (enabled)
+                        (*itr)->CastSpell(*itr, SPELL_FOG_2, true);
+                    else
+                        (*itr)->RemoveAurasDueToSpell(SPELL_FOG_2);
             }
 
             void EnterCombat(Unit* who) 
@@ -155,13 +174,13 @@ class boss_admiral_ripsnarl : public CreatureScript
                 Talk(SAY_AGGRO);
 
                 events.ScheduleEvent(EVENT_SWIPE, urand(5000, 10000));
-                events.ScheduleEvent(EVENT_THRIST_OF_BLOOD, urand(5000, 7000));
                 if (IsHeroic())
                     events.ScheduleEvent(EVENT_GO_FOR_THE_THROAT, urand(5000, 10000));
 
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RIPSNARL_ACHIEVEMENT);
                 instance->DoResetAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, ACHIEVEMENT_CRITERIA_CONDITION_UNK13, 28179);
                 DoZoneInCombat();
+                SetFog(false);
                 instance->SetBossState(DATA_ADMIRAL, IN_PROGRESS);
             }
 
@@ -175,6 +194,7 @@ class boss_admiral_ripsnarl : public CreatureScript
             {
                 _JustDied();
                 Talk(SAY_DEATH);
+                SetFog(false);
 
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RIPSNARL_ACHIEVEMENT);
             }
@@ -201,6 +221,8 @@ class boss_admiral_ripsnarl : public CreatureScript
                     EnterSpecialPhase();
                     for (uint8 i = 0; i < 38; i++)
                         me->SummonCreature(NPC_DUMMY_1, dummyPos[i]);
+                    events.ScheduleEvent(EVENT_SUMMON_VAPOR, 5000);
+                    SetFog(true);
                     return;
                 }
                 else if (me->HealthBelowPct(50) && stage == 1)
@@ -236,7 +258,6 @@ class boss_admiral_ripsnarl : public CreatureScript
                         case EVENT_CONTINUE:
                             me->SetVisible(true);
                             me->SetReactState(REACT_AGGRESSIVE);
-                            events.ScheduleEvent(EVENT_THRIST_OF_BLOOD, urand(5000, 7000));
                             if (IsHeroic())
                                 events.ScheduleEvent(EVENT_GO_FOR_THE_THROAT, urand(5000, 10000));
                             
@@ -246,14 +267,15 @@ class boss_admiral_ripsnarl : public CreatureScript
                                 DoCast(pTarget, SPELL_GO_FOR_THE_THROAT);
                             }
                             break;
-                        case EVENT_THRIST_OF_BLOOD:
-                            DoCast(me, SPELL_THRIST_OF_BLOOD_AURA);
-                            events.ScheduleEvent(EVENT_THRIST_OF_BLOOD, urand(7000, 9000));
-                            break;
                         case EVENT_GO_FOR_THE_THROAT:
                             if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                                 DoCast(pTarget, SPELL_GO_FOR_THE_THROAT);
                             events.ScheduleEvent(EVENT_GO_FOR_THE_THROAT, urand(10000, 20000));
+                            break;
+                        case EVENT_SUMMON_VAPOR:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0, true))
+                                DoCast(target, SPELL_VAPOR_SUMMON);
+                            events.ScheduleEvent(EVENT_SUMMON_VAPOR, 5000);
                             break;
                     }
                 }
@@ -269,17 +291,12 @@ class boss_admiral_ripsnarl : public CreatureScript
             {
                 me->AttackStop();
                 me->SetReactState(REACT_PASSIVE);
-                events.CancelEvent(EVENT_THRIST_OF_BLOOD);
                 events.CancelEvent(EVENT_GO_FOR_THE_THROAT);
                 me->SetVisible(false);
                 
                 DoResetThreat();
 
                 me->RemoveAurasDueToSpell(SPELL_THRIST_OF_BLOOD_AURA);
-
-                for (uint8 i = 0; i < 3; i++)
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                        DoCast(target, SPELL_VAPOR_SUMMON);
 
                 Talk(SAY_SPELL4);
 
@@ -385,7 +402,7 @@ class spell_admiral_ripsnarl_coalesce : public SpellScriptLoader
                 if (!GetCaster())
                     return;
 
-                if (Creature* pAdmiral = GetCaster()->FindNearestCreature(NPC_ADMIRAL, 100.0f))
+                if (Creature* pAdmiral = GetCaster()->FindNearestCreature(NPC_ADMIRAL_RIPSNARL, 100.0f))
                     pAdmiral->AI()->DoAction(ACTION_COALESCE);
             }
 

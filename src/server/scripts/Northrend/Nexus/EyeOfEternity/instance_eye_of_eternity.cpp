@@ -139,11 +139,9 @@ public:
                     break;
                 case NPC_MALYGOS:
                     malygosGUID = creature->GetGUID();
-                    creature->setActive(true);
                     break;
                 case NPC_PORTAL_TRIGGER:
                     portalTriggers.push_back(creature->GetGUID());
-                    creature->setActive(true);
                     break;
                 case NPC_ALEXSTRASZA_BUNNY:
                     alexstraszaBunnyGUID = creature->GetGUID();
@@ -198,17 +196,21 @@ public:
                     uint8 counter = 0;
                     if (Creature* trigger = instance->GetCreature(*itr_vortex))
                     {
+                        // each trigger have to cast the spell to 5 players.
                         for (std::list<HostileReference*>::const_iterator itr = m_threatlist.begin(); itr!= m_threatlist.end(); ++itr)
                         {
+                            if (counter >= 5)
+                                break;
+
                             if (Unit* target = (*itr)->getTarget())
                             {
                                 Player* player = target->ToPlayer();
 
-                                if (!player || !player->isAlive() || player->isGameMaster() || player->HasAura(SPELL_VORTEX_4))
+                                if (!player || player->isGameMaster() || player->HasAura(SPELL_VORTEX_4))
                                     continue;
 
                                 player->CastSpell(trigger, SPELL_VORTEX_4, true);
-                                break;
+                                counter++;
                             }
                         }
                     }

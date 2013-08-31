@@ -78,7 +78,8 @@ enum Events
     EVENT_ARCANE_BARRAGE             = 1,
 
     // ======== WYRMREST SKYTALON ==========
-    EVENT_CAST_RIDE_SPELL            = 1
+    EVENT_CAST_RIDE_SPELL            = 1,
+    EVENT_ANNOUNCE_ENERGY            = 2
 };
 
 enum Phases
@@ -344,8 +345,6 @@ public:
         {
             _despawned = false; // We determine if Malygos will be realocated to spawning position on reset triggered by boss despawn on evade
             _flySpeed = me->GetSpeed(MOVE_FLIGHT); // Get initial fly speed, otherwise on each wipe fly speed would add up if we get it
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
         }
 
         void Reset()
@@ -369,7 +368,6 @@ public:
             _performingSurgeOfPower = false;
             _performingDestroyPlatform = false;
 
-            me->SetCanFly(true);
             me->SetDisableGravity(true);
             me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
             // TO DO: find what in core is making boss slower than in retail (when correct speed data) or find missing movement flag update or forced spline change
@@ -677,6 +675,7 @@ public:
         }
 
         void MoveInLineOfSight(Unit* who)
+
         {
             if (!me->isInCombat() || _phase != PHASE_ONE)
                 return;
@@ -757,7 +756,7 @@ public:
 
         void UpdateAI(uint32 const diff)
         {
-            if (!UpdateVictim() && _phase != PHASE_NOT_STARTED && _phase != PHASE_TWO)
+            if (!instance || (!UpdateVictim() && _phase != PHASE_NOT_STARTED && _phase != PHASE_TWO))
                 return;
 
             events.Update(diff);
@@ -1104,7 +1103,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 const /*diff*/)
+        void UpdateAI (uint32 const /*diff*/)
         {
             // When duration of opened riff visual ends, closed one should be cast
             if (!me->HasAura(SPELL_PORTAL_VISUAL_CLOSED) && !me->HasAura(SPELL_PORTAL_OPENED))
@@ -1218,11 +1217,6 @@ public:
             _wpCount = 0;
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& damage)
-        {
-            damage = 0;
-        }
-
         void PassengerBoarded(Unit* unit, int8 /*seat*/, bool apply)
         {
             if (apply)
@@ -1232,9 +1226,28 @@ public:
                     unit->CastSpell(unit, SPELL_TELEPORT_VISUAL_ONLY);
                     unit->ToCreature()->SetInCombatWithZone();
                 }
+                else if (unit->GetTypeId() == TYPEID_PLAYER)
+                    me->SetDisableGravity(true);
             }
-            else
-                me->DespawnOrUnsummon(1*IN_MILLISECONDS);
+            else if (!apply)
+            {
+                if (unit->GetTypeId() != TYPEID_PLAYER)
+                {
+
+                    me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetDisableGravity(false);
+                    me->SetCanFly(false);
+                }
+                else if (unit->GetTypeId() == TYPEID_PLAYER)
+                {
+                    me->SetDisableGravity(false);
+                    me->SetCanFly(false);
+                }
+
+                me->setFaction(FACTION_FRIENDLY);
+                me->RemoveAllAuras();
+            }
         }
 
         void UpdateAI(uint32 const diff)
@@ -1254,7 +1267,7 @@ public:
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 }
 
-                //me->DespawnOrUnsummon(3*IN_MILLISECONDS);
+                me->DespawnOrUnsummon(3*IN_MILLISECONDS);
         }
 
         void MovementInform(uint32 type, uint32 id)
@@ -1309,11 +1322,6 @@ public:
         {
         }
 
-        void DamageTaken(Unit* /*who*/, uint32& damage)
-        {
-            damage = 0;
-        }
-
         void PassengerBoarded(Unit* unit, int8 /*seat*/, bool apply)
         {
             if (apply)
@@ -1323,12 +1331,10 @@ public:
             }
             else if (!apply)
             {
-                me->setFaction(FACTION_FRIENDLY);
                 me->StopMoving();
                 me->SetDisableGravity(false);
                 me->SetCanFly(false);
                 me->AI()->EnterEvadeMode();
-                me->GetMotionMaster()->MoveFall();
             }
         }
 
@@ -1342,10 +1348,10 @@ public:
                 init.SetCyclic();
                 init.Launch();
             }
-            /*else
+            else
             {
                 me->DespawnOrUnsummon(3*IN_MILLISECONDS);
-            }*/
+            }
         }
 
     private:
@@ -1422,7 +1428,7 @@ class npc_nexus_lord : public CreatureScript
                             _events.ScheduleEvent(EVENT_HASTE_BUFF, 15*IN_MILLISECONDS);
                             break;
                         case EVENT_NUKE_DUMMY:
-                            DoCast(me->getVictim(), SPELL_DUMMY_NUKE, true);
+                            DoCastVictim(SPELL_DUMMY_NUKE, true);
                             DoCast(me, SPELL_ALIGN_DISK_AGGRO, true);
                             _events.ScheduleEvent(EVENT_NUKE_DUMMY, 1*IN_MILLISECONDS);
                             break;
@@ -1538,7 +1544,7 @@ public:
             }
         }
 
-        void UpdateAI (uint32 const /*diff*/)
+        void UpdateAI(uint32 const /*diff*/)
         {
         }
 
@@ -1570,7 +1576,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_arcane_overloadAI (creature);
+        return new npc_arcane_overloadAI(creature);
     }
 };
 
@@ -1584,6 +1590,11 @@ public:
     {
         npc_wyrmrest_skytalonAI(Creature* creature) : VehicleAI(creature)
         {
+        }
+
+        void Reset()
+        {
+            me->setPowerType(POWER_ENERGY);
         }
 
         void IsSummonedBy(Unit* summoner)
@@ -1607,6 +1618,12 @@ public:
                 {
                     case EVENT_CAST_RIDE_SPELL:
                         me->CastSpell(_summoner, SPELL_RIDE_RED_DRAGON_TRIGGERED, true);
+                        _events.ScheduleEvent(EVENT_ANNOUNCE_ENERGY, 500);
+                        break;
+                    case EVENT_ANNOUNCE_ENERGY:
+                        bool ru = _summoner->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+                        _summoner->GetSession()->SendNotification(ru ? "Энергия: %u" : "Energy: %u", me->GetPower(POWER_ENERGY));
+                        _events.ScheduleEvent(EVENT_ANNOUNCE_ENERGY, 500);
                         break;
                 }
             }
@@ -1635,7 +1652,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_wyrmrest_skytalonAI (creature);
+        return new npc_wyrmrest_skytalonAI(creature);
     }
 };
 
@@ -1661,7 +1678,7 @@ class npc_static_field : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const
         {
-            return new npc_static_fieldAI (creature);
+            return new npc_static_fieldAI(creature);
         }
 };
 
@@ -1800,10 +1817,10 @@ class spell_malygos_arcane_storm : public SpellScriptLoader
                 {
                     // Resize list only to objects that are vehicles.
                     IsCreatureVehicleCheck check(true);
-                    Trinity::RandomResizeList(targets, check, (malygos->GetMap()->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL ? 4 : 10));
+                    Trinity::Containers::RandomResizeList(targets, check, (malygos->GetMap()->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL ? 4 : 10));
                 }
                 else
-                    Trinity::RandomResizeList(targets, (malygos->GetMap()->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL ? 4 : 10));
+                    Trinity::Containers::RandomResizeList(targets, (malygos->GetMap()->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL ? 4 : 10));
             }
 
             void HandleVisual(SpellEffIndex /*effIndex*/)
@@ -2081,7 +2098,7 @@ class spell_scion_of_eternity_arcane_barrage : public SpellScriptLoader
                 if (!targets.empty())
                 {
                     if (targets.size() > 1)
-                        Trinity::RandomResizeList(targets, 1);
+                        Trinity::Containers::RandomResizeList(targets, 1);
 
                     if (WorldObject* filteredTarget = targets.front())
                         if (malygos)
@@ -2337,7 +2354,7 @@ class spell_malygos_surge_of_power_warning_selector_25 : public SpellScriptLoade
                 std::list<WorldObject*> selectedTargets = targets;
 
                 uint8 guidDataSlot = DATA_FIRST_SURGE_TARGET_GUID; // SetGuid in Malygos AI is reserved for 14th, 15th and 16th Id for the three targets
-                Trinity::RandomResizeList(selectedTargets, 3);
+                Trinity::Containers::RandomResizeList(selectedTargets, 3);
                 for (std::list<WorldObject*>::const_iterator itr = selectedTargets.begin(); itr != selectedTargets.end(); ++itr)
                 {
                     Creature* target = (*itr)->ToCreature();
@@ -2531,7 +2548,7 @@ class achievement_denyin_the_scion : public AchievementCriteriaScript
         {
             // Only melee disks can be used
             if (Unit* disk = source->GetVehicleBase())
-                if (disk->GetEntry() == NPC_HOVER_DISK_MELEE || disk->GetEntry() == NPC_HOVER_DISK_CASTER)
+                if (disk->GetEntry() == NPC_HOVER_DISK_MELEE)
                     return true;
 
             return false;

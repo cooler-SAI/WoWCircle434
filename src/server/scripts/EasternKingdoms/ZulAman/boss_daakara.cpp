@@ -41,7 +41,7 @@ enum Spells
     SPELL_SWEEPING_WINDS            = 97647,
     SPELL_FEATHER_VORTEX_VISUAL     = 97835,
     SPELL_FEATHER_VORTEX_PASSIVE    = 43120,
-    SPELL_LIGHTNING_TOTEM           = 93930,
+    SPELL_LIGHTNING_TOTEM           = 97930,
 
     //SPELL_SPIRIT_AURA               = 42466,
     //SPELL_SIPHON_SOUL               = 43501,
@@ -260,7 +260,8 @@ class boss_daakara : public CreatureScript
                     events.CancelEvent(EVENT_OVERPOWER);
                     events.CancelEvent(EVENT_LYNX_RUSH);
                     events.CancelEvent(EVENT_CLAW_RAGE);
-                    EnterPhase(urand(2, 3));                    
+                    //EnterPhase(urand(2, 3));
+                    EnterPhase(2);
                     return;
                 }
 
@@ -392,7 +393,7 @@ class npc_daakara_vortex : public CreatureScript
             {
             }
             
-            void SetGUID(uint64 guid, uint32 data)
+            void SetGUID(uint64 guid, int32 data)
             {
                 victimGUID = guid;
             }

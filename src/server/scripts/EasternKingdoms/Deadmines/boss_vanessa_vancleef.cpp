@@ -328,7 +328,7 @@ class npc_vanessa_vancleef_vanessa_sitting : public CreatureScript
                         case EVENT_INTRO_7:
                             if (pInstance)
                                 pInstance->SetData(DATA_VANESSA_EVENT, DONE);
-                            if (Creature* pVanessa = me->FindNearestCreature(NPC_VANESSA, 40.0f))
+                            if (Creature* pVanessa = me->FindNearestCreature(NPC_VANESSA_VANCLEEF, 40.0f))
                                 pVanessa->SetVisible(true);
                             
                             pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_EVENT);
@@ -379,15 +379,6 @@ class npc_vanessa_vancleef_defias_enforcer : public CreatureScript
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
-                
-                if (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        default:
-                            break;
-                    }
-                }
 
                 DoMeleeAttackIfReady();
             }

@@ -4,12 +4,12 @@
 
 enum ScriptTexts
 {
-    SAY_DEATH       = 0,
-    SAY_TRANSFORM   = 1,
-    SAY_BLOODVENOM  = 3, // ?
-    SAY_X           = 2, // ?
-    SAY_KILL        = 4,
-    SAY_AGGRO       = 5,
+    SAY_AGGRO               = 0,
+    SAY_TRANSFORM           = 1,
+    SAY_BLOODVENOM          = 3, 
+    SAY_WHISPER_OF_HETHISS  = 2, 
+    SAY_KILL                = 4,
+    SAY_DEATH               = 5,
 };
 
 enum Spells
@@ -195,6 +195,7 @@ class boss_venoxis : public CreatureScript
                             events.ScheduleEvent(EVENT_TOXIC_LINK, urand(15000, 19000));
                             break;
                         case EVENT_WHISPER_OF_HETHISS:
+                            Talk(SAY_WHISPER_OF_HETHISS);
                             //if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                                 //DoCast(pTarget, SPELL_WHISPER_OF_HETHISS);
                             events.ScheduleEvent(EVENT_WHISPER_OF_HETHISS, 10000);

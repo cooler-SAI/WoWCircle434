@@ -5,7 +5,8 @@ DoorData const doorData[] =
 {
     {GO_COURTYARD_DOOR, DATA_ASHBURY,   DOOR_TYPE_PASSAGE,  BOUNDARY_NONE},
     {GO_SORCERER_DOOR,  DATA_VALDEN,    DOOR_TYPE_PASSAGE,  BOUNDARY_NONE},
-    {GO_ARUGAL_DOOR,    DATA_VALDEN,    DOOR_TYPE_PASSAGE,  BOUNDARY_NONE},      
+    {GO_ARUGAL_DOOR,    DATA_VALDEN,    DOOR_TYPE_PASSAGE,  BOUNDARY_NONE},
+    {GO_ARUGAL_DOOR,    DATA_GODFREY,   DOOR_TYPE_ROOM,     BOUNDARY_NONE},
 };
 
 class instance_shadowfang_keep : public InstanceMapScript
@@ -40,6 +41,14 @@ class instance_shadowfang_keep : public InstanceMapScript
 
             void OnCreatureCreate(Creature* pCreature)
             {
+                if (!teamInInstance)
+                {
+                    Map::PlayerList const &players = instance->GetPlayers();
+                    if (!players.isEmpty())
+                        if (Player* player = players.begin()->getSource())
+                            teamInInstance = player->GetTeam();
+                }
+
                 switch(pCreature->GetEntry())
                 {
                     case NPC_BELMONT:
@@ -53,6 +62,10 @@ class instance_shadowfang_keep : public InstanceMapScript
                     case NPC_GUARD_HORDE2:
                         if (teamInInstance == ALLIANCE)
                             pCreature->UpdateEntry(NPC_GUARD_ALLY, ALLIANCE);
+                        break;
+                    case NPC_CROMUSH:
+                        if (teamInInstance == ALLIANCE)
+                            pCreature->SetPhaseMask(2, true);
                         break;
                     case NPC_ASHBURY:
                         uiAshburyGUID = pCreature->GetGUID();

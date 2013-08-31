@@ -1,14 +1,11 @@
 #include"ScriptPCH.h"
 #include"shadowfang_keep.h"
 
-
-#define SAY_AGGRO "Leave this accursed place at once!"
-#define SAY_DEATH "This death is only a temporary respite from my curse."
-#define SAY_KILL1 "I hope your spirit finds solace."
-#define SAY_KILL2 "May your soul rest in peace."
-
 enum ScriptTexts
 {
+    SAY_AGGRO = 0,
+    SAY_DEATH = 1,
+    SAY_KILL  = 2,
 };
 
 enum Events
@@ -77,7 +74,7 @@ class boss_baron_silverlaine : public CreatureScript
 
             void EnterCombat(Unit* pWho)
             {
-                me->MonsterYell(SAY_AGGRO, 0, 0);
+                Talk(SAY_AGGRO);
                 events.ScheduleEvent(EVENT_VEIL_OF_SHADOW, 12000);
                 DoZoneInCombat();
                 instance->SetBossState(DATA_SILVERLAINE, IN_PROGRESS);
@@ -85,13 +82,13 @@ class boss_baron_silverlaine : public CreatureScript
 
             void KilledUnit(Unit* who)
             {
-                me->MonsterYell(urand(0, 1)? SAY_KILL1: SAY_KILL2, 0, 0);
+                Talk(SAY_KILL);
             }
 
             void JustDied(Unit* pWho)
             {
                 _JustDied();
-                me->MonsterYell(SAY_DEATH, 0, 0);
+                Talk(SAY_DEATH);
             }
                                  
             void UpdateAI(const uint32 uiDiff)

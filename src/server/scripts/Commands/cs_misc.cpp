@@ -877,6 +877,7 @@ public:
         // save if the player has last been saved over 20 seconds ago
         uint32 saveInterval = sWorld->getIntConfig(CONFIG_INTERVAL_SAVE);
         if (saveInterval == 0 || (saveInterval > 20 * IN_MILLISECONDS && player->GetSaveTimer() <= saveInterval - 20 * IN_MILLISECONDS))
+            player->SaveToDB();
             handler->SendSysMessage(LANG_PLAYER_SAVED);
 
         return true;
@@ -1785,7 +1786,7 @@ public:
             return false;
 
         char const* muteReason = strtok(NULL, "\r");
-        std::string muteReasonStr = "No reason";
+        std::string muteReasonStr = "не указана.";
         if (muteReason != NULL)
             muteReasonStr = muteReason;
 
@@ -1833,13 +1834,13 @@ public:
 
         std::string announce;
 
-        announce = "The character '";
+        announce = "Чат персонажа '";
         announce += nameStr;
-        announce += "' was muted for ";
+        announce +=  "' был заблокирован на ";
         announce += delayStr;
-        announce += " minutes by the character '";
+        announce += " минут(у) модератором '";
         announce += handler->GetSession()? handler->GetSession()->GetPlayerName(): "";
-        announce += "'. The reason is: ";
+        announce += "'. Причина: ";
         announce += muteReasonStr;
         
         char buff[2048];
