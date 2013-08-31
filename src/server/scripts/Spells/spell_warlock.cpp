@@ -725,6 +725,15 @@ public:
     class spell_warl_soul_stone_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_warl_soul_stone_SpellScript);
+
+        SpellCastResult CheckCast()
+        {
+            if (GetCaster())
+                if (InstanceScript* pInstance = GetCaster()->GetInstanceScript())
+                    return (pInstance->CanUseResurrection() ? SPELL_CAST_OK : SPELL_FAILED_IN_COMBAT_RES_LIMIT_REACHED);
+            return SPELL_CAST_OK;
+        }
+
         void HandleSoulStone()
         {
             Unit* target = GetHitUnit();
@@ -733,6 +742,9 @@ public:
 
             if (target->isDead())
             {
+                if (InstanceScript* pInstance = target->GetInstanceScript())
+                    pInstance->UpdateResurrectionsCount();
+
                 PreventHitAura();
                 target->ToPlayer()->SetUInt32Value(PLAYER_SELF_RES_SPELL, 3026);
             }
@@ -740,6 +752,7 @@ public:
 
         void Register()
         {
+            OnCheckCast += SpellCheckCastFn(spell_warl_soul_stone_SpellScript::CheckCast);
             AfterHit += SpellHitFn(spell_warl_soul_stone_SpellScript::HandleSoulStone);
         }
     };

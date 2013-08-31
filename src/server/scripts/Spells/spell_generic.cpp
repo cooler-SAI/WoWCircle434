@@ -2637,6 +2637,63 @@ public:
     }
 };
 
+class spell_gen_touch_the_nightmare : public SpellScriptLoader
+{
+public:
+    spell_gen_touch_the_nightmare() : SpellScriptLoader("spell_gen_touch_the_nightmare") { }
+
+    class spell_gen_touch_the_nightmare_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_touch_the_nightmare_SpellScript);
+
+        void HandleDamageCalc(SpellEffIndex /*effIndex*/)
+        {
+            uint32 bp = GetCaster()->GetMaxHealth() * 0.3f;
+            SetHitDamage(bp);
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_gen_touch_the_nightmare_SpellScript::HandleDamageCalc, EFFECT_2, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_gen_touch_the_nightmare_SpellScript();
+    }
+};
+
+class spell_gen_dream_funnel: public SpellScriptLoader
+{
+public:
+    spell_gen_dream_funnel() : SpellScriptLoader("spell_gen_dream_funnel") { }
+
+    class spell_gen_dream_funnel_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_dream_funnel_AuraScript);
+
+        void HandleEffectCalcAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
+        {
+            if (GetCaster())
+                amount = GetCaster()->GetMaxHealth() * 0.05f;
+
+            canBeRecalculated = false;
+        }
+
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_dream_funnel_AuraScript::HandleEffectCalcAmount, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_dream_funnel_AuraScript::HandleEffectCalcAmount, EFFECT_2, SPELL_AURA_PERIODIC_DAMAGE);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_gen_dream_funnel_AuraScript();
+    }
+};
+
 enum GenericLifebloom
 {
     SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL        = 43422,
@@ -3188,6 +3245,61 @@ class spell_gen_throw_torch : public SpellScriptLoader
         }
 };
 
+enum ICSeaforiumSpells
+{
+    SPELL_BOMB_CREDIT_1 = 68366,
+    SPELL_BOMB_CREDIT_2 = 68367, // huge
+};
+
+class spell_gen_ic_seaforium_blast : public SpellScriptLoader
+{
+    public:
+        spell_gen_ic_seaforium_blast() : SpellScriptLoader("spell_gen_ic_seaforium_blast") {}
+
+        class spell_gen_ic_seaforium_blast_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_gen_ic_seaforium_blast_SpellScript);
+
+            bool Validate(SpellInfo const* /*spell*/)
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_BOMB_CREDIT_1))
+                    return false;
+                if (!sSpellMgr->GetSpellInfo(SPELL_BOMB_CREDIT_2))
+                    return false;
+                return true;
+            }
+
+            bool Load()
+            {
+                return GetOriginalCaster()->GetTypeId() == TYPEID_PLAYER;
+            }
+
+            void AchievementCredit(SpellEffIndex /*effIndex*/)
+            {
+                if (Unit* originalCaster = GetOriginalCaster())
+                    if (GameObject* go = GetHitGObj())
+                        if (go->GetGOInfo()->type == GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING)
+                        {
+                            if (m_scriptSpellId == 66676 || m_scriptSpellId == 67814)
+                                originalCaster->CastSpell(originalCaster, SPELL_BOMB_CREDIT_1, true);
+                            else if (m_scriptSpellId == 66672 || m_scriptSpellId ==  67813)
+                                originalCaster->CastSpell(originalCaster, SPELL_BOMB_CREDIT_2, true);
+                        }
+
+            }
+
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_gen_ic_seaforium_blast_SpellScript::AchievementCredit, EFFECT_1, SPELL_EFFECT_GAMEOBJECT_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_gen_ic_seaforium_blast_SpellScript();
+        }
+};
+
 class spell_crossfaction_bg_restore_faction : public SpellScriptLoader
 {
 public:
@@ -3339,6 +3451,8 @@ void AddSC_generic_spell_scripts()
     new spell_gen_count_pct_from_max_hp("spell_gen_default_count_pct_from_max_hp");
     new spell_gen_count_pct_from_max_hp("spell_gen_50pct_count_pct_from_max_hp", 50);
     new spell_gen_despawn_self();
+    new spell_gen_touch_the_nightmare();
+    new spell_gen_dream_funnel();
     new spell_gen_lifebloom("spell_hexlord_lifebloom", SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_tur_ragepaw_lifebloom", SPELL_TUR_RAGEPAW_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_cenarion_scout_lifebloom", SPELL_CENARION_SCOUT_LIFEBLOOM_FINAL_HEAL);
@@ -3353,6 +3467,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_torch_target_picker();
     new spell_gen_juggle_torch_catch();
     new spell_gen_throw_torch();
+    new spell_gen_ic_seaforium_blast();
     new spell_crossfaction_bg_restore_faction();
     new spell_crossfaction_bg_set_faction_h();
     new spell_crossfaction_bg_set_faction_a();

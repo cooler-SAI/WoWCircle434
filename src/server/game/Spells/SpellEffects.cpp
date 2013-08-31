@@ -1301,10 +1301,10 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
 
                             // Don't summon self
                             if (!pPlayer || pPlayer->GetGUID() == m_caster->GetGUID())
-                                return;
+                                continue;
 
                             if (!pPlayer->isAlive() || !pPlayer->IsInWorld())
-                                return;
+                                continue;
 
                             float x, y, z;
                             m_caster->GetPosition(x, y, z);
@@ -2555,6 +2555,11 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
             case 33778:
             {
                 addhealth = m_caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL, m_spellValue->EffectBasePoints[1]);
+                break;
+            }
+            // Word of Glory
+            case 85673:
+            {
                 break;
             }
             default:
@@ -6665,6 +6670,10 @@ void Spell::EffectResurrect(SpellEffIndex effIndex)
 
     if (target->IsRessurectRequested())       // already have one active request
         return;
+
+    if (m_spellInfo->HasAttribute(SPELL_ATTR8_BATTLE_RESURRECTION))
+        if (InstanceScript* pInstance = target->GetInstanceScript())
+            pInstance->UpdateResurrectionsCount();
 
     uint32 health = target->CountPctFromMaxHealth(damage);
     uint32 mana   = CalculatePct(target->GetMaxPower(POWER_MANA), damage);

@@ -58,6 +58,11 @@ enum WorldStatesET
     WORLDSTATE_FRAGMENTS_COLLECTED  = 6025,
 };
 
+enum QuestIds
+{
+    QUEST_MUROZOND  = 30096,
+};
+
 enum QuestSpells
 {
     SPELL_ARCHIVED_JAINA    = 109284,

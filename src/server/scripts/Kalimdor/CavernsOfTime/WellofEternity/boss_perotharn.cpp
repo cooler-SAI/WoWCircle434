@@ -200,19 +200,9 @@ class boss_perotharn : public CreatureScript
                 if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_1, 100.0f))
                     pIllidan->AI()->DoAction(1); // ACTION_PEROTHARN_DEAD
 
-                // Temporary quest
-                Map::PlayerList const &PlayerList = instance->instance->GetPlayers();
-                if (!PlayerList.isEmpty())
-                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                        if (Player* pPlayer = i->getSource())
-                            if (me->GetDistance(pPlayer) <= 50.0f && pPlayer->GetQuestStatus(QUEST_IN_UNENDING_NUMBERS) == QUEST_STATUS_INCOMPLETE)
-                            {
-                                pPlayer->KilledMonsterCredit(58239, 0);
-                                pPlayer->KilledMonsterCredit(58240, 0);
-                                pPlayer->KilledMonsterCredit(58241, 0);
-                            }
-
-                                    
+                instance->DoKilledMonsterKredit(QUEST_IN_UNENDING_NUMBERS, 58239, 0);
+                instance->DoKilledMonsterKredit(QUEST_IN_UNENDING_NUMBERS, 58240, 0);
+                instance->DoKilledMonsterKredit(QUEST_IN_UNENDING_NUMBERS, 58241, 0);                               
             }
             
             void KilledUnit(Unit* who)

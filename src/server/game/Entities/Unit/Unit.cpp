@@ -2979,6 +2979,21 @@ void Unit::InterruptNonMeleeSpells(bool withDelayed, uint32 spell_id, bool withI
         InterruptSpell(CURRENT_CHANNELED_SPELL, true, true);
 }
 
+void Unit::InterruptNonMeleeSpellsExcept(bool withDelayed, uint32 except, bool withInstant)
+{
+    // generic spells are interrupted if they are not finished or delayed
+    if (m_currentSpells[CURRENT_GENERIC_SPELL] && m_currentSpells[CURRENT_GENERIC_SPELL]->m_spellInfo->Id != except)
+        InterruptSpell(CURRENT_GENERIC_SPELL, withDelayed, withInstant);
+
+    // autorepeat spells are interrupted if they are not finished or delayed
+    if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL] && m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id != except)
+        InterruptSpell(CURRENT_AUTOREPEAT_SPELL, withDelayed, withInstant);
+
+    // channeled spells are interrupted if they are not finished, even if they are delayed
+    if (m_currentSpells[CURRENT_CHANNELED_SPELL] && m_currentSpells[CURRENT_CHANNELED_SPELL]->m_spellInfo->Id != except)
+        InterruptSpell(CURRENT_CHANNELED_SPELL, true, true);
+}
+
 Spell* Unit::FindCurrentSpellBySpellId(uint32 spell_id) const
 {
     for (uint32 i = 0; i < CURRENT_MAX_SPELL; i++)
@@ -7327,6 +7342,17 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     triggered_spell_id = 32747;
                     break;
                 }
+                // Glyph of Regrowth
+                case 54743:
+                {
+                    if (GetHealthPct() < 50.0f)
+                    {
+                        if (Aura * aur = victim->GetAura(procSpell->Id, GetGUID()))
+                            aur->RefreshDuration(false);
+                    }
+
+                    return true;
+                }
                 // Item - Druid T10 Balance 4P Bonus
                 case 70723:
                 {
@@ -7581,6 +7607,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         int32 bp0 = int32(CalculatePct(GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + crIds[i]), 25));
                         CastCustomSpell(this, spellIds[i], &bp0, 0, 0, true);
                     }
+                    // Item - Rogue T13 2P Bonus
+                    if (HasAura(105849))
+                        CastSpell(this, 105864, true);
 
                     if (!redirectTarget)
                         break;

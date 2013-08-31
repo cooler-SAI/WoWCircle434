@@ -1165,6 +1165,10 @@ void AchievementMgr<T>::UpdateAchievementCriteria(AchievementCriteriaTypes type,
             case ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS:
             case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA:
             case ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA: // This also behaves like ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA
+            case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE_GUILD:
+            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHAEOLOGY_PROJECTS:
+            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE_TYPE:
+            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE:
                 SetCriteriaProgress(achievementCriteria, 1, referencePlayer, PROGRESS_ACCUMULATE);
                 break;
             // std case: increment at miscValue1
@@ -1183,8 +1187,15 @@ void AchievementMgr<T>::UpdateAchievementCriteria(AchievementCriteriaTypes type,
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
             case ACHIEVEMENT_CRITERIA_TYPE_DAMAGE_DONE:
             case ACHIEVEMENT_CRITERIA_TYPE_HEALING_DONE:
+            case ACHIEVEMENT_CRITERIA_TYPE_CATCH_FROM_POOL:
+            case ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_BANK_SLOTS:
+            case ACHIEVEMENT_CRITERIA_TYPE_EARN_GUILD_ACHIEVEMENT_POINTS:
+            case ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_TABARD:
+            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_GUILD:
+            case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILLS_GUILD:
                 SetCriteriaProgress(achievementCriteria, miscValue1, referencePlayer, PROGRESS_ACCUMULATE);
                 break;
+            // std case: increment at miscValue2
             case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
             case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:
             case ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM:
@@ -1424,79 +1435,13 @@ void AchievementMgr<T>::UpdateAchievementCriteria(AchievementCriteriaTypes type,
 
                 SetCriteriaProgress(achievementCriteria, miscValue2, referencePlayer, PROGRESS_ACCUMULATE);
                 break;
-            }
-            case ACHIEVEMENT_CRITERIA_TYPE_CATCH_FROM_POOL:
-            {
-                if (!miscValue1)
-                    continue;
-
-                SetCriteriaProgress(achievementCriteria, miscValue1, referencePlayer, PROGRESS_ACCUMULATE);
-                break;
-            }
-            case ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_BANK_SLOTS:
-            {
-                if (!miscValue1)
-                    continue;
-
-                SetCriteriaProgress(achievementCriteria, miscValue1, referencePlayer, PROGRESS_HIGHEST);
-                break;
-            }
-            case ACHIEVEMENT_CRITERIA_TYPE_EARN_GUILD_ACHIEVEMENT_POINTS:
-            {
-                if (!miscValue1)
-                    continue;
-
-                SetCriteriaProgress(achievementCriteria, miscValue1, referencePlayer, PROGRESS_ACCUMULATE);
-                break;
-            }
-            case ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_TABARD:
-            {
-                if (!miscValue1)
-                    continue;
-
-                SetCriteriaProgress(achievementCriteria, miscValue1, referencePlayer);
-                break;
-            }
-            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_GUILD:
-            {
-                if (!miscValue1)
-                    continue;
-
-                SetCriteriaProgress(achievementCriteria, miscValue1, referencePlayer, PROGRESS_ACCUMULATE);
-                break;
-            }
-            case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILLS_GUILD:
-            {
-                if (!miscValue1)
-                    continue;
-
-                SetCriteriaProgress(achievementCriteria, miscValue1, referencePlayer, PROGRESS_ACCUMULATE);
-                break;
-            }
-            case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE_GUILD:
-            {
-                if (!miscValue1)
-                    continue;
-
-                SetCriteriaProgress(achievementCriteria, 1, referencePlayer, PROGRESS_ACCUMULATE);
-                break;
-            }
-            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHAEOLOGY_PROJECTS:
-            {
-                if (!miscValue1)
-                    continue;
-
-                SetCriteriaProgress(achievementCriteria, 1, referencePlayer, PROGRESS_ACCUMULATE);
-                break;
-            }
+            }                
             // FIXME: not triggered in code as result, need to implement
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_RAID:
             case ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA:
             case ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK:
             case ACHIEVEMENT_CRITERIA_TYPE_EARNED_PVP_TITLE:
             case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE:
-            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE_TYPE:
-            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE:
                 break;                                   // Not implemented yet :(
         }
 
@@ -1662,7 +1607,11 @@ bool AchievementMgr<T>::IsCompletedCriteria(AchievementCriteriaEntry const* achi
             return progress->counter >= achievementCriteria->honorable_kills_guild.killCount;
         case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE_GUILD:
             return progress->counter >= achievementCriteria->kill_creature_type_guild.count;
-         // handle all statistic-only criteria here
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE_TYPE:
+            return progress->counter >= achievementCriteria->guild_challenge_complete_type.count;
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE:
+            return progress->counter >= achievementCriteria->guild_challenge_complete.count;
+        // handle all statistic-only criteria here
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
         case ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP:
         case ACHIEVEMENT_CRITERIA_TYPE_DEATH:
@@ -2774,6 +2723,10 @@ bool AchievementMgr<T>::RequirementsSatisfied(AchievementCriteriaEntry const *ac
             break;
         case ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA:
             if (miscValue1 != achievementCriteria->win_arena.mapID)
+                return false;
+            break;
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE_TYPE:
+            if (miscValue1 != achievementCriteria->guild_challenge_complete_type.challenge_type)
                 return false;
             break;
         default:

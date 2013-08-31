@@ -5590,73 +5590,98 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
             case SPELL_EFFECT_DUMMY:
             {
-                // Death Coil
-                if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && m_spellInfo->SpellFamilyFlags[0] == 0x2000)
+                switch (m_spellInfo->Id)
                 {
-                    Unit* target = m_targets.GetUnitTarget();
-
-                    if (!target || (target->IsFriendlyTo(m_caster) && target->GetCreatureType() != CREATURE_TYPE_UNDEAD))
-                        return SPELL_FAILED_BAD_TARGETS;
-
-                    if (!target->IsFriendlyTo(m_caster))
+                    // Death Coil
+                    case 47541:
                     {
-                        if (!m_caster->HasInArc(static_cast<float>(M_PI), target))
-                            return SPELL_FAILED_UNIT_NOT_INFRONT;
-                        if (!m_caster->_IsValidAttackTarget(target, GetSpellInfo()))
+                        Unit* target = m_targets.GetUnitTarget();
+
+                        if (!target || (target->IsFriendlyTo(m_caster) && target->GetCreatureType() != CREATURE_TYPE_UNDEAD))
                             return SPELL_FAILED_BAD_TARGETS;
+
+                        if (!target->IsFriendlyTo(m_caster))
+                        {
+                            if (!m_caster->HasInArc(static_cast<float>(M_PI), target))
+                                return SPELL_FAILED_UNIT_NOT_INFRONT;
+                            if (!m_caster->_IsValidAttackTarget(target, GetSpellInfo()))
+                                return SPELL_FAILED_BAD_TARGETS;
+                        }
+                        break;
                     }
-                }
-                // Have Group, Will Travel
-                else if (m_spellInfo->Id == 83967)
-                {
-                    Map* pMap = m_caster->GetMap();
-                    if (!pMap || pMap->Instanceable())
-                        return SPELL_FAILED_SPELL_UNAVAILABLE;
-                }
-                // Awaken Peon
-                else if (m_spellInfo->Id == 19938)
-                {
-                    Unit* unit = m_targets.GetUnitTarget();
-                    if (!unit || !unit->HasAura(17743))
-                        return SPELL_FAILED_BAD_TARGETS;
-                }
-                // Righteous Defense
-                else if (m_spellInfo->Id == 31789)
-                {
-                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
-                        return SPELL_FAILED_DONT_REPORT;
-
-                    Unit* target = m_targets.GetUnitTarget();
-                    if (!target || !target->IsFriendlyTo(m_caster) || target->getAttackers().empty())
-                        return SPELL_FAILED_BAD_TARGETS;
-
-                }
-                // Kill Command
-                else if (m_spellInfo->Id == 34026)
-                {
-                    if (Unit* pet = m_caster->GetGuardianPet())
+                    // Have Group, Will Travel
+                    case 83967:
                     {
-                        Unit* target = pet->getVictim();
-                        if (!target)
-                            target = m_caster->getVictim();
-                        if (!target || !m_caster)
-                            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
-                        if (!pet->isInCombat())
-                            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
-                        if (!pet->IsWithinDistInMap(target, 5))
-                            return SPELL_FAILED_OUT_OF_RANGE;
+                        Map* pMap = m_caster->GetMap();
+                        if (!pMap)
+                            return SPELL_FAILED_SPELL_UNAVAILABLE;
+
+                        if (pMap->IsDungeon())
+                        {
+                            if (InstanceMap* iMap = pMap->ToInstanceMap())
+                                if (InstanceScript* pInstance = iMap->GetInstanceScript())
+                                    if (pInstance->IsEncounterInProgress())
+                                        return SPELL_FAILED_SPELL_UNAVAILABLE;
+
+                            if (!m_caster->FindNearestCreature(SUMMON_ENABLER_STALKER, 10.0f))
+                                return SPELL_FAILED_SPELL_UNAVAILABLE;
+                        }
+                        else if (pMap->IsBattlegroundOrArena())
+                            return SPELL_FAILED_SPELL_UNAVAILABLE;
+
+                        break;
                     }
-                    else
-                        return SPELL_FAILED_NO_PET;
-                    break;
-                }
-                // Skull Bash
-                else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DRUID && m_spellInfo->SpellFamilyFlags[2] & 0x10000000 && m_caster->HasUnitState(UNIT_STATE_ROOT) && !m_caster->IsWithinDistInMap(m_targets.GetUnitTarget(), 5))
-                    return SPELL_FAILED_ROOTED;
-                else if (m_spellInfo->Id == 68996) // Two Forms (Racial)
-                {
-                    if (m_caster->isInCombat())
-                        return SPELL_FAILED_AFFECTING_COMBAT;
+                    // Awaken Peon
+                    case 9938:
+                    {
+                        Unit* unit = m_targets.GetUnitTarget();
+                        if (!unit || !unit->HasAura(17743))
+                            return SPELL_FAILED_BAD_TARGETS;
+                        break;
+                    }
+                    // Righteous Defense
+                    case 31789:
+                    {
+                        if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                            return SPELL_FAILED_DONT_REPORT;
+
+                        Unit* target = m_targets.GetUnitTarget();
+                        if (!target || !target->IsFriendlyTo(m_caster) || target->getAttackers().empty())
+                            return SPELL_FAILED_BAD_TARGETS;
+                        break;
+                    }
+                    // Kill Command
+                    case 34026:
+                    {
+                        if (Unit* pet = m_caster->GetGuardianPet())
+                        {
+                            Unit* target = pet->getVictim();
+                            if (!target)
+                                target = m_caster->getVictim();
+                            if (!target || !m_caster)
+                                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+                            if (!pet->isInCombat())
+                                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+                            if (!pet->IsWithinMeleeRange(target))
+                                return SPELL_FAILED_OUT_OF_RANGE;
+                        }
+                        else
+                            return SPELL_FAILED_NO_PET;
+                        break;
+                    }
+                    // Skull Bash
+                    case 80964:
+                    case 80965:
+                        if (m_caster->HasUnitState(UNIT_STATE_ROOT) && !m_caster->IsWithinMeleeRange(m_targets.GetUnitTarget(), 5))
+                            return SPELL_FAILED_ROOTED;
+                        break;
+                    // Two Forms (Racial)
+                    case 68996: 
+                        if (m_caster->isInCombat())
+                            return SPELL_FAILED_AFFECTING_COMBAT;
+                        break;
+                    default:
+                        break;
                 }
                 break;
             }
@@ -5997,8 +6022,15 @@ SpellCastResult Spell::CheckCast(bool strict)
                             return SPELL_FAILED_NOT_IN_BATTLEGROUND;
                 break;
             case SPELL_EFFECT_RESURRECT:
-                if (m_spellInfo->HasAttribute(SPELL_ATTR8_BATTLE_RESURRECTION) && m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->HasAura(97821))
-                    return SPELL_FAILED_TARGET_CANNOT_BE_RESURRECTED;
+                if (m_spellInfo->HasAttribute(SPELL_ATTR8_BATTLE_RESURRECTION))
+                {
+                    if (InstanceScript* pInstance = m_caster->GetInstanceScript())
+                        if (!pInstance->CanUseResurrection())
+                            return SPELL_FAILED_IN_COMBAT_RES_LIMIT_REACHED;
+
+                    if (m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->HasAura(97821))
+                        return SPELL_FAILED_TARGET_CANNOT_BE_RESURRECTED;
+                }
                 break;
             default:
                 break;

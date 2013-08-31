@@ -9547,6 +9547,16 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             if (bg && bg->GetTypeID(true) == BATTLEGROUND_BFG)
                 bg->FillInitialWorldStates(data);
             break;
+        // Halls of Reflection
+        case 4820:
+            if (instance && mapid == 668)
+                instance->FillInitialWorldStates(data);
+            else
+            {
+                data << uint32(4884) << uint32(0);              // 9 WORLD_STATE_HOR_WAVES_ENABLED
+                data << uint32(4882) << uint32(0);              // 10 WORLD_STATE_HOR_WAVE_COUNT
+            }
+            break;
         // Wintergrasp
         case 4197:
             if (bf && bf->GetTypeId() == BATTLEFIELD_WG)
@@ -23983,7 +23993,8 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
 
         if (!canLoot && GetMap()->IsRaidOrHeroicDungeon() && 
             proto && proto->GetMaxStackSize() == 1 && 
-            proto->Class != ITEM_CLASS_QUEST && proto->Class != ITEM_CLASS_MISCELLANEOUS)
+            proto->Class != ITEM_CLASS_QUEST && proto->Class != ITEM_CLASS_MISCELLANEOUS &&
+            !(proto->Class == ITEM_CLASS_CONSUMABLE && proto->SubClass == ITEM_SUBCLASS_CONSUMABLE))
         {
             SendEquipError(EQUIP_ERR_NOT_EQUIPPABLE, NULL, NULL, item->itemid);
             return;

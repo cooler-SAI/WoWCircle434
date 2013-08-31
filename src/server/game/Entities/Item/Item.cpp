@@ -1188,7 +1188,7 @@ bool Item::CanBeTransmogrified() const
     if (proto->Flags2 & ITEM_FLAGS_EXTRA_CANNOT_BE_TRANSMOG)
         return false;
 
-    if (!HasStats() && !HasSpells())
+    if (!HasStats() && !HasSpells() && (proto->Quality < ITEM_QUALITY_RARE))
         return false;
 
     return true;

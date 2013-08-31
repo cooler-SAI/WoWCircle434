@@ -1979,18 +1979,13 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // Rapture
                         if (AuraEffect* auraEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PRIEST, 2894, 0))
                         {
-                            // check cooldown
+                            // check cooldown (need to use spell 63853 instead of cooldown)
                             if (caster->GetTypeId() == TYPEID_PLAYER)
                             {
                                 if (caster->ToPlayer()->HasSpellCooldown(auraEff->GetId()))
-                                {
-                                    // This additional check is needed to add a minimal delay before cooldown in in effect
-                                    // to allow all bubbles broken by a single damage source proc mana return
-                                    if (caster->ToPlayer()->GetSpellCooldownDelay(auraEff->GetId()) <= 11)
-                                        break;
-                                }
-                                else    // and add if needed
-                                    caster->ToPlayer()->AddSpellCooldown(auraEff->GetId(), 0, uint32(time(NULL) + 12));
+                                    break;
+                                
+                                caster->ToPlayer()->AddSpellCooldown(auraEff->GetId(), 0, uint32(time(NULL) + 12));
                             }
 
                             float multiplier = float(auraEff->GetAmount());

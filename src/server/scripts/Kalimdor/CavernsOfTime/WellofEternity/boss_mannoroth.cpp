@@ -476,6 +476,7 @@ class boss_mannoroth : public CreatureScript
                                     }
                         }
                     }
+                    instance->DoKilledMonsterKredit(QUEST_THE_PATH_TO_THE_DRAGON_SOUL, 54969, 0);
                     instance->UpdateEncounterState(ENCOUNTER_CREDIT_CAST_SPELL, SPELL_COMPLETE_ENCOUNTER, me); 
                     instance->SetBossState(DATA_MANNOROTH, DONE);
                     instance->DoModifyPlayerCurrencies(395, 7000);

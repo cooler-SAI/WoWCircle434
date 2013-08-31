@@ -223,6 +223,8 @@ class boss_murozond : public CreatureScript
                 
                     if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, instance->GetData64(DATA_HOURGLASS)))
                         pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND);
+
+                    instance->DoKilledMonsterKredit(QUEST_MUROZOND, 54432, 0);
                 }
             }
 
