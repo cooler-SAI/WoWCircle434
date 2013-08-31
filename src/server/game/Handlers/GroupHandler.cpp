@@ -63,11 +63,11 @@ void WorldSession::SendPartyResult(PartyOperation operation, const std::string& 
 
 void WorldSession::HandleGroupInviteOpcode(WorldPacket & recvData)
 {
-    time_t now = time(NULL);
-    if (now - timeLastGroupInviteCommand < 5)
-        return;
-    else
-       timeLastGroupInviteCommand = now;
+    //time_t now = time(NULL);
+    //if (now - timeLastGroupInviteCommand < 5)
+    //    return;
+    //else
+    //   timeLastGroupInviteCommand = now;
 
     ObjectGuid crossRealmGuid; // unused
 
@@ -402,6 +402,21 @@ void WorldSession::HandleGroupInviteResponseOpcode(WorldPacket& recvData)
     }
 }
 
+void WorldSession::HandleGroupClearMarker(WorldPacket& recv_data)
+{
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_CLEAR_RAID_MARKER");
+
+    uint8 marker;
+    recv_data >> marker;
+
+    if (Group* group = GetPlayer()->GetGroup())
+    {
+        group->RemoveGroupMarkerMask(1 << marker);
+        group->SendRaidMarkerUpdate();
+        group->RemoveMarker();
+    }
+}
+
 void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
 {
     uint64 guid;
@@ -720,7 +735,7 @@ void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recvData)
         group->SendTargetIconList(this);
     else                                                    // target icon update
     {
-        if (!group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
+        if (group->isRaidGroup() && !group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
             return;
 
         uint64 guid;

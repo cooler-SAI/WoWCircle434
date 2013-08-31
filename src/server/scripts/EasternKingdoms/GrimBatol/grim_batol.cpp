@@ -1976,6 +1976,34 @@ class spell_twilight_thundercaller_electric_blast: public SpellScriptLoader
         }
 };
 
+class npc_battered_red_drake : public CreatureScript
+{
+public:
+    npc_battered_red_drake() : CreatureScript("npc_battered_red_drake") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_battered_red_drakeAI(creature);
+    }
+
+    struct npc_battered_red_drakeAI : public CreatureAI
+    {
+        npc_battered_red_drakeAI(Creature* creature) : CreatureAI(creature) { }
+
+        void OnSpellClick(Unit* clicker)
+        {
+            if (InstanceScript* instance = me->GetInstanceScript())
+                if (instance->GetData(DATA_FORGEMASTER_THRONGUS) != DONE)
+                    return;
+
+            if (me->GetEntry() == 42571)
+                clicker->NearTeleportTo(-549.354f, -582.390f, 276.597f, 2.73476f, false);
+        }
+
+        void UpdateAI(uint32 const diff) { }
+    };
+};
+
 void AddSC_grim_batol()
 {
     new npc_ascended_flameseeker();
@@ -2009,4 +2037,5 @@ void AddSC_grim_batol()
     new spell_twilight_enforcer_meat_grinder();
     new spell_twilight_shadow_weaver_shadow_weave();
     new spell_twilight_thundercaller_electric_blast();
+    new npc_battered_red_drake();
 }

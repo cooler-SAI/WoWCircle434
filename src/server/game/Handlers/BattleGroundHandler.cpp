@@ -35,6 +35,7 @@
 #include "Opcodes.h"
 #include "DisableMgr.h"
 #include "Group.h"
+#include "RatedBattleground.h"
 
 void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recvData)
 {
@@ -418,30 +419,54 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
         return;
 
     BattlegroundQueueTypeId bgQueueTypeId = _player->GetBattlegroundQueueTypeId(queueSlot);
-    if (bgQueueTypeId == BATTLEGROUND_QUEUE_NONE)
+	
+    if (bgQueueTypeId == BATTLEGROUND_QUEUE_NONE || bgQueueTypeId >= MAX_BATTLEGROUND_QUEUE_TYPES)
         return;
 
-    BattlegroundTypeId bgTypeId = BattlegroundMgr::BGTemplateId(bgQueueTypeId);
     BattlegroundQueue& bgQueue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
+    BattlegroundTypeId bgTypeId = BattlegroundMgr::BGTemplateId(bgQueueTypeId);
+
+    if (bgTypeId == BATTLEGROUND_TYPE_NONE || bgTypeId >= MAX_BATTLEGROUND_TYPE_ID)
+    {
+        sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattlegroundHandler: invalid bgTypeId (%u) received.", bgTypeId);
+        return;
+    }
 
     //we must use temporary variable, because GroupQueueInfo pointer can be deleted in BattlegroundQueue::RemovePlayer() function
     GroupQueueInfo ginfo;
-    if (!bgQueue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
+    if (bgQueueTypeId != BATTLEGROUND_QUEUE_RBG)
+    {
+        if (!bgQueue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
         return;
+
+    }
+    else
+        sRBGQueue->GetQueueInfoByPlayer(_player->GetGUID(), &ginfo);
 
     // if action == 1, then instanceId is required
     if (!ginfo.IsInvitedToBGInstanceGUID && action == 1)
         return;
 
-
-    Battleground* bg = sBattlegroundMgr->GetBattleground(ginfo.IsInvitedToBGInstanceGUID, bgTypeId);
-
-    // bg template might and must be used in case of leaving queue, when instance is not created yet
-    if (!bg && action == 0)
+	
+    // BGTemplateId returns BATTLEGROUND_AA when it is arena queue.
+    // Do instance id search as there is no AA bg instances.
+    Battleground* bg = sBattlegroundMgr->GetBattleground(ginfo.IsInvitedToBGInstanceGUID, bgTypeId == BATTLEGROUND_AA || bgTypeId == BATTLEGROUND_RATED_10_VS_10 ? BATTLEGROUND_TYPE_NONE : bgTypeId);
+    if (!bg)
+    {
+        if (action)
+        {
+            sLog->outDebug(LOG_FILTER_BATTLEGROUND, "CMSG_BATTLEFIELD_PORT %s Slot: %u, Unk: %u, Time: %u, Action: %u. Cant find BG with id %u!",
+                queueSlot, unk, time, action, ginfo.IsInvitedToBGInstanceGUID);
+            return;
+        }
+        // if (!bg && action == 0)
         bg = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId);
     
-    if (!bg)
-        return;
+        if (!bg)
+            return;
+
+    // get real bg type
+    bgTypeId = bg->GetTypeID();
 
     // expected bracket entry
     PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bg->GetMapId(), _player->getLevel());
@@ -470,9 +495,9 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
     }
 
     WorldPacket data;
-    switch (action)
+    if (action)
     {
-        case 1:                                         // port to battleground
+            // port to battleground
             if (!_player->IsInvitedForBattlegroundQueueType(bgQueueTypeId))
                 return;                                 // cheating?
 
@@ -494,8 +519,10 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
 
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, _player, queueSlot, STATUS_IN_PROGRESS, _player->GetBattlegroundQueueJoinTime(bgTypeId), bg->GetElapsedTime(), bg->GetArenaType());
             _player->GetSession()->SendPacket(&data);
+
             // remove battleground queue status from BGmgr
-            bgQueue.RemovePlayer(_player->GetGUID(), false);
+
+            bg->GetTypeID() == BATTLEGROUND_RATED_10_VS_10 ? sRBGQueue->RemovePlayer(_player->GetGUID()) : bgQueue.RemovePlayer(_player->GetGUID(), false);
             // this is still needed here if battleground "jumping" shouldn't add deserter debuff
             // also this is required to prevent stuck at old battleground after SetBattlegroundId set to new
             if (Battleground* currentBg = _player->GetBattleground())
@@ -509,11 +536,9 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
             sBattlegroundMgr->SendToBattleground(_player, ginfo.IsInvitedToBGInstanceGUID, bgTypeId);
             // add only in HandleMoveWorldPortAck()
             // bg->AddPlayer(_player, team);
-            break;
-        case 0:                                         // leave queue
-            if (bg->isArena() && bg->GetStatus() > STATUS_WAIT_QUEUE)
-                return;
-
+    }
+    else // leave queue
+    {
             // if player leaves rated arena match before match start, it is counted as he played but he lost
             if (ginfo.IsRated && ginfo.IsInvitedToBGInstanceGUID)
             {
@@ -524,18 +549,20 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
                     at->SaveToDB();
                 }
             }
-            _player->RemoveBattlegroundQueueId(bgQueueTypeId);  // must be called this way, because if you move this call to queue->removeplayer, it causes bugs
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, _player, queueSlot, STATUS_NONE, 0, 0, ARENA_TYPE_NONE);
+            SendPacket(&data);
+			
+            _player->RemoveBattlegroundQueueId(bgQueueTypeId);  // must be called this way, because if you move this call to queue->removeplayer, it causes bugs
+            bg->GetTypeID() == BATTLEGROUND_RATED_10_VS_10 ? sRBGQueue->RemovePlayer(_player->GetGUID()) : bgQueue.RemovePlayer(_player->GetGUID(), true);
 
-            bgQueue.RemovePlayer(_player->GetGUID(), true);
-            // player left queue, we should update it - do not update Arena Queue
+			// player left queue, we should update it - do not update Arena Queue
             if (!ginfo.ArenaType)
                 sBattlegroundMgr->ScheduleQueueUpdate(ginfo.ArenaMatchmakerRating, ginfo.ArenaType, bgQueueTypeId, bgTypeId, bracketEntry->GetBracketId());
-            SendPacket(&data);
-            break;
-        default:
-            sLog->outError(LOG_FILTER_NETWORKIO, "Battleground port: unknown action %u", action);
-            break;
+
+            // break;
+        // default:
+            // sLog->outError(LOG_FILTER_NETWORKIO, "Battleground port: unknown action %u", action);
+            // break;
     }
 }
 
@@ -683,6 +710,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket & recvData)
     if (!err)
     {
         bg->SetRated(true);
+        bg->SetArenaorBGType(true);
         ginfo = bgQueue.AddGroup(_player, grp, bgTypeId, bracketEntry, arenatype, true, false, arenaRating, matchmakerRating, ateamId);
         avgTime = bgQueue.GetAverageQueueWaitTime(ginfo, bracketEntry->GetBracketId());
     }
@@ -702,12 +730,75 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket & recvData)
 
         // add to queue
         uint32 queueSlot = member->AddBattlegroundQueueId(bgQueueTypeId);
+        member->AddBattlegroundQueueJoinTime(bgTypeId, ginfo->JoinTime);
         WorldPacket data; // send status packet (in queue)
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, member, queueSlot, STATUS_WAIT_QUEUE, avgTime, 0, arenatype);
         member->GetSession()->SendPacket(&data);
     }
 
     sBattlegroundMgr->ScheduleQueueUpdate(matchmakerRating, arenatype, bgQueueTypeId, bgTypeId, bracketEntry->GetBracketId());
+}
+
+void WorldSession::HandleBattlemasterJoinRated(WorldPacket& recvData)
+{
+    if (_player->InBattleground())
+        return;
+
+    Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(BATTLEGROUND_RATED_10_VS_10);
+    if (!bg)
+    {
+        sLog->outError(LOG_FILTER_NETWORKIO, "Battleground: template bg (all arenas) not found");
+        return;
+    }
+
+    BattlegroundTypeId bgTypeId = bg->GetTypeID();
+    BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(bgTypeId, 0);
+    PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bg->GetMapId(), _player->getLevel());
+    if (!bracketEntry)
+        return;
+
+    Group* grp = _player->GetGroup();
+
+    GroupJoinBattlegroundResult err = ERR_BATTLEGROUND_NONE;
+
+    err = grp->CanJoinBattlegroundQueue(bg, bgQueueTypeId, 0, bg->GetMaxPlayersPerTeam(), false, 0);
+
+    // no group found, error
+    if (!grp)
+        return;
+    if (grp->GetLeaderGUID() != _player->GetGUID())
+        return;
+
+    for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+    {
+        Player* member = itr->getSource();
+        if (!member)
+            continue;
+
+        // add to queue
+
+        WorldPacket data; // send status packet (in queue)
+
+        if (err)
+        {
+            sBattlegroundMgr->BuildStatusFailedPacket(&data, bg, _player, 0, err);
+            member->GetSession()->SendPacket(&data);
+            continue;
+        }
+        else
+        {
+            uint32 queueSlot = member->AddBattlegroundQueueId(bgQueueTypeId);
+
+            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, member, queueSlot, STATUS_WAIT_QUEUE, 1, 1, 0);
+            member->GetSession()->SendPacket(&data);
+        }
+    }
+
+    if (!err)
+    {
+        sRBGQueue->AddGroup(_player);
+        sRBGQueue->Update();
+    }
 }
 
 void WorldSession::HandleReportPvPAFK(WorldPacket & recvData)
@@ -727,31 +818,28 @@ void WorldSession::HandleRequestRatedBgInfo(WorldPacket & recvData)
     uint8 unk;
     recvData >> unk;
 
-/*
-data << uint32(BgWeeklyWins20vs20);
-data << uint32(BgWeeklyPlayed20vs20);
-data << uint32(BgWeeklyPlayed15vs15);
-data << uint32(unk);
-data << uint32(BgWeeklyWins10vs10);
-data << uint32(unk);
-data << uint32(unk);
-data << uint32(unk);
-data << uint32(BgWeeklyWins15vs15);
-data << uint32(unk);
-data << uint32(unk);
-data << uint32(unk);
-data << uint32(unk);
-data << uint32(unk);
-data << uint32(unk);
-data << uint32(BgWeeklyPlayed10vs10);
-data << uint32(unk);
-data << uint32(unk);
-*/
-
     /// @Todo: perfome research in this case
+    /// The unk fields are related to arenas
     WorldPacket data(SMSG_RATED_BG_STATS, 72);
-    for (int32 i = 0; i < 18; ++i)
-        data << uint32(0);
+    data << uint32(0);      // BgWeeklyWins20vs20
+    data << uint32(0);      // BgWeeklyPlayed20vs20
+    data << uint32(0);      // BgWeeklyPlayed15vs15
+    data << uint32(0);
+    data << uint32(_player->getRBG()->getWeekWins());      // BgWeeklyWins10vs10
+    data << uint32(0);
+    data << uint32(0);
+    data << uint32(0);
+    data << uint32(0);      // BgWeeklyWins15vs15
+    data << uint32(0);
+    data << uint32(0);
+    data << uint32(0);
+    data << uint32(0);
+    data << uint32(0);
+    data << uint32(0);
+    data << uint32(_player->getRBG()->getWeekGames());      // BgWeeklyPlayed10vs10 wins
+    data << uint32(0);
+    data << uint32(0);
+
     SendPacket(&data);
 }
 
@@ -775,13 +863,62 @@ void WorldSession::HandleRequestPvpReward(WorldPacket& recvData)
 void WorldSession::HandleRequestRatedBgStats(WorldPacket& recvData)
 {
     WorldPacket data(SMSG_BATTLEFIELD_RATED_INFO, 29);
-    data << uint32(0);  // Reward
+    data << uint32(RatedBattleground::ConquestPointReward);  // Reward
     data << uint8(3);   //unk
-    data << uint32(0);  //unk1
+    data << uint32(_player->getRBG()->getRating());  //unk1
     data << uint32(0);  //unk2
     data << _player->GetCurrencyWeekCap(CURRENCY_TYPE_CONQUEST_META_BG, true);
     data << uint32(0);  //unk3
     data << uint32(0);  //unk4
     data << _player->GetCurrency(CURRENCY_TYPE_CONQUEST_POINTS, true);
+
+    SendPacket(&data);
+}
+
+void WorldSession::HandleInspectRatedBGStats(WorldPacket &recvData)
+{
+    ObjectGuid pGuid;
+	
+    recvData
+        .ReadByteMask(pGuid[1])
+        .ReadByteMask(pGuid[4])
+        .ReadByteMask(pGuid[6])
+        .ReadByteMask(pGuid[5])
+        .ReadByteMask(pGuid[0])
+        .ReadByteMask(pGuid[2])
+        .ReadByteMask(pGuid[7])
+        .ReadByteMask(pGuid[3])
+
+        .ReadByteSeq(pGuid[4])
+        .ReadByteSeq(pGuid[7])
+        .ReadByteSeq(pGuid[2])
+        .ReadByteSeq(pGuid[5])
+        .ReadByteSeq(pGuid[6])
+        .ReadByteSeq(pGuid[3])
+        .ReadByteSeq(pGuid[0])
+        .ReadByteSeq(pGuid[1]);
+
+    WorldPacket data(SMSG_INSPECT_RATED_BG_STATS);
+    data.WriteBit(pGuid[6]);
+    data.WriteBit(pGuid[4]);
+    data.WriteBit(pGuid[5]);
+    data.WriteBit(pGuid[1]);
+    data.WriteBit(pGuid[2]);
+    data.WriteBit(pGuid[7]);
+    data.WriteBit(pGuid[0]);
+    data.WriteBit(pGuid[3]);
+
+    data.WriteByteSeq(pGuid[4]);
+    data << uint32(5);
+
+    data.WriteByteSeq(pGuid[1]);
+    data.WriteByteSeq(pGuid[7]);
+    data.WriteByteSeq(pGuid[3]);
+    data.WriteByteSeq(pGuid[6]);
+    data << uint32(5);
+    data << uint32(3);
+    data.WriteByteSeq(pGuid[2]);
+    data.WriteByteSeq(pGuid[5]);
+    data.WriteByteSeq(pGuid[0]);
     SendPacket(&data);
 }

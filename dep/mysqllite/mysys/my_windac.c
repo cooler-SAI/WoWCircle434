@@ -152,7 +152,7 @@ int my_security_attr_create(SECURITY_ATTRIBUTES **psa, const char **perror,
     *perror= "Failed to allocate memory for DACL";
     goto error;
   }
-  if (! InitializeAcl(dacl, dacl_length, ACL_REVISION))
+  if (! InitializeAcl(dacl, dacl_length, MYF(MY_ZEROFILL|MY_WME)))
   {
     *perror= "Failed to initialize DACL";
     goto error;

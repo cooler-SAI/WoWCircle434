@@ -121,9 +121,12 @@ public:
                 AddDoor(pGo, true);
                 break;
             case GO_CHOGALL_FLOOR:
-                AddDoor(pGo, true);
-                uiChogallFloorGUID = pGo->GetGUID();
-                break;
+                if (instance->IsHeroic())
+                {
+                    AddDoor(pGo, true);
+                    uiChogallFloorGUID = pGo->GetGUID();
+                    break;
+                }
             }
         }
 

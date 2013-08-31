@@ -199,6 +199,10 @@ enum CreaturesIds
     NPC_SE_KOR_KRON_REAVER                      = 37920,
     NPC_SE_SKYBREAKER_MARINE                    = 37830,
     NPC_FROST_FREEZE_TRAP                       = 37744,
+    NPC_APOTHECARY_CANDITH_TOMAS                = 37935,
+    NPC_MORGAN_DAYBLAZE                         = 37936,
+    NPC_BRAZIE_GETZ                             = 37904,
+    NPC_SHELY_STEELBOWELS                       = 37903,
 
     // Festergut
     NPC_FESTERGUT                               = 36626,

@@ -37,8 +37,10 @@ enum Creatures
     NPC_ATRAMEDES                   = 41442,
     NPC_CHIMAERON                   = 43296, 
     NPC_BILE_O_TRON_800             = 44418, 
+
     NPC_NEFARIAN                    = 41376, 
     NPC_ONYXIA                      = 41270, 
+
     NPC_LORD_VICTOR_NEFARIAN        = 41379,
     NPC_LORD_VICTOR_NEFARIUS_HEROIC = 49226,
     NPC_MALORIAK_EVENT              = 43404,

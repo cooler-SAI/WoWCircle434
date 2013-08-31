@@ -1,13 +1,11 @@
 #include"ScriptPCH.h"
 #include"shadowfang_keep.h"
 
-#define SAY_AGGRO "Even here i find myself beset by fools!"
-#define SAY_DEATH "My new life was just beginning..."
-#define SAY_KILL1 "This childish effort ends now!"
-#define SAY_KILL2 "You shall annoy me no longer!"
-
 enum ScriptTexts
 {
+    SAY_AGGRO = 0,
+    SAY_DEATH = 1,
+    SAY_KILL  = 2,
 };
 
 enum Spells
@@ -92,7 +90,7 @@ class boss_lord_valden : public CreatureScript
                 events.ScheduleEvent(EVENT_ICE_SHARDS, 30000);
                 events.ScheduleEvent(EVENT_CONJURE_POISONOUS_MIXTURE, 6000);
                 instance->SetBossState(DATA_VALDEN, IN_PROGRESS);
-                me->MonsterYell(SAY_AGGRO, 0, 0);
+                Talk(SAY_AGGRO);
                 DoZoneInCombat();
             }
             
@@ -100,12 +98,12 @@ class boss_lord_valden : public CreatureScript
             {
                 _JustDied();
 
-                me->MonsterYell(SAY_DEATH, 0, 0);
+                Talk(SAY_DEATH);
             }
 
             void KilledUnit(Unit* who)
             {
-                me->MonsterYell(urand(0, 1)? SAY_KILL1: SAY_KILL2, 0, 0);
+                Talk(SAY_KILL);
             }
 
             void UpdateAI(const uint32 uiDiff)

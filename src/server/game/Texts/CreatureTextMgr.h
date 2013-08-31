@@ -184,7 +184,7 @@ void CreatureTextMgr::SendChatPacket(WorldObject* source, Builder const& builder
         case CHAT_MSG_MONSTER_WHISPER:
         case CHAT_MSG_RAID_BOSS_WHISPER:
         {
-            if (range == TEXT_RANGE_NORMAL) //ignores team and gmOnly
+            if (range == TEXT_RANGE_NORMAL || range == TEXT_RANGE_AREA) //ignores team and gmOnly
             {
                 Player* player = ObjectAccessor::FindPlayer(whisperGuid);
                 if (!player || !player->GetSession())

@@ -542,6 +542,8 @@ void LFGQueue::UpdateQueueTimers(time_t currTime)
     for (LfgQueueDataContainer::iterator itQueue = QueueDataStore.begin(); itQueue != QueueDataStore.end(); ++itQueue)
     {
         LfgQueueData& queueinfo = itQueue->second;
+        if (!queueinfo.dungeons.size())
+            continue;
         uint32 dungeonId = (*queueinfo.dungeons.begin());
         uint32 queuedTime = uint32(currTime - queueinfo.joinTime);
         uint8 role = PLAYER_ROLE_NONE;
