@@ -164,11 +164,13 @@ Unit* ObjectAccessor::FindUnit(uint64 guid)
     return GetObjectInWorld(guid, (Unit*)NULL);
 }
 
-Player* ObjectAccessor::FindPlayerByName(const char* name)
+Player* ObjectAccessor::FindPlayerByName(std::string const& name)
 {
     TRINITY_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
+    
     std::string nameStr = name;
-
+    std::transform(nameStr.begin(), nameStr.end(), nameStr.begin(), ::tolower);
+     
     HashMapHolder<Player>::MapType const& m = GetPlayers();
     for (HashMapHolder<Player>::MapType::const_iterator iter = m.begin(); iter != m.end(); ++iter)
     {
@@ -176,8 +178,8 @@ Player* ObjectAccessor::FindPlayerByName(const char* name)
             continue;
 
         std::string currentName = iter->second->GetName();
-
-        if (nameStr == currentName)
+        std::transform(currentName.begin(), currentName.end(), currentName.begin(), ::tolower);
+        if (nameStr.compare(currentName) == 0)
             return iter->second;
     }
 

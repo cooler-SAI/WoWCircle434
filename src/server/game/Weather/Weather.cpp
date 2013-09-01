@@ -37,8 +37,6 @@ Weather::Weather(uint32 zone, WeatherData const* weatherChances)
     m_timer.SetInterval(sWorld->getIntConfig(CONFIG_INTERVAL_CHANGEWEATHER));
     m_type = WEATHER_TYPE_FINE;
     m_grade = 0;
-
-    sLog->outInfo(LOG_FILTER_GENERAL, "WORLD: Starting weather system for zone %u (change every %u minutes).", m_zone, (uint32)(m_timer.GetInterval() / (MINUTE*IN_MILLISECONDS)));
 }
 
 /// Launch a weather update
@@ -94,10 +92,6 @@ bool Weather::ReGenerate()
     time_t gtime = sWorld->GetGameTime();
     struct tm * ltime = localtime(&gtime);
     uint32 season = ((ltime->tm_yday - 78 + 365)/91)%4;
-
-    static char const* seasonName[WEATHER_SEASONS] = { "spring", "summer", "fall", "winter" };
-
-    sLog->outInfo(LOG_FILTER_GENERAL, "Generating a change in %s weather for zone %u.", seasonName[season], m_zone);
 
     if ((u < 60) && (m_grade < 0.33333334f))                // Get fair
     {
@@ -215,50 +209,6 @@ bool Weather::UpdateWeather()
     WorldPacket data(SMSG_WEATHER, (4+4+4));
     data << uint32(state) << (float)m_grade << uint8(0);
     player->SendMessageToSet(&data, true);
-
-    ///- Log the event
-    char const* wthstr;
-    switch (state)
-    {
-        case WEATHER_STATE_LIGHT_RAIN:
-            wthstr = "light rain";
-            break;
-        case WEATHER_STATE_MEDIUM_RAIN:
-            wthstr = "medium rain";
-            break;
-        case WEATHER_STATE_HEAVY_RAIN:
-            wthstr = "heavy rain";
-            break;
-        case WEATHER_STATE_LIGHT_SNOW:
-            wthstr = "light snow";
-            break;
-        case WEATHER_STATE_MEDIUM_SNOW:
-            wthstr = "medium snow";
-            break;
-        case WEATHER_STATE_HEAVY_SNOW:
-            wthstr = "heavy snow";
-            break;
-        case WEATHER_STATE_LIGHT_SANDSTORM:
-            wthstr = "light sandstorm";
-            break;
-        case WEATHER_STATE_MEDIUM_SANDSTORM:
-            wthstr = "medium sandstorm";
-            break;
-        case WEATHER_STATE_HEAVY_SANDSTORM:
-            wthstr = "heavy sandstorm";
-            break;
-        case WEATHER_STATE_THUNDERS:
-            wthstr = "thunders";
-            break;
-        case WEATHER_STATE_BLACKRAIN:
-            wthstr = "blackrain";
-            break;
-        case WEATHER_STATE_FINE:
-        default:
-            wthstr = "fine";
-            break;
-    }
-    sLog->outInfo(LOG_FILTER_GENERAL, "Change the weather of zone %u to %s.", m_zone, wthstr);
 
     return true;
 }

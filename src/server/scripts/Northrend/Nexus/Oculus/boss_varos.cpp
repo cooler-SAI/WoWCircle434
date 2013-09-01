@@ -59,7 +59,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new boss_varosAI (creature);
+        return new boss_varosAI(creature);
     }
 
     struct boss_varosAI : public BossAI
@@ -95,7 +95,7 @@ public:
             return coreEnergizeOrientation;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(uint32 const diff)
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -134,7 +134,7 @@ public:
                         events.ScheduleEvent(EVENT_CALL_AZURE, urand(20, 25) * IN_MILLISECONDS);
                         break;
                     case EVENT_AMPLIFY_MAGIC:
-                        DoCast(me->getVictim(), SPELL_CALL_AMPLIFY_MAGIC);
+                        DoCastVictim(SPELL_CALL_AMPLIFY_MAGIC);
                         events.ScheduleEvent(EVENT_AMPLIFY_MAGIC, urand(17, 20) * IN_MILLISECONDS);
                         break;
                 }
@@ -186,7 +186,7 @@ class npc_azure_ring_captain : public CreatureScript
                 }
             }
 
-            void UpdateAI(const uint32 /*diff*/)
+            void UpdateAI(uint32 const /*diff*/)
             {
                 if (!UpdateVictim())
                     return;
@@ -206,7 +206,7 @@ class npc_azure_ring_captain : public CreatureScript
                     DoCast(target, SPELL_ICE_BEAM);
             }
 
-            void DoAction(const int32 action)
+            void DoAction(int32 const action)
             {
                 switch (action)
                 {

@@ -1095,6 +1095,13 @@ AllowTickets = 1
 
 DungeonFinder.OptionsMask = 1
 
+#
+#     DungeonFinder.CastDeserter
+#        Description: Cast Deserter spell at players who leave DF-parties while the dungeons is in progress.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+DungeonFinder.CastDeserter = 0
 
 #
 #   DBC.EnforceItemAttributes

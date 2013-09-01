@@ -2847,7 +2847,7 @@ void SpellMgr::LoadSpellCustomAttr()
         if (!spellInfo->_IsPositiveEffect(EFFECT_2, false))
             spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE_EFF2;
 
-        if (spellInfo->SpellVisual[0] == 3879)
+        if (spellInfo->SpellVisual[0] == 3879 || spellInfo->Id == 74117)
             spellInfo->AttributesCu |= SPELL_ATTR0_CU_CONE_BACK;
 
         ////////////////////////////////////
@@ -2912,15 +2912,20 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
                 break;
             case 2818: // Deadly Poison
+            case 12654: // Ignite
             case 31803: // Censure
             case 77661: // Searing Flame
             case 77489: // Echo of Light
+            case 99002: // Fiery Claws, Item - Druid T12 Feral 2P Bonus
             case 99132: // Divine Fire, Item - Priest T12 Healer 2P Bonus
             case 99173: // Burning Wounds, Item - Rogue T12 2P Bonus
-            case 99002: // Fiery Claws, Item - Druid T12 Feral 2P Bonus
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER;
                 break;
-            case 60256:
+            case 45257: // Using Steam Tonk Controller
+            case 45440: // Steam Tonk Controller
+            case 49352: // Crashin' Thrashin' Racer Controller
+            case 75111: // Blue Crashin' Thrashin' Racer Controller
+            case 60256: // Collect Sample
                 //Crashes client on pressing ESC (Maybe because of ReqSpellFocus and GameObject)
                 spellInfo->AttributesEx4 &= ~SPELL_ATTR4_TRIGGERED;
                 break;
@@ -3060,6 +3065,14 @@ void SpellMgr::LoadSpellCustomAttr()
             case 109182: // Unstable Twilight
             case 109183: // Unstable Twilight
             case 109184: // Unstable Twilight
+            case 107439: // Twilight Barrage
+            case 109203: // Twilight Barrage
+            case 109204: // Twilight Barrage
+            case 109205: // Twilight Barrage
+            case 106401: // Twilight Onslaught
+            case 108862: // Twilight Onslaught
+            case 109226: // Twilight Onslaught
+            case 109227: // Twilight Onslaught
                 // ONLY SPELLS WITH SPELLFAMILY_GENERIC and EFFECT_SCHOOL_DAMAGE
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 break;
@@ -4132,15 +4145,8 @@ void SpellMgr::LoadDbcDataCorrections()
             case 88840: // Vanish
                 spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(125);
                 break;
-            case 88736: // Taste for Blood
-                spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_DUMMY;
-                spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
-                spellInfo->ProcChance = 0;
-                spellInfo->ProcFlags = 0;
-                break;
             case 95647: // Ripsnarl Achievement Aura
                 spellInfo->AttributesEx3 = SPELL_ATTR3_ONLY_TARGET_PLAYERS;
-                break;
                 break;
             case 89268: // Throw Food Targeting
             case 89740: 
@@ -6466,6 +6472,37 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[EFFECT_0].TriggerSpell = 103327;
                 spellInfo->Effects[EFFECT_1].TriggerSpell = 106174;
                 break;
+            // Warmaster Blackhorn
+            case 107558: // Degeneration
+            case 108861:
+            case 109207:
+            case 109208:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            case 107567: // Brutal Strike
+            case 109209:
+            case 109210:
+            case 109211:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            case 109204: // Twilight Barrage
+            case 109205:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            case 107588: // Twilight Onslaught
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                break;
+            case 108038: // Harpoon
+                spellInfo->SetRangeIndex(13); // 5000 yards
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break;
+            case 107518: // Detonate
+                spellInfo->Effects[EFFECT_2].Effect = 0;
+                break;
+            case 108046: // Shockwave
+            case 110137:
+                spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
+                break;
             // ENDOF DRAGON SOUL SPELLS
             //
             // Camouflage
@@ -7327,6 +7364,11 @@ void SpellMgr::LoadDbcDataCorrections()
             case 95199: // Intimidating Shout - Glyph of Intimidating Shout
                 spellInfo->ProcFlags = 0;
                 spellInfo->ProcChance = 0;
+                break;
+            case 48760: // Occulus portals
+            case 49305:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_0].TargetB = TARGET_DEST_DB;
                 break;
             default:
                 break;

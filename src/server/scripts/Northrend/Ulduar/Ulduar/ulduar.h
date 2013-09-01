@@ -211,7 +211,7 @@ enum UlduarNPCs
     NPC_SANITY_WELL                         = 33991,
     NPC_DESCEND_INTO_MADNESS                = 34072,
     NPC_MARKED_IMMORTAL_GUARDIAN            = 36064,
-	
+
     // Algalon the Observer
     NPC_BRANN_BRONZBEARD_ALG                = 34064,
     NPC_AZEROTH                             = 34246,
@@ -293,7 +293,7 @@ enum UlduarGameObjects
     GO_BRAIN_ROOM_DOOR_1                    = 194635,
     GO_BRAIN_ROOM_DOOR_2                    = 194636,
     GO_BRAIN_ROOM_DOOR_3                    = 194637,
-	
+
     // Algalon the Observer
     GO_CELESTIAL_PLANETARIUM_ACCESS_10      = 194628,
     GO_CELESTIAL_PLANETARIUM_ACCESS_25      = 194752,
@@ -317,7 +317,7 @@ enum EventIds
     EVENT_ACTIVATE_SANITY_WELL          = 21432,
     EVENT_HODIRS_PROTECTIVE_GAZE_PROC   = 21437,
 };
-	
+
 enum LeviathanActions
 {
     ACTION_TOWER_OF_STORM_DESTROYED     = 1,
@@ -366,8 +366,8 @@ enum UlduarTeleportSpells
     SPELL_ANTECHAMBER_TELEPORT          = 64030,
     SPELL_SHATTERED_WALKWAY_TELEPORT    = 64029,
     SPELL_CONSERVATORY_TELEPORT         = 64024,
-    SPELL_SPARK_OF_IMAGINATION_TELEPORT = 64025,    // NIY
-    SPELL_DESCENT_INTO_MADNESS_TELEPORT = 64027     // NIY
+    SPELL_SPARK_OF_IMAGINATION_TELEPORT = 64025,
+    SPELL_DESCENT_INTO_MADNESS_TELEPORT = 64027
 };
 
 enum UlduarData
@@ -413,7 +413,7 @@ enum UlduarData
     DATA_ILLUSION,
     DATA_DRIVE_ME_CRAZY,
     DATA_KEEPERS_COUNT,
-	
+
     // Algalon the Observer
     DATA_ALGALON_SUMMON_STATE,
     DATA_SIGILDOOR_01,

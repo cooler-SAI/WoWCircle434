@@ -217,6 +217,9 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
             SaveToDB();
         }
 
+        // Clear resurrections count
+        ResetResurrectionsCount();
+
         for (uint32 type = 0; type < MAX_DOOR_TYPES; ++type)
             for (DoorSet::iterator i = bossInfo->door[type].begin(); i != bossInfo->door[type].end(); ++i)
                 UpdateDoorState(*i);
@@ -448,6 +451,17 @@ void InstanceScript::DoNearTeleportPlayers(const Position pos, bool casting /*=f
                 pPlayer->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), casting);
 }
 
+void InstanceScript::DoKilledMonsterKredit(uint32 questId, uint32 entry, uint64 guid/* =0*/)
+{
+    Map::PlayerList const &plrList = instance->GetPlayers();
+    
+    if (!plrList.isEmpty())
+        for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
+            if (Player* pPlayer = i->getSource())
+                if (pPlayer->GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)
+                    pPlayer->KilledMonsterCredit(entry, guid);
+}
+
 bool InstanceScript::CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/ /*= NULL*/, uint32 /*miscvalue1*/ /*= 0*/)
 {
     sLog->outError(LOG_FILTER_GENERAL, "Achievement system call InstanceScript::CheckAchievementCriteriaMeet but instance script for map %u not have implementation for achievement criteria %u",
@@ -547,4 +561,20 @@ void InstanceScript::UpdatePhasing()
     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
         if (Player* player = itr->getSource())
             player->GetPhaseMgr().NotifyConditionChanged(phaseUdateData);
+}
+
+bool InstanceScript::CanUseResurrection()
+{
+    if (!instance)
+        return true;
+
+    if (!instance->IsRaid())
+        return true;
+
+    if (!IsEncounterInProgress())
+        return true;
+
+    uint8 max_count = (instance->Is25ManRaid() ? 3 : 1);
+
+    return (resurrections < max_count);
 }

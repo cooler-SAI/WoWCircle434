@@ -2142,7 +2142,7 @@ void Player::ToggleAFK()
     ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK);
 
     // afk player not allowed in battleground
-    if (isAFK() && InBattleground() && !InArena())
+    if (isAFK() && InBattleground() && (!InArena() || isDead()))
         LeaveBattleground();
 }
 
@@ -3468,10 +3468,14 @@ void Player::SendInitialSpells()
 
     for (PlayerSpellMap::const_iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
     {
-        if (itr->second->state == PLAYERSPELL_REMOVED)
+        PlayerSpell* playerSpell = itr->second;
+        if (!playerSpell)
+            continue;
+        
+        if (playerSpell->state == PLAYERSPELL_REMOVED)
             continue;
 
-        if (!itr->second->active || itr->second->disabled)
+        if (!playerSpell->active || playerSpell->disabled)
             continue;
 
         data << uint32(itr->first);
@@ -4837,10 +4841,6 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
     // bones will be deleted by corpse/bones deleting thread shortly
     sObjectAccessor->ConvertCorpseForPlayer(playerguid);
 
-    if (uint32 guildId = GetGuildIdFromDB(playerguid))
-        if (Guild* guild = sGuildMgr->GetGuildById(guildId))
-            guild->DeleteMember(guid);
-
     // remove from arena teams
     LeaveAllArenaTeams(playerguid);
 
@@ -4859,6 +4859,10 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
         // Completely remove from the database
         case CHAR_DELETE_REMOVE:
         {
+            if (uint32 guildId = GetGuildIdFromDB(playerguid))
+                if (Guild* guild = sGuildMgr->GetGuildById(guildId))
+                    guild->DeleteMember(guid);
+
             SQLTransaction trans = CharacterDatabase.BeginTransaction();
             QueryResult resultMail = CharacterDatabase.PQuery("SELECT id,messageType,mailTemplateId,sender,subject,body,money,has_items FROM mail WHERE receiver='%u' AND has_items<>0 AND cod<>0", guid);
             if (resultMail)
@@ -7219,7 +7223,7 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
         honor_f *= sWorld->getRate(RATE_HONOR_PREMIUM);
 
     // Back to int now
-    honor = int32(honor_f);
+    honor = std::max(int32(honor_f), 1);
     // honor - for show honor points in log
     // victim_guid - for show victim name in log
     // victim_rank [1..4]  HK: <dishonored rank>
@@ -9546,6 +9550,40 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
         case 5449:
             if (bg && bg->GetTypeID(true) == BATTLEGROUND_BFG)
                 bg->FillInitialWorldStates(data);
+            else
+            {
+                data << uint32(0x6e7) << uint32(0x0);       //  7 1767 //LIGHTHOUSE map state (A)
+                data << uint32(0x6e8) << uint32(0x0);       //  8 1768 //LIGHTHOUSE map state (H)
+                data << uint32(0x6e9) << uint32(0x0);       //  9 1769 //LIGHTHOUSE map state (CON A)
+                data << uint32(0x6ea) << uint32(0x0);       // 10 1770 //LIGHTHOUSE map state (CON H)
+                data << uint32(0x6ec) << uint32(0x0);       // 11 1772 //WATERWORKS state (A)
+                data << uint32(0x6ed) << uint32(0x0);       // 12 1773 //WATERWORKS state (H)
+                data << uint32(0x6ee) << uint32(0x0);       // 13 1774 //WATERWORKS state (CON A)
+                data << uint32(0x6ef) << uint32(0x0);       // 14 1775 //WATERWORKS state (CON H)
+                data << uint32(0x6f0) << uint32(0x0);       // 15 1776 alliance resources
+                data << uint32(0x6f1) << uint32(0x0);       // 16 1777 horde resources
+                data << uint32(0x6f2) << uint32(0x0);       // 17 1778 horde bases
+                data << uint32(0x6f3) << uint32(0x0);       // 18 1779 alliance bases
+                data << uint32(0x6f4) << uint32(0x7d0);     // 19 1780 max resources (2000)
+                data << uint32(0x6f6) << uint32(0x0);       // 20 1782 //MINE map state (A)
+                data << uint32(0x6f7) << uint32(0x0);       // 21 1783 //MINE map state (H)
+                data << uint32(0x6f8) << uint32(0x0);       // 22 1784 //MINE map state (CON A)
+                data << uint32(0x6f9) << uint32(0x0);       // 23 1785 //MINE map state (CON H)
+                data << uint32(0x732) << uint32(0x1);       // 24 1842 //LIGHTHOUSE map icon (NONE)
+                data << uint32(0x735) << uint32(0x1);       // 35 1845 //WATERWORKS map icon (NONE)
+                data << uint32(0x736) << uint32(0x1);       // 25 1846 //MINE map icon (NONE)
+                data << uint32(0x7a3) << uint32(0x708);     // 26 1955 warning limit (1800)
+            }
+            break;
+        // Halls of Reflection
+        case 4820:
+            if (instance && mapid == 668)
+                instance->FillInitialWorldStates(data);
+            else
+            {
+                data << uint32(4884) << uint32(0);              // 9 WORLD_STATE_HOR_WAVES_ENABLED
+                data << uint32(4882) << uint32(0);              // 10 WORLD_STATE_HOR_WAVE_COUNT
+            }
             break;
         // Wintergrasp
         case 4197:
@@ -21086,13 +21124,10 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         return false;
     }
 
-    if (crItem->maxcount != 0) // bought
-    {
-        //if (pProto->Quality > ITEM_QUALITY_EPIC || (pProto->Quality == ITEM_QUALITY_EPIC && pProto->ItemLevel >= MinNewsItemLevel[sWorld->getIntConfig(CONFIG_EXPANSION)]))
-            //if (Guild* guild = sGuildMgr->GetGuildById(GetGuildId()))
-                //guild->GetNewsLog().AddNewEvent(GUILD_NEWS_ITEM_PURCHASED, time(NULL), GetGUID(), 0, item);
-        return true;
-    }
+    if (pProto->Quality > ITEM_QUALITY_EPIC || (pProto->Quality == ITEM_QUALITY_EPIC && pProto->ItemLevel >= MinNewsItemLevel[sWorld->getIntConfig(CONFIG_EXPANSION)]))
+        if (Guild* guild = sGuildMgr->GetGuildById(GetGuildId()))
+            guild->GetNewsLog().AddNewEvent(GUILD_NEWS_ITEM_PURCHASED, time(NULL), GetGUID(), 0, item);
+    return true;
 
     return false;
 }
@@ -23986,7 +24021,8 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
 
         if (!canLoot && GetMap()->IsRaidOrHeroicDungeon() && 
             proto && proto->GetMaxStackSize() == 1 && 
-            proto->Class != ITEM_CLASS_QUEST && proto->Class != ITEM_CLASS_MISCELLANEOUS)
+            proto->Class != ITEM_CLASS_QUEST && proto->Class != ITEM_CLASS_MISCELLANEOUS &&
+            !(proto->Class == ITEM_CLASS_CONSUMABLE && proto->SubClass == ITEM_SUBCLASS_CONSUMABLE))
         {
             SendEquipError(EQUIP_ERR_NOT_EQUIPPABLE, NULL, NULL, item->itemid);
             return;
@@ -24026,10 +24062,10 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
 
         --loot->unlootedCount;
 
-        //if (const ItemTemplate* proto = sObjectMgr->GetItemTemplate(item->itemid))
-            //if (proto->Quality > ITEM_QUALITY_EPIC || (proto->Quality == ITEM_QUALITY_EPIC && proto->ItemLevel >= MinNewsItemLevel[sWorld->getIntConfig(CONFIG_EXPANSION)]))
-                //if (Guild* guild = sGuildMgr->GetGuildById(GetGuildId()))
-                    //guild->GetNewsLog().AddNewEvent(GUILD_NEWS_ITEM_LOOTED, time(NULL), GetGUID(), 0, item->itemid);
+        if (const ItemTemplate* proto = sObjectMgr->GetItemTemplate(item->itemid))
+            if (proto->Quality > ITEM_QUALITY_EPIC || (proto->Quality == ITEM_QUALITY_EPIC && proto->ItemLevel >= MinNewsItemLevel[sWorld->getIntConfig(CONFIG_EXPANSION)]))
+                if (Guild* guild = sGuildMgr->GetGuildById(GetGuildId()))
+                    guild->GetNewsLog().AddNewEvent(GUILD_NEWS_ITEM_LOOTED, time(NULL), GetGUID(), 0, item->itemid);
 
         SendNewItem(newitem, uint32(item->count), false, false, true);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM, item->itemid, item->count);

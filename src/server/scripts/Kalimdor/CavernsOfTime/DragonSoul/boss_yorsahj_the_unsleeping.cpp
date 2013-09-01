@@ -286,7 +286,7 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                             else
                                 DoCastVictim(SPELL_VOID_BOLT);
 
-                            events.ScheduleEvent(EVENT_VOID_BOLT, 9000);
+                            events.ScheduleEvent(EVENT_VOID_BOLT, (bShuma ? 5000 : 9000));
                             break;
                         case EVENT_CALL_BLOOD_1:
                             events.CancelEvent(EVENT_VOID_BOLT);
@@ -423,6 +423,8 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                             DoCast(me, SPELL_SPAWNING_POOL_2, true);
                             DoCast(me, SPELL_SPAWNING_POOL_3, true);
                             DoCast(me, SPELL_CORRUPTED_MINIONS_AURA);
+                            if (bShuma)
+                                events.ScheduleEvent(EVENT_CORRUPTED_MINIONS, 30000);
                             break;
                         case EVENT_DEEP_CORRUPTION:
                             DoCastAOE(SPELL_DEEP_CORRUPTION);

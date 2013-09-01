@@ -833,7 +833,7 @@ namespace Trinity
                 if (!u->isTargetableForAttack(false))
                     return false;
 
-                return i_obj->IsWithinDistInMap(u, i_range) && !i_funit->IsFriendlyTo(u);
+                return i_obj->IsWithinDistInMap(u, i_range) && i_funit->IsValidAttackTarget(u);
             }
         private:
             WorldObject const* i_obj;
@@ -1137,7 +1137,7 @@ namespace Trinity
             if (!me->IsWithinDistInMap(u, m_range))
                 return false;
 
-            if (!me->canSeeOrDetect(u))
+            if (!me->IsValidAttackTarget(u))
                 return false;
 
             if (u->HasCrowdControlAura())

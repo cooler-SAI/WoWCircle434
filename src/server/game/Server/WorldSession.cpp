@@ -105,12 +105,9 @@ timeLastChannelInviteCommand(0), timeLastGroupInviteCommand(0), timeLastGuildInv
 timeLastChannelMuteCommand(0), timeLastChannelBanCommand(0), timeLastChannelUnbanCommand(0), timeLastChannelAnnounceCommand(0),
 timeLastChannelModerCommand(0), timeLastChannelOwnerCommand(0), timeLastChannelSetownerCommand(0), timeLastChannelUnmoderCommand(0),
 timeLastChannelUnmuteCommand(0), timeLastChannelKickCommand(0), timelastReloadUi(0), timeLastServerCommand(0), timeCharEnumOpcode(0),
-timeLastArenaTeamCommand(0)
+timeLastArenaTeamCommand(0), timeLastWhisperCommand(0), timeLastCalendarInvCommand(0), timeLastChangeSubGroupCommand(0),
+m_uiAntispamMailSentCount(0), m_uiAntispamMailSentTimer(0)
 {
-    // Antispam
-    m_uiAntispamMailSentCount = 0;
-    m_uiAntispamMailSentTimer = 0;
-
     _warden = NULL;
     _filterAddonMessages = false;
 

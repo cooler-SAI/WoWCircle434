@@ -31,7 +31,6 @@
 
 void WorldSession::HandleArenaTeamCreateOpcode(WorldPacket& recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_CREATE");
     uint32 slot, icon, iconcolor, border, bordercolor, background, size;
     std::string name;
 
@@ -68,16 +67,12 @@ void WorldSession::HandleArenaTeamCreateOpcode(WorldPacket& recvData)
 
     // Register arena team
     sArenaTeamMgr->AddArenaTeam(arenaTeam);
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Arena team (guid: %u) added to sArenaTeamMgr", arenaTeam->GetId());
 }
 
 void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket & recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_INSPECT_ARENA_TEAMS");
-
     uint64 guid;
     recvData >> guid;
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Inspect Arena stats (GUID: %u TypeId: %u)", GUID_LOPART(guid), GuidHigh2TypeId(GUID_HIPART(guid)));
 
     if (Player* player = ObjectAccessor::FindPlayer(guid))
     {
@@ -94,8 +89,6 @@ void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleArenaTeamQueryOpcode(WorldPacket & recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_ARENA_TEAM_QUERY");
-
     uint32 arenaTeamId;
     recvData >> arenaTeamId;
 
@@ -108,8 +101,6 @@ void WorldSession::HandleArenaTeamQueryOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket & recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_ARENA_TEAM_ROSTER");
-
     time_t now = time(NULL);
     if (now - timeLastArenaTeamCommand < 5)
         return;
@@ -125,8 +116,6 @@ void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket & recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_INVITE");
-
     time_t now = time(NULL);
     if (now - timeLastArenaTeamCommand < 5)
         return;
@@ -145,7 +134,7 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket & recvData)
         if (!normalizePlayerName(invitedName))
             return;
 
-        player = sObjectAccessor->FindPlayerByName(invitedName.c_str());
+        player = sObjectAccessor->FindPlayerByName(invitedName);
     }
 
     if (!player)
@@ -195,22 +184,16 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket & recvData)
         return;
     }
 
-    sLog->outDebug(LOG_FILTER_BATTLEGROUND, "Player %s Invited %s to Join his ArenaTeam", GetPlayer()->GetName(), invitedName.c_str());
-
     player->SetArenaTeamIdInvited(arenaTeam->GetId());
 
     WorldPacket data(SMSG_ARENA_TEAM_INVITE, (8+10));
     data << GetPlayer()->GetName();
     data << arenaTeam->GetName();
     player->GetSession()->SendPacket(&data);
-
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_ARENA_TEAM_INVITE");
 }
 
 void WorldSession::HandleArenaTeamAcceptOpcode(WorldPacket & /*recvData*/)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_ACCEPT");                // empty opcode
-
     ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(_player->GetArenaTeamIdInvited());
     if (!arenaTeam)
         return;
@@ -242,16 +225,12 @@ void WorldSession::HandleArenaTeamAcceptOpcode(WorldPacket & /*recvData*/)
 
 void WorldSession::HandleArenaTeamDeclineOpcode(WorldPacket & /*recvData*/)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_DECLINE");               // empty opcode
-
     // Remove invite from player
     _player->SetArenaTeamIdInvited(0);
 }
 
 void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket & recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_LEAVE");
-
     time_t now = time(NULL);
     if (now - timeLastArenaTeamCommand < 5)
         return;
@@ -298,8 +277,6 @@ void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket & recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_DISBAND");
-
     time_t now = time(NULL);
     if (now - timeLastArenaTeamCommand < 5)
         return;
@@ -326,8 +303,6 @@ void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket & recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_REMOVE");
-
     uint32 arenaTeamId;
     std::string name;
 
@@ -372,8 +347,6 @@ void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleArenaTeamLeaderOpcode(WorldPacket & recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_LEADER");
-
     uint32 arenaTeamId;
     std::string name;
 

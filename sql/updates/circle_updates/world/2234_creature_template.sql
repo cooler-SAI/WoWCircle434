@@ -1,0 +1,1 @@
+Update`creature_template` SET `unit_flags` = `unit_flags` | 8 WHERE name like 'training dummy';

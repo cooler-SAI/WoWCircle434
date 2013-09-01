@@ -811,8 +811,8 @@ class npc_muradin_gunship : public CreatureScript
 
             if (action == 1001)
             {
-                //creature->AI()->DoAction(ACTION_INTRO_START);
-                //creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                creature->AI()->DoAction(ACTION_INTRO_START);
+                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
             return true;
         }
@@ -2028,8 +2028,8 @@ class npc_saurfang_gunship : public CreatureScript
 
             if (action == 1001)
             {
-                //creature->AI()->DoAction(ACTION_INTRO_START);
-                //creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                creature->AI()->DoAction(ACTION_INTRO_START);
+                creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             }
             return true;
         }

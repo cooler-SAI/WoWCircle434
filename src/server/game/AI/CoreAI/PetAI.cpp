@@ -95,7 +95,7 @@ void PetAI::UpdateAI(const uint32 diff)
         // is only necessary to stop casting, the pet must not exit combat
         if (me->getVictim()->HasCrowdControlAura(me))
         {
-            me->InterruptNonMeleeSpells(false);
+            me->InterruptNonMeleeSpellsExcept(false, 90337);    // hack for Bad Manner
             return;
         }
 

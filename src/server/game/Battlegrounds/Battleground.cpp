@@ -255,7 +255,7 @@ void Battleground::Update(uint32 diff)
     if (!PreUpdateImpl(diff))
         return;
 
-    if (!GetPlayersSize())
+    if (!GetPlayersSize() && !GetSpectatorsSize())
     {
         //BG is empty
         // if there are no players invited, delete BG
@@ -1317,6 +1317,7 @@ void Battleground::EventPlayerLoggedIn(Player* player)
 void Battleground::EventPlayerLoggedOut(Player* player)
 {
     uint64 guid = player->GetGUID();
+    RemoveSpectator(player);
     if (!IsPlayerInBattleground(guid))  // Check if this player really is in battleground (might be a GM who teleported inside)
         return;
 
@@ -2096,6 +2097,7 @@ void Battleground::RemovePlayer(Player* player, uint64 guid, uint32 team)
 {
     if (!player)
         return;
+    RemoveSpectator(player);
     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_IGNORE_FACTION))
     {
         player->setFactionForRace(player->getRace());

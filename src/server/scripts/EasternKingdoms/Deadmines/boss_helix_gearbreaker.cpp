@@ -164,7 +164,7 @@ class boss_helix_gearbreaker : public CreatureScript
                 if (!me->GetVehicle())
                     if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                     {
-                        Talk(SAY_OAF_DEAD);
+                        //Talk(SAY_OAF_DEAD);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         return;
                     }

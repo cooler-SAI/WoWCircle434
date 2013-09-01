@@ -688,6 +688,8 @@ class boss_sara : public CreatureScript
 
             void DamageTaken(Unit* /*attacker*/, uint32& damage)
             {
+                if (_events.IsInPhase(PHASE_TRANSFORM) && damage >= me->GetHealth())
+                    damage = 0;
                 if (_events.IsInPhase(PHASE_ONE) && damage >= me->GetHealth())
                 {
                     damage = 0;
@@ -2535,7 +2537,10 @@ class spell_yogg_saron_match_health : public SpellScriptLoader    // 64069
             void HandleScript(SpellEffIndex /*effIndex*/)
             {
                 if (Unit* target = GetHitUnit())
+                {
                     target->SetHealth(target->CountPctFromMaxHealth((int32)GetCaster()->GetHealthPct()));
+                    ((Creature*)target)->ResetPlayerDamageReq();
+                }
             }
 
             void Register()

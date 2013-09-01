@@ -268,7 +268,7 @@ class instance_ulduar : public InstanceMapScript
                     else
                         algalon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                 }
-				
+                
                 // Keepers at Observation Ring
                 if (GetBossState(BOSS_FREYA) == DONE && _summonObservationRingKeeper[0] && !KeeperGUIDs[0])
                 {
@@ -640,7 +640,7 @@ class instance_ulduar : public InstanceMapScript
                         break;
                     case GO_VEZAX_DOOR:
                         VezaxDoorGUID = gameObject->GetGUID();
-                        HandleGameObject(0, false, gameObject);
+                        HandleGameObject(0, GetBossState(BOSS_VEZAX) == DONE, gameObject);
                         break;
                     case GO_WAY_TO_YOGG:
                         WayToYoggGUID = gameObject->GetGUID();
@@ -910,7 +910,7 @@ class instance_ulduar : public InstanceMapScript
 
                             HandleGameObject(HodirDoorGUID, true);
                             HandleGameObject(HodirIceDoorGUID, true);
-							
+                            
                             instance->SummonCreature(NPC_HODIR_OBSERVATION_RING, ObservationRingKeepersPos[1]);
                         }
                         break;
@@ -1141,7 +1141,7 @@ class instance_ulduar : public InstanceMapScript
                         return VezaxGUID;
                     case BOSS_ALGALON:
                         return AlgalonGUID;
-						
+                        
                     // Yogg-Saron
                     case BOSS_YOGG_SARON:
                         return YoggSaronGUID;
@@ -1351,7 +1351,7 @@ class instance_ulduar : public InstanceMapScript
 
                 for (uint8 i = 0; i < 4; ++i)
                     saveStream << ' ' << (KeeperGUIDs[i] ? 1 : 0);
-				
+
                 OUT_SAVE_INST_DATA_COMPLETE;
                 return saveStream.str();
             }
@@ -1402,7 +1402,7 @@ class instance_ulduar : public InstanceMapScript
                             DoUpdateWorldState(WORLD_STATE_ALGALON_DESPAWN_TIMER, _algalonTimer);
                         }
                     }
-					
+                    
                     for (uint8 i = 0; i < 4; ++i)
                     {
                         loadStream >> tempState;

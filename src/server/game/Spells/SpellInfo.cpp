@@ -1055,29 +1055,6 @@ bool SpellInfo::HasAura(AuraType aura) const
     return false;
 }
 
-const AuraType cc_auras[] = { SPELL_AURA_MOD_CONFUSE,
-    SPELL_AURA_MOD_FEAR,
-    SPELL_AURA_MOD_STUN,
-    SPELL_AURA_MOD_ROOT,
-    SPELL_AURA_TRANSFORM,
-    SPELL_AURA_NONE };
-
-bool SpellInfo::HasCCAura() const
-{
-    bool has_cc_aura = false;
-    int i = 0;
-    do
-    {
-        if (HasAura(cc_auras[i]))
-        {
-            has_cc_aura = true;
-            break;
-        }
-    }
-    while (cc_auras[++i] != SPELL_AURA_NONE);
-    return has_cc_aura;
-}
-
 bool SpellInfo::HasAreaAuraEffect() const
 {
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -1842,7 +1819,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
                 case SPELL_AURA_FLY:
                 case SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED:
                 {
-                    if (!player->IsKnowHowFlyIn(map_id, zone_id, Id))
+                    if (!player->IsKnowHowFlyIn(map_id, zone_id, Id) && Id != 70766) // Dream Portal on Valithria
                         return SPELL_FAILED_INCORRECT_AREA;
                     break;
                 }
@@ -2767,6 +2744,9 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                 case 54836: // Wrath of the Plaguebringer
                 case 61987: // Avenging Wrath Marker
                 case 61988: // Divine Shield exclude aura
+                case 69708: // Ice Prison (HoR)
+                case 70194: // Dark Arrow (HoR)
+                case 70070: // Harvest Soul (HoR)
                     return false;
                 case 30877: // Tag Murloc
                 case 61716: // Rabbit Costume

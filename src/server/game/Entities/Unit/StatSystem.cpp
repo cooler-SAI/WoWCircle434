@@ -1156,6 +1156,14 @@ void Guardian::UpdateMaxHealth()
     value += GetModifierValue(unitMod, TOTAL_VALUE) + stamina * multiplicator;
     value *= GetModifierValue(unitMod, TOTAL_PCT);
 
+    // Glyph of Voidwalker
+    if (GetEntry() == ENTRY_VOIDWALKER)
+    {
+        if (Player * owner = GetSpellModOwner())
+            if (AuraEffect * auraEff = owner->GetAuraEffect(56247, 0))
+                AddPct(value, auraEff->GetAmount());
+    }
+
     SetMaxHealth((uint32)value);
 }
 
@@ -1337,6 +1345,12 @@ void Guardian::UpdateSpellHitChance()
             m_modSpellHitChance = (*i)->GetAmount();
         }
     }
+
+    // Some pets have not spellhit in scaling auras
+    // Water Elemental
+    if (GetEntry() == 510)
+        if (Player* pOwner = m_owner->ToPlayer())
+            m_modSpellHitChance = pOwner->GetFloatValue(PLAYER_FIELD_UI_SPELL_HIT_MODIFIER) + pOwner->GetRatingBonusValue(CR_HIT_SPELL);
 }
 
 void Guardian::UpdateExpertise()

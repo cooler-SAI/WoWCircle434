@@ -1331,6 +1331,11 @@ void Group::CountTheRoll(Rolls::iterator rollI)
                     roll->getLoot()->unlootedCount--;
                     AllowedLooterSet looters = item->GetAllowedLooters();
                     player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
+
+                    if (const ItemTemplate* proto = sObjectMgr->GetItemTemplate(item->itemid))
+                        if (proto->Quality > ITEM_QUALITY_EPIC || (proto->Quality == ITEM_QUALITY_EPIC && proto->ItemLevel >= MinNewsItemLevel[sWorld->getIntConfig(CONFIG_EXPANSION)]))
+                            if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
+                                guild->GetNewsLog().AddNewEvent(GUILD_NEWS_ITEM_LOOTED, time(NULL), player->GetGUID(), 0, item->itemid);
                 }
                 else
                 {

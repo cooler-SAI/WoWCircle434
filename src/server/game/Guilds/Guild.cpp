@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "DatabaseEnv.h"
 #include "Guild.h"
 #include "GuildMgr.h"
@@ -1142,7 +1141,7 @@ bool Guild::Create(Player* pLeader, const std::string& name)
     m_leaderGuid = pLeader->GetGUID();
     m_name = name;
     m_info = "";
-    m_motd = "No message set.";
+    m_motd = "Сообщение не установлено.";
     m_bankMoney = 0;
     m_createdDate = ::time(NULL);
     _level = 1;
@@ -1608,7 +1607,7 @@ void Guild::HandleBuyBankTab(WorldSession* session, uint8 tabId)
 
 void Guild::HandleInviteMember(WorldSession* session, const std::string& name)
 {
-    Player* pInvitee = sObjectAccessor->FindPlayerByName(name.c_str());
+    Player* pInvitee = sObjectAccessor->FindPlayerByName(name);
     if (!pInvitee)
     {
         SendCommandResult(session, GUILD_INVITE_S, ERR_GUILD_PLAYER_NOT_FOUND_S, name);
@@ -1626,11 +1625,11 @@ void Guild::HandleInviteMember(WorldSession* session, const std::string& name)
         return;
     }
     // Invited player cannot be in another guild
-    /*if (pInvitee->GetGuildId())
+    if (pInvitee->GetGuildId())
     {
-        SendCommandResult(session, GUILD_INVITE, ERR_ALREADY_IN_GUILD_S, name);
+        SendCommandResult(session, GUILD_INVITE_S, ERR_ALREADY_IN_GUILD_S, name);
         return;
-    }*/
+    }
     // Invited player cannot be invited
     if (pInvitee->GetGuildIdInvited())
     {
@@ -3285,9 +3284,8 @@ void Guild::GiveXP(uint32 xp, Player* source /*=NULL*/)
 
     if (source)
     {
-        Member* member = GetMember(source->GetGUID());
+        if (Member* member = GetMember(source->GetGUID()))
         {
-            ASSERT(member != NULL);
 
             member->AddXPContrib(xp);
             member->AddXPContribWeek(xp);
@@ -3326,7 +3324,7 @@ void Guild::GiveXP(uint32 xp, Player* source /*=NULL*/)
             }
         }
 
-        //GetNewsLog().AddNewEvent(GUILD_NEWS_LEVEL_UP, time(NULL), 0, 0, _level);
+        GetNewsLog().AddNewEvent(GUILD_NEWS_LEVEL_UP, time(NULL), 0, 0, _level);
         GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_GUILD_LEVEL, GetLevel(), 0, 0, NULL, source);
 
         ++oldLevel;
@@ -3370,7 +3368,7 @@ void Guild::ResetWeeklyReputation()
 
 void Guild::GuildNewsLog::AddNewEvent(GuildNews eventType, time_t date, uint64 playerGuid, uint32 flags, uint32 data)
 {
-    /*uint32 id = _newsLog.size();
+    uint32 id = _newsLog.size();
 
     GuildNewsEntry& log = _newsLog[id];
     log.EventType = eventType;
@@ -3391,14 +3389,14 @@ void Guild::GuildNewsLog::AddNewEvent(GuildNews eventType, time_t date, uint64 p
 
     WorldPacket packet;
     BuildNewsData(id, log, packet);
-    GetGuild()->BroadcastPacket(&packet);*/
+    GetGuild()->BroadcastPacket(&packet);
 }
 
 void Guild::GuildNewsLog::LoadFromDB(PreparedQueryResult result)
 {
     if (!result)
         return;
-    /*do
+    do
     {
         Field* fields = result->Fetch();
         uint32 id = fields[0].GetInt32();
@@ -3409,7 +3407,7 @@ void Guild::GuildNewsLog::LoadFromDB(PreparedQueryResult result)
         log.Flags = fields[4].GetInt32();
         log.Date = time_t(fields[5].GetInt32());
     }
-    while (result->NextRow());*/
+    while (result->NextRow());
 }
 
 void Guild::GuildNewsLog::BuildNewsData(uint32 id, GuildNewsEntry& guildNew, WorldPacket& data)
@@ -3525,12 +3523,11 @@ void Guild::CompleteGuildChallenge(uint8 type)
     
     uint32 add_exp = reward[type].Expirience;
     uint64 add_gold = (cur_count > 0) ? reward[type].Gold2 : reward[type].Gold;
-    add_gold *= 10000;
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
    
     // Add Money
-    _ModifyBankMoney(trans, add_gold, true);
+    _ModifyBankMoney(trans, add_gold * 10000, true);
 
     // Add XP
     GiveXP(add_exp, NULL);
@@ -3551,6 +3548,10 @@ void Guild::CompleteGuildChallenge(uint8 type)
     data << uint32(max_count); // max
 
     BroadcastPacket(&data);
+
+    // Achievements
+    GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE, 1, 0, 0, NULL, NULL);
+    GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE_TYPE, type, 1, 0, NULL, NULL);
 }
 
 uint32 Guild::CalculateXPCapFromChallenge() const

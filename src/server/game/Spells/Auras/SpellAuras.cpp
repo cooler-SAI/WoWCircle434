@@ -817,9 +817,7 @@ void Aura::RefreshTimers()
 {
     m_maxDuration = CalcMaxDuration();
     bool resetPeriodic = true;
-    if ((m_spellInfo->HasAura(SPELL_AURA_PERIODIC_DAMAGE) || m_spellInfo->HasAura(SPELL_AURA_PERIODIC_LEECH) || m_spellInfo->HasAura(SPELL_AURA_PERIODIC_HEAL)) && 
-        ((m_spellInfo->SpellFamilyName >= SPELLFAMILY_MAGE && m_spellInfo->SpellFamilyName <= SPELLFAMILY_SHAMAN) ||
-        m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT))
+    if (m_spellInfo->AttributesEx8 & SPELL_ATTR8_DONT_RESET_PERIODIC_TIMER)
     {
         int32 minAmplitude = m_maxDuration;
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -1265,6 +1263,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_GENERIC:
                 switch (GetId())
                 {
+                    // PvP Trinket
+                    case 42292:
+                        if (target && target->GetTypeId() == TYPEID_PLAYER)
+                            target->CastSpell(target, (target->ToPlayer()->GetTeam() == ALLIANCE ? 97403 : 97404), true);
+                        break;
                     // Magma, Echo of Baine
                     case 101619:
                         if (target && target->GetTypeId() == TYPEID_PLAYER && !target->HasAura(101866))
@@ -1979,18 +1982,13 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         // Rapture
                         if (AuraEffect* auraEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PRIEST, 2894, 0))
                         {
-                            // check cooldown
+                            // check cooldown (need to use spell 63853 instead of cooldown)
                             if (caster->GetTypeId() == TYPEID_PLAYER)
                             {
                                 if (caster->ToPlayer()->HasSpellCooldown(auraEff->GetId()))
-                                {
-                                    // This additional check is needed to add a minimal delay before cooldown in in effect
-                                    // to allow all bubbles broken by a single damage source proc mana return
-                                    if (caster->ToPlayer()->GetSpellCooldownDelay(auraEff->GetId()) <= 11)
-                                        break;
-                                }
-                                else    // and add if needed
-                                    caster->ToPlayer()->AddSpellCooldown(auraEff->GetId(), 0, uint32(time(NULL) + 12));
+                                    break;
+                                
+                                caster->ToPlayer()->AddSpellCooldown(auraEff->GetId(), 0, uint32(time(NULL) + 12));
                             }
 
                             float multiplier = float(auraEff->GetAmount());

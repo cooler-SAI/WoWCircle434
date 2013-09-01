@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "Common.h"
 #include "GuildMgr.h"
 
@@ -236,7 +235,7 @@ void GuildMgr::LoadGuilds()
                                                      "FirstProffLevel, FirstProffSkill, FirstProffRank, SecondProffLevel, SecondProffSkill, SecondProffRank, "
                                                      //    37              38
                                                      "total_activity, week_activity "
-                                                     "FROM guild_member gm LEFT JOIN characters c ON c.guid = gm.guid ORDER BY guildid ASC");
+                                                     "FROM guild_member gm LEFT JOIN characters c ON c.guid = gm.guid WHERE c.deleteinfos_name IS NULL ORDER BY guildid ASC");
 
         if (!result)
         {
@@ -450,7 +449,7 @@ void GuildMgr::LoadGuilds()
         }
     }
     // 10. Loading Guild news
-    /*sLog->outInfo(LOG_FILTER_GENERAL, "Loading Guild News");
+    sLog->outInfo(LOG_FILTER_GENERAL, "Loading Guild News");
     {
         for (GuildContainer::const_iterator itr = GuildStore.begin(); itr != GuildStore.end(); ++itr)
         {
@@ -458,7 +457,7 @@ void GuildMgr::LoadGuilds()
             stmt->setInt32(0, itr->first);
             itr->second->GetNewsLog().LoadFromDB(CharacterDatabase.Query(stmt));
         }
-    }*/
+    }
     // 11. Loading Guild Challenges data
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading guild challenges...");
     {

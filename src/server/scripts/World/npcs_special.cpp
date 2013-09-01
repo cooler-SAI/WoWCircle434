@@ -3497,7 +3497,7 @@ class npc_flame_orb: public CreatureScript
 
                 if (uiDamageTimer <= diff)
                 {
-                    if (Unit* target = me->SelectNearestTarget(15))
+                    if (Unit* target = me->SelectNearestTargetNoCC(15))
                         DoCast(target, SPELL_FLAME_ORB_DAMAGE);
 
                     uiDamageTimer = 1 * IN_MILLISECONDS;
@@ -3582,7 +3582,7 @@ class npc_frostfire_orb: public CreatureScript
 
                 if (uiDamageTimer <= diff)
                 {
-                    if (Unit* target = me->SelectNearestTarget(15))
+                    if (Unit* target = me->SelectNearestTargetNoCC(15))
                     {
                         DoCast(target, spellId_dmg);
                     }

@@ -93,6 +93,7 @@ void AddSC_npc_professions();
 void AddSC_npc_innkeeper();
 void AddSC_npcs_special();
 void AddSC_npc_taxi();
+void AddSC_spectator();
 void AddSC_npc_companions();
 void AddSC_achievement_scripts();
 void AddSC_tarecgosa_scripts();
@@ -130,14 +131,13 @@ void AddSC_boss_gyth();
 void AddSC_boss_rend_blackhand();
 void AddSC_instance_blackrock_spire();
 void AddSC_boss_razorgore();                 //Blackwing lair
-void AddSC_boss_vael();
+void AddSC_boss_vaelastrasz();
 void AddSC_boss_broodlord();
 void AddSC_boss_firemaw();
 void AddSC_boss_ebonroc();
 void AddSC_boss_flamegor();
 void AddSC_boss_chromaggus();
 void AddSC_boss_nefarian();
-void AddSC_boss_victor_nefarius();
 void AddSC_instance_blackwing_lair();
 
 void AddSC_instance_deadmines(); // Deadmines
@@ -505,6 +505,7 @@ void AddSC_instance_halls_of_reflection();   // Halls of Reflection
 void AddSC_halls_of_reflection();
 void AddSC_boss_falric();
 void AddSC_boss_marwyn();
+void AddSC_boss_lich_king_hr();
 void AddSC_instance_icecrown_citadel(); // Icecrown Citadel
 void AddSC_icecrown_citadel();
 void AddSC_icecrown_citadel_teleport();
@@ -740,6 +741,7 @@ void AddSC_boss_yorsahj_the_unsleeping();
 void AddSC_boss_warlord_zonozz();
 void AddSC_boss_hagara_the_stormbinder();
 void AddSC_boss_ultraxion();
+void AddSC_boss_warmaster_blackhorn();
 
 // battlegrounds
 
@@ -853,6 +855,7 @@ void AddWorldScripts()
     AddSC_npc_innkeeper();
     AddSC_npcs_special();
     AddSC_npc_taxi();
+    AddSC_spectator();
     AddSC_npc_companions();
     AddSC_achievement_scripts();
     AddSC_tarecgosa_scripts();
@@ -895,14 +898,13 @@ void AddEasternKingdomsScripts()
     AddSC_boss_rend_blackhand();
     AddSC_instance_blackrock_spire();
     AddSC_boss_razorgore();                 //Blackwing lair
-    AddSC_boss_vael();
+    AddSC_boss_vaelastrasz();
     AddSC_boss_broodlord();
     AddSC_boss_firemaw();
     AddSC_boss_ebonroc();
     AddSC_boss_flamegor();
     AddSC_boss_chromaggus();
     AddSC_boss_nefarian();
-    AddSC_boss_victor_nefarius();
     AddSC_instance_blackwing_lair();
     AddSC_instance_deadmines(); // Deadmines
     AddSC_deadmines();
@@ -1366,6 +1368,7 @@ void AddNorthrendScripts()
     AddSC_halls_of_reflection();
     AddSC_boss_falric();
     AddSC_boss_marwyn();
+    AddSC_boss_lich_king_hr();
     AddSC_instance_icecrown_citadel(); // Icecrown Citadel
     AddSC_icecrown_citadel();
     AddSC_icecrown_citadel_teleport();
@@ -1514,6 +1517,7 @@ void AddNorthrendScripts()
     AddSC_boss_warlord_zonozz();
     AddSC_boss_hagara_the_stormbinder();
     AddSC_boss_ultraxion();
+    AddSC_boss_warmaster_blackhorn();
 
 #endif
 }

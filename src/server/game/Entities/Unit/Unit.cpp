@@ -307,6 +307,7 @@ Unit::~Unit()
         if (m_currentSpells[i])
         {
             m_currentSpells[i]->SetReferencedFromCurrent(false);
+            m_currentSpells[i]->SetExecutedCurrently(false);
             m_currentSpells[i] = NULL;
         }
 
@@ -1895,6 +1896,14 @@ void Unit::CalcHealAbsorb(Unit* victim, const SpellInfo* healSpell, uint32 &heal
 
         RemainingHeal -= currentAbsorb;
 
+        // Consuming Shroud, Warmaster Blackhorn, Dragon Soul
+        if ((*i)->GetSpellInfo()->Id == 110214 || (*i)->GetSpellInfo()->Id == 110598)
+            if (victim)
+            {
+                int32 bp0 = (RemainingHeal > 0 ? (healAmount - RemainingHeal) : healAmount);
+                victim->CastCustomSpell((Unit*)NULL, 110215, &bp0, NULL, NULL, true);
+            }
+
         // Reduce shield amount
         (*i)->SetAmount((*i)->GetAmount() - currentAbsorb);
         // Need remove it later
@@ -2429,7 +2438,14 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spell)
         return SPELL_MISS_NONE;
 
     if (spell->IsInterruptSpell())
+    {
+        // only deflect works here
+        int32 deflect_chance = victim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS);
+        if (roll_chance_i(deflect_chance))
+            return SPELL_MISS_DEFLECT;
+
         return SPELL_MISS_NONE;
+    }
 
     SpellSchoolMask schoolMask = spell->GetSchoolMask();
     // PvP - PvE spell misschances per leveldif > 2
@@ -2898,7 +2914,6 @@ void Unit::InterruptSpell(CurrentSpellTypes spellType, bool withDelayed, bool wi
 {
     ASSERT(spellType < CURRENT_MAX_SPELL);
 
-    //sLog->outDebug(LOG_FILTER_UNITS, "Interrupt spell for unit %u.", GetEntry());
     Spell* spell = m_currentSpells[spellType];
     if (spell
         && (withDelayed || spell->getState() != SPELL_STATE_DELAYED)
@@ -2976,6 +2991,21 @@ void Unit::InterruptNonMeleeSpells(bool withDelayed, uint32 spell_id, bool withI
 
     // channeled spells are interrupted if they are not finished, even if they are delayed
     if (m_currentSpells[CURRENT_CHANNELED_SPELL] && (!spell_id || m_currentSpells[CURRENT_CHANNELED_SPELL]->m_spellInfo->Id == spell_id))
+        InterruptSpell(CURRENT_CHANNELED_SPELL, true, true);
+}
+
+void Unit::InterruptNonMeleeSpellsExcept(bool withDelayed, uint32 except, bool withInstant)
+{
+    // generic spells are interrupted if they are not finished or delayed
+    if (m_currentSpells[CURRENT_GENERIC_SPELL] && m_currentSpells[CURRENT_GENERIC_SPELL]->m_spellInfo->Id != except)
+        InterruptSpell(CURRENT_GENERIC_SPELL, withDelayed, withInstant);
+
+    // autorepeat spells are interrupted if they are not finished or delayed
+    if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL] && m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id != except)
+        InterruptSpell(CURRENT_AUTOREPEAT_SPELL, withDelayed, withInstant);
+
+    // channeled spells are interrupted if they are not finished, even if they are delayed
+    if (m_currentSpells[CURRENT_CHANNELED_SPELL] && m_currentSpells[CURRENT_CHANNELED_SPELL]->m_spellInfo->Id != except)
         InterruptSpell(CURRENT_CHANNELED_SPELL, true, true);
 }
 
@@ -3743,7 +3773,7 @@ void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase)
     AuraList& scAuras = GetSingleCastAuras();
     for (AuraList::const_iterator itr = scAuras.begin(); itr != scAuras.end(); ++itr)
         if (Aura* aura = *itr)
-            if (aura->GetUnitOwner() != this && !aura->GetUnitOwner()->InSamePhase(newPhase))
+            if (aura->GetUnitOwner() != this && !aura->GetUnitOwner()->InSamePhase(newPhase) && !aura->IsRemoved())
                 tempList.push_back(aura);
 
     if (!tempList.empty())
@@ -5607,6 +5637,11 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             return false;
 
                         triggered_spell_id = procSpell->Id;
+
+                        // Fulmination
+                        if (procSpell->Id == 88767)
+                            basepoints0 = damage;
+
                         break;
                     }
                     break;
@@ -6293,10 +6328,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 11120:
                 case 12846:
                 {
-                    if (AuraEffect const *aurEff = GetAuraEffect(12654, EFFECT_0, GetGUID()))
-                        if (!aurEff->GetTickNumber())
-                            return false;
-
                     Unit* original_caster = GetProcOwner();
                     if (!original_caster)
                         return false;
@@ -7327,6 +7358,17 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     triggered_spell_id = 32747;
                     break;
                 }
+                // Glyph of Regrowth
+                case 54743:
+                {
+                    if (GetHealthPct() < 50.0f)
+                    {
+                        if (Aura * aur = victim->GetAura(procSpell->Id, GetGUID()))
+                            aur->RefreshDuration(false);
+                    }
+
+                    return true;
+                }
                 // Item - Druid T10 Balance 4P Bonus
                 case 70723:
                 {
@@ -7581,6 +7623,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         int32 bp0 = int32(CalculatePct(GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + crIds[i]), 25));
                         CastCustomSpell(this, spellIds[i], &bp0, 0, 0, true);
                     }
+                    // Item - Rogue T13 2P Bonus
+                    if (HasAura(105849))
+                        CastSpell(this, 105864, true);
 
                     if (!redirectTarget)
                         break;
@@ -10758,6 +10803,12 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             }
             break;
         }
+        case 81585: // Chakra: Serenity Renew update proc
+        {
+            if (procSpell->IsTargetingArea())
+                return false;
+            break;
+        }
     }
 
     if (cooldown && GetTypeId() == TYPEID_PLAYER && ToPlayer()->HasSpellCooldown(trigger_spell_id))
@@ -12397,11 +12448,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     }
 
     // Done fixed damage bonus auras
-    int32 DoneAdvertisedBenefit  = SpellBaseDamageBonusDone(spellProto->GetSchoolMask());
-    // Pets just add their bonus damage to their spell damage
-    // note that their spell damage is just gain of their own auras
-    if (HasUnitTypeMask(UNIT_MASK_GUARDIAN))
-        DoneAdvertisedBenefit += ((Guardian*)this)->GetBonusDamage();
+    int32 DoneAdvertisedBenefit  = SpellBaseDamageBonusDone(spellProto->GetSchoolMask());    
 
     // Check for table values
     float coeff = 0;
@@ -12839,16 +12886,6 @@ float Unit::GetSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolM
                                  if (victim->HealthAbovePct(80))
                                     crit_chance += predatory->GetAmount();
                             }
-                            break;
-                        }
-                        break;
-                    case SPELLFAMILY_WARRIOR:
-                        // Victory Rush
-                        if (spellProto->SpellFamilyFlags[1] & 0x100)
-                        {
-                            // Glyph of Victory Rush
-                            if (AuraEffect const* aurEff = GetAuraEffect(58382, 0))
-                                crit_chance += aurEff->GetAmount();
                             break;
                         }
                         break;
@@ -14106,7 +14143,7 @@ void Unit::SendMountResult(MountResult error)
 void Unit::SetInCombatWith(Unit* enemy)
 {
     Unit* eOwner = enemy->GetCharmerOrOwnerOrSelf();
-    if (eOwner->IsPvP() || eOwner->isBattlegroundVehicle())
+    if (eOwner->IsPvP() || (eOwner->ToCreature() && eOwner->ToCreature()->isBattlegroundVehicle()))
     {
         SetInCombatState(true, enemy);
         return;
@@ -14600,10 +14637,6 @@ bool Unit::IsAlwaysVisibleFor(WorldObject const* seer) const
 bool Unit::IsAlwaysDetectableFor(WorldObject const* seer) const
 {
     if (WorldObject::IsAlwaysDetectableFor(seer))
-        return true;
-
-    // Hunter's Mark
-    if (HasAura(1130, seer->GetGUID()) && !HasAura(11327))
         return true;
 
     return false;
@@ -16840,7 +16873,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         // only auras that has triggered spell should proc from fully absorbed damage
         if (procExtra & PROC_EX_ABSORB && isVictim)
         {
-            if (damage || spellProto->HasCCAura() || spellProto->Effects[EFFECT_0].TriggerSpell || spellProto->Effects[EFFECT_1].TriggerSpell || spellProto->Effects[EFFECT_2].TriggerSpell)
+            if (damage || spellProto->HasCustomAttribute(SPELL_ATTR0_CU_AURA_CC) || spellProto->Effects[EFFECT_0].TriggerSpell || spellProto->Effects[EFFECT_1].TriggerSpell || spellProto->Effects[EFFECT_2].TriggerSpell)
                 active = true;
         }
         if (!IsTriggeredAtSpellProcEvent(target, triggerData.aura, procSpell, procFlag, procExtra, attType, isVictim, active, triggerData.spellProcEvent))
@@ -20404,13 +20437,14 @@ bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool tel
         if (GetTypeId() == TYPEID_PLAYER)
             GetMap()->PlayerRelocation(ToPlayer(), x, y, z, orientation);
         else
+        {
             GetMap()->CreatureRelocation(ToCreature(), x, y, z, orientation);
+            // code block for underwater state update
+            UpdateUnderwaterState(GetMap(), x, y, z);
+        }
     }
     else if (turn)
         UpdateOrientation(orientation);
-
-    // code block for underwater state update
-    UpdateUnderwaterState(GetMap(), x, y, z);
 
     return (relocated || turn);
 }
@@ -21169,6 +21203,8 @@ void Unit::RemoveBattlegroundStartingAuras()
             ++iter;
     }
 }
+
+
 
 void Unit::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
 {

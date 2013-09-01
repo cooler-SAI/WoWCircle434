@@ -351,11 +351,26 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         if (ihit->effectMask & (1<<effIndex))
                             ++count;
 
+                    switch (m_spellInfo->Id)
+                    {
+                        case 106401: // Twilight Onslaught
+                        case 108862: // Twilight Onslaught
+                        case 109226: // Twilight Onslaught
+                        case 109227: // Twilight Onslaught
+                            ++count; // + ship
+                            break;
+                    }
+
                     damage /= count;                    // divide to all targets
                 }
 
                 switch (m_spellInfo->Id)                     // better way to check unknown
                 { 
+                    // Mirror Image, Frost Bolt
+                    case 59638:
+                        if (m_caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                            damage += int32(((Guardian*)m_caster)->GetBonusDamage() * 0.25f);
+                        break;
                     case 109721: // Lightning Strike, Vial of Shadows (lfr)
                         damage += int32(0.266f * m_caster->GetTotalAttackPowerValue(m_caster->getClass() == CLASS_HUNTER ? RANGED_ATTACK : BASE_ATTACK));
                         break;
@@ -435,21 +450,15 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     // Shaman, Fire Elemental, Fire Nova
                     case 12470:
                     {
-                        if (Unit* owner = m_caster->GetOwner())
-                        {
-                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
-                            damage += spd;
-                        }
+                        if (m_caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                            damage += ((Guardian*)m_caster)->GetBonusDamage();
                         break;
                     }
                     // Shaman, Fire Elemental, Fire Shield
                     case 13376:
                     {
-                        if (Unit* owner = m_caster->GetOwner())
-                        {
-                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
-                            damage += spd * 0.032f;
-                        }
+                        if (m_caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                            damage += ((Guardian*)m_caster)->GetBonusDamage() * 0.032f;
                         break;
                     }
                     // Decimation Blade, Baleroc
@@ -510,6 +519,8 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     {
                         // about +4 base spell dmg per level
                         damage = (m_caster->getLevel() - 60) * 4 + 60;
+                        if (m_caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                            damage += ((Guardian*)m_caster)->GetBonusDamage() * 0.23f;
                         break;
                     }
                     // Ancient Fury
@@ -592,14 +603,11 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             {
                 switch (m_spellInfo->Id)
                 {
-                    // Doom Bolt
+                    // Warlock, Doomguard, Doom Bolt
                     case 85692:
                     {
-                        if (Unit* owner = m_caster->GetOwner())
-                        {
-                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
-                            damage += spd * 1.36f;
-                        }
+                        if (m_caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                            damage += ((Guardian*)m_caster)->GetBonusDamage() * 1.36f;
                         break;
                     }
                     // Firebolt
@@ -963,16 +971,26 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             {
                 switch (m_spellInfo->Id)
                 {
+                    // Mirror Image, Fire Blast
+                    case 59637:
+                        if (m_caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                            damage += int32(((Guardian*)m_caster)->GetBonusDamage() * 0.15f);
+                        break;
+                    // Water Elemental, Water Bolt
+                    case 31707:
+                        if (Unit* pOwner = m_caster->GetOwner())
+                            damage += int32(pOwner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST) * 0.42f);
+                        break;
+                    // Water Elemental, Freeze
+                    case 33395:
+                        if (Unit* pOwner = m_caster->GetOwner())
+                            damage += int32(pOwner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST) * 0.029f);
+                        break;
                     // Shaman, Fire Elemental, Fire Blast
                     case 57984:
-                    {
-                        if (Unit* owner = m_caster->GetOwner())
-                        {
-                            int32 spd = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL);
-                            damage += spd * 0.429f;
-                        }
+                        if (m_caster->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
+                            damage += ((Guardian*)m_caster)->GetBonusDamage() * 0.429f;
                         break;
-                    }
                     case 71757: // Deep Freeze should deal damage to permanently stun-immune targets.
                         if (unitTarget->GetTypeId() != TYPEID_UNIT || !(unitTarget->IsImmunedToSpellEffect(sSpellMgr->GetSpellInfo(44572), 0)))
                             return;
@@ -1301,10 +1319,10 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
 
                             // Don't summon self
                             if (!pPlayer || pPlayer->GetGUID() == m_caster->GetGUID())
-                                return;
+                                continue;
 
                             if (!pPlayer->isAlive() || !pPlayer->IsInWorld())
-                                return;
+                                continue;
 
                             float x, y, z;
                             m_caster->GetPosition(x, y, z);
@@ -2557,6 +2575,11 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
                 addhealth = m_caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL, m_spellValue->EffectBasePoints[1]);
                 break;
             }
+            // Word of Glory
+            case 85673:
+            {
+                break;
+            }
             default:
                 addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
                 break;
@@ -2661,6 +2684,10 @@ void Spell::EffectHealthLeech(SpellEffIndex effIndex)
     if (!unitTarget || !unitTarget->isAlive() || damage < 0)
         return;
 
+    // Siphon Vitality, Warmaster Blackhorn, Dragon Soul
+    if (m_spellInfo->Id == 110312)
+        damage = unitTarget->CountPctFromCurHealth(20);
+
     damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
     damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
 
@@ -2760,9 +2787,9 @@ void Spell::DoCreateItem(uint32 /*i*/, uint32 itemtype)
         // create the new item and store it
         Item* pItem = player->StoreNewItem(dest, newitemid, true, Item::GenerateItemRandomPropertyId(newitemid));
 
-       // if (pProto->Quality > ITEM_QUALITY_EPIC || (pProto->Quality == ITEM_QUALITY_EPIC && pProto->ItemLevel >= MinNewsItemLevel[sWorld->getIntConfig(CONFIG_EXPANSION)]))
-            //if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
-                //guild->GetNewsLog().AddNewEvent(GUILD_NEWS_ITEM_CRAFTED, time(NULL), player->GetGUID(), 0, pProto->ItemId);
+        if (pProto->Quality > ITEM_QUALITY_EPIC || (pProto->Quality == ITEM_QUALITY_EPIC && pProto->ItemLevel >= MinNewsItemLevel[sWorld->getIntConfig(CONFIG_EXPANSION)]))
+            if (Guild* guild = sGuildMgr->GetGuildById(player->GetGuildId()))
+                guild->GetNewsLog().AddNewEvent(GUILD_NEWS_ITEM_CRAFTED, time(NULL), player->GetGUID(), 0, pProto->ItemId);
 
         // was it successful? return error if not
         if (!pItem)
@@ -3388,8 +3415,9 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
     // Item - Warlock T13 2P Bonus (Doomguard and Infernal)
-    if (AuraEffect const* aurEff = m_originalCaster->GetAuraEffect(105888, EFFECT_1))
-        duration += aurEff->GetAmount();
+    if (entry == 11859 || entry == 89)
+        if (AuraEffect const* aurEff = m_originalCaster->GetAuraEffect(105888, EFFECT_1))
+            duration += aurEff->GetAmount() * 1000;
 
     TempSummon* summon = NULL;
 
@@ -4355,7 +4383,7 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
             unitTarget->getThreatManager().setCurrentVictim(forcedVictim);
 
     if (unitTarget->GetTypeId() == TYPEID_UNIT && unitTarget->ToCreature()->IsAIEnabled 
-    && (!unitTarget->ToCreature()->HasReactState(REACT_PASSIVE) || unitTarget->IsPetGuardianStuff()))
+    && (!unitTarget->ToCreature()->HasReactState(REACT_PASSIVE) || (unitTarget->IsPetGuardianStuff() && IS_PLAYER_GUID(unitTarget->GetCharmerOrOwnerGUID()))))
     {
         // taken from case COMMAND_ATTACK:                        //spellid=1792  //ATTACK PetHandler.cpp
         if (CharmInfo* charmInfo = unitTarget->GetCharmInfo())
@@ -6665,6 +6693,10 @@ void Spell::EffectResurrect(SpellEffIndex effIndex)
 
     if (target->IsRessurectRequested())       // already have one active request
         return;
+
+    if (m_spellInfo->HasAttribute(SPELL_ATTR8_BATTLE_RESURRECTION))
+        if (InstanceScript* pInstance = target->GetInstanceScript())
+            pInstance->UpdateResurrectionsCount();
 
     uint32 health = target->CountPctFromMaxHealth(damage);
     uint32 mana   = CalculatePct(target->GetMaxPower(POWER_MANA), damage);

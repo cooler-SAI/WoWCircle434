@@ -2,6 +2,7 @@
 #define DEF_DRAGONSOUL_H
 // 109247 - ds nerf real
 // 109251 - ds nerf dummy
+// 109255 - ds nerf dummy
 // 108202 - temple teleport
 // 108263 - ship teleport
 // 106094 - eye teleport +
@@ -25,6 +26,9 @@ enum Datas
     DATA_LESSER_CACHE_25N   = 13,
     DATA_LESSER_CACHE_10H   = 14,
     DATA_LESSER_CACHE_25H   = 15,
+    DATA_SWAYZE             = 16,
+    DATA_REEVS              = 17,
+    DATA_ALLIANCE_SHIP      = 18,
 };
 
 enum CreatureIds
@@ -37,6 +41,8 @@ enum CreatureIds
     NPC_ULTRAXION                   = 55294,
     NPC_BLACKHORN                   = 56427,
     NPC_GORIONA                     = 56781,
+    NPC_SKY_CAPTAIN_SWAYZE          = 55870,
+    NPC_KAANU_REEVS                 = 55891,
 
     NPC_NETHESTRASZ                 = 57287, // teleport upstairs
     NPC_EIENDORMI                   = 57288, // teleport to Yor'sahj
@@ -65,6 +71,7 @@ enum GameObjects
     GO_LESSER_CACHE_OF_THE_ASPECTS_25N  = 210161,
     GO_LESSER_CACHE_OF_THE_ASPECTS_10H  = 210162,
     GO_LESSER_CACHE_OF_THE_ASPECTS_25H  = 210163,
+    GO_ALLIANCE_SHIP                    = 210210,
 };
 
 enum SharedSpells

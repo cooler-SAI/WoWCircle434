@@ -443,6 +443,7 @@ public:
             {
                 if (CheckTimer < diff)
                 {
+                    me->UpdateSpeed(MOVE_FLIGHT, true);
                     CheckTimer = 5000;
                     if (me->GetAreaId() == AREA_VALLEY_OF_ANCIENT_WINTERS)
                     {
