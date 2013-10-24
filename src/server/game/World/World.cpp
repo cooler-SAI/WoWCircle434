@@ -3365,39 +3365,4 @@ void World::ProcessMailboxQueue()
     }
     else
         sLog->outError(LOG_FILTER_WORLDSERVER, "MailboxQueue: No pending mail");
-
-    QueryResult commandexist = CharacterDatabase.Query("SELECT id FROM custom_command");
-    if(commandexist)
-    {
-        do
-        {
-            fetch = commandexist->Fetch();
-            uint32 id = fetch[0].GetUInt32();
-
-            QueryResult select = CharacterDatabase.PQuery("SELECT * FROM custom_command WHERE id = '%u'", id);
-            if(select)
-            {
-                do
-                {
-                    f = select->Fetch();
-                    std::string filename = f[1].GetCString();
-                    uint32 account = f[2].GetUInt32();
-                    std::string name = f[3].GetCString();
-                    uint32 guid = f[4].GetUInt32();
-
-                    switch (PlayerDumpReader().LoadDump(filename.c_str(), account, name, guid))
-                    {
-                        case DUMP_SUCCESS:
-                        case DUMP_FILE_OPEN_ERROR:
-                        {
-                            CharacterDatabase.PExecute("DELETE FROM custom_command WHERE id = '%u'", id);
-                            sLog->outError(LOG_FILTER_REMOTECOMMAND, "custom_command: %s, account %u", filename.c_str(), account);
-                        }
-                        break;
-                    }
-
-                } while (select->NextRow());
-            }
-        } while ( commandexist->NextRow() );
-    }
 }
