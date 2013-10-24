@@ -51,12 +51,14 @@ class Log
         void outWarn(LogFilterType f, char const* str, ...) ATTR_PRINTF(3,4);
         void outError(LogFilterType f, char const* str, ...) ATTR_PRINTF(3,4);
         void outFatal(LogFilterType f, char const* str, ...) ATTR_PRINTF(3,4);
+        void outArena(const char * str, ...)                 ATTR_PRINTF(2,3);
 
         void EnableDBAppenders();
         void outCommand(uint32 account, const char * str, ...) ATTR_PRINTF(3, 4);
         void outCharDump(char const* str, uint32 account_id, uint32 guid, char const* name);
         static std::string GetTimestampStr();
 
+        static void outTimestamp(FILE* file);
         void SetRealmID(uint32 id);
 
     private:
@@ -74,6 +76,8 @@ class Log
         AppenderMap appenders;
         LoggerMap loggers;
         uint8 AppenderId;
+        FILE* openLogFile(char const* configFileName, char const* configTimeStampFlag, char const* mode);
+        FILE* arenaLogFile;
 
         std::string m_logsDir;
         std::string m_logsTimestamp;

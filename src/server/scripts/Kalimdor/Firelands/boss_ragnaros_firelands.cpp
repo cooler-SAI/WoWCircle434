@@ -411,7 +411,7 @@ class boss_ragnaros_firelands : public CreatureScript
 
             void EnterCombat(Unit* attacker)
             {
-                if (!instance->CheckRequiredBosses(DATA_RAGNAROS, attacker->ToPlayer()))
+                if (!instance->CheckRequiredBosses(DATA_RAGNAROS, me->GetEntry(), attacker->ToPlayer()))
                 {
                     EnterEvadeMode();
                     instance->DoNearTeleportPlayers(FLEntrancePos);

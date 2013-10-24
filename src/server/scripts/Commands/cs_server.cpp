@@ -104,30 +104,24 @@ public:
 
     static bool HandleServerInfoCommand(ChatHandler* handler, char const* /*args*/)
     {
-        uint32 playersNum           = sWorld->GetPlayerCount();
-        //uint32 maxPlayersNum        = sWorld->GetMaxPlayerCount();
         uint32 activeClientsNum     = sWorld->GetActiveSessionCount();
         uint32 queuedClientsNum     = sWorld->GetQueuedSessionCount();
         uint32 maxActiveClientsNum  = sWorld->GetMaxActiveSessionCount();
         uint32 maxQueuedClientsNum  = sWorld->GetMaxQueuedSessionCount();
         std::string uptime          = secsToTimeString(sWorld->GetUptime());
         uint32 updateTime           = sWorld->GetUpdateTime();
-     if(playersNum > 50)
-        playersNum = (playersNum * 1.33);
 
-    handler->PSendSysMessage("-=Isengard.ru=- " _DATE " |cffff0000Version - " _HASH); //antoma
-    handler->PSendSysMessage(LANG_CONNECTED_USERS, playersNum, maxActiveClientsNum, queuedClientsNum, maxQueuedClientsNum);
-    handler->PSendSysMessage(LANG_UPTIME, uptime.c_str());
-
-    if (updateTime > 500)
-    handler->PSendSysMessage(LANG_DIFF_POOR, updateTime);
-    else if (updateTime > 200)
-    handler->PSendSysMessage(LANG_DIFF_NORMAL, updateTime);
-    else
-    handler->PSendSysMessage(LANG_DIFF_GOOD, updateTime);
+        handler->SendSysMessage(_FULLVERSION);
+        handler->PSendSysMessage(LANG_CONNECTED_USERS, activeClientsNum, maxActiveClientsNum, queuedClientsNum, maxQueuedClientsNum);
+        handler->PSendSysMessage(LANG_UPTIME, uptime.c_str());
+        handler->PSendSysMessage(LANG_UPDATE_DIFF, updateTime);
+        // Can't use sWorld->ShutdownMsg here in case of console command
+        if (sWorld->IsShuttingDown())
+            handler->PSendSysMessage(LANG_SHUTDOWN_TIMELEFT, secsToTimeString(sWorld->GetShutDownTimeLeft()).c_str());
 
         return true;
     }
+
     // Display the 'Message of the day' for the realm
     static bool HandleServerMotdCommand(ChatHandler* handler, char const* /*args*/)
     {

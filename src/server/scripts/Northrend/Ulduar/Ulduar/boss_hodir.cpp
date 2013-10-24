@@ -359,7 +359,7 @@ class boss_hodir : public CreatureScript
 
             void EnterCombat(Unit* who)
             {
-                if (!instance->CheckRequiredBosses(BOSS_HODIR, who->ToPlayer()))
+                if (!instance->CheckRequiredBosses(BOSS_HODIR, me->GetEntry(), who->ToPlayer()))
                 {
                     EnterEvadeMode();
                     instance->DoCastSpellOnPlayers(SPELL_BASE_CAMP_TELEPORT);

@@ -124,7 +124,7 @@ class boss_baleroc : public CreatureScript
 
             void EnterCombat(Unit* attacker)
             {
-                if (!instance->CheckRequiredBosses(DATA_BALEROC, attacker->ToPlayer()))
+                if (!instance->CheckRequiredBosses(DATA_BALEROC, me->GetEntry(), attacker->ToPlayer()))
                 {
                     EnterEvadeMode();
                     instance->DoNearTeleportPlayers(FLEntrancePos);

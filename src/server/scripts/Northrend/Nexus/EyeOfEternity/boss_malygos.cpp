@@ -571,7 +571,7 @@ public:
             me->setActive(true);
             if (instance)
             {
-                if (!instance->CheckRequiredBosses(DATA_MALYGOS_EVENT))
+                if (!instance->CheckRequiredBosses(DATA_MALYGOS_EVENT, me->GetEntry()))
                 {
                     EnterEvadeMode();
                     return;

@@ -24,7 +24,7 @@
 #include "Define.h"
 #include "revision.h"
 
-#define _PACKAGENAME "Isengard"
+#define _PACKAGENAME "Uwow"
 
 #if TRINITY_ENDIAN == TRINITY_BIGENDIAN
 # define _ENDIAN_STRING "big-endian"
@@ -39,6 +39,6 @@
 #  define _FULLVERSION _PACKAGENAME " rev. " _HASH " (Win32, " _BUILD_DIRECTIVE ")"
 # endif
 #else
-#  define _FULLVERSION _PACKAGENAME " rev. " _HASH " (Unix, " _BUILD_DIRECTIVE ")"
+#  define _FULLVERSION _PACKAGENAME " rev. " _HASH " (Win64, " _BUILD_DIRECTIVE ")"
 #endif
 #endif

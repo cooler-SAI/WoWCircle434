@@ -454,7 +454,7 @@ class boss_freya : public CreatureScript
 
             void EnterCombat(Unit* who)
             {
-                if (!instance->CheckRequiredBosses(BOSS_FREYA, who->ToPlayer()))
+                if (!instance->CheckRequiredBosses(BOSS_FREYA, me->GetEntry(), who->ToPlayer()))
                 {
                     //EnterEvadeMode();
                     me->DisappearAndDie();

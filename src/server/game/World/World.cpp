@@ -511,6 +511,7 @@ void World::LoadConfigSettings(bool reload)
         rate_values[RATE_TALENT] = 1.0f;
     }
     rate_values[RATE_ONLINE] = ConfigMgr::GetFloatDefault("Rate.Online", 1.47f);
+    rate_values[RATE_DONATE] = ConfigMgr::GetFloatDefault("Rate.Donate", 1.0f);
     rate_values[RATE_MOVESPEED] = ConfigMgr::GetFloatDefault("Rate.MoveSpeed", 1.0f);
     if (rate_values[RATE_MOVESPEED] < 0)
     {

@@ -65,40 +65,6 @@ enum EncounterState
     TO_BE_DECIDED = 5
 };
 
-enum DoorType
-{
-    DOOR_TYPE_ROOM          = 0,    // Door can open if encounter is not in progress
-    DOOR_TYPE_PASSAGE       = 1,    // Door can open if encounter is done
-    DOOR_TYPE_SPAWN_HOLE    = 2,    // Door can open if encounter is in progress, typically used for spawning places
-    MAX_DOOR_TYPES
-};
-
-enum BoundaryType
-{
-    BOUNDARY_NONE = 0,
-    BOUNDARY_N,
-    BOUNDARY_S,
-    BOUNDARY_E,
-    BOUNDARY_W,
-    BOUNDARY_NE,
-    BOUNDARY_NW,
-    BOUNDARY_SE,
-    BOUNDARY_SW,
-    BOUNDARY_MAX_X = BOUNDARY_N,
-    BOUNDARY_MIN_X = BOUNDARY_S,
-    BOUNDARY_MAX_Y = BOUNDARY_W,
-    BOUNDARY_MIN_Y = BOUNDARY_E
-};
-
-typedef std::map<BoundaryType, float> BossBoundaryMap;
-
-struct DoorData
-{
-    uint32 entry, bossId;
-    DoorType type;
-    uint32 boundary;
-};
-
 struct MinionData
 {
     uint32 entry, bossId;
@@ -162,6 +128,17 @@ class InstanceScript : public ZoneScript
         //Called when a player successfully enters the instance.
         virtual void OnPlayerEnter(Player* /*player*/) {}
 
+        void OnGameObjectCreate(GameObject* go)
+        {
+            if(sObjectMgr->GetCreatureAIInstaceGoData(go->GetEntry()))
+                AddDoor(go, true);
+        }
+        void OnGameObjectRemove(GameObject* go)
+        {
+            if(sObjectMgr->GetCreatureAIInstaceGoData(go->GetEntry()))
+                AddDoor(go, false);
+        }
+
         //Handle open / close objects
         //use HandleGameObject(0, boolen, GO); in OnObjectCreate in instance scripts
         //use HandleGameObject(GUID, boolen, NULL); in any other script
@@ -221,7 +198,16 @@ class InstanceScript : public ZoneScript
         virtual bool CheckAchievementCriteriaMeet(uint32 /*criteria_id*/, Player const* /*source*/, Unit const* /*target*/ = NULL, uint32 /*miscvalue1*/ = 0);
 
         // Checks boss requirements (one boss required to kill other)
-        virtual bool CheckRequiredBosses(uint32 /*bossId*/, Player const* /*player*/ = NULL) const { return true; }
+        virtual bool CheckRequiredBosses(uint32 bossId, uint32 entry, Player const* player = NULL) const
+        {
+            if(CreatureAIInstance const* aiinstdata = sObjectMgr->GetCreatureAIInstaceData(entry))
+            {
+                if(aiinstdata->bossidactivete != 0)
+                    if (GetBossState(aiinstdata->bossidactivete) != DONE)
+                        return false;
+            }
+            return true;
+        }
 
         // Checks encounter state at kill/spellcast
         void UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source);
@@ -238,13 +224,18 @@ class InstanceScript : public ZoneScript
 
         // ReCheck PhaseTemplate related conditions
         void UpdatePhasing();
+        void SetBossNumber(uint32 number)
+        {
+            sLog->outDebug(LOG_FILTER_TSCR, "InstanceScript::SetBossNumber number %u", number);
+            if(bosses.size() < number) bosses.resize(number);
+        }
+        void LoadDoorDataBase(std::vector<DoorData> const* data);
 
         void UpdateResurrectionsCount() { resurrections++; }
         bool CanUseResurrection();
         void ResetResurrectionsCount() { resurrections = 0; }
 
     protected:
-        void SetBossNumber(uint32 number) { bosses.resize(number); }
         void LoadDoorData(DoorData const* data);
         void LoadMinionData(MinionData const* data);
 

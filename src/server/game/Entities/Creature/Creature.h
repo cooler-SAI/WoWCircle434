@@ -301,6 +301,64 @@ struct CreatureModelInfo
 // Benchmarked: Faster than std::map (insert/find)
 typedef UNORDERED_MAP<uint16, CreatureModelInfo> CreatureModelContainer;
 
+// `creature_ai_instance` table
+struct CreatureAIInstance
+{
+    uint32 entry;
+    uint32 bossid;
+    uint32 bossidactivete;
+};
+
+typedef UNORDERED_MAP<uint32, CreatureAIInstance> CreatureAIInstanceContainer;
+
+// `creature_ai_instance_door` table
+
+enum DoorType
+{
+    DOOR_TYPE_ROOM          = 0,    // Door can open if encounter is not in progress
+    DOOR_TYPE_PASSAGE       = 1,    // Door can open if encounter is done
+    DOOR_TYPE_SPAWN_HOLE    = 2,    // Door can open if encounter is in progress, typically used for spawning places
+    MAX_DOOR_TYPES
+};
+
+struct DoorData
+{
+    uint32 entry, bossId;
+    DoorType type;
+    uint32 boundary;
+};
+
+struct DoorGoData
+{
+    uint32 entry, bossId, instanceId;
+    DoorType type;
+    uint32 boundary;
+};
+
+typedef std::map<uint32, std::vector<DoorData> > CreatureAIInstanceDoorContainer;
+typedef std::map<uint32, std::vector<DoorGoData> > CreatureAIInstanceGoContainer;
+
+
+enum BoundaryType
+{
+    BOUNDARY_NONE = 0,
+    BOUNDARY_N,
+    BOUNDARY_S,
+    BOUNDARY_E,
+    BOUNDARY_W,
+    BOUNDARY_NE,
+    BOUNDARY_NW,
+    BOUNDARY_SE,
+    BOUNDARY_SW,
+    BOUNDARY_MAX_X = BOUNDARY_N,
+    BOUNDARY_MIN_X = BOUNDARY_S,
+    BOUNDARY_MAX_Y = BOUNDARY_W,
+    BOUNDARY_MIN_Y = BOUNDARY_E
+};
+
+typedef std::map<BoundaryType, float> BossBoundaryMap;
+
+// `creature_ai_instance_door` table
 enum InhabitTypeValues
 {
     INHABIT_GROUND = 1,
@@ -752,6 +810,7 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
         void FarTeleportTo(Map* map, float X, float Y, float Z, float O);
 
         bool m_isTempWorldObject; //true when possessed
+        uint32 GetBossId() const { return bossid; }
 
         bool isBattlegroundVehicle() const;
 
@@ -800,6 +859,7 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
 
         uint16 m_LootMode;                                  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
         uint32 guid_transport;
+        uint32 bossid;
 
         bool IsInvisibleDueToDespawn() const;
     private:
@@ -837,6 +897,17 @@ class ForcedDespawnDelayEvent : public BasicEvent
 
     private:
         Creature& m_owner;
+};
+
+class SetPhaseDelayEvent : public BasicEvent
+{
+    public:
+        SetPhaseDelayEvent(Creature& owner, uint32 phase) : BasicEvent(), m_owner(owner), m_phase(phase) { }
+        bool Execute(uint64 e_time, uint32 p_time);
+
+    private:
+        Creature& m_owner;
+        uint32 m_phase;
 };
 
 #endif

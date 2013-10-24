@@ -371,6 +371,7 @@ void Item::SaveToDB(SQLTransaction& trans)
             if (!isInTransaction)
                 CharacterDatabase.CommitTransaction(trans);
 
+            CharacterDatabase.PExecute("UPDATE character_donate SET state = 1 WHERE itemguid = '%u'", guid);
             delete this;
             return;
         }
@@ -473,6 +474,7 @@ bool Item::LoadFromDB(uint32 guid, uint64 owner_guid, Field* fields, uint32 entr
 void Item::DeleteFromDB(SQLTransaction& trans, uint32 itemGuid)
 {
     trans->PAppend("DELETE FROM item_instance WHERE guid = '%u'", itemGuid);
+    CharacterDatabase.PExecute("UPDATE character_donate SET state = 1 WHERE itemguid = '%u'", itemGuid);
 }
 
 void Item::DeleteFromDB(SQLTransaction& trans)

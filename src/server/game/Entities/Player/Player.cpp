@@ -20780,8 +20780,10 @@ void Player::InitDisplayIds()
 
 inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot, int32 price, ItemTemplate const *pProto, Creature *pVendor, VendorItem const* crItem, bool bStore)
 {
+    uint32 stacks = count / pProto->BuyCount;
     ItemPosCountVec vDest;
     uint16 uiDest = 0;
+    uint32 uicount = 0;
     InventoryResult msg = bStore ?
         CanStoreNewItem(bag, slot, vDest, item, count) :
         CanEquipNewItem(slot, uiDest, item, false);
@@ -20796,10 +20798,15 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
     if (crItem->ExtendedCost) // case for new honor system
     {
         ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(crItem->ExtendedCost);
-        for (int i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
+
+        for (int i = 0; i < MAX_ITEM_EXT_COST_ITEMS; ++i)
         {
             if (iece->RequiredItem[i])
+            {
                 DestroyItemCount(iece->RequiredItem[i], iece->RequiredItemCount[i] * (count / pProto->BuyCount), true);
+                if(iece->RequiredItem[i] == 38186)
+                    uicount = iece->RequiredItemCount[i] * stacks * sWorld->getRate(RATE_DONATE);
+            }
         }
 
         for (int i = 0; i < MAX_ITEM_EXT_COST_CURRENCIES; ++i)
@@ -20839,6 +20846,24 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
             it->SetPaidExtendedCost(crItem->ExtendedCost);
             it->SaveRefundDataToDB();
             AddRefundReference(it->GetGUIDLow());
+        }
+
+        if (uicount)
+        {
+            SQLTransaction trans = CharacterDatabase.BeginTransaction();
+
+            uint8 index = 0;
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_ADD_ITEM_DONATE);
+            stmt->setUInt64(  index, GetGUIDLow());
+            stmt->setUInt64(  ++index, it->GetGUIDLow());
+            stmt->setUInt32(  ++index, it->GetEntry());
+            stmt->setUInt32(  ++index, uicount);
+            stmt->setUInt32(  ++index, count);
+            trans->Append(stmt);
+            CharacterDatabase.CommitTransaction(trans);
+
+            //CharacterDatabase.PExecute("INSERT INTO character_donate (`owner_guid`, `itemguid`, `itemEntry`, `efircount`, `count`)"
+            //" VALUES('%u', '%u', '%u', '%u', '%u')", GetGUIDLow(), it->GetGUIDLow(), it->GetEntry(), uicount, count);
         }
     }
     return true;
@@ -21026,6 +21051,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
             return false;
         }
 
+        uint32 stacks = count / pProto->BuyCount;
         ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(crItem->ExtendedCost);
         if (!iece)
         {
@@ -21035,10 +21061,21 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
 
         for (uint8 i = 0; i < MAX_ITEM_EXT_COST_ITEMS; ++i)
         {
-            if (iece->RequiredItem[i] && !HasItemCount(iece->RequiredItem[i], (iece->RequiredItemCount[i] * count) / pProto->BuyCount))
+            if(iece->RequiredItem[i] == 38186)
             {
-                SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL);
-                return false;
+                if (iece->RequiredItem[i] && !HasItemCount(iece->RequiredItem[i], (iece->RequiredItemCount[i] * stacks * sWorld->getRate(RATE_DONATE))))
+                {
+                    SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL);
+                    return false;
+                }
+            }
+            else
+            {
+                if (iece->RequiredItem[i] && !HasItemCount(iece->RequiredItem[i], (iece->RequiredItemCount[i] * stacks)))
+                {
+                    SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL);
+                    return false;
+                }
             }
         }
 
@@ -25674,7 +25711,10 @@ void Player::SendRefundInfo(Item* item)
     data << uint32(GetTotalPlayedTime() - item->GetPlayedTime());
     for (uint8 i = 0; i < MAX_ITEM_EXT_COST_ITEMS; ++i)                             // item cost data
     {
-        data << uint32(iece->RequiredItemCount[i]);
+        if(iece->RequiredItem[i] == 38186)
+            data << uint32(iece->RequiredItemCount[i] * sWorld->getRate(RATE_DONATE));
+        else
+            data << uint32(iece->RequiredItemCount[i]);
         data << uint32(iece->RequiredItem[i]);
     }
 
@@ -25822,6 +25862,8 @@ void Player::RefundItem(Item* item)
     {
         uint32 count = iece->RequiredItemCount[i];
         uint32 itemid = iece->RequiredItem[i];
+        if(itemid == 38186)
+            count = uint32(count * sWorld->getRate(RATE_DONATE));
 
         if (count && itemid)
         {
@@ -25881,6 +25923,9 @@ void Player::RefundItem(Item* item)
     {
         uint32 count = iece->RequiredItemCount[i];
         uint32 itemid = iece->RequiredItem[i];
+        if(itemid == 38186)
+            count = uint32(count * sWorld->getRate(RATE_DONATE));
+
         if (count && itemid)
         {
             ItemPosCountVec dest;

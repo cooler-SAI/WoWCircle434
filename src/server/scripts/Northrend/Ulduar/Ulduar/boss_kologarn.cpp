@@ -135,7 +135,7 @@ class boss_kologarn : public CreatureScript
 
             void EnterCombat(Unit* who)
             {
-                if (!instance->CheckRequiredBosses(BOSS_KOLOGARN, who->ToPlayer()))
+                if (!instance->CheckRequiredBosses(BOSS_KOLOGARN, me->GetEntry(), who->ToPlayer()))
                 {
                     EnterEvadeMode();
                     instance->DoCastSpellOnPlayers(SPELL_BASE_CAMP_TELEPORT);

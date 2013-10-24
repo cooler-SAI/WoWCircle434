@@ -528,7 +528,7 @@ class boss_thorim : public CreatureScript
 
             void EnterCombat(Unit* who)
             {
-                if (!instance->CheckRequiredBosses(BOSS_THORIM, who->ToPlayer()))
+                if (!instance->CheckRequiredBosses(BOSS_THORIM, me->GetEntry(), who->ToPlayer()))
                 {
                     EnterEvadeMode();
                     instance->DoCastSpellOnPlayers(SPELL_BASE_CAMP_TELEPORT);

@@ -294,6 +294,9 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
         case SMART_TARGET_HOSTILE_LAST_AGGRO:
         case SMART_TARGET_HOSTILE_RANDOM:
         case SMART_TARGET_HOSTILE_RANDOM_NOT_TOP:
+        case SMART_TARGET_HOSTILE_RANDOM_PLAYER:
+        case SMART_TARGET_HOSTILE_RANDOM_NOT_TOP_PLAYER:
+        case SMART_TARGET_HOSTILE_RANDOM_AURA:
         case SMART_TARGET_ACTION_INVOKER:
         case SMART_TARGET_INVOKER_PARTY:
         case SMART_TARGET_POSITION:
@@ -393,6 +396,10 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_OOC_LOS:
             case SMART_EVENT_IC_LOS:
                 if (!IsMinMaxValid(e, e.event.los.cooldownMin, e.event.los.cooldownMax))
+                    return false;
+                break;
+            case SMART_EVENT_CHECK_DIST_TO_HOME:
+                if (!IsMinMaxValid(e, e.event.dist.repeatMin, e.event.dist.repeatMax))
                     return false;
                 break;
             case SMART_EVENT_RESPAWN:
@@ -908,6 +915,10 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_HOME_POS:
         case SMART_ACTION_SET_HEALTH_REGEN:
         case SMART_ACTION_SET_RANGED_MOVEMENT:
+        case SMART_ACTION_BOSS_EVADE:
+        case SMART_ACTION_BOSS_ANOUNCE:
+        case SMART_ACTION_MOVE_Z:
+        case SMART_ACTION_SET_KD:
             break;
         default:
             sLog->outError(LOG_FILTER_SQL, "SmartAIMgr: Not handled action_type(%u), event_type(%u), Entry %d SourceType %u Event %u, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);

@@ -79,6 +79,7 @@ public:
     uint32 m_loops, m_lastchange;
     uint32 w_loops, w_lastchange;
     uint32 _delaytime;
+    uint32 pid;
     void SetDelayTime(uint32 t) { _delaytime = t; }
     void run(void)
     {
@@ -104,7 +105,14 @@ public:
             else if (getMSTimeDiff(w_lastchange, curtime) > _delaytime)
             {
                 sLog->outError(LOG_FILTER_WORLDSERVER, "World Thread hangs, kicking out server!");
-                ASSERT(false);
+                if(pid)
+                {
+                    char buffer[20];
+                    sprintf(buffer,"kill -11 %s",pid);
+                    system(buffer);
+                }
+                else
+                    ASSERT(false);
             }
         }
         sLog->outInfo(LOG_FILTER_WORLDSERVER, "Anti-freeze thread exiting without problems.");
@@ -124,6 +132,7 @@ int Master::Run()
 {
     BigNumber seed1;
     seed1.SetRand(16 * 8);
+    uint32 pid;
 
     sLog->outInfo(LOG_FILTER_WORLDSERVER, "%s (worldserver-daemon)", _FULLVERSION);
     sLog->outInfo(LOG_FILTER_WORLDSERVER, "<Ctrl-C> to stop.\n");
@@ -142,7 +151,7 @@ int Master::Run()
     std::string pidfile = ConfigMgr::GetStringDefault("PidFile", "");
     if (!pidfile.empty())
     {
-        uint32 pid = CreatePIDFile(pidfile);
+        pid = CreatePIDFile(pidfile);
         if (!pid)
         {
             sLog->outError(LOG_FILTER_WORLDSERVER, "Cannot create PID file %s.\n", pidfile.c_str());
@@ -247,6 +256,8 @@ int Master::Run()
     {
         FreezeDetectorRunnable* fdr = new FreezeDetectorRunnable();
         fdr->SetDelayTime(freeze_delay * 1000);
+        if(pid)
+            fdr->pid = pid;
         ACE_Based::Thread freeze_thread(fdr);
         freeze_thread.setPriority(ACE_Based::Highest);
     }

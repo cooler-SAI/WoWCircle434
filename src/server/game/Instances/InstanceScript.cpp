@@ -86,6 +86,17 @@ void InstanceScript::LoadDoorData(const DoorData* data)
     sLog->outDebug(LOG_FILTER_TSCR, "InstanceScript::LoadDoorData: " UI64FMTD " doors loaded.", uint64(doors.size()));
 }
 
+void InstanceScript::LoadDoorDataBase(std::vector<DoorData> const* data)
+{
+    for (std::vector<DoorData>::const_iterator itr = data->begin(); itr != data->end(); ++itr)
+    {
+        if (itr->bossId < bosses.size())
+            doors.insert(std::make_pair(itr->entry, DoorInfo(&bosses[itr->bossId], itr->type, BoundaryType(itr->boundary))));
+        sLog->outDebug(LOG_FILTER_TSCR, "InstanceScript::LoadDoorDataBase data->entry %u, data->bossId %u, bosses.size() %u, data->type %u, data->boundary %u", itr->entry, itr->bossId, bosses.size(), itr->type, itr->boundary);
+    }
+    sLog->outDebug(LOG_FILTER_TSCR, "InstanceScript::LoadDoorDataBase: " UI64FMTD " doors loaded.", uint64(doors.size()));
+}
+
 void InstanceScript::UpdateMinionState(Creature* minion, EncounterState state)
 {
     switch (state)

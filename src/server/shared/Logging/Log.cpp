@@ -29,7 +29,7 @@
 #include <cstdio>
 #include <sstream>
 
-Log::Log() : worker(NULL)
+Log::Log() : worker(NULL), arenaLogFile(NULL)
 {
     SetRealmID(0);
     m_logsTimestamp = "_" + GetTimestampStr();
@@ -492,4 +492,53 @@ void Log::LoadFromConfig()
             m_logsDir.push_back('/');
     ReadAppendersFromConfig();
     ReadLoggersFromConfig();
+    arenaLogFile = openLogFile("ArenaLogFile", NULL, "a");
+}
+
+void Log::outArena(const char * str, ...)
+{
+    if (!str)
+        return;
+
+    if (arenaLogFile)
+    {
+        va_list ap;
+        outTimestamp(arenaLogFile);
+        va_start(ap, str);
+        vfprintf(arenaLogFile, str, ap);
+        fprintf(arenaLogFile, "\n");
+        va_end(ap);
+        fflush(arenaLogFile);
+    }
+}
+
+void Log::outTimestamp(FILE* file)
+{
+    time_t t = time(NULL);
+    tm* aTm = localtime(&t);
+    //       YYYY   year
+    //       MM     month (2 digits 01-12)
+    //       DD     day (2 digits 01-31)
+    //       HH     hour (2 digits 00-23)
+    //       MM     minutes (2 digits 00-59)
+    //       SS     seconds (2 digits 00-59)
+    fprintf(file, "%-4d-%02d-%02d %02d:%02d:%02d ", aTm->tm_year+1900, aTm->tm_mon+1, aTm->tm_mday, aTm->tm_hour, aTm->tm_min, aTm->tm_sec);
+}
+
+FILE* Log::openLogFile(char const* configFileName, char const* configTimeStampFlag, char const* mode)
+{
+    std::string logfn=ConfigMgr::GetStringDefault(configFileName, "");
+    if (logfn.empty())
+        return NULL;
+
+    if (configTimeStampFlag && ConfigMgr::GetBoolDefault(configTimeStampFlag, false))
+    {
+        size_t dot_pos = logfn.find_last_of(".");
+        if (dot_pos!=logfn.npos)
+            logfn.insert(dot_pos, m_logsTimestamp);
+        else
+            logfn += m_logsTimestamp;
+    }
+
+    return fopen((m_logsDir+logfn).c_str(), mode);
 }

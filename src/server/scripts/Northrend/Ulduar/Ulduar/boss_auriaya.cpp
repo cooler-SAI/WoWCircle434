@@ -171,7 +171,7 @@ class boss_auriaya : public CreatureScript
 
             void EnterCombat(Unit* who)
             {
-                if (!instance->CheckRequiredBosses(BOSS_AURIAYA, who->ToPlayer()))
+                if (!instance->CheckRequiredBosses(BOSS_AURIAYA, me->GetEntry(), who->ToPlayer()))
                 {
                     EnterEvadeMode();
                     instance->DoCastSpellOnPlayers(SPELL_BASE_CAMP_TELEPORT);

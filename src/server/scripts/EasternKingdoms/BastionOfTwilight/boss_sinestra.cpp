@@ -299,7 +299,7 @@ class boss_sinestra : public CreatureScript
             {
                 if (pInstance)
                 {
-                    if (!pInstance->CheckRequiredBosses(DATA_SINESTRA))
+                    if (!pInstance->CheckRequiredBosses(DATA_SINESTRA, me->GetEntry()))
                     {
                         EnterEvadeMode();
 

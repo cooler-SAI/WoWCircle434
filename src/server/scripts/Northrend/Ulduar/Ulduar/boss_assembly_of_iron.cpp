@@ -935,7 +935,7 @@ class boss_stormcaller_brundir : public CreatureScript
                 if (!who)
                     return;
 
-                if (!instance->CheckRequiredBosses(BOSS_ASSEMBLY_OF_IRON, who->ToPlayer()))
+                if (!instance->CheckRequiredBosses(BOSS_ASSEMBLY_OF_IRON, me->GetEntry(), who->ToPlayer()))
                 {
                     EnterEvadeMode();
                     instance->DoCastSpellOnPlayers(SPELL_BASE_CAMP_TELEPORT);

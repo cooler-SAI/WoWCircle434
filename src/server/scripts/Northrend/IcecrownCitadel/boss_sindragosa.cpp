@@ -244,13 +244,6 @@ class boss_sindragosa : public CreatureScript
 
             void EnterCombat(Unit* victim)
             {
-                if (!instance->CheckRequiredBosses(DATA_SINDRAGOSA, victim->ToPlayer()))
-                {
-                    EnterEvadeMode();
-                    instance->DoCastSpellOnPlayers(LIGHT_S_HAMMER_TELEPORT);
-                    return;
-                }
-
                 me->setActive(true);
                 DoZoneInCombat();
                 instance->SetBossState(DATA_SINDRAGOSA, IN_PROGRESS);
