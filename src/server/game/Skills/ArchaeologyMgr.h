@@ -62,6 +62,13 @@ struct ProjectCost
     bool currency;
 };
 
+struct CompletedProject
+{
+    uint32 projectId;
+    uint32 count;
+    time_t TimeCreated;
+};
+
 typedef std::set<uint32> SiteSet;
 typedef std::map<uint32, SiteSet> Sites;
 typedef std::set<uint32> ProjectSet;
@@ -69,7 +76,7 @@ typedef std::map<uint32, ProjectSet> Projects;
 
 typedef std::set<uint32> ResearchSiteSet;
 typedef std::set<uint32> ResearchProjectSet;
-typedef std::set<uint32> CompletedProjectSet;
+typedef UNORDERED_MAP<uint32, CompletedProject> CompletedProjectMap;
 
 class ArchaeologyMgr
 {
@@ -89,12 +96,31 @@ class ArchaeologyMgr
             costData.push_back(ProjectCost(entry, count, isCurrency));
         }
         void ClearProjectCost() { costData.clear(); }
+        uint32 GetCompletedProjectCount(uint32 id)
+        {
+            CompletedProjectMap::const_iterator itr = _completedProjects.find(id);
+            return itr != _completedProjects.end() ? itr->second.count : 0;
+        }
+        void AddCompletedProjectCount(uint32 id)
+        {
+            CompletedProjectMap::iterator itr = _completedProjects.find(id);
+            if(itr != _completedProjects.end())
+                itr->second.count = itr->second.count + 1;
+            else
+            {
+                CompletedProject arch;
+                arch.projectId = id;
+                arch.count = 1;
+                arch.TimeCreated = time(NULL);
+                _completedProjects[id] = arch;
+            }
+        }
 
         bool ValidateCostData();
         bool SolveResearchProject(uint32 projectId);
         uint32 GetSurveyBotEntry(float &orientation);
 
-        CompletedProjectSet & GetCompletedProjects() { return _completedProjects; }
+        CompletedProjectMap & GetCompletedProjects() { return _completedProjects; }
 
         void GenerateResearchProjects();
         void GenerateResearchSites();
@@ -109,7 +135,7 @@ class ArchaeologyMgr
         DigitSite _digSites[16];
         ResearchSiteSet _researchSites[4];
         ResearchProjectSet _researchProjects;
-        CompletedProjectSet _completedProjects;
+        CompletedProjectMap _completedProjects;
         bool _archaeologyChanged;
 
         bool HasResearchSite(uint32 id, uint32 mapId) const

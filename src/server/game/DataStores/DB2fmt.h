@@ -21,6 +21,8 @@
 const char Itemfmt[]="niiiiiii";
 const char ItemCurrencyCostfmt[]="xn";
 const char ItemSparsefmt[]="niiiffiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiifiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiisssssiiiiiiiiiiiiiiiiiiiiiifiiifii";
-const char ItemExtendedCostEntryfmt[]="nxxiiiiiiiiiiiixiiiiiiiiiixxxxx";
+const char ItemExtendedCostEntryfmt[]="nxxiiiiiiiiiiiixiiiiiiiiiixxixx";
+const std::string CustomItemExtendedCostEntryfmt="paappppppppppppappppppppppaapaa";
+const std::string CustomItemExtendedCostEntryIndex = "ID";
 
 #endif

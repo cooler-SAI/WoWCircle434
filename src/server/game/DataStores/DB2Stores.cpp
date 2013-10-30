@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "DB2Stores.h"
 #include "Log.h"
 #include "SharedDefines.h"
@@ -52,7 +51,7 @@ struct LocalDB2Data
 };
 
 template<class T>
-inline void LoadDB2(StoreProblemList1& errlist, DB2Storage<T>& storage, const std::string& db2_path, const std::string& filename)
+inline void LoadDB2(StoreProblemList1& errlist, DB2Storage<T>& storage, const std::string& db2_path, const std::string& filename, std::string const* customFormat = NULL, std::string const* customIndexName = NULL)
 {
     // compatibility format and C++ structure sizes
     ASSERT(DB2FileLoader::GetFormatRecordSize(storage.GetFormat()) == sizeof(T) || LoadDB2_assert_print(DB2FileLoader::GetFormatRecordSize(storage.GetFormat()), sizeof(T), filename));
@@ -60,7 +59,11 @@ inline void LoadDB2(StoreProblemList1& errlist, DB2Storage<T>& storage, const st
     ++DB2FilesCount;
 
     std::string db2_filename = db2_path + filename;
-    if (!storage.Load(db2_filename.c_str()))
+    SqlDb2 * sql = NULL;
+    if (customFormat)
+        sql = new SqlDb2(&filename, customFormat, customIndexName, storage.GetFormat());
+
+    if (!storage.Load(db2_filename.c_str(), sql))
     {
         // sort problematic db2 to (1) non compatible and (2) nonexistent
         if (FILE * f = fopen(db2_filename.c_str(), "rb"))
@@ -73,6 +76,8 @@ inline void LoadDB2(StoreProblemList1& errlist, DB2Storage<T>& storage, const st
         else
             errlist.push_back(db2_filename);
     }
+
+    delete sql;
 }
 
 void LoadDB2Stores(const std::string& dataPath)
@@ -84,7 +89,7 @@ void LoadDB2Stores(const std::string& dataPath)
     LoadDB2(bad_db2_files, sItemStore, db2Path, "Item.db2");
     LoadDB2(bad_db2_files, sItemCurrencyCostStore, db2Path, "ItemCurrencyCost.db2");
     LoadDB2(bad_db2_files, sItemSparseStore, db2Path, "Item-sparse.db2");
-    LoadDB2(bad_db2_files, sItemExtendedCostStore, db2Path, "ItemExtendedCost.db2");
+    LoadDB2(bad_db2_files, sItemExtendedCostStore, db2Path, "ItemExtendedCost.db2", &CustomItemExtendedCostEntryfmt, &CustomItemExtendedCostEntryIndex);
     // error checks
     if (bad_db2_files.size() >= DB2FilesCount)
     {

@@ -228,7 +228,11 @@ enum ScoreType
     //SOTA
     SCORE_DESTROYED_DEMOLISHER  = 18,
     SCORE_DESTROYED_WALL        = 19,
-    SCORE_PLAYER_SPEC           = 20
+    SCORE_PLAYER_SPEC           = 20,
+    /** World of Warcraft Armory **/
+    SCORE_DAMAGE_TAKEN          = 21,
+    SCORE_HEALING_TAKEN         = 22
+    /** World of Warcraft Armory **/
 };
 
 enum ArenaType
@@ -308,7 +312,7 @@ typedef std::map<uint64, int32> MatchMakingRatingChangeStore;
 struct BattlegroundScore
 {
     BattlegroundScore() : KillingBlows(0), Deaths(0), HonorableKills(0), BonusHonor(0),
-        DamageDone(0), HealingDone(0)
+        DamageDone(0), HealingDone(0), DamageTaken(0), HealingTaken(0)
     { }
 
     virtual ~BattlegroundScore() { }                        //virtual destructor is used when deleting score from scores map
@@ -319,6 +323,10 @@ struct BattlegroundScore
     uint32 BonusHonor;
     uint32 DamageDone;
     uint32 HealingDone;
+    /** World of Warcraft Armory **/
+    uint32 DamageTaken;
+    uint32 HealingTaken;
+    /** World of Warcraft Armory **/
 };
 
 enum BGHonorMode
@@ -542,6 +550,9 @@ class Battleground
         void SetArenaTeamIdForTeam(uint32 Team, uint32 ArenaTeamId) { m_ArenaTeamIds[GetTeamIndexByTeamId(Team)] = ArenaTeamId; }
         uint32 GetArenaTeamIdForTeam(uint32 Team) const             { return m_ArenaTeamIds[GetTeamIndexByTeamId(Team)]; }
         uint32 GetArenaTeamIdByIndex(uint32 index) const { return m_ArenaTeamIds[index]; }
+        void SetArenaTeamRatingChangeForTeam(uint32 Team, int32 RatingChange) { m_ArenaTeamRatingChanges[GetTeamIndexByTeamId(Team)] = RatingChange; }
+        int32 GetArenaTeamRatingChangeForTeam(uint32 Team) const    { return m_ArenaTeamRatingChanges[GetTeamIndexByTeamId(Team)]; }
+        int32 GetArenaTeamRatingChangeByIndex(uint32 index) const   { return m_ArenaTeamRatingChanges[index]; }
         void SetArenaMatchmakerRating(uint32 Team, uint32 MMR){ m_ArenaTeamMMR[GetTeamIndexByTeamId(Team)] = MMR; }
         uint32 GetArenaMatchmakerRating(uint32 Team) const          { return m_ArenaTeamMMR[GetTeamIndexByTeamId(Team)]; }
         uint32 GetArenaMatchmakerRatingByIndex(uint32 index) const  { return m_ArenaTeamMMR[index]; }
@@ -756,6 +767,7 @@ class Battleground
         // Players count by team
         uint32 m_PlayersCount[BG_TEAMS_COUNT];
 
+        int32 m_ArenaTeamRatingChanges[BG_TEAMS_COUNT];
         uint32 m_ArenaTeamMMR[BG_TEAMS_COUNT];
         MatchMakingRatingChangeStore m_matchMakingRatingChange;
 

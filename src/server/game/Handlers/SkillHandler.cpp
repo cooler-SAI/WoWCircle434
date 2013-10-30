@@ -119,22 +119,20 @@ void WorldSession::HandleUnlearnSkillOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleArcheologyRequestHistory(WorldPacket& recvPacket)
 {
-    WorldPacket data(SMSG_RESEARCH_SETUP_HISTORY);
 
     uint32 count = GetPlayer()->GetArchaeologyMgr().GetCompletedProjects().size();
+    if (count <= 0)
+        return;
 
+    WorldPacket data(SMSG_RESEARCH_SETUP_HISTORY);
     data.WriteBits(count,22);
 
-    if (count > 0)
-        for (std::set<uint32>::const_iterator itr = GetPlayer()->GetArchaeologyMgr().GetCompletedProjects().begin(); itr != GetPlayer()->GetArchaeologyMgr().GetCompletedProjects().end(); ++itr)
-        {
-            if (ResearchProjectEntry const* project = sResearchProjectStore.LookupEntry((*itr)))
-            {
-                data.append<uint32>(uint32((*itr))); // projectId
-                data.append<uint32>(1); // count
-                data.append<uint32>(uint32(time(NULL))); // time
-            }
-        }
+    for (CompletedProjectMap::const_iterator itr = GetPlayer()->GetArchaeologyMgr().GetCompletedProjects().begin(); itr != GetPlayer()->GetArchaeologyMgr().GetCompletedProjects().end(); ++itr)
+    {
+        data << uint32(itr->second.projectId); //Project Id
+        data << uint32(itr->second.count);   //Count
+        data << uint32(itr->second.TimeCreated);   //Time create
+    }
 
     SendPacket(&data);
 }

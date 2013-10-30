@@ -396,7 +396,7 @@ void ArchaeologyMgr::GenerateResearchProjects()
     for (std::set<ResearchProjectEntry const*>::const_iterator itr = sResearchProjectSet.begin(); itr != sResearchProjectSet.end(); ++itr)
     {
         ResearchProjectEntry const* entry = (*itr);
-        if ((entry->rare && !roll_chance_i(chance)) || IsCompletedProject(entry->ID))
+        if (entry->rare && (!roll_chance_i(chance) || IsCompletedProject(entry->ID)))
             continue;
 
         tempProjects[entry->branchId].insert(entry->ID);
@@ -460,8 +460,7 @@ bool ArchaeologyMgr::SolveResearchProject(uint32 projectId)
     _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHAEOLOGY_PROJECTS, projectId, 1);
     _player->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ARCHAEOLOGY_PROJECTS, projectId, 1);
 
-    if (entry->rare)
-        _completedProjects.insert(projectId);
+    AddCompletedProjectCount(projectId);
 
     // Add new project
     ProjectSet tempProjects;
@@ -471,7 +470,7 @@ bool ArchaeologyMgr::SolveResearchProject(uint32 projectId)
     {
         if ((*itr)->branchId == entry->branchId)
         {
-            if (((*itr)->rare && !roll_chance_i(chance)) || IsCompletedProject((*itr)->ID))
+            if ((*itr)->rare && (!roll_chance_i(chance) || IsCompletedProject((*itr)->ID)))
                 continue;
 
             tempProjects.insert((*itr)->ID);
@@ -487,7 +486,7 @@ bool ArchaeologyMgr::SolveResearchProject(uint32 projectId)
 
 bool ArchaeologyMgr::IsCompletedProject(uint32 id)
 {
-    CompletedProjectSet::const_iterator itr = _completedProjects.find(id);
+    CompletedProjectMap::const_iterator itr = _completedProjects.find(id);
     return (itr != _completedProjects.end()); 
 }
 
@@ -503,7 +502,7 @@ void ArchaeologyMgr::SaveArchaeology(SQLTransaction& trans)
 
     std::ostringstream ss;
 
-    ss << "INSERT INTO character_archaeology  (guid, sites0, sites1, sites2, sites3, counts, projects, completed) VALUES (";
+    ss << "INSERT INTO character_archaeology  (guid, sites0, sites1, sites2, sites3, counts, projects) VALUES (";
 
     ss << GUID_LOPART(_player->GetGUID()) << ", '";
 
@@ -539,14 +538,22 @@ void ArchaeologyMgr::SaveArchaeology(SQLTransaction& trans)
     for (ResearchProjectSet::const_iterator itr = _researchProjects.begin(); itr != _researchProjects.end(); ++itr)
         ss << (*itr) << " ";
 
-    ss << "', '";
-
-    for (CompletedProjectSet::const_iterator itr = _completedProjects.begin(); itr != _completedProjects.end(); ++itr)
-        ss << (*itr) << " ";
-
     ss << "')";
 
     trans->Append(ss.str().c_str());
+
+    for (CompletedProjectMap::const_iterator itr = _completedProjects.begin(); itr != _completedProjects.end(); ++itr)
+    {
+        ResearchProjectEntry const* entry = sResearchProjectStore.LookupEntry(itr->first);
+        if (!entry) // should never happen
+            continue;
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_PROJECTHISTORY);
+        stmt->setUInt32(0, _player->GetGUIDLow());
+        stmt->setUInt32(1, itr->second.projectId);
+        stmt->setUInt32(2, itr->second.count);
+        stmt->setUInt32(3, itr->second.TimeCreated);
+        trans->Append(stmt);
+    }
     _archaeologyChanged = false;
 }
 
@@ -622,12 +629,29 @@ void ArchaeologyMgr::LoadArchaeology(PreparedQueryResult result)
     ValidateProjects();
 
     // Loading completed projects
-    if (fields[6].GetCString())
+
+    if(QueryResult resultpr = CharacterDatabase.PQuery("SELECT projectId, count, TimeCreated FROM character_archprojecthistory WHERE guid = '%u'", _player->GetGUIDLow()))
     {
-        Tokenizer tokens(fields[6].GetCString(), ' ');
-        if (tokens.size() > 0)
-            for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
-                _completedProjects.insert(atoi((*itr)));
+        do
+        {
+            Field* fields = resultpr->Fetch();
+
+            uint32 projectId = fields[0].GetUInt32();
+            uint32 count = fields[1].GetUInt32();
+            time_t TimeCreated = fields[2].GetUInt32();
+
+            ResearchProjectEntry const* entry = sResearchProjectStore.LookupEntry(projectId);
+            if (!entry)
+                continue;
+
+            CompletedProject arch;
+            arch.projectId = projectId;
+            arch.count = count;
+            arch.TimeCreated = TimeCreated;
+
+            _completedProjects[projectId] = arch;
+        }
+        while (resultpr->NextRow());
     }
 }
 
