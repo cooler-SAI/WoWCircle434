@@ -30,6 +30,8 @@
 #include "SpellInfo.h"
 #include "GuildMgr.h"
 #include <vector>
+#include "DB2Structure.h"
+#include "DB2Stores.h"
 
 void WorldSession::HandleSplitItemOpcode(WorldPacket& recvData)
 {
