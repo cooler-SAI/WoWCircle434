@@ -19,6 +19,7 @@
 
 #include "Common.h"
 #include "Language.h"
+#include "WordFilterMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "World.h"
@@ -110,7 +111,8 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recvData)
         Guild::SendCommandResult(this, GUILD_CREATE_S, ERR_GUILD_NAME_EXISTS_S, name);
         return;
     }
-    if (sObjectMgr->IsReservedName(name) || !ObjectMgr::IsValidCharterName(name))
+    if (sObjectMgr->IsReservedName(name) || !ObjectMgr::IsValidCharterName(name) ||
+        (sWorld->getBoolConfig(CONFIG_WORD_FILTER_ENABLE) && !sWordFilterMgr->FindBadWord(name).empty()))
     {
         Guild::SendCommandResult(this, GUILD_CREATE_S, ERR_GUILD_NAME_INVALID, name);
         return;
@@ -298,7 +300,8 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket & recvData)
         Guild::SendCommandResult(this, GUILD_CREATE_S, ERR_GUILD_NAME_EXISTS_S, newName);
         return;
     }
-    if (sObjectMgr->IsReservedName(newName) || !ObjectMgr::IsValidCharterName(newName))
+    if (sObjectMgr->IsReservedName(newName) || !ObjectMgr::IsValidCharterName(newName) ||
+        (sWorld->getBoolConfig(CONFIG_WORD_FILTER_ENABLE) && !sWordFilterMgr->FindBadWord(newName).empty()))
     {
         Guild::SendCommandResult(this, GUILD_CREATE_S, ERR_GUILD_NAME_INVALID, newName);
         return;

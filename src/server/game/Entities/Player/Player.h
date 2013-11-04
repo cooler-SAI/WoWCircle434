@@ -3287,6 +3287,9 @@ class Player : public Unit, public GridObject<Player>
         RestType rest_type;
         ////////////////////Rest System/////////////////////
 
+        //WorldFilter
+        std::string m_sentMsgCache;
+
         // Social
         PlayerSocial *m_social;
 

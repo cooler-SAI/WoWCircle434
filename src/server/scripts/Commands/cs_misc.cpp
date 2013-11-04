@@ -29,6 +29,7 @@
 #include "TargetedMovementGenerator.h"
 #include "WeatherMgr.h"
 #include "ace/INET_Addr.h"
+#include "WordFilterMgr.h"
 
 class misc_commandscript : public CommandScript
 {
@@ -37,6 +38,19 @@ public:
 
     ChatCommand* GetCommands() const
     {
+        static ChatCommand badWordCommandTable[] =
+        {
+            { "add",                SEC_ADMINISTRATOR,      true,  &HandleBadWordAddCommand,            "", NULL },
+            { "remove",             SEC_ADMINISTRATOR,      true,  &HandleBadWordRemoveCommand,         "", NULL },
+            { "list",               SEC_ADMINISTRATOR,      true,  &HandleBadWordListCommand,           "", NULL },
+            { NULL,                 0,                      false, NULL,                                "", NULL }
+        };
+        static ChatCommand wordFilterCommandTable[] =
+        {
+            { "badword",            SEC_ADMINISTRATOR,      true,  NULL,                                "", badWordCommandTable },
+            { "mod",                SEC_ADMINISTRATOR,      true,  &HandleWordFilterModCommand,         "", NULL },
+            { NULL,                 0,                      false, NULL,                                "", NULL }
+        };
         static ChatCommand groupCommandTable[] =
         {
             { "leader",         SEC_ADMINISTRATOR,          false,  &HandleGroupLeaderCommand,          "", NULL },
@@ -114,9 +128,107 @@ public:
             { "bindsight",          SEC_ADMINISTRATOR,      false, HandleBindSightCommand,              "", NULL },
             { "unbindsight",        SEC_ADMINISTRATOR,      false, HandleUnbindSightCommand,            "", NULL },
             { "playall",            SEC_GAMEMASTER,         false, HandlePlayAllCommand,                "", NULL },
+            { "wordfilter",         SEC_ADMINISTRATOR,      false, NULL,                                "", wordFilterCommandTable },
             { NULL,                 0,                      false, NULL,                                "", NULL }
         };
         return commandTable;
+    }
+
+    static bool HandleBadWordAddCommand(ChatHandler* handler, char const* args)
+    {
+        std::string badWord = args;
+
+        const uint8 maxWordSize = 3;
+        if (badWord.size() <= maxWordSize)
+        {
+            handler->PSendSysMessage("The word '%s' is incorrect! The word length must be greater than %u.", badWord.c_str(), maxWordSize);
+            return false;
+        }
+
+        if (!sWordFilterMgr->AddBadWord(badWord, true))
+        {
+            handler->PSendSysMessage("The word '%s' is exist!", badWord.c_str());
+            return false;
+        }
+
+        handler->PSendSysMessage("The word '%s' is added to 'bad_word'.", badWord.c_str());
+        return true;
+    }
+
+    static bool HandleBadWordRemoveCommand(ChatHandler* handler, char const* args)
+    {
+        std::string badWord = args;
+
+        if (!sWordFilterMgr->RemoveBadWord(args, true))
+        {
+            handler->PSendSysMessage("The word '%s' is not exist!", badWord.c_str());
+            return false;
+        }
+
+        handler->PSendSysMessage("The word '%s' is removed from 'bad_word'.", badWord.c_str());
+        return true;
+    }
+
+    static bool HandleBadWordListCommand(ChatHandler* handler, char const* args)
+    {
+        WordFilterMgr::BadWordMap const& badWords = sWordFilterMgr->GetBadWords();
+
+        if (badWords.empty())
+        {
+            handler->PSendSysMessage("empty.");
+            return true;
+        }
+
+        std::string strBadWordList;
+        uint16 addressesSize = 0;
+        const uint16 maxAddressesSize = 255; // !uint8
+
+        for (WordFilterMgr::BadWordMap::const_iterator it = badWords.begin(); it != badWords.end(); ++it)
+        {
+            strBadWordList.append(it->second);
+
+            if ((*it) != (*badWords.rbegin()))
+                strBadWordList.append(", ");
+            else
+                strBadWordList.append(".");
+
+            // send
+            if (addressesSize >= maxAddressesSize)
+            {
+                handler->PSendSysMessage("Bad words: %s", strBadWordList.c_str());
+                strBadWordList.clear();
+                addressesSize = 0;
+            }
+
+            addressesSize += it->second.size();
+        }
+
+        return true;
+    }
+
+    static bool HandleWordFilterModCommand(ChatHandler* handler, char const* args)
+    {
+        std::string argstr = (char*)args;
+        if (argstr == "on")
+        {
+            sWorld->setBoolConfig(CONFIG_WORD_FILTER_ENABLE, true);
+            handler->PSendSysMessage("WordFilter: mod is enabled");
+            return true;
+        }
+        if (argstr == "off")
+        {
+            sWorld->setBoolConfig(CONFIG_WORD_FILTER_ENABLE, false);
+            handler->PSendSysMessage("WordFilter: mod is disabled");
+            return true;
+        }
+
+        std::string strModIs = sWorld->getBoolConfig(CONFIG_WORD_FILTER_ENABLE) ? "enabled" : "disabled";
+        handler->PSendSysMessage("WordFilter: mod is now %s.", strModIs.c_str());
+
+        handler->SendSysMessage(LANG_USE_BOL);
+        handler->SetSentErrorMessage(true);
+
+        return true;
     }
 
     static bool HandleDevCommand(ChatHandler* handler, char const* args)

@@ -44,6 +44,7 @@
 #include "TicketMgr.h"
 #include "SpellMgr.h"
 #include "GroupMgr.h"
+#include "WordFilterMgr.h"
 #include "Chat.h"
 #include "DBCStores.h"
 #include "DB2Stores.h"
@@ -995,6 +996,9 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_CHATFLOOD_MESSAGE_DELAY] = ConfigMgr::GetIntDefault("ChatFlood.MessageDelay", 1);
     m_int_configs[CONFIG_CHATFLOOD_MUTE_TIME]     = ConfigMgr::GetIntDefault("ChatFlood.MuteTime", 10);
 
+    m_int_configs[CONFIG_WORD_FILTER_MUTE_DURATION] = ConfigMgr::GetIntDefault("WordFilter.MuteDuration", 30000);
+    m_bool_configs[CONFIG_WORD_FILTER_ENABLE]       = ConfigMgr::GetBoolDefault("WordFilter.Enable", true);
+
     m_int_configs[CONFIG_EVENT_ANNOUNCE] = ConfigMgr::GetIntDefault("Event.Announce", 0);
 
     m_float_configs[CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS] = ConfigMgr::GetFloatDefault("CreatureFamilyFleeAssistanceRadius", 30.0f);
@@ -1411,6 +1415,11 @@ void World::SetInitialWorldSettings()
     sObjectMgr->SetDBCLocaleIndex(GetDefaultDbcLocale());        // Get once for all the locale index of DBC language (console/broadcasts)
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Localization strings loaded in %u ms", GetMSTimeDiffToNow(oldMSTime));
 
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING,"Loading Letter Analogs...");
+    sWordFilterMgr->LoadLetterAnalogs();
+
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING,"Loading Bad Words...");
+    sWordFilterMgr->LoadBadWords();
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Page Texts...");
     sObjectMgr->LoadPageTexts();

@@ -37,6 +37,7 @@ EndScriptData */
 #include "Chat.h"
 #include "WaypointManager.h"
 #include "WardenCheckMgr.h"
+#include "WordFilterMgr.h"
 
 class reload_commandscript : public CommandScript
 {
@@ -70,6 +71,7 @@ public:
             { "areatrigger_involvedrelation", SEC_ADMINISTRATOR, true,  &HandleReloadQuestAreaTriggersCommand,          "", NULL },
             { "areatrigger_tavern",           SEC_ADMINISTRATOR, true,  &HandleReloadAreaTriggerTavernCommand,          "", NULL },
             { "areatrigger_teleport",         SEC_ADMINISTRATOR, true,  &HandleReloadAreaTriggerTeleportCommand,        "", NULL },
+            { "bad_word",                     SEC_ADMINISTRATOR, true,  &HandleReloadBadWordCommand,                    "", NULL },
             { "autobroadcast",                SEC_ADMINISTRATOR, true,  &HandleReloadAutobroadcastCommand,              "", NULL },
             { "command",                      SEC_ADMINISTRATOR, true,  &HandleReloadCommandCommand,                    "", NULL },
             { "conditions",                   SEC_ADMINISTRATOR, true,  &HandleReloadConditions,                        "", NULL },
@@ -98,6 +100,7 @@ public:
             { "item_enchantment_template",    SEC_ADMINISTRATOR, true,  &HandleReloadItemEnchantementsCommand,          "", NULL },
             { "item_loot_template",           SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesItemCommand,          "", NULL },
             { "lfg_dungeon_rewards",          SEC_ADMINISTRATOR, true,  &HandleReloadLfgRewardsCommand,                 "", NULL },
+            { "letter_analog",                SEC_ADMINISTRATOR, true,  &HandleReloadLetterAnalogCommand,               "", NULL },
             { "locales_achievement_reward",   SEC_ADMINISTRATOR, true,  &HandleReloadLocalesAchievementRewardCommand,   "", NULL },
             { "locales_creature",             SEC_ADMINISTRATOR, true,  &HandleReloadLocalesCreatureCommand,            "", NULL },
             { "locales_creature_text",        SEC_ADMINISTRATOR, true,  &HandleReloadLocalesCreatureTextCommand,        "", NULL },
@@ -194,6 +197,7 @@ public:
         HandleReloadVehicleTemplateAccessoryCommand(handler, "");
 
         HandleReloadAutobroadcastCommand(handler, "");
+        HandleReloadBadWordCommand(handler, "");
         return true;
     }
 
@@ -1258,6 +1262,22 @@ public:
         sObjectMgr->LoadPhaseDefinitions();
         sWorld->UpdatePhaseDefinitions();
         handler->SendGlobalGMSysMessage("Phase Definitions reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadLetterAnalogCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING,"Re-Loading Letter Analogs...");
+        sWordFilterMgr->LoadLetterAnalogs();
+        handler->SendGlobalGMSysMessage("DB table `letter_analog` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadBadWordCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING,"Re-Loading Bad Words...");
+        sWordFilterMgr->LoadBadWords();
+        handler->SendGlobalGMSysMessage("DB table `bad_word` reloaded.");
         return true;
     }
 };
