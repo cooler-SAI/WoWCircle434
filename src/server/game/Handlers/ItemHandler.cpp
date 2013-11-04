@@ -804,6 +804,7 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
                 {
                     if(ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(vendorItem->ExtendedCost))
                         price = uint32(iece->RequiredItemCount[0] * 10000 * sWorld->getRate(RATE_DONATE));
+                }
             }
             else
                 enablers.push_back(1);
