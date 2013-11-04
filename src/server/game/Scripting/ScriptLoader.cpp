@@ -20,6 +20,10 @@
 
 //examples
 void AddSC_vip_commandscript();
+void AddSC_multi_vendor();
+void AddSC_custom_reward();
+void AddSC_command_arena();
+void AddSC_teleguy();
 
 // spells
 void AddSC_deathknight_spell_scripts();
@@ -1544,5 +1548,9 @@ void AddCustomScripts()
 #ifdef SCRIPTS
     /* This is where custom scripts should be added. */
     AddSC_vip_commandscript();
+    AddSC_multi_vendor();
+    AddSC_custom_reward();
+    AddSC_command_arena();
+    AddSC_teleguy();
 #endif
 }

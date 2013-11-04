@@ -797,6 +797,11 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
             {
                 enablers.push_back(0);
                 itemsData << uint32(vendorItem->ExtendedCost);
+                //Hack for donate
+                if(vendorItem->ExtendedCost > 4999)
+                {
+                    if(ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(vendorItem->ExtendedCost))
+                        price = uint32(iece->RequiredItemCount[0] * 10000 * sWorld->getRate(RATE_DONATE));
             }
             else
                 enablers.push_back(1);
