@@ -3939,6 +3939,7 @@ void Spell::EffectLearnSkill(SpellEffIndex effIndex)
     // Archaeology
     if (skillid == SKILL_ARCHAEOLOGY)
     {
+        sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "EffectLearnSkill spell %u, skillid %u, skillval %u, damage %u", m_spellInfo->Id, skillid, skillval, damage);
         unitTarget->ToPlayer()->GetArchaeologyMgr().GenerateResearchSites();
         unitTarget->ToPlayer()->GetArchaeologyMgr().GenerateResearchProjects();
     }
