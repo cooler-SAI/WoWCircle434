@@ -823,7 +823,7 @@ class FallingFragmentTargetSelector
     public:
         FallingFragmentTargetSelector(Unit* caster, std::list<GameObject*> const& collisionList) : _caster(caster), _collisionList(collisionList) { }
 
-        bool operator()(Unit* unit)
+        bool operator()(WorldObject* unit)
         {
             for (std::list<GameObject*>::const_iterator itr = _collisionList.begin(); itr != _collisionList.end(); ++itr)
                 if ((*itr)->IsInBetween(_caster, unit, 5.0f))
