@@ -571,7 +571,11 @@ void ArchaeologyMgr::LoadArchaeology(PreparedQueryResult result)
         _digSites[i].clear();
 
     if (!result)
+    {
+        _player->GetArchaeologyMgr().GenerateResearchSites();
+        _player->GetArchaeologyMgr().GenerateResearchProjects();
         return;
+    }
 
     Field* fields = result->Fetch();
 
