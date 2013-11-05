@@ -26,9 +26,6 @@ enum Spells
     SPELL_DEEP_CORRUPTION           = 105171,
     SPELL_DEEP_CORRUPTION_AURA      = 103628,
     SPELL_DEEP_CORRUPTION_DMG       = 105173,
-    SPELL_DEEP_CORRUPTION_DMG_25    = 108347,
-    SPELL_DEEP_CORRUPTION_DMG_10H   = 108348,
-    SPELL_DEEP_CORRUPTION_DMG_25H   = 108349,
     SPELL_DIGESTIVE_ACID            = 105031,
     SPELL_DIGESTIVE_ACID_DUMMY      = 105562,
     SPELL_DIGESTIVE_ACID_AOE        = 105571,
@@ -94,6 +91,7 @@ enum Events
     EVENT_MANA_VOID_1       = 11,
     EVENT_PSYCHIC_SLICE     = 12,
     EVENT_MANA_VOID_2       = 13,
+    EVENT_CHECK_POSITION    = 14,
 };
 
 enum Adds
@@ -118,6 +116,11 @@ enum Actions
     ACTION_DARK     = 5,
     ACTION_PURPLE   = 6,
     ACTION_BLUE     = 7,
+};
+
+enum MovePoints
+{
+    POINT_CENTER          = 1,
 };
 
 const Position globulesPos[6] = 
@@ -165,14 +168,6 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                 memset(bAchieve, false, sizeof(bAchieve));
             }
 
-            void InitializeAI()
-            {
-                if (!instance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(DSScriptName))
-                    me->IsAIEnabled = false;
-                else if (!me->isDead())
-                    Reset();
-            }
-
             void MoveInLineOfSight(Unit* who)
             {
                 if (!bIntro && me->GetDistance(who) <= 70.0f)
@@ -213,6 +208,7 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                 events.ScheduleEvent(EVENT_BERSERK, 10 * MINUTE * IN_MILLISECONDS);
                 events.ScheduleEvent(EVENT_VOID_BOLT, 6000);
                 events.ScheduleEvent(EVENT_CALL_BLOOD_1, 22000);
+                events.ScheduleEvent(EVENT_CHECK_POSITION, 5*IN_MILLISECONDS);
 
                 DoZoneInCombat();
                 instance->SetBossState(DATA_YORSAHJ, IN_PROGRESS);
@@ -257,6 +253,21 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                     summon->GetMotionMaster()->MoveRandom(25.0f);
             }
 
+            void MovementInform(uint32 type, uint32 pointId)
+            {
+                if (type != POINT_MOTION_TYPE)
+                    return;
+
+                switch (pointId)
+                {
+                    case POINT_CENTER:
+                        events.ScheduleEvent(EVENT_CALL_BLOOD_2, 1000);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             void UpdateAI(const uint32 diff)
             {
                 if (!UpdateVictim())
@@ -286,7 +297,7 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                             else
                                 DoCastVictim(SPELL_VOID_BOLT);
 
-                            events.ScheduleEvent(EVENT_VOID_BOLT, (bShuma ? 5000 : 9000));
+                            events.ScheduleEvent(EVENT_VOID_BOLT, 9000);
                             break;
                         case EVENT_CALL_BLOOD_1:
                             events.CancelEvent(EVENT_VOID_BOLT);
@@ -309,9 +320,8 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                             bContinue = false;
                             bShuma = false;
 
-                            events.ScheduleEvent(EVENT_CALL_BLOOD_2, 1000);
-
-                            me->NearTeleportTo(centerPos.GetPositionX(), centerPos.GetPositionY(), centerPos.GetPositionZ(), centerPos.GetOrientation());
+                            //me->NearTeleportTo(centerPos.GetPositionX(), centerPos.GetPositionY(), centerPos.GetPositionZ(), centerPos.GetOrientation());
+                            me->GetMotionMaster()->MovePoint(POINT_CENTER, centerPos);
                             break;
                         case EVENT_CALL_BLOOD_2:
                         {
@@ -423,8 +433,6 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                             DoCast(me, SPELL_SPAWNING_POOL_2, true);
                             DoCast(me, SPELL_SPAWNING_POOL_3, true);
                             DoCast(me, SPELL_CORRUPTED_MINIONS_AURA);
-                            if (bShuma)
-                                events.ScheduleEvent(EVENT_CORRUPTED_MINIONS, 30000);
                             break;
                         case EVENT_DEEP_CORRUPTION:
                             DoCastAOE(SPELL_DEEP_CORRUPTION);
@@ -436,6 +444,13 @@ class boss_yorsahj_the_unsleeping: public CreatureScript
                             break;
                         case EVENT_MANA_VOID_2:
                             DoCast(me, SPELL_MANA_VOID_SUMMON);
+                            break;
+                        case EVENT_CHECK_POSITION:
+                            if (me->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) > 80.0f)
+                                DoCast(me, SPELL_BERSERK);
+                            if (me->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) > 120.0f)
+                                EnterEvadeMode();
+                            events.ScheduleEvent(EVENT_CHECK_POSITION, 5*IN_MILLISECONDS);
                             break;
                         default:
                             break;
@@ -819,30 +834,14 @@ class spell_yorsahj_the_unsleeping_deep_corruption : public SpellScriptLoader
 
             void HandlePeriodicTick(AuraEffect const* aurEff)
             {
-                if (!GetCaster())
+                if (!GetTarget())
                     return;
 
                 if (Aura* aur = GetAura())
                 {
                     if (aur->GetStackAmount() >= 5)
                     {
-                        uint32 spellId = SPELL_DEEP_CORRUPTION_DMG;
-                        switch (GetCaster()->GetMap()->GetDifficulty())
-                        {
-                            case RAID_DIFFICULTY_10MAN_NORMAL: spellId = SPELL_DEEP_CORRUPTION_DMG; break;
-                            case RAID_DIFFICULTY_25MAN_NORMAL: spellId = SPELL_DEEP_CORRUPTION_DMG_25; break;
-                            case RAID_DIFFICULTY_10MAN_HEROIC: spellId = SPELL_DEEP_CORRUPTION_DMG_10H; break;
-                            case RAID_DIFFICULTY_25MAN_HEROIC: spellId = SPELL_DEEP_CORRUPTION_DMG_25H; break;
-                        }
-
-                        if (InstanceScript* pInstance = GetCaster()->GetInstanceScript())
-                        {
-                            if (uint64 guid = pInstance->GetData64(DATA_YORSAHJ))
-                                GetCaster()->CastSpell(GetCaster(), spellId, true, 0, NULL, guid);
-                        }
-                        else
-                            GetCaster()->CastSpell(GetCaster(), spellId, true);
-
+                        GetTarget()->CastSpell(GetTarget(), SPELL_DEEP_CORRUPTION_DMG, true);
                         aur->Remove();
                     }
                 }
@@ -881,7 +880,7 @@ class spell_yorsahj_the_unsleeping_digestive_acid_aoe : public SpellScriptLoader
                     if (Unit* pTank = pYorsahj->getVictim())
                         targets.remove(pTank);
 
-                uint32 max_targets = (GetCaster()->GetMap()->Is25ManRaid() ? 8 : 4);
+                uint32 max_targets = (GetCaster()->GetMap()->Is25ManRaid() ? 10 : 5);
                 Trinity::Containers::RandomResizeList(targets, max_targets);
             }
 
@@ -940,9 +939,7 @@ class spell_yorsahj_the_unsleeping_mana_void : public SpellScriptLoader
             
                     bool operator()(WorldObject* unit)
                     {
-                        if (unit->GetTypeId() != TYPEID_PLAYER)
-                            return true;
-                        return (unit->ToPlayer()->getPowerType() != POWER_MANA);
+                        return (!unit->ToUnit() || unit->ToUnit()->getPowerType() != POWER_MANA);
                     }
             };
 
@@ -975,6 +972,8 @@ class achievement_taste_the_rainbow : public AchievementCriteriaScript
     private:
         uint32 _Id;
 };
+
+
 
 void AddSC_boss_yorsahj_the_unsleeping()
 {

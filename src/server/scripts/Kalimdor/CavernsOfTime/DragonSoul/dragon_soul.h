@@ -106,4 +106,5 @@ const Position ultraxionPos[2] =
     {-1699.469971f, -2388.030029f, 355.192993f, 3.21552f} // move to
 };
 
+void WhisperToAllPlayerInZone(int32 TextId, Creature* sender);
 #endif

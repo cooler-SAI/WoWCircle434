@@ -1313,14 +1313,14 @@ class spell_dragon_soul_shadowed_globule_deep_corruption : public SpellScriptLoa
 
             void HandlePeriodicTick(AuraEffect const* aurEff)
             {
-                if (!GetCaster())
+                if (!GetTarget())
                     return;
 
                 if (Aura* aur = GetAura())
                 {
                     if (aur->GetStackAmount() >= 5)
                     {
-                        GetCaster()->CastSpell(GetCaster(), SPELL_DEEP_CORRUPTION_DMG, true);
+                        GetTarget()->CastSpell(GetTarget(), SPELL_DEEP_CORRUPTION_DMG, true);
                         aur->Remove();
                     }
                 }

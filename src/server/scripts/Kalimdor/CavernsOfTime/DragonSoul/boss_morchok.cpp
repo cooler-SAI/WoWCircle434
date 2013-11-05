@@ -110,14 +110,6 @@ class boss_morchok: public CreatureScript
                 me->setActive(true);
             }
 
-            void InitializeAI()
-            {
-                if (!instance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(DSScriptName))
-                    me->IsAIEnabled = false;
-                else if (!me->isDead())
-                    Reset();
-            }
-
             void Reset()
             {
                 _Reset();
@@ -747,17 +739,71 @@ class spell_morchok_black_blood_of_the_earth : public SpellScriptLoader
 
             void HandlePeriodicTick(AuraEffect const* aurEff)
             {
-                /*uint32 ticks = aurEff->GetTickNumber() + 1;
+                float ticks = aurEff->GetTickNumber();
+                int counter = (int)floor(ticks / 5) + 1;
 
-                for (uint32 j = 0; j < ticks; ++j)
+                if(Unit* me = GetCaster())
+                if(ticks == 1 || ticks == 5 || ticks == 10 || ticks == 15)
                 {
-                    for (float i = 0.0f; i < 2 * M_PI; i += float (1.0f / float(ticks)))
+                    float _angle;
+                    float radius = 10.0f;
+                    Position _pos;
+                    std::list<GameObject*> fallingfragments;
+                    GetGameObjectListWithEntryInGrid(fallingfragments, me, GO_INNER_WALL, 60.0f);
+                    for (int i = 0; i < counter; i++)
                     {
-                        Position pos;
-                        GetCaster()->GetNearPosition(pos, 5 * ticks, i);
-                        GetCaster()->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
+                        //blackblood 1
+                        _angle = me->GetOrientation() + M_PI/4;
+                        me->GetNearPosition(_pos, radius, _angle);
+                        if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
+                            me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
+                        //blackblood 2
+                        _angle = me->GetOrientation() + M_PI/2;
+                        me->GetNearPosition(_pos, radius, _angle);
+                        if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
+                            me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
+                        //blackblood 3
+                        _angle = me->GetOrientation() + (3*M_PI)/4;
+                        me->GetNearPosition(_pos, radius, _angle);
+                        if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
+                            me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
+                        //blackblood 4
+                        _angle = me->GetOrientation() + M_PI;
+                        me->GetNearPosition(_pos, radius, _angle);
+                        if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
+                            me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
+                        //blackblood 5
+                        _angle = me->GetOrientation() + M_PI/4 + M_PI;
+                        me->GetNearPosition(_pos, radius, _angle);
+                        if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
+                            me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
+                        //blackblood 6
+                        _angle = me->GetOrientation() + M_PI/2 + M_PI;
+                        me->GetNearPosition(_pos, radius, _angle);
+                        if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
+                            me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
+                        //blackblood 7
+                        _angle = me->GetOrientation() + (3*M_PI)/4 + M_PI;
+                        me->GetNearPosition(_pos, radius, _angle);
+                        if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
+                            me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
+                        //blackblood 8
+                        _angle = me->GetOrientation() + M_PI*2;
+                        me->GetNearPosition(_pos, radius, _angle);
+                        if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
+                            me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
+                        radius += 10.0f;
                     }
-                }*/
+                }
+            }
+
+            bool BlackBloodPositionSelect(std::list<GameObject*> const& collisionList, float x, float y, Unit* me)
+            {
+                for (std::list<GameObject*>::const_iterator itr = collisionList.begin(); itr != collisionList.end(); ++itr)
+                    if ((*itr)->IsInBetween(me, x, y, 5.0f))
+                        return false;
+
+                return true;
             }
 
             void Register()
@@ -770,6 +816,25 @@ class spell_morchok_black_blood_of_the_earth : public SpellScriptLoader
         {
             return new spell_morchok_black_blood_of_the_earth_AuraScript();
         }
+};
+
+class FallingFragmentTargetSelector
+{
+    public:
+        FallingFragmentTargetSelector(Unit* caster, std::list<GameObject*> const& collisionList) : _caster(caster), _collisionList(collisionList) { }
+
+        bool operator()(Unit* unit)
+        {
+            for (std::list<GameObject*>::const_iterator itr = _collisionList.begin(); itr != _collisionList.end(); ++itr)
+                if ((*itr)->IsInBetween(_caster, unit, 5.0f))
+                    return true;
+
+            return false;
+        }
+
+    private:
+        Unit* _caster;
+        std::list<GameObject*> const& _collisionList;
 };
 
 class spell_morchok_black_blood_of_the_earth_dmg : public SpellScriptLoader
@@ -792,16 +857,14 @@ class spell_morchok_black_blood_of_the_earth_dmg : public SpellScriptLoader
 
                 if (AuraEffect const* aurEff = GetCaster()->GetAuraEffect(SPELL_BLACK_BLOOD_OF_THE_EARTH, EFFECT_0))
                 {
-                    uint32 ticks = aurEff->GetTickNumber() + 1;
-                    targets.remove_if(DistanceCheck(GetCaster(), float(ticks * 4)));
+                    float ticks = aurEff->GetTickNumber();
+                    int counter = (int)floor(ticks / 5) + 1;
+                    targets.remove_if(DistanceCheck(GetCaster(), float(counter * 15)));
                 }
 
-                std::list<GameObject*> goList;
-                GetCaster()->GetGameObjectListWithEntryInGrid(goList, GO_INNER_WALL, 100.0f);
-                if (!goList.empty())
-                    for (std::list<GameObject*>::const_iterator itr = goList.begin(); itr != goList.end(); ++itr)
-                        targets.remove_if(WallCheck(GetCaster(), (*itr)));
-
+                std::list<GameObject*> fallingfragments;
+                GetGameObjectListWithEntryInGrid(fallingfragments, GetCaster(), GO_INNER_WALL, 200.0f);
+                targets.remove_if (FallingFragmentTargetSelector(GetCaster(), fallingfragments));
             }
 
             void Register()
@@ -815,7 +878,7 @@ class spell_morchok_black_blood_of_the_earth_dmg : public SpellScriptLoader
             {
                 public:
                     DistanceCheck(Unit* searcher, float distance) : _searcher(searcher), _distance(distance) {}
-            
+
                     bool operator()(WorldObject* unit)
                     {
                         return (_searcher->GetDistance2d(unit) > _distance);
@@ -824,21 +887,6 @@ class spell_morchok_black_blood_of_the_earth_dmg : public SpellScriptLoader
                 private:
                     Unit* _searcher;
                     float _distance;
-            };
-
-            class WallCheck
-            {
-                public:
-                    WallCheck(Unit* searcher, GameObject* go) : _searcher(searcher), _go(go) {}
-            
-                    bool operator()(WorldObject* unit)
-                    {
-                        return (_go->IsInBetween(_searcher, unit, 2.0f));
-                    }
-
-                private:
-                    Unit* _searcher;
-                    GameObject* _go;
             };
         };
              
@@ -925,6 +973,45 @@ class achievement_dont_stay_so_close_to_me : public AchievementCriteriaScript
         }
 };
 
+class spell_morchok_resonating_crystal : public SpellScriptLoader
+{
+    public:
+        spell_morchok_resonating_crystal() : SpellScriptLoader("spell_morchok_resonating_crystal") { }
+
+        class spell_morchok_resonating_crystal_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_morchok_resonating_crystal_AuraScript);
+
+            int32 amount;
+
+            bool Load()
+            {
+                amount = 200;
+                return true;
+            }
+
+            void OnPeriodic(AuraEffect const* /*aurEff*/)
+            {
+                if(amount > 0)
+                    amount -= 20;
+                if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_1))
+                    effect->ChangeAmount(amount);
+            }
+
+            // function registering
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_morchok_resonating_crystal_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+            }
+        };
+
+        // function which creates AuraScript
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_morchok_resonating_crystal_AuraScript();
+        }
+};
+
 void AddSC_boss_morchok()
 {
     new boss_morchok();
@@ -935,5 +1022,6 @@ void AddSC_boss_morchok()
     new spell_morchok_black_blood_of_the_earth();
     new spell_morchok_black_blood_of_the_earth_dmg();
     new spell_morchok_stomp();
+    new spell_morchok_resonating_crystal();
     new achievement_dont_stay_so_close_to_me();
 }

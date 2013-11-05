@@ -210,6 +210,7 @@ class boss_ultraxion: public CreatureScript
 
                 DoCastAOE(SPELL_TWILIGHT_SHIFT_AOE, true);
                 DoCastAOE(SPELL_HEROIC_WILL_AOE, true);
+                DoCastAOE(SPELL_LAST_DEFENDER_OF_AZEROTH_DUMMY, true);
 
                 events.ScheduleEvent(EVENT_UNSTABLE_MONSTROSITY, 1000);
                 events.ScheduleEvent(EVENT_HOUR_OF_TWILIGHT, 45000);

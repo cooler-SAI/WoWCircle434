@@ -22,6 +22,8 @@ class instance_dragon_soul : public InstanceMapScript
                 uiMorchokGUID = 0;
                 uiKohcromGUID = 0;
                 uiZonozzGUID = 0;
+                uiValeeraGUID = 0;
+                uiEiendormiGUID = 0;
                 uiHagaraGUID = 0;
                 uiUltraxionGUID = 0;
 
@@ -49,6 +51,12 @@ class instance_dragon_soul : public InstanceMapScript
                         break;
                     case NPC_KOHCROM:
                         uiKohcromGUID = pCreature->GetGUID();
+                        break;
+                    case NPC_VALEERA:
+                        uiValeeraGUID = pCreature->GetGUID();
+                        break;
+                    case NPC_EIENDORMI:
+                        uiEiendormiGUID = pCreature->GetGUID();
                         break;
                     case NPC_ZONOZZ:
                         uiZonozzGUID = pCreature->GetGUID();
@@ -83,7 +91,7 @@ class instance_dragon_soul : public InstanceMapScript
                     case NPC_TRAVEL_TO_EYE_OF_ETERNITY:
                     case NPC_TRAVEL_TO_WYRMREST_BASE:
                     case NPC_TRAVEL_TO_WYRMREST_SUMMIT:
-                        teleportGUIDs.push_back(pCreature->GetGUID());
+                        //teleportGUIDs.push_back(pCreature->GetGUID());
                         break;
                     default:
                         break;
@@ -129,6 +137,8 @@ class instance_dragon_soul : public InstanceMapScript
                 {
                     case DATA_MORCHOK: return uiMorchokGUID;
                     case DATA_KOHCROM: return uiKohcromGUID;
+                    case NPC_VALEERA: return uiValeeraGUID;
+                    case NPC_EIENDORMI: return uiEiendormiGUID;
                     case DATA_ZONOZZ: return uiZonozzGUID;
                     case DATA_HAGARA: return uiHagaraGUID;
                     case DATA_ULTRAXION: return uiUltraxionGUID;
@@ -250,6 +260,8 @@ class instance_dragon_soul : public InstanceMapScript
                 uint64 uiKohcromGUID;
                 uint64 uiZonozzGUID;
                 uint64 uiHagaraGUID;
+                uint64 uiValeeraGUID;
+                uint64 uiEiendormiGUID;
                 uint64 uiUltraxionGUID;
                 uint64 uiAllianceShipGUID;
                 uint64 uiSwayzeGUID;
@@ -263,6 +275,14 @@ class instance_dragon_soul : public InstanceMapScript
                
         };
 };
+
+void WhisperToAllPlayerInZone(int32 TextId, Creature* sender)
+{
+    Map::PlayerList const &players = sender->GetMap()->GetPlayers();
+    for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+        if (Player* player = i->getSource())
+            DoScriptText(TextId, sender, player);
+}
 
 void AddSC_instance_dragon_soul()
 {

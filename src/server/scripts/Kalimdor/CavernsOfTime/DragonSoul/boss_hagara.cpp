@@ -32,6 +32,7 @@ enum Spells
     SPELL_ICE_LANCE_DMG             = 105316,
     SPELL_ICY_TOMB_AOE              = 104448,
     SPELL_ICY_TOMB_DUMMY            = 104449,
+    SPELL_ICY_TRAP                  = 72217,
     SPELL_ICY_TOMB                  = 104451,
     SPELL_SHATTERED_ICE             = 105289,
     SPELL_FOCUSED_ASSAULT           = 107851,
@@ -471,6 +472,7 @@ class boss_hagara_the_stormbinder: public CreatureScript
                 Talk(SAY_DEATH);
 
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_WATERY_ENTRENCHMENT);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ICY_TOMB);
             }
 
             void KilledUnit(Unit* victim)
@@ -703,7 +705,7 @@ class boss_hagara_the_stormbinder: public CreatureScript
                                 for (Map::PlayerList::const_iterator itr = plrList.begin(); itr != plrList.end(); ++itr)
                                     if (Player* pPlayer = itr->getSource())
                                     {
-                                        if (me->GetDistance(pPlayer) <= 23)
+                                        if (me->GetDistance(pPlayer) <= 29)
                                         {
                                             if (!pPlayer->HasAura(SPELL_WATERY_ENTRENCHMENT))
                                                 pPlayer->CastSpell(pPlayer, SPELL_WATERY_ENTRENCHMENT, true);
@@ -760,7 +762,8 @@ class boss_hagara_the_stormbinder: public CreatureScript
                             SelectTargetList(targets, RAID_MODE(3, 7), SELECT_TARGET_RANDOM, 0.0f, true);
                             if (!targets.empty())
                                 for (UnitList::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                                    DoCast((*itr), SPELL_ICICLE, true);
+                                    (*itr)->CastSpell((*itr), SPELL_ICICLE, true);
+                                    //DoCast((*itr), SPELL_ICICLE, true);
                             events.ScheduleEvent(EVENT_ICICLE, urand(8000, 9000));
                             break;
                         }
@@ -2017,8 +2020,20 @@ class spell_hagara_the_stormbinder_frostflake : public SpellScriptLoader
                         aur->ModStackAmount(1);
             }
 
+            void HandleDispel(DispelInfo* dispelInfo)
+            {
+                if (GetCaster() && dispelInfo)
+                    if(Unit* pTarget = dispelInfo->GetDispeller())
+                    {
+                        if(!pTarget->HasAura(SPELL_WATERY_ENTRENCHMENT))
+                            GetCaster()->CastSpell(pTarget, SPELL_ICY_TRAP, true);
+                    }
+                Remove(AURA_REMOVE_BY_DEFAULT);
+            }
+
             void Register()
             {
+                AfterDispel += AuraDispelFn(spell_hagara_the_stormbinder_frostflake_AuraScript::HandleDispel);
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_hagara_the_stormbinder_frostflake_AuraScript::HandlePeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
             }
         };

@@ -119,13 +119,13 @@ const Position centerPos = {-1769.329956f, -1916.869995f, -226.28f, 0.0f};
 const Position tentaclePos[14] = 
 {
     {-1702.57f, -1884.71f, -221.513f, 3.63029f},
-    {-1801.84f, -1851.69f, -221.436f, 5.2709f},
+    {-1696.95f, -1941.09f, -221.292f, 1.90241f},
     {-1792.2f, -1988.63f, -221.373f, 1.41372f},
     {-1834.55f, -1952.28f, -221.38f, 0.628318f},
     {-1734.35f, -1983.18f, -221.445f, 2.14675f},
     {-1745.46f, -1847.31f, -221.437f, 4.43314f},
     {-1839.37f, -1895.09f, -221.381f, 5.98648f},
-    {-1696.95f, -1941.09f, -221.292f, 1.90241f},
+    {-1801.84f, -1851.69f, -221.436f, 5.2709f},
 
     {-1739.246826f, -1885.623047f, -226.28f, 4.44f},
     {-1791.315552f, -1885.340820f, -226.06f, 4.94f},
@@ -384,14 +384,14 @@ class boss_warlord_zonozz: public CreatureScript
                             DoCast(me, SPELL_TANTRUM);
                             switch (GetDifficulty())
                             {
-                                case RAID_DIFFICULTY_10MAN_NORMAL:
+                                /*case RAID_DIFFICULTY_10MAN_NORMAL:
                                     SpawnRandomTentacles(4, 0, 0);
                                     break;                                    
                                 case RAID_DIFFICULTY_25MAN_NORMAL:
                                     SpawnRandomTentacles(8, 0, 0);
-                                    break;
+                                    break;*/
                                 case RAID_DIFFICULTY_10MAN_HEROIC:
-                                    SpawnRandomTentacles(4, 2, 1);
+                                    SpawnRandomTentacles(5, 2, 1);
                                     break;
                                 case RAID_DIFFICULTY_25MAN_HEROIC:
                                     SpawnRandomTentacles(8, 4, 2);
@@ -548,7 +548,7 @@ class npc_warlord_zonozz_void_of_the_unmaking : public CreatureScript
                                 events.ScheduleEvent(EVENT_UPDATE_AURA, 4000);
                                 events.ScheduleEvent(EVENT_CHECK_DISTANCE, 4000);
                             }
-                            else if (Creature* pZonozz = me->FindNearestCreature(NPC_ZONOZZ, 5.0f))
+                            else if (Creature* pZonozz = me->FindNearestCreature(NPC_ZONOZZ, 3.0f))
                             {
                                 uint8 stacks = 1;
                                 if (Aura const* aur = me->GetAura(SPELL_VOID_DIFFUSION_BUFF))
