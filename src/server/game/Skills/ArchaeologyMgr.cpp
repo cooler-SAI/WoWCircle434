@@ -244,7 +244,7 @@ void ArchaeologyMgr::ShowResearchSites()
 
         ++count;
     }
-    Log->outDebug(LOG_FILTER_SPELLS_AURAS, "rchaeologyMgr::ShowResearchSites count %u", count);
+    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "rchaeologyMgr::ShowResearchSites count %u", count);
 }
 
 void ArchaeologyMgr::ShowResearchProjects()
@@ -272,7 +272,7 @@ void ArchaeologyMgr::ShowResearchProjects()
 
         ++count;
     }
-    Log->outDebug(LOG_FILTER_SPELLS_AURAS, "rchaeologyMgr::ShowResearchProjects count %u", count);
+    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "rchaeologyMgr::ShowResearchProjects count %u", count);
 }
 
 ResearchWithLevelResult ArchaeologyMgr::CanResearchWithLevel(uint32 siteId)
@@ -356,7 +356,7 @@ void ArchaeologyMgr::GenerateResearchSites()
     if (sResearchSiteSet.empty())
         return;
 
-    Log->outDebug(LOG_FILTER_SPELLS_AURAS, "rchaeologyMgr::GenerateResearchSites");
+    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "rchaeologyMgr::GenerateResearchSites");
 
     for (uint8 i = 0; i < 4; ++i)
         _researchSites[i].clear();
@@ -389,7 +389,7 @@ void ArchaeologyMgr::GenerateResearchProjects()
         return;
 
     uint16 skill_now = _player->GetSkillValue(SKILL_ARCHAEOLOGY);
-    Log->outDebug(LOG_FILTER_SPELLS_AURAS, "rchaeologyMgr::GenerateResearchSites skill_now %u", skill_now);
+    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "rchaeologyMgr::GenerateResearchSites skill_now %u", skill_now);
     if (!skill_now)
         return;
 
