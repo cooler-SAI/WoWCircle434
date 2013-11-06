@@ -7213,11 +7213,13 @@ bool Player::RewardHonor(Unit* victim, uint32 groupsize, int32 honor, bool pvpto
 
     if (victim != NULL)
     {
+        honor_f *= sWorld->getRate(RATE_HONOR);
+
         if (groupsize > 1)
             honor_f /= groupsize;
     }
-
-    honor_f *= sWorld->getRate(RATE_HONOR);
+    else
+        honor_f *= sWorld->getRate(RATE_HONOR_QB);
 
     if (GetSession()->IsPremium())
         honor_f *= sWorld->getRate(RATE_HONOR_PREMIUM);
