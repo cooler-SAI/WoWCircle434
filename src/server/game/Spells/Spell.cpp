@@ -3075,12 +3075,40 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
 
     // trigger linked auras remove/apply
     // TODO: remove/cleanup this, as this table is not documented and people are doing stupid things with it
-    if (std::vector<int32> const* spellTriggered = sSpellMgr->GetSpellLinked(m_spellInfo->Id + SPELL_LINK_HIT))
-        for (std::vector<int32>::const_iterator i = spellTriggered->begin(); i != spellTriggered->end(); ++i)
-            if (*i < 0)
-                unit->RemoveAurasDueToSpell(-(*i));
+    if (std::vector<SpellLinked> const* spellTriggered = sSpellMgr->GetSpellLinked(m_spellInfo->Id + SPELL_LINK_HIT))
+    {
+        for (std::vector<SpellLinked>::const_iterator i = spellTriggered->begin(); i != spellTriggered->end(); ++i)
+        {
+            if (i->effect < 0)
+                unit->RemoveAurasDueToSpell(-(i->effect));
             else
-                unit->CastSpell(unit, *i, true, 0, 0, m_caster->GetGUID());
+            {
+                if(i->type2)
+                {
+                    if(i->hastalent != 0 && !m_caster->HasAura(i->hastalent))
+                        continue;
+                    if(i->hastalent2 != 0 && !m_caster->HasAura(i->hastalent2))
+                        continue;
+                }
+                else
+                {
+                    if(i->hastalent != 0 && !unit->HasAura(i->hastalent))
+                        continue;
+                    if(i->hastalent2 != 0 && !unit->HasAura(i->hastalent2))
+                        continue;
+                }
+                if(i->chance != 0 && !roll_chance_i(i->chance))
+                    continue;
+                if(i->cooldown != 0 && unit->GetTypeId() == TYPEID_PLAYER && unit->ToPlayer()->HasSpellCooldown(i->effect))
+                    continue;
+
+                unit->CastSpell(unit, i->effect, true, 0, 0, m_caster->GetGUID());
+
+                if(i->cooldown != 0 && unit->GetTypeId() == TYPEID_PLAYER)
+                    unit->ToPlayer()->AddSpellCooldown(i->effect, 0, time(NULL) + i->cooldown);
+            }
+        }
+    }
 }
 
 void Spell::DoAllEffectOnTarget(GOTargetInfo* target)
@@ -3728,13 +3756,37 @@ void Spell::cast(bool skipCheck)
 
     CallScriptAfterCastHandlers();
 
-    if (const std::vector<int32> *spell_triggered = sSpellMgr->GetSpellLinked(m_spellInfo->Id))
+    if (const std::vector<SpellLinked> *spell_triggered = sSpellMgr->GetSpellLinked(m_spellInfo->Id))
     {
-        for (std::vector<int32>::const_iterator i = spell_triggered->begin(); i != spell_triggered->end(); ++i)
-            if (*i < 0)
-                m_caster->RemoveAurasDueToSpell(-(*i));
+        for (std::vector<SpellLinked>::const_iterator i = spell_triggered->begin(); i != spell_triggered->end(); ++i)
+            if (i->effect < 0)
+                m_caster->RemoveAurasDueToSpell(-(i->effect));
             else
-                m_caster->CastSpell(m_targets.GetUnitTarget() ? m_targets.GetUnitTarget() : m_caster, *i, true);
+            {
+                if(i->type2 && m_targets.GetUnitTarget())
+                {
+                    if(i->hastalent != 0 && !m_targets.GetUnitTarget()->HasAura(i->hastalent))
+                        continue;
+                    if(i->hastalent2 != 0 && !m_targets.GetUnitTarget()->HasAura(i->hastalent2))
+                        continue;
+                }
+                else
+                {
+                    if(i->hastalent != 0 && !m_caster->HasAura(i->hastalent))
+                        continue;
+                    if(i->hastalent2 != 0 && !m_caster->HasAura(i->hastalent2))
+                        continue;
+                }
+                if(i->chance != 0 && !roll_chance_i(i->chance))
+                    continue;
+                if(i->cooldown != 0 && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->ToPlayer()->HasSpellCooldown(i->effect))
+                    continue;
+
+                m_caster->CastSpell(m_targets.GetUnitTarget() ? m_targets.GetUnitTarget() : m_caster, i->effect, true);
+
+                if(i->cooldown != 0 && m_caster->GetTypeId() == TYPEID_PLAYER)
+                    m_caster->ToPlayer()->AddSpellCooldown(i->effect, 0, time(NULL) + i->cooldown);
+            }
     }
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
