@@ -16660,7 +16660,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     SetByteValue(PLAYER_FIELD_BYTES, 2, fields[58].GetUInt8());
 
     m_currentPetSlot = PetSlot(fields[60].GetInt32());
-    m_petSlotUsed = fields[61].GetUInt32();
+    m_petSlotUsed = fields[61].GetInt32();
 
     InitDisplayIds();
 
@@ -18687,7 +18687,7 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setUInt32(index++, m_grantableLevels);
 
         stmt->setInt32(index++, m_currentPetSlot);
-        stmt->setUInt32(index++, m_petSlotUsed);
+        stmt->setInt32(index++, m_petSlotUsed);
     }
     else
     {
@@ -18813,7 +18813,7 @@ void Player::SaveToDB(bool create /*=false*/)
         stmt->setUInt8(index++, IsInWorld() ? 1 : 0);
 
         stmt->setInt32(index++, m_currentPetSlot);
-        stmt->setUInt32(index++, m_petSlotUsed);
+        stmt->setInt32(index++, m_petSlotUsed);
 
         // Index
         stmt->setUInt32(index++, GetGUIDLow());

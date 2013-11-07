@@ -1446,6 +1446,12 @@ void World::SetInitialWorldSettings()
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Spell Proc Event conditions...");
     sSpellMgr->LoadSpellProcEvents();
 
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Prco Check spells...");
+    sSpellMgr->LoadSpellPrcoCheck();
+
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading triggered spells...");
+    sSpellMgr->LoadSpellTriggered();
+
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Spell Proc conditions and data...");
     sSpellMgr->LoadSpellProcs();
 
