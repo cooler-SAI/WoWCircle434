@@ -541,7 +541,7 @@ uint8 ArenaTeam::GetSlotByType(uint32 type)
             break;
     }
     sLog->outError(LOG_FILTER_ARENAS, "FATAL: Unknown arena team type %u for some arena team", type);
-    return 0xFF;
+    return 1;
 }
 
 uint8 ArenaTeam::GetTypeBySlot(uint32 slot)
@@ -555,7 +555,7 @@ uint8 ArenaTeam::GetTypeBySlot(uint32 slot)
             break;
     }
     sLog->outError(LOG_FILTER_ARENAS, "FATAL: Unknown arena team slot %u for some arena team", slot);
-    return 0xFF;
+    return 1;
 }
 
 bool ArenaTeam::IsMember(uint64 guid) const
