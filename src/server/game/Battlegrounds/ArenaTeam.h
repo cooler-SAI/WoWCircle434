@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -39,6 +39,7 @@ enum ArenaTeamCommandTypes
 
 enum ArenaTeamCommandErrors
 {
+    ERR_ARENA_TEAM_CREATED                  = 0x00,
     ERR_ARENA_TEAM_INTERNAL                 = 0x01,
     ERR_ALREADY_IN_ARENA_TEAM               = 0x02,
     ERR_ALREADY_IN_ARENA_TEAM_S             = 0x03,
@@ -106,7 +107,7 @@ struct ArenaTeamMember
     uint16 PersonalRating;
     uint16 MatchMakerRating;
 
-    void ModifyPersonalRating(Player* player, int32 mod, uint32 type, uint32 max_rating);
+    void ModifyPersonalRating(Player* player, int32 mod, uint32 type);
     void ModifyMatchmakerRating(int32 mod, uint32 slot);
 };
 
@@ -120,13 +121,15 @@ struct ArenaTeamStats
     uint32 Rank;
 };
 
+#define MAX_ARENA_SLOT 3                                    // 0..2 slots
+
 class ArenaTeam
 {
     public:
         ArenaTeam();
         ~ArenaTeam();
 
-        bool Create(uint64 captainGuid, uint8 slot, std::string teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor);
+        bool Create(uint64 captainGuid, uint8 type, std::string const& teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor);
         void Disband(WorldSession* session);
 
         typedef std::list<ArenaTeamMember> MemberList;
@@ -135,9 +138,9 @@ class ArenaTeam
         uint32 GetType() const            { return Type; }
         uint8  GetSlot() const            { return GetSlotByType(GetType()); }
         static uint8 GetSlotByType(uint32 type);
-        static uint8 GetTypeBySlot(uint32 slot);
+        static uint8 GetTypeBySlot(uint8 slot);
         uint64 GetCaptain() const  { return CaptainGuid; }
-        std::string GetName() const       { return TeamName; }
+        std::string const& GetName() const       { return TeamName; }
         const ArenaTeamStats& GetStats() const { return Stats; }
 
         uint32 GetRating() const          { return Stats.Rating; }
@@ -159,7 +162,7 @@ class ArenaTeam
         static inline bool IsArenaTypeValid(ArenaType type) { return type == ARENA_TYPE_2v2 || type == ARENA_TYPE_3v3 || type == ARENA_TYPE_5v5; }
 
         ArenaTeamMember* GetMember(uint64 guid);
-        ArenaTeamMember* GetMember(const std::string& name);
+        ArenaTeamMember* GetMember(std::string const& name);
 
         bool IsFighting() const;
 
@@ -169,9 +172,9 @@ class ArenaTeam
         void SaveToDB();
 
         void BroadcastPacket(WorldPacket* packet);
-        void BroadcastEvent(ArenaTeamEvents event, uint64 guid, uint8 strCount, std::string str1, std::string str2, std::string str3);
+        void BroadcastEvent(ArenaTeamEvents event, uint64 guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3);
         void NotifyStatsChanged();
-		
+
         void MassInviteToEvent(WorldSession* session);
 
         void Roster(WorldSession* session);
@@ -180,7 +183,7 @@ class ArenaTeam
         void Inspect(WorldSession* session, uint64 guid);
 
         int32  GetMatchmakerRatingMod(uint32 ownRating, uint32 opponentRating, bool won);
-        int32  GetRatingMod(uint32 ownRating, uint32 opponentRating, uint32 ownMmr, bool won);
+        int32  GetRatingMod(uint32 ownRating, uint32 opponentRating, bool won);
         float  GetChanceAgainst(uint32 ownRating, uint32 opponentRating);
         int32  WonAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32& rating_change);
         void   MemberWon(Player* player, uint32 againstMatchmakerRating, int32 MatchmakerRatingChange);
