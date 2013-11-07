@@ -41,7 +41,7 @@ ArenaTeam::ArenaTeam()
 ArenaTeam::~ArenaTeam()
 { }
 
-bool ArenaTeam::Create(uint64 captainGuid, uint8 type, std::string const& teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor)
+bool ArenaTeam::Create(uint64 captainGuid, uint8 slot, std::string const& teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor)
 {
     // Check if captain is present
     if (!ObjectAccessor::FindPlayer(captainGuid))
@@ -56,7 +56,7 @@ bool ArenaTeam::Create(uint64 captainGuid, uint8 type, std::string const& teamNa
 
     // Assign member variables
     CaptainGuid = captainGuid;
-    Type = type;
+    Type = GetTypeBySlot(slot);
     TeamName = teamName;
     BackgroundColor = backgroundColor;
     EmblemStyle = emblemStyle;
@@ -544,13 +544,13 @@ uint8 ArenaTeam::GetSlotByType(uint32 type)
     return 0xFF;
 }
 
-uint8 ArenaTeam::GetTypeBySlot(uint8 slot)
+uint8 ArenaTeam::GetTypeBySlot(uint32 slot)
 {
     switch (slot)
     {
-        case 0: return ARENA_TEAM_2v2;
-        case 1: return ARENA_TEAM_3v3;
-        case 2: return ARENA_TEAM_5v5;
+        case ARENA_SLOT_2v2: return 2;
+        case ARENA_SLOT_3v3: return 3;
+        case ARENA_SLOT_5v5: return 5;
         default:
             break;
     }
