@@ -848,7 +848,7 @@ void Battleground::EndBattleground(uint32 winner)
                     CharacterDatabase.Execute(sql_query.str().c_str());
                 }
 
-                CharacterDatabase.PExecute("REPLACE INTO arena_team_history (id, winner_team, winner_rating, winnerChange, loser_team, loser_rating, loserChange, type, map, duration) VALUES ('%u','%u', '%u', '%i', '%u', '%u', '%i', '%u', '%u', '%u')", 
+                CharacterDatabase.PExecute("REPLACE INTO arena_team_history (id, winner_team, winner_rating, winner_change, loser_team, loser_rating, loser_change, type, map, duration) VALUES ('%u','%u', '%u', '%i', '%u', '%u', '%i', '%u', '%u', '%u')", 
                 gameID, winnerArenaTeam->GetId(), winnerArenaTeam->GetRating(), GetArenaMatchmakerRating(winner), loserArenaTeam->GetId(), loserArenaTeam->GetRating(), GetArenaMatchmakerRating(GetOtherTeam(winner)), winnerArenaTeam->GetType(), GetMapId(), GetElapsedTime());
                 /** World of Warcraft Armory **/
 

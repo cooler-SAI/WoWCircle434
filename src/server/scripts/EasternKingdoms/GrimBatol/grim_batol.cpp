@@ -1,4 +1,4 @@
-#include "ScriptPCH.h"
+#include "EasternKingdomsPCH.h"
 #include "grim_batol.h"
     
 enum Creatures

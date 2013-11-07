@@ -1,6 +1,4 @@
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
+#include "EasternKingdomsPCH.h"
 #include "zulgurub.h"
 
 enum Yells

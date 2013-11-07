@@ -1,4 +1,4 @@
-#include "ScriptPCH.h"
+#include "EasternKingdomsPCH.h"
 #include "zulgurub.h"
 
 enum JindoScriptTexts

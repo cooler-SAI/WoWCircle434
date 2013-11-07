@@ -1,4 +1,4 @@
-#include "ScriptPCH.h"
+#include "EasternKingdomsPCH.h"
 #include "deadmines.h"
 
 //todo: реализовать flame wall

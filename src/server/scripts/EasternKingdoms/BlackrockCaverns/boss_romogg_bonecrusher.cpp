@@ -1,4 +1,4 @@
-#include "ScriptPCH.h"
+#include "EasternKingdomsPCH.h"
 #include "blackrock_caverns.h"
 
 //todo: реализовать призыв о помощи

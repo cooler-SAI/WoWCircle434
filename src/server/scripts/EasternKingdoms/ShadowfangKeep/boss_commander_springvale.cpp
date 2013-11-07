@@ -1,4 +1,4 @@
-#include"ScriptPCH.h"
+#include"EasternKingdomsPCH.h"
 #include"WorldPacket.h"
 #include"shadowfang_keep.h"
 #include"ScriptMgr.h"

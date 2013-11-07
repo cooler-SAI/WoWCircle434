@@ -1,4 +1,4 @@
-#include"ScriptPCH.h"
+#include"EasternKingdomsPCH.h"
 #include"Spell.h"
 #include "GameObjectAI.h"
 #include "blackwing_descent.h"

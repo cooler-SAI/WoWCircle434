@@ -1,4 +1,4 @@
-#include "ScriptPCH.h"
+#include "EasternKingdomsPCH.h"
 #include "zulaman.h"
 
 #define SE_LOC_X_MAX 400

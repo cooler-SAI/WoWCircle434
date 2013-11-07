@@ -162,6 +162,7 @@ target_link_libraries(worldserver
   game
   shared
   scripts
+  EasternKingdoms
   collision
   g3dlib
   gsoap
