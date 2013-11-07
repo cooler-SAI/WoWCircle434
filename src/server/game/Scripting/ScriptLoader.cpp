@@ -624,7 +624,7 @@ void AddSC_terokkar_forest();
 void AddSC_zangarmarsh();
 
 // Events
-void AddSC_event_childrens_week();
+//void AddSC_event_childrens_week();
 
 // Cataclysm Scripts
 void AddSC_instance_throne_of_the_tides(); // Throne of the Tides
@@ -1517,7 +1517,7 @@ void AddNorthrendScripts()
 void AddEventScripts()
 {
 #ifdef SCRIPTS
-    AddSC_event_childrens_week();
+    //AddSC_event_childrens_week();
 #endif
 }
 

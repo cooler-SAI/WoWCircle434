@@ -10,7 +10,7 @@
 
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
-  Events/childrens_week.cpp
+  #Events/childrens_week.cpp
 )
 
 message("  -> Prepared: Events")
