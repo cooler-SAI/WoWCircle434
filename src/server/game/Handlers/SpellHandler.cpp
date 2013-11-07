@@ -220,6 +220,20 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
         return;
     }
 
+    // Hack for give char curency
+    if (proto->Spells[0].SpellId == 13)
+    {
+        uint32 countefirs = pUser->GetItemCount(proto->ItemId, false);
+        uint32 curency = proto->Spells[1].SpellId;
+        uint32 curency_count = proto->Spells[1].SpellCooldown;
+       if(curency > 0 && curency_count > 0 && countefirs > 0)
+        {
+            pUser->ModifyCurrency(curency, curency_count, true, false, true);
+            pUser->DestroyItemCount(proto->ItemId, 1, true);
+        }
+        return;
+    }
+
     // Verify that the bag is an actual bag or wrapped item that can be used "normally"
     if (!(proto->Flags & ITEM_PROTO_FLAG_OPENABLE) && !item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED))
     {

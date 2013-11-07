@@ -8454,6 +8454,20 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
         return;
     }
 
+    // special case for rewards curency
+    if (proto->Spells[0].SpellId == 13)
+    {
+        uint32 countefirs = GetItemCount(proto->ItemId, false);
+        uint32 curency = proto->Spells[1].SpellId;
+        uint32 curency_count = proto->Spells[1].SpellCooldown;
+        if(curency > 0 && curency_count > 0 && countefirs > 0)
+        {
+            ModifyCurrency(curency, curency_count, true, false, true);
+            DestroyItemCount(proto->ItemId, 1, true);
+        }
+        return;
+    }
+
     // use triggered flag only for items with many spell casts and for not first cast
     uint8 count = 0;
 
