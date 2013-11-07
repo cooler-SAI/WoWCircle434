@@ -10,11 +10,11 @@
 
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
-  Custom/teleguy.cpp
+  #Custom/teleguy.cpp
   Custom/command_arena.cpp
   Custom/multi_vendor.cpp
   Custom/custom_reward.cpp
-  Custom/perenos_charov.cpp
+  #Custom/perenos_charov.cpp
 )
 
 message("  -> Prepared: Custom")
