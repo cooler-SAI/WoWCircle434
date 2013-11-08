@@ -1233,8 +1233,8 @@ public:
 
             if (uiTimer <= diff)
             {
-                if (Unit* random = Unit::GetUnit(*me, instance ? instance->GetData64(DATA_PLAYER_GUID) : 0))
-                    DoCast(random, SPELL_SHADOW_BOLT, false);
+                //if (Unit* random = Unit::GetUnit(*me, instance ? instance->GetData64(DATA_PLAYER_GUID) : 0))
+                    //DoCast(random, SPELL_SHADOW_BOLT, false);
                 uiTimer = urand(500, 1000);
             } else uiTimer -= diff;
         }
