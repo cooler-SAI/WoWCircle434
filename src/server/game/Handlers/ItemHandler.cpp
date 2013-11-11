@@ -32,6 +32,7 @@
 #include <vector>
 #include "DB2Structure.h"
 #include "DB2Stores.h"
+#include "HookMgr.h"
 
 void WorldSession::HandleSplitItemOpcode(WorldPacket& recvData)
 {

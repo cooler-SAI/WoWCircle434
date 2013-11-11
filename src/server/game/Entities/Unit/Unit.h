@@ -274,6 +274,9 @@ enum UnitRename
 #define MAX_AGGRO_RESET_TIME 10 // in seconds
 #define MAX_AGGRO_RADIUS 45.0f  // yards
 
+#define MAX_AGGRO_RESET_TIME 10 // in seconds
+#define MAX_AGGRO_RADIUS 45.0f  // yards
+
 enum Swing
 {
     NOSWING                    = 0,
@@ -1515,6 +1518,8 @@ class Unit : public WorldObject
 
         virtual uint32 GetBlockPercent() { return 30; }
 
+        virtual uint32 GetShieldBlockValue() const =0;
+        uint32 GetShieldBlockValue(uint32 soft_cap, uint32 hard_cap) const;
         uint32 GetUnitMeleeSkill(Unit const* target = NULL) const { return (target ? getLevelForTarget(target) : getLevel()) * 5; }
         float GetWeaponProcChance() const;
         float GetPPMProcChance(uint32 WeaponSpeed, float PPM,  const SpellInfo* spellProto) const;

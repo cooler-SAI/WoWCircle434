@@ -66,6 +66,7 @@
 #include "InstanceScript.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "HookMgr.h"
 
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
 {

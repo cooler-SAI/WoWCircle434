@@ -612,6 +612,8 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
         bool SetDisableGravity(bool disable, bool packetOnly = false);
         bool SetHover(bool enable);
 
+        uint32 GetShieldBlockValue() const;
+
         SpellSchoolMask GetMeleeDamageSchoolMask() const { return m_meleeDamageSchoolMask; }
         void SetMeleeDamageSchool(SpellSchools school) { m_meleeDamageSchoolMask = SpellSchoolMask(1 << school); }
 

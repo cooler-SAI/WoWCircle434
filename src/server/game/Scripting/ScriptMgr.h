@@ -206,6 +206,39 @@ class SpellScriptLoader : public ScriptObject
         virtual AuraScript* GetAuraScript() const { return NULL; }
 };
 
+class WorldScript : public ScriptObject
+{
+    protected:
+
+        WorldScript(const char* name);
+
+    public:
+
+        // Called when the open/closed state of the world changes.
+        virtual void OnOpenStateChange(bool /*open*/) { }
+
+        // Called after the world configuration is (re)loaded.
+        virtual void OnConfigLoad(bool /*reload*/) { }
+
+        // Called before the message of the day is changed.
+        virtual void OnMotdChange(std::string& /*newMotd*/) { }
+
+        // Called when a world shutdown is initiated.
+        virtual void OnShutdownInitiate(ShutdownExitCode /*code*/, ShutdownMask /*mask*/) { }
+
+        // Called when a world shutdown is cancelled.
+        virtual void OnShutdownCancel() { }
+
+        // Called on every world tick (don't execute too heavy code here).
+        virtual void OnUpdate(uint32 /*diff*/) { }
+
+        // Called when the world is started.
+        virtual void OnStartup() { }
+
+        // Called when the world is actually shut down.
+        virtual void OnShutdown() { }
+};
+
 template<class TMap> class MapScript : public UpdatableScript<TMap>
 {
     MapEntry const* _mapEntry;
@@ -519,6 +552,12 @@ class PlayerScript : public ScriptObject
         // Called when a player is bound to an instance
         virtual void OnBindToInstance(Player* /*player*/, Difficulty /*difficulty*/, uint32 /*mapId*/, bool /*permanent*/) { }
 
+        // Called when a player enters combat
+        virtual void OnPlayerEnterCombat(Player* /*player*/, Unit* /*enemy*/) { }
+
+        // Called when a player leaves combat
+       virtual void OnPlayerLeaveCombat(Player* /*player*/) { }
+
 };
 
 
@@ -582,6 +621,17 @@ class ScriptMgr
         void CreateSpellScripts(uint32 spellId, std::list<SpellScript*>& scriptVector);
         void CreateAuraScripts(uint32 spellId, std::list<AuraScript*>& scriptVector);
         void CreateSpellScriptLoaders(uint32 spellId, std::vector<std::pair<SpellScriptLoader*, std::multimap<uint32, uint32>::iterator> >& scriptVector);
+
+    public: /* WorldScript */
+
+        void OnOpenStateChange(bool open);
+        void OnConfigLoad(bool reload);
+        void OnMotdChange(std::string& newMotd);
+        void OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask);
+        void OnShutdownCancel();
+        void OnWorldUpdate(uint32 diff);
+        void OnStartup();
+        void OnShutdown();
 
     public: /* InstanceMapScript */
 
@@ -673,7 +723,8 @@ class ScriptMgr
         void OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck);
         void OnPlayerLogin(Player* player);
         void OnPlayerLogout(Player* player);
-        void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
+        void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);        void OnPlayerEnterCombat(Player* player, Unit* enemy);
+        void OnPlayerLeaveCombat(Player* player);
 
     public: /* GroupScript */
 

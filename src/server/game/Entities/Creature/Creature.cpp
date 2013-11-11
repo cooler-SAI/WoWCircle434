@@ -2341,6 +2341,11 @@ void Creature::SetInCombatWithZone()
     }
 }
 
+uint32 Creature::GetShieldBlockValue() const                  //dunno mob block value
+{
+    return (getLevel()/2 + uint32(GetStat(STAT_STRENGTH)/20));
+}
+
 void Creature::_AddCreatureSpellCooldown(uint32 spell_id, time_t end_time)
 {
     m_CreatureSpellCooldowns[spell_id] = end_time;

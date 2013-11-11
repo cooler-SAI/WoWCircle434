@@ -81,6 +81,7 @@
 #include "BattlefieldMgr.h"
 #include "BattlefieldWG.h"
 #include "RatedBattleground.h"
+#include "HookMgr.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -1261,7 +1262,7 @@ bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
         if (msg != EQUIP_ERR_OK)
             break;
 
-        EquipNewItem(eDest, titem_id, true);
+        Item* item = EquipNewItem(eDest, titem_id, true);
         AutoUnequipOffhandIfNeed();
         --titem_amount;
     }
@@ -5759,6 +5760,15 @@ float Player::GetTotalBaseModValue(BaseModGroup modGroup) const
         return 0.0f;
 
     return m_auraBaseMod[modGroup][FLAT_MOD] * m_auraBaseMod[modGroup][PCT_MOD];
+}
+
+uint32 Player::GetShieldBlockValue() const
+{
+    float value = (m_auraBaseMod[SHIELD_BLOCK_VALUE][FLAT_MOD] + GetStat(STAT_STRENGTH) * 0.5f - 10)*m_auraBaseMod[SHIELD_BLOCK_VALUE][PCT_MOD];
+
+    value = (value < 0) ? 0 : value;
+
+    return uint32(value);
 }
 
 float Player::GetMeleeCritFromAgility()
@@ -11306,6 +11316,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
                 }
             }
             dest = ((INVENTORY_SLOT_BAG_0 << 8) | eslot);
+
             return EQUIP_ERR_OK;
         }
     }
@@ -11631,7 +11642,11 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
         if (proto->HolidayId && !IsHolidayActive((HolidayIds)proto->HolidayId))
             return EQUIP_ERR_CLIENT_LOCKED_OUT;
 
-        return EQUIP_ERR_OK;
+#ifdef ELUNA
+        return sHookMgr->OnCanUseItem(this, proto->ItemId);
+#else
+		return EQUIP_ERR_OK;
+#endif
     }
 
     return EQUIP_ERR_ITEM_NOT_FOUND;
@@ -12015,6 +12030,9 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
         ApplyEquipCooldown(pItem2);
 
+#ifdef ELUNA
+        sHookMgr->OnEquip(this, pItem2, bag, slot);
+#endif
         return pItem2;
     }
 
@@ -12022,6 +12040,9 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, pItem->GetEntry(), slot);
 
+#ifdef ELUNA
+    sHookMgr->OnEquip(this, pItem, bag, slot);
+#endif
     return pItem;
 }
 
@@ -24149,6 +24170,10 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE, item->itemid, item->count, loot->loot_type);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item->itemid, item->count);
         UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item->itemid, item->count);
+
+#ifdef ELUNA
+        sHookMgr->OnLootItem(this, newitem, item->count, this->GetLootGUID());
+#endif
     }
     else
         SendEquipError(msg, NULL, NULL, item->itemid);

@@ -613,6 +613,10 @@ uint32 Unit::DealDamage(Unit* victim, uint32 damage, CleanDamage const* cleanDam
             victim->ToPlayer()->SetDamageTakenForSecond(damage);
     }
 
+    // Signal the pet it was attacked so the AI can respond if needed
+    if (victim->GetTypeId() == TYPEID_UNIT && this != victim && victim->isPet() && victim->isAlive())
+        victim->ToPet()->AI()->AttackedBy(this);
+
     if (damagetype != NODAMAGE)
     {
         // interrupting auras with AURA_INTERRUPT_FLAG_DAMAGE before checking !damage (absorbed damage breaks that type of auras)
@@ -2585,6 +2589,21 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
             return checker->MagicSpellHitResult(victim, spell);
     }
     return SPELL_MISS_NONE;
+}
+
+uint32 Unit::GetShieldBlockValue(uint32 soft_cap, uint32 hard_cap) const
+{
+    uint32 value = GetShieldBlockValue();
+    if (value >= hard_cap)
+    {
+        value = (soft_cap + hard_cap) / 2;
+    }
+    else if (value > soft_cap)
+    {
+        value = soft_cap + ((value - soft_cap) / 2);
+    }
+
+    return value;
 }
 
 float Unit::GetUnitDodgeChance() const
@@ -14291,7 +14310,10 @@ void Unit::CombatStart(Unit* target, bool initialAggro)
         if (!target->isInCombat() && target->GetTypeId() != TYPEID_PLAYER
             && !target->ToCreature()->HasReactState(REACT_PASSIVE) && target->ToCreature()->IsAIEnabled)
         {
-            target->ToCreature()->AI()->AttackStart(this);
+            if (target->isPet())
+                target->ToCreature()->AI()->AttackedBy(this); // PetAI has special handler before AttackStart()
+            else
+                target->ToCreature()->AI()->AttackStart(this);
         }
 
         SetInCombatWith(target);
@@ -14390,10 +14412,11 @@ void Unit::ClearInCombat()
         else if (!isCharmed())
             return;
     }
-    else
+    else if(Player* player = ToPlayer())
     {
-        ToPlayer()->UpdatePotionCooldown();
-        ToPlayer()->ResetHolyPowerTimer();
+        player->UpdatePotionCooldown();
+        player->ResetHolyPowerTimer();
+        sScriptMgr->OnPlayerLeaveCombat(player);
     }
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
 }
@@ -20338,7 +20361,7 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
     {
         Creature* creature = ToCreature();
         if (creature && creature->IsAIEnabled)
-            creature->AI()->OnSpellClick(clicker);
+            creature->AI()->OnSpellClick(clicker, result);
     }
 
     return result;

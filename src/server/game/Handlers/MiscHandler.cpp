@@ -57,6 +57,7 @@
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "DBCStore.h"
+#include "HookMgr.h"
 
 void WorldSession::HandleRepopRequestOpcode(WorldPacket& recvData)
 {
@@ -93,6 +94,13 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recvData)
 
     if (_player->PlayerTalkClass->IsGossipOptionCoded(gossipListId))
         recvData >> code;
+#ifdef ELUNA
+    if (IS_ITEM_GUID(guid) || IS_PLAYER_GUID(guid))
+    {
+        sHookMgr->HandleGossipSelectOption(GetPlayer(), guid, GetPlayer()->PlayerTalkClass->GetGossipOptionSender(gossipListId), GetPlayer()->PlayerTalkClass->GetGossipOptionAction(gossipListId), code, menuId);
+        return;
+    }
+#endif
 
     Creature* unit = NULL;
     GameObject* go = NULL;

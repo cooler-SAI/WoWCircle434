@@ -31,6 +31,7 @@
 #include "World.h"
 #include "Util.h"
 #include "GuildMgr.h"
+#include "HookMgr.h"
 
 void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket & recvData)
 {
@@ -512,6 +513,9 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     target->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE, item.itemid, item.count, loot->loot_type);
     target->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item.itemid, item.count);
     target->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item.itemid, item.count);
+#ifdef ELUNA
+    sHookMgr->OnLootItem(target, newitem, item.count, lootguid);
+#endif
     
     // mark as looted
     item.count=0;

@@ -73,7 +73,7 @@ class DBCStorage
     typedef std::list<char*> StringPoolList;
     public:
         explicit DBCStorage(const char *f) :
-            fmt(f), nCount(0), fieldCount(0), dataTable(NULL)
+            fmt(f), nCount(0), fieldCount(0), dataTable(NULL), loaded(false)
         {
             indexTable.asT = NULL;
         }
@@ -81,8 +81,34 @@ class DBCStorage
 
         T const* LookupEntry(uint32 id) const
         {
+            if(loaded)
+            {
+                typename std::map<uint32, T const*>::const_iterator it = data.find(id);
+                if (it == data.end())
+                    return NULL;
+                return it->second;
+            }
             return (id >= nCount) ? NULL : indexTable.asT[id];
         }
+
+        void SetEntry(uint32 id, T* t) // Cryptic they say..
+        {
+            if(!loaded)
+            {
+                for (uint32 i = 0; i < GetNumRows(); ++i)
+                {
+                    T const* node = LookupEntry(i);
+                    if (!node)
+                        continue;
+                    data[i] = node;
+                }
+                loaded = true;
+            }
+            if (id > nCount)
+                nCount = id+1;
+            data[id] = t;
+        }
+
         T* LookupEntryNoConst(uint32 id) const
         {
             return (id >= nCount) ? NULL : indexTable.asT[id];
@@ -259,6 +285,12 @@ class DBCStorage
 
         void Clear()
         {
+            if (loaded)
+            {
+                data.clear();
+                loaded = false;
+            }
+
             if (!indexTable.asT)
                 return;
 
@@ -314,6 +346,8 @@ class DBCStorage
         indexTable;
 
         T* dataTable;
+        std::map<uint32, T const*> data;
+        bool loaded;
         StringPoolList stringPoolList;
 };
 
