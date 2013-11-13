@@ -53,6 +53,7 @@ class Channel;
 class Creature;
 class DynamicObject;
 class Group;
+class Guild;
 class OutdoorPvP;
 class Pet;
 class PlayerMenu;
@@ -2140,6 +2141,7 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetGuildLevel() { return GetUInt32Value(PLAYER_GUILDLEVEL); }
         void SetGuildIdInvited(uint32 GuildId) { m_GuildIdInvited = GuildId; }
         uint32 GetGuildId() const { return GetUInt32Value(OBJECT_FIELD_DATA); /* return only lower part */ }
+        Guild* GetGuild();
         static uint32 GetGuildIdFromDB(uint64 guid);
         static uint8 GetRankFromDB(uint64 guid);
         int GetGuildIdInvited() { return m_GuildIdInvited; }

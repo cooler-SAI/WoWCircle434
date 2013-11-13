@@ -1,4 +1,4 @@
-#include "EasternKingdomsPCH.h"
+#include "ScriptPCH.h"
 #include "zulaman.h"
 
 enum Scripttexts

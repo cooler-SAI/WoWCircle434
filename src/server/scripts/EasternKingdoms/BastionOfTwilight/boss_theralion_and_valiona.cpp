@@ -1,4 +1,4 @@
-#include "EasternKingdomsPCH.h"
+#include "ScriptPCH.h"
 #include "bastion_of_twilight.h"
 
 enum ValionaScriptTexts

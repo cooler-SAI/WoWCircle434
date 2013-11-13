@@ -1,4 +1,4 @@
-#include "EasternKingdomsPCH.h"
+#include "ScriptPCH.h"
 #include "the_stonecore.h"
 
 enum Spells

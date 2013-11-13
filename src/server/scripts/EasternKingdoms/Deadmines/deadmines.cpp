@@ -1,4 +1,4 @@
-#include "EasternKingdomsPCH.h"
+#include "ScriptPCH.h"
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
 #include "InstanceScript.h"

@@ -1,4 +1,4 @@
-#include"EasternKingdomsPCH.h"
+#include"ScriptPCH.h"
 #include"Spell.h"
 #include"bastion_of_twilight.h"
 

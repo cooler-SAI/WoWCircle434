@@ -1,5 +1,5 @@
 #include "grim_batol.h"
-#include "EasternKingdomsPCH.h"
+#include "ScriptPCH.h"
 
 
 //todo: реализовать адов и mighty stomp

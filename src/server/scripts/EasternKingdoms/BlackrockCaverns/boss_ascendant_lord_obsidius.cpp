@@ -1,4 +1,4 @@
-#include "EasternKingdomsPCH.h"
+#include "ScriptPCH.h"
 #include "blackrock_caverns.h"
 
 //todo: сделать спелл трансформации

@@ -1,5 +1,5 @@
 #include "grim_batol.h"
-#include "EasternKingdomsPCH.h"
+#include "ScriptPCH.h"
 
 class instance_grim_batol : public InstanceMapScript
 {

@@ -1,4 +1,4 @@
-#include "EasternKingdomsPCH.h"
+#include "ScriptPCH.h"
 #include "blackrock_caverns.h"
 
 class blackrock_caverns_teleport: public CreatureScript

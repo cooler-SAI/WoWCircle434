@@ -7380,6 +7380,12 @@ uint32 Player::GetGuildIdFromDB(uint64 guid)
     return id;
 }
 
+Guild* Player::GetGuild()
+{
+    uint32 guildId = GetGuildId();
+    return guildId ? sGuildMgr->GetGuildById(guildId) : NULL;
+}
+
 uint8 Player::GetRankFromDB(uint64 guid)
 {
     QueryResult result = CharacterDatabase.PQuery("SELECT rank FROM guild_member WHERE guid='%u'", GUID_LOPART(guid));

@@ -206,6 +206,40 @@ class SpellScriptLoader : public ScriptObject
         virtual AuraScript* GetAuraScript() const { return NULL; }
 };
 
+class ServerScript : public ScriptObject
+{
+    protected:
+
+        ServerScript(const char* name);
+
+    public:
+
+        // Called when reactive socket I/O is started (WorldSocketMgr).
+        virtual void OnNetworkStart() { }
+
+        // Called when reactive I/O is stopped.
+        virtual void OnNetworkStop() { }
+
+        // Called when a remote socket establishes a connection to the server. Do not store the socket object.
+        virtual void OnSocketOpen(WorldSocket* /*socket*/) { }
+
+        // Called when a socket is closed. Do not store the socket object, and do not rely on the connection
+        // being open; it is not.
+        virtual void OnSocketClose(WorldSocket* /*socket*/, bool /*wasNew*/) { }
+
+        // Called when a packet is sent to a client. The packet object is a copy of the original packet, so reading
+        // and modifying it is safe.
+        virtual void OnPacketSend(WorldSocket* /*socket*/, WorldPacket& /*packet*/) { }
+
+        // Called when a (valid) packet is received by a client. The packet object is a copy of the original packet, so
+        // reading and modifying it is safe.
+        virtual void OnPacketReceive(WorldSocket* /*socket*/, WorldPacket& /*packet*/) { }
+
+        // Called when an invalid (unknown opcode) packet is received by a client. The packet is a reference to the orignal
+        // packet; not a copy. This allows you to actually handle unknown packets (for whatever purpose).
+        virtual void OnUnknownPacketReceive(WorldSocket* /*socket*/, WorldPacket& /*packet*/) { }
+};
+
 class WorldScript : public ScriptObject
 {
     protected:
@@ -237,6 +271,100 @@ class WorldScript : public ScriptObject
 
         // Called when the world is actually shut down.
         virtual void OnShutdown() { }
+};
+
+class FormulaScript : public ScriptObject
+{
+    protected:
+
+        FormulaScript(const char* name);
+
+    public:
+
+        // Called after calculating honor.
+        virtual void OnHonorCalculation(float& /*honor*/, uint8 /*level*/, float /*multiplier*/) { }
+
+        // Called after gray level calculation.
+        virtual void OnGrayLevelCalculation(uint8& /*grayLevel*/, uint8 /*playerLevel*/) { }
+
+        // Called after calculating experience color.
+        virtual void OnColorCodeCalculation(XPColorChar& /*color*/, uint8 /*playerLevel*/, uint8 /*mobLevel*/) { }
+
+        // Called after calculating zero difference.
+        virtual void OnZeroDifferenceCalculation(uint8& /*diff*/, uint8 /*playerLevel*/) { }
+
+        // Called after calculating base experience gain.
+        virtual void OnBaseGainCalculation(uint32& /*gain*/, uint8 /*playerLevel*/, uint8 /*mobLevel*/, ContentLevels /*content*/) { }
+
+        // Called after calculating experience gain.
+        virtual void OnGainCalculation(uint32& /*gain*/, Player* /*player*/, Unit* /*unit*/) { }
+
+        // Called when calculating the experience rate for group experience.
+        virtual void OnGroupRateCalculation(float& /*rate*/, uint32 /*count*/, bool /*isRaid*/) { }
+};
+
+class AuctionHouseScript : public ScriptObject
+{
+    protected:
+
+        AuctionHouseScript(const char* name);
+
+    public:
+
+        // Called when an auction is added to an auction house.
+        virtual void OnAuctionAdd(AuctionHouseObject* /*ah*/, AuctionEntry* /*entry*/) { }
+
+        // Called when an auction is removed from an auction house.
+        virtual void OnAuctionRemove(AuctionHouseObject* /*ah*/, AuctionEntry* /*entry*/) { }
+
+        // Called when an auction was succesfully completed.
+        virtual void OnAuctionSuccessful(AuctionHouseObject* /*ah*/, AuctionEntry* /*entry*/) { }
+
+        // Called when an auction expires.
+        virtual void OnAuctionExpire(AuctionHouseObject* /*ah*/, AuctionEntry* /*entry*/) { }
+};
+
+class GuildScript : public ScriptObject
+{
+    protected:
+
+        GuildScript(const char* name);
+
+    public:
+
+        bool IsDatabaseBound() const { return false; }
+
+        // Called when a member is added to the guild.
+        virtual void OnAddMember(Guild* /*guild*/, Player* /*player*/, uint8& /*plRank*/) { }
+
+        // Called when a member is removed from the guild.
+        virtual void OnRemoveMember(Guild* /*guild*/, Player* /*player*/, bool /*isDisbanding*/, bool /*isKicked*/) { }
+
+        // Called when the guild MOTD (message of the day) changes.
+        virtual void OnMOTDChanged(Guild* /*guild*/, const std::string& /*newMotd*/) { }
+
+        // Called when the guild info is altered.
+        virtual void OnInfoChanged(Guild* /*guild*/, const std::string& /*newInfo*/) { }
+
+        // Called when a guild is created.
+        virtual void OnCreate(Guild* /*guild*/, Player* /*leader*/, const std::string& /*name*/) { }
+
+        // Called when a guild is disbanded.
+        virtual void OnDisband(Guild* /*guild*/) { }
+
+        // Called when a guild member withdraws money from a guild bank.
+        virtual void OnMemberWitdrawMoney(Guild* /*guild*/, Player* /*player*/, uint64& /*amount*/, bool /*isRepair*/) { }
+
+        // Called when a guild member deposits money in a guild bank.
+        virtual void OnMemberDepositMoney(Guild* /*guild*/, Player* /*player*/, uint64& /*amount*/) { }
+
+        // Called when a guild member moves an item in a guild bank.
+        virtual void OnItemMove(Guild* /*guild*/, Player* /*player*/, Item* /*pItem*/, bool /*isSrcBank*/, uint8 /*srcContainer*/, uint8 /*srcSlotId*/,
+            bool /*isDestBank*/, uint8 /*destContainer*/, uint8 /*destSlotId*/) { }
+
+        virtual void OnEvent(Guild* /*guild*/, uint8 /*eventType*/, uint32 /*playerGuid1*/, uint32 /*playerGuid2*/, uint8 /*newRank*/) { }
+
+        virtual void OnBankEvent(Guild* /*guild*/, uint8 /*eventType*/, uint8 /*tabId*/, uint32 /*playerGuid*/, uint32 /*itemOrMoney*/, uint16 /*itemStackCount*/, uint8 /*destTabId*/) { }
 };
 
 template<class TMap> class MapScript : public UpdatableScript<TMap>
@@ -725,6 +853,48 @@ class ScriptMgr
         void OnPlayerLogout(Player* player);
         void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);        void OnPlayerEnterCombat(Player* player, Unit* enemy);
         void OnPlayerLeaveCombat(Player* player);
+
+    public: /* GuildScript */
+
+        void OnGuildAddMember(Guild* guild, Player* player, uint8& plRank);
+        void OnGuildRemoveMember(Guild* guild, Player* player, bool isDisbanding, bool isKicked);
+        void OnGuildMOTDChanged(Guild* guild, const std::string& newMotd);
+        void OnGuildInfoChanged(Guild* guild, const std::string& newInfo);
+        void OnGuildCreate(Guild* guild, Player* leader, const std::string& name);
+        void OnGuildDisband(Guild* guild);
+        void OnGuildMemberWitdrawMoney(Guild* guild, Player* player, uint64 &amount, bool isRepair);
+        void OnGuildMemberDepositMoney(Guild* guild, Player* player, uint64 &amount);
+        void OnGuildItemMove(Guild* guild, Player* player, Item* pItem, bool isSrcBank, uint8 srcContainer, uint8 srcSlotId,
+        bool isDestBank, uint8 destContainer, uint8 destSlotId);
+        void OnGuildEvent(Guild* guild, uint8 eventType, uint32 playerGuid1, uint32 playerGuid2, uint8 newRank);
+        void OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, uint32 playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId);
+
+    public: /* AuctionHouseScript */
+
+        void OnAuctionAdd(AuctionHouseObject* ah, AuctionEntry* entry);
+        void OnAuctionRemove(AuctionHouseObject* ah, AuctionEntry* entry);
+        void OnAuctionSuccessful(AuctionHouseObject* ah, AuctionEntry* entry);
+        void OnAuctionExpire(AuctionHouseObject* ah, AuctionEntry* entry);
+
+    public: /* FormulaScript */
+
+        void OnHonorCalculation(float& honor, uint8 level, float multiplier);
+        void OnGrayLevelCalculation(uint8& grayLevel, uint8 playerLevel);
+        void OnColorCodeCalculation(XPColorChar& color, uint8 playerLevel, uint8 mobLevel);
+        void OnZeroDifferenceCalculation(uint8& diff, uint8 playerLevel);
+        void OnBaseGainCalculation(uint32& gain, uint8 playerLevel, uint8 mobLevel, ContentLevels content);
+        void OnGainCalculation(uint32& gain, Player* player, Unit* unit);
+        void OnGroupRateCalculation(float& rate, uint32 count, bool isRaid);
+
+    public: /* ServerScript */
+
+        void OnNetworkStart();
+        void OnNetworkStop();
+        void OnSocketOpen(WorldSocket* socket);
+        void OnSocketClose(WorldSocket* socket, bool wasNew);
+        void OnPacketReceive(WorldSocket* socket, WorldPacket packet);
+        void OnPacketSend(WorldSocket* socket, WorldPacket packet);
+        void OnUnknownPacketReceive(WorldSocket* socket, WorldPacket packet);
 
     public: /* GroupScript */
 

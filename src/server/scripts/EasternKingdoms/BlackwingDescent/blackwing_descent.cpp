@@ -1,4 +1,4 @@
-#include"EasternKingdomsPCH.h"
+#include"ScriptPCH.h"
 #include "blackwing_descent.h"
 
 enum ScriptTexts

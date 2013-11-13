@@ -1,4 +1,4 @@
-#include "EasternKingdomsPCH.h"
+#include "ScriptPCH.h"
 //#include "GridNotifiers.h"
 #include "zulgurub.h"
 

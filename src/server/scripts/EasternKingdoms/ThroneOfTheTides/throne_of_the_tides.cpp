@@ -1,4 +1,4 @@
-#include "EasternKingdomsPCH.h"
+#include "ScriptPCH.h"
 #include "throne_of_the_tides.h"
 
 enum ScriptTexts

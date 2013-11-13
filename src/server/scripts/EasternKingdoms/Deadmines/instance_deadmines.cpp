@@ -1,4 +1,4 @@
-#include "EasternKingdomsPCH.h"
+#include "ScriptPCH.h"
 #include "deadmines.h"
 
 #define MAX_ENCOUNTER 6

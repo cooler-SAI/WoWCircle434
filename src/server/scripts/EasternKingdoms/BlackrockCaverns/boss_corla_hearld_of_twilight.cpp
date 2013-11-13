@@ -1,4 +1,4 @@
-#include "EasternKingdomsPCH.h"
+#include "ScriptPCH.h"
 #include "Spell.h"
 #include "blackrock_caverns.h"
 

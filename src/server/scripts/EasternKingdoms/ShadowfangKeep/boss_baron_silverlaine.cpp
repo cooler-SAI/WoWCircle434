@@ -1,4 +1,4 @@
-#include"EasternKingdomsPCH.h"
+#include"ScriptPCH.h"
 #include"shadowfang_keep.h"
 
 enum ScriptTexts

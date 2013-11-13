@@ -275,7 +275,9 @@ void ScriptMgr::Unload()
 
     // Clear scripts for every script type.
     SCR_CLEAR(SpellScriptLoader);
+    SCR_CLEAR(ServerScript);
     SCR_CLEAR(WorldScript);
+    SCR_CLEAR(FormulaScript);
     SCR_CLEAR(WorldMapScript);
     SCR_CLEAR(InstanceMapScript);
     SCR_CLEAR(BattlegroundMapScript);
@@ -291,6 +293,8 @@ void ScriptMgr::Unload()
     SCR_CLEAR(AchievementCriteriaScript);
     SCR_CLEAR(PlayerScript);
     SCR_CLEAR(GroupScript);
+    SCR_CLEAR(AuctionHouseScript);
+    SCR_CLEAR(GuildScript);
 
     #undef SCR_CLEAR
 }
@@ -1095,6 +1099,30 @@ WorldScript::WorldScript(const char* name)
     : ScriptObject(name)
 {
     ScriptRegistry<WorldScript>::AddScript(this);
+}
+
+AuctionHouseScript::AuctionHouseScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<AuctionHouseScript>::AddScript(this);
+}
+
+GuildScript::GuildScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<GuildScript>::AddScript(this);
+}
+
+ServerScript::ServerScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<ServerScript>::AddScript(this);
+}
+
+FormulaScript::FormulaScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<FormulaScript>::AddScript(this);
 }
 
 WorldMapScript::WorldMapScript(const char* name, uint32 mapId)

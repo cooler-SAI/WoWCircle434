@@ -1,5 +1,5 @@
 #include "grim_batol.h"
-#include "EasternKingdomsPCH.h"
+#include "ScriptPCH.h"
 
 enum ScriptTexts
 {

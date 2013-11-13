@@ -1,4 +1,4 @@
-#include "EasternKingdomsPCH.h"
+#include "ScriptPCH.h"
 #include "the_stonecore.h"
 
 class instance_the_stonecore : public InstanceMapScript

@@ -2526,8 +2526,8 @@ int LuaUnit::GiveXP(lua_State* L, Unit* unit)
 
     uint8 level = player->getLevel();
 
-    if (triggerHook)
-        sScriptMgr->OnGivePlayerXP(player, xp, victim);
+    //if (triggerHook)
+        //sScriptMgr->OnGivePlayerXP(player, xp, victim);
 
     if (!pureXP)
     {
@@ -3725,7 +3725,7 @@ int LuaUnit::SetCurrency(lua_State* L, Unit* unit)
 
     uint32 currency = luaL_checkunsigned(L, 1);
     uint32 count = luaL_checkunsigned(L, 2);
-    player->SetCurrency(currency, count, true);
+    player->SetCurrency(currency, count);
     return 0;
 }
 
