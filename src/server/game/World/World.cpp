@@ -2916,31 +2916,40 @@ void World::InitRandomBGResetTime()
 
 void World::InitCurrencyResetTime()
 {
-    time_t currencytime = uint64(sWorld->getWorldState(WS_CURRENCY_RESET_TIME));
-    if (!currencytime)
-        m_NextCurrencyReset = time_t(time(NULL));         // game time not yet init
+    if(getIntConfig(CONFIG_CURRENCY_RESET_DAY) == -1)
+    {
+        time_t wsTime = getWorldState(WS_CURRENCY_RESET_TIME);
+        time_t curTime = time(NULL);
+        m_NextCurrencyReset = wsTime < curTime ? curTime : wsTime;
+    }
+    else
+    {
+        time_t currencytime = uint64(sWorld->getWorldState(WS_CURRENCY_RESET_TIME));
+        if (!currencytime)
+            m_NextCurrencyReset = time_t(time(NULL));         // game time not yet init
 
-    // generate time by config
-    time_t curTime = time(NULL);
-    tm localTm = *localtime(&curTime);
+        // generate time by config
+        time_t curTime = time(NULL);
+        tm localTm = *localtime(&curTime);
 
-    localTm.tm_wday = getIntConfig(CONFIG_CURRENCY_RESET_DAY);
-    localTm.tm_hour = getIntConfig(CONFIG_CURRENCY_RESET_HOUR);
-    localTm.tm_sec = 0;
-    localTm.tm_min = 0;
+        localTm.tm_wday = getIntConfig(CONFIG_CURRENCY_RESET_DAY);
+        localTm.tm_hour = getIntConfig(CONFIG_CURRENCY_RESET_HOUR);
+        localTm.tm_sec = 0;
+        localTm.tm_min = 0;
 
-    // current week reset time
-    time_t nextWeekResetTime = mktime(&localTm);
+        // current week reset time
+        time_t nextWeekResetTime = mktime(&localTm);
 
-    // next reset time before current moment
-    if (curTime >= nextWeekResetTime)
-        nextWeekResetTime += getIntConfig(CONFIG_CURRENCY_RESET_INTERVAL) * DAY;
+        // next reset time before current moment
+        if (curTime >= nextWeekResetTime)
+            nextWeekResetTime += getIntConfig(CONFIG_CURRENCY_RESET_INTERVAL) * DAY;
 
-    // normalize reset time
-    m_NextCurrencyReset = currencytime < curTime ? nextWeekResetTime - getIntConfig(CONFIG_CURRENCY_RESET_INTERVAL) * DAY : nextWeekResetTime;
+        // normalize reset time
+        m_NextCurrencyReset = currencytime < curTime ? nextWeekResetTime - getIntConfig(CONFIG_CURRENCY_RESET_INTERVAL) * DAY : nextWeekResetTime;
 
-    if (!currencytime)
-        sWorld->setWorldState(WS_CURRENCY_RESET_TIME, uint64(m_NextCurrencyReset));
+        if (!currencytime)
+            sWorld->setWorldState(WS_CURRENCY_RESET_TIME, uint64(m_NextCurrencyReset));
+    }
 }
 
 void World::InitServerAutoRestartTime()
