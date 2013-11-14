@@ -1555,22 +1555,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         }
                         break;
                     }
-                    // Power Word: Shield
-                    case 17:
-                    {
-                        // Weakened Soul
-                        if (!target->HasAura(6788))
-                            caster->CastSpell(target, 6788, true);
-
-                        // Glyph of Power Word: Shield
-                        if (AuraEffect* glyph = caster->GetAuraEffect(55672, 0))
-                        {
-                            // instantly heal m_amount% of the absorb-value
-                            int32 heal = glyph->GetAmount() * GetEffect(0)->GetAmount()/100;
-                            caster->CastCustomSpell(GetUnitOwner(), 56160, &heal, NULL, NULL, true, 0, GetEffect(0));
-                        }
-                        break;
-                    }
                     // Renew
                     case 139:
                     {
@@ -1633,8 +1617,15 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     // Item - Shaman T13 Enhancement 2P Bonus
                     if (target->HasAura(105866))
                         target->CastSpell(target, 105869, true);
-                    break;
                 }
+                // Spiritwalker's Grace
+                else if (GetId() == 79206)
+                {
+                    // Item - Shaman T13 Restoration 4P Bonus (Spiritwalker's Grace)
+                    if (target->HasAura(105876))
+                        target->CastSpell(target, 105877, true);
+                }
+                
                 break;
             case SPELLFAMILY_WARRIOR:
                 // Heroic Fury
@@ -1715,7 +1706,8 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     default:
                         break;
                 }
-                if (m_spellInfo->SpellFamilyFlags[2] & 0x20)
+                // Communion
+                if (m_spellInfo->SpellFamilyFlags[2] & 0x20 && target == caster)
                     caster->CastSpell(caster, 63531, true);
                 break;
             case SPELLFAMILY_DEATHKNIGHT:
@@ -1911,6 +1903,10 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         target->RemoveAurasDueToSpell(44544);
                         break;
                     case 118: // Improved Polymorph
+                    case 28271:
+                    case 28272:
+                    case 61721:
+                    case 61305:
                         if (removeMode == AURA_REMOVE_BY_EXPIRE || removeMode == AURA_REMOVE_BY_CANCEL || removeMode == AURA_REMOVE_NONE)
                             break;
 
@@ -2026,33 +2022,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         break;
                 }
                 break;
-            case SPELLFAMILY_PRIEST:
-                if (!caster)
-                    break;
-                // Power word: shield
-                if (m_spellInfo->Id == 17)
-                {
-                    if (removeMode == AURA_REMOVE_BY_ENEMY_SPELL || removeMode == AURA_REMOVE_BY_DEFAULT)
-                    {
-                        // Rapture
-                        if (AuraEffect* auraEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PRIEST, 2894, 0))
-                        {
-                            // check cooldown (need to use spell 63853 instead of cooldown)
-                            if (caster->GetTypeId() == TYPEID_PLAYER)
-                            {
-                                if (caster->ToPlayer()->HasSpellCooldown(auraEff->GetId()))
-                                    break;
-                                
-                                caster->ToPlayer()->AddSpellCooldown(auraEff->GetId(), 0, uint32(time(NULL) + 12));
-                            }
-
-                            float multiplier = float(auraEff->GetAmount());
-                            int32 basepoints0 = int32(CalculatePct(caster->GetMaxPower(POWER_MANA), multiplier));
-                            caster->CastCustomSpell(caster, 47755, &basepoints0, NULL, NULL, true);
-                        }
-                    }
-                }
-                break;
             case SPELLFAMILY_ROGUE:
                 // Apply stealth at remove Vanish
                 if (GetId() == 11327 && removeMode == AURA_REMOVE_BY_EXPIRE)
@@ -2092,8 +2061,8 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Avenging Wrath
                 if (m_spellInfo->Id == 31884)
                     target->RemoveAura(57318);
-                // Comunion
-                else if (m_spellInfo->SpellFamilyFlags[2] & 0x20)
+                // Communion
+                else if (m_spellInfo->SpellFamilyFlags[2] & 0x20 && target == caster)
                 if (caster)
                     caster->RemoveAurasDueToSpell(63531);
                 // Divine Protection
@@ -3600,8 +3569,9 @@ void DynObjAura::FillTargetMap(std::map<Unit*, uint8> & targets, Unit* /*caster*
                 continue;
 
         UnitList targetList;
-        if (GetSpellInfo()->Effects[effIndex].TargetB.GetTarget() == TARGET_DEST_DYNOBJ_ALLY
-            || GetSpellInfo()->Effects[effIndex].TargetB.GetTarget() == TARGET_UNIT_DEST_AREA_ALLY)
+        bool is_positive = GetSpellInfo()->Effects[effIndex].TargetB.GetTarget() == TARGET_DEST_DYNOBJ_ALLY
+            || GetSpellInfo()->Effects[effIndex].TargetB.GetTarget() == TARGET_UNIT_DEST_AREA_ALLY;
+        if (is_positive)
         {
             Trinity::AnyFriendlyUnitInObjectRangeCheck u_check(GetDynobjOwner(), dynObjOwnerCaster, radius);
             Trinity::UnitListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(GetDynobjOwner(), targetList, u_check);
@@ -3616,8 +3586,19 @@ void DynObjAura::FillTargetMap(std::map<Unit*, uint8> & targets, Unit* /*caster*
 
         for (UnitList::iterator itr = targetList.begin(); itr!= targetList.end();++itr)
         {
-            if (dynObjOwnerCaster->MagicSpellHitResult((*itr), m_spellInfo))
-                continue;
+            // handling for cloak of shadows
+            if ((*itr)->HasAura(31224) && is_positive == false)
+            {
+                // only spells listed in list should be applied on COSh
+                switch (m_spellInfo->Id)
+                {
+                    case 94528: // Flare
+                    case 76577: // Smoke Bomb
+                        break;
+                    default:
+                        continue;
+                }
+            }
 
             std::map<Unit*, uint8>::iterator existing = targets.find(*itr);
             if (existing != targets.end())

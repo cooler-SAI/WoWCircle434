@@ -257,12 +257,15 @@ class spell_hun_sniper_training : public SpellScriptLoader
                     Unit* caster = GetCaster();
                     uint32 spellId = SPELL_SNIPER_TRAINING_BUFF_R1 + GetId() - SPELL_SNIPER_TRAINING_R1;
                     if (Unit* target = GetTarget())
-                        if (!target->HasAura(spellId))
+                    {
+                        Aura *aur = target->GetAura(spellId);
+                        if (!aur || aur->GetMaxDuration() - aur->GetDuration() > 5000)
                         {
                             SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(spellId);
                             Unit* triggerCaster = triggeredSpellInfo->NeedsToBeTriggeredByCaster() ? caster : target;
                             triggerCaster->CastSpell(target, triggeredSpellInfo, true, 0, aurEff);
                         }
+                    }
                 }
             }
 

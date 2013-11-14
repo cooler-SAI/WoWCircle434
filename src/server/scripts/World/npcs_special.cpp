@@ -1843,6 +1843,10 @@ public:
     }
 };
 
+#define SPELL_ARCANE_SPEC 78832
+#define SPELL_FIRE_SPEC 99062
+#define SPELL_FROST_SPEC 59638
+
 class npc_mirror_image : public CreatureScript
 {
 public:
@@ -1851,19 +1855,48 @@ public:
     struct npc_mirror_imageAI : CasterAI
     {
         npc_mirror_imageAI(Creature* creature) : CasterAI(creature) {}
+        
+        uint32 spell_id;
 
         void InitializeAI()
         {
+            spell_id = SPELL_FROST_SPEC;
+
             CasterAI::InitializeAI();
             Unit* owner = me->GetOwner();
             if (!owner)
                 return;
+
+            if (Player* player = owner->ToPlayer())
+            {
+                if (player->HasGlyph(63093))
+                {
+                    switch (player->GetPrimaryTalentTreeForCurrentSpec())
+                    {
+                        case TALENT_TREE_MAGE_ARCANE:
+                            spell_id = SPELL_ARCANE_SPEC;
+                            break;
+                        case TALENT_TREE_MAGE_FIRE:
+                            spell_id = SPELL_FIRE_SPEC;
+                            break;
+                    }
+                }
+            }
+
             // Inherit Master's Threat List (not yet implemented)
             owner->CastSpell((Unit*)NULL, 58838, true);
             // here mirror image casts on summoner spell (not present in client dbc) 49866
             // here should be auras (not present in client dbc): 35657, 35658, 35659, 35660 selfcasted by mirror images (stats related?)
             // Clone Me!
             owner->CastSpell(me, 45204, true);
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            DoCastVictim(spell_id);
         }
 
         // Do not reload Creature templates on evade mode enter - prevent visual lost
@@ -2016,11 +2049,6 @@ class npc_lightwell : public CreatureScript
             npc_lightwellAI(Creature* creature) : PassiveAI(creature)
             {
                 DoCast(me, 59907, false);
-            }
-
-            void EnterEvadeMode()
-            {
-                return;
             }
         };
 
@@ -3112,6 +3140,30 @@ class npc_shadowy_apparition : public CreatureScript
                 {
                     bCast = true;
                     me->CastSpell(me->getVictim(), 87532, true, NULL, NULL, (me->GetOwner() ? me->GetOwner()->GetGUID() : 0));
+
+                    if (Unit * owner = me->GetOwner())
+                    {
+                        // Item - Priest T13 Shadow 4P Bonus (Shadowfiend and Shadowy Apparition)
+                        if (AuraEffect * eff = owner->GetAuraEffect(105844, 0))
+                        {
+                            if (roll_chance_i(eff->GetAmount()))
+                            {
+                                // don't apply if allready have orbs
+                                bool found = false;
+                                if (Aura * orbs = owner->GetAura(77487))
+                                    if (orbs->GetStackAmount() == 3)
+                                        found = true;
+
+                                if (!found)
+                                {
+                                    for (int i = 0; i < eff->GetSpellInfo()->Effects[1].BasePoints; i++)
+                                    {
+                                        owner->CastSpell(owner, 77487, true);
+                                    }
+                                }
+                            }
+                        }
+                    }
                     me->DespawnOrUnsummon();
                 }
             }
@@ -3292,7 +3344,7 @@ public:
 
         void CheckIfMoveInRing(Unit *who)
         {
-            if (who->isAlive() && me->IsInRange(who, 2.0f, 4.7f) && me->IsWithinLOSInMap(who) && isReady)
+            if (who->isAlive() && me->IsInRange(who, 0.0f, 10.0f, true, false) && me->IsWithinLOSInMap(who) && isReady)
             {
                 if (!who->HasAura(82691))
                 {
@@ -3799,6 +3851,9 @@ enum CustomCasterGuardian
     SPELL_FIRESEED      = 99026,
     SPELL_FLAME_BLAST   = 99226,
 
+    SPELL_DOOM          = 603,
+    SPELL_AGONY         = 980,
+
     EVENT_CAST_SPELL    = 1,
 };
 
@@ -3850,8 +3905,25 @@ class npc_custom_caster_guard : public CreatureScript
 
             void OwnerAttacked(Unit* target)
             {
-                if (!curTarget)
+                if (me->GetEntry() == NPC_DOOM_GUARD)
+                {
+                    if (curTarget)
+                    {
+                        if (!curTarget->HasAura(SPELL_DOOM) && !curTarget->HasAura(SPELL_AGONY))
+                            curTarget = target;
+                    }
+                    else
+                        curTarget = target;
+                }
+                else if (!curTarget)
                     curTarget = target;
+            }
+
+            void OwnerSpellHit(Unit* target, SpellInfo const* spell)
+            {
+                if (me->GetEntry() == NPC_DOOM_GUARD)
+                    if (spell->Id == SPELL_DOOM || spell->Id == SPELL_AGONY)
+                        curTarget = target;
             }
 
             void UpdateAI(const uint32 diff)
@@ -4128,6 +4200,201 @@ class npc_shahram : public CreatureScript
         }
 };
 
+/*#####
+# npc_argent squire
+#####*/
+
+enum squire
+{
+    ACH_PONY_UP                     = 3736,
+
+    NPC_ARGENT_GRUNT                = 33239,
+    NPC_ARGENT_SQUIRE               = 33238,
+
+    SPELL_SQUIRE_MOUNT_CHECK        = 67039,
+    SPELL_STORMWIND_PENNANT         = 62727,
+    SPELL_SENJIN_PENNANT            = 63446,
+    SPELL_DARNASSUS_PENNANT         = 63443,
+    SPELL_EXODAR_PENNANT            = 63439,
+    SPELL_UNDERCITY_PENNANT         = 63441,
+    SPELL_GNOMEREAGAN_PENNANT       = 63442,
+    SPELL_IRONFORGE_PENNANT         = 63440,
+    SPELL_ORGRIMMAR_PENNANT         = 63444,
+    SPELL_SILVERMOON_PENNANT        = 63438,
+    SPELL_THUNDERBLUFF_PENNANT      = 63445,
+    SPELL_SQUIRE_TIRED              = 67401,
+    SPELL_SQUIRE_BANK               = 67368,
+    SPELL_SQUIRE_SHOP               = 67377,
+    SPELL_SQUIRE_POSTMAN            = 67376,
+    SPELL_PLAYER_TIRED              = 67334
+};
+
+class npc_argent_squire : public CreatureScript
+{
+public:
+    npc_argent_squire() : CreatureScript("npc_argent_squire") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_argent_squireAI(creature);
+    }
+
+    struct npc_argent_squireAI : public ScriptedAI
+    {
+        npc_argent_squireAI(Creature* creature) : ScriptedAI(creature) { }
+
+        bool Bank;
+        bool Shop;
+        bool Mail;
+
+        uint32 curPennant;
+
+        void Reset()
+        {
+            curPennant = 0;
+            Bank=false;
+            Shop=false;
+            Mail=false;
+
+            if (Aura* tired = me->GetOwner()->GetAura(SPELL_PLAYER_TIRED))
+            {
+                int32 duration = tired->GetDuration();
+                tired = me->AddAura(SPELL_SQUIRE_TIRED, me);
+                tired->SetDuration(duration);
+            }
+        }
+
+        void UpdateAI(uint32 const diff)
+        {
+            Player* player = me->GetOwner()->ToPlayer();
+
+            if (player->HasAchieved(ACH_PONY_UP))
+                if (!me->HasAura(SPELL_SQUIRE_MOUNT_CHECK))
+                    me->AddAura(SPELL_SQUIRE_MOUNT_CHECK,me);
+
+            if (me->HasAura(SPELL_SQUIRE_TIRED)) // Make sure Tired aura is applied before Unsummon
+            {
+                if (Bank || Shop || Mail)
+                {
+                    me->DespawnOrUnsummon();
+                }
+            }
+        }
+
+        void sGossipSelect (Player* player, uint32 /*sender*/, uint32 action)
+        {
+            switch (action)
+            {
+                case 0:
+                    player->CLOSE_GOSSIP_MENU();
+                    if (!Bank)
+                    {
+                        Bank = true;
+                        me->AddAura(SPELL_SQUIRE_BANK,me);
+                        player->AddAura(SPELL_PLAYER_TIRED, player);
+                        me->SetFlag(UNIT_NPC_FLAGS,UNIT_NPC_FLAG_BANKER);
+                    }
+                    player->GetSession()->SendShowBank(player->GetGUID());
+                    break;
+                case 1:
+                    player->CLOSE_GOSSIP_MENU();
+                    if (!Shop)
+                    {
+                        Shop = true;
+                        me->AddAura(SPELL_SQUIRE_SHOP,me);
+                        player->AddAura(SPELL_PLAYER_TIRED, player);
+                    }
+                    player->GetSession()->SendListInventory(me->GetGUID());
+                    break;
+                case 2:
+                    player->CLOSE_GOSSIP_MENU();
+                    if (!Mail)
+                    {
+                        me->RemoveFlag(UNIT_NPC_FLAGS,UNIT_NPC_FLAG_GOSSIP);
+                        me->RemoveFlag(UNIT_NPC_FLAGS,UNIT_NPC_FLAG_VENDOR);
+                        me->SetFlag(UNIT_NPC_FLAGS,UNIT_NPC_FLAG_MAILBOX);
+                        Mail = true;
+                        me->AddAura(SPELL_SQUIRE_POSTMAN,me);
+                        player->AddAura(SPELL_PLAYER_TIRED, player);
+                    }
+                    player->GetSession()->SendShowMail(me->GetGUID());
+                    break;
+                case 3: //Darnassus/Darkspear Pennant
+                    player->CLOSE_GOSSIP_MENU();
+                    me->RemoveAurasDueToSpell(curPennant);
+                    if (me->GetEntry()==NPC_ARGENT_SQUIRE)
+                    {
+                        me->AddAura(SPELL_DARNASSUS_PENNANT,me);
+                        curPennant = SPELL_DARNASSUS_PENNANT;
+                    }
+                    else
+                    {
+                        me->AddAura(SPELL_SENJIN_PENNANT,me);
+                        curPennant = SPELL_SENJIN_PENNANT;
+                    }
+                    break;
+                case 4: //Exodar/Forsaken Pennant
+                    player->CLOSE_GOSSIP_MENU();
+                    me->RemoveAurasDueToSpell(curPennant);
+                    if (me->GetEntry()==NPC_ARGENT_SQUIRE)
+                    {
+                        me->AddAura(SPELL_EXODAR_PENNANT,me);
+                        curPennant = SPELL_EXODAR_PENNANT;
+                    }
+                    else
+                    {
+                        me->AddAura(SPELL_UNDERCITY_PENNANT,me);
+                        curPennant = SPELL_UNDERCITY_PENNANT;
+                    }
+                    break;
+                case 5: //Gnomereagan/Orgrimmar Pennant
+                    player->CLOSE_GOSSIP_MENU();
+                    me->RemoveAurasDueToSpell(curPennant);
+                    if (me->GetEntry()==NPC_ARGENT_SQUIRE)
+                    {
+                        me->AddAura(SPELL_GNOMEREAGAN_PENNANT,me);
+                        curPennant = SPELL_GNOMEREAGAN_PENNANT;
+                    }
+                    else
+                    {
+                        me->AddAura(SPELL_ORGRIMMAR_PENNANT,me);
+                        curPennant = SPELL_ORGRIMMAR_PENNANT;
+                    }
+                    break;
+                case 6: //Ironforge/Silvermoon Pennant
+                    player->CLOSE_GOSSIP_MENU();
+                    me->RemoveAurasDueToSpell(curPennant);
+                    if (me->GetEntry()==NPC_ARGENT_SQUIRE)
+                    {
+                        me->AddAura(SPELL_IRONFORGE_PENNANT,me);
+                        curPennant = SPELL_IRONFORGE_PENNANT;
+                    }
+                    else
+                    {
+                        me->AddAura(SPELL_SILVERMOON_PENNANT,me);
+                        curPennant = SPELL_SILVERMOON_PENNANT;
+                    }
+                    break;
+                case 7: //Stormwind/Thunder Bluff Pennant
+                    player->CLOSE_GOSSIP_MENU();
+                    me->RemoveAurasDueToSpell(curPennant);
+                    if (me->GetEntry()==NPC_ARGENT_SQUIRE)
+                    {
+                        me->AddAura(SPELL_STORMWIND_PENNANT,me);
+                        curPennant = SPELL_STORMWIND_PENNANT;
+                    }
+                    else
+                    {
+                        me->AddAura(SPELL_THUNDERBLUFF_PENNANT,me);
+                        curPennant = SPELL_THUNDERBLUFF_PENNANT;
+                    }
+                    break;
+            }
+        }
+
+    };
+};
+
 void AddSC_npcs_special()
 {
     new npc_air_force_bots();
@@ -4177,4 +4444,5 @@ void AddSC_npcs_special()
     new npc_searing_totem();
     new npc_gurthalak_tentacle_of_the_old_ones();
     new npc_shahram();
+    new npc_argent_squire();
 }

@@ -844,6 +844,7 @@ class AuraScript : public _SpellScript
         Unit* GetTarget() const;
         // returns AuraApplication object of currently processed target
         AuraApplication const* GetTargetApplication() const;
+        AuraRemoveMode GetRemoveMod() const;
 };
 
 //

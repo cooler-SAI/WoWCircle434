@@ -28,6 +28,7 @@
 
 enum PriestSpells
 {
+    PRIEST_POWER_WORD_SHIELD                    = 17,
     PRIEST_SPELL_GUARDIAN_SPIRIT_HEAL           = 48153,
     PRIEST_SPELL_PENANCE_R1                     = 47540,
     PRIEST_SPELL_PENANCE_R1_DAMAGE              = 47758,
@@ -402,6 +403,10 @@ class spell_pri_shadow_word_death : public SpellScriptLoader
                 else if (AuraEffect* aurEff = GetCaster()->GetAuraEffect(47581, 1))
                     AddPct(damage, aurEff->GetAmount());
 
+                // Item - Priest T13 Shadow 2P Bonus (Shadow Word: Death)
+                if (AuraEffect * aurEff = GetCaster()->GetAuraEffect(105843, 1))
+                    AddPct(damage, -aurEff->GetAmount());
+
                 GetCaster()->CastCustomSpell(GetCaster(), PRIEST_SHADOW_WORD_DEATH, &damage, 0, 0, true);
             }
 
@@ -520,6 +525,114 @@ public:
     }
 };
 
+// Power Word: Shield
+class spell_pri_power_word_shield : public SpellScriptLoader
+{
+public:
+    spell_pri_power_word_shield() : SpellScriptLoader("spell_pri_power_word_shield") { }
+
+    class spell_pri_power_word_shield_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_pri_power_word_shield_AuraScript);
+
+        bool t13bumped;
+
+        bool Validate(SpellInfo const* /*spellEntry*/)
+        {
+            if (!sSpellMgr->GetSpellInfo(PRIEST_POWER_WORD_SHIELD))
+                return false;
+            return true;
+        }
+
+        void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
+        {
+            Unit *caster = GetCaster();
+            t13bumped = false;
+
+            //+87% from sp bonus
+            float bonus = 0.87f;
+            amount += caster->SpellBaseHealingBonusDone(SpellSchoolMask(GetSpellInfo()->SchoolMask)) * bonus;
+
+            // Improved Power Word: Shield
+            if (AuraEffect const* IPWS = caster->GetAuraEffect(14768, 0))
+                AddPct(amount, IPWS->GetAmount());
+            else if (AuraEffect const* IPWS = caster->GetAuraEffect(14748, 0))    // Rank 1
+                AddPct(amount, IPWS->GetAmount());
+
+            // Focused Power
+            // Reuse variable, not sure if this code below can be moved before Twin Disciplines
+            amount *= caster->GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
+
+            // Mastery Priest
+            if (Aura* aur = caster->GetAura(77484))
+                AddPct(amount, aur->GetEffect(0)->GetAmount());
+
+            // T13 Priest 
+            if (AuraEffect * eff = caster->GetAuraEffect(105832, 0))
+            {
+                if (roll_chance_i(eff->GetAmount()))
+                {
+                    t13bumped = true;
+                    amount *= 2;
+                }
+            }
+        }
+        void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            Unit *caster = GetCaster();
+            if (!caster)
+                return;
+
+            // Rapture
+            if (GetRemoveMod() != AURA_REMOVE_BY_ENEMY_SPELL && GetRemoveMod() != AURA_REMOVE_BY_ENEMY_SPELL)
+                return;
+
+            // Rapture cooldown
+            if (caster->HasAura(63853))
+                return;
+
+            if (AuraEffect* auraEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PRIEST, 2894, 0))
+            {
+                float multiplier = float(auraEff->GetAmount());
+                if (t13bumped)
+                    multiplier *= 2;
+
+                int32 basepoints0 = int32(CalculatePct(caster->GetMaxPower(POWER_MANA), multiplier));
+                caster->CastCustomSpell(caster, 47755, &basepoints0, NULL, NULL, true);
+            }
+
+            caster->CastSpell(caster, 63853, true);
+        }
+
+        void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            Unit * target = GetTarget();
+            Unit * caster = GetCaster();
+            if (!target->HasAura(6788))
+                caster->CastSpell(target, 6788, true);
+
+             // Glyph of Power Word: Shield
+            if (AuraEffect* glyph = caster->GetAuraEffect(55672, 0))
+            {
+                // instantly heal m_amount% of the absorb-value
+                int32 heal = glyph->GetAmount() * GetEffect(0)->GetAmount()/100;
+                caster->CastCustomSpell(GetUnitOwner(), 56160, &heal, NULL, NULL, true, 0, GetEffect(0));
+            }
+        }
+        void Register()
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_power_word_shield_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+            AfterEffectApply   += AuraEffectApplyFn(spell_pri_power_word_shield_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove  += AuraEffectRemoveFn(spell_pri_power_word_shield_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_pri_power_word_shield_AuraScript();
+    }
+};
+
 void AddSC_priest_spell_scripts()
 {
     new spell_pri_guardian_spirit();
@@ -534,4 +647,5 @@ void AddSC_priest_spell_scripts()
     new spell_pri_shadowform();
     new spell_pri_improved_devouring_plague();
     new spell_pri_silence();
+    new spell_pri_power_word_shield();
 }

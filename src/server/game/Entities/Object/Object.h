@@ -908,7 +908,7 @@ class WorldObject : public Object, public WorldLocation
         bool IsWithinLOS(float x, float y, float z) const;
         bool IsWithinLOSInMap(const WorldObject* obj) const;
         bool GetDistanceOrder(WorldObject const* obj1, WorldObject const* obj2, bool is3D = true) const;
-        bool IsInRange(WorldObject const* obj, float minRange, float maxRange, bool is3D = true) const;
+        bool IsInRange(WorldObject const* obj, float minRange, float maxRange, bool is3D = true, bool useSizeFactor = true) const;
         bool IsInRange2d(float x, float y, float minRange, float maxRange) const;
         bool IsInRange3d(float x, float y, float z, float minRange, float maxRange) const;
         bool isInFront(WorldObject const* target, float arc = M_PI) const;

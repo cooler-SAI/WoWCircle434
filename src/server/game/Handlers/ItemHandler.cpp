@@ -398,7 +398,12 @@ void WorldSession::SendItemSparseDb2Reply(uint32 entry)
     buff << uint32(proto->Bonding);
 
     // item name
+    int loc_idx = GetSessionDbLocaleIndex();
+
     std::string name = proto->Name1;
+    if (loc_idx >= 0)
+        if (ItemLocale const* il = sObjectMgr->GetItemLocale(entry))
+            ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
     buff << uint16(name.length());
     if (name.length())
         buff << name;
@@ -407,6 +412,9 @@ void WorldSession::SendItemSparseDb2Reply(uint32 entry)
         buff << uint16(0);
 
     std::string desc = proto->Description;
+    if (loc_idx >= 0)
+        if (ItemLocale const* il = sObjectMgr->GetItemLocale(entry))
+            ObjectMgr::GetLocaleString(il->Description, loc_idx, desc);
     buff << uint16(desc.length());
     if (desc.length())
         buff << desc;

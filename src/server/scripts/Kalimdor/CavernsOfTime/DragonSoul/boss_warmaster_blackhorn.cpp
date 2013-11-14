@@ -271,6 +271,15 @@ class boss_warmaster_blackhorn: public CreatureScript
                         for (std::list<Creature*>::const_iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
                             (*itr)->AI()->DoAction(ACTION_END_BATTLE);
 
+                    creatures.clear();
+                    me->GetCreatureListWithEntryInGrid(creatures, NPC_SKYFIRE_CANNON, 200.0f);
+                    if (!creatures.empty())
+                        for (std::list<Creature*>::const_iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                            {
+                                (*itr)->InterruptNonMeleeSpells(false);
+                                (*itr)->AI()->EnterEvadeMode();
+                            }
+
                     instance->SetBossState(DATA_BLACKHORN, NOT_STARTED);
 
                     me->DespawnOrUnsummon(2000);
@@ -324,6 +333,15 @@ class boss_warmaster_blackhorn: public CreatureScript
                     instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, pShip);
                     pShip->DespawnOrUnsummon();
                 }
+
+                std::list<Creature*> creatures;
+                me->GetCreatureListWithEntryInGrid(creatures, NPC_SKYFIRE_CANNON, 200.0f);
+                if (!creatures.empty())
+                    for (std::list<Creature*>::const_iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                        {
+                            (*itr)->InterruptNonMeleeSpells(false);
+                            (*itr)->AI()->EnterEvadeMode();
+                        }
 
                 if (Creature* pSwayze = me->FindNearestCreature(NPC_SKY_CAPTAIN_SWAYZE, 200.0f))
                     pSwayze->AI()->DoAction(ACTION_BLACKHORN_DIED);
@@ -1538,11 +1556,6 @@ class spell_warmaster_blackhorn_twilight_barrage_dmg : public SpellScriptLoader
                 if (!GetCaster())
                     return;
 
-                if (!targets.empty())
-                    for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                        if (SpellInfo const* spell = GetSpellInfo())
-                            targets.remove_if(ImmuneCheck(GetSpellInfo()));
-
                 if (targets.empty())
                 {
                     if (Creature* pBlackhorn = GetCaster()->FindNearestCreature(NPC_BLACKHORN, 300.0f))
@@ -1550,9 +1563,12 @@ class spell_warmaster_blackhorn_twilight_barrage_dmg : public SpellScriptLoader
 
                     if (Creature* pShip = GetCaster()->FindNearestCreature(NPC_SKYFIRE, 300.0f))
                     {
-                        int32 bp0 = GetSpellInfo()->Effects[EFFECT_0].BasePoints;
-                        bp0 *= 1.5f;
-                        GetCaster()->CastCustomSpell(pShip, SPELL_TWILIGHT_BARRAGE_DMG_2, &bp0, NULL, NULL, true);
+                        if (SpellInfo const* spellInfo = GetSpellInfo())
+                        {
+                            int32 bp0 = GetSpellInfo()->Effects[EFFECT_0].BasePoints;
+                            bp0 *= 1.5f;
+                            GetCaster()->CastCustomSpell(pShip, SPELL_TWILIGHT_BARRAGE_DMG_2, &bp0, NULL, NULL, true);
+                        }
                     }
                 }
             }
@@ -1561,27 +1577,6 @@ class spell_warmaster_blackhorn_twilight_barrage_dmg : public SpellScriptLoader
             {
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_warmaster_blackhorn_twilight_barrage_dmg_SpellScript::FilterTargetsDamage, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
             }
-
-            class ImmuneCheck
-            {
-                public:
-                    ImmuneCheck(SpellInfo const* spellInfo) : _spellInfo(spellInfo) {}
-            
-                    bool operator()(WorldObject* unit)
-                    {
-                        if (unit->GetTypeId() != TYPEID_PLAYER)
-                            return true;
-
-                        if (Unit* pTarget = unit->ToUnit())
-                            if (pTarget->IsImmunedToSpell(_spellInfo) || pTarget->HasAura(31224) || pTarget->HasAura(19263))
-                                return true;
-
-                        return false;
-                    }
-
-            private:
-                SpellInfo const* _spellInfo;
-            };
         };
 
         SpellScript* GetSpellScript() const

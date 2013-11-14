@@ -2652,10 +2652,10 @@ void Player::Regenerate(Powers power)
         break;
         case POWER_FOCUS:
         {
-            addvalue += m_regenTimer * 0.001f * 5.0f * regenmod * sWorld->getRate(RATE_POWER_FOCUS);
-//             std::ostringstream oss;
-//             oss << GetPower(POWER_FOCUS) + addvalue;
-//             this->Say(oss.str(), LANG_UNIVERSAL
+            addvalue += m_regenTimer * 0.001f * 6.0f * regenmod * sWorld->getRate(RATE_POWER_FOCUS);
+            //std::ostringstream oss;
+            //oss << GetPower(POWER_FOCUS) + addvalue;
+            //this->Say(oss.str(), LANG_UNIVERSAL);
             break;
         }
         case POWER_ENERGY:                                              // Regenerate energy (rogue)
@@ -17485,6 +17485,18 @@ void Player::_LoadGlyphAuras()
             SetGlyph(i, 0);
         }
     }
+}
+
+bool Player::HasGlyph(uint32 spell_id)
+{
+    for (uint8 i = 0; i < MAX_GLYPH_SLOT_INDEX; ++i)
+        if (uint32 glyph = GetGlyph(GetActiveSpec(), i))
+            if (GlyphPropertiesEntry const* gp = sGlyphPropertiesStore.LookupEntry(glyph))
+                if (GlyphSlotEntry const* gs = sGlyphSlotStore.LookupEntry(GetGlyphSlot(i)))
+                    if (gp->TypeFlags == gs->TypeFlags && gp->SpellId == spell_id)
+                        return true;
+
+    return false;
 }
 
 void Player::LoadCorpse()

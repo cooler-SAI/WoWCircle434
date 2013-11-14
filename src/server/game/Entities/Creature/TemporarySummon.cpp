@@ -201,6 +201,8 @@ void TempSummon::InitStats(uint32 duration)
             }
             owner->m_SummonSlot[slot] = GetGUID();
         }
+        else
+            owner->m_SummonNoSlot.insert(GetGUID());
     }
 
     if (m_Properties->Faction)
@@ -267,15 +269,15 @@ void TempSummon::RemoveFromWorld()
 
     if (m_Properties)
     {
+        Unit* owner = GetSummoner();
         if (uint8 slot = uint8(m_Properties->Slot))
         {
             ASSERT(slot < MAX_SUMMON_SLOT);
-            if (Unit* owner = GetSummoner())
-            {
-                if (owner->m_SummonSlot[slot] == GetGUID())
-                    owner->m_SummonSlot[slot] = 0;
-            }
+            if (owner->m_SummonSlot[slot] == GetGUID())
+                owner->m_SummonSlot[slot] = 0;
         }
+        else
+            owner->m_SummonNoSlot.erase(GetGUID());
     }
 
     //if (GetOwnerGUID())

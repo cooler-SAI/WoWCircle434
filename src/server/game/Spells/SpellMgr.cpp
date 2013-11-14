@@ -108,10 +108,10 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
         {
             // Frostbite
             if (spellproto->SpellFamilyFlags[1] & 0x80000000)
-                return DIMINISHING_ROOT;
+                return DIMINISHING_RANDOM_ROOT;
             // Shattered Barrier
             else if (spellproto->SpellVisual[0] == 12297)
-                return DIMINISHING_ROOT;
+                return DIMINISHING_RANDOM_ROOT;
             // Deep Freeze
             else if (spellproto->SpellIconID == 2939 && spellproto->SpellVisual[0] == 9963)
                 return DIMINISHING_CONTROLLED_STUN;
@@ -176,6 +176,10 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Solar Beam
             else if (spellproto->Id == 81261)
                 return DIMINISHING_LIMITONLY;
+            // Feral Charge: Bear Effect
+            else if (spellproto->Id == 45334)
+                return DIMINISHING_RANDOM_ROOT;
+            
             break;
         }
         case SPELLFAMILY_ROGUE:
@@ -258,11 +262,11 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
     if (mechanic & (1 << MECHANIC_FEAR))
         return DIMINISHING_FEAR;
     if (mechanic & (1 << MECHANIC_STUN))
-        return triggered ? DIMINISHING_STUN : DIMINISHING_CONTROLLED_STUN;
+        return triggered ? DIMINISHING_RANDOM_STUN : DIMINISHING_CONTROLLED_STUN;
     if (mechanic & (1 << MECHANIC_BANISH))
         return DIMINISHING_BANISH;
     if (mechanic & (1 << MECHANIC_ROOT))
-        return triggered ? DIMINISHING_ROOT : DIMINISHING_CONTROLLED_ROOT;
+        return triggered ? DIMINISHING_RANDOM_ROOT : DIMINISHING_CONTROLLED_ROOT;
     if (mechanic & (1 << MECHANIC_HORROR))
         return DIMINISHING_HORROR;
 
@@ -275,7 +279,7 @@ DiminishingReturnsType GetDiminishingReturnsGroupType(DiminishingGroup group)
     {
         case DIMINISHING_TAUNT:
         case DIMINISHING_CONTROLLED_STUN:
-        case DIMINISHING_STUN:
+        case DIMINISHING_RANDOM_STUN:
         case DIMINISHING_OPENING_STUN:
         case DIMINISHING_CYCLONE:
             return DRTYPE_ALL;
@@ -367,8 +371,8 @@ bool IsDiminishingReturnsGroupDurationLimited(DiminishingGroup group)
         case DIMINISHING_HORROR:
         case DIMINISHING_MIND_CONTROL:
         case DIMINISHING_OPENING_STUN:
-        case DIMINISHING_ROOT:
-        case DIMINISHING_STUN:
+        case DIMINISHING_RANDOM_ROOT:
+        case DIMINISHING_RANDOM_STUN:
         case DIMINISHING_SLEEP:
         case DIMINISHING_LIMITONLY:
             return true;
@@ -673,9 +677,9 @@ bool SpellMgr::IsSpellLearnToSpell(uint32 spell_id1, uint32 spell_id2) const
     return false;
 }
 
-SpellTargetPosition const* SpellMgr::GetSpellTargetPosition(uint32 spell_id) const
+SpellTargetPosition const* SpellMgr::GetSpellTargetPosition(uint32 spell_id, SpellEffIndex effIndex) const
 {
-    SpellTargetPositionMap::const_iterator itr = mSpellTargetPositions.find(spell_id);
+    SpellTargetPositionMap::const_iterator itr = mSpellTargetPositions.find(std::make_pair(spell_id, effIndex));
     if (itr != mSpellTargetPositions.end())
         return &itr->second;
     return NULL;
@@ -1574,8 +1578,8 @@ void SpellMgr::LoadSpellTargetPositions()
 
     mSpellTargetPositions.clear();                                // need for reload case
 
-    //                                                0      1              2                  3                  4                  5
-    QueryResult result = WorldDatabase.Query("SELECT id, target_map, target_position_x, target_position_y, target_position_z, target_orientation FROM spell_target_position");
+    //                                                0      1          2             3                  4                  5                   6
+    QueryResult result = WorldDatabase.Query("SELECT id, effIndex, target_map, target_position_x, target_position_y, target_position_z, target_orientation FROM spell_target_position");
     if (!result)
     {
         sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded 0 spell target coordinates. DB table `spell_target_position` is empty.");
@@ -1588,25 +1592,26 @@ void SpellMgr::LoadSpellTargetPositions()
         Field* fields = result->Fetch();
 
         uint32 Spell_ID = fields[0].GetUInt32();
+        SpellEffIndex effIndex = SpellEffIndex(fields[1].GetUInt8());
 
         SpellTargetPosition st;
 
-        st.target_mapId       = fields[1].GetUInt16();
-        st.target_X           = fields[2].GetFloat();
-        st.target_Y           = fields[3].GetFloat();
-        st.target_Z           = fields[4].GetFloat();
-        st.target_Orientation = fields[5].GetFloat();
+        st.target_mapId       = fields[2].GetUInt16();
+        st.target_X           = fields[3].GetFloat();
+        st.target_Y           = fields[4].GetFloat();
+        st.target_Z           = fields[5].GetFloat();
+        st.target_Orientation = fields[6].GetFloat();
 
         MapEntry const* mapEntry = sMapStore.LookupEntry(st.target_mapId);
         if (!mapEntry)
         {
-            sLog->outError(LOG_FILTER_SQL, "Spell (ID:%u) target map (ID: %u) does not exist in `Map.dbc`.", Spell_ID, st.target_mapId);
+            sLog->outError(LOG_FILTER_SQL, "Spell (Id: %u, effIndex: %u) target map (ID: %u) does not exist in `Map.dbc`.", Spell_ID, effIndex, st.target_mapId);
             continue;
         }
 
         if (st.target_X==0 && st.target_Y==0 && st.target_Z==0)
         {
-            sLog->outError(LOG_FILTER_SQL, "Spell (ID:%u) target coordinates not provided.", Spell_ID);
+            sLog->outError(LOG_FILTER_SQL, "Spell (Id: %u, effIndex: %u) target coordinates not provided.", Spell_ID, effIndex);
             continue;
         }
 
@@ -1617,34 +1622,17 @@ void SpellMgr::LoadSpellTargetPositions()
             continue;
         }
 
-        bool found = false;
-        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        if (spellInfo->Effects[effIndex].TargetA.GetTarget() == TARGET_DEST_DB || spellInfo->Effects[effIndex].TargetB.GetTarget() == TARGET_DEST_DB)
         {
-            if (spellInfo->Effects[i].TargetA.GetTarget() == TARGET_DEST_DB || spellInfo->Effects[i].TargetB.GetTarget() == TARGET_DEST_DB)
-            {
-                // additional requirements
-                if (spellInfo->Effects[i].Effect == SPELL_EFFECT_BIND && spellInfo->Effects[i].MiscValue)
-                {
-                    uint32 area_id = sMapMgr->GetAreaId(st.target_mapId, st.target_X, st.target_Y, st.target_Z);
-                    if (area_id != uint32(spellInfo->Effects[i].MiscValue))
-                    {
-                        sLog->outError(LOG_FILTER_SQL, "Spell (Id: %u) listed in `spell_target_position` expected point to zone %u bit point to zone %u.", Spell_ID, spellInfo->Effects[i].MiscValue, area_id);
-                        break;
-                    }
-                }
-
-                found = true;
-                break;
-            }
+            std::pair<uint32, SpellEffIndex> key = std::make_pair(Spell_ID, effIndex);
+            mSpellTargetPositions[key] = st;
+            ++count;
         }
-        if (!found)
+        else
         {
-            sLog->outError(LOG_FILTER_SQL, "Spell (Id: %u) listed in `spell_target_position` does not have target TARGET_DEST_DB (17).", Spell_ID);
+            sLog->outError(LOG_FILTER_SQL, "Spell (Id: %u, effIndex: %u) listed in `spell_target_position` does not have target TARGET_DEST_DB (17).", Spell_ID, effIndex);
             continue;
         }
-
-        mSpellTargetPositions[Spell_ID] = st;
-        ++count;
 
     } while (result->NextRow());
 
@@ -3845,6 +3833,9 @@ void SpellMgr::LoadDbcDataCorrections()
             case 62383: // Shatter (Ignis)
                 spellInfo->SpellVisual[0] = 12639;
                 break;
+            case 76577: // Smoke Bomb
+                spellInfo->SpellVisual[1] = 20733;
+                break;
             case 63342: // Focused Eyebeam Summon Trigger (Kologarn)
                 spellInfo->MaxAffectedTargets = 1;
                 break;
@@ -4318,6 +4309,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 82189: // Chains of Woe
                 spellInfo->Effects[0].SetRadiusIndex(28);
                 spellInfo->Effects[1].SetRadiusIndex(28);
+                break;
+            // Corla
+            case 75677: // Nether Beam
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
             // Ascendant Lord Obsidius
             case 76186: // Thinderclap
@@ -6643,6 +6638,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 110137:
                 spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
                 break;
+            case 108041: // Artillery Barrage
+            case 109213:
+                spellInfo->Effects[EFFECT_0].BasePoints = 0;
+                break;
             // ENDOF DRAGON SOUL SPELLS
             //
             // Camouflage
@@ -6816,7 +6815,7 @@ void SpellMgr::LoadDbcDataCorrections()
             // Circle of Healing
             case 34861:
                 spellInfo->Effects[0].SetRadiusIndex(10);
-                spellInfo->Effects[0].TargetB = TARGET_UNIT_CASTER_AREA_RAID;
+                spellInfo->Effects[0].TargetB = TARGET_UNIT_TARGET_RAID;
                 break;
             // Sin and Punishment
             case 87099:
@@ -7279,6 +7278,8 @@ void SpellMgr::LoadDbcDataCorrections()
             // Death Grip
             case 49560:
             case 49576:
+                spellInfo->SchoolMask = SPELL_SCHOOL_MASK_SHADOW;
+                spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
                 spellInfo->Mechanic = MECHANIC_NONE;
                 spellInfo->Effects[0].Mechanic = MECHANIC_NONE;
                 break;
@@ -7505,10 +7506,22 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->ProcFlags = 0;
                 spellInfo->ProcChance = 0;
                 break;
+            case 87154: // Evangelism
+                spellInfo->Dispel = DISPEL_NONE;
+                break;
+            case 105770: // Item - Druid T13 Restoration 4P Bonus (Rejuvenation)
+                spellInfo->Effects[0].SpellClassMask = flag96(0x00000050, 0, 0);
+                break;
+            case 105786: // Temporal Ruin Warlock 4P T13 bonus
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_DUMMY;
+                break;
             case 48760: // Occulus portals
             case 49305:
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
                 spellInfo->Effects[EFFECT_0].TargetB = TARGET_DEST_DB;
+                break;
+            case 96766: // Quest Bang
+                spellInfo->AttributesEx3 &= ~SPELL_ATTR3_DEATH_PERSISTENT;
                 break;
             default:
                 break;

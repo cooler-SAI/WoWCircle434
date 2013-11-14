@@ -481,7 +481,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
         return;
 
     // not allow remove spells with attr SPELL_ATTR0_CANT_CANCEL
-    if (spellInfo->Attributes & SPELL_ATTR0_CANT_CANCEL)
+    if ((spellInfo->Attributes & SPELL_ATTR0_CANT_CANCEL) && spellInfo->Id != 75207)
         return;
 
     // channeled spell case (it currently casted then)

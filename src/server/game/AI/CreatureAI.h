@@ -116,6 +116,9 @@ class CreatureAI : public UnitAI
         // Called when spell hits a target
         virtual void SpellHitTarget(Unit* /*target*/, SpellInfo const* /*spell*/) {}
 
+        // Called when spell hits a target by owner
+        virtual void OwnerSpellHit(Unit* /*target*/, SpellInfo const* /*spell*/) {}
+
         // Called when the creature is target of hostile action: swing, hostile spell landed, fear/etc)
         virtual void AttackedBy(Unit* /*attacker*/) {}
         virtual bool IsEscorted() { return false; }

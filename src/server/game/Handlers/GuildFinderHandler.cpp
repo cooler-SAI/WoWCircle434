@@ -85,6 +85,9 @@ void WorldSession::HandleGuildFinderAddRecruit(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildFinderBrowse(WorldPacket& recvPacket)
 {
+	// Temporary
+	return;
+	
     uint32 classRoles = 0;
     uint32 availability = 0;
     uint32 guildInterests = 0;
@@ -213,6 +216,9 @@ void WorldSession::HandleGuildFinderDeclineRecruit(WorldPacket& recvPacket)
 
 void WorldSession::HandleGuildFinderGetApplications(WorldPacket& /*recvPacket*/)
 {
+	// Temporary
+	return;
+	
     std::list<MembershipRequest> applicatedGuilds = sGuildFinderMgr->GetAllMembershipRequestsForPlayer(GetPlayer()->GetGUIDLow());
     uint32 applicationsCount = applicatedGuilds.size();
     WorldPacket data(SMSG_LF_GUILD_MEMBERSHIP_LIST_UPDATED, 7 + 54 * applicationsCount);

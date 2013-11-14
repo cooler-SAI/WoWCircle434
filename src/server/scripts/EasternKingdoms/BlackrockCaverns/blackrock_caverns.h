@@ -52,6 +52,10 @@ enum NPCs
     NPC_RAZ_THE_CRAZED           = 39670,
     NPC_FINKLE_EINHORN           = 49476,
     NPC_TWILIGHT_PORTAL          = 51340,
+
+    // Corla, Herald of Twilight
+    NPC_TWILIGHT_ZEALOT_CORLA = 50284,
+    NPC_NETHER_ESSENCE_TRIGGER = 49526,
 };
 
 enum GameObjectIds

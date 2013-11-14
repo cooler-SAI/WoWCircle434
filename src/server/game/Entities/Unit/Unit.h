@@ -692,7 +692,8 @@ enum NPCFlags
     UNIT_NPC_FLAG_PLAYER_VEHICLE        = 0x02000000,       // players with mounts that have vehicle data should have it set
     UNIT_NPC_FLAG_REFORGER              = 0x08000000,       // reforging
     UNIT_NPC_FLAG_TRANSMOGRIFIER        = 0x10000000,       // transmogrification
-    UNIT_NPC_FLAG_VAULTKEEPER           = 0x20000000        // void storage
+    UNIT_NPC_FLAG_VAULTKEEPER           = 0x20000000,        // void storage
+    UNIT_NPC_FLAG_MAILBOX               = 0x04000000        // Taken from wiki
 };
 
 enum MovementFlags
@@ -1691,6 +1692,8 @@ class Unit : public WorldObject
         void SetCritterGUID(uint64 guid) { SetUInt64Value(UNIT_FIELD_CRITTER, guid); }
         uint64 GetCritterGUID() const { return GetUInt64Value(UNIT_FIELD_CRITTER); }
 
+        Creature* GetSummon(uint8 index) { return m_SummonSlot[index] ? GetMap()->GetCreature(m_SummonSlot[index]) : NULL; }
+
         bool IsControlledByPlayer() const { return m_ControlledByPlayer; }
         uint64 GetCharmerOrOwnerGUID() const { return m_charmerGuid? m_charmerGuid: m_ownerGuid; }
         uint64 GetCharmerOrOwnerOrOwnGUID() const
@@ -1928,6 +1931,7 @@ class Unit : public WorldObject
         uint32 m_addDmgOnce;
         uint64 m_SummonSlot[MAX_SUMMON_SLOT];
         uint64 m_ObjectSlot[MAX_GAMEOBJECT_SLOT];
+        std::set<uint64> m_SummonNoSlot;
 
         ShapeshiftForm GetShapeshiftForm() const { return ShapeshiftForm(GetByteValue(UNIT_FIELD_BYTES_2, 3)); }
         void SetShapeshiftForm(ShapeshiftForm form)

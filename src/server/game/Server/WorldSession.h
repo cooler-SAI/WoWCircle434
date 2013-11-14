@@ -304,6 +304,7 @@ class WorldSession
         void SendTrainerList(uint64 guid, const std::string& strTitle);
         void SendListInventory(uint64 guid);
         void SendShowBank(uint64 guid);
+        void SendShowMail(uint64 guid);
         void SendTabardVendorActivate(uint64 guid);
         void SendSpiritResurrect();
         void SendBindPoint(Creature* npc);
@@ -856,9 +857,8 @@ class WorldSession
 
         // Looking for Dungeon/Raid
         void HandleLfgSetCommentOpcode(WorldPacket& recvData);
-        void HandleLfgGetLockInfoOpcode(WorldPacket& recvData);
-        void SendLfgPlayerLockInfo();
-        void SendLfgPartyLockInfo(); 
+        void HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& recvData);
+        void HandleLfgPartyLockInfoRequestOpcode(WorldPacket& recvData);
         void HandleLfgJoinOpcode(WorldPacket& recvData);
         void HandleLfgLeaveOpcode(WorldPacket& recvData);
         void HandleLfgSetRolesOpcode(WorldPacket& recvData);
@@ -869,7 +869,8 @@ class WorldSession
         void HandleLfrLeaveOpcode(WorldPacket& recvData);
         void HandleLfgGetStatus(WorldPacket& recv_data);
 
-        void SendLfgUpdateStatus(LfgUpdateData const& updateData, bool party); 
+        void SendLfgUpdatePlayer(LfgUpdateData const& updateData);
+        void SendLfgUpdateParty(LfgUpdateData const& updateData);
         void SendLfgRoleChosen(uint64 guid, uint8 roles);
         void SendLfgRoleCheckUpdate(LfgRoleCheck const& pRoleCheck);
         void SendLfgLfrList(bool update);

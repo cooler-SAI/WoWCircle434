@@ -279,6 +279,9 @@ public:
     {
         if (InstanceScript* instance = creature->GetInstanceScript())
         {
+            if (creature->isQuestGiver())
+                player->PrepareQuestMenu(creature->GetGUID());
+
             switch (instance->GetData(DATA_MAIN_EVENT_PHASE))
             {
                 case NOT_STARTED:

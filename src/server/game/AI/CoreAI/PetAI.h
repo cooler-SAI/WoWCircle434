@@ -31,6 +31,7 @@ class PetAI : public CreatureAI
 
         explicit PetAI(Creature* c);
 
+        void _DoMeleeAttackIfReady();
         void UpdateAI(const uint32);
         static int Permissible(const Creature*);
 

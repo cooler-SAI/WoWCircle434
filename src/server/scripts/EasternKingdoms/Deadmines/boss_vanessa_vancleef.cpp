@@ -1,5 +1,7 @@
 #include "ScriptPCH.h"
 #include "deadmines.h"
+#include "LFGMgr.h"
+#include "Group.h"
 
 enum ScriptedTexts
 {
@@ -175,6 +177,14 @@ class boss_vanessa_vancleef : public CreatureScript
                 Talk(SAY_DEATH);
 
                 _JustDied();
+
+				Map::PlayerList const& players = me->GetMap()->GetPlayers();
+				if (!players.isEmpty())
+				{
+					Player* pPlayer = players.begin()->getSource();
+					if (pPlayer && pPlayer->GetGroup())
+						sLFGMgr->FinishDungeon(pPlayer->GetGroup()->GetGUID(), 326);
+				}
             }
 
             void UpdateAI(const uint32 diff)

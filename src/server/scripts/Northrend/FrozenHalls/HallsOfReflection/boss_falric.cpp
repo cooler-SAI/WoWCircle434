@@ -33,9 +33,8 @@ enum Spells
     SPELL_QUIVERING_STRIKE                        = 72422,
     SPELL_IMPENDING_DESPAIR                       = 72426,
     SPELL_DEFILING_HORROR                         = 72435,
-    SPELL_HOPELESSNESS_66                         = 72395,
-    SPELL_HOPELESSNESS_33                         = 72396,
-    SPELL_HOPELESSNESS_10                         = 72397,
+    SPELL_HOPELESSNESS                            = 72395,
+    H_SPELL_HOPELESSNESS                          = 72390, /// @todo not in dbc. Add in DB.
 };
 
 enum Events
@@ -83,27 +82,6 @@ public:
             events.ScheduleEvent(EVENT_DEFILING_HORROR, urand(25000, 45000)); /// @todo adjust timer.
         }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/)
-        {
-            if (uiHopelessnessCount == 0 && !HealthAbovePct(66))
-            {
-                DoCast(SPELL_HOPELESSNESS_66);
-                uiHopelessnessCount++;
-            }
-            else if (uiHopelessnessCount == 1 && !HealthAbovePct(33))
-            {
-                me->RemoveAllAuras();
-                DoCast(SPELL_HOPELESSNESS_33);
-                uiHopelessnessCount++;
-            }
-            else if (uiHopelessnessCount == 2 && !HealthAbovePct(10))
-            {
-                me->RemoveAllAuras();
-                DoCast(SPELL_HOPELESSNESS_10);
-                uiHopelessnessCount++;
-            }
-        }
-
         void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_DEATH);
@@ -146,6 +124,14 @@ public:
                     DoCast(SPELL_DEFILING_HORROR);
                     events.ScheduleEvent(EVENT_DEFILING_HORROR, urand(25000, 45000)); /// @todo adjust timer.
                     break;
+            }
+
+            if ((uiHopelessnessCount < 1 && HealthBelowPct(66))
+                || (uiHopelessnessCount < 2 && HealthBelowPct(33))
+                || (uiHopelessnessCount < 3 && HealthBelowPct(10)))
+            {
+                uiHopelessnessCount++;
+                DoCast(DUNGEON_MODE(SPELL_HOPELESSNESS, H_SPELL_HOPELESSNESS));
             }
 
             DoMeleeAttackIfReady();

@@ -119,13 +119,13 @@ public:
                     case GOSSIP_ACTION_INFO_DEF + 1:
                         if (!HAS_ESSENCE(player))
                         {
-                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Я хочу отправиться в полет на зеленых крыльях." : "I want to fly on the wings of the Green Flight.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Какие способности есть у Изумрудного дракона?" : "What abilities do Emerald Drakes have?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Я хочу управлять зеленым драконом." : "I want to fly on the wings of the Green Flight.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Какими способностями обладают изумрудные драконы?" : "What abilities do Emerald Drakes have?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                             player->SEND_GOSSIP_MENU(GOSSIP_TEXTID_VERDISA1, creature->GetGUID());
                         }
                         else
                         {
-                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Какие способности есть у Изумрудного дракона?" : "What abilities do Emerald Drakes have?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Какими способностями обладают изумрудные драконы?" : "What abilities do Emerald Drakes have?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                             player->SEND_GOSSIP_MENU(GOSSIP_TEXTID_VERDISA2, creature->GetGUID());
                         }
                         break;
@@ -151,13 +151,13 @@ public:
                     case GOSSIP_ACTION_INFO_DEF + 1:
                         if (!HAS_ESSENCE(player))
                         {
-                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Я хочу отправиться в полет на красных крыльях." : "I want to fly on the wings of the Red Flight.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Какие способности есть у Рубинового дракона?" : "What abilities do Ruby Drakes have?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Я хочу управлять красным драконом." : "I want to fly on the wings of the Red Flight.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Какими способностями обладают рубиновые драконы?" : "What abilities do Ruby Drakes have?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                             player->SEND_GOSSIP_MENU(GOSSIP_TEXTID_BELGARISTRASZ1, creature->GetGUID());
                         }
                         else
                         {
-                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Какие способности есть у Рубинового дракона?" : "What abilities do Ruby Drakes have?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Какими способностями обладают рубиновые драконы?" : "What abilities do Ruby Drakes have?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                             player->SEND_GOSSIP_MENU(GOSSIP_TEXTID_BELGARISTRASZ2, creature->GetGUID());
                         }
                         break;
@@ -183,13 +183,13 @@ public:
                     case GOSSIP_ACTION_INFO_DEF + 1:
                         if (!HAS_ESSENCE(player))
                         {
-                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Я хочу отправиться в полет на бронзовых крыльях." : "I want to fly on the wings of the Bronze Flight.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Какие способности есть у Янтарного дракона?" : "What abilities do Amber Drakes have?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Я хочу управлять бронзовым драконом." : "I want to fly on the wings of the Bronze Flight.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Какими способностями обладают янтарные драконы?" : "What abilities do Amber Drakes have?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                             player->SEND_GOSSIP_MENU(GOSSIP_TEXTID_ETERNOS1, creature->GetGUID());
                         }
                         else
                         {
-                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Какие способности есть у Янтарного дракона?" : "What abilities do Amber Drakes have?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Какими способностями обладают янтарные драконы?" : "What abilities do Amber Drakes have?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                             player->SEND_GOSSIP_MENU(GOSSIP_TEXTID_ETERNOS2, creature->GetGUID());
                         }
                         break;
@@ -224,7 +224,7 @@ public:
         {
             if (instance->GetBossState(DATA_DRAKOS_EVENT) == DONE)
             {
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Так чего же мы ждем?" : "So where do we go from here?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "И что нам дальше делать?" : "So where do we go from here?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 player->SEND_GOSSIP_MENU(GOSSIP_TEXTID_DRAKES, creature->GetGUID());
             }
         }

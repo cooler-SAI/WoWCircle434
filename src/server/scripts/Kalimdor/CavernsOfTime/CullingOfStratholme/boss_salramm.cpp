@@ -23,8 +23,7 @@ SDComment: TODO: Intro
 SDCategory:
 Script Data End */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
+#include "ScriptPCH.h"
 #include "culling_of_stratholme.h"
 
 enum Spells
@@ -79,6 +78,8 @@ public:
         uint32 uiShadowBoltTimer;
         uint32 uiStealFleshTimer;
         uint32 uiSummonGhoulsTimer;
+        uint32 uiRespawnZombiesTimer;
+        bool bTransformed;
 
         InstanceScript* instance;
 
@@ -139,7 +140,17 @@ public:
                 if (Unit* random_pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     DoCast(random_pTarget, SPELL_SUMMON_GHOULS);
                 uiSummonGhoulsTimer = 10000;
-            } else uiSummonGhoulsTimer -= diff;
+            } 
+            else uiSummonGhoulsTimer -= diff;
+
+            // Respawn risen zombies at town
+            if(!bTransformed)
+                if (uiRespawnZombiesTimer <= diff)
+                {
+                    instance->SetData(DATA_TRANSFORM_CITIZENS, SPECIAL);
+                    bTransformed = true;
+                }
+                else uiRespawnZombiesTimer -= diff;
 
             DoMeleeAttackIfReady();
         }

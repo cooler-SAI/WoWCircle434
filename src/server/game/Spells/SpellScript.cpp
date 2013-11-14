@@ -1136,3 +1136,9 @@ AuraApplication const* AuraScript::GetTargetApplication() const
     return m_auraApplication;
 }
 
+AuraRemoveMode AuraScript::GetRemoveMod() const
+{
+    return m_auraApplication->GetRemoveMode();
+}
+
+

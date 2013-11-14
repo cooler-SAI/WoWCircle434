@@ -2589,7 +2589,7 @@ class npc_korkron_primalist: public CreatureScript
                             {
                                 tempUnit->AI()->Talk(SAY_FIRST_SQUAD_RESCUED_HORDE_1);
                                 tempUnit->AI()->Talk(SAY_SUMMON_BATTLE_STANDARD);
-                                tempUnit->CastSpell(tempUnit, SPELL_SUMMON_BATTLE_STANDART_H, true);
+                                //tempUnit->CastSpell(tempUnit, SPELL_SUMMON_BATTLE_STANDART_H, true);
                             }
                             instance->SetData(DATA_FIRST_SQUAD_STATE, DONE);
                             break;
@@ -2821,7 +2821,7 @@ class npc_skybreaker_vindicator: public CreatureScript
                             {
                                 tempUnit->AI()->Talk(SAY_FIRST_SQUAD_RESCUED_ALLIANCE_1);
                                 tempUnit->AI()->Talk(SAY_SUMMON_BATTLE_STANDARD);
-                                tempUnit->CastSpell(tempUnit, SPELL_SUMMON_BATTLE_STANDART_A, true);
+                                //tempUnit->CastSpell(tempUnit, SPELL_SUMMON_BATTLE_STANDART_A, true);
                             }
                             instance->SetData(DATA_FIRST_SQUAD_STATE, DONE);
                             break;

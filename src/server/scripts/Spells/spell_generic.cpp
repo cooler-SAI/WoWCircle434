@@ -2637,63 +2637,6 @@ public:
     }
 };
 
-class spell_gen_touch_the_nightmare : public SpellScriptLoader
-{
-public:
-    spell_gen_touch_the_nightmare() : SpellScriptLoader("spell_gen_touch_the_nightmare") { }
-
-    class spell_gen_touch_the_nightmare_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_gen_touch_the_nightmare_SpellScript);
-
-        void HandleDamageCalc(SpellEffIndex /*effIndex*/)
-        {
-            uint32 bp = GetCaster()->GetMaxHealth() * 0.3f;
-            SetHitDamage(bp);
-        }
-
-        void Register()
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_gen_touch_the_nightmare_SpellScript::HandleDamageCalc, EFFECT_2, SPELL_EFFECT_SCHOOL_DAMAGE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_gen_touch_the_nightmare_SpellScript();
-    }
-};
-
-class spell_gen_dream_funnel: public SpellScriptLoader
-{
-public:
-    spell_gen_dream_funnel() : SpellScriptLoader("spell_gen_dream_funnel") { }
-
-    class spell_gen_dream_funnel_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_gen_dream_funnel_AuraScript);
-
-        void HandleEffectCalcAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
-        {
-            if (GetCaster())
-                amount = GetCaster()->GetMaxHealth() * 0.05f;
-
-            canBeRecalculated = false;
-        }
-
-        void Register()
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_dream_funnel_AuraScript::HandleEffectCalcAmount, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_dream_funnel_AuraScript::HandleEffectCalcAmount, EFFECT_2, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const
-    {
-        return new spell_gen_dream_funnel_AuraScript();
-    }
-};
-
 enum GenericLifebloom
 {
     SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL        = 43422,
@@ -3399,6 +3342,42 @@ class spell_crossfaction_bg_set_faction_a : public SpellScriptLoader
         }
 };
 
+class spell_gen_mount_check : public SpellScriptLoader
+{
+public:
+    spell_gen_mount_check() : SpellScriptLoader("spell_gen_mount_check") { }
+
+    class spell_gen_mount_check_AuraScript : public AuraScript
+    {
+
+        PrepareAuraScript(spell_gen_mount_check_AuraScript)
+
+    public:
+        spell_gen_mount_check_AuraScript() { }
+
+        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                if (caster->GetOwner()->IsMounted())
+                    caster->Mount(29736);
+                else if (caster->IsMounted())
+                    caster->Dismount();
+            }
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_mount_check_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_gen_mount_check_AuraScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_absorb0_hitlimit1();
@@ -3451,8 +3430,6 @@ void AddSC_generic_spell_scripts()
     new spell_gen_count_pct_from_max_hp("spell_gen_default_count_pct_from_max_hp");
     new spell_gen_count_pct_from_max_hp("spell_gen_50pct_count_pct_from_max_hp", 50);
     new spell_gen_despawn_self();
-    new spell_gen_touch_the_nightmare();
-    new spell_gen_dream_funnel();
     new spell_gen_lifebloom("spell_hexlord_lifebloom", SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_tur_ragepaw_lifebloom", SPELL_TUR_RAGEPAW_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_cenarion_scout_lifebloom", SPELL_CENARION_SCOUT_LIFEBLOOM_FINAL_HEAL);
@@ -3471,4 +3448,5 @@ void AddSC_generic_spell_scripts()
     new spell_crossfaction_bg_restore_faction();
     new spell_crossfaction_bg_set_faction_h();
     new spell_crossfaction_bg_set_faction_a();
+    new spell_gen_mount_check();
 }

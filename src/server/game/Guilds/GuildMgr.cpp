@@ -235,7 +235,7 @@ void GuildMgr::LoadGuilds()
                                                      "FirstProffLevel, FirstProffSkill, FirstProffRank, SecondProffLevel, SecondProffSkill, SecondProffRank, "
                                                      //    37              38
                                                      "total_activity, week_activity "
-                                                     "FROM guild_member gm LEFT JOIN characters c ON c.guid = gm.guid WHERE c.deleteinfos_name IS NULL ORDER BY guildid ASC");
+                                                     "FROM guild_member gm LEFT JOIN characters c ON c.guid = gm.guid WHERE c.deleteDate IS NULL ORDER BY guildid ASC");
 
         if (!result)
         {

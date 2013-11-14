@@ -1988,6 +1988,7 @@ class Player : public Unit, public GridObject<Player>
             SetUInt32Value(PLAYER_FIELD_GLYPHS_1 + slot, glyph);
         }
         uint32 GetGlyph(uint8 spec, uint8 slot) const { return _talentMgr->SpecInfo[spec].Glyphs[slot]; }
+        bool HasGlyph(uint32 spell_id);
 
         PlayerTalentMap const* GetTalentMap(uint8 spec) const { return _talentMgr->SpecInfo[spec].Talents; }
         PlayerTalentMap* GetTalentMap(uint8 spec) { return _talentMgr->SpecInfo[spec].Talents; }

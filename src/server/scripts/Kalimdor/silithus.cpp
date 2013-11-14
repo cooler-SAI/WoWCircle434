@@ -38,14 +38,6 @@ EndContentData */
 ## npc_highlord_demitrian
 ###*/
 
-#define GOSSIP_DEMITRIAN1 "What do you know of it?"
-#define GOSSIP_DEMITRIAN2 "I am listening, Demitrian."
-#define GOSSIP_DEMITRIAN3 "Continue, please."
-#define GOSSIP_DEMITRIAN4 "A battle?"
-#define GOSSIP_DEMITRIAN5 "<Nod>"
-#define GOSSIP_DEMITRIAN6 "Caught unaware? How?"
-#define GOSSIP_DEMITRIAN7 "So what did Ragnaros do next?"
-
 class npc_highlord_demitrian : public CreatureScript
 {
 public:
@@ -53,31 +45,33 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
     {
+        bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
         player->PlayerTalkClass->ClearMenus();
         switch (action)
         {
         case GOSSIP_ACTION_INFO_DEF:
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_DEMITRIAN2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Я слушаю, Демитриан":"I am listening, Demitrian.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
             player->SEND_GOSSIP_MENU(6842, creature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF+1:
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_DEMITRIAN3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Продолжай, пожалуйста.":"Continue, please.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
             player->SEND_GOSSIP_MENU(6843, creature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF+2:
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_DEMITRIAN4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Битва?":"A battle?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
             player->SEND_GOSSIP_MENU(6844, creature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF+3:
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_DEMITRIAN5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "<Кивок>":"<Nod>", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4);
             player->SEND_GOSSIP_MENU(6867, creature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF+4:
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_DEMITRIAN6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+5);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Застали врасплох? Как?":"Caught unaware? How?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+5);
             player->SEND_GOSSIP_MENU(6868, creature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF+5:
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_DEMITRIAN7, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+6);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "И что Рагнарос сделал потом?":"So what did Ragnaros do next?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+6);
             player->SEND_GOSSIP_MENU(6869, creature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF+6:
@@ -94,12 +88,14 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
+        bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
         if (creature->isQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(7785) == QUEST_STATUS_NONE &&
             (player->HasItemCount(18563, 1, false) || player->HasItemCount(18564, 1, false)))
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_DEMITRIAN1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Что ты об этом знаешь?":"What do you know of it?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
         player->SEND_GOSSIP_MENU(6812, creature->GetGUID());
             return true;
@@ -110,22 +106,6 @@ public:
 /*###
 ## npcs_rutgar_and_frankal
 ###*/
-
-//gossip item text best guess
-#define GOSSIP_ITEM1 "I seek information about Natalia"
-
-#define GOSSIP_ITEM2 "That sounds dangerous!"
-#define GOSSIP_ITEM3 "What did you do?"
-#define GOSSIP_ITEM4 "Who?"
-#define GOSSIP_ITEM5 "Women do that. What did she demand?"
-#define GOSSIP_ITEM6 "What do you mean?"
-#define GOSSIP_ITEM7 "What happened next?"
-
-#define GOSSIP_ITEM11 "Yes, please continue"
-#define GOSSIP_ITEM12 "What language?"
-#define GOSSIP_ITEM13 "The Priestess attacked you?!"
-#define GOSSIP_ITEM14 "I should ask the monkey about this"
-#define GOSSIP_ITEM15 "Then what..."
 
 enum RutgarAndFrankal //trigger creatures to kill
 {
@@ -140,62 +120,73 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
     {
+        bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
         player->PlayerTalkClass->ClearMenus();
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Это кажется опасным.":"That sounds dangerous!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
                 player->SEND_GOSSIP_MENU(7755, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 1:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "И что с ней случилось после этого?":"What did you do?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 player->SEND_GOSSIP_MENU(7756, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Наталия?":"Who?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                 player->SEND_GOSSIP_MENU(7757, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 3:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Каковы требования?":"Women do that. What did she demand?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
                 player->SEND_GOSSIP_MENU(7758, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 4:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Показала свою натуру? Это что значит?":"What do you mean?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                 player->SEND_GOSSIP_MENU(7759, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 5:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM7, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Одержимая чем?":"What happened next?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
                 player->SEND_GOSSIP_MENU(7760, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 6:
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Я вернусь, как только разберусь в этом бардаке.":"I''ll be back as soon as''ll take care of this mess.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
                 player->SEND_GOSSIP_MENU(7761, creature->GetGUID());
-                                                                //'kill' our trigger to update quest status
+            case GOSSIP_ACTION_INFO_DEF + 7:
+                player->CLOSE_GOSSIP_MENU();
+                //'kill' our trigger to update quest status
                 player->KilledMonsterCredit(TRIGGER_RUTGAR, 0);
                 break;
 
             case GOSSIP_ACTION_INFO_DEF + 9:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM11, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Это мне и хотелось услышать.":"Yes, please continue.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
                 player->SEND_GOSSIP_MENU(7762, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 10:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM12, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Странно.":"What language?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
                 player->SEND_GOSSIP_MENU(7763, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 11:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM13, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Ты не можешь справиться с одной-единственной жрицей ночных эльфов?":"The Priestess attacked you?!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
                 player->SEND_GOSSIP_MENU(7764, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 12:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM14, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Я хотел тебя спросить насчет этой обезьяны.":"I should ask the monkey about this.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
                 player->SEND_GOSSIP_MENU(7765, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 13:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM15, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "И что тогда?":"Then what...", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
                 player->SEND_GOSSIP_MENU(7766, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 14:
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Вот так история! Значит, она пошла в Улей Регал, и с тех пор вы не видели ее?":"What a story! So she went to Hive Regal, and since then you have not seen it?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 15);
                 player->SEND_GOSSIP_MENU(7767, creature->GetGUID());
-                                                                //'kill' our trigger to update quest status
+            case GOSSIP_ACTION_INFO_DEF + 15:
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Спасибо за информацию, Франкал.":"Thanks for the information, Frankal.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 16);
+                player->SEND_GOSSIP_MENU(7768, creature->GetGUID());
+            case GOSSIP_ACTION_INFO_DEF + 16:
+                player->CLOSE_GOSSIP_MENU();
+                //'kill' our trigger to update quest status
                 player->KilledMonsterCredit(TRIGGER_FRANKAL, 0);
                 break;
         }
@@ -204,18 +195,20 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
+        bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
         if (creature->isQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(8304) == QUEST_STATUS_INCOMPLETE &&
             creature->GetEntry() == 15170 &&
             !player->GetReqKillOrCastCurrentCount(8304, TRIGGER_RUTGAR))
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Привет, Рутгар. Командир отправил меня сюда разузнать хоть что-нибудь о его пропавшей жене.":"I seek information about Natalia.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
         if (player->GetQuestStatus(8304) == QUEST_STATUS_INCOMPLETE &&
             creature->GetEntry() == 15171 &&
             player->GetReqKillOrCastCurrentCount(8304, TRIGGER_RUTGAR))
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+9);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Привет, Франкал. Говорят, ты знаешь, где находится госпожа Наталия Мар\'алит.":"I seek information about Natalia.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+9);
 
         player->SEND_GOSSIP_MENU(7754, creature->GetGUID());
 

@@ -761,7 +761,8 @@ class boss_ragnaros_firelands : public CreatureScript
                             break;
                         case EVENT_RAGE_OF_RAGNAROS:
                             Talk(SAY_EVENT);
-                            DoCastAOE(SPELL_RAGE_OF_RAGNAROS_AOE);
+                            if (!IsHeroic())
+                                DoCastAOE(SPELL_RAGE_OF_RAGNAROS_AOE);
                             break;
                         case EVENT_BURNING_WOUND:
                             DoCastVictim(SPELL_BURNING_WOUND);

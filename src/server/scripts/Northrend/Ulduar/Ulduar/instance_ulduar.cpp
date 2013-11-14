@@ -235,6 +235,7 @@ class instance_ulduar : public InstanceMapScript
                 conSpeedAtory                    = false;
                 Unbroken                         = true;
                 _summonAlgalon                   = false;
+                _algalonSummoned                 = false;
 
                 memset(AlgalonSigilDoorGUID, 0, sizeof(AlgalonSigilDoorGUID));
                 memset(AlgalonFloorGUID, 0, sizeof(AlgalonFloorGUID));

@@ -3162,7 +3162,8 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_ZONE: // 41
                 if (!unit || !unit->IsInWorld() || unit->GetZoneId() != reqValue)
-                    return false;
+                    if (!referencePlayer || !referencePlayer->IsInWorld() || referencePlayer->GetZoneId() != reqValue)
+                        return false;
                 break;
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_TARGET_HEALTH_PERCENT_BELOW: // 46
                 if (!unit || !unit->IsInWorld() || unit->GetHealthPct() >= reqValue)

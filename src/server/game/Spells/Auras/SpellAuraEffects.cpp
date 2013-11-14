@@ -645,32 +645,6 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                         DoneActualBenefit += caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()) * 0.8068f;
                     }
                     break;
-                case SPELLFAMILY_PRIEST:
-                    // Power Word: Shield
-                    if (GetSpellInfo()->Id == 17)
-                    {
-                        //+87% from sp bonus
-                        float bonus = 0.87f;
-
-                        DoneActualBenefit += caster->SpellBaseHealingBonusDone(SpellSchoolMask(m_spellInfo->SchoolMask)) * bonus;
-                        DoneActualBenefit *= caster->CalculateLevelPenalty(GetSpellInfo());
-                        amount += (int32)DoneActualBenefit;
-
-                        // Improved Power Word: Shield
-                        if (AuraEffect const* pAurEff = caster->GetDummyAuraEffect(SPELLFAMILY_PRIEST, 566, 0))
-                            amount = int32(amount * (100.0f + pAurEff->GetAmount()) / 100.0f);
-
-                        // Focused Power
-                        // Reuse variable, not sure if this code below can be moved before Twin Disciplines
-                        amount *= caster->GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
-
-                        // Mastery Priest
-                        if (Aura* aur = caster->GetAura(77484))
-                            AddPct(amount, aur->GetEffect(0)->GetAmount());
-
-                        return amount;
-                    }
-                    break;
                 case SPELLFAMILY_DRUID:
                     // Savage Defence
                     if (GetSpellInfo()->Id == 62606)
@@ -3587,12 +3561,35 @@ void AuraEffect::HandleModTaunt(AuraApplication const* aurApp, uint8 mode, bool 
 
     Unit* target = aurApp->GetTarget();
 
-    if (!target->isAlive() || !target->CanHaveThreatList())
+    if (!target->isAlive())
         return;
 
     Unit* caster = GetCaster();
     if (!caster || !caster->isAlive())
         return;
+
+    if (!target->CanHaveThreatList())
+    {
+        if (target->getVictim() != caster)
+        {
+            if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsAIEnabled 
+                && (!target->ToCreature()->HasReactState(REACT_PASSIVE) || (target->IsPetGuardianStuff() && IS_PLAYER_GUID(target->GetCharmerOrOwnerGUID()))))
+            {
+                // taken from case COMMAND_ATTACK:                        //spellid=1792  //ATTACK PetHandler.cpp
+                if (CharmInfo* charmInfo = target->GetCharmInfo())
+                {
+                    target->AttackStop();
+                    charmInfo->SetIsCommandAttack(true);
+                    charmInfo->SetIsAtStay(false);
+                    charmInfo->SetIsFollowing(false);
+                    charmInfo->SetIsCommandFollow(false);
+                    charmInfo->SetIsReturning(false);
+                }
+                target->ToCreature()->AI()->AttackStart(caster);
+            }
+        }
+        return;
+    }
 
     if (apply)
         target->TauntApply(caster);
@@ -4200,10 +4197,12 @@ void AuraEffect::HandleModMechanicImmunity(AuraApplication const* aurApp, uint8 
             // Actually we should apply immunities here, too, but the aura has only 100 ms duration, so there is practically no point
             break;
         case 54508: // Demonic Empowerment
-            mechanic = (1 << MECHANIC_SNARE) | (1 << MECHANIC_ROOT);
+            mechanic = (1 << MECHANIC_SNARE) | (1 << MECHANIC_ROOT) | (1 << MECHANIC_FEAR) | (1 << MECHANIC_BANISH);
             target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_SNARE, apply);
             target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_ROOT, apply);
             target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_STUN, apply);
+            target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_FEAR, apply);
+            target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_BANISH, apply);
             break;
         case 70029: // The Beast Within
         case 19574: // Bestial Wrath
@@ -5988,6 +5987,10 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
             {
                 if (Guardian * pet = caster->ToPlayer()->GetPet())
                     pet->UpdateMaxHealth();
+            }
+            else if (m_spellInfo->Id == 105786)
+            {
+                target->ToPlayer()->UpdateSpellDamageAndHealingBonus();
             }
             break;
         }

@@ -31,6 +31,7 @@ enum DynamicObjectType
     DYNAMIC_OBJECT_AREA_SPELL       = 0x1,
     DYNAMIC_OBJECT_FARSIGHT_FOCUS   = 0x2,
     DYNAMIC_OBJECT_RAID_MARKER      = 0x3,
+    DYNAMIC_OBJECT_UNK              = 0x8,
 };
 
 class DynamicObject : public WorldObject, public GridObject<DynamicObject>
@@ -53,6 +54,8 @@ class DynamicObject : public WorldObject, public GridObject<DynamicObject>
         void SetCasterViewpoint();
         void RemoveCasterViewpoint();
         Unit* GetCaster() const { return _caster; }
+        SpellInfo const* GetSpellInfo() const { return _spell; }
+        DynamicObjectType GetType() const { return _type; }
         void BindToCaster();
         void UnbindFromCaster();
         uint32 GetSpellId() const {  return GetUInt32Value(DYNAMICOBJECT_SPELLID); }
@@ -70,6 +73,8 @@ class DynamicObject : public WorldObject, public GridObject<DynamicObject>
         Aura* _removedAura;
         Unit* _caster;
         int32 _duration; // for non-aura dynobjects
+        SpellInfo const* _spell;
+        DynamicObjectType _type;
         bool _isViewpoint;
 };
 #endif

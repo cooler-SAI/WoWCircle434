@@ -231,6 +231,8 @@ public:
             return true;
         }
 
+        ticket->Complete();
+
         if (Player* player = ticket->GetPlayer())
             if (player->IsInWorld())
                 ticket->SendResponse(player->GetSession());

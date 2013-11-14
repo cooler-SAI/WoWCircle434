@@ -314,7 +314,7 @@ public:
             return false;
 
         LfgUpdateType error = LfgUpdateType(atoi(result));
-        handler->GetSession()->SendLfgUpdateStatus(LfgUpdateData(error), false);
+        handler->GetSession()->SendLfgUpdatePlayer(LfgUpdateData(error));
         return true;
     }
 

@@ -2571,6 +2571,10 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
         }
     }
 
+    // Taunt-like spells can't miss since 4.0.1
+    if (spell->HasEffect(SPELL_EFFECT_ATTACK_ME))
+        return SPELL_MISS_NONE;
+
     Unit * checker = (isTotem() && GetOwner()) ? GetOwner() : this;
     switch (spell->DmgClass)
     {
@@ -2839,8 +2843,6 @@ void Unit::_UpdateAutoRepeatSpell()
                     InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
                     return;
                 }
-                else if (currentSpell->m_spellInfo->Id == 19434)
-                    return;
             }
         }
 
@@ -3124,6 +3126,16 @@ Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8
     if (!casterGUID)
         casterGUID = caster->GetGUID();
 
+    // Special handling for Sunder Armor
+    if (newAura->Id == 58567)
+    {
+        if (Aura * aura = GetAura(58567))
+        {
+            aura->ModStackAmount(1);
+            return aura;
+        }
+    }
+    
     // passive and Incanter's Absorption and auras with different type can stack with themselves any number of times
     if (!newAura->IsMultiSlotAura())
     {
@@ -3200,7 +3212,7 @@ void Unit::_AddAura(UnitAura* aura, Unit* caster)
         Unit::AuraList& scAuras = caster->GetSingleCastAuras();
         for (AuraList::const_iterator itr = scAuras.begin(); itr != scAuras.end(); ++itr)
         {
-            if ((*itr) != aura && 
+            if ((*itr) != aura && (*itr)->GetSpellInfo() &&
                 (*itr)->GetSpellInfo()->IsSingleTargetWith(aura->GetSpellInfo()))
                     tempList.push_back((*itr));
         }
@@ -5879,6 +5891,27 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         return false;
 
                     triggered_spell_id = 34650;
+
+                    // Item - Priest T13 Shadow 4P Bonus (Shadowfiend and Shadowy Apparition)
+                    if (AuraEffect * eff = target->GetAuraEffect(105844, 0))
+                    {
+                        if (roll_chance_i(eff->GetAmount()))
+                        {
+                            // don't apply if allready have orbs
+                            bool found = false;
+                            if (Aura * orbs = target->GetAura(77487))
+                                if (orbs->GetStackAmount() == 3)
+                                    found = true;
+
+                            if (!found)
+                            {
+                                for (int i = 0; i < eff->GetSpellInfo()->Effects[1].BasePoints; i++)
+                                {
+                                    target->CastSpell(target, 77487, true);
+                                }
+                            }
+                        }
+                    }
                     break;
                 }
                 // Mark of Malice
@@ -6337,14 +6370,18 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 AuraList & scAuras = GetSingleCastAuras();
                 for (AuraList::iterator iter = scAuras.begin(); iter != scAuras.end(); ++iter)
                 {
-                    if( (*iter)->GetId() == triggered_spell_id)
+                    if (Aura* aur = (*iter))
                     {
-                        // can update current target slow
-                        if ((*iter)->GetOwner() == target)
-                            break;
-                        return false;
+                        if (aur->GetId() == triggered_spell_id)
+                        {
+                            // can update current target slow
+                            if (aur->GetOwner() == target)
+                                break;
+                            return false;
+                        }
                     }
                 }
+
                 break;
             }
             // Magic Absorption
@@ -6364,6 +6401,10 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             {
                 if (!procSpell)
                     return false;
+
+                if (procSpell->Id == 2948)
+                    if (HasAura(11367) || HasAura(11115))
+                        return false;
 
                 // mana cost save
                 int32 cost = int32(procSpell->ManaCost + CalculatePct(GetCreateMana(), procSpell->ManaCostPercentage));
@@ -6412,14 +6453,14 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
                         Cell cell(p);
 
-                        Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck u_check(this, 100.0f);
+                        Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck u_check(this, 8.0f);
                         Trinity::UnitListSearcher<Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck> checker(this, targets, u_check);
 
                         TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck>, GridTypeMapContainer > grid_object_checker(checker);
                         TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck>, WorldTypeMapContainer > world_object_checker(checker);
 
-                        cell.Visit(p, grid_object_checker,  *GetMap(), *this, 30.0f);
-                        cell.Visit(p, world_object_checker, *GetMap(), *this, 30.0f);
+                        cell.Visit(p, grid_object_checker,  *GetMap(), *this, 8.0f);
+                        cell.Visit(p, world_object_checker, *GetMap(), *this, 8.0f);
                     }
 
                     if (targets.empty())
@@ -8412,6 +8453,10 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 case 16180:
                 case 16196:
                 {
+                    // Check Water Shield
+                    if (!HasAura(52127))
+                        return false;
+
                     SpellInfo const* spellEnergize = sSpellMgr->GetSpellInfo(101033);
                     if (!spellEnergize)
                         return false;
@@ -8725,13 +8770,15 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!procSpell || !target || GetTypeId() != TYPEID_PLAYER || effIndex != 0)
                         return false;
 
+                    int32 chance = triggeredByAura->GetAmount();
+
+                    // Chain Lightning has /3 chance to proc instead of other spells (kinda 8% for 25%)
                     if (procSpell->Id == 421)
                     {
-                        if (ToPlayer()->GetSelectedUnit() != target)
-                            return false;
+                        chance = chance / 3;
                     }
 
-                    if (!roll_chance_i(triggeredByAura->GetAmount()))
+                    if (!roll_chance_i(chance))
                         return false;
 
                     switch (procSpell->Id)
@@ -8906,7 +8953,21 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             aur->SetDuration(aur->GetDuration() + 3000);
                         else
                             CastCustomSpell(this, 51460, &basepoints0, NULL, NULL, true);
+
+                        // Item - Death Knight T13 DPS 4P Bonus
+                        if (Aura * aura = GetAura(105646))
+                        {
+                            if (roll_chance_i(aura->GetSpellInfo()->Effects[1].BasePoints))
+                                CastSpell(this, 105647, true);
+                        }
                         return true;
+                    }
+
+                    // Item - Death Knight T13 DPS 4P Bonus
+                    if (AuraEffect * auraEff = GetAuraEffect(105646, 0))
+                    {
+                        if (roll_chance_i(auraEff->GetAmount()))
+                            CastSpell(this, 105647, true);
                     }
 
                     std::set<uint8> runes;
@@ -10378,6 +10439,8 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                 if (lsCharges > 7 && (HasAura(88766)))
                     CastSpell(this, 95774, true);
             }
+            else 
+                return false;
             break;
         }
         // Shadow Infusion
@@ -11373,6 +11436,11 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
 
         if (playerPet && playerPet->isAlive())
             playerPet->AI()->OwnerAttacked(victim);
+
+        for (std::set<uint64>::iterator itr = m_SummonNoSlot.begin(); itr != m_SummonNoSlot.end(); ++itr)
+             if (Creature* summon = GetMap()->GetCreature(*itr))
+                 if (summon->IsAIEnabled)
+                     summon->AI()->OwnerAttacked(victim);
     }
 
     return true;
@@ -12827,6 +12895,13 @@ int32 Unit::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
                 DoneAdvertisedBenefit += int32(CalculatePct(GetTotalAttackPowerValue(BASE_ATTACK), (*i)->GetAmount()));
 
         int32 spModPct = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_SPELL_POWER_PCT);
+
+        // Temporal Ruin Warlock 4P T13 bonus
+        if (AuraEffect * eff = GetAuraEffect(105786, 0))
+        {
+            spModPct += eff->GetAmount();
+        }
+
         DoneAdvertisedBenefit += DoneAdvertisedBenefit * spModPct / 100;
     }
 
@@ -13474,6 +13549,13 @@ int32 Unit::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
                 AdvertisedBenefit += int32(CalculatePct(GetTotalAttackPowerValue(BASE_ATTACK), (*i)->GetAmount()));
 
         int32 spModPct = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_SPELL_POWER_PCT);
+
+        // Temporal Ruin Warlock 4P T13 bonus
+        if (AuraEffect * eff = GetAuraEffect(105786, 0))
+        {
+            spModPct += eff->GetAmount();
+        }
+
         AdvertisedBenefit += AdvertisedBenefit * spModPct / 100;
     }
     return AdvertisedBenefit;
@@ -14141,8 +14223,18 @@ void Unit::UpdateMount()
 
     if (mountType)
     {
-        uint32 zoneId, areaId;
+        uint32 zoneId, topZoneId, areaId;
         GetZoneAndAreaId(zoneId, areaId);
+        topZoneId = zoneId;
+        while (true)
+        {
+            AreaTableEntry const* zone = GetAreaEntryByAreaID(topZoneId);
+            if (!zone)
+                break;
+            if (zone->zone == 0)
+                break;
+            topZoneId = zone->zone;
+        }
 
         uint32 ridingSkill = 5000;
         if (GetTypeId() == TYPEID_PLAYER)
@@ -14217,7 +14309,7 @@ void Unit::UpdateMount()
             if (mountCapability->RequiredMap != -1 && GetMapId() != uint32(mountCapability->RequiredMap))
                 continue;
 
-            if (mountCapability->RequiredArea && (mountCapability->RequiredArea != zoneId && mountCapability->RequiredArea != areaId))
+            if (mountCapability->RequiredArea && (mountCapability->RequiredArea != zoneId && mountCapability->RequiredArea != topZoneId && mountCapability->RequiredArea != areaId))
                 continue;
 
             if (mountCapability->RequiredAura && !HasAura(mountCapability->RequiredAura))
@@ -15845,6 +15937,13 @@ int32 Unit::ModSpellDuration(SpellInfo const* spellProto, Unit const* target, in
                     duration *= 2;
             }
         }
+
+        // Item - Druid T13 Restoration 4P Bonus (Rejuvenation)
+        if (AuraEffect * eff = GetAuraEffect(105770, 0))
+        {
+            if (roll_chance_i(eff->GetAmount()) && eff->IsAffectingSpell(spellProto))
+                duration *= 2;
+        } 
     }
     return std::max(duration, 0);
 }
@@ -19207,12 +19306,13 @@ void Unit::RemoveCharmedBy(Unit* charmer)
                     ToPlayer()->SetMover(this);
                 break;
             case CHARM_TYPE_POSSESS:
+                ClearUnitState(UNIT_STATE_POSSESSED);
                 charmer->ToPlayer()->SetClientControl(charmer, 1);
                 charmer->ToPlayer()->SetViewpoint(this, false);
                 charmer->ToPlayer()->SetClientControl(this, 0);
                 charmer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                 if (GetTypeId() == TYPEID_PLAYER)
-                    ToPlayer()->SetMover(this);
+                    ToPlayer()->SetClientControl(this, 1);
                 break;
             case CHARM_TYPE_CHARM:
                 if (GetTypeId() == TYPEID_UNIT && charmer->getClass() == CLASS_WARLOCK)
@@ -21334,6 +21434,20 @@ bool Unit::IsVisionObscured(Unit* victim, SpellInfo const* spellInfo) const
             return false;
         else
             return true;
+    }
+    // Victim and caster have aura with effect SPELL_AURA_INTERFERE_TARGETTING, but aura may be not smoke bomb.
+    else if (myAura != NULL && victimAura != NULL)
+    {
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            if (AuraEffect* effect = myAura->GetEffect(i))
+            {
+                if (effect->GetAuraType() != SPELL_AURA_INTERFERE_TARGETTING)
+                    continue;
+                if (effect->GetAmount() && !IsFriendlyTo(victimCaster))
+                    return true;
+            }
+        }
     }
     return false;
 }

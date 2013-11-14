@@ -354,6 +354,10 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
 
                     switch (m_spellInfo->Id)
                     {
+                        case 107439: // Twilight Barrage
+                        case 109203: // Twilight Barrage
+                        case 109204: // Twilight Barrage
+                        case 109205: // Twilight Barrage
                         case 106401: // Twilight Onslaught
                         case 108862: // Twilight Onslaught
                         case 109226: // Twilight Onslaught
@@ -2081,10 +2085,19 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
 
     float speedXY, speedZ;
     CalculateJumpSpeeds(effIndex, m_caster->GetExactDist2d(x, y), speedXY, speedZ);
-    if (m_spellInfo->Id == 49575)
-        m_caster->GetMotionMaster()->CustomJump(x, y, z, speedXY, speedZ);
-    else
-        m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
+
+    switch (m_spellInfo->Id)
+    {
+        case 49575: // Death Grip 
+        case 92832: // Leap of Faith
+            m_caster->GetMotionMaster()->CustomJump(x, y, z, speedXY, speedZ);
+            break;
+        case 49376:
+            m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ, destTarget->GetOrientation());
+            break;
+        default:
+            m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
+    }
 }
 
 void Spell::CalculateJumpSpeeds(uint8 i, float dist, float & speedXY, float & speedZ)
@@ -2915,7 +2928,7 @@ void Spell::EffectPersistentAA(SpellEffIndex effIndex)
         if (!caster->IsInWorld())
             return;
         DynamicObject* dynObj = new DynamicObject(false);
-        if (!dynObj->CreateDynamicObject(sObjectMgr->GenerateLowGuid(HIGHGUID_DYNAMICOBJECT), caster, m_spellInfo, *destTarget, radius, DYNAMIC_OBJECT_AREA_SPELL))
+        if (!dynObj->CreateDynamicObject(sObjectMgr->GenerateLowGuid(HIGHGUID_DYNAMICOBJECT), caster, m_spellInfo, *destTarget, radius, DYNAMIC_OBJECT_UNK))
         {
             delete dynObj;
             return;
@@ -3669,6 +3682,19 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
             unitTarget->RemoveAurasWithMechanic((1<<MECHANIC_SNARE) | (1<<MECHANIC_ROOT), AURA_REMOVE_BY_ENEMY_SPELL, 0, 1);
     }
 
+    // Mass Dispel Inivisiblity removal
+    if (m_spellInfo->Id == 32592)
+    {
+        DispelChargesList inv_dispel_list;
+        unitTarget->GetDispellableAuraList(m_caster, 1 << DISPEL_INVISIBILITY, inv_dispel_list);
+        // will not call scripted dispel hook
+        for (DispelChargesList::iterator itr = inv_dispel_list.begin(); itr != inv_dispel_list.end(); ++itr)
+        {
+            if (Aura * aur = itr->first)
+                aur->Remove(AURA_REMOVE_BY_ENEMY_SPELL);
+        }
+        
+    }
     DispelChargesList dispel_list;
     unitTarget->GetDispellableAuraList(m_caster, dispelMask, dispel_list);
     if (dispel_list.empty())
@@ -3679,7 +3705,8 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
     DispelChargesList success_list;
     WorldPacket dataFail(SMSG_DISPEL_FAILED, 8+8+4+4+damage*4);
     // dispel N = damage buffs (or while exist buffs for dispel)
-    for (int32 count = 0; count < damage && !dispel_list.empty();)
+    int32 count;
+    for (count = 0; count < damage && !dispel_list.empty();)
     {
         // Random select buff for dispel
         DispelChargesList::iterator itr = dispel_list.begin();
@@ -3741,7 +3768,7 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
             if (AuraEffect* aurEff = m_caster->GetAuraEffect(55677, 0))
                 if (m_caster->IsFriendlyTo(unitTarget))
                 {
-                    int32 bp = int32(unitTarget->CountPctFromMaxHealth(aurEff->GetAmount()));
+                    int32 bp = int32(unitTarget->CountPctFromMaxHealth(aurEff->GetAmount() * count));
                     m_caster->CastCustomSpell(unitTarget, 56131, &bp, 0, 0, true); 
                 }
 
@@ -5889,7 +5916,8 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     Unit::AuraEffectList const& aurasPereodic = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
                     for (Unit::AuraEffectList::const_iterator i = aurasPereodic.begin(); i !=  aurasPereodic.end(); ++i)
                     {
-                        if ((*i)->GetCasterGUID() != m_caster->GetGUID() || !(*i)->GetSpellInfo()->HasSchoolMask(SPELL_SCHOOL_MASK_FIRE))
+                        if ((*i)->GetCasterGUID() != m_caster->GetGUID() || !(*i)->GetSpellInfo()->HasSchoolMask(SPELL_SCHOOL_MASK_FIRE) 
+                            || (*i)->GetId() == 11129)  // Combustion
                             continue;
 
                         if (!(*i)->GetAmplitude())
@@ -6700,7 +6728,7 @@ void Spell::EffectResurrect(SpellEffIndex effIndex)
             pInstance->UpdateResurrectionsCount();
 
     uint32 health = target->CountPctFromMaxHealth(damage);
-    uint32 mana   = CalculatePct(target->GetMaxPower(POWER_MANA), damage);
+    uint32 mana   = CalculatePct(target->GetMaxPower(POWER_MANA), m_spellInfo->Id == 20484 ? 20 : m_spellInfo->Effects[effIndex].BasePoints);
 
     ExecuteLogEffectResurrect(effIndex, target);
 
@@ -8132,7 +8160,7 @@ void Spell::EffectBind(SpellEffIndex effIndex)
     WorldLocation loc;
     if (m_spellInfo->Effects[effIndex].TargetA.GetTarget() == TARGET_DEST_DB || m_spellInfo->Effects[effIndex].TargetB.GetTarget() == TARGET_DEST_DB)
     {
-        SpellTargetPosition const* st = sSpellMgr->GetSpellTargetPosition(m_spellInfo->Id);
+        SpellTargetPosition const* st = sSpellMgr->GetSpellTargetPosition(m_spellInfo->Id, effIndex);
         if (!st)
             return;
 

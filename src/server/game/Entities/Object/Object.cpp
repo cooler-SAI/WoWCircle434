@@ -934,6 +934,24 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* 
             }
         }
     }
+    else if (isType(TYPEMASK_DYNAMICOBJECT))                    // dymamic object case
+    {
+        for (uint16 index = 0; index < valCount; ++index)
+        {
+            if (updateMask->GetBit(index))
+            {
+                if (index == DYNAMICOBJECT_BYTES)
+                {
+                    if (!target->IsFriendlyTo(ToDynObject()->GetCaster()))
+                        *data << uint32((ToDynObject()->GetSpellInfo()->SpellVisual[1] != 0 ? ToDynObject()->GetSpellInfo()->SpellVisual[1] : ToDynObject()->GetSpellInfo()->SpellVisual[0]) | (ToDynObject()->GetType() << 28));
+                    else
+                        *data << uint32(ToDynObject()->GetSpellInfo()->SpellVisual[0] | (ToDynObject()->GetType() << 28));
+                }
+                else
+                    *data << m_uint32Values[index];                // other cases
+            }
+        }
+    }
     else                                                    // other objects case (no special index checks)
     {
         for (uint16 index = 0; index < valCount; ++index)
@@ -1903,7 +1921,7 @@ bool WorldObject::GetDistanceOrder(WorldObject const* obj1, WorldObject const* o
     return distsq1 < distsq2;
 }
 
-bool WorldObject::IsInRange(WorldObject const* obj, float minRange, float maxRange, bool is3D /* = true */) const
+bool WorldObject::IsInRange(WorldObject const* obj, float minRange, float maxRange, bool is3D /* = true */, bool useSizeFactor /* = true */) const
 {
     float dx = GetPositionX() - obj->GetPositionX();
     float dy = GetPositionY() - obj->GetPositionY();
@@ -1914,7 +1932,7 @@ bool WorldObject::IsInRange(WorldObject const* obj, float minRange, float maxRan
         distsq += dz*dz;
     }
 
-    float sizefactor = GetObjectSize() + obj->GetObjectSize();
+    float sizefactor = useSizeFactor ? (GetObjectSize() + obj->GetObjectSize()) : 0.0f;
 
     // check only for real range
     if (minRange > 0.0f)

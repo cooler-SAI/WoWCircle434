@@ -504,7 +504,8 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
                 float preciseBasePoints = ScalingMultiplier * multiplier;
                 if (DeltaScalingMultiplier/* && target*/)
                 {
-                    float delta = DeltaScalingMultiplier * ScalingMultiplier * multiplier * 0.5f;
+                   // float delta = DeltaScalingMultiplier * ScalingMultiplier * multiplier * 0.5f;
+                    float delta = fabs(DeltaScalingMultiplier * ScalingMultiplier * multiplier * 0.5f); // TODO: if all be correct need uncomment assert again
                     preciseBasePoints += frand(-delta, delta);
                 }
 
@@ -1382,7 +1383,7 @@ bool SpellInfo::IsAffectedBySpellMods() const
 
 bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
 {
-    if (!IsAffectedBySpellMods())
+    if (mod->op != SPELLMOD_CRIT_DAMAGE_BONUS && !IsAffectedBySpellMods())
         return false;
 
     SpellInfo const* affectSpell = sSpellMgr->GetSpellInfo(mod->spellId);
@@ -1439,6 +1440,15 @@ bool SpellInfo::CanDispelAura(SpellInfo const* aura) const
     // These auras (Cyclone for example) are not dispelable
     if (aura->AttributesEx & SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE)
         return false;
+
+    switch (aura->Id)
+    {
+        case 94528: // Flare
+        case 76577: // Smoke Bomb
+            return false;
+        default:
+            break;
+    }
 
     return true;
 }
@@ -3095,6 +3105,7 @@ bool SpellInfo::_IsNeedDelay() const
         case 79128: // Improved Expose Armor
         case 36032: // Arcane Blast
         case 109950: // Fury of Destroyer
+        case 63853: // Rapture cooldown for Rapture Trick
             return true;
     }
 
@@ -3152,6 +3163,7 @@ bool SpellInfo::IsBreakingCamouflage() const
         case 82945: // Immolation Trap Launcher
         case 82948: // Snake Trap launcher
         case 93435: // Roar of Courage (Special Ability)
+        case 105132:
             return false;
     }
 

@@ -653,15 +653,16 @@ class boss_algalon_the_observer : public CreatureScript
                             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_RENAME);
                             break;
                         case EVENT_OUTRO_2:
-                            _EnterEvadeMode();
-                            me->AddUnitState(UNIT_STATE_EVADE);
+                            //_EnterEvadeMode();
+                            //me->AddUnitState(UNIT_STATE_EVADE);
                             me->GetMotionMaster()->MovePoint(POINT_ALGALON_OUTRO, AlgalonOutroPos);
                             break;
                         case EVENT_OUTRO_3:
-                            DoCastAOE(SPELL_KILL_CREDIT);
+                            me->CastSpell(me, SPELL_KILL_CREDIT);
                             break;
                         case EVENT_OUTRO_4:
                             DoCastAOE(SPELL_SUPERMASSIVE_FAIL);
+
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             break;
                         case EVENT_OUTRO_5:
@@ -987,6 +988,8 @@ class go_celestial_planetarium_access : public GameObjectScript
                 }
 
                 if (!hasKey)
+                    return false;
+                if (go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE))
                     return false;
 
                 // Start Algalon event

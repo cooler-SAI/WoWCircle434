@@ -1377,6 +1377,11 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                         maxSize = 3;
                         power = POWER_HEALTH;
                         break;
+                    // Tranquility 
+                    case 44203:
+                        maxSize = 5;
+                        power = POWER_HEALTH;
+                        break;
                 }
                 break;
             default:
@@ -1444,7 +1449,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                 m_targets.SetDst(playerCaster->m_homebindX, playerCaster->m_homebindY, playerCaster->m_homebindZ, playerCaster->GetOrientation(), playerCaster->m_homebindMapId);
             return;
         case TARGET_DEST_DB:
-            if (SpellTargetPosition const* st = sSpellMgr->GetSpellTargetPosition(m_spellInfo->Id))
+            if (SpellTargetPosition const* st = sSpellMgr->GetSpellTargetPosition(m_spellInfo->Id, effIndex))
             {
                 // TODO: fix this check
                 if (m_spellInfo->HasEffect(SPELL_EFFECT_TELEPORT_UNITS))
@@ -2544,7 +2549,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     m_spellAura = NULL; // Set aura to null for every target-make sure that pointer is not used for unit without aura applied
 
                             //Spells with this flag cannot trigger if effect is casted on self
-    bool canEffectTrigger = !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_CANT_TRIGGER_PROC) && unitTarget->CanProc() && CanExecuteTriggersOnHit(mask) && CanProcOnTarget(unitTarget);
+    bool canEffectTrigger = !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_CANT_TRIGGER_PROC) && unitTarget->CanProc() && (missInfo == SPELL_MISS_IMMUNE2 || CanExecuteTriggersOnHit(mask)) && CanProcOnTarget(unitTarget);
     Unit* spellHitTarget = NULL;
 
     if (missInfo == SPELL_MISS_NONE)                          // In case spell hit target, do all effect on that target
@@ -2752,6 +2757,16 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
                 if (Player* p = m_originalCaster->GetCharmerOrOwnerPlayerOrPlayerItself())
                     p->CastedCreatureOrGO(spellHitTarget->GetEntry(), spellHitTarget->GetGUID(), m_spellInfo->Id);
         }
+
+        for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
+            if (Creature* summon = m_caster->GetSummon(i))
+                if (summon->IsAIEnabled)
+                    summon->AI()->OwnerSpellHit(spellHitTarget, m_spellInfo);
+
+        for (std::set<uint64>::iterator itr = m_caster->m_SummonNoSlot.begin(); itr != m_caster->m_SummonNoSlot.end(); ++itr)
+            if (Creature* summon = m_caster->GetMap()->GetCreature(*itr))
+                if (summon->IsAIEnabled)
+                    summon->AI()->OwnerSpellHit(spellHitTarget, m_spellInfo);
 
         if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsAIEnabled)
             m_caster->ToCreature()->AI()->SpellHitTarget(spellHitTarget, m_spellInfo);
@@ -4804,7 +4819,7 @@ void Spell::SendChannelUpdate(uint32 time)
 {
     if (time == 0)
     {
-        m_caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+//         m_caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
         m_caster->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
     }
 
@@ -6177,9 +6192,19 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (m_caster->ToPlayer())
                         ridingSkill = m_caster->ToPlayer()->GetSkillValue(SKILL_RIDING);
 
-                    uint32 zoneId, areaId;
+                    uint32 zoneId, topZoneId, areaId;
                     m_caster->GetZoneAndAreaId(zoneId, areaId);
-
+                    topZoneId = zoneId;
+                    while (true)
+                    {
+                        AreaTableEntry const* zone = GetAreaEntryByAreaID(topZoneId);
+                        if (!zone)
+                            break;
+                        if (zone->zone == 0)
+                            break;
+                        topZoneId = zone->zone;
+                    }
+                    
                     for (uint32 i = MAX_MOUNT_CAPABILITIES-1; i < MAX_MOUNT_CAPABILITIES; --i)
                     {
                         uint32 id = type->MountCapability[i];
@@ -6196,7 +6221,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (temp->RequiredMap != -1 && m_caster->GetMapId() != uint32(temp->RequiredMap))
                             continue;
 
-                        if (temp->RequiredArea && (temp->RequiredArea != zoneId && temp->RequiredArea != areaId))
+                        if (temp->RequiredArea && (temp->RequiredArea != zoneId && temp->RequiredArea != topZoneId && temp->RequiredArea != areaId))
                             continue;
 
                         if (temp->RequiredAura && !m_caster->HasAura(temp->RequiredAura))
@@ -6206,6 +6231,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                             continue;
 
                         capability = temp;
+                        break;
                     }
                 }
 

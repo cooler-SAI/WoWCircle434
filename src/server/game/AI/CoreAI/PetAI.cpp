@@ -77,6 +77,17 @@ void PetAI::_stopAttack()
     HandleReturnMovement();
 }
 
+void PetAI::_DoMeleeAttackIfReady()
+{
+    if (me->GetEntry() == 510)
+    {
+        if ((me->GetPower(POWER_MANA) / me->GetMaxPower(POWER_MANA) * 100) < 1.0f)
+            DoMeleeAttackIfReady();
+    }
+    else
+        DoMeleeAttackIfReady();
+}
+
 void PetAI::UpdateAI(const uint32 diff)
 {
     if (!me->isAlive() || !me->GetCharmInfo())
@@ -106,14 +117,17 @@ void PetAI::UpdateAI(const uint32 diff)
             return;
         }
 
-        // Check before attacking to prevent pets from leaving stay position
-        if (me->GetCharmInfo()->HasCommandState(COMMAND_STAY))
+        if (!me->HasAura(24450)) // Prowl (Bonus Ability)
         {
-            if (me->GetCharmInfo()->IsCommandAttack() || (me->GetCharmInfo()->IsAtStay() && me->IsWithinMeleeRange(me->getVictim())))
-                DoMeleeAttackIfReady();
+            // Check before attacking to prevent pets from leaving stay position
+            if (me->GetCharmInfo()->HasCommandState(COMMAND_STAY))
+            {
+                if (me->GetCharmInfo()->IsCommandAttack() || (me->GetCharmInfo()->IsAtStay() && me->IsWithinMeleeRange(me->getVictim())))
+                    _DoMeleeAttackIfReady();
+            }
+            else
+                _DoMeleeAttackIfReady();
         }
-        else
-            DoMeleeAttackIfReady();
     }
     else
     {
@@ -332,6 +346,9 @@ void PetAI::AttackStart(Unit* target)
     if (!CanAttack(target))
         return;
 
+    if (Unit* owner = me->GetCharmerOrOwner())
+        owner->RemoveAurasByType(SPELL_AURA_MOD_CAMOUFLAGE);
+
     // Only chase if not commanded to stay or if stay but commanded to attack
     DoAttack(target, (!me->GetCharmInfo()->HasCommandState(COMMAND_STAY) || me->GetCharmInfo()->IsCommandAttack()));
 }
@@ -345,7 +362,7 @@ void PetAI::OwnerAttackedBy(Unit* attacker)
         return;
 
     // Passive pets don't do anything
-    if (me->HasReactState(REACT_PASSIVE))
+    if (me->HasReactState(REACT_ASSIST) || me->HasReactState(REACT_PASSIVE))
         return;
 
     // Prevent pet from disengaging from current target
@@ -366,12 +383,13 @@ void PetAI::OwnerAttacked(Unit* target)
         return;
 
     // Passive pets don't do anything
-    if (!me->HasReactState(REACT_ASSIST))
+    if (me->HasReactState(REACT_PASSIVE))
         return;
 
     // Prevent pet from disengaging from current target
-    if (me->getVictim() && me->getVictim()->isAlive())
-        return;
+    if (!me->HasReactState(REACT_ASSIST))
+        if (me->getVictim() && me->getVictim()->isAlive())
+            return;
 
     // Continue to evaluate and attack if necessary
     AttackStart(target);
@@ -460,8 +478,10 @@ void PetAI::DoAttack(Unit* target, bool chase)
 {
     // Handles attack with or without chase and also resets flags
     // for next update / creature kill
+    
+    bool melee = me->GetEntry() == 510; // Water Elemental
 
-    if (me->Attack(target, true))
+    if (me->Attack(target, melee))
     {
         if (Unit* owner = me->GetOwner())
             owner->SetInCombatWith(target);

@@ -82,6 +82,9 @@ void DynamicObject::RemoveFromWorld()
 
 bool DynamicObject::CreateDynamicObject(uint32 guidlow, Unit* caster, SpellInfo const* spell, Position const& pos, float radius, DynamicObjectType type)
 {
+    _spell = spell;
+    _type = type;
+
     SetMap(caster->GetMap());
     Relocate(pos);
     if (!IsPositionValid())

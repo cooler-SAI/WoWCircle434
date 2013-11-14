@@ -72,8 +72,8 @@ public:
             if (instance)
                 instance->SetBossState(DATA_MARWYN_EVENT, IN_PROGRESS);
 
-            events.ScheduleEvent(EVENT_OBLITERATE, urand(2000,3000));          /// @todo Check timer
-            events.ScheduleEvent(EVENT_WELL_OF_CORRUPTION, 5000);
+            events.ScheduleEvent(EVENT_OBLITERATE, 30000);          /// @todo Check timer
+            events.ScheduleEvent(EVENT_WELL_OF_CORRUPTION, 13000);
             events.ScheduleEvent(EVENT_CORRUPTED_FLESH, 20000);
             events.ScheduleEvent(EVENT_SHARED_SUFFERING, 20000);    /// @todo Check timer
         }
@@ -106,12 +106,11 @@ public:
             {
                 case EVENT_OBLITERATE:
                     DoCast(SPELL_OBLITERATE);
-                    events.ScheduleEvent(EVENT_OBLITERATE, urand(13000,15000));
+                    events.ScheduleEvent(EVENT_OBLITERATE, 30000);
                     break;
                 case EVENT_WELL_OF_CORRUPTION:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                        DoCast(target, SPELL_WELL_OF_CORRUPTION);
-                    events.ScheduleEvent(EVENT_WELL_OF_CORRUPTION, urand(13000,15000));
+                    DoCast(SPELL_WELL_OF_CORRUPTION);
+                    events.ScheduleEvent(EVENT_WELL_OF_CORRUPTION, 13000);
                     break;
                 case EVENT_CORRUPTED_FLESH:
                     Talk(SAY_CORRUPTED_FLESH);

@@ -114,6 +114,7 @@ void AddSC_boss_high_interrogator_gerstahn();
 void AddSC_boss_magmus();
 void AddSC_boss_moira_bronzebeard();
 void AddSC_boss_tomb_of_seven();
+void AddSC_boss_coren_direbrew();
 void AddSC_instance_blackrock_depths();
 void AddSC_boss_drakkisath();                //Blackrock Spire
 void AddSC_boss_halycon();
@@ -503,7 +504,6 @@ void AddSC_instance_halls_of_reflection();   // Halls of Reflection
 void AddSC_halls_of_reflection();
 void AddSC_boss_falric();
 void AddSC_boss_marwyn();
-void AddSC_boss_lich_king_hr();
 void AddSC_instance_icecrown_citadel(); // Icecrown Citadel
 void AddSC_icecrown_citadel();
 void AddSC_icecrown_citadel_teleport();
@@ -875,6 +875,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_magmus();
     AddSC_boss_moira_bronzebeard();
     AddSC_boss_tomb_of_seven();
+	AddSC_boss_coren_direbrew();
     AddSC_instance_blackrock_depths();
     AddSC_boss_drakkisath();                //Blackrock Spire
     AddSC_boss_halycon();
@@ -1360,7 +1361,6 @@ void AddNorthrendScripts()
     AddSC_halls_of_reflection();
     AddSC_boss_falric();
     AddSC_boss_marwyn();
-    AddSC_boss_lich_king_hr();
     AddSC_instance_icecrown_citadel(); // Icecrown Citadel
     AddSC_icecrown_citadel();
     AddSC_icecrown_citadel_teleport();

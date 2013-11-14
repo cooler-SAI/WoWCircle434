@@ -46,13 +46,13 @@ public:
         static ChatCommand commandTable[] =
         {
             { "vip",            SEC_PLAYER,         false, NULL,                                "", vipCommandTable },
-            { NULL,             0,               false, NULL,                                "", NULL }
+            { NULL,             0,                  false, NULL,                                "", NULL            }
         };
         return commandTable;
     }
 
-	
-	static bool HandleVipBankCommand(ChatHandler* handler, const char* /*args*/)
+
+    static bool HandleVipBankCommand(ChatHandler* handler, const char* /*args*/)
     {
         Player *plr = handler->GetSession()->GetPlayer();
 
@@ -62,8 +62,8 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
-		
-		if (!sWorld->getBoolConfig(CONFIG_VIP_BANK_COMMAND))
+
+        if (!sWorld->getBoolConfig(CONFIG_VIP_BANK_COMMAND))
         {
             handler->SendSysMessage(LANG_VIP_COMMAND_DISABLED);
             handler->SetSentErrorMessage(true);

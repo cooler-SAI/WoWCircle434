@@ -1,0 +1,1 @@
+UPDATE `spell_proc_event` SET `SpellFamilyMask0` = '16392' WHERE `entry` IN (47201, 47202, 47203);
