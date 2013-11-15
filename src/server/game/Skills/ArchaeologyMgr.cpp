@@ -275,6 +275,9 @@ void ArchaeologyMgr::ShowResearchProjects()
 
 ResearchWithLevelResult ArchaeologyMgr::CanResearchWithLevel(uint32 siteId)
 {
+    if(!_player)
+        return RS_RESULT_FAIL;
+
     uint32 skill_now = _player->GetSkillValue(SKILL_ARCHAEOLOGY);
     if (!skill_now)
         return RS_RESULT_FAIL;
