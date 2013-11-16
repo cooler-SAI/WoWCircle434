@@ -547,6 +547,8 @@ public:
         void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
         {
             Unit *caster = GetCaster();
+            if(!caster)
+                return;
             t13bumped = false;
 
             //+87% from sp bonus
