@@ -608,8 +608,11 @@ public:
 
         void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
-            Unit * target = GetTarget();
-            Unit * caster = GetCaster();
+            Unit* target = GetTarget();
+            Unit* caster = GetCaster();
+            if(!caster || !target)
+                return;
+
             if (!target->HasAura(6788))
                 caster->CastSpell(target, 6788, true);
 
