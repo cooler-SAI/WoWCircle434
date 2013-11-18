@@ -147,7 +147,10 @@ public:
                         break;
                 }
                 if(rewarded)
+                {
                     CharacterDatabase.PExecute("DELETE FROM character_reward WHERE guid = %u", guid);
+                    player->SaveToDB();
+                }
             }while (result->NextRow());
         }
         else

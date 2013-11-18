@@ -269,15 +269,17 @@ void TempSummon::RemoveFromWorld()
 
     if (m_Properties)
     {
-        Unit* owner = GetSummoner();
-        if (uint8 slot = uint8(m_Properties->Slot))
+        if(Unit* owner = GetSummoner())
         {
-            ASSERT(slot < MAX_SUMMON_SLOT);
-            if (owner->m_SummonSlot[slot] == GetGUID())
-                owner->m_SummonSlot[slot] = 0;
+            if (uint8 slot = uint8(m_Properties->Slot))
+            {
+                ASSERT(slot < MAX_SUMMON_SLOT);
+                if (owner->m_SummonSlot[slot] == GetGUID())
+                    owner->m_SummonSlot[slot] = 0;
+            }
+            else
+                owner->m_SummonNoSlot.erase(GetGUID());
         }
-        else
-            owner->m_SummonNoSlot.erase(GetGUID());
     }
 
     //if (GetOwnerGUID())
