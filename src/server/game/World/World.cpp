@@ -2432,45 +2432,19 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, std::string dura
     PreparedQueryResult resultAccounts = PreparedQueryResult(NULL); //used for kicking
     PreparedStatement* stmt = NULL;
 
-    if (mode == BAN_ACCOUNT_ID)
-    {
-        uint32 account = atoi(nameOrIP.c_str());
-        SQLTransaction trans = LoginDatabase.BeginTransaction();
-        // make sure there is only one active ban
-        stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
-        stmt->setUInt32(0, account);
-        trans->Append(stmt);
-        // No SQL injection with prepared statements
-        stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_AUTO_BANNED);
-        stmt->setUInt32(0, account);
-        stmt->setUInt32(1, ConfigMgr::GetIntDefault("RealmID", 0));
-        stmt->setUInt32(2, duration_secs);
-        stmt->setString(3, author);
-        stmt->setString(4, reason);
-        trans->Append(stmt);
-
-        if (WorldSession* sess = FindSession(account))
-            if (std::string(sess->GetPlayerName()) != author)
-                sess->KickPlayer();
-
-        LoginDatabase.CommitTransaction(trans);
-        return BAN_SUCCESS;
-    }
-
     ///- Update the database with ban information
     switch (mode)
     {
          case BAN_IP:
              // No SQL injection with prepared statements
-             stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_IP);
+            stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_IP);
             stmt->setString(0, nameOrIP);
             resultAccounts = LoginDatabase.Query(stmt);
             stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_IP_BANNED);
             stmt->setString(0, nameOrIP);
-            stmt->setUInt32(1, ConfigMgr::GetIntDefault("RealmID", 0));
-            stmt->setUInt32(2, duration_secs);
-            stmt->setString(3, author);
-            stmt->setString(4, reason);
+            stmt->setUInt32(1, duration_secs);
+            stmt->setString(2, author);
+            stmt->setString(3, reason);
             LoginDatabase.Execute(stmt);
              break;
          case BAN_ACCOUNT:
@@ -2507,16 +2481,26 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, std::string dura
         if (mode != BAN_IP)
         {
             // make sure there is only one active ban
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
+            stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
             stmt->setUInt32(0, account);
-            trans->Append(stmt);
-            // No SQL injection with prepared statements
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_BANNED);
-            stmt->setUInt32(0, account);
-            stmt->setUInt32(1, duration_secs);
-            stmt->setString(2, author);
-            stmt->setString(3, reason);
-            trans->Append(stmt);
+            PreparedQueryResult banresult = LoginDatabase.Query(stmt);
+            if (banresult)
+            {
+                stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_BANNED);
+                stmt->setUInt32(0, duration_secs);
+                stmt->setUInt32(1, account);
+                trans->Append(stmt);
+            }
+            else
+            {
+                // No SQL injection with prepared statements
+                stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_BANNED);
+                stmt->setUInt32(0, account);
+                stmt->setUInt32(1, duration_secs);
+                stmt->setString(2, author);
+                stmt->setString(3, reason);
+                trans->Append(stmt);
+            }
         }
 
         if (WorldSession* sess = FindSession(account))
@@ -2548,16 +2532,6 @@ bool World::RemoveBanAccount(BanMode mode, std::string nameOrIP)
             account = sObjectMgr->GetPlayerAccountIdByPlayerName(nameOrIP);
 
         if (!account)
-            return false;
-
-        QueryResult result = LoginDatabase.PQuery("SELECT realm FROM account_banned WHERE id = '%u' AND active = '1'", account);
-        if (!result)
-            return false;
-
-        Field *fields = result->Fetch();
-        uint32 realmID = fields[0].GetUInt32();
-
-        if (realmID != ConfigMgr::GetIntDefault("RealmID", 0))
             return false;
 
         //NO SQL injection as account is uint32

@@ -1915,34 +1915,50 @@ public:
             if (WorldSession* session = sWorld->FindSession(accountId))
                 target = session->GetPlayer();
 
-        uint32 notSpeakTime = uint32(atoi(delayStr));
+        int64 notSpeakTime = (int64) atoi(delayStr);
 
         // must have strong lesser security level
         if (handler->HasLowerSecurity (target, targetGuid, true))
             return false;
 
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_MUTE_TIME);
-
-        if (target)
+        // If the account is muted add time mute
+        int64 activemute = 0;
+        QueryResult mutresult = LoginDatabase.PQuery("SELECT mutetime FROM account WHERE id = %u", accountId);
+        if (mutresult)
         {
-            // Target is online, mute will be in effect right away.
-            int64 muteTime = time(NULL) + notSpeakTime * MINUTE;
-            target->GetSession()->m_muteTime = muteTime;
-            stmt->setInt64(0, muteTime);
-            ChatHandler(target).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notSpeakTime, muteReasonStr.c_str());
+            do
+            {
+                Field* fields = mutresult->Fetch();
+                activemute = fields[0].GetUInt64();
+            } while (mutresult->NextRow());
+        }
+        int64 muteTime;
+
+        // Target is online, mute will be in effect right away.
+        if (activemute > time(NULL) && notSpeakTime > 0)
+        {
+            if(notSpeakTime < 4294967295)
+            {
+                muteTime = notSpeakTime * MINUTE;
+                LoginDatabase.PQuery("UPDATE account SET mutetime = mutetime + %u WHERE id = %u", muteTime, accountId);
+                if (target)
+                    target->GetSession()->m_muteTime = target->GetSession()->m_muteTime + muteTime;
+            }
         }
         else
         {
-            // Target is offline, mute will be in effect starting from the next login.
-            int64 muteTime = -int64(notSpeakTime * MINUTE);
-            stmt->setInt64(0, muteTime);
+            if(notSpeakTime < 0)
+                muteTime = 4294967295;
+            else
+                muteTime = time(NULL) + notSpeakTime * MINUTE;
+            LoginDatabase.PQuery("UPDATE account SET mutetime = " UI64FMTD " WHERE id = %u", uint64(muteTime), accountId);
+            if (target)
+                target->GetSession()->m_muteTime = muteTime;
         }
 
-        stmt->setUInt32(1, accountId);
-        LoginDatabase.Execute(stmt);
-        std::string nameLink = handler->playerLink(targetName);
-
         handler->PSendSysMessage(target ? LANG_YOU_DISABLE_CHAT : LANG_COMMAND_DISABLE_CHAT_DELAYED, nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
+
+        LoginDatabase.PQuery("INSERT INTO account_muted VALUES (%u, UNIX_TIMESTAMP(), UNIX_TIMESTAMP() + %u, '%s', '%s', 1)", accountId, notSpeakTime*60, handler->GetSession()->GetPlayer()->GetName().c_str(), muteReasonStr.c_str());
 
         std::string announce;
 
@@ -1999,6 +2015,8 @@ public:
         stmt->setUInt32(1, accountId);
         LoginDatabase.Execute(stmt);
 
+        LoginDatabase.PQuery("UPDATE account_muted SET active = 0 WHERE id = %u AND active != 0", accountId);
+
         if (target)
             ChatHandler(target).PSendSysMessage(LANG_YOUR_CHAT_ENABLED);
 
@@ -2008,7 +2026,6 @@ public:
 
         return true;
     }
-
 
     static bool HandleMovegensCommand(ChatHandler* handler, char const* /*args*/)
     {
