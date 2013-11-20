@@ -383,12 +383,14 @@ public:
 
         if (*args)
         {
+            uint32 lowguid = 0;
             // number or [name] Shift-click form |color|Hcreature:creature_guid|h[name]|h|r
             char* cId = handler->extractKeyFromLink((char*)args, "Hcreature");
             if (!cId)
-                return false;
+                lowguid = (uint32) atoi((char*)args);
+            else
+                lowguid = atoi(cId);
 
-            uint32 lowguid = atoi(cId);
             if (!lowguid)
                 return false;
 
