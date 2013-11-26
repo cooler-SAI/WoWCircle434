@@ -2064,8 +2064,8 @@ void World::Update(uint32 diff)
     if (m_gameTime > m_NextRandomBGReset)
         ResetRandomBG();
 
-    //if (m_gameTime > m_NextCurrencyReset)
-    //    ResetCurrencyWeekCap();
+    if (m_gameTime > m_NextCurrencyReset)
+        ResetCurrencyWeekCap();
 
     if (m_gameTime > m_NextServerRestart)
         AutoRestartServer();
@@ -2972,9 +2972,7 @@ void World::ResetDailyQuests()
 
 void World::ResetCurrencyWeekCap()
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CURRENCY_RESET_WEEK_CAP);
-    stmt->setUInt32(0, 0);
-    CharacterDatabase.Execute(stmt);
+    CharacterDatabase.Execute("UPDATE character_currency SET week_count = 0;");
 
     sCurrencyMgr->ResetCurrencyCapToAllPlayers();
     m_NextCurrencyReset = time_t(m_NextCurrencyReset + DAY * getIntConfig(CONFIG_CURRENCY_RESET_INTERVAL));
