@@ -105,6 +105,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
         case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
         case ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS:
         case ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL:
+        case ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA:
             break;
         default:
             if (dataType != ACHIEVEMENT_CRITERIA_DATA_TYPE_SCRIPT)
@@ -181,6 +182,14 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
             }
             return true;
         }
+        case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA:
+            if (!GetAreaEntryByAreaID(area.id))
+            {
+                sLog->outError(LOG_FILTER_SQL, "Table `achievement_criteria_data` (Entry: %u Type: %u) for data type ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA (%u) has wrong area id in value1 (%u), ignored.",
+                    criteria->ID, criteria->type, dataType, area.id);
+                return false;
+            }
+            return true;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_LEVEL:
             if (level.minlevel > STRONG_MAX_LEVEL)
             {
@@ -305,6 +314,8 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
             return !target->HealthAbovePct(health.percent);
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AURA:
             return source->HasAuraEffect(aura.spell_id, aura.effect_idx);
+        case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA:
+            return area.id == source->GetZoneId() || area.id == source->GetAreaId();
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_AURA:
             return target && target->HasAuraEffect(aura.spell_id, aura.effect_idx);
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_VALUE:
@@ -2597,6 +2608,11 @@ bool AchievementMgr<T>::RequirementsSatisfied(AchievementCriteriaEntry const *ac
             if (!worldOverlayEntry)
                 break;
 
+                // those requirements couldn't be found in the dbc
+            if(AchievementCriteriaDataSet const* data = sAchievementMgr->GetCriteriaDataSet(achievementCriteria))
+                if (data->Meets(referencePlayer, unit))
+                    return true;
+
             bool matchFound = false;
             for (int j = 0; j < MAX_WORLD_MAP_OVERLAY_AREA_IDX; ++j)
             {
@@ -3049,6 +3065,11 @@ bool AchievementMgr<T>::AdditionalRequirementsSatisfied(AchievementCriteriaEntry
             }
             case ACHIEVEMENT_CRITERIA_ADDITIONAL_CONDITION_SOURCE_AREA_OR_ZONE: // 17
             {
+             // those requirements couldn't be found in the dbc
+             if(AchievementCriteriaDataSet const* data = sAchievementMgr->GetCriteriaDataSet(criteria))
+                 if (data->Meets(referencePlayer, unit))
+                     return true;
+
                 if (!referencePlayer)
                     return false;
 
