@@ -15,6 +15,7 @@ set(scripts_STAT_SRCS
   Custom/multi_vendor.cpp
   Custom/custom_reward.cpp
   Custom/perenos_charov.cpp
+  Custom/midsummer_fire_festival.cpp
 )
 
 message("  -> Prepared: Custom")

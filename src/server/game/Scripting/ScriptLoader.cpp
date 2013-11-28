@@ -24,6 +24,7 @@ void AddSC_multi_vendor();
 void AddSC_custom_reward();
 void AddSC_command_arena();
 void AddSC_teleguy();
+void AddSC_midsummer_fire_festival();
 
 // spells
 void AddSC_deathknight_spell_scripts();
@@ -1552,5 +1553,6 @@ void AddCustomScripts()
     AddSC_custom_reward();
     AddSC_command_arena();
     AddSC_teleguy();
+    AddSC_midsummer_fire_festival();
 #endif
 }
