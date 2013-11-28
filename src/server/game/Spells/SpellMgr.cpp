@@ -7523,6 +7523,36 @@ void SpellMgr::LoadDbcDataCorrections()
             case 96766: // Quest Bang
                 spellInfo->AttributesEx3 &= ~SPELL_ATTR3_DEATH_PERSISTENT;
                 break;
+            case 61784: // Feast On Turkey
+                spellInfo->Effects[0].Effect = SPELL_EFFECT_TRIGGER_SPELL;
+                spellInfo->Effects[0].TriggerSpell = 61842;
+                spellInfo->ProcChance = 100;
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_MASTER;
+                break;
+            case 61786: // Feast On Sweet Potatoes
+                spellInfo->Effects[0].Effect = SPELL_EFFECT_TRIGGER_SPELL;
+                spellInfo->Effects[0].TriggerSpell = 61844;
+                spellInfo->ProcChance = 100;
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_MASTER;
+                break;
+            case 61788: // Feast On Stuffing
+                spellInfo->Effects[0].Effect = SPELL_EFFECT_TRIGGER_SPELL;
+                spellInfo->Effects[0].TriggerSpell = 61843;
+                spellInfo->ProcChance = 100;
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_MASTER;
+                break;
+            case 61787: // Feast On Pie
+                spellInfo->Effects[0].Effect = SPELL_EFFECT_TRIGGER_SPELL;
+                spellInfo->Effects[0].TriggerSpell = 61845;
+                spellInfo->ProcChance = 100;
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_MASTER;
+                break;
+            case 61785: // Feast On Cranberries
+                spellInfo->Effects[0].Effect = SPELL_EFFECT_TRIGGER_SPELL;
+                spellInfo->Effects[0].TriggerSpell = 61841;
+                spellInfo->ProcChance = 100;
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_MASTER;
+                break;
             default:
                 break;
         }
