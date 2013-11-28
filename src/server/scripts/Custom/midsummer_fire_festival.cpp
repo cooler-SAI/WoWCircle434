@@ -476,6 +476,17 @@ class spell_achiev_snow : public SpellScriptLoader
         }
 };
 
+class achievement_check_true : public AchievementCriteriaScript
+{
+    public:
+        achievement_check_true() : AchievementCriteriaScript("achievement_check_true") { }
+
+        bool OnCheck(Player* /*source*/, Unit* /*target*/)
+        {
+            return true;
+        }
+};
+
 void AddSC_midsummer_fire_festival()
 {
     new boss_ahune;
@@ -490,4 +501,5 @@ void AddSC_midsummer_fire_festival()
     new spell_turkey_tracker();
     new spell_pass_the_turkey();
     new spell_achiev_snow();
+    new achievement_check_true();
 }
