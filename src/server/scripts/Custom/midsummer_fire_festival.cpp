@@ -22,14 +22,11 @@ class spell_fire_dancing : public SpellScriptLoader
 
             void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-                Unit* caster = GetCaster();
-                // caster may be not avalible (logged out for example)
-                if (!caster)
-                    return;
-
-                if (GameObject* Cage = caster->FindNearestGameObject(GO_RIBBON_POLE, 10))
-                     if (AchievementEntry const *AchievWC = sAchievementStore.LookupEntry(ACHIEVEMENT_FIRE_DANCING))
-                        caster->ToPlayer()->CompletedAchievement(AchievWC);
+                if (Unit* caster = GetCaster())
+                    if(Player* player = caster->ToPlayer())
+                        if (GameObject* Cage = caster->FindNearestGameObject(GO_RIBBON_POLE, 10))
+                            if (AchievementEntry const *AchievWC = sAchievementStore.LookupEntry(ACHIEVEMENT_FIRE_DANCING))
+                                player->CompletedAchievement(AchievWC);
             }
 
             // function registering
@@ -58,12 +55,11 @@ class spell_torches_caught : public SpellScriptLoader
 
             void OnStackChange(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-                Unit* caster = GetCaster();
-                // caster may be not avalible (logged out for example)
-                if (caster)
+                if (Unit* caster = GetCaster())
                     if(GetStackAmount() >= 39)
-                        if (AchievementEntry const *Achiev = sAchievementStore.LookupEntry(ACHIEVEMENT_TORCH_JUGGLER))
-                            caster->ToPlayer()->CompletedAchievement(Achiev);
+                        if(Player* player = caster->ToPlayer())
+                            if (AchievementEntry const *Achiev = sAchievementStore.LookupEntry(ACHIEVEMENT_TORCH_JUGGLER))
+                                player->CompletedAchievement(Achiev);
             }
 
             // function registering
@@ -95,9 +91,9 @@ class spell_throw_torch : public SpellScriptLoader
                 PreventHitDefaultEffect(EFFECT_0);
 
                 Unit* caster = GetCaster();
-                Unit* target = caster->ToPlayer()->GetSelectedUnit();
-                if(!caster)
+                if(!caster || !caster->ToPlayer())
                     return;
+                Unit* target = caster->ToPlayer()->GetSelectedUnit();
                 if(target && target->GetTypeId() == TYPEID_PLAYER && target != caster)
                 {
                     caster->CastSpell(caster, SPELL_TORCHES_CAUGHT, true);
@@ -145,13 +141,9 @@ class spell_throw_torch2 : public SpellScriptLoader
             {
                 PreventHitDefaultEffect(EFFECT_0);
 
-                Unit* caster = GetCaster();
-                if(!caster)
-                    return;
-                Unit* target = caster->getVictim();
-                // caster may be not avalible (logged out for example)
-                if(target)
-                    caster->CastSpell(target, 45669, true);
+                if(Unit* caster = GetCaster())
+                    if(Unit* target = caster->getVictim())
+                        caster->CastSpell(target, 45669, true);
             }
 
             void Register()
@@ -375,12 +367,11 @@ class spell_turkey_tracker : public SpellScriptLoader
 
             void OnStackChange(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-                Unit* caster = GetCaster();
-                // caster may be not avalible (logged out for example)
-                if (caster)
+                if (Unit* caster = GetCaster())
                     if(GetStackAmount() >= 39)
-                        if (AchievementEntry const *Achiev = sAchievementStore.LookupEntry(3578))
-                            caster->ToPlayer()->CompletedAchievement(Achiev);
+                        if(Player* player = caster->ToPlayer())
+                            if (AchievementEntry const *Achiev = sAchievementStore.LookupEntry(3578))
+                                player->CompletedAchievement(Achiev);
             }
 
             // function registering
@@ -410,18 +401,10 @@ class spell_pass_the_turkey : public SpellScriptLoader
             {
                 PreventHitDefaultEffect(EFFECT_0);
 
-                Player* pPlayer;
-                Unit* caster = GetCaster();
-                if(!caster)
-                    return;
-                if(caster->GetTypeId() == TYPEID_PLAYER)
-                    pPlayer = caster->ToPlayer();
-                else if (caster->GetCharmerOrOwner())
-                    pPlayer = caster->GetCharmerOrOwner()->ToPlayer();
-
-                if(pPlayer)
-                    if (AchievementEntry const *Achiev = sAchievementStore.LookupEntry(3579))
-                        pPlayer->CompletedAchievement(Achiev);
+                if(Unit* caster = GetCaster())
+                    if (Player* player = caster->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        if (AchievementEntry const *Achiev = sAchievementStore.LookupEntry(3579))
+                            player->CompletedAchievement(Achiev);
             }
 
             void Register()
