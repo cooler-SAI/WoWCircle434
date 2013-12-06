@@ -554,6 +554,10 @@ struct SmartAction
         struct
         {
             uint32 quest;
+            uint32 prequest;
+            uint32 check;
+            uint32 queststate;
+            uint32 prequeststate;
         } quest;
 
         struct
@@ -1017,7 +1021,8 @@ enum SMARTAI_TARGETS
     SMART_TARGET_HOSTILE_RANDOM_PLAYER          = 125,   // Just any random target on our threat list player
     SMART_TARGET_HOSTILE_RANDOM_NOT_TOP_PLAYER  = 126,   // Any random target except top threat player
     SMART_TARGET_HOSTILE_RANDOM_AURA            = 127,   // Any random target except top threat player
-    SMART_TARGET_END                            = 128
+    SMART_TARGET_RANDOM_POSITION                = 128,   // Any random position
+    SMART_TARGET_END                            = 129
 };
 
 struct SmartTarget
@@ -1112,6 +1117,11 @@ struct SmartTarget
             uint32 dist;
             uint32 param3;
         } spell;
+
+        struct
+        {
+            uint32 range;
+        } randomPos;
     };
 };
 
