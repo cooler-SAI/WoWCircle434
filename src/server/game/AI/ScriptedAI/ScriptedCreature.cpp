@@ -1,9 +1,9 @@
 /* Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
- *
- * Thanks to the original authors: ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
- *
- * This program is free software licensed under GPL version 2
- * Please see the included DOCS/LICENSE.TXT for more information */
+*
+* Thanks to the original authors: ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+*
+* This program is free software licensed under GPL version 2
+* Please see the included DOCS/LICENSE.TXT for more information */
 
 
 #include "ScriptPCH.h"
@@ -418,35 +418,35 @@ bool ScriptedAI::EnterEvadeIfOutOfCombatArea(uint32 const diff)
 
     switch (me->GetEntry())
     {
-        case NPC_BLOOD_QUEEN:
-            if (z > 390.0f)
-                return false;
-            break;
-        case NPC_GARFROST:
-            if (me->GetDistance2d(688.93f, -197.52f) < 66.0f)
-                return false;
-            break;
-        case NPC_BROODLORD:                                         // broodlord (not move down stairs)
-            if (z > 448.60f)
-                return false;
-            break;
-        case NPC_VOID_REAVER:                                         // void reaver (calculate from center of room)
-            if (me->GetDistance2d(432.59f, 371.93f) < 105.0f)
-                return false;
-            break;
-        case NPC_JAN_ALAI:                                         // jan'alai (calculate by Z)
-            if (z > 12.0f)
-                return false;
-            break;
-        case NPC_SARTHARION:                                         // sartharion (calculate box)
-            if (x > 3218.86f && x < 3275.69f && y < 572.40f && y > 484.68f)
-                return false;
-            break;
-        default: // For most of creatures that certain area is their home area.
-            sLog->outInfo(LOG_FILTER_GENERAL, "TSCR: EnterEvadeIfOutOfCombatArea used for creature entry %u, but does not have any definition. Using the default one.", me->GetEntry());
-            uint32 homeAreaId = me->GetMap()->GetAreaId(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY(), me->GetHomePosition().GetPositionZ());
-            if (me->GetAreaId() == homeAreaId)
-                return false;
+    case NPC_BLOOD_QUEEN:
+        if (z > 390.0f)
+            return false;
+        break;
+    case NPC_GARFROST:
+        if (me->GetDistance2d(688.93f, -197.52f) < 66.0f)
+            return false;
+        break;
+    case NPC_BROODLORD:                                         // broodlord (not move down stairs)
+        if (z > 448.60f)
+            return false;
+        break;
+    case NPC_VOID_REAVER:                                         // void reaver (calculate from center of room)
+        if (me->GetDistance2d(432.59f, 371.93f) < 105.0f)
+            return false;
+        break;
+    case NPC_JAN_ALAI:                                         // jan'alai (calculate by Z)
+        if (z > 12.0f)
+            return false;
+        break;
+    case NPC_SARTHARION:                                         // sartharion (calculate box)
+        if (x > 3218.86f && x < 3275.69f && y < 572.40f && y > 484.68f)
+            return false;
+        break;
+    default: // For most of creatures that certain area is their home area.
+        sLog->outInfo(LOG_FILTER_GENERAL, "TSCR: EnterEvadeIfOutOfCombatArea used for creature entry %u, but does not have any definition. Using the default one.", me->GetEntry());
+        uint32 homeAreaId = me->GetMap()->GetAreaId(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY(), me->GetHomePosition().GetPositionZ());
+        if (me->GetAreaId() == homeAreaId)
+            return false;
     }
 
     EnterEvadeMode();
@@ -532,40 +532,40 @@ bool BossAI::CheckBoundary(Unit* who)
     {
         switch (itr->first)
         {
-            case BOUNDARY_N:
-                if (me->GetPositionX() > itr->second)
-                    return false;
-                break;
-            case BOUNDARY_S:
-                if (me->GetPositionX() < itr->second)
-                    return false;
-                break;
-            case BOUNDARY_E:
-                if (me->GetPositionY() < itr->second)
-                    return false;
-                break;
-            case BOUNDARY_W:
-                if (me->GetPositionY() > itr->second)
-                    return false;
-                break;
-            case BOUNDARY_NW:
-                if (me->GetPositionX() + me->GetPositionY() > itr->second)
-                    return false;
-                break;
-            case BOUNDARY_SE:
-                if (me->GetPositionX() + me->GetPositionY() < itr->second)
-                    return false;
-                break;
-            case BOUNDARY_NE:
-                if (me->GetPositionX() - me->GetPositionY() > itr->second)
-                    return false;
-                break;
-            case BOUNDARY_SW:
-                if (me->GetPositionX() - me->GetPositionY() < itr->second)
-                    return false;
-                break;
-            default:
-                break;
+        case BOUNDARY_N:
+            if (me->GetPositionX() > itr->second)
+                return false;
+            break;
+        case BOUNDARY_S:
+            if (me->GetPositionX() < itr->second)
+                return false;
+            break;
+        case BOUNDARY_E:
+            if (me->GetPositionY() < itr->second)
+                return false;
+            break;
+        case BOUNDARY_W:
+            if (me->GetPositionY() > itr->second)
+                return false;
+            break;
+        case BOUNDARY_NW:
+            if (me->GetPositionX() + me->GetPositionY() > itr->second)
+                return false;
+            break;
+        case BOUNDARY_SE:
+            if (me->GetPositionX() + me->GetPositionY() < itr->second)
+                return false;
+            break;
+        case BOUNDARY_NE:
+            if (me->GetPositionX() - me->GetPositionY() > itr->second)
+                return false;
+            break;
+        case BOUNDARY_SW:
+            if (me->GetPositionX() - me->GetPositionY() < itr->second)
+                return false;
+            break;
+        default:
+            break;
         }
     }
 
