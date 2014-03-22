@@ -42,6 +42,7 @@ public:
             { "invite",         SEC_GAMEMASTER,     true,  &HandleGuildInviteCommand,           "", NULL },
             { "uninvite",       SEC_GAMEMASTER,     true,  &HandleGuildUninviteCommand,         "", NULL },
             { "rank",           SEC_GAMEMASTER,     true,  &HandleGuildRankCommand,             "", NULL },
+            { "xp",             SEC_ADMINISTRATOR,  true,  &HandleGuildXPCommand,               "", NULL },
             { NULL,             0,                  false, NULL,                                "", NULL }
         };
         static ChatCommand commandTable[] =
@@ -190,6 +191,31 @@ public:
 
         uint8 newRank = uint8(atoi(rankStr));
         return targetGuild->ChangeMemberRank(targetGuid, newRank);
+    }
+
+    static bool HandleGuildXPCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* cval = strtok((char*)args, " ");
+
+        if (!cval)
+            return false;
+
+        uint32 xp = (uint32)atoi(cval);
+
+        Player* pPlayer = handler->GetSession()->GetPlayer();
+        if (!pPlayer)
+            return false;
+
+        Guild* pGuild = sGuildMgr->GetGuildById(pPlayer->GetGuildId());
+        if (!pGuild)
+            return false;
+
+        pGuild->GiveXP(xp, pPlayer);
+
+        return true;
     }
 };
 
