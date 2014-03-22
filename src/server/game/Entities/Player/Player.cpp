@@ -20266,7 +20266,10 @@ void Player::RestoreSpellMods(Spell* spell, uint32 ownerAuraId, Aura* aura)
 
             // Do not set more spellmods than avalible
             if (mod->ownerAura->GetCharges() < mod->charges)
+            {
                 mod->charges = mod->ownerAura->GetCharges();
+                mod->ownerAura->SetModCharges(mod->charges);
+            }
 
             // Skip this check for now - aura charges may change due to various reason
             // TODO: trac these changes correctly
