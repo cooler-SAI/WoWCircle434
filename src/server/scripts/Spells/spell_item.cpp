@@ -1578,6 +1578,7 @@ enum NitroBoots
 {
     SPELL_NITRO_BOOTS_SUCCESS       = 54861,
     SPELL_NITRO_BOOTS_BACKFIRE      = 46014,
+    SPELL_ROCKET_FUEL_LEAK          = 94794,
 };
 
 class spell_item_nitro_boots : public SpellScriptLoader
@@ -1606,7 +1607,15 @@ class spell_item_nitro_boots : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /* effIndex */)
             {
                 Unit* caster = GetCaster();
-                uint32 spellId = roll_chance_i(95) ? SPELL_NITRO_BOOTS_SUCCESS : SPELL_NITRO_BOOTS_BACKFIRE;
+                
+                uint32 spellId = SPELL_NITRO_BOOTS_SUCCESS;
+                
+                uint32 roll =  urand(0, 100);
+                if (roll > 95)
+                    spellId = SPELL_ROCKET_FUEL_LEAK;
+                else if (roll > 90)
+                    spellId = SPELL_NITRO_BOOTS_BACKFIRE;
+
                 if (!caster->GetMap()->IsOutdoors(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ()))
                     spellId = SPELL_NITRO_BOOTS_SUCCESS;
 

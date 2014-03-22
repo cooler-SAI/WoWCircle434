@@ -107,29 +107,38 @@ class spell_hun_masters_call : public SpellScriptLoader
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
                 if (Unit* ally = GetHitUnit())
+                {
                     if (Player* caster = GetCaster()->ToPlayer())
                         if (Pet* target = caster->GetPet())
                         {
                             TriggerCastFlags castMask = TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_CASTER_AURASTATE);
+                            target->CastSpell(target, HUNTER_SPELL_MASTERS_CALL_TRIGGERED, castMask);
                             target->CastSpell(ally, GetEffectValue(), castMask);
-                            target->CastSpell(ally, GetSpellInfo()->Effects[EFFECT_0].CalcValue(), castMask);
                         }
+                }
             }
 
-            void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+            SpellCastResult CheckCast()
             {
-                if (Unit* target = GetHitUnit())
+                if (Player* caster = GetCaster()->ToPlayer())
                 {
-                    // Cannot be processed while pet is dead
-                    TriggerCastFlags castMask = TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_CASTER_AURASTATE);
-                    target->CastSpell(target, HUNTER_SPELL_MASTERS_CALL_TRIGGERED, castMask);
+                    Pet* pet = caster->GetPet();
+                    if (!pet)
+                        return SPELL_FAILED_NO_PET;
+
+                    if (pet->isDead())
+                    {
+                        SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_PET_IS_DEAD);
+                        return SPELL_FAILED_CUSTOM_ERROR;
+                    }
                 }
+                return SPELL_CAST_OK;
             }
 
             void Register()
             {
                 OnEffectHitTarget += SpellEffectFn(spell_hun_masters_call_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-                OnEffectHitTarget += SpellEffectFn(spell_hun_masters_call_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+                OnCheckCast += SpellCheckCastFn(spell_hun_masters_call_SpellScript::CheckCast);
             }
         };
 

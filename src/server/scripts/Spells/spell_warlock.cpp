@@ -50,6 +50,7 @@ enum WarlockSpells
     WARLOCK_HEALTHSTONE_CREATE              = 34130,
     WARLOCK_HEALTHSTONE_HEAL                = 6262,
     WARLOCK_DARK_INTENT_EFFECT              = 85767,
+    WARLOCK_DARK_INTENT_EFFECT_2            = 85768
 };
 
 /// Updated 4.3.4
@@ -495,7 +496,7 @@ class spell_warl_haunt : public SpellScriptLoader
 
             void Register()
             {
-                OnHit += SpellHitFn(spell_warl_haunt_SpellScript::HandleOnHit);
+                AfterHit += SpellHitFn(spell_warl_haunt_SpellScript::HandleOnHit);
             }
         };
 
@@ -608,7 +609,7 @@ public:
             if(!caster || !target)
                 return;
 
-            caster->CastSpell(target, WARLOCK_DARK_INTENT_EFFECT, true);
+            caster->CastSpell(target, WARLOCK_DARK_INTENT_EFFECT_2, true);
             target->CastSpell(caster, WARLOCK_DARK_INTENT_EFFECT, true);        
         }
 
