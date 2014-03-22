@@ -125,6 +125,9 @@ class InstanceScript : public ZoneScript
         //This is to prevent players from entering during boss encounters.
         virtual bool IsEncounterInProgress() const;
 
+        //Called when a player begins to enter the instance.
+        virtual void BeforePlayerEnter(Player* /*player*/) {}
+
         //Called when a player successfully enters the instance.
         virtual void OnPlayerEnter(Player* /*player*/) {}
 
