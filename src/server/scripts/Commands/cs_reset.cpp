@@ -41,6 +41,7 @@ public:
             { "spells",         SEC_ADMINISTRATOR,  true,  &HandleResetSpellsCommand,           "", NULL },
             { "stats",          SEC_ADMINISTRATOR,  true,  &HandleResetStatsCommand,            "", NULL },
             { "talents",        SEC_ADMINISTRATOR,  true,  &HandleResetTalentsCommand,          "", NULL },
+            { "diminishings",   SEC_ADMINISTRATOR,  true,  &HandleResetDiminishingsCommand,     "", NULL },
             { "all",            SEC_ADMINISTRATOR,  true,  &HandleResetAllCommand,              "", NULL },
             { NULL,             0,                  false, NULL,                                "", NULL }
         };
@@ -258,6 +259,13 @@ public:
         handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
         handler->SetSentErrorMessage(true);
         return false;
+    }
+
+    static bool HandleResetDiminishingsCommand(ChatHandler* handler, char const* args)
+    {
+        Unit * target = handler->getSelectedUnit();
+        target->ClearDiminishings();
+        return true;
     }
 
     static bool HandleResetAllCommand(ChatHandler* handler, char const* args)
