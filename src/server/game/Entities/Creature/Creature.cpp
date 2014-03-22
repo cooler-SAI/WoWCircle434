@@ -1627,6 +1627,9 @@ float Creature::GetAttackDistance(Unit const* player) const
 
 void Creature::setDeathState(DeathState s)
 {
+    if (s != ALIVE && s != JUST_RESPAWNED)
+        SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+
     Unit::setDeathState(s);
 
     if (s == JUST_DIED)
