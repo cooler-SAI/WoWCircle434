@@ -462,6 +462,17 @@ void InstanceScript::DoNearTeleportPlayers(const Position pos, bool casting /*=f
                 pPlayer->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), casting);
 }
 
+void InstanceScript::DoStartMovie(uint32 movieId)
+{
+    Map::PlayerList const &plrList = instance->GetPlayers();
+
+    if (!plrList.isEmpty())
+        for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
+            if (Player* pPlayer = i->getSource())
+                pPlayer->SendMovieStart(movieId);
+
+}
+
 void InstanceScript::DoKilledMonsterKredit(uint32 questId, uint32 entry, uint64 guid/* =0*/)
 {
     Map::PlayerList const &plrList = instance->GetPlayers();

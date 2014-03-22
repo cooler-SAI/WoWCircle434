@@ -184,6 +184,8 @@ class InstanceScript : public ZoneScript
 
         void DoNearTeleportPlayers(const Position pos, bool casting = false);
 
+        void DoStartMovie(uint32 movieId);
+
         void DoKilledMonsterKredit(uint32 questId, uint32 entry, uint64 guid = 0);
 
         // Return wether server allow two side groups or not
