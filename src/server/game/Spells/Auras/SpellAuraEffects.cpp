@@ -995,6 +995,20 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             }
             break;
         }
+        case SPELL_AURA_MOD_BLOCK_CRIT_CHANCE:
+        {
+            // Shield Block
+            if (GetId() == 2565)
+            {
+                if (Unit* pTarget = GetBase()->GetUnitOwner())
+                {
+                    float block_chance = pTarget->GetUnitBlockChance();
+                    if (block_chance > 75.0f) // 75 + 25 from effect_0
+                        amount = int32(block_chance - 75.0f);
+                }
+            }
+            break;
+        }
 
         default:
             break;
