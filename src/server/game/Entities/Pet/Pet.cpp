@@ -1138,6 +1138,11 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 0.75f * m_owner->GetFloatValue(UNIT_FIELD_MAXDAMAGE));
                     break;
                 }
+                case 53491: // Fiery Imp
+                {
+                    LearnPetScalingAuras();
+                    break;
+                }
             }
             break;
         }
