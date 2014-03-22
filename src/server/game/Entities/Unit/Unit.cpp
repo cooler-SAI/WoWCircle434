@@ -2575,6 +2575,9 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
     if (spell->HasEffect(SPELL_EFFECT_ATTACK_ME))
         return SPELL_MISS_NONE;
 
+    // Taunt-like spells can't miss since 4.0.1
+    if (spell->HasEffect(SPELL_EFFECT_ATTACK_ME))
+        return SPELL_MISS_NONE;
     Unit * checker = (isTotem() && GetOwner()) ? GetOwner() : this;
     switch (spell->DmgClass)
     {
