@@ -1191,7 +1191,8 @@ bool Item::CanBeTransmogrified() const
         return false;
 
     if (!HasStats() && !HasSpells() && (proto->Quality < ITEM_QUALITY_RARE))
-        return false;
+        if (proto->ItemId != 78340) // Cloak of the Darkmoon Faire
+            return false;
 
     return true;
 }
