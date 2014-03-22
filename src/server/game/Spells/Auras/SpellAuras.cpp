@@ -1045,8 +1045,14 @@ void Aura::UnregisterSingleTarget()
     // TODO: find a better way to do this.
     if (!caster)
         caster = ObjectAccessor::GetObjectInOrOutOfWorld(GetCasterGUID(), (Unit*)NULL);
-    ASSERT(caster);
-    caster->GetSingleCastAuras().remove(this);
+    if (caster)
+    {
+        //caster->GetSingleCastAuras().remove(this);
+        for (AuraIdList::iterator itr = caster->GetSingleCastAuras().begin(); itr != caster->GetSingleCastAuras().end(); ++itr)
+            if ((*itr).id == GetId())
+                itr = caster->GetSingleCastAuras().erase(itr);
+    }
+
     SetIsSingleTarget(false);
 }
 
