@@ -541,7 +541,7 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
     data << uint8(20);
 
     uint8 num = 0;
-
+    uint32 slotmask = 0;
     if (result)
     {
         do
@@ -553,12 +553,20 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
             data << uint32(fields[3].GetUInt32());          // creature entry
             data << uint32(fields[4].GetUInt16());          // level
             data << fields[5].GetString();                  // name
-            data << uint8(fields[1].GetUInt8() < uint8(PET_SLOT_STABLE_FIRST)? 1: 2);                               // 1 = current, 2/3 = in stable (any from 4, 5, ... create problems with proper show)
+            uint8 slot = fields[1].GetUInt8();
+            if (slot < uint8(PET_SLOT_STABLE_FIRST))
+                slotmask |= (1 << slot);
+
+            data << uint8(slot < uint8(PET_SLOT_STABLE_FIRST)? 1: 2); // 1 = current, 2/3 = in stable (any from 4, 5, ... create problems with proper show)
+            
+
 
             ++num;
         }
         while (result->NextRow());
     }
+
+    GetPlayer()->m_petSlotUsed = slotmask;
 
     data.put<uint8>(wpos, num);                             // set real data to placeholder
 
