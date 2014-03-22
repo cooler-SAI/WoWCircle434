@@ -2369,6 +2369,11 @@ bool WorldObject::CanDetectInvisibilityOf(WorldObject const* obj) const
     if (this->ToUnit() && this->ToUnit()->HasAuraType(SPELL_AURA_335) && !obj->m_invisibility.GetFlags())
         return true;
 
+    if (obj->ToUnit())
+    {
+        if (((Unit*)obj)->HasAuraTypeWithCaster(SPELL_AURA_MOD_STALKED, GetGUID()))
+            return true;
+    }
     // Check for not detected types
     if (mask != obj->m_invisibility.GetFlags())
         return false;
@@ -2377,8 +2382,10 @@ bool WorldObject::CanDetectInvisibilityOf(WorldObject const* obj) const
     // (it's at least true for spell: 66)
     // It seems like that only Units are affected by this check (couldn't see arena doors with preparation invisibility)
     if (obj->ToUnit())
+    {
         if ((m_invisibility.GetFlags() & obj->m_invisibilityDetect.GetFlags()) != m_invisibility.GetFlags())
             return false;
+    }
 
     for (uint32 i = 0; i < TOTAL_INVISIBILITY_TYPES; ++i)
     {
