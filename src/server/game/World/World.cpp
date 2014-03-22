@@ -125,6 +125,9 @@ World::World()
     m_isClosed = false;
 
     m_CleaningFlags = 0;
+
+    m_monsterSayDebugTimer = getMSTime();
+    m_monsterSayDebugCounter = 0;
 }
 
 /// World destructor

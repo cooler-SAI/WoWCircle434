@@ -2549,7 +2549,7 @@ namespace Trinity
     };
 }                                                           // namespace Trinity
 
-void WorldObject::MonsterSay(const char* text, uint32 language, uint64 TargetGuid)
+void WorldObject::MonsterSay(const char* text, uint32 language, uint64 TargetGuid) const
 {
     CellCoord p = Trinity::ComputeCellCoord(GetPositionX(), GetPositionY());
 
@@ -2563,7 +2563,7 @@ void WorldObject::MonsterSay(const char* text, uint32 language, uint64 TargetGui
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
 }
 
-void WorldObject::DebugMonsterSay(const char* msg, ...)
+void WorldObject::DebugMonsterSay(const char* msg, ...) const
 {
     va_list ap;
     char text[MAX_QUERY_LEN];
@@ -2572,7 +2572,50 @@ void WorldObject::DebugMonsterSay(const char* msg, ...)
     MonsterSay(text, 0, 0);
 }
 
-void WorldObject::MonsterSay(int32 textId, uint32 language, uint64 TargetGuid)
+void WorldObject::DebugMonsterSayTimer( const char* msg, ... ) const
+{
+    va_list ap;
+    char text[MAX_QUERY_LEN];
+    va_start(ap, msg);
+    vsnprintf(text, MAX_QUERY_LEN, msg, ap);
+    sprintf(text, "%s, %u", text, getMSTime());
+    MonsterSay(text, 0, 0);
+
+}
+
+void WorldObject::DebugMonsterSayTimerDelta( const char* msg, ... ) const
+{
+    va_list ap;
+    char text[MAX_QUERY_LEN];
+    va_start(ap, msg);
+    vsnprintf(text, MAX_QUERY_LEN, msg, ap);
+    sprintf(text, "%s, %u", text, sWorld->GetMonsterSayDebugTimerAndUpdate());
+    MonsterSay(text, 0, 0);
+
+}
+
+void WorldObject::DebugMonsterSayIncCounter(const char* msg, ...) const
+{
+    va_list ap;
+    char text[MAX_QUERY_LEN];
+    va_start(ap, msg);
+    vsnprintf(text, MAX_QUERY_LEN, msg, ap);
+    sprintf(text, "%s, counter %u", text, sWorld->IncMonsterSayDebugCounter());
+    MonsterSay(text, 0, 0);
+}
+
+void WorldObject::DebugMonsterSayResetCounter(const char* msg, ...) const
+{
+    sWorld->ResetMonsterSayDebugCounter();
+    va_list ap;
+    char text[MAX_QUERY_LEN];
+    va_start(ap, msg);
+    vsnprintf(text, MAX_QUERY_LEN, msg, ap);
+    sprintf(text, "%s, counter reseted", text);
+    MonsterSay(text, 0, 0);
+}
+
+void WorldObject::MonsterSay(int32 textId, uint32 language, uint64 TargetGuid) const
 {
     CellCoord p = Trinity::ComputeCellCoord(GetPositionX(), GetPositionY());
 

@@ -839,6 +839,10 @@ class World
 
         void UpdatePhaseDefinitions();
         void ResetCurrencyWeekCap();
+        uint32 GetMonsterSayDebugTimerAndUpdate() { uint32 currentTime = getMSTime(); uint32 delta = currentTime - m_monsterSayDebugTimer; m_monsterSayDebugTimer = currentTime; return delta; }
+        uint32 IncMonsterSayDebugCounter()          { return ++m_monsterSayDebugTimer; }
+        uint32 GetMonsterSayDebugCounter()          { return m_monsterSayDebugTimer; }
+        void ResetMonsterSayDebugCounter()          { m_monsterSayDebugTimer = 0; }
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
@@ -934,6 +938,9 @@ class World
 
         void ProcessQueryCallbacks();
         ACE_Future_Set<PreparedQueryResult> m_realmCharCallbacks;
+
+        uint32 m_monsterSayDebugTimer;
+        uint32 m_monsterSayDebugCounter;
 };
 
 extern uint32 realmID;
