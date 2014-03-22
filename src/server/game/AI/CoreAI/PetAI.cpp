@@ -552,6 +552,10 @@ bool PetAI::CanAttack(Unit* target)
     if (!target)
         return false;
 
+    // If pet disabled dont start attack (for example owner in mount)
+    if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED) && !me->HasUnitState(UNIT_STATE_STUNNED))
+        return false;
+
     if (!target->isAlive())
     {
         // Clear target to prevent getting stuck on dead targets
