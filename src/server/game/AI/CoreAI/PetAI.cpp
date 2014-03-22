@@ -270,9 +270,9 @@ void PetAI::UpdateAI(const uint32 diff)
     }
 
     // Update speed as needed to prevent dropping too far behind and despawning
-    me->UpdateSpeed(MOVE_RUN, true);
-    me->UpdateSpeed(MOVE_WALK, true);
-    me->UpdateSpeed(MOVE_FLIGHT, true);
+    //me->UpdateSpeed(MOVE_RUN, true);
+    //me->UpdateSpeed(MOVE_WALK, true);
+    //me->UpdateSpeed(MOVE_FLIGHT, true);
     
 }
 
@@ -345,6 +345,9 @@ void PetAI::AttackStart(Unit* target)
     // Check all pet states to decide if we can attack this target
     if (!CanAttack(target))
         return;
+
+    if (Unit* owner = me->GetCharmerOrOwner())
+        owner->RemoveAurasByType(SPELL_AURA_MOD_CAMOUFLAGE);
 
     if (Unit* owner = me->GetCharmerOrOwner())
         owner->RemoveAurasByType(SPELL_AURA_MOD_CAMOUFLAGE);
@@ -448,7 +451,7 @@ void PetAI::HandleReturnMovement()
     if (me->isCharmed())
         return;
 
-    if (me->GetCharmInfo()->HasCommandState(COMMAND_STAY))
+    if (me->GetCharmInfo()->HasCommandState(COMMAND_STAY) || me->GetCharmInfo()->HasCommandState(COMMAND_MOVE_TO))
     {
         if (!me->GetCharmInfo()->IsAtStay() && !me->GetCharmInfo()->IsReturning())
         {
@@ -580,6 +583,18 @@ bool PetAI::CanAttack(Unit* target)
     // Stay - can attack if target is within range or commanded to
     if (me->GetCharmInfo()->HasCommandState(COMMAND_STAY))
         return (me->IsWithinMeleeRange(target) || me->GetCharmInfo()->IsCommandAttack());
+
+    if (me->HasReactState(REACT_ASSIST))
+    {
+        Unit* ownerTarget = NULL;
+        if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
+            ownerTarget = owner->GetSelectedUnit();
+        else
+            ownerTarget = me->GetCharmerOrOwner()->getVictim();
+
+        if (target != ownerTarget)
+            return false;
+    }
 
     //  Pets attacking something (or chasing) should only switch targets if owner tells them to
     if (me->getVictim() && me->getVictim() != target)
