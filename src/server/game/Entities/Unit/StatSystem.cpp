@@ -719,7 +719,7 @@ void Player::ApplyHealthRegenBonus(int32 amount, bool apply)
 
 void Player::UpdateManaRegen()
 {
-    if (getPowerType() != POWER_MANA)
+    if (getPowerType() != POWER_MANA && !IsInFeralForm())
         return;
 
     // Mana regen from spirit
@@ -791,7 +791,6 @@ void Player::UpdateAllRunesRegen()
             float regen = float(1 * IN_MILLISECONDS) / float(cooldown);
             if (regen < 0.0099999998f)
             {
-                sLog->outError(LOG_FILTER_PLAYER, "Player %s has regen lesser than client value, setted as 0.01", GetName());
                 regen = 0.01f;
             }
             //ASSERT(regen > 0.0099999998f);
@@ -1008,32 +1007,14 @@ bool Guardian::UpdateStats(Stats stat)
         }
         case STAT_STAMINA:
         {
+            mod = 0.0f;
             if (IsPetGhoul() || IsPetGargoyle())
             {
-                mod = 0.45f;
-                
                 // Glyph of the Ghoul
                 if (AuraEffect const* aurEff = owner->GetAuraEffect(58686, 0))
                     mod += CalculatePct(1.0f, aurEff->GetAmount()); 
             }
-            else if (owner->getClass() == CLASS_WARLOCK && isPet())
-                mod = 0.75f;
-            else if (owner->getClass() == CLASS_MAGE && isPet())
-                mod = 0.75f;
-            else
-            {
-                mod = 0.45f;
 
-                if (isPet())
-                {
-                    switch(ToPet()->GetTalentType())
-                    {
-                        case PET_TALENT_TYPE_FEROCITY: mod = 0.67f; break;
-                        case PET_TALENT_TYPE_TENACITY: mod = 0.78f; break;
-                        case PET_TALENT_TYPE_CUNNING: mod = 0.725f; break;
-                    }
-                }
-            }
             ownersBonus = owner->GetStat(stat) * mod;
             ownersBonus *= GetModifierValue(UNIT_MOD_STAT_STAMINA, TOTAL_PCT);
             value += ownersBonus;
@@ -1136,24 +1117,30 @@ void Guardian::UpdateMaxHealth()
     UnitMods unitMod = UNIT_MOD_HEALTH;
     float stamina = GetStat(STAT_STAMINA) - GetCreateStat(STAT_STAMINA);
 
+    uint32 basehealth = 0;
+    if (Unit* owner = GetCharmerOrOwner())
+        basehealth = owner->GetMaxHealth();
+
     float multiplicator;
     switch (GetEntry())
     {
-        case ENTRY_IMP:                 multiplicator = 8.4f;   break;
-        case ENTRY_VOIDWALKER:          multiplicator = 11.0f;  break;
-        case ENTRY_SUCCUBUS:            multiplicator = 9.1f;   break;
-        case ENTRY_FELHUNTER:           multiplicator = 9.5f;   break;
-        case ENTRY_FELGUARD:            multiplicator = 11.0f;  break;
-        case ENTRY_BLOODWORM:           multiplicator = 1.0f;   break;
-        case ENTRY_GHOUL:               multiplicator = 15.0f;  break;
-        case ENTRY_GARGOYLE:            multiplicator = 15.0f;  break;
-        case ENTRY_WATER_ELEMENTAL:     multiplicator = 10.0f;  break;
-        default:                        multiplicator = 14.0f;  break;
+        case ENTRY_IMP:                 multiplicator = 0.30f;   break;
+        case ENTRY_VOIDWALKER:          multiplicator = 0.50f;  break;
+        case ENTRY_SUCCUBUS:            multiplicator = 0.45f;   break;
+        case ENTRY_FELHUNTER:           multiplicator = 0.70f; break;
+        case ENTRY_FELGUARD:            multiplicator = 0.75f;  break;
+        case ENTRY_BLOODWORM:           multiplicator = 0.10f;   break;
+        case ENTRY_GHOUL:               multiplicator = 0.75f;  break;
+        case ENTRY_GARGOYLE:            multiplicator = 0.75f;  break;
+        case ENTRY_WATER_ELEMENTAL:     multiplicator = 0.50f;  break;
+        default:                        multiplicator = 0.70f;  break;
     }
 
-    float value = GetModifierValue(unitMod, BASE_VALUE) + GetCreateHealth();
+    basehealth *= multiplicator;
+
+    float value = GetModifierValue(unitMod, BASE_VALUE) + basehealth;
     value *= GetModifierValue(unitMod, BASE_PCT);
-    value += GetModifierValue(unitMod, TOTAL_VALUE) + stamina * multiplicator;
+    value += GetModifierValue(unitMod, TOTAL_VALUE) + stamina * 10;
     value *= GetModifierValue(unitMod, TOTAL_PCT);
 
     // Glyph of Voidwalker
@@ -1345,10 +1332,8 @@ void Guardian::UpdateSpellHitChance()
             m_modSpellHitChance = (*i)->GetAmount();
         }
     }
-
-    // Some pets have not spellhit in scaling auras
-    // Water Elemental
-    if (GetEntry() == 510)
+    
+    if (GetEntry() == 510) // Water Elemental
         if (Player* pOwner = m_owner->ToPlayer())
             m_modSpellHitChance = pOwner->GetFloatValue(PLAYER_FIELD_UI_SPELL_HIT_MODIFIER) + pOwner->GetRatingBonusValue(CR_HIT_SPELL);
 }
