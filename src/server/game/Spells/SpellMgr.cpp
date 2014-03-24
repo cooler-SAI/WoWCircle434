@@ -6462,6 +6462,19 @@ void SpellMgr::LoadDbcDataCorrections()
             case 103541: // Safe
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
                 break;
+            case 103687: // Crush Armor
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 103785: // Black Blood of the Earth dmg
+            case 108570:
+            case 110288:
+            case 110287:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
+            case 109033: // Stomp (heroic)
+            case 109034:
+                spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+                break;
             // Yor'sahj The Unsleeping
             case 105420: // Color Combine 1
             case 105435: // Color Combine 2
@@ -6641,6 +6654,45 @@ void SpellMgr::LoadDbcDataCorrections()
             case 108041: // Artillery Barrage
             case 109213:
                 spellInfo->Effects[EFFECT_0].BasePoints = 0;
+                break;
+            // Spine of Deathwing
+            case 105490: // Fiery Grip
+            case 109457:
+            case 109458:
+            case 109459:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_0].TargetB = 0;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->Effects[EFFECT_1].TargetB = 0;
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            case 105241: // Absorb Blood
+                spellInfo->Effects[EFFECT_0].SetRadiusIndex(26); // 4 yards
+                break;
+            case 105479: // Searing Plasma
+            case 109362:
+            case 109363:
+            case 109364:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE;
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
+            case 105777: // Roll Control
+                spellInfo->SetDurationIndex(27); // 3 seconds
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                break;
+            case 105847: // Seal Armor Breach
+            case 105848:
+                spellInfo->InterruptFlags = 0;
+                break;
+            // Madness of Deathwing
+            case 106663: // Carrying Winds
+            case 106668:
+            case 106670:
+            case 106672:
+            case 106674:
+            case 106676:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
                 break;
             // ENDOF DRAGON SOUL SPELLS
             //

@@ -741,6 +741,8 @@ void AddSC_boss_warlord_zonozz();
 void AddSC_boss_hagara_the_stormbinder();
 void AddSC_boss_ultraxion();
 void AddSC_boss_warmaster_blackhorn();
+void AddSC_spine_of_deathwing();
+void AddSC_madness_of_deathwing();
 
 // battlegrounds
 
@@ -1511,6 +1513,8 @@ void AddNorthrendScripts()
     AddSC_boss_hagara_the_stormbinder();
     AddSC_boss_ultraxion();
     AddSC_boss_warmaster_blackhorn();
+    AddSC_spine_of_deathwing();
+    AddSC_madness_of_deathwing();
 
 #endif
 }

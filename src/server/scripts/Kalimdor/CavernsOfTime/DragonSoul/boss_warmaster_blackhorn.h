@@ -30,7 +30,6 @@ const Position enginePos[4] =
     {13397.6f, -12162.7f, 142.621f, 0.0f}
 };
 
-const Position skyfirePos = {13444.9f, -12133.3f, 151.21f, 0.0f};
 const Position blackhornPos = {13465.208008f, -12134.354492f, 151.18f, 3.07f};
 const Position sapperPos[2] = 
 {
