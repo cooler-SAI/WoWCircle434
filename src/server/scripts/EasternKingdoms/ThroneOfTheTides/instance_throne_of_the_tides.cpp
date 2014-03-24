@@ -52,7 +52,7 @@ public:
             memset(m_uiEvents, 0, sizeof(m_uiEvents));
         }
 
-        void OnPlayerEnter(Player* pPlayer)
+        void BeforePlayerEnter(Player* pPlayer)
         {
             if (!uiTeamInInstance)
             uiTeamInInstance = pPlayer->GetTeam();

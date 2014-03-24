@@ -3692,19 +3692,6 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
             unitTarget->RemoveAurasWithMechanic((1<<MECHANIC_SNARE) | (1<<MECHANIC_ROOT), AURA_REMOVE_BY_ENEMY_SPELL, 0, 1);
     }
 
-    // Mass Dispel Inivisiblity removal
-    if (m_spellInfo->Id == 32592)
-    {
-        DispelChargesList inv_dispel_list;
-        unitTarget->GetDispellableAuraList(m_caster, 1 << DISPEL_INVISIBILITY, inv_dispel_list);
-        // will not call scripted dispel hook
-        for (DispelChargesList::iterator itr = inv_dispel_list.begin(); itr != inv_dispel_list.end(); ++itr)
-        {
-            if (Aura * aur = itr->first)
-                aur->Remove(AURA_REMOVE_BY_ENEMY_SPELL);
-        }
-        
-    }
     DispelChargesList dispel_list;
     unitTarget->GetDispellableAuraList(m_caster, dispelMask, dispel_list);
     if (dispel_list.empty())
@@ -3715,8 +3702,7 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
     DispelChargesList success_list;
     WorldPacket dataFail(SMSG_DISPEL_FAILED, 8+8+4+4+damage*4);
     // dispel N = damage buffs (or while exist buffs for dispel)
-    int32 count;
-    for (count = 0; count < damage && !dispel_list.empty();)
+    for (int32 count = 0; count < damage && !dispel_list.empty();)
     {
         // Random select buff for dispel
         DispelChargesList::iterator itr = dispel_list.begin();
@@ -3778,7 +3764,7 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
             if (AuraEffect* aurEff = m_caster->GetAuraEffect(55677, 0))
                 if (m_caster->IsFriendlyTo(unitTarget))
                 {
-                    int32 bp = int32(unitTarget->CountPctFromMaxHealth(aurEff->GetAmount() * count));
+                    int32 bp = int32(unitTarget->CountPctFromMaxHealth(aurEff->GetAmount()));
                     m_caster->CastCustomSpell(unitTarget, 56131, &bp, 0, 0, true); 
                 }
 
@@ -5926,8 +5912,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     Unit::AuraEffectList const& aurasPereodic = unitTarget->GetAuraEffectsByType(SPELL_AURA_PERIODIC_DAMAGE);
                     for (Unit::AuraEffectList::const_iterator i = aurasPereodic.begin(); i !=  aurasPereodic.end(); ++i)
                     {
-                        if ((*i)->GetCasterGUID() != m_caster->GetGUID() || !(*i)->GetSpellInfo()->HasSchoolMask(SPELL_SCHOOL_MASK_FIRE) 
-                            || (*i)->GetId() == 11129)  // Combustion
+                        if ((*i)->GetCasterGUID() != m_caster->GetGUID() || !(*i)->GetSpellInfo()->HasSchoolMask(SPELL_SCHOOL_MASK_FIRE))
                             continue;
 
                         if (!(*i)->GetAmplitude())
@@ -6738,7 +6723,7 @@ void Spell::EffectResurrect(SpellEffIndex effIndex)
             pInstance->UpdateResurrectionsCount();
 
     uint32 health = target->CountPctFromMaxHealth(damage);
-    uint32 mana   = CalculatePct(target->GetMaxPower(POWER_MANA), m_spellInfo->Id == 20484 ? 20 : m_spellInfo->Effects[effIndex].BasePoints);
+    uint32 mana   = CalculatePct(target->GetMaxPower(POWER_MANA), damage);
 
     ExecuteLogEffectResurrect(effIndex, target);
 

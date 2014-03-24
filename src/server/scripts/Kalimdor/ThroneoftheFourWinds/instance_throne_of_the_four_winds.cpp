@@ -26,7 +26,7 @@ public:
             LoadDoorData(doordata);
         }
 
-        void OnPlayerEnter(Player* pPlayer)
+        void BeforePlayerEnter(Player* pPlayer)
         {
             if (!uiTeamInInstance)
                 uiTeamInInstance = pPlayer->GetTeam();

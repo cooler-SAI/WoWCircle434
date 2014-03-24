@@ -255,11 +255,14 @@ class instance_ulduar : public InstanceMapScript
                 packet << uint32(WORLD_STATE_ALGALON_DESPAWN_TIMER) << uint32(std::min<uint32>(_algalonTimer, 60));
             }
 
-            void OnPlayerEnter(Player* player)
+            void BeforePlayerEnter(Player* player)
             {
                 if (!TeamInInstance)
                     TeamInInstance = player->GetTeam();
+            }
 
+            void OnPlayerEnter(Player* player)
+            {
                 if (_summonAlgalon)
                 {
                     _summonAlgalon = false;
@@ -1043,8 +1046,8 @@ class instance_ulduar : public InstanceMapScript
                                             UpdateData data(plr->GetMapId());
                                             WorldPacket pkt;
                                             go->BuildValuesUpdateBlockForPlayer(&data, plr);
-                                            data.BuildPacket(&pkt);
-                                            plr->GetSession()->SendPacket(&pkt);
+                                            if (data.BuildPacket(&pkt))
+                                                plr->GetSession()->SendPacket(&pkt);
                                         }
                                     }
                                 }

@@ -936,9 +936,8 @@ void Spell::SelectImplicitChannelTargets(SpellEffIndex effIndex, SpellImplicitTa
 
     Spell* channeledSpell = m_originalCaster->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
     if (!channeledSpell)
-    {
         return;
-    }
+
     switch (targetType.GetTarget())
     {
         case TARGET_UNIT_CHANNEL_TARGET:
@@ -1147,6 +1146,7 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
             ASSERT(false && "Spell::SelectImplicitAreaTargets: received not implemented target reference type");
             return;
     }
+
     if (!referer)
         return;
 
@@ -1168,6 +1168,7 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
              ASSERT(false && "Spell::SelectImplicitAreaTargets: received not implemented target reference type");
              return;
     }
+
     std::list<WorldObject*> targets;
     float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster, NULL, GetSpellInfo()->IsPositive()) * m_spellValue->RadiusMod;
     SearchAreaTargets(targets, radius, center, referer, targetType.GetObjectType(), targetType.GetCheckType(), m_spellInfo->Effects[effIndex].ImplicitTargetConditions);
@@ -1413,11 +1414,6 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                 }
             }
         }
-
-        // todo: move to scripts, but we must call it before resize list by MaxAffectedTargets
-        // Intimidating Shout
-        if (m_spellInfo->Id == 5246 && effIndex != EFFECT_0)
-            unitTargets.remove(m_targets.GetUnitTarget());
 
         // Other special target selection goes here
         if (uint32 maxTargets = m_spellValue->MaxAffectedTargets)
@@ -2315,6 +2311,11 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /* 
                 m_delayMoment = 100LL;
             }
         }
+        if (m_spellInfo->Attributes & SPELL_ATTR0_ONLY_STEALTHED && target->GetTypeId() == TYPEID_UNIT)
+        {
+            targetInfo.timeDelay = 0LL;
+            m_delayMoment = 0LL;
+        }
         else if (m_spellInfo->Id == 24259) // Spell Lock - Silenced
         {
             targetInfo.timeDelay = 100LL;
@@ -2757,6 +2758,16 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
                 if (Player* p = m_originalCaster->GetCharmerOrOwnerPlayerOrPlayerItself())
                     p->CastedCreatureOrGO(spellHitTarget->GetEntry(), spellHitTarget->GetGUID(), m_spellInfo->Id);
         }
+
+        for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
+            if (Creature* summon = m_caster->GetSummon(i))
+                if (summon->IsAIEnabled)
+                    summon->AI()->OwnerSpellHit(spellHitTarget, m_spellInfo);
+
+        for (std::set<uint64>::iterator itr = m_caster->m_SummonNoSlot.begin(); itr != m_caster->m_SummonNoSlot.end(); ++itr)
+            if (Creature* summon = m_caster->GetMap()->GetCreature(*itr))
+                if (summon->IsAIEnabled)
+                    summon->AI()->OwnerSpellHit(spellHitTarget, m_spellInfo);
 
         for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
             if (Creature* summon = m_caster->GetSummon(i))
@@ -5108,14 +5119,12 @@ void Spell::TakeRunePower(bool didHit)
             runeCost[i] = int32(runeCost[i] * (1.0f + m_caster->GetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER + school)));
             if (runeCost[i] < 0)
                 runeCost[i] = 0;
-
-            if (runeCost[i] < 0)
-                runeCost[i] = 0;
         }
     }
 
     runeCost[RUNE_DEATH] = 0;                               // calculated later
 
+    bool gain_runic = runeCostData->NoRuneCost();         //  if spell doesn't have runecost - player can have some runic power, Horn of Winter for example
     for (uint32 i = 0; i < MAX_RUNES; ++i)
     {
         RuneType rune = player->GetCurrentRune(i);
@@ -5126,6 +5135,7 @@ void Spell::TakeRunePower(bool didHit)
         player->SetRuneCooldown(i, cooldown);
         player->SetDeathRuneUsed(i, false);
         runeCost[rune]--;
+        gain_runic = true;
     }
 
     runeCost[RUNE_DEATH] = runeCost[RUNE_BLOOD] + runeCost[RUNE_UNHOLY] + runeCost[RUNE_FROST];
@@ -5140,6 +5150,8 @@ void Spell::TakeRunePower(bool didHit)
                 uint32 cooldown = ((m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_DK_DEATH_STRIKE) > 0 || didHit) ? player->GetRuneBaseCooldown(i) : uint32(RUNE_MISS_COOLDOWN);
                 player->SetRuneCooldown(i, cooldown);
                 runeCost[rune]--;
+
+                gain_runic = true;
 
                 bool takePower = didHit;
                 if (uint32 spell = player->GetRuneConvertSpell(i))
@@ -5159,7 +5171,7 @@ void Spell::TakeRunePower(bool didHit)
     }
 
     // you can gain some runic power when use runes
-    if (didHit)
+    if (didHit && gain_runic)
         if (int32 rp = int32(runeCostData->runePowerGain * sWorld->getRate(RATE_POWER_RUNICPOWER_INCOME)))
             player->ModifyPower(POWER_RUNIC_POWER, int32(rp));
 }
@@ -6328,7 +6340,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     if (m_caster->HasAuraWithMechanic(1 << MECHANIC_POLYMORPH))
     {
         // Shapeshift
-        if (m_spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT))
+        if (m_spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT) && m_spellInfo->Id != 33891)    // Tree of Life is exception
             return SPELL_FAILED_CHARMED;
 
         // Teleport
@@ -6505,6 +6517,10 @@ SpellCastResult Spell::CheckCasterAuras() const
                 {
                     // Sap & Hand of Freedom hack
                     if ((*i)->GetSpellInfo()->Id == 6770 && m_spellInfo->Id == 1044)
+                        continue;
+                    
+                    // Freezing trap hack
+                    if ((*i)->GetSpellInfo()->Id == 3355 && (m_spellInfo->Id == 33206 || m_spellInfo->Id == 47788))
                         continue;
 
                     foundNotStun = true;
@@ -7370,6 +7386,13 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
             break;
     }
 
+    // Hour of Twilight
+    if (m_spellInfo->Id == 103327)
+    {
+        // Deterrence
+        if (target->HasAura(19263))
+            return false;
+    }
     if (!m_spellInfo->IsNeedAdditionalLosChecks() && (IsTriggered() || m_spellInfo->AttributesEx2 & SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS))
         return true;
 
@@ -7675,8 +7698,9 @@ void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier)
             }
             else if (m_damage < 0)
             {
-                if (m_spellInfo->Id == 88686 || // Holy Word: Sanctuary
-                    m_spellInfo->Id == 73921) // Healing Rain
+                if (m_spellInfo->Id == 73921 || // Healing Rain
+                    m_spellInfo->Id == 82327 || // Holy Radiance
+                    m_spellInfo->Id == 86452)   // Holy Radiance HoT
                 {
                     if (m_caster->GetTypeId() == TYPEID_PLAYER)
                     {
@@ -8335,7 +8359,7 @@ bool WorldObjectSpellTargetCheck::operator()(WorldObject* target)
                     return false;
                 if (!_caster->_IsValidAssistTarget(unitTarget, _spellInfo))
                     return false;
-                if (!_referer->IsInRaidWith(unitTarget))
+                if (!_referer->IsInRaidWith(unitTarget) && !_referer->IsInPartyWith(unitTarget))
                     return false;
                 break;
             default:

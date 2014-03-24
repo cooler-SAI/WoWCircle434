@@ -233,7 +233,6 @@ class boss_grand_warlock_nethekurse : public CreatureScript
                     return;
 
                 instance->SetData(TYPE_NETHEKURSE, DONE);
-                instance->HandleGameObject(instance->GetData64(DATA_NETHEKURSE_DOOR), true);
             }
 
             void UpdateAI(const uint32 diff)

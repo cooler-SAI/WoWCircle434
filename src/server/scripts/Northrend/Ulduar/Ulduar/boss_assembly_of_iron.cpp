@@ -636,7 +636,18 @@ class boss_runemaster_molgeim : public CreatureScript
             void EnterCombat(Unit* who)
             {
                 me->setActive(true);
-                StartEncounter(instance, me);
+                
+                if (instance->GetBossState(BOSS_ASSEMBLY_OF_IRON) != IN_PROGRESS)
+                    instance->SetBossState(BOSS_ASSEMBLY_OF_IRON, IN_PROGRESS);
+
+                if (Creature* pBrundir = ObjectAccessor::GetCreature(*me, instance->GetData64(BOSS_BRUNDIR)))
+                    if (!pBrundir->isInCombat())
+                        DoZoneInCombat(pBrundir);
+
+                if (Creature* pSteelbreaker = ObjectAccessor::GetCreature(*me, instance->GetData64(BOSS_STEELBREAKER)))
+                    if (!pSteelbreaker->isInCombat())
+                        DoZoneInCombat(pSteelbreaker);
+
                 if (!sayEnterCombat)
                 {
                     Talk(SAY_MOLGEIM_AGGRO);
@@ -944,7 +955,18 @@ class boss_stormcaller_brundir : public CreatureScript
 
                 me->setActive(true);
                 me->InterruptNonMeleeSpells(true);
-                StartEncounter(instance, me);
+                
+                if (instance->GetBossState(BOSS_ASSEMBLY_OF_IRON) != IN_PROGRESS)
+                    instance->SetBossState(BOSS_ASSEMBLY_OF_IRON, IN_PROGRESS);
+
+                if (Creature* pMolgeim = ObjectAccessor::GetCreature(*me, instance->GetData64(BOSS_MOLGEIM)))
+                    if (!pMolgeim->isInCombat())
+                        DoZoneInCombat(pMolgeim);
+
+                if (Creature* pSteelbreaker = ObjectAccessor::GetCreature(*me, instance->GetData64(BOSS_STEELBREAKER)))
+                    if (!pSteelbreaker->isInCombat())
+                        DoZoneInCombat(pSteelbreaker);
+
                 if (!sayEnterCombat)
                 {
                     Talk(SAY_BRUNDIR_AGGRO);

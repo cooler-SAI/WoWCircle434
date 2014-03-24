@@ -171,10 +171,14 @@ class instance_icecrown_citadel : public InstanceMapScript
                 data << uint32(WORLDSTATE_EXECUTION_TIME)     << uint32(BloodQuickeningMinutes);
             }
 
-            void OnPlayerEnter(Player* player)
+            void BeforePlayerEnter(Player* player)
             {
                 if (!TeamInInstance)
                     TeamInInstance = player->GetTeam();
+            }
+
+            void OnPlayerEnter(Player* player)
+            {
 
                 if (instance->IsHeroic())
                 {

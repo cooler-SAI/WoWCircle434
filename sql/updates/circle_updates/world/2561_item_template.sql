@@ -1,0 +1,1 @@
+UPDATE `item_template` SET `delay`=1400 WHERE `entry` IN (78414, 77220, 78422);

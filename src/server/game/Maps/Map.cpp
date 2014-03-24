@@ -2474,6 +2474,9 @@ bool InstanceMap::AddPlayerToMap(Player* player)
         m_resetAfterUnload = false;
         m_unloadWhenEmpty = false;
     }
+    
+    if (i_data)
+        i_data->BeforePlayerEnter(player);
 
     // this will acquire the same mutex so it cannot be in the previous block
     Map::AddPlayerToMap(player);

@@ -182,11 +182,6 @@ public:
                 instance->SetData(DATA_MAULGAREVENT, DONE);
         }
 
-           void AddDeath()
-           {
-                DoScriptText(RAND(SAY_OGRE_DEATH1, SAY_OGRE_DEATH2, SAY_OGRE_DEATH3, SAY_OGRE_DEATH4), me);
-           }
-
         void EnterCombat(Unit* who)
         {
             StartEvent(who);
@@ -372,8 +367,8 @@ public:
                 Maulgar = (Unit::GetCreature((*me), instance->GetData64(DATA_MAULGAR)));
 
                 if (Maulgar)
-                    CAST_AI(boss_high_king_maulgar::boss_high_king_maulgarAI, Maulgar->AI())->AddDeath();
-
+                    DoScriptText(RAND(SAY_OGRE_DEATH1, SAY_OGRE_DEATH2, SAY_OGRE_DEATH3, SAY_OGRE_DEATH4), Maulgar);
+                
                 if (CheckAllBossDied(instance, me))
                     instance->SetData(DATA_MAULGAREVENT, DONE);
             }
@@ -487,8 +482,8 @@ public:
                 Maulgar = (Unit::GetCreature((*me), instance->GetData64(DATA_MAULGAR)));
 
                 if (Maulgar)
-                    CAST_AI(boss_high_king_maulgar::boss_high_king_maulgarAI, Maulgar->AI())->AddDeath();
-
+                    DoScriptText(RAND(SAY_OGRE_DEATH1, SAY_OGRE_DEATH2, SAY_OGRE_DEATH3, SAY_OGRE_DEATH4), Maulgar);
+                
                 if (CheckAllBossDied(instance, me))
                     instance->SetData(DATA_MAULGAREVENT, DONE);
             }
@@ -607,14 +602,14 @@ public:
                 Maulgar = (Unit::GetCreature((*me), instance->GetData64(DATA_MAULGAR)));
 
                 if (Maulgar)
-                    CAST_AI(boss_high_king_maulgar::boss_high_king_maulgarAI, Maulgar->AI())->AddDeath();
+                    DoScriptText(RAND(SAY_OGRE_DEATH1, SAY_OGRE_DEATH2, SAY_OGRE_DEATH3, SAY_OGRE_DEATH4), Maulgar);
 
                 if (CheckAllBossDied(instance, me))
                     instance->SetData(DATA_MAULGAREVENT, DONE);
             }
         }
 
-         void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 diff)
         {
             //Only if not incombat check if the event is started
             if (!me->isInCombat() && instance && instance->GetData(DATA_MAULGAREVENT))
@@ -717,7 +712,7 @@ public:
                 Maulgar = (Unit::GetCreature((*me), instance->GetData64(DATA_MAULGAR)));
 
                 if (Maulgar)
-                    CAST_AI(boss_high_king_maulgar::boss_high_king_maulgarAI, Maulgar->AI())->AddDeath();
+                    DoScriptText(RAND(SAY_OGRE_DEATH1, SAY_OGRE_DEATH2, SAY_OGRE_DEATH3, SAY_OGRE_DEATH4), Maulgar);
 
                 if (CheckAllBossDied(instance, me))
                     instance->SetData(DATA_MAULGAREVENT, DONE);

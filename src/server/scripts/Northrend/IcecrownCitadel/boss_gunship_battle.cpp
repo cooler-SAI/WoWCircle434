@@ -364,8 +364,8 @@ void StartFlyShip(Transport* ship)
             UpdateData transData(ship->GetMapId());
             ship->BuildCreateUpdateBlockForPlayer(&transData, player);
             WorldPacket packet;
-            transData.BuildPacket(&packet);
-            player->SendDirectMessage(&packet);
+            if (transData.BuildPacket(&packet))
+                player->SendDirectMessage(&packet);
         }
     }
 }
@@ -438,8 +438,8 @@ void StopFlyShip(Transport* ship)
             UpdateData transData (ship->GetMapId());
             ship->BuildCreateUpdateBlockForPlayer(&transData, player);
             WorldPacket packet;
-            transData.BuildPacket(&packet);
-            player->SendDirectMessage(&packet);
+            if (transData.BuildPacket(&packet))
+                player->SendDirectMessage(&packet);
         }
     }
 }
@@ -2249,8 +2249,8 @@ class npc_saurfang_gunship : public CreatureScript
                                     UpdateData transData;
                                     hordeShip->BuildCreateUpdateBlockForPlayer(&transData, player);
                                     WorldPacket packet;
-                                    transData.BuildPacket(&packet);
-                                    player->SendDirectMessage(&packet);
+                                    if (transData.BuildPacket(&packet))
+                                        player->SendDirectMessage(&packet);
                                 }
                             }
                             events.ScheduleEvent(EVENT_SEND_UPDATE, 3000);*/

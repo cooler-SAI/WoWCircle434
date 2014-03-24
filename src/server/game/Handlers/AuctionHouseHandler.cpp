@@ -202,6 +202,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recvData)
     Item* items[MAX_AUCTION_ITEMS];
 
     uint32 finalCount = 0;
+    uint32 true_item_entry = 0;
 
     for (uint32 i = 0; i < itemsCount; ++i)
     {
@@ -213,6 +214,14 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recvData)
             return;
         }
 
+        if (!true_item_entry)
+            true_item_entry = item->GetEntry();
+        else
+            if (item->GetEntry() != true_item_entry)
+            {
+                SendAuctionCommandResult(NULL, AUCTION_SELL_ITEM, ERR_AUCTION_ITEM_NOT_FOUND);
+                return;
+            }
         if (sAuctionMgr->GetAItem(item->GetGUIDLow()) || !item->CanBeTraded() || item->IsNotEmptyBag() ||
             item->GetTemplate()->Flags & ITEM_PROTO_FLAG_CONJURED || item->GetUInt32Value(ITEM_FIELD_DURATION) ||
             item->GetCount() < count[i] || _player->GetItemCount(item->GetEntry(), false) < count[i])

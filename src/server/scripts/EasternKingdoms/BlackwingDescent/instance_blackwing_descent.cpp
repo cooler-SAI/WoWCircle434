@@ -42,7 +42,7 @@ class instance_blackwing_descent : public InstanceMapScript
                 memset(&m_uiOmnotronGUID, 0, sizeof(m_uiOmnotronGUID));
             }
 
-            void OnPlayerEnter(Player* player)
+            void BeforePlayerEnter(Player* player)
             {
                 if (!uiTeamInInstance)
                     uiTeamInInstance = player->GetTeam();

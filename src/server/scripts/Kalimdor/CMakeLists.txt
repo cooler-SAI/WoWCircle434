@@ -80,6 +80,8 @@ set(scripts_STAT_SRCS
   Kalimdor/CavernsOfTime/DragonSoul/boss_hagara.cpp
   Kalimdor/CavernsOfTime/DragonSoul/boss_ultraxion.cpp
   Kalimdor/CavernsOfTime/DragonSoul/boss_warmaster_blackhorn.cpp
+  Kalimdor/CavernsOfTime/DragonSoul/boss_spine_of_deathwing.cpp
+  Kalimdor/CavernsOfTime/DragonSoul/boss_madness_of_deathwing.cpp
   Kalimdor/CavernsOfTime/DragonSoul/boss_warmaster_blackhorn.h
   Kalimdor/CavernsOfTime/DragonSoul/instance_dragon_soul.cpp
   Kalimdor/CavernsOfTime/DragonSoul/dragon_soul.cpp

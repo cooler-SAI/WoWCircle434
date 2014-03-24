@@ -46,7 +46,7 @@ class instance_halls_of_origination : public InstanceMapScript
                 uiAnraphetBossDoorGUID = 0;
             }
 
-            void OnPlayerEnter(Player* player)
+            void BeforePlayerEnter(Player* player)
             {
                 if (!uiTeamInInstance)
                     uiTeamInInstance = player->GetTeam();

@@ -1103,7 +1103,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)
     pCurrChar->StopCastingBindSight();
     pCurrChar->StopCastingCharm();
     pCurrChar->RemoveAurasByType(SPELL_AURA_BIND_SIGHT);
-
+    pCurrChar->UpdateArmorSpecializations(SLOT_HEAD);
     sScriptMgr->OnPlayerLogin(pCurrChar);
 
     delete holder;

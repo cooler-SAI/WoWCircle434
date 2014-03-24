@@ -29,37 +29,38 @@ EndScriptData */
 
 #define MAX_ENCOUNTER  2
 
-#define DOOR_NETHEKURSE     1
-
 class instance_shattered_halls : public InstanceMapScript
 {
     public:
-        instance_shattered_halls()
-            : InstanceMapScript("instance_shattered_halls", 540)
+        instance_shattered_halls() : InstanceMapScript("instance_shattered_halls", 540){}
+
+        InstanceScript* GetInstanceScript(InstanceMap* map) const
         {
+            return new instance_shattered_halls_InstanceMapScript(map);
         }
+
         struct instance_shattered_halls_InstanceMapScript : public InstanceScript
         {
             instance_shattered_halls_InstanceMapScript(Map* map) : InstanceScript(map) {}
-
-            uint32 m_auiEncounter[MAX_ENCOUNTER];
-            uint64 nethekurseGUID;
-            uint64 nethekurseDoorGUID;
 
             void Initialize()
             {
                 memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
                 nethekurseGUID = 0;
-                nethekurseDoorGUID = 0;
+                nethekurseDoor1GUID = 0;
+                nethekurseDoor2GUID = 0;
             }
 
             void OnGameObjectCreate(GameObject* go)
             {
                 switch (go->GetEntry())
                 {
-                    case DOOR_NETHEKURSE:
-                        nethekurseDoorGUID = go->GetGUID();
+                    case GO_GRAND_WARLOCK_CHAMBER_DOOR_1:
+                        nethekurseDoor1GUID = go->GetGUID();
+                        break;
+                    case GO_GRAND_WARLOCK_CHAMBER_DOOR_2:
+                        nethekurseDoor2GUID = go->GetGUID();
                         break;
                 }
             }
@@ -80,6 +81,11 @@ class instance_shattered_halls : public InstanceMapScript
                 {
                     case TYPE_NETHEKURSE:
                         m_auiEncounter[0] = data;
+                        if (data == DONE)
+                        {
+                            HandleGameObject(nethekurseDoor1GUID, true);
+                            HandleGameObject(nethekurseDoor2GUID, true);
+                        }
                         break;
                     case TYPE_OMROGG:
                         m_auiEncounter[1] = data;
@@ -105,17 +111,17 @@ class instance_shattered_halls : public InstanceMapScript
                 {
                     case DATA_NETHEKURSE:
                         return nethekurseGUID;
-                    case DATA_NETHEKURSE_DOOR:
-                        return nethekurseDoorGUID;
                 }
                 return 0;
             }
-        };
 
-        InstanceScript* GetInstanceScript(InstanceMap* map) const
-        {
-            return new instance_shattered_halls_InstanceMapScript(map);
-        }
+        private:
+
+            uint32 m_auiEncounter[MAX_ENCOUNTER];
+            uint64 nethekurseGUID;
+            uint64 nethekurseDoor1GUID;
+            uint64 nethekurseDoor2GUID;
+        };
 };
 
 void AddSC_instance_shattered_halls()

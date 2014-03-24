@@ -52,7 +52,7 @@ class instance_pit_of_saron : public InstanceMapScript
                 _teamInInstance = 0;
             }
 
-            void OnPlayerEnter(Player* player)
+            void BeforePlayerEnter(Player* player)
             {
                 if (!_teamInInstance)
                     _teamInInstance = player->GetTeam();

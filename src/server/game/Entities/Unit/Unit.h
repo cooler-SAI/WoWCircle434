@@ -1403,6 +1403,13 @@ class Unit : public WorldObject
            return (uint32)f_BaseAttackTime;
         }
 
+        // TODO: There are some mystery about attack time usage
+        uint32 GetHastedAttackTime(WeaponAttackType att) const
+        {
+            float f_BaseAttackTime = GetFloatValue(UNIT_FIELD_BASEATTACKTIME+att);
+            return (uint32)f_BaseAttackTime;
+        }
+
         void SetAttackTime(WeaponAttackType att, uint32 val) { SetFloatValue(UNIT_FIELD_BASEATTACKTIME+att, val*m_modAttackSpeedPct[att]); }
         void ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply);
         void ApplyCastTimePercentMod(float val, bool apply);

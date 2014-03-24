@@ -14440,16 +14440,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, bool isControlled)
     if (isInCombat() || HasUnitState(UNIT_STATE_EVADE))
         return;
 
-    for (Unit::ControlList::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
-        (*itr)->SetInCombatState(PvP, enemy, true);
-
-    if (Creature* creature = ToCreature())
-        if (IsAIEnabled && creature->AI()->IsPassived())
-            return;
-
     SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
-    if (isControlled)
-        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
 
     if (Creature* creature = ToCreature())
     {
@@ -14483,6 +14474,12 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, bool isControlled)
 
     if (GetTypeId() == TYPEID_PLAYER && !ToPlayer()->IsInWorgenForm() && ToPlayer()->CanSwitch())
         ToPlayer()->SwitchToWorgenForm();
+
+    for (Unit::ControlList::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
+    {
+        (*itr)->SetInCombatState(PvP, enemy);
+        (*itr)->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
+    }
 }
 
 void Unit::ClearInCombat()

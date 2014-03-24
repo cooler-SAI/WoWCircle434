@@ -33,7 +33,7 @@ class instance_shadowfang_keep : public InstanceMapScript
                 teamInInstance = 0;
             };
 
-            void OnPlayerEnter(Player* pPlayer)
+            void BeforePlayerEnter(Player* pPlayer)
             {
                 if (!teamInInstance)
                     teamInInstance = pPlayer->GetTeam();
@@ -53,15 +53,15 @@ class instance_shadowfang_keep : public InstanceMapScript
                 {
                     case NPC_BELMONT:
                         if (teamInInstance == ALLIANCE)
-                            pCreature->UpdateEntry(NPC_IVAR, ALLIANCE);
+                            pCreature->UpdateEntry(NPC_IVAR);
                         break;
                     case NPC_GUARD_HORDE1:
                         if (teamInInstance == ALLIANCE)
-                            pCreature->UpdateEntry(NPC_GUARD_ALLY, ALLIANCE);
+                            pCreature->UpdateEntry(NPC_GUARD_ALLY);
                         break;
                     case NPC_GUARD_HORDE2:
                         if (teamInInstance == ALLIANCE)
-                            pCreature->UpdateEntry(NPC_GUARD_ALLY, ALLIANCE);
+                            pCreature->UpdateEntry(NPC_GUARD_ALLY);
                         break;
                     case NPC_CROMUSH:
                         if (teamInInstance == ALLIANCE)

@@ -977,8 +977,6 @@ private:
     uint32 _Id;
 };
 
-
-
 void AddSC_boss_yorsahj_the_unsleeping()
 {
     new boss_yorsahj_the_unsleeping();

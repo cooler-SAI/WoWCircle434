@@ -420,7 +420,7 @@ public:
 
         void Reset()
         {
-            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+            //me->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
 
             events.Reset();
             summons.DespawnAll();
@@ -432,7 +432,7 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+            //me->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
         }
 
         void SetGUID(uint64 guid, int32 type)
@@ -477,7 +477,7 @@ public:
 
         void JustSummoned(Creature* summon)
         {
-            instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
+            //me->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
 
             summons.Summon(summon);
             if (me->isInCombat())
@@ -727,7 +727,7 @@ public:
         class AurasCheck
         {
         public:
-            AurasCheck() {}
+            AurasCheck() { }
 
             bool operator()(WorldObject* unit)
             {

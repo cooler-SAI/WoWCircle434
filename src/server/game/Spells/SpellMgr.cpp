@@ -196,6 +196,10 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Crippling poison - Limit to 10 seconds in PvP (No SpellFamilyFlags)
             else if (spellproto->SpellIconID == 163)
                 return DIMINISHING_LIMITONLY;
+            // Feral Charge: Bear Effect
+            else if (spellproto->Id == 45334)
+                return DIMINISHING_RANDOM_ROOT;
+            
             break;
         }
         case SPELLFAMILY_HUNTER:
@@ -3047,6 +3051,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 99002: // Fiery Claws, Item - Druid T12 Feral 2P Bonus
             case 99132: // Divine Fire, Item - Priest T12 Healer 2P Bonus
             case 99173: // Burning Wounds, Item - Rogue T12 2P Bonus
+            case 56161: // Glyph of Prayer of Healing
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_DONT_RESET_PERIODIC_TIMER;
                 break;
             case 45257: // Using Steam Tonk Controller
@@ -3260,6 +3265,7 @@ void SpellMgr::LoadSpellCustomAttr()
                 break;
             case 70890: // Scourge Strike triggered part
             case 96172: // Hand of Light
+            case 101085: // Wrath of Tarecgosa
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_TRIGGERED_IGNORE_RESILENCE;
                 break;
             default:
@@ -6806,7 +6812,7 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // Fingers of Frost
             case 44544:
-                spellInfo->Effects[0].SpellClassMask = flag96(0x00020000, 0x00100000, 0x00000008);
+                spellInfo->Effects[0].SpellClassMask = flag96(0x00020000, 0x00100000, 0x00000028);
                 break;
             // Living Bomb
             case 44457:
@@ -6845,6 +6851,12 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->Effects[0].Amplitude = 3000;
                 spellInfo->Effects[1].BasePoints = 5;
                 spellInfo->Effects[1].Amplitude = 1000;
+                break;
+            case 724:
+                spellInfo->Effects[0].BasePoints = 75360916;
+                break;
+            case 59907:
+                spellInfo->Effects[1].BasePoints = 75360916;
                 break;
             // Improved Mind Blast
             case 15273:
@@ -6918,6 +6930,8 @@ void SpellMgr::LoadDbcDataCorrections()
             // Dark Intent proc
             case 85768:
                 spellInfo->SpellFamilyName = SPELLFAMILY_WARLOCK;
+                spellInfo->SetRangeIndex(13);
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_TARGET_ANY;
                 break;
             // Howl of Terror
             case 5484:
@@ -7514,6 +7528,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 25281:
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
                 break;
+            // Sunder Armor
+            case 58567:
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CAN_STACK_FROM_DIFF_CASTERS;
+                break;
             // Ram
             case 60206:
                 spellInfo->Effects[EFFECT_2].SetRadiusIndex(EFFECT_RADIUS_10_YARDS);
@@ -7528,6 +7546,7 @@ void SpellMgr::LoadDbcDataCorrections()
             // Intercept stun
             case 20253:
                 spellInfo->Attributes |= SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK;
+                spellInfo->Speed = SPEED_CHARGE * 3;
                 break;
             case 64843:     // Divine Hymn
             case 64901:     // Hymn of Hope
@@ -7605,6 +7624,34 @@ void SpellMgr::LoadDbcDataCorrections()
                 spellInfo->ProcChance = 100;
                 spellInfo->Effects[0].TargetA = TARGET_UNIT_MASTER;
                 break;
+            case 49016: // Unholy Frenzy
+                spellInfo->AttributesEx4 |= SPELL_ATTR4_FIXED_DAMAGE;
+                break;
+            case 53695:
+            case 53696:
+                spellInfo->Effects[1].Effect = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->Effects[1].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL;
+                spellInfo->Effects[1].TargetA = TARGET_UNIT_CASTER;
+                spellInfo->Effects[1].TargetB = 0;
+                break;
+            case 83077:
+                spellInfo->SpellFamilyFlags[0] = 0;
+                break;
+            case 53182:
+            case 53183:
+            case 53184:
+                spellInfo->Effects[0].ApplyAuraName = SPELL_AURA_ADD_PCT_MODIFIER;
+                break;
+            case 73685: // Unleash Life 
+                spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+                break;
+            case 48045: // Mind Sear
+                spellInfo->AttributesEx |= SPELL_ATTR1_CANT_TARGET_SELF;
+                break;
+            case 47750: // Penance heal
+            case 47666: // Penance dmg
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_TARGET_ANY;
+                break; 
             default:
                 break;
         }
@@ -7616,6 +7663,10 @@ void SpellMgr::LoadDbcDataCorrections()
             case 339: // Entangling Roots
             case 335: // Freezing Trap
             case 118: // Polymorph
+            case 28271: // Polymorph
+            case 28272: // Polymorph
+            case 61721: // Polymorph 
+            case 61305: // Polymorph
             case 20066: // Repentance
             case 9484: // Shackle Undead
             case 2094: // Blind

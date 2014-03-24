@@ -517,7 +517,7 @@ enum SpellAttr6
     SPELL_ATTR6_UNK20                            = 0x00100000, // 20 only 58371, 62218
     SPELL_ATTR6_CLIENT_UI_TARGET_EFFECTS         = 0x00200000, // 21 it's only client-side attribute
     SPELL_ATTR6_UNK22                            = 0x00400000, // 22 only 72054
-    SPELL_ATTR6_UNK23                            = 0x00800000, // 23
+    SPELL_ATTR6_STOPS_AUTOATTACK                 = 0x00800000, // 23
     SPELL_ATTR6_CAN_TARGET_UNTARGETABLE          = 0x01000000, // 24
     SPELL_ATTR6_UNK25                            = 0x02000000, // 25 Exorcism, Flash of Light
     SPELL_ATTR6_UNK26                            = 0x04000000, // 26 related to player castable positive buff
@@ -579,7 +579,7 @@ enum SpellAttr8
     SPELL_ATTR8_NAME_CHANGED_DURING_TRANSFORM    = 0x00000400, // 10 according to wowhead comments, name changes, title remains
     SPELL_ATTR8_UNK11                            = 0x00000800, // 11
     SPELL_ATTR8_AURA_SEND_AMOUNT                 = 0x00001000, // 12 Aura must have flag AFLAG_ANY_EFFECT_AMOUNT_SENT to send amount
-    SPELL_ATTR8_UNK13                            = 0x00002000, // 13
+    SPELL_ATTR8_AURA_PER_CASTER                  = 0x00002000, // 13
     SPELL_ATTR8_UNK14                            = 0x00004000, // 14
     SPELL_ATTR8_WATER_MOUNT                      = 0x00008000, // 15
     SPELL_ATTR8_UNK16                            = 0x00010000, // 16
@@ -588,7 +588,7 @@ enum SpellAttr8
     SPELL_ATTR8_USE_COMBO_POINTS_ON_ANY_TARGET   = 0x00080000, // 19 allows to consume combo points from dead targets
     SPELL_ATTR8_ARMOR_SPECIALIZATION             = 0x00100000, // 20
     SPELL_ATTR8_UNK21                            = 0x00200000, // 21
-    SPELL_ATTR8_UNK22                            = 0x00400000, // 22
+    SPELL_ATTR8_UNK22                            = 0x00400000, // 22 some healing auras have this flag
     SPELL_ATTR8_BATTLE_RESURRECTION              = 0x00800000, // For those resurrection spells that can be used in combat
     SPELL_ATTR8_HEALING_SPELL                    = 0x01000000, // 24
     SPELL_ATTR8_UNK25                            = 0x02000000, // 25

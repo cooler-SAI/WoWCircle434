@@ -1,0 +1,3 @@
+﻿DELETE FROM `conditions` WHERE `SourceEntry`=89752;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES 
+(17, 0, 89752, 0, 0, 31, 1, 3, 48136, 0, 0, 0, '', 'Lethality Analyzer - Collect Specimen');

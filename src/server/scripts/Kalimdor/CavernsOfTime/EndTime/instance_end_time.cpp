@@ -48,7 +48,7 @@ class instance_end_time : public InstanceMapScript
                 second_echo = Trinity::Containers::SelectRandomContainerElement(echo_list);
             }
 
-            void OnPlayerEnter(Player* pPlayer)
+            void BeforePlayerEnter(Player* pPlayer)
             {
                 if (!uiTeamInInstance)
 				    uiTeamInInstance = pPlayer->GetTeam();

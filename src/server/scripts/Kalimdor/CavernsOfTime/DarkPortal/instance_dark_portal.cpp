@@ -125,7 +125,7 @@ public:
             return false;
         }
 
-        void OnPlayerEnter(Player* player)
+        void BeforePlayerEnter(Player* player)
         {
             if (GetData(TYPE_MEDIVH) == IN_PROGRESS)
                 return;

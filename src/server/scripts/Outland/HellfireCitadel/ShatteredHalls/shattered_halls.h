@@ -21,8 +21,14 @@
 
 #define TYPE_NETHEKURSE         1
 #define DATA_NETHEKURSE         2
-#define DATA_NETHEKURSE_DOOR    3
 
 #define TYPE_OMROGG             4
+
+enum GameObjects
+{
+    GO_GRAND_WARLOCK_CHAMBER_DOOR_1 = 182539,
+    GO_GRAND_WARLOCK_CHAMBER_DOOR_2 = 182540,
+};
+
 #endif
 

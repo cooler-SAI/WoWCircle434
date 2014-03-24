@@ -54,7 +54,7 @@ class instance_ramparts : public InstanceMapScript
                 uiTeam = 0;
             }
             
-            void OnPlayerEnter(Player* player)
+            void BeforePlayerEnter(Player* player)
             {
                 if (!uiTeam)
                     uiTeam = player->GetTeam();

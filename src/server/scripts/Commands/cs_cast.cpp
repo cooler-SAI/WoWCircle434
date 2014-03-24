@@ -100,7 +100,7 @@ public:
 
     static bool HandleCastBackCommand(ChatHandler* handler, char const* args)
     {
-        Creature* caster = handler->getSelectedCreature();
+        Unit* caster = handler->getSelectedUnit();
         if (!caster)
         {
             handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);

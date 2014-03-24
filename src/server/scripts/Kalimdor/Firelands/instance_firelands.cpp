@@ -55,7 +55,7 @@ class instance_firelands : public InstanceMapScript
                 gameobjectPortals.clear();
             }
 
-            void OnPlayerEnter(Player* pPlayer)
+            void BeforePlayerEnter(Player* pPlayer)
             {
                 if (!uiTeamInInstance)
                     uiTeamInInstance = pPlayer->GetTeam();

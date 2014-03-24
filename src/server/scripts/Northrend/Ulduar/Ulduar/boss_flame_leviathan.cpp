@@ -283,6 +283,7 @@ class boss_flame_leviathan : public CreatureScript
                 Shutdown = 0;
                 _pursueTarget = 0;
 
+                me->RemoveAllAuras();
                 me->SetReactState(REACT_DEFENSIVE);
             }
 
@@ -338,6 +339,7 @@ class boss_flame_leviathan : public CreatureScript
 
             void JustDied(Unit* /*victim*/)
             {
+                me->RemoveAllAuras();
                 _JustDied();
                 // Set Field Flags 67108928 = 64 | 67108864 = UNIT_FLAG_UNK_6 | UNIT_FLAG_SKINNABLE
                 // Set DynFlags 12
@@ -495,17 +497,17 @@ class boss_flame_leviathan : public CreatureScript
                         me->RemoveLootMode(LOOT_MODE_HARD_MODE_4);
                         --ActiveTowersCount;
                     }
-                    if (me->HasLootMode(LOOT_MODE_DEFAULT | LOOT_MODE_HARD_MODE_1 | LOOT_MODE_HARD_MODE_2 | LOOT_MODE_HARD_MODE_3) && ActiveTowersCount == 3)
+                    else if (me->HasLootMode(LOOT_MODE_DEFAULT | LOOT_MODE_HARD_MODE_1 | LOOT_MODE_HARD_MODE_2 | LOOT_MODE_HARD_MODE_3) && ActiveTowersCount == 3)
                     {
                         me->RemoveLootMode(LOOT_MODE_HARD_MODE_3);
                         --ActiveTowersCount;
                     }
-                    if (me->HasLootMode(LOOT_MODE_DEFAULT | LOOT_MODE_HARD_MODE_1 | LOOT_MODE_HARD_MODE_2) && ActiveTowersCount == 2)
+                    else if (me->HasLootMode(LOOT_MODE_DEFAULT | LOOT_MODE_HARD_MODE_1 | LOOT_MODE_HARD_MODE_2) && ActiveTowersCount == 2)
                     {
                         me->RemoveLootMode(LOOT_MODE_HARD_MODE_2);
                         --ActiveTowersCount;
                     }
-                    if (me->HasLootMode(LOOT_MODE_DEFAULT | LOOT_MODE_HARD_MODE_1) && ActiveTowersCount == 1)
+                    else if (me->HasLootMode(LOOT_MODE_DEFAULT | LOOT_MODE_HARD_MODE_1) && ActiveTowersCount == 1)
                     {
                         me->RemoveLootMode(LOOT_MODE_HARD_MODE_1);
                         --ActiveTowersCount;
@@ -728,8 +730,11 @@ class boss_flame_leviathan_overload_device : public CreatureScript
             {
             }
 
-            void OnSpellClick(Unit* clicker)
+            void OnSpellClick(Unit* /*clicker*/, bool& result)
             {
+                if (!result)
+                    return;
+
                 if (me->GetVehicle())
                 {
                     me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);

@@ -36,6 +36,7 @@
 #include "ScriptMgr.h"
 #include "SpellScript.h"
 #include "Vehicle.h"
+#include "Group.h"
 //#include "InstanceScript.h"
 
 AuraApplication::AuraApplication(Unit* target, Unit* caster, Aura* aura, uint8 effMask):
@@ -1045,13 +1046,8 @@ void Aura::UnregisterSingleTarget()
     // TODO: find a better way to do this.
     if (!caster)
         caster = ObjectAccessor::GetObjectInOrOutOfWorld(GetCasterGUID(), (Unit*)NULL);
-    if (caster)
-    {
-        //caster->GetSingleCastAuras().remove(this);
-        for (AuraIdList::iterator itr = caster->GetSingleCastAuras().begin(); itr != caster->GetSingleCastAuras().end(); ++itr)
-            if ((*itr).id == GetId())
-                itr = caster->GetSingleCastAuras().erase(itr);
-    }
+    ASSERT(caster);
+    caster->GetSingleCastAuras().remove(this);
 
     SetIsSingleTarget(false);
 }
@@ -2352,6 +2348,18 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         {
                             caster->RemoveAurasDueToSpell(80886);
                             caster->RemoveAurasDueToSpell(80879);
+                        }
+                    }
+                    // T13 4/5 bonus
+                    if (apply)
+                    {
+                        if (caster->HasAura(105735))
+                        {
+                            // Stampede
+                            if (caster->HasAura(78892))
+                                caster->CastSpell(caster, 81021, true);
+                            else if (caster->HasAura(78893))
+                                caster->CastSpell(caster, 81022, true);
                         }
                     }
                     break;
