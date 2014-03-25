@@ -404,7 +404,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS]=
     &AuraEffect::HandleNoImmediateEffect,                         //344 SPELL_AURA_MOD_AUTOATTACK_DAMAGE implemented in Unit::MeleeDamageBonusTaken
     &AuraEffect::HandleNoImmediateEffect,                         //345 SPELL_AURA_BYPASS_ARMOR_FOR_CASTER
     &AuraEffect::HandleAuraProgressBar,                           //346 SPELL_AURA_PROGRESS_BAR
-    &AuraEffect::HandleNULL,                                      //347 SPELL_AURA_MOD_SPELL_COOLDOWN_BY_HASTE
+    &AuraEffect::HandleNoImmediateEffect,                         //347 SPELL_AURA_MOD_SPELL_COOLDOWN_BY_HASTE
     &AuraEffect::HandleNoImmediateEffect,                         //348 SPELL_AURA_DEPOSIT_BONUS_MONEY_IN_GUILD_BANK_ON_LOOT implemented in WorldSession::HandleLootMoneyOpcode
     &AuraEffect::HandleNoImmediateEffect,                         //349 SPELL_AURA_MOD_CURRENCY_GAIN implemented in Player::ModifyCurrency
     &AuraEffect::HandleNULL,                                      //350 SPELL_AURA_MOD_GATHERING_ITEMS_GAINED_PERCENT
@@ -8123,56 +8123,14 @@ void AuraEffect::HandleAuraProgressBar(AuraApplication const* aurApp, uint8 mode
 {
     if (!(mode & AURA_EFFECT_HANDLE_REAL))
         return;
-
-    Unit* target = aurApp->GetTarget();
-
-    Unit* caster = GetCaster();
-
-    Aura const* aura = GetBase();
-
-    if (!target)
+    
+    uint32 altPowerId = GetMiscValue();
+    UnitPowerBarEntry const* powerEntry = sUnitPowerBarStore.LookupEntry(altPowerId);
+    if (!powerEntry)
         return;
-
+    
     if (apply)
-    {
-        switch (GetSpellInfo()->Id)
-        {
-            case 88824: // Sound Bar Atramedes (HandlePeriodicDummyAuraTick for movement add?).
-            case 93103: //Cho'gall Corruption
-            case 78949: // Onyxia Discharge - target is same as caster.
-            case 98229: // Majordomo Heroic Concentration
-                target->SetPower(POWER_ALTERNATE_POWER, 0);
-                target->SetMaxPower(POWER_ALTERNATE_POWER, 100);
-                break;
-            case 98226: // Rhyolith Balance - Orientation: - power goes to left, + power goes to right.
-                target->SetPower(POWER_ALTERNATE_POWER, 25);
-                target->SetMaxPower(POWER_ALTERNATE_POWER, 50);
-                break;
-            case 101410: // Molten Feather Bar - Alysrazor - 98734 is spell to give 1 power, 97128 needs script and triggers it. 99464 (Molting) is Alys aura.
-                target->SetPower(POWER_ALTERNATE_POWER, 0);
-                target->SetMaxPower(POWER_ALTERNATE_POWER, 3);
-                break;
-            case 102668: // Sands of the Hourglass, Murozond, End Time
-                target->SetPower(POWER_ALTERNATE_POWER, 5);
-                target->SetMaxPower(POWER_ALTERNATE_POWER, 5);
-                break;
-            default:
-                target->SetPower(POWER_ALTERNATE_POWER, 0);
-                target->SetMaxPower(POWER_ALTERNATE_POWER, 100);
-                break;
-
-            //Deathwing Corrupted Blood meter 106843 - 100 power
-            //Hideous Amalgamation Absorb Blood bar - 109329. starts 25 - max 50 power.
-            //Thrall Bar - 100439, Elemental Bonds - Destroy totems to free Thrall. 100 power...Firelands.
-            //Thrall Bar - 99961, Elemental Bonds - Destroy Forces.100 power...Deepholm.
-            //Thrall Bar - 99642, Elemental Bonds - Destroy Elementals.100 power...Vasjh'ir.
-            //Thrall Bar - 99358, Elemental Bonds - Destroy Elementals.100 power...Uldum.
-            //Warden Stillwater - 35000 power, 92598.
-            //Waves like map treasure, 7 power - 92597.
-            //Waves like map treasure, 5 power - 91651.
-            //Heroic Will Ultraxion - Needs no stuff. No power, puts you in shadow realm 5 sec.
-            //Enter the Dream - Ysera - 106464 - Needs no stuff. No power, decreases damage by 50%.
-            //DeathWingBack? (Roll Control?)
-        }
-    }
+        aurApp->GetTarget()->SetMaxPower(POWER_ALTERNATE_POWER, powerEntry->MaxPower);
+    else
+        aurApp->GetTarget()->SetMaxPower(POWER_ALTERNATE_POWER, 0);
 }

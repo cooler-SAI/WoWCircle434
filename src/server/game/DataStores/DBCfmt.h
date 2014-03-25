@@ -164,6 +164,7 @@ char const TaxiPathEntryfmt[]="niii";
 char const TaxiPathNodeEntryfmt[]="diiifffiiii";
 char const TeamContributionPointsfmt[]="df";
 char const TotemCategoryEntryfmt[]="nxii";
+char const UnitPowerBarfmt[]="niixxxxxxxxxxxxxxxxxxxxxxxx";
 const char TransportAnimationEntryfmt[]="diixxxx";
 char const VehicleEntryfmt[]="niffffiiiiiiiifffffffffffffffssssfifiixx";
 char const VehicleSeatEntryfmt[]="niiffffffffffiiiiiifffffffiiifffiiiiiiiffiiiiixxxxxxxxxxxxxxxxxxxx";
