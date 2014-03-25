@@ -1145,6 +1145,15 @@ void WorldSession::ProcessQueryCallbacks()
         HandleStableChangeSlotCallback(result, param);
         _stableChangeSlotCallback.FreeResult();
     }
+    
+    //- HandleRenameGuild
+    if(_guildRenameCallback.IsReady())
+    {
+        std::string param = _guildRenameCallback.GetParam();
+        _guildRenameCallback.GetResult(result);
+        HandleGuildRenameCallback(param);
+        _guildRenameCallback.FreeResult();
+    }
 }
 
 void WorldSession::InitWarden(BigNumber* k, std::string os)

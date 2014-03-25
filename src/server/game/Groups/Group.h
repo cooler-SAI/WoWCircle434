@@ -224,6 +224,7 @@ class Group
         GroupReference const* GetFirstMember() const { return m_memberMgr.getFirst(); }
         uint32 GetMembersCount() const { return m_memberSlots.size(); }
 
+        uint8 GetGroupType() { return m_groupType; }
         uint8 GetMemberGroup(uint64 guid) const;
 
         void ConvertToLFG();

@@ -764,6 +764,13 @@ MinDualSpecLevel = 30
 StartPlayerLevel = 1
 
 #
+#    MinRaidLvlReq
+#        Description: Level requirement for Raid join
+#        Default:     1
+
+MinimalLvlForRaid = 10
+
+#
 #    StartHeroicPlayerLevel
 #        Description: Staring level for heroic class characters after creation.
 #        Range:       1-MaxPlayerLevel

@@ -963,10 +963,17 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleCompleteCinematic(WorldPacket& /*recvData*/)
 {
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_COMPLETE_CINEMATIC");
 }
 
 void WorldSession::HandleNextCinematicCamera(WorldPacket& /*recvData*/)
 {
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_NEXT_CINEMATIC_CAMERA");
+}
+
+void WorldSession::HandleCompleteMovie(WorldPacket& /*recvData*/)
+{
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_COMPLETE_MOVIE");
 }
 
 void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
@@ -1929,12 +1936,6 @@ void WorldSession::HandleChangeCurrencyFlags(WorldPacket& recvPacket)
     if (GetPlayer())
         GetPlayer()->ModifyCurrencyFlag(currencyId, uint8(flags));
 }
-
-void WorldSession::HandleCemeteryListOpcode(WorldPacket& recvPacket)
-{
-    GetPlayer()->SendCemeteryList(false);
-}
-
 void WorldSession::HandlerCategoryCooldownOpocde(WorldPacket& recvPacket)
 {
     Unit::AuraEffectList const& list = GetPlayer()->GetAuraEffectsByType(SPELL_AURA_MOD_SPELL_CATEGORY_COOLDOWN);
@@ -1949,4 +1950,72 @@ void WorldSession::HandlerCategoryCooldownOpocde(WorldPacket& recvPacket)
     }
 
     SendPacket(&data);
+}
+
+void WorldSession::HandleChangePlayerDifficulty(WorldPacket& recvData)
+{
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "Received CMSG_CHANGEPLAYER_DIFFICULTY");
+
+    uint32 difficulty;
+
+    recvData >> difficulty;
+
+    uint32 result = 0;
+
+    switch(result)
+    {
+    case ERR_DIFFICULTY_CHANGE_COOLDOWN_S:
+    case ERR_DIFFICULTY_CHANGE_UPDATE_TIME:
+    case ERR_DIFFICULTY_CHANGE_UPDATE_MAP_DIFFICULTY_ENTRY:
+        {
+            uint32 time = 0;
+            uint32 difficultyMapId = 0;
+            uint32 cooldownTime = 0;
+
+            WorldPacket data(SMSG_PLAYER_DIFFICULTY_CHANGE, 8);
+            data << result;
+
+            if (result == ERR_DIFFICULTY_CHANGE_UPDATE_TIME)
+                data << time;
+            else if (result == ERR_DIFFICULTY_CHANGE_COOLDOWN_S)
+                data << cooldownTime;
+            else
+                data << difficultyMapId;
+
+            SendPacket(&data);
+            break;
+        }
+    case ERR_DIFFICULTY_CHANGE_OTHER_HEROIC_S:
+        {
+            uint64 guid = 0;
+
+            WorldPacket data(SMSG_PLAYER_DIFFICULTY_CHANGE);
+            data << result;
+            data.appendPackGUID(guid); //guid of the player which is locked
+
+            SendPacket(&data);
+            break;
+        }
+    default:
+        {
+            WorldPacket data(SMSG_PLAYER_DIFFICULTY_CHANGE,4);
+            data << result;
+
+            SendPacket(&data);
+            break;
+        }
+    }
+}
+
+void WorldSession::HandleSetPreferedCemetery(WorldPacket& recvData)
+{
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_SET_PREFERED_CEMETERY");
+
+    uint32 CemeteryId;
+    recvData >> CemeteryId;
+}
+
+void WorldSession::HandleCemeteryListRequest(WorldPacket& recvPacket)
+{
+    GetPlayer()->SendCemeteryList(false);
 }

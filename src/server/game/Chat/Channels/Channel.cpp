@@ -1036,14 +1036,14 @@ void Channel::MakeNotInLfg(WorldPacket* data)
 // done 0x22
 void Channel::MakeVoiceOn(WorldPacket* data, uint64 guid)
 {
-    MakeNotifyPacket(data, CHAT_VOICE_ON_NOTICE, 8);
+    MakeNotifyPacket(data, CHAT_VOICE_ON_NOTICE);
     *data << uint64(guid);
 }
 
 // done 0x23
 void Channel::MakeVoiceOff(WorldPacket* data, uint64 guid)
 {
-    MakeNotifyPacket(data, CHAT_VOICE_OFF_NOTICE, 8);
+    MakeNotifyPacket(data, CHAT_VOICE_OFF_NOTICE);
     *data << uint64(guid);
 }
 

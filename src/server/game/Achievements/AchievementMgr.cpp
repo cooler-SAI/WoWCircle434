@@ -3836,3 +3836,18 @@ AchievementCriteriaEntry const* AchievementGlobalMgr::GetAchievementCriteria(uin
 {
     return sAchievementCriteriaStore.LookupEntry(criteriaId);
 }
+
+template<class T>
+CompletedAchievementData* AchievementMgr<T>::GetCompletedDataForAchievement(uint32 achievementId)
+{
+    CompletedAchievementMap::iterator itr = m_completedAchievements.find(achievementId);
+
+    if(itr != m_completedAchievements.end())
+    {
+        return &(itr->second);
+    }
+    else
+    {
+        return NULL;
+    }
+}

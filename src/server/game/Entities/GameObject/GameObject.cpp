@@ -2040,6 +2040,66 @@ void GameObject::EnableCollision(bool enable)
         GetMap()->InsertGameObjectModel(*m_model);*/
 
     m_model->enable(enable ? GetPhaseMask() : 0);
+
+    ObjectGuid goGuid = GetGUID();
+    WorldPacket data;
+
+    if(enable)
+    {
+        data.SetOpcode(SMSG_MOVE_COLLISION_ENABLE);
+
+        data.WriteBit(goGuid[6]);
+        data.WriteBit(goGuid[7]);
+        data.WriteBit(goGuid[4]);
+        data.WriteBit(goGuid[0]);
+        data.WriteBit(goGuid[2]);
+        data.WriteBit(goGuid[1]);
+        data.WriteBit(goGuid[5]);
+        data.WriteBit(goGuid[3]);
+
+        data.ResetBits();
+
+        data.WriteByteSeq(goGuid[1]);
+        data.WriteByteSeq(goGuid[4]);
+
+        data << GetPhaseMask();
+
+        data.WriteByteSeq(goGuid[6]);
+        data.WriteByteSeq(goGuid[2]);
+        data.WriteByteSeq(goGuid[5]);
+        data.WriteByteSeq(goGuid[3]);
+        data.WriteByteSeq(goGuid[0]);
+        data.WriteByteSeq(goGuid[7]);
+    }
+    else
+    {
+        data.SetOpcode(SMSG_MOVE_COLLISION_DISABLE);
+
+        data.WriteBit(goGuid[2]);
+        data.WriteBit(goGuid[1]);
+        data.WriteBit(goGuid[4]);
+        data.WriteBit(goGuid[3]);
+        data.WriteBit(goGuid[0]);
+        data.WriteBit(goGuid[6]);
+        data.WriteBit(goGuid[7]);
+        data.WriteBit(goGuid[5]);
+
+        data.ResetBits();
+
+        data.WriteByteSeq(goGuid[6]);
+        data.WriteByteSeq(goGuid[2]);
+        data.WriteByteSeq(goGuid[4]);
+        data.WriteByteSeq(goGuid[1]);
+        data.WriteByteSeq(goGuid[7]);
+        data.WriteByteSeq(goGuid[0]);
+        data.WriteByteSeq(goGuid[3]);
+
+        data << GetPhaseMask();
+
+        data.WriteByteSeq(goGuid[5]);
+    }
+
+    SendMessageToSet(&data,true);
 }
 
 void GameObject::UpdateModel()

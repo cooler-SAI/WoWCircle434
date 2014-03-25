@@ -86,6 +86,22 @@ struct AccountData
     std::string Data;
 };
 
+enum ChangeDynamicDifficultyResult
+{
+    ERR_DIFFICULTY_CHANGE_COOLDOWN_S                            = 0, // sends the remaining time in seconds to the client
+    ERR_DIFFICULTY_CHANGE_WORLDSTATE                            = 1,
+    ERR_DIFFICULTY_CHANGE_ENCOUNTER                             = 2,
+    ERR_DIFFICULTY_CHANGE_COMBAT                                = 3,
+    ERR_DIFFICULTY_CHANGE_PLAYER_BUSY                           = 4,
+    ERR_DIFFICULTY_CHANGE_UPDATE_TIME                           = 5, // sends the remaining time in time_t
+    ERR_DIFFICULTY_CHANGE_ALREADY_STARTED                       = 6,
+    ERR_DIFFICULTY_CHANGE_UPDATE_MAP_DIFFICULTY_ENTRY           = 7, // sends the ID of MapDifficulty
+    ERR_DIFFICULTY_CHANGE_OTHER_HEROIC_S                        = 8, // sends it when someone is locked for the encounter on heroic, sends the locked player packed guid
+    ERR_DIFFICULTY_CHANGE_HEROIC_INSTANCE_ALREADY_RUNNING       = 9,
+    ERR_DIFFICULTY_DISABLED_IN_LFG                              = 10, 
+    ERR_DIFFICULTY_CHANGE_SUCCESS                               = 11 // sends remaining time in time_t and mapId
+};
+
 enum PartyOperation
 {
     PARTY_OP_INVITE = 0,
@@ -578,6 +594,10 @@ class WorldSession
         void HandleGroupSwapSubGroupOpcode(WorldPacket& recvData);
         void HandleGroupAssistantLeaderOpcode(WorldPacket& recvData);
         void HandlePartyAssignmentOpcode(WorldPacket& recvData);
+        void HandleRequestJoinUpdates(WorldPacket & recvData);
+        void HandleSetAllowLowLevelRaidOpcode(WorldPacket& recvData);
+        void HandleSetEveryoneIsAssistant(WorldPacket& recvData);
+        void SendGroupCancel(std::string unkString);
 
         void HandlePetitionBuyOpcode(WorldPacket& recvData);
         void HandlePetitionShowSignOpcode(WorldPacket& recvData);
@@ -616,6 +636,11 @@ class WorldSession
         void HandleGuildRequestPartyState(WorldPacket& recvPacket);
         void HandleGuildRequestMaxDailyXP(WorldPacket& recvPacket);
         void HandleAutoDeclineGuildInvites(WorldPacket& recvPacket);
+        void HandleGuildAchievementProgressQuery(WorldPacket& recvData);
+        void HandleGuildAchievementMembers(WorldPacket& recvPacket);
+        void HandleGuildRenameRequest(WorldPacket& recvPacket);
+        void HandleGuildRenameCallback(std::string newName);
+        void SendGuildCancelInvite(std::string unkString, uint8 unkByte);
 
         void HandleGuildFinderAddRecruit(WorldPacket& recvPacket);
         void HandleGuildFinderBrowse(WorldPacket& recvPacket);
@@ -781,6 +806,7 @@ class WorldSession
         void HandleGetChannelMemberCount(WorldPacket& recvPacket);
         void HandleSetChannelWatch(WorldPacket& recvPacket);
 
+        void HandleCompleteMovie(WorldPacket& recvPacket);
         void HandleCompleteCinematic(WorldPacket& recvPacket);
         void HandleNextCinematicCamera(WorldPacket& recvPacket);
 
@@ -830,6 +856,10 @@ class WorldSession
         void HandleRequestPvpReward(WorldPacket& recvData);
         void HandleRequestRatedBgStats(WorldPacket& recvData);
 
+        // Cemetery
+        void HandleSetPreferedCemetery(WorldPacket& recvData);
+        void HandleCemeteryListRequest(WorldPacket& recvData);
+
         void HandleWardenDataOpcode(WorldPacket& recvData);
         void HandleWorldTeleportOpcode(WorldPacket& recvData);
         void HandleMinimapPingOpcode(WorldPacket& recvData);
@@ -837,6 +867,7 @@ class WorldSession
         void HandleFarSightOpcode(WorldPacket& recvData);
         void HandleSetDungeonDifficultyOpcode(WorldPacket& recvData);
         void HandleSetRaidDifficultyOpcode(WorldPacket& recvData);
+        void HandleChangePlayerDifficulty(WorldPacket& recvData);
         void HandleSetTitleOpcode(WorldPacket& recvData);
         void HandleRealmSplitOpcode(WorldPacket& recvData);
         void HandleTimeSyncResp(WorldPacket& recvData);
@@ -911,9 +942,10 @@ class WorldSession
         void HandleItemRefundInfoRequest(WorldPacket& recvData);
         void HandleItemRefund(WorldPacket& recvData);
 
-        void HandleChannelVoiceOnOpcode(WorldPacket& recvData);
+        void HandleChannelVoiceOnOpcode(WorldPacket& recvPacket);
+        void HandleChannelVoiceOffOpcode(WorldPacket& recvPacket);
         void HandleVoiceSessionEnableOpcode(WorldPacket& recvData);
-        void HandleSetActiveVoiceChannel(WorldPacket& recvData);
+        void HandleSetActiveVoiceChannel(WorldPacket& recvPacket);
         void HandleSetTaxiBenchmarkOpcode(WorldPacket& recvData);
 
         // Guild Bank
@@ -978,7 +1010,6 @@ class WorldSession
         void HandleAlterAppearance(WorldPacket& recvData);
         void HandleCharCustomize(WorldPacket& recvData);
         void HandleQueryInspectAchievements(WorldPacket& recvData);
-        void HandleGuildAchievementProgressQuery(WorldPacket& recvData);
         void HandleEquipmentSetSave(WorldPacket& recvData);
         void HandleEquipmentSetDelete(WorldPacket& recvData);
         void HandleEquipmentSetUse(WorldPacket& recvData);
@@ -996,7 +1027,6 @@ class WorldSession
         void HandleObjectUpdateFailedOpcode(WorldPacket& recvPacket);
         void HandleObjectUpdateRescuedOpcode(WorldPacket& recvPacket);
         void HandleChangeCurrencyFlags(WorldPacket& recvPacket);
-        void HandleCemeteryListOpcode(WorldPacket& recvPacket);
         void HandlerCategoryCooldownOpocde(WorldPacket& recvPacket);
         int32 HandleEnableNagleAlgorithm();
 
@@ -1015,6 +1045,7 @@ class WorldSession
         QueryCallback<PreparedQueryResult, uint64> _sendStabledPetCallback;
         QueryCallback<PreparedQueryResult, uint32> _stableChangeSlotCallback;
         QueryCallback<PreparedQueryResult, CharacterCreateInfo*, true> _charCreateCallback;
+        QueryCallback<PreparedQueryResult, std::string> _guildRenameCallback;
         QueryResultHolderFuture _charLoginCallback;
 
     private:

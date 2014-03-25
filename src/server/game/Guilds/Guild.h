@@ -800,6 +800,7 @@ public:
     void SendLoginInfo(WorldSession* session) const;
     void SendGuildReputationWeeklyCap(WorldSession* session) const;
     void SendGuildXP(WorldSession* session) const;
+    void SendGuildRename(std::string name);
 
     // Load from DB
     bool LoadFromDB(Field* fields);

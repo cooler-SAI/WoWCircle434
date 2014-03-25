@@ -22,26 +22,58 @@
 #include "WorldSession.h"
 #include "Opcodes.h"
 #include "Log.h"
+#include "ChannelMgr.h"
+#include "Channel.h"
+#include "Chat.h"
+#include "ObjectMgr.h"
+#include "SocialMgr.h"
+#include "World.h"
+#include "DatabaseEnv.h"
+#include "AccountMgr.h"
 
 void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recvData)
 {
-    // uint8 isVoiceEnabled, uint8 isMicrophoneEnabled
-    recvData.read_skip<uint8>();
-    recvData.read_skip<uint8>();
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_VOICE_SESSION_ENABLE");
+	
+	bool VoiceEnabled, MicrophoneEnabled;
+
+    recvData >> VoiceEnabled;
+    recvData >> MicrophoneEnabled;
+    // Something lacking here.
 }
 
-void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& /*recvData*/)
+void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& recvPacket)
 {
-    // Enable Voice button in channel context menu
-    /* structure:
-        8 bits -> channel name length
-        string -> channel name
-    */
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CHANNEL_VOICE_ON");
+    
+    uint32 length = recvPacket.ReadBits(8);
+    std::string channelname = recvPacket.ReadString(length);
+
+    if (ChannelMgr* cMgr = channelMgr(_player->GetTeam()))
+        if (Channel* chn = cMgr->GetChannel(channelname, _player))
+            chn->MakeVoiceOn(&recvPacket, _player->GetGUID());
 }
 
-void WorldSession::HandleSetActiveVoiceChannel(WorldPacket& recvData)
+void WorldSession::HandleChannelVoiceOffOpcode(WorldPacket& recvPacket)
 {
-    recvData.read_skip<uint32>();
-    recvData.read_skip<char*>();
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CHANNEL_VOICE_OFF");
+    
+    uint32 length = recvPacket.ReadBits(8);
+    std::string channelname = recvPacket.ReadString(length);
+
+    if (ChannelMgr* cMgr = channelMgr(_player->GetTeam()))
+        if (Channel* chn = cMgr->GetChannel(channelname, _player))
+            chn->MakeVoiceOff(&recvPacket, _player->GetGUID());
 }
 
+void WorldSession::HandleSetActiveVoiceChannel(WorldPacket& recvPacket)
+{
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_SET_ACTIVE_VOICE_CHANNEL");
+
+    uint32 channelId;
+    std::string channelname;
+
+    recvPacket >> channelId;
+    uint32 length = recvPacket.ReadBits(8);
+    channelname = recvPacket.ReadString(length);
+}

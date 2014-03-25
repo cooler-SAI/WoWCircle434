@@ -1552,11 +1552,42 @@ void Guild::HandleSetMemberNote(WorldSession* session, std::string const& note, 
         SendCommandResult(session, GUILD_INVITE_S, ERR_GUILD_PERMISSIONS);
     else if (Member* member = GetMember(guid))
     {
+        ObjectGuid playerGuid;
+
         if (isPublic)
             member->SetPublicNote(note);
         else
             member->SetOfficerNote(note);
         HandleRoster(session);
+
+        WorldPacket data(SMSG_GUILD_MEMBER_UPDATE_NOTE);
+
+        data.WriteBit(playerGuid[7]);
+        data.WriteBit(playerGuid[2]);
+        data.WriteBit(playerGuid[3]);
+
+        data.WriteBits(note.size(),8);
+
+        data.WriteBit(playerGuid[5]);
+        data.WriteBit(playerGuid[0]);
+        data.WriteBit(playerGuid[6]);
+        data.WriteBit(playerGuid[4]);
+        data.WriteBit(isPublic);
+        data.WriteBit(playerGuid[1]);
+
+        data.WriteByteSeq(playerGuid[3]);
+        data.WriteByteSeq(playerGuid[0]);
+        data.WriteByteSeq(playerGuid[5]);
+        data.WriteByteSeq(playerGuid[2]);
+
+        data.WriteString(note);
+
+        data.WriteByteSeq(playerGuid[7]);
+        data.WriteByteSeq(playerGuid[6]);
+        data.WriteByteSeq(playerGuid[1]);
+        data.WriteByteSeq(playerGuid[4]);
+
+        session->SendPacket(&data);
     }
 }
 
@@ -3343,6 +3374,36 @@ void Guild::SendGuildXP(WorldSession* session) const
     data << uint64(member->GetXPContribWeek());
     data << uint64(GetExperience());
     session->SendPacket(&data);
+}
+
+void Guild::SendGuildRename(std::string name)
+{
+    m_name = name;
+
+    ObjectGuid gguid = GetGUID();
+    WorldPacket data(SMSG_GUILD_RENAMED);
+
+    data.WriteBit(gguid[5]);
+    data.WriteBits(name.size(), 8);
+    data.WriteBit(gguid[4]);
+    data.WriteBit(gguid[0]);
+    data.WriteBit(gguid[6]);
+    data.WriteBit(gguid[3]);
+    data.WriteBit(gguid[1]);
+    data.WriteBit(gguid[7]);
+    data.WriteBit(gguid[2]);
+
+    data.WriteByteSeq(gguid[3]);
+    data.WriteByteSeq(gguid[2]);
+    data.WriteByteSeq(gguid[7]);
+    data.WriteByteSeq(gguid[1]);
+    data.WriteByteSeq(gguid[0]);
+    data.WriteByteSeq(gguid[6]);
+    data.WriteString(name);
+    data.WriteByteSeq(gguid[4]);
+    data.WriteByteSeq(gguid[5]);
+
+    BroadcastPacket(&data);
 }
 
 void Guild::ResetDailyExperience()

@@ -6460,6 +6460,7 @@ void Spell::EffectDisEnchant(SpellEffIndex /*effIndex*/)
     {
         caster->UpdateCraftSkill(m_spellInfo->Id);
         caster->SendLoot(itemTarget->GetGUID(), LOOT_DISENCHANTING);
+        caster->SendDisenchantCredit(itemTarget);
     }
 
     // item will be removed at disenchanting end

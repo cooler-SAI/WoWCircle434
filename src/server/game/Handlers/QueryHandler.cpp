@@ -374,13 +374,15 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleCorpseMapPositionQuery(WorldPacket& recvData)
 {
-    uint32 unk;
-    recvData >> unk;
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recv CMSG_CORPSE_MAP_POSITION_QUERY");
 
-    WorldPacket data(SMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE, 4+4+4+4);
-    data << int(0);
-    data << int(0);
-    data << int(0);
+    uint32 transportGuidLow;
+    recvData >> transportGuidLow;
+
+    WorldPacket data(SMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE, 4 + 4 + 4 + 4);
+    data << float(0);
+    data << float(0);
+    data << float(0);
     data << float(0);
     SendPacket(&data);
 }

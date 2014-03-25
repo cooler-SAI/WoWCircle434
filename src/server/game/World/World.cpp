@@ -1158,6 +1158,8 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_CHARDELETE_MIN_LEVEL] = ConfigMgr::GetIntDefault("CharDelete.MinLevel", 0);
     m_int_configs[CONFIG_CHARDELETE_KEEP_DAYS] = ConfigMgr::GetIntDefault("CharDelete.KeepDays", 30);
 
+    m_int_configs[CONFIG_MIN_LVL_FOR_RAID] = ConfigMgr::GetIntDefault("MinimalLvlForRaid", 1);
+
     ///- Read the "Data" directory from the config file
     std::string dataPath = ConfigMgr::GetStringDefault("DataDir", "./");
     if (dataPath.at(dataPath.length()-1) != '/' && dataPath.at(dataPath.length()-1) != '\\')

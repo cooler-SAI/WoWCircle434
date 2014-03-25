@@ -172,6 +172,26 @@ class ByteBuffer
             return uint32(mktime(lt));
         }
 
+        std::string ReadString(uint32 length)
+        {
+            if (!length)
+                return std::string();
+            char* buffer = new char[length + 1];
+            memset(buffer, 0, length + 1);
+            read((uint8*)buffer, length);
+            std::string retval = buffer;
+            delete[] buffer;
+            return retval;
+        }
+
+        //! Method for writing strings that have their length sent separately in packet
+        //! without null-terminating the string
+        void WriteString(std::string const& str)
+        {
+            if (size_t len = str.length())
+                append(str.c_str(), len);
+        }
+
         ByteBuffer& ReadPackedTime(uint32& time)
         {
             time = ReadPackedTime();

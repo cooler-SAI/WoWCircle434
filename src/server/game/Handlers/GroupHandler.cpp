@@ -228,6 +228,12 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket & recvData)
         return;
     }
 
+    if (group && group->isRaidGroup() && !player->GetAllowLowLevelRaid() && (player->getLevel() < sWorld->getIntConfig(CONFIG_MIN_LVL_FOR_RAID)))
+    {
+        SendPartyResult(PARTY_OP_INVITE, "", ERR_RAID_DISALLOWED_BY_LEVEL);
+        return;
+    }
+
     if (group)
     {
         // not have permissions for invite
@@ -1145,4 +1151,86 @@ void WorldSession::HandleOptOutOfLootOpcode(WorldPacket& recvData)
     }
 
     GetPlayer()->SetPassOnGroupLoot(passOnLoot);
+}
+
+void WorldSession::HandleRequestJoinUpdates(WorldPacket & recvData)
+{
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GROUP_REQUEST_JOIN_UPDATES ");
+
+    Group* grp = GetPlayer()->GetGroup();
+
+    if(grp)
+    {
+        WorldPacket data(SMSG_REAL_GROUP_UPDATE, 13);
+        data << uint8(grp->GetGroupType());
+        data << uint32(grp->GetMembersCount());
+
+        if(grp->GetMembersCount() > 2) //group is already formed, send the latest member guid
+        {
+            Group::MemberSlotList::const_iterator lastMember = --grp->GetMemberSlots().end();
+
+            data << uint64(lastMember->guid);
+        }
+        else // group has just formed, send the other player guid
+        {
+            Group::MemberSlotList::const_iterator member = grp->GetMemberSlots().begin();
+
+            if(member->guid == GetPlayer()->GetGUID())
+                ++member;
+
+            data << uint64(member->guid);
+        }
+        SendPacket(&data);
+    }
+}
+
+void WorldSession::HandleSetAllowLowLevelRaidOpcode(WorldPacket& recvData)
+{
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received opcode CMSG_LOW_LEVEL_RAID, CMSG_LOW_LEVEL_RAID_USER: %4X", recvData.GetOpcode());
+
+    uint8 allow;
+    recvData >> allow;
+
+    GetPlayer()->SetAllowLowLevelRaid(allow);
+}
+
+void WorldSession::HandleSetEveryoneIsAssistant(WorldPacket& recvData)
+{
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_SET_EVERYONE_IS_ASSISTANT");
+
+    Group* group = GetPlayer()->GetGroup();
+
+    if (!group || !group->isRaidGroup())    // Only raid groups may have assistant
+        return;
+
+    if (!group->IsLeader(GetPlayer()->GetGUID()))
+        return;
+
+    bool active = recvData.ReadBit();   // 0 == inactive, 1 == active
+
+    if (active)
+    {
+        for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next()) // Loop through all members
+            if (Player* player = itr->getSource())
+                group->SetGroupMemberFlag(player->GetGUID(), active, MEMBER_FLAG_ASSISTANT);
+
+        group->SendUpdate();
+    }
+    else
+    {
+        for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next()) // Loop through all members
+            if (Player* player = itr->getSource())
+                group->SetGroupMemberFlag(player->GetGUID(), !active, MEMBER_FLAG_ASSISTANT);
+
+        group->SendUpdate();
+    }
+}
+
+void WorldSession::SendGroupCancel(std::string unkString)
+{
+    WorldPacket data(SMSG_GROUP_CANCEL, unkString.length());
+
+    data << unkString;
+
+    SendPacket(&data);
 }

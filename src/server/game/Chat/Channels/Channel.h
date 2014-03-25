@@ -196,8 +196,6 @@ class Channel
         void MakeThrottled(WorldPacket* data);                                  //? 0x1F
         void MakeNotInArea(WorldPacket* data);                                  //? 0x20
         void MakeNotInLfg(WorldPacket* data);                                   //? 0x21
-        void MakeVoiceOn(WorldPacket* data, uint64 guid);                       //+ 0x22
-        void MakeVoiceOff(WorldPacket* data, uint64 guid);                      //+ 0x23
 
         void SendToAll(WorldPacket* data, uint64 p = 0);
         void SendToAllButOne(WorldPacket* data, uint64 who);
@@ -258,6 +256,9 @@ class Channel
         uint32 GetNumPlayers() const { return players.size(); }
         uint8 GetFlags() const { return m_flags; }
         bool HasFlag(uint8 flag) const { return m_flags & flag; }
+
+        void MakeVoiceOn(WorldPacket* data, uint64 guid);                       //+ 0x22
+        void MakeVoiceOff(WorldPacket* data, uint64 guid);                      //+ 0x23
 
         void Join(uint64 p, const char *pass);
         void Leave(uint64 p, bool send = true);
