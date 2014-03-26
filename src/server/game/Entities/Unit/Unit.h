@@ -2280,6 +2280,11 @@ class Unit : public WorldObject
         void ReleaseFocus(Spell const* focusSpell);
         bool IsVisionObscured(Unit* victim, SpellInfo const* spellInfo) const;
 
+        //alt power 10
+        int32 alt;
+        int32 GetAltPower() {return alt;};
+        void SetAltPower(int32 power);
+
         // Movement info
         Movement::MoveSpline * movespline;
 

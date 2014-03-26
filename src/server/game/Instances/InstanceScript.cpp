@@ -434,12 +434,12 @@ void InstanceScript::DoCastSpellOnPlayers(uint32 spell)
 
 void InstanceScript::DoSetAlternatePowerOnPlayers(int32 value)
 {
-    Map::PlayerList const &plrList = instance->GetPlayers();
+    Map::PlayerList const &PlayerList = instance->GetPlayers();
 
-    if (!plrList.isEmpty())
-        for (Map::PlayerList::const_iterator i = plrList.begin(); i != plrList.end(); ++i)
-            if (Player* pPlayer = i->getSource())
-                pPlayer->SetPower(POWER_ALTERNATE_POWER, value);
+    if (!PlayerList.isEmpty())
+        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+            if (Player* player = i->getSource())
+                player->SetAltPower(player->GetPower(POWER_ALTERNATE_POWER));
 }
 
 void InstanceScript::DoModifyPlayerCurrencies(uint32 id, int32 value)
