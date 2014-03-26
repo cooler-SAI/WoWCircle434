@@ -16190,7 +16190,8 @@ bool Unit::HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, f
         case UNIT_MOD_FOCUS:
         case UNIT_MOD_ENERGY:
         case UNIT_MOD_RUNE:
-        case UNIT_MOD_RUNIC_POWER:          UpdateMaxPower(GetPowerTypeByAuraGroup(unitMod));          break;
+        case UNIT_MOD_RUNIC_POWER:
+        case UNIT_MOD_ALTERNATE_POWER      :UpdateMaxPower(GetPowerTypeByAuraGroup(unitMod));          break;
 
         case UNIT_MOD_RESISTANCE_HOLY:
         case UNIT_MOD_RESISTANCE_FIRE:
@@ -22029,29 +22030,7 @@ void Unit::SetAltPower(int32 power)
 {
     alt = power;
 
-    if (HasAura(93103)) // Corruption Cho'gall. - Finished.
-    {
-        if (alt >= 25 && !HasAura(81836))
-           AddAura(81836, ToPlayer());
-        
-        if (alt >= 50 && !HasAura(81829))
-           AddAura(81829, ToPlayer());
-        
-        if (alt >= 75 && !HasAura(82125))
-        {
-           AddAura(82125, ToPlayer());
-           AddAura(82167, ToPlayer());
-           Creature* malformation = ToPlayer()->SummonCreature(43888, ToPlayer()->GetPositionX(), ToPlayer()->GetPositionY(), ToPlayer()->GetPositionZ(), ToPlayer()->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN);
-           malformation->CastSpell(ToPlayer(), 46598, true);
-        }
-
-        if (alt >= 100 && !HasAura(82193))
-        {
-            AddAura(82193, ToPlayer());
-            AddAura(82170, ToPlayer());
-        }
-    }
-    else if (HasAura(78949)) //Electricity Onyxia. - Finished.
+    if (HasAura(78949)) //Electricity Onyxia. - Finished.
     {
         if (alt >= 100)
             CastSpell(ToUnit(), 78999, true);
