@@ -172,6 +172,8 @@ enum CharterTypes
 #define DB2_REPLY_SPARSE 2442913102
 #define DB2_REPLY_ITEM   1344507586
 
+typedef std::list<WorldPacket*> packetBlock; 
+
 //class to deal with packet processing
 //allows to determine if next packet is safe to be processed
 class PacketFilter
@@ -260,6 +262,7 @@ class WorldSession
         bool IsAddonRegistered(const std::string& prefix) const;
 
         void SendPacket(WorldPacket const* packet, bool forced = false);
+        WorldPacket BuildMultiplePackets(packetBlock packets);
 
         void SendNotification(const char *format, ...) ATTR_PRINTF(2, 3);
         void SendNotification(uint32 string_id, ...);

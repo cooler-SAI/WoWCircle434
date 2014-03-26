@@ -1180,3 +1180,16 @@ bool WorldSession::HasCommandsCooldown()
     timeLastServerCommand = now;
     return false;
 }
+
+WorldPacket WorldSession::BuildMultiplePackets(packetBlock packets)
+{
+    WorldPacket data(SMSG_MULTIPLE_PACKETS, packets.size());
+
+    for(packetBlock::const_iterator itr = packets.begin(); itr != packets.end(); ++itr)
+    {
+        data << uint16((*itr)->GetOpcode());
+        data << uint16((*itr)->size());
+        data.append((*itr)->contents(), (*itr)->size());
+    }
+    return data;
+}
