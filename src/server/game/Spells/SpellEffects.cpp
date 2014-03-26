@@ -2703,9 +2703,21 @@ void Spell::EffectHealthLeech(SpellEffIndex effIndex)
     if (!unitTarget || !unitTarget->isAlive() || damage < 0)
         return;
 
-    // Siphon Vitality, Warmaster Blackhorn, Dragon Soul
-    if (m_spellInfo->Id == 110312)
+    switch (m_spellInfo->Id)
+    {
+        // Siphon Vitality, Warmaster Blackhorn, Dragon Soul
+    case 110312:
         damage = unitTarget->CountPctFromCurHealth(20);
+        break;
+        // Drain Life, Item - Dragon Soul - Proc - Str Tank Sword, Souldrinker
+    case 108022:
+    case 109828:
+    case 109831:
+        damage = int32(0.001f * damage * m_caster->GetMaxHealth());
+        break;
+    default:
+        break;
+    }
 
     damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
     damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
