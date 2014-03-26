@@ -2019,3 +2019,18 @@ void WorldSession::HandleCemeteryListRequest(WorldPacket& recvPacket)
 {
     GetPlayer()->SendCemeteryList(false);
 }
+
+void WorldSession::SendStreamingMovie()
+{
+    uint8 count = 0;
+
+    WorldPacket data(SMSG_STREAMING_MOVIE, 4 + (2 * count));
+    data.WriteBits(count, 25);
+
+    for (uint8 i = 0; i < 0; ++i)
+    {
+        data << uint16(0);  //File Data ID
+    }
+
+    SendPacket(&data);
+}
