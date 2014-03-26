@@ -1456,18 +1456,26 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             {
                 // Raise Dead
                 case 46584:
-                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
-                        return;
+                    {
+                        if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                            return;
 
-                    // Do we have talent Master of Ghouls?
-                    if (m_caster->HasAura(52143))
-                        spell_id = 52150; // summon as pet
-                    else
-                        spell_id = 46585; // or guardian
+                        // Do we have talent Master of Ghouls?
+                        if (m_caster->HasAura(52143))
+                            spell_id = 52150; // summon as pet
+                        else
+                            spell_id = 46585; // or guardian
 
-                    // Remove cooldown - summon spellls have category
-                    m_caster->ToPlayer()->RemoveSpellCooldown(52150, true);
-                    m_caster->ToPlayer()->RemoveSpellCooldown(46585, true);
+                        if (m_targets.HasDst())
+                            targets.SetDst(*m_targets.GetDstPos());
+                        else
+                        {
+                            targets.SetDst(*m_caster);
+                        }
+                        // Remove cooldown - summon spellls have category
+                        m_caster->ToPlayer()->RemoveSpellCooldown(52150, true);
+                        m_caster->ToPlayer()->RemoveSpellCooldown(46585, true);
+                    }
                     break;
                 // Ghoul: Gnaw
                 case 47481:
