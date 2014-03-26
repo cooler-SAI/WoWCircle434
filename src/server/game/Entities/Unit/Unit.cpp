@@ -8795,6 +8795,10 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (HasAura(105816))
                         CastSpell(this, 105821, true);
 
+                    // Taming the Flames, Item - Shaman T12 Elemental 2P Bonus
+                    if (HasAura(99204))
+                        ToPlayer()->ReduceSpellCooldown(2894, 4000);
+
                     break;
                 }
                 // Item - Shaman T10 Elemental 4P Bonus
