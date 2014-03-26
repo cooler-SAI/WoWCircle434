@@ -1476,6 +1476,10 @@ bool SpellInfo::CanCritDamageClassNone() const
 
         case 71607: // Item - Bauble of True Blood 10m
         case 71646: // Item - Bauble of True Blood 25m
+
+        case 109825: // Item - Windward Heart heroic
+        case 108000: // Item - Windward Heart lfr
+        case 109822: // Item - Windward Heart normal
             return true;
     }
     return false;
