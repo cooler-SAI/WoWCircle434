@@ -9045,6 +9045,14 @@ void Player::SendNotifyLootItemRemoved(uint8 lootSlot, bool currency)
     GetSession()->SendPacket(&data);
 }
 
+void Player::SendNotifyCurrencyLootRestored(uint8 lootSlot)
+{
+    // Made it, although it doesn't seem to be used anywhere.
+    WorldPacket data(SMSG_CURRENCY_LOOT_RESTORED, 1);
+    data << uint8(lootSlot);
+    GetSession()->SendPacket(&data);
+}
+
 void Player::SendUpdateWorldState(uint32 Field, uint32 Value)
 {
     WorldPacket data(SMSG_UPDATE_WORLD_STATE, 4+4+1);
