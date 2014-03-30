@@ -137,18 +137,19 @@ public:
         {
             Talk(SAY_AGGRO);
 
-            events.ScheduleEvent(EVENT_STOMP, urand(12000, 14000));
-            events.ScheduleEvent(EVENT_EARTHEN_VORTEX, urand(56000, 60000));
-            events.ScheduleEvent(EVENT_RESONATING_CRYSTAL, urand(19000, 20000));
-            events.ScheduleEvent(EVENT_BERSERK, 7 * MINUTE * IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_STOMP,               urand(12000, 14000));
+            events.ScheduleEvent(EVENT_EARTHEN_VORTEX,      urand(56000, 60000));
+            events.ScheduleEvent(EVENT_RESONATING_CRYSTAL,  urand(19000, 20000));
+            events.ScheduleEvent(EVENT_BERSERK,             7 * MINUTE * IN_MILLISECONDS);
+
             if (!IsHeroic())
                 events.ScheduleEvent(EVENT_CRUSH_ARMOR, urand(6000, 12000));
 
             _stompguid1 = 0;
             _stompguid2 = 0;
-            bEnrage = false;
-            bKohcrom = false;
-            bAchieve = true;
+            bEnrage     = false;
+            bKohcrom    = false;
+            bAchieve    = true;
             bFirstStomp = false;
             bFirstCrystal = false;
 
@@ -156,9 +157,13 @@ public:
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_WARNING);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SAFE);
 
+            me->setActive(true);
             DoZoneInCombat();
-            instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
-            instance->SetBossState(DATA_MORCHOK, IN_PROGRESS);
+            if (instance)
+            {
+                instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
+                instance->SetBossState(DATA_MORCHOK, IN_PROGRESS);
+            }
         }
 
         void JustDied(Unit* /*killer*/)
@@ -284,15 +289,17 @@ public:
                         }
                         events.ScheduleEvent(EVENT_UPDATE_HEALTH, 3000);
                     }
-
                     break;
+
                 case EVENT_BERSERK:
                     DoCast(me, SPELL_BERSERK);
                     break;
+
                 case EVENT_CRUSH_ARMOR:
                     DoCastVictim(SPELL_CRUSH_ARMOR);
                     events.ScheduleEvent(EVENT_CRUSH_ARMOR, urand(12000, 15000));
                     break;
+
                 case EVENT_STOMP:
                     {
                         _stompguid1 = 0;
@@ -312,6 +319,7 @@ public:
                         bFirstStomp = false;
                         break;
                     }
+
                 case EVENT_RESONATING_CRYSTAL:
                     {
                         int32 tim = int32(events.GetNextEventTime(EVENT_EARTHEN_VORTEX)) - int32(events.GetTimer());
@@ -331,6 +339,7 @@ public:
                         bFirstCrystal = false;
                         break;
                     }
+
                 case EVENT_EARTHEN_VORTEX:
                     Talk(SAY_GROUND1);
                     me->SetReactState(REACT_PASSIVE);
@@ -350,15 +359,18 @@ public:
                     events.ScheduleEvent(EVENT_BLACK_BLOOD, 5000);
                     events.ScheduleEvent(EVENT_EARTHEN_VORTEX, urand(94000, 97000));
                     break;
+
                 case EVENT_BLACK_BLOOD:
                     Talk(SAY_GROUND2);
                     DoCast(me, SPELL_BLACK_BLOOD_OF_THE_EARTH);
                     events.ScheduleEvent(EVENT_CONTINUE_1, 18000);
                     break;
+
                 case EVENT_CONTINUE:
                     me->SetReactState(REACT_AGGRESSIVE);
                     AttackStart(me->getVictim());
                     break;
+
                 case EVENT_CONTINUE_1:
                     me->SetReactState(REACT_AGGRESSIVE);
                     AttackStart(me->getVictim());
@@ -515,6 +527,7 @@ public:
                     _stompguid2 = 0;
                     DoCast(me, SPELL_STOMP);
                     break;
+
                 case EVENT_RESONATING_CRYSTAL:
                     {
                         Position pos;
@@ -522,6 +535,7 @@ public:
                         me->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_RESONATING_CRYSTAL, true);
                         break;
                     }
+
                 case EVENT_EARTHEN_VORTEX:
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
@@ -529,10 +543,12 @@ public:
                     DoCast(me, SPELL_EARTHS_VENGEANCE);
                     events.ScheduleEvent(EVENT_BLACK_BLOOD, 5000);
                     break;
+
                 case EVENT_BLACK_BLOOD:
                     DoCast(me, SPELL_BLACK_BLOOD_OF_THE_EARTH);
                     events.ScheduleEvent(EVENT_CONTINUE, 18000);
                     break;
+
                 case EVENT_CONTINUE:
                     me->SetReactState(REACT_AGGRESSIVE);
                     AttackStart(me->getVictim());
@@ -574,9 +590,7 @@ public:
 
         EventMap events; 
 
-        void Reset()
-        {
-        }
+        void Reset() { }
 
         void IsSummonedBy(Unit* /*owner*/)
         {
@@ -694,7 +708,6 @@ public:
     {
         return new spell_morchok_target_selected_SpellScript();
     }
-
 };
 
 class spell_morchok_resonating_crystal_dmg : public SpellScriptLoader
