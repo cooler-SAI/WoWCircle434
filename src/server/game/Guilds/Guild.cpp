@@ -3360,6 +3360,11 @@ void Guild::GiveXP(uint32 xp, Player* source /*=NULL*/)
 
         ++oldLevel;
     }
+
+    if(source)
+        SendGuildXP(source->GetSession()); //this is needed, to display correct update on gain.
+    else
+        SendGuildXP();
 }
 
 void Guild::SendGuildXP(WorldSession* session) const

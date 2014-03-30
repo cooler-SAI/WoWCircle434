@@ -799,7 +799,7 @@ public:
     void SendMoneyInfo(WorldSession* session) const;
     void SendLoginInfo(WorldSession* session) const;
     void SendGuildReputationWeeklyCap(WorldSession* session) const;
-    void SendGuildXP(WorldSession* session) const;
+    void SendGuildXP(WorldSession* session = NULL) const;
     void SendGuildRename(std::string name);
 
     // Load from DB
