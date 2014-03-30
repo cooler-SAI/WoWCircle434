@@ -441,6 +441,7 @@ public:
             events.ScheduleEvent(EVENT_ICE_LANCE, 10000);
 
             DoZoneInCombat();
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
             instance->SetBossState(DATA_HAGARA, IN_PROGRESS);
         }
 
