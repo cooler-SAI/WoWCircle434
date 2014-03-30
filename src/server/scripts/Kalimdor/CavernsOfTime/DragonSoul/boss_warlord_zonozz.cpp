@@ -120,8 +120,8 @@ const Position tentaclePos[14] =
 {
     {-1702.57f, -1884.71f, -221.513f, 3.63029f},
     {-1696.95f, -1941.09f, -221.292f, 1.90241f},
-    {-1792.2f, -1988.63f, -221.373f, 1.41372f},
-    {-1834.55f, -1952.28f, -221.38f, 0.628318f},
+    {-1792.2f,  -1988.63f, -221.373f, 1.41372f},
+    {-1834.55f, -1952.28f, -221.38f,  0.628318f},
     {-1734.35f, -1983.18f, -221.445f, 2.14675f},
     {-1745.46f, -1847.31f, -221.437f, 4.43314f},
     {-1839.37f, -1895.09f, -221.381f, 5.98648f},
@@ -219,11 +219,11 @@ public:
             Talk(SAY_AGGRO);
             DoCastAOE(SPELL_ZONOZZ_WHISPER_AGGRO, true);
 
-            events.ScheduleEvent(EVENT_CHECK_DISTANCE, 5000);
-            events.ScheduleEvent(EVENT_BERSERK, 6 * MINUTE * IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_PSYCHIC_DRAIN, 13000);
-            events.ScheduleEvent(EVENT_FOCUSED_ANGER, 10500);
-            events.ScheduleEvent(EVENT_DISRUPTING_SHADOWS, urand(25000, 30000));
+            events.ScheduleEvent(EVENT_CHECK_DISTANCE,      5000);
+            events.ScheduleEvent(EVENT_BERSERK,             6 * MINUTE * IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_PSYCHIC_DRAIN,       13000);
+            events.ScheduleEvent(EVENT_FOCUSED_ANGER,       10500);
+            events.ScheduleEvent(EVENT_DISRUPTING_SHADOWS,  urand(25000, 30000));
             events.ScheduleEvent(EVENT_VOID_OF_THE_UNMAKING, 5500);
 
             instance->DoRemoveAurasDueToSpellOnPlayers(RAID_MODE(SPELL_BLACK_BLOOD_OF_GORATH, SPELL_BLACK_BLOOD_OF_GORATH_25));
@@ -378,7 +378,8 @@ public:
                 case EVENT_TANTRUM_1:
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
-                    me->NearTeleportTo(centerPos.GetPositionX(), centerPos.GetPositionY(), centerPos.GetPositionZ(), centerPos.GetOrientation());
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MoveTargetedHome();
                     events.ScheduleEvent(EVENT_TANTRUM_2, 3000);
                     break;
                 case EVENT_TANTRUM_2:
@@ -478,9 +479,6 @@ public:
 
         void IsSummonedBy(Unit* /*owner*/)
         {
-            //me->SetSpeed(MOVE_RUN, 0.428571f, true);
-            //me->SetSpeed(MOVE_WALK, 0.428571f, true);
-            //me->SetSpeed(MOVE_FLIGHT, 0.428571f, true);
             me->SetSpeed(MOVE_RUN, 0.6f, true);
             me->SetSpeed(MOVE_WALK, 0.6f, true);
             me->SetSpeed(MOVE_FLIGHT, 0.6f, true);
