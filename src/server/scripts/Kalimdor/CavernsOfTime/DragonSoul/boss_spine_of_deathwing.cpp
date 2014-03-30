@@ -126,23 +126,23 @@ enum RollStage
 const Position corruptionPos[8] = 
 {
     {-13868.6f, -13667.3f, 262.836f, 0.0698132f}, // left 1
-    {-13841.1f, -13666.9f, 262.795f, 3.01942f}, // right 1
+    {-13841.1f, -13666.9f, 262.795f, 3.01942f},   // right 1
     {-13868.5f, -13654.1f, 262.946f, 0.0174533f}, // left 2
-    {-13842.8f, -13654.1f, 263.965f, 5.84685f}, // right 2
-    {-13867.1f, -13638.5f, 264.783f, 2.33874f}, // left 3
-    {-13841.2f, -13635.2f, 265.261f, 0.785398f}, // right 3
-    {-13870.5f, -13614.4f, 266.88f, 1.95477f}, // left 4
-    {-13839.3f, -13614.8f, 266.32f, 6.23082f} // right 4
+    {-13842.8f, -13654.1f, 263.965f, 5.84685f},   // right 2
+    {-13867.1f, -13638.5f, 264.783f, 2.33874f},   // left 3
+    {-13841.2f, -13635.2f, 265.261f, 0.785398f},  // right 3
+    {-13870.5f, -13614.4f, 266.88f,  1.95477f},   // left 4
+    {-13839.3f, -13614.8f, 266.32f,  6.23082f}    // right 4
 };
 
 const Position tendonsPos[6] =
 {
-    {-13862.8f, -13645.f, 265.752f, 1.5708f}, // left 1
-    {-13846.8f, -13644.7f, 265.789f, 1.5708f}, // right 1
-    {-13862.6f, -13626.3f, 266.59f, 1.5708f}, // left 2
-    {-13846.6f, -13626.f, 266.638f, 1.5708f}, // right 2
-    {-13862.6f, -13604.9f, 269.227f, 1.5708f}, // left 3
-    {-13846.6f, -13604.7f, 269.174f, 1.5708f} // right 3
+    {-13862.8f, -13645.f,  265.752f, 1.5708f},  // left 1
+    {-13846.8f, -13644.7f, 265.789f, 1.5708f},  // right 1
+    {-13862.6f, -13626.3f, 266.59f,  1.5708f},  // left 2
+    {-13846.6f, -13626.f,  266.638f, 1.5708f},  // right 2
+    {-13862.6f, -13604.9f, 269.227f, 1.5708f},  // left 3
+    {-13846.6f, -13604.7f, 269.174f, 1.5708f}   // right 3
 };
 
 class npc_spine_of_deathwing_deathwing : public CreatureScript
@@ -287,7 +287,7 @@ public:
                         pInstance->DoRespawnGameObject(pInstance->GetData64(DATA_GREATER_CACHE_25H), DAY);
                         break;
                         }*/
-                        //pInstance->DoStartMovie(75);
+                        pInstance->DoStartMovie(75);
                         pInstance->DoNearTeleportPlayers(madnessdeathwingPos);
                     }                            
                     break;
@@ -513,6 +513,8 @@ public:
             me->SetReactState(REACT_PASSIVE);
             damageCounter = 0;
             isGrip = false;
+
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void IsSummonedBy(Unit* /*who*/)
@@ -641,11 +643,14 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
 
             isExplode = false;
+
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void Reset()
         {
             events.Reset();
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void DoAction(const int32 action)
@@ -794,6 +799,8 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
 
             isDead = false;
+
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void MovementInform(uint32 type, uint32 id)
@@ -1247,7 +1254,7 @@ public:
         class PlayersCheck
         {
         public:
-            PlayersCheck(WorldObject const* obj) : _obj(obj) {}
+            PlayersCheck(WorldObject const* obj) : _obj(obj) { }
             bool operator()(Player* u)
             {
                 if (!u->isAlive())
@@ -1256,8 +1263,7 @@ public:
                 if (!_obj->IsWithinDistInMap(u, 200.0f))
                     return false;
 
-                if (u->HasAura(SPELL_BLOOD_CORRUPTION_DEATH) ||
-                    u->HasAura(SPELL_BLOOD_CORRUPTION_EARTH))
+                if (u->HasAura(SPELL_BLOOD_CORRUPTION_DEATH) || u->HasAura(SPELL_BLOOD_CORRUPTION_EARTH))
                     return false;
 
                 if (_obj->GetGUID() == u->GetGUID())
