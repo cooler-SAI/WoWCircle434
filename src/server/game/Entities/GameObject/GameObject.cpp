@@ -2057,8 +2057,6 @@ void GameObject::EnableCollision(bool enable)
         data.WriteBit(goGuid[5]);
         data.WriteBit(goGuid[3]);
 
-        data.ResetBits();
-
         data.WriteByteSeq(goGuid[1]);
         data.WriteByteSeq(goGuid[4]);
 
@@ -2083,8 +2081,6 @@ void GameObject::EnableCollision(bool enable)
         data.WriteBit(goGuid[6]);
         data.WriteBit(goGuid[7]);
         data.WriteBit(goGuid[5]);
-
-        data.ResetBits();
 
         data.WriteByteSeq(goGuid[6]);
         data.WriteByteSeq(goGuid[2]);
@@ -2182,8 +2178,6 @@ void GameObject::ActivateAnimation(uint32 anim)
     data.WriteBit(guid[2]);
     data.WriteBit(guid[3]);
     data.WriteBit(guid[6]);
-
-    data.ResetBits();
 
     data.WriteByteSeq(guid[5]);
     data.WriteByteSeq(guid[1]);
