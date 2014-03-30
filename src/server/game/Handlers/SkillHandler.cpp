@@ -136,3 +136,10 @@ void WorldSession::HandleArcheologyRequestHistory(WorldPacket& recvPacket)
 
     SendPacket(&data);
 }
+
+void WorldSession::HandleSetPrimaryTree(WorldPacket& recvPacket)
+{
+    uint32 talentTabId;
+
+    recvPacket >> talentTabId;
+}
