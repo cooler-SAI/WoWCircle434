@@ -560,6 +560,10 @@ enum CurrencyTypes
     CURRENCY_TYPE_VALOR_POINTS          = 396,
     CURRENCY_TYPE_CONQUEST_META_ARENA   = 483,
     CURRENCY_TYPE_CONQUEST_META_BG      = 484,
+
+    // Dragon Soul.
+    CURRENCY_TYPE_MOTE_OF_DARKNESS      = 614,
+    CURRENCY_TYPE_ESS_CORRUPTED_DW      = 615,
 };
 
 #endif

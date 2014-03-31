@@ -258,7 +258,7 @@ class boss_queen_azshara : public CreatureScript
 
                             instance->SetBossState(DATA_AZSHARA, DONE);
                             instance->DoRespawnGameObject(instance->GetData64(DATA_ROYAL_CACHE), DAY);
-                            instance->DoModifyPlayerCurrencies(395, 7000);
+                            instance->DoModifyPlayerCurrencies(CURRENCY_TYPE_JUSTICE_POINTS, 7000);
                             me->DespawnOrUnsummon();
                             break;
                         }

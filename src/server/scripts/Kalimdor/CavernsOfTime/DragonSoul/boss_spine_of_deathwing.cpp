@@ -270,8 +270,8 @@ public:
                     //DoCastAOE(SPELL_PLAY_MOVIE);
                     if (pInstance)
                     {
-                        pInstance->DoModifyPlayerCurrencies(396, (IsHeroic() ? 140 : 120));
-                        pInstance->DoModifyPlayerCurrencies(614, 1);
+                        pInstance->DoModifyPlayerCurrencies(CURRENCY_TYPE_VALOR_POINTS, (IsHeroic() ? 140 : 120));
+                        pInstance->DoModifyPlayerCurrencies(CURRENCY_TYPE_MOTE_OF_DARKNESS, 1);
                         /*switch (GetDifficulty())
                         {
                         case RAID_DIFFICULTY_10MAN_NORMAL:

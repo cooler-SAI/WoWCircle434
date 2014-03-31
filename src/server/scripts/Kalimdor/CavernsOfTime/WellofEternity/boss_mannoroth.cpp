@@ -476,10 +476,10 @@ class boss_mannoroth : public CreatureScript
                                     }
                         }
                     }
-                    instance->DoKilledMonsterKredit(QUEST_THE_PATH_TO_THE_DRAGON_SOUL, 54969, 0);
+                    instance->DoKilledMonsterKredit(QUEST_THE_PATH_TO_THE_DRAGON_SOUL, NPC_MANNOROTH, 0);
                     instance->UpdateEncounterState(ENCOUNTER_CREDIT_CAST_SPELL, SPELL_COMPLETE_ENCOUNTER, me); 
                     instance->SetBossState(DATA_MANNOROTH, DONE);
-                    instance->DoModifyPlayerCurrencies(395, 7000);
+                    instance->DoModifyPlayerCurrencies(CURRENCY_TYPE_JUSTICE_POINTS, 7000);
                 }
                 
                 if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 150.0f))
