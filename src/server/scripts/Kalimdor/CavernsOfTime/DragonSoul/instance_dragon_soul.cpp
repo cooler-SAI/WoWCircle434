@@ -26,12 +26,16 @@ class instance_dragon_soul : public InstanceMapScript
                 uiEiendormiGUID = 0;
                 uiHagaraGUID = 0;
                 uiUltraxionGUID = 0;
-
+                uiBlackhornGUID = 0;
                 uiAllianceShipGUID = 0;
                 uiSwayzeGUID = 0;
                 uiReevsGUID = 0;
+                uiDeckGUID = 0;
+                uiMaelstormGUID = 0;
 
                 memset(uiLesserCacheofTheAspects, 0, sizeof(uiLesserCacheofTheAspects));
+                memset(uiBackPlates, 0, sizeof(uiBackPlates));
+                memset(uiGreaterCacheofTheAspects, 0, sizeof(uiGreaterCacheofTheAspects));
 
                 bHagaraEvent = 0;
             }
@@ -87,11 +91,30 @@ class instance_dragon_soul : public InstanceMapScript
                                 pCreature->SetVisible(false);
                         }
                         break;
+                    case NPC_BLACKHORN:
+                        uiBlackhornGUID = pCreature->GetGUID();
+                        break;
                     case NPC_TRAVEL_TO_WYRMREST_TEMPLE:
                     case NPC_TRAVEL_TO_EYE_OF_ETERNITY:
                     case NPC_TRAVEL_TO_WYRMREST_BASE:
                     case NPC_TRAVEL_TO_WYRMREST_SUMMIT:
-                        //teleportGUIDs.push_back(pCreature->GetGUID());
+                        teleportGUIDs.push_back(pCreature->GetGUID());
+                        break;
+                    case NPC_TRAVEL_TO_DECK:
+                        if (GetBossState(DATA_BLACKHORN) == DONE)
+                            pCreature->SetVisible(true);
+                        else
+                            pCreature->SetVisible(false);
+                        uiDeckGUID = pCreature->GetGUID();
+                        teleportGUIDs.push_back(pCreature->GetGUID());
+                        break;
+                    case NPC_TRAVEL_TO_MAELSTORM:
+                        if (GetBossState(DATA_SPINE) == DONE)
+                            pCreature->SetVisible(true);
+                        else
+                            pCreature->SetVisible(false);
+                        uiMaelstormGUID = pCreature->GetGUID();
+                        teleportGUIDs.push_back(pCreature->GetGUID());
                         break;
                     default:
                         break;
@@ -102,6 +125,8 @@ class instance_dragon_soul : public InstanceMapScript
             {
                 if (pCreature->GetEntry() == NPC_ULTRAXION)
                     uiUltraxionGUID = 0;
+                else if (pCreature->GetEntry() == NPC_BLACKHORN)
+                    uiBlackhornGUID = 0;
             }
 
             void OnGameObjectCreate(GameObject* pGo)
@@ -126,6 +151,27 @@ class instance_dragon_soul : public InstanceMapScript
                             pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED);
                         pGo->UpdateObjectVisibility();
                         break;
+                    case GO_DEATHWING_BACK_PLATE_1:
+                        uiBackPlates[0] = pGo->GetGUID();
+                        break;
+                    case GO_DEATHWING_BACK_PLATE_2:
+                        uiBackPlates[1] = pGo->GetGUID();
+                        break;
+                    case GO_DEATHWING_BACK_PLATE_3:
+                        uiBackPlates[2] = pGo->GetGUID();
+                        break;
+                    case GO_GREATER_CACHE_OF_THE_ASPECTS_10N:
+                        uiGreaterCacheofTheAspects[0] = pGo->GetGUID();
+                        break;
+                    case GO_GREATER_CACHE_OF_THE_ASPECTS_25N:
+                        uiGreaterCacheofTheAspects[1] = pGo->GetGUID();
+                        break;
+                    case GO_GREATER_CACHE_OF_THE_ASPECTS_10H:
+                        uiGreaterCacheofTheAspects[2] = pGo->GetGUID();
+                        break;
+                    case GO_GREATER_CACHE_OF_THE_ASPECTS_25H:
+                        uiGreaterCacheofTheAspects[3] = pGo->GetGUID();
+                        break;
                     default:
                         break;
                 }
@@ -142,12 +188,20 @@ class instance_dragon_soul : public InstanceMapScript
                     case DATA_ZONOZZ: return uiZonozzGUID;
                     case DATA_HAGARA: return uiHagaraGUID;
                     case DATA_ULTRAXION: return uiUltraxionGUID;
+                    case DATA_BLACKHORN: return uiBlackhornGUID;
                     case DATA_LESSER_CACHE_10N: return uiLesserCacheofTheAspects[0];
                     case DATA_LESSER_CACHE_25N: return uiLesserCacheofTheAspects[1];
                     case DATA_LESSER_CACHE_10H: return uiLesserCacheofTheAspects[2];
                     case DATA_LESSER_CACHE_25H: return uiLesserCacheofTheAspects[3];
                     case DATA_SWAYZE: return uiSwayzeGUID;
                     case DATA_REEVS: return uiReevsGUID;
+                    case DATA_BACK_PLATE_1: return uiBackPlates[0];
+                    case DATA_BACK_PLATE_2: return uiBackPlates[1];
+                    case DATA_BACK_PLATE_3: return uiBackPlates[2];
+                    case DATA_GREATER_CACHE_10N: return uiGreaterCacheofTheAspects[0];
+                    case DATA_GREATER_CACHE_25N: return uiGreaterCacheofTheAspects[1];
+                    case DATA_GREATER_CACHE_10H: return uiGreaterCacheofTheAspects[2];
+                    case DATA_GREATER_CACHE_25H: return uiGreaterCacheofTheAspects[3];
                     case DATA_ALLIANCE_SHIP: return uiAllianceShipGUID;
                     default: return 0;
                 }
@@ -175,6 +229,14 @@ class instance_dragon_soul : public InstanceMapScript
             {
                 if (!InstanceScript::SetBossState(type, state))
                     return false;
+                
+                if (type == DATA_BLACKHORN)
+                    if (Creature* pDeck = instance->GetCreature(uiDeckGUID))
+                        pDeck->SetVisible(state == DONE ? true : false);
+                
+                if (type == DATA_SPINE)
+                    if (Creature* pMaelstorm = instance->GetCreature(uiMaelstormGUID))
+                        pMaelstorm->SetVisible(state == DONE ? true : false);
 
                 if (state == IN_PROGRESS)
                 {
@@ -266,8 +328,13 @@ class instance_dragon_soul : public InstanceMapScript
                 uint64 uiAllianceShipGUID;
                 uint64 uiSwayzeGUID;
                 uint64 uiReevsGUID;
+                uint64 uiBlackhornGUID;
+                uint64 uiDeckGUID;
+                uint64 uiMaelstormGUID;
 
                 uint64 uiLesserCacheofTheAspects[4];
+                uint64 uiBackPlates[3];
+                uint64 uiGreaterCacheofTheAspects[4];
 
                 std::vector<uint64> teleportGUIDs;
 
