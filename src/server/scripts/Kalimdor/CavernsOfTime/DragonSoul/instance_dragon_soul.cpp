@@ -19,19 +19,26 @@ public:
         {
             SetBossNumber(MAX_ENCOUNTER);
 
-            uiMorchokGUID       = 0;
-            uiKohcromGUID       = 0;
-            uiZonozzGUID        = 0;
-            uiValeeraGUID       = 0;
-            uiEiendormiGUID     = 0;
-            uiHagaraGUID        = 0;
-            uiUltraxionGUID     = 0;
-            uiBlackhornGUID     = 0;
-            uiAllianceShipGUID  = 0;
-            uiSwayzeGUID        = 0;
-            uiReevsGUID         = 0;
-            uiDeckGUID          = 0;
-            uiMaelstormGUID     = 0;
+            uiMorchokGUID           = 0;
+            uiKohcromGUID           = 0;
+            uiZonozzGUID            = 0;
+            uiValeeraGUID           = 0;
+            uiEiendormiGUID         = 0;
+            uiHagaraGUID            = 0;
+            uiUltraxionGUID         = 0;
+            uiBlackhornGUID         = 0;
+            uiAllianceShipGUID      = 0;
+            uiSwayzeGUID            = 0;
+            uiReevsGUID             = 0;
+            uiDeckGUID              = 0;
+            uiMaelstormGUID         = 0;
+
+            DeathwingGUID           = 0;
+            Maelstrom_trall         = 0;
+            Maelstrom_kalecgos      = 0;
+            Maelstrom_ysera         = 0;
+            Maelstrom_nozdormy      = 0;
+            Maelstrom_alexstrasza   = 0;
 
             memset(uiLesserCacheofTheAspects, 0, sizeof(uiLesserCacheofTheAspects));
             memset(uiBackPlates, 0, sizeof(uiBackPlates));
@@ -116,6 +123,24 @@ public:
                 uiMaelstormGUID = pCreature->GetGUID();
                 teleportGUIDs.push_back(pCreature->GetGUID());
                 break;
+            case NPC_DEATHWING_1:
+                DeathwingGUID = pCreature->GetGUID();
+                break;
+            case NPC_THRALL_2: 
+                Maelstrom_trall = pCreature->GetGUID(); 
+                break;
+            case NPC_KALECGOS_DRAGON: 
+                Maelstrom_kalecgos = pCreature->GetGUID(); 
+                break;
+            case NPC_YSERA_DRAGON: 
+                Maelstrom_ysera = pCreature->GetGUID(); 
+                break;
+            case NPC_NOZDORMU_DRAGON: 
+                Maelstrom_nozdormy = pCreature->GetGUID(); 
+                break;
+            case NPC_ALEXSTRASZA_DRAGON: 
+                Maelstrom_alexstrasza = pCreature->GetGUID(); 
+                break;
             default:
                 break;
             }
@@ -181,28 +206,30 @@ public:
         {
             switch (type)
             {
-            case DATA_MORCHOK:          return uiMorchokGUID;
-            case DATA_KOHCROM:          return uiKohcromGUID;
-            case NPC_VALEERA:           return uiValeeraGUID;
-            case NPC_EIENDORMI:         return uiEiendormiGUID;
-            case DATA_ZONOZZ:           return uiZonozzGUID;
-            case DATA_HAGARA:           return uiHagaraGUID;
-            case DATA_ULTRAXION:        return uiUltraxionGUID;
-            case DATA_BLACKHORN:        return uiBlackhornGUID;
-            case DATA_LESSER_CACHE_10N: return uiLesserCacheofTheAspects[0];
-            case DATA_LESSER_CACHE_25N: return uiLesserCacheofTheAspects[1];
-            case DATA_LESSER_CACHE_10H: return uiLesserCacheofTheAspects[2];
-            case DATA_LESSER_CACHE_25H: return uiLesserCacheofTheAspects[3];
-            case DATA_SWAYZE:           return uiSwayzeGUID;
-            case DATA_REEVS:            return uiReevsGUID;
-            case DATA_BACK_PLATE_1:     return uiBackPlates[0];
-            case DATA_BACK_PLATE_2:     return uiBackPlates[1];
-            case DATA_BACK_PLATE_3:     return uiBackPlates[2];
-            case DATA_GREATER_CACHE_10N: return uiGreaterCacheofTheAspects[0];
-            case DATA_GREATER_CACHE_25N: return uiGreaterCacheofTheAspects[1];
-            case DATA_GREATER_CACHE_10H: return uiGreaterCacheofTheAspects[2];
-            case DATA_GREATER_CACHE_25H: return uiGreaterCacheofTheAspects[3];
-            case DATA_ALLIANCE_SHIP:    return uiAllianceShipGUID;
+            case DATA_MORCHOK:              return uiMorchokGUID;
+            case DATA_KOHCROM:              return uiKohcromGUID;
+            case NPC_VALEERA:               return uiValeeraGUID;
+            case NPC_EIENDORMI:             return uiEiendormiGUID;
+            case DATA_ZONOZZ:               return uiZonozzGUID;
+            case DATA_HAGARA:               return uiHagaraGUID;
+            case DATA_ULTRAXION:            return uiUltraxionGUID;
+            case DATA_BLACKHORN:            return uiBlackhornGUID;
+            case DATA_LESSER_CACHE_10N:     return uiLesserCacheofTheAspects[0];
+            case DATA_LESSER_CACHE_25N:     return uiLesserCacheofTheAspects[1];
+            case DATA_LESSER_CACHE_10H:     return uiLesserCacheofTheAspects[2];
+            case DATA_LESSER_CACHE_25H:     return uiLesserCacheofTheAspects[3];
+            case DATA_SWAYZE:               return uiSwayzeGUID;
+            case DATA_REEVS:                return uiReevsGUID;
+            case DATA_BACK_PLATE_1:         return uiBackPlates[0];
+            case DATA_BACK_PLATE_2:         return uiBackPlates[1];
+            case DATA_BACK_PLATE_3:         return uiBackPlates[2];
+            case DATA_GREATER_CACHE_10N:    return uiGreaterCacheofTheAspects[0];
+            case DATA_GREATER_CACHE_25N:    return uiGreaterCacheofTheAspects[1];
+            case DATA_GREATER_CACHE_10H:    return uiGreaterCacheofTheAspects[2];
+            case DATA_GREATER_CACHE_25H:    return uiGreaterCacheofTheAspects[3];
+            case DATA_ALLIANCE_SHIP:        return uiAllianceShipGUID;
+            case NPC_THRALL_2:              return Maelstrom_trall;
+            case DATA_DAMAGE_DEATHWING:     return DeathwingGUID;
             default: return 0;
             }
             return 0;
@@ -336,6 +363,14 @@ public:
         uint64 uiLesserCacheofTheAspects[4];
         uint64 uiBackPlates[3];
         uint64 uiGreaterCacheofTheAspects[4];
+
+        uint64 DeathwingGUID;
+
+        uint64 Maelstrom_trall;
+        uint64 Maelstrom_kalecgos;
+        uint64 Maelstrom_ysera;
+        uint64 Maelstrom_nozdormy;
+        uint64 Maelstrom_alexstrasza;
 
         std::vector<uint64> teleportGUIDs;
 

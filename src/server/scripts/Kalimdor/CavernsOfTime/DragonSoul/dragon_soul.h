@@ -20,6 +20,9 @@ enum Datas
     DATA_ULTRAXION          = 4,
     DATA_BLACKHORN          = 5,
     DATA_SPINE              = 6,
+    DATA_DEATHWING          = 7,
+    DATA_ATTACK_DEATHWING   = 8,
+    DATA_DAMAGE_DEATHWING   = 9,
     DATA_KOHCROM            = 10,
     DATA_HAGARA_EVENT       = 11,
     DATA_LESSER_CACHE_10N   = 12,
@@ -72,12 +75,27 @@ enum CreatureIds
     NPC_THRALL_2                                = 56103, // after spine
     NPC_THE_DRAGON_SOUL_2                       = 56694, // after spine
 
+    NPC_DEATHWING                               = 56173, // at the eye
+    NPC_DEATHWING_1                             = 57962, // invisible head
+    NPC_ALEXSTRASZA_DRAGON                      = 56099, // 1
+    NPC_NOZDORMU_DRAGON                         = 56102, // 2
+    NPC_YSERA_DRAGON                            = 56100, // 3
+    NPC_KALECGOS_DRAGON                         = 56101, // 4
+    NPC_ARM_TENTACLE_1                          = 56846, // 2
+    NPC_ARM_TENTACLE_2                          = 56167, // 3
+    NPC_WING_TENTACLE_1                         = 56168, // 1
+    NPC_WING_TENTACLE_2                         = 57972, // 4
     NPC_AGGRA                                   = 58211, // after madness
     NPC_THRALL_3                                = 58232, // after madness
     NPC_KALECGOS_2                              = 58210, // after madness
     NPC_NOZDORMU_2                              = 58208, // after madness
     NPC_ALEXSTRASZA_2                           = 58207, // after madness
     NPC_YSERA_2                                 = 58209, // after madness
+    NPC_CORRUPTION_PARASITE                     = 57479,
+    NPC_CONGEALING_BLOOD                        = 57798,
+    NPC_ELEMENTIUM_FRAGMENT                     = 56724,
+    NPC_ELEMENTIUM_TERROR                       = 56710,
+    NPC_MUTATED_CORRUPTION                      = 56471,
 };
 
 enum GameObjects
@@ -127,6 +145,8 @@ enum SharedSpells
     SPELL_WARDEN_RING_GREEN                     = 95514,
     SPELL_WARDEN_RING_ORANGE                    = 110468,
     SPELL_WARDEN_RING_YELLOW                    = 110469,
+
+    SPELL_AGONUZUNG_PAIN                        = 106548,
 };
 
 const Position teleportPos[6] =
