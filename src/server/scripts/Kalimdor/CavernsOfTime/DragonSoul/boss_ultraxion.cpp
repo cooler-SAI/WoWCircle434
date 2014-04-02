@@ -721,7 +721,7 @@ public:
 
         void Register()
         {
-            if (m_scriptSpellId == 109075 ||
+            if (m_scriptSpellId == SPELL_FADING_LIGHT_AOE_1 ||
                 m_scriptSpellId == 110080 ||
                 m_scriptSpellId == 110079 ||
                 m_scriptSpellId == 110078)

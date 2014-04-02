@@ -11,6 +11,7 @@ enum ScriptedTexts
     SAY_DEATHWING_TALK              = 5,
 };
 
+#define SPELL_BURST				RAID_MODE<uint32>(105219, 109371, 109372, 109373)
 enum Spells
 {
     // Deathwing
@@ -49,7 +50,6 @@ enum Spells
 
     // Corrupted Blood
     SPELL_RESIDUE                   = 105223,
-    SPELL_BURST                     = 105219,
 
     // Burning Tendons
     SPELL_SEAL_ARMOR_BREACH_1       = 105847,
@@ -70,14 +70,14 @@ enum Spells
 
 enum Adds
 {
-    NPC_HIDEOUS_AMALGAMATION    = 53890,
-    NPC_CORRUPTION_1            = 53891,
-    NPC_CORRUPTION_2            = 56161, // ?
-    NPC_CORRUPTION_3            = 56162, // ?
-    NPC_SPAWNER                 = 53888,
-    NPC_CORRUPTED_BLOOD         = 53889,
-    NPC_BURNING_TENDONS_1       = 56341, // left
-    NPC_BURNING_TENDONS_2       = 56575, // right
+    NPC_HIDEOUS_AMALGAMATION        = 53890,
+    NPC_CORRUPTION_1                = 53891,
+    NPC_CORRUPTION_2                = 56161, // ?
+    NPC_CORRUPTION_3                = 56162, // ?
+    NPC_SPAWNER                     = 53888,
+    NPC_CORRUPTED_BLOOD             = 53889,
+    NPC_BURNING_TENDONS_1           = 56341, // left
+    NPC_BURNING_TENDONS_2           = 56575, // right
 };
 
 enum Events
@@ -106,10 +106,10 @@ enum Actions
 
 enum MiscData
 {
-    DATA_POS        = 1,
-    POINT_SPAWNER   = 2,
-    DATA_PLATES     = 3,
-    DATA_BLAST_POS  = 4,
+    DATA_POS            = 1,
+    POINT_SPAWNER       = 2,
+    DATA_PLATES         = 3,
+    DATA_BLAST_POS      = 4,
 };
 
 enum RollStage
@@ -164,11 +164,13 @@ public:
             pInstance = me->GetInstanceScript();
             rollStage = ROLL_NONE;
             destroyedPlates = 0;
+            me->SetVisible(false);
         }
 
         void Reset()
         {
             pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+            me->SetVisible(false);
         }
 
         void JustDied(Unit* /*killer*/)
@@ -179,6 +181,7 @@ public:
         void EnterCombat(Unit* who)
         {
             pInstance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
+            DoZoneInCombat();
         }
 
         void DoAction(const int32 action)
@@ -267,26 +270,27 @@ public:
                 case EVENT_END_ENCOUNTER:
                     events.Reset();
                     ResetBattle(true);
-                    //DoCastAOE(SPELL_PLAY_MOVIE);
+                    DoCastAOE(SPELL_PLAY_MOVIE);
                     if (pInstance)
                     {
                         pInstance->DoModifyPlayerCurrencies(CURRENCY_TYPE_VALOR_POINTS, (IsHeroic() ? 140 : 120));
                         pInstance->DoModifyPlayerCurrencies(CURRENCY_TYPE_MOTE_OF_DARKNESS, 1);
-                        /*switch (GetDifficulty())
+                        pInstance->SetBossState(DATA_SPINE, DONE);
+                        switch (GetDifficulty())
                         {
                         case RAID_DIFFICULTY_10MAN_NORMAL:
-                        pInstance->DoRespawnGameObject(pInstance->GetData64(DATA_GREATER_CACHE_10N), DAY);
-                        break;
+                            pInstance->DoRespawnGameObject(pInstance->GetData64(DATA_GREATER_CACHE_10N), DAY);
+                            break;
                         case RAID_DIFFICULTY_25MAN_NORMAL:
-                        pInstance->DoRespawnGameObject(pInstance->GetData64(DATA_GREATER_CACHE_25N), DAY);
-                        break;
+                            pInstance->DoRespawnGameObject(pInstance->GetData64(DATA_GREATER_CACHE_25N), DAY);
+                            break;
                         case RAID_DIFFICULTY_10MAN_HEROIC:
-                        pInstance->DoRespawnGameObject(pInstance->GetData64(DATA_GREATER_CACHE_10H), DAY);
-                        break;
+                            pInstance->DoRespawnGameObject(pInstance->GetData64(DATA_GREATER_CACHE_10H), DAY);
+                            break;
                         case RAID_DIFFICULTY_25MAN_HEROIC:
-                        pInstance->DoRespawnGameObject(pInstance->GetData64(DATA_GREATER_CACHE_25H), DAY);
-                        break;
-                        }*/
+                            pInstance->DoRespawnGameObject(pInstance->GetData64(DATA_GREATER_CACHE_25H), DAY);
+                            break;
+                        }
                         pInstance->DoStartMovie(75);
                         pInstance->DoNearTeleportPlayers(madnessdeathwingPos);
                     }                            
@@ -527,6 +531,7 @@ public:
         {
             events.ScheduleEvent(EVENT_SEARING_PLASMA, urand(1000, 8000));
             events.ScheduleEvent(EVENT_FIERY_GRIP, urand(31000, 33000));
+            DoZoneInCombat();
         }
 
         void DamageTaken(Unit* /*who*/, uint32 &damage)
@@ -703,6 +708,7 @@ public:
         {
             if (IsHeroic())
                 events.ScheduleEvent(EVENT_BLOOD_CORRUPTION, urand(6000, 11000));
+            DoZoneInCombat();
         }
 
         void DamageTaken(Unit* /*who*/, uint32& damage)
@@ -822,6 +828,11 @@ public:
                         me->Attack(pTarget, true);
                     }
                 }
+        }
+
+        void EnterCombat(Unit* /*who*/)
+        {
+            DoZoneInCombat();
         }
 
         void DamageTaken(Unit* /*who*/, uint32 & damage)

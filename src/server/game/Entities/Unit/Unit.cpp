@@ -11182,9 +11182,6 @@ void Unit::setPowerType(Powers new_powertype)
         case POWER_ENERGY:
             SetMaxPower(POWER_ENERGY, GetCreatePowers(POWER_ENERGY));
             break;
-        case POWER_ALTERNATE_POWER:
-            SetMaxPower(POWER_ALTERNATE_POWER, GetCreatePowers(POWER_ALTERNATE_POWER));
-            break;
     }
     UpdateMaxPower(new_powertype);
 }
@@ -16332,7 +16329,6 @@ Powers Unit::GetPowerTypeByAuraGroup(UnitMods unitMod) const
         case UNIT_MOD_ENERGY:      return POWER_ENERGY;
         case UNIT_MOD_RUNE:        return POWER_RUNES;
         case UNIT_MOD_RUNIC_POWER: return POWER_RUNIC_POWER;
-        case UNIT_MOD_ALTERNATE_POWER: return POWER_ALTERNATE_POWER;
         default:
         case UNIT_MOD_MANA:        return POWER_MANA;
     }
@@ -16548,8 +16544,6 @@ int32 Unit::GetCreatePowers(Powers power) const
             return (GetTypeId() == TYPEID_PLAYER && ((Player const*)this)->getClass() == CLASS_PALADIN ? 3 : 0);
         case POWER_HEALTH:
             return 0;
-        case POWER_ALTERNATE_POWER:
-            return 100;
         default:
             break;
     }
@@ -22050,73 +22044,4 @@ void Unit::WriteMovementInfo(WorldPacket &data)
                 break;
         }
     }
-}
-
-// Alt Power (Progress Bars).
-void Unit::SetAltPower(int32 power)
-{
-    alt = power;
-
-    if (HasAura(78949)) //Electricity Onyxia. - Finished.
-    {
-        if (alt >= 100)
-            CastSpell(ToUnit(), 78999, true);
-    }
-    else if (HasAura(88824)) //Sound Atramedes. - Finished.
-    {
-        if (alt >= 100)
-            CastSpell(ToPlayer(), 102133, true);
-    }
-    else if (HasAura(98229)) //Concentration Majordomo HC. - LOADING BAR NOT DONE.
-    {
-        if (alt >= 25 && !HasAura(98254))
-           AddAura(98254, ToPlayer());
-        
-        if (alt >= 50 && !HasAura(98253))
-        {
-           AddAura(98253, ToPlayer());
-           ToPlayer()->RemoveAurasDueToSpell(98254, true);
-        }
-        
-        if (alt >= 75 && !HasAura(98252))
-        {
-           AddAura(98252, ToPlayer());
-           RemoveAurasDueToSpell(98253, true);
-        }
-        
-        if (alt >= 100 && !HasAura(98245))
-        {
-           AddAura(98245, ToPlayer());
-           ToPlayer()->RemoveAurasDueToSpell(98252, true);
-        }
-    }
-    else if (HasAura(101410)) // Molten Feathers Alysrazor. - Finished.
-    {
-        if (alt >= 3)
-        {
-           CastSpell(ToUnit(), 98624, true);
-           alt = 0;
-           ToUnit()->SetPower(POWER_ALTERNATE_POWER, 0);
-           AddAura(101410, ToPlayer());
-           if (HasAura(101410))
-           {
-               if (alt >= 3)
-                   AddAura(98619, ToPlayer());
-           }
-        }
-    }
-
-    if (alt < 0)
-        alt = 0;
-
-    if (alt > 100)
-        alt = 100;
-
-
-    WorldPacket data(SMSG_POWER_UPDATE);
-    data.append(GetPackGUID());
-    data << int32(1);
-    data << int8(POWER_ALTERNATE_POWER);
-    data << int32(alt);
-    SendMessageToSet(&data, GetTypeId() == TYPEID_PLAYER ? true : false);
 }

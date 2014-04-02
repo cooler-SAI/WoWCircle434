@@ -32,6 +32,7 @@ public:
             uiReevsGUID             = 0;
             uiDeckGUID              = 0;
             uiMaelstormGUID         = 0;
+            uiSpineGuid             = 0;
 
             DeathwingGUID           = 0;
             Maelstrom_trall         = 0;
@@ -122,6 +123,9 @@ public:
                     pCreature->SetVisible(false);
                 uiMaelstormGUID = pCreature->GetGUID();
                 teleportGUIDs.push_back(pCreature->GetGUID());
+                break;
+            case DATA_SPINE:
+                uiSpineGuid = pCreature->GetGUID();
                 break;
             case NPC_DEATHWING_1:
                 DeathwingGUID = pCreature->GetGUID();
@@ -229,6 +233,7 @@ public:
             case DATA_GREATER_CACHE_25H:    return uiGreaterCacheofTheAspects[3];
             case DATA_ALLIANCE_SHIP:        return uiAllianceShipGUID;
             case NPC_THRALL_2:              return Maelstrom_trall;
+            case DATA_SPINE:                return uiSpineGuid;
             case DATA_DAMAGE_DEATHWING:     return DeathwingGUID;
             default: return 0;
             }
@@ -363,6 +368,7 @@ public:
         uint64 uiLesserCacheofTheAspects[4];
         uint64 uiBackPlates[3];
         uint64 uiGreaterCacheofTheAspects[4];
+        uint64 uiSpineGuid;
 
         uint64 DeathwingGUID;
 

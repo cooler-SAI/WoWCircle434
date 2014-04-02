@@ -2813,7 +2813,6 @@ void Player::ResetAllPowers()
             break;
         case POWER_ALTERNATE_POWER:
             SetPower(POWER_ALTERNATE_POWER, 0);
-            SetAltPower(0);
             break;
         default:
             break;
@@ -5185,7 +5184,6 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         SetPower(POWER_ENERGY, uint32(GetMaxPower(POWER_ENERGY)*restore_percent));
         SetPower(POWER_FOCUS, uint32(GetMaxPower(POWER_FOCUS)*restore_percent));
         SetPower(POWER_ECLIPSE, 0);
-        SetPower(POWER_ALTERNATE_POWER, 0);
     }
 
     // trigger update zone for alive state zone updates

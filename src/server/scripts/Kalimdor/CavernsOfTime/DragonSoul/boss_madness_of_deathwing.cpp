@@ -23,6 +23,11 @@ enum ScriptedTexts
 
 #define CreatCacheOfTheAspects RAID_MODE(GO_GREATER_CACHE_OF_THE_ASPECTS_10N, GO_GREATER_CACHE_OF_THE_ASPECTS_25N, GO_GREATER_CACHE_OF_THE_ASPECTS_10H, GO_GREATER_CACHE_OF_THE_ASPECTS_25H)
 
+enum Actions
+{
+    ACTION_CORRUPTED_BLOOD = 1,
+};
+
 enum Events
 {
     // Deathwing
@@ -51,6 +56,7 @@ enum Events
     EVENT_ELEMENTIUM_TERROR,
     EVENT_CORRUPTED_BLOOD,
     EVENT_CONGEALING_BLOOD,
+
 
     //Phase 2 mob events
     EVENT_SHRAPNEL,
@@ -83,6 +89,7 @@ enum Spells
     SPELL_SHRAPNEL                  = 106791,
     SPELL_TETANUS                   = 106728,
     SPELL_CORRUPTED_BLOOD           = 106835,
+    SPELL_CORRUPTED_BLOOD_BAR       = 106843,
 
     // Thrall
     SPELL_ASTRAL_RECALL             = 108537, 
@@ -254,6 +261,13 @@ public:
 
             events.Update(diff);
 
+            if (me->HealthBelowPct(20))
+            {
+                events.ScheduleEvent(HAS_20PROCENT_HEALTH_NEW_PHASE, 150);
+
+                return;
+            }
+
             while (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)
@@ -274,22 +288,39 @@ public:
                 case PHASE_1:
                     events.ScheduleEvent(EVENT_ASSAULT_ASPECTS, 3000);
 
-                    if (IsHeroic())
-                        events.ScheduleEvent(EVENT_CATACLYSM, 900000);
+                    events.ScheduleEvent(EVENT_CATACLYSM, 2000);
                     events.ScheduleEvent(EVENT_CORRUPTING_PARASITE, urand(60000, 120000));
                     events.ScheduleEvent(EVENT_ELEMENTIUM_BOLT, 150);
-                    events.ScheduleEvent(HAS_20PROCENT_HEALTH_NEW_PHASE, 150);
+                    //events.ScheduleEvent(HAS_20PROCENT_HEALTH_NEW_PHASE, 150);
                     break;
 
                 case EVENT_ELEMENTIUM_BOLT:
                     break;
 
                 case EVENT_CATACLYSM:
-                    DoCast(SPELL_CATACLYSM);
+                    {
+                        if (Creature* ARM_TENTACLE_1 = me->FindNearestCreature(NPC_ARM_TENTACLE_1, 600.0f))
+                            if (ARM_TENTACLE_1->GetHealthPct() < 50.0f)
+                                DoCast(SPELL_CATACLYSM);
+
+                        if (Creature* ARM_TENTACLE_2 = me->FindNearestCreature(NPC_ARM_TENTACLE_2, 600.0f))
+                            if (ARM_TENTACLE_2->GetHealthPct() < 50.0f)
+                                DoCast(SPELL_CATACLYSM);
+
+                        if (Creature* WING_TENTACLE_1 = me->FindNearestCreature(NPC_WING_TENTACLE_1, 600.0f))
+                            if (WING_TENTACLE_1->GetHealthPct() < 50.0f)
+                                DoCast(SPELL_CATACLYSM);
+
+                        if (Creature* WING_TENTACLE_2 = me->FindNearestCreature(NPC_WING_TENTACLE_2, 600.0f))
+                            if (WING_TENTACLE_2->GetHealthPct() < 50.0f)
+                                DoCast(SPELL_CATACLYSM);
+                    }
+
+                    events.ScheduleEvent(EVENT_CATACLYSM, 3000);
                     break;
 
                 case HAS_20PROCENT_HEALTH_NEW_PHASE:
-                    if (me->GetHealthPct() < 53)
+                    if (me->GetHealthPct() < 20)
                     {
                         events.CancelEvent(HAS_20PROCENT_HEALTH_NEW_PHASE);
                         events.ScheduleEvent(PHASE_2, 150);
@@ -320,7 +351,7 @@ public:
 
                 case PHASE_2:
                     events.CancelEvent(EVENT_ASSAULT_ASPECTS);
-                    events.CancelEvent(EVENT_CATACLYSM);
+                    //events.CancelEvent(EVENT_CATACLYSM);
                     events.CancelEvent(EVENT_CORRUPTING_PARASITE);
                     events.CancelEvent(EVENT_ELEMENTIUM_BOLT);
                     events.CancelEvent(PHASE_2);
@@ -352,18 +383,10 @@ public:
                     events.ScheduleEvent(EVENT_ELEMENTIUM_FRAGMENT, urand(60000, 90000));
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                         me->SummonCreature(NPC_ELEMENTIUM_FRAGMENT, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 120000);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                        me->SummonCreature(NPC_ELEMENTIUM_FRAGMENT, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 120000);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                        me->SummonCreature(NPC_ELEMENTIUM_FRAGMENT, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 120000);
                     break;
 
                 case EVENT_ELEMENTIUM_FRAGMENT:
                     events.ScheduleEvent(EVENT_ELEMENTIUM_FRAGMENT, urand(120000, 200000));
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                        me->SummonCreature(NPC_ELEMENTIUM_TERROR, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 120000);
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                        me->SummonCreature(NPC_ELEMENTIUM_TERROR, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 120000);
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                         me->SummonCreature(NPC_ELEMENTIUM_TERROR, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 120000);
                     break;
@@ -389,7 +412,7 @@ public:
                 me->DespawnOrUnsummon(100);
             if (Unit* creature = me->FindNearestCreature(NPC_MUTATED_CORRUPTION, 600.0f))
                 me->DespawnOrUnsummon(100);
-                
+
 
             if (Unit* killer = me->FindNearestPlayer(1000.0f))
                 killer->SummonGameObject(CreatCacheOfTheAspects, -12075.2f,  12168.2f, -2.56926f, 3.57793f, 0.0f, 0.0f, -0.976295f, 0.216442f, 320000);
@@ -516,7 +539,6 @@ public:
                 if (InstanceScript* instance = creature->GetInstanceScript())
                 {
                     player->CLOSE_GOSSIP_MENU();
-                    instance->SetData(DATA_ATTACK_DEATHWING, IN_PROGRESS);
                     creature->SummonCreature(NPC_DEATHWING, CreatureSpawnPos[0]);
 
                     if (Creature* deathwing = creature->FindNearestCreature(NPC_DEATHWING, 400.0f))

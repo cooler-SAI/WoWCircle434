@@ -780,17 +780,17 @@ public:
                     for (int i = 0; i < counter; i++)
                     {
                         //blackblood 1
-                        _angle = me->GetOrientation() + M_PI/4;
+                        _angle = me->GetOrientation() + M_PI / 4;
                         me->GetNearPosition(_pos, radius, _angle);
                         if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
                             me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
                         //blackblood 2
-                        _angle = me->GetOrientation() + M_PI/2;
+                        _angle = me->GetOrientation() + M_PI / 2;
                         me->GetNearPosition(_pos, radius, _angle);
                         if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
                             me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
                         //blackblood 3
-                        _angle = me->GetOrientation() + (3*M_PI)/4;
+                        _angle = me->GetOrientation() + (3 * M_PI) / 4;
                         me->GetNearPosition(_pos, radius, _angle);
                         if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
                             me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
@@ -800,22 +800,22 @@ public:
                         if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
                             me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
                         //blackblood 5
-                        _angle = me->GetOrientation() + M_PI/4 + M_PI;
+                        _angle = me->GetOrientation() + M_PI / 4 + M_PI;
                         me->GetNearPosition(_pos, radius, _angle);
                         if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
                             me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
                         //blackblood 6
-                        _angle = me->GetOrientation() + M_PI/2 + M_PI;
+                        _angle = me->GetOrientation() + M_PI / 2 + M_PI;
                         me->GetNearPosition(_pos, radius, _angle);
                         if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
                             me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
                         //blackblood 7
-                        _angle = me->GetOrientation() + (3*M_PI)/4 + M_PI;
+                        _angle = me->GetOrientation() + (3 * M_PI) / 4 + M_PI;
                         me->GetNearPosition(_pos, radius, _angle);
                         if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
                             me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
                         //blackblood 8
-                        _angle = me->GetOrientation() + M_PI*2;
+                        _angle = me->GetOrientation() + M_PI * 2;
                         me->GetNearPosition(_pos, radius, _angle);
                         if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
                             me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
@@ -904,7 +904,7 @@ public:
         class DistanceCheck
         {
         public:
-            DistanceCheck(Unit* searcher, float distance) : _searcher(searcher), _distance(distance) {}
+            DistanceCheck(Unit* searcher, float distance) : _searcher(searcher), _distance(distance) { }
 
             bool operator()(WorldObject* unit)
             {
