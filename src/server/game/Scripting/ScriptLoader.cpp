@@ -635,6 +635,10 @@ void AddSC_boss_commander_ulthok();
 void AddSC_boss_erunak_stonespeaker();
 void AddSC_boss_ozumat();
 
+void AddSC_throne_of_the_four_winds(); // throne of four winds
+void AddSC_boss_conclave_of_wind();
+void AddSC_instance_throne_of_the_four_winds();
+
 void AddSC_instance_blackrock_caverns(); // Blackrock Caverns
 void AddSC_blackrock_caverns_teleport();
 void AddSC_boss_romogg_bonecrusher();
@@ -1406,6 +1410,10 @@ void AddNorthrendScripts()
     AddSC_boss_commander_ulthok();
     AddSC_boss_erunak_stonespeaker();
     AddSC_boss_ozumat();
+
+    AddSC_throne_of_the_four_winds(); // throne of four winds
+    AddSC_boss_conclave_of_wind();
+    AddSC_instance_throne_of_the_four_winds();
 
     AddSC_instance_blackrock_caverns(); // Blackrock Caverns
     AddSC_blackrock_caverns_teleport();

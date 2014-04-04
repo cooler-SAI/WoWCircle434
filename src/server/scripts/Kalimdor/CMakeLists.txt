@@ -87,7 +87,9 @@ set(scripts_STAT_SRCS
   Kalimdor/CavernsOfTime/DragonSoul/dragon_soul.cpp
   Kalimdor/CavernsOfTime/DragonSoul/dragon_soul.h
   Kalimdor/ThroneoftheFourWinds/instance_throne_of_the_four_winds.cpp
+  Kalimdor/ThroneoftheFourWinds/throne_of_the_four_winds.cpp
   Kalimdor/ThroneoftheFourWinds/throne_of_the_four_winds.h
+  Kalimdor/ThroneoftheFourWinds/boss_conclave_of_wind.cpp
   Kalimdor/BlackfathomDeeps/boss_kelris.cpp
   Kalimdor/BlackfathomDeeps/instance_blackfathom_deeps.cpp
   Kalimdor/BlackfathomDeeps/boss_gelihast.cpp
