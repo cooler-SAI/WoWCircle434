@@ -6,7 +6,6 @@
 * Please see the included DOCS/LICENSE.TXT for more information */
 
 
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "Item.h"
 #include "Spell.h"

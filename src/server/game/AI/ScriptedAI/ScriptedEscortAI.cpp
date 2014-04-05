@@ -3,7 +3,6 @@
  * Please see the included DOCS/LICENSE.TXT for more information */
 
 
-#include "ScriptPCH.h"
 /* ScriptData
 SDName: Npc_EscortAI
 SD%Complete: 100
