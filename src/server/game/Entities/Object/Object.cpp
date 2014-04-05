@@ -314,10 +314,12 @@ void Object::DestroyForPlayer(Player* target, bool onDeath) const
 
 void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 {
-    const Player* player = ToPlayer();
-    const Unit* unit = ToUnit();
-    const GameObject* go = ToGameObject();
+    const Player*        player = ToPlayer();
+    const Unit*          unit = ToUnit();
+    const GameObject*    go = ToGameObject();
     const DynamicObject* dob = ToDynObject();
+
+    bool unkFlag = false;
 
     const WorldObject* wo =
         player ? (const WorldObject*)player : (
@@ -325,34 +327,44 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         go ? (const WorldObject*)go : dob ? (const WorldObject*)dob : (const WorldObject*)ToCorpse()));
 
     uint32 transportPause = 0;
-    /*if (go)
-    {
-        if (GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(go->GetEntry()))
-        {
-            if (goinfo->type == GAMEOBJECT_TYPE_TRANSPORT && goinfo->transport.pause)
-                transportPause = goinfo->transport.pause;
-        }
-    }*/
 
     if (unit)
         const_cast<Unit*>(unit)->m_movementInfo.Normalize(GetTypeId() == TYPEID_UNIT);
 
-    (*data)
-        .WriteBit(false) // unkBit1
-        .WriteBit(false) // byte4
-        .WriteBit((flags & UPDATEFLAG_ROTATION) && go)
-        .WriteBit(flags & UPDATEFLAG_ANIMKITS)
-        .WriteBit((flags & UPDATEFLAG_HAS_TARGET) && unit && unit->getVictim())
-        .WriteBit(flags & UPDATEFLAG_SELF) // byte0
-        .WriteBit((flags & UPDATEFLAG_VEHICLE) && unit)
-        .WriteBit((flags & UPDATEFLAG_LIVING) && unit)
-        .WriteBits(transportPause ? 1 : 0, 24)
-        .WriteBit(false) // byte1
-        .WriteBit((flags & UPDATEFLAG_GO_TRANSPORT_POSITION) && wo)
-        .WriteBit((flags & UPDATEFLAG_STATIONARY_POSITION) && wo)
-        .WriteBit(flags & UPDATEFLAG_UNK5)
-        .WriteBit(false) // byte2
-        .WriteBit(flags & UPDATEFLAG_TRANSPORT); // byte198
+    data->WriteBit(false); // unkBit1
+    data->WriteBit(false); // byte4
+    data->WriteBit((flags & UPDATEFLAG_ROTATION) && go);
+    data->WriteBit(flags & UPDATEFLAG_ANIMKITS);
+    data->WriteBit((flags & UPDATEFLAG_HAS_TARGET) && unit && unit->getVictim());
+    data->WriteBit(flags & UPDATEFLAG_SELF); // byte0
+    data->WriteBit((flags & UPDATEFLAG_VEHICLE) && unit);
+    data->WriteBit((flags & UPDATEFLAG_LIVING) && unit);
+        
+    std::vector<uint32> transportFrames;
+    if (flags & UPDATEFLAG_TRANSPORT_ARR)
+    {
+        const GameObjectTemplate* goInfo = ToGameObject()->GetGOInfo();
+        if (goInfo->type == GAMEOBJECT_TYPE_TRANSPORT)
+        {
+            if (goInfo->transport.startFrame)
+                transportFrames.push_back(goInfo->transport.startFrame);
+            if (goInfo->transport.nextFrame1)
+                transportFrames.push_back(goInfo->transport.nextFrame1);
+            //if (goInfo->transport.nextFrame2)
+            //    transportFrames.push_back(goInfo->transport.nextFrame2);
+            //if (goInfo->transport.nextFrame3)
+            //    transportFrames.push_back(goInfo->transport.nextFrame3);
+        }
+    }
+    data->WriteBits(transportFrames.size(), 24);
+    
+
+    data->WriteBit(false); // byte1
+    data->WriteBit((flags & UPDATEFLAG_GO_TRANSPORT_POSITION) && wo);
+    data->WriteBit((flags & UPDATEFLAG_STATIONARY_POSITION) && wo);
+    data->WriteBit(unkFlag);
+    data->WriteBit(false); // byte2
+    data->WriteBit(flags & (UPDATEFLAG_TRANSPORT | UPDATEFLAG_TRANSPORT_ARR)); // byte198
 
     if ((flags & UPDATEFLAG_LIVING) && unit)
     {
@@ -369,14 +381,14 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
             data->WriteBits(unit->m_movementInfo.flags, 30);
 
         (*data)
-            .WriteBit(false) // p2.84 UnkFalse
+            .WriteBit(unit->IsSplineEnabled())
             .WriteBit(!unit->m_movementInfo.HavePitch)
             .WriteBit(unit->IsSplineEnabled())
             .WriteBit(unit->m_movementInfo.HasServerMovementFlag(SERVERMOVEFLAG_FALLDATA))
             .WriteBit(!unit->m_movementInfo.HaveSplineElevation)
             .WriteByteMask(guid[5])
             .WriteBit(unit->m_movementInfo.HasTransportData())
-            .WriteBit(false/*!unit->m_movementInfo.time*/);
+            .WriteBit(false);
 
         if (unit->m_movementInfo.HasTransportData())
         {
@@ -453,8 +465,8 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
             .WriteBit(true);                                                      // Missing AnimKit3
     }
 
-    if (transportPause)
-        *data << uint32(transportPause);
+    for (int i = 0; i < transportFrames.size(); ++i)
+        *data << uint32(transportFrames[i]);
 
     if ((flags & UPDATEFLAG_LIVING) && unit)
     {
@@ -528,7 +540,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
             .append<float>(unit->GetSpeed(MOVE_WALK));
 
         if (true/*unit->m_movementInfo.time*/)
-            *data << uint32(getMSTime()/*unit->m_movementInfo.time*/);
+            *data << uint32(getMSTime());
 
         (*data)
             .append<float>(unit->GetSpeed(MOVE_FLIGHT_BACK))
@@ -581,7 +593,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     if ((flags & UPDATEFLAG_ROTATION) && go)
         *data << uint64(go->GetRotation());
 
-    if (flags & UPDATEFLAG_UNK5)
+    if (unkFlag)
     {
         *data << float(0.0f);
         *data << float(0.0f);
@@ -640,7 +652,9 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     //}
 
     if (flags & UPDATEFLAG_TRANSPORT)
-        *data << uint32(getMSTime());
+        *data << uint32(getMSTime());                       // Transport path timer - getMSTime is wrong.
+    else if (flags & UPDATEFLAG_TRANSPORT_ARR)
+        *data << uint32(GetUInt32Value(GAMEOBJECT_LEVEL));
 }
 
 void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* updateMask, Player* target) const
@@ -1549,20 +1563,12 @@ bool MovementInfo::Check(Player* target, Opcodes opcode)
         if (!t_pos.IsPositionValid() ||
             t_pos.GetPositionX() > 50 || t_pos.GetPositionY() > 50 || t_pos.GetPositionZ() > 50)
         {
-            sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Opcode %u Session %u Invalid transport coords (%f, %f, %f)",
-                uint32(opcode), target->GetSession()->GetAccountId(),
-                t_pos.GetPositionX(), t_pos.GetPositionY(), t_pos.GetPositionZ()
-                );
             return false;
         }
 
         if (!Trinity::IsValidMapCoord(pos.GetPositionX() + t_pos.GetPositionX(), pos.GetPositionY() + t_pos.GetPositionY(),
             pos.GetPositionZ() + t_pos.GetPositionZ(), pos.GetOrientation() + t_pos.GetOrientation()))
         {
-            sLog->outError(LOG_FILTER_GENERAL, "MovementInfo::Check: Opcode %u Session %u Invalid transport coords (%f, %f, %f)",
-                uint32(opcode), target->GetSession()->GetAccountId(),
-                t_pos.GetPositionX(), t_pos.GetPositionY(), t_pos.GetPositionZ()
-                );
             return false;
         }
     }

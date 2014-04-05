@@ -738,6 +738,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>
         void SetGoType(GameobjectTypes type) { SetByteValue(GAMEOBJECT_BYTES_1, 1, type); }
         GOState GetGoState() const { return GOState(GetByteValue(GAMEOBJECT_BYTES_1, 0)); }
         void SetGoState(GOState state);
+        uint32 CalculateAnimDuration(GOState oldState, GOState newState) const;
         uint8 GetGoArtKit() const { return GetByteValue(GAMEOBJECT_BYTES_1, 2); }
         void SetGoArtKit(uint8 artkit);
         uint8 GetGoAnimProgress() const { return GetByteValue(GAMEOBJECT_BYTES_1, 3); }
@@ -837,6 +838,14 @@ class GameObject : public WorldObject, public GridObject<GameObject>
         std::string GetAIName() const;
         void SetDisplayId(uint32 displayid);
         uint32 GetDisplayId() const { return GetUInt32Value(GAMEOBJECT_DISPLAYID); }
+
+        void SetManualAnim(bool apply)
+        {
+            if (apply && m_goInfo->type == GAMEOBJECT_TYPE_TRANSPORT)
+                m_updateFlag |= UPDATEFLAG_TRANSPORT_ARR;
+            else
+                m_updateFlag &= ~UPDATEFLAG_TRANSPORT_ARR;
+        }
 
         GameObjectModel * m_model;
     protected:

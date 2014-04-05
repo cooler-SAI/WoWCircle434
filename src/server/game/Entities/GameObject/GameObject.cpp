@@ -243,12 +243,13 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
             m_goValue->Building.MaxHealth = m_goValue->Building.Health;
             SetGoAnimProgress(255);
             SetUInt32Value(GAMEOBJECT_PARENTROTATION, m_goInfo->building.destructibleData);
+            SetUInt32Value(GAMEOBJECT_DISPLAYID, m_goInfo->building.destructibleData);
             break;
         case GAMEOBJECT_TYPE_TRANSPORT:
             SetUInt32Value(GAMEOBJECT_LEVEL, getMSTime()/*goinfo->transport.pause*/);
             if (goinfo->transport.startOpen)
                 SetGoState(GO_STATE_ACTIVE);
-            SetGoAnimProgress(animprogress);
+            //SetGoAnimProgress(animprogress);
             break;
         case GAMEOBJECT_TYPE_FISHINGNODE:
             SetGoAnimProgress(0);
@@ -285,7 +286,8 @@ void GameObject::Update(uint32 diff)
     } else
         AI()->UpdateAI(diff);
 
-    if (IS_MO_TRANSPORT(GetGUID()))
+    GameObjectTemplate const* goInfo = GetGOInfo();
+    if (goInfo->type == GAMEOBJECT_TYPE_MO_TRANSPORT)
     {
         //((Transport*)this)->Update(p_time);
         return;
@@ -2002,8 +2004,13 @@ void GameObject::SetLootState(LootState state, Unit* unit)
 
 void GameObject::SetGoState(GOState state)
 {
+    GOState oldState = GetGoState();
     SetByteValue(GAMEOBJECT_BYTES_1, 0, state);
     sScriptMgr->OnGameObjectStateChanged(this, state);
+
+    if (oldState != state && (m_updateFlag & UPDATEFLAG_TRANSPORT_ARR))
+        SetUInt32Value(GAMEOBJECT_LEVEL, getMSTime() + CalculateAnimDuration(oldState, state));
+
     if (m_model)
     {
         if (!IsInWorld())
@@ -2016,6 +2023,25 @@ void GameObject::SetGoState(GOState state)
 
         EnableCollision(collision);
     }
+}
+
+uint32 GameObject::CalculateAnimDuration(GOState oldState, GOState newState) const
+{
+    if (oldState == newState || oldState >= MAX_GO_STATE || newState >= MAX_GO_STATE)
+        return 0;
+
+    TransportAnimationsByEntry::const_iterator itr = sTransportAnimationsByEntry.find(GetEntry());
+    if (itr == sTransportAnimationsByEntry.end())
+        return 0;
+
+    uint32 frameByState[MAX_GO_STATE] = { 0, m_goInfo->transport.startFrame, m_goInfo->transport.nextFrame1 };
+    if (oldState == GO_STATE_ACTIVE)
+        return frameByState[newState];
+
+    if (newState == GO_STATE_ACTIVE)
+        return frameByState[oldState];
+
+    return uint32(std::abs(int32(frameByState[oldState]) - int32(frameByState[newState])));
 }
 
 void GameObject::SetDisplayId(uint32 displayid)
