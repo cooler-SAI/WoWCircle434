@@ -901,7 +901,7 @@ void WorldSession::HandleGuildAchievementMembers(WorldPacket& recvPacket)
         if(pGuild->GetAchievementMgr().HasAchieved(achievementId))
         {
             ObjectGuid gguid = pGuild->GetGUID();
-            CompletedAchievementData* achievement = sAchievementMgr->GetCompletedDataForAchievement(achievementId);
+            CompletedAchievementData* achievement = pGuild->GetAchievementMgr().GetCompletedDataForAchievement(achievementId);
             WorldPacket data(SMSG_GUILD_ACHIEVEMENT_MEMBERS);
 
             data.WriteBit(gguid[3]);
