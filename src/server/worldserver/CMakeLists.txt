@@ -162,6 +162,7 @@ target_link_libraries(worldserver
   game
   shared
   scripts
+  newscripts
   collision
   g3dlib
   gsoap

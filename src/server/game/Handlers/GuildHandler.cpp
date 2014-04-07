@@ -27,6 +27,7 @@
 #include "Guild.h"
 #include "GossipDef.h"
 #include "SocialMgr.h"
+#include "AchievementMgr.h"
 
 // Helper for getting guild object of session's player.
 // If guild does not exist, sends error (if necessary).
