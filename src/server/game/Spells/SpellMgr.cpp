@@ -3268,6 +3268,12 @@ void SpellMgr::LoadSpellCustomAttr()
             case 101085: // Wrath of Tarecgosa
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_TRIGGERED_IGNORE_RESILENCE;
                 break;
+            case 77827: // Nefarian / Onyxia Tail Lash
+            case 94128: // Nefarian / Onyxia Tail Lash
+            case 94129: // Nefarian / Onyxia Tail Lash
+            case 94130: // Nefarian / Onyxia Tail Lash
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CONE_BACK;
+                break;
             default:
                 break;
         }
