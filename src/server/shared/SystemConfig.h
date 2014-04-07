@@ -34,11 +34,11 @@
 
 #if PLATFORM == PLATFORM_WINDOWS
 # ifdef _WIN64
-#  define _FULLVERSION _PACKAGENAME " rev. " _HASH " (Win64, "_BUILD_DIRECTIVE ")"
+#  define _FULLVERSION _PACKAGENAME " rev.24.0 08.04.2014 " _HASH " (Win64, "_BUILD_DIRECTIVE ")"
 # else
-#  define _FULLVERSION _PACKAGENAME " rev. " _HASH " (Win32, " _BUILD_DIRECTIVE ")"
+#  define _FULLVERSION _PACKAGENAME " rev.24.0 08.04.2014 " _HASH " (Win32, " _BUILD_DIRECTIVE ")"
 # endif
 #else
-#  define _FULLVERSION _PACKAGENAME " rev. " _HASH " (Win64, " _BUILD_DIRECTIVE ")"
+#  define _FULLVERSION _PACKAGENAME " rev.24.0 08.04.2014 " _HASH " (Win64, " _BUILD_DIRECTIVE ")"
 #endif
 #endif

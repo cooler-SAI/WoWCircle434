@@ -3851,18 +3851,3 @@ CompletedAchievementData* AchievementMgr<T>::GetCompletedDataForAchievement(uint
         return NULL;
     }
 }
-
-template<>
-CompletedAchievementData* AchievementMgr<Guild>::GetCompletedDataForAchievement(uint32 achievementId)
-{
-    CompletedAchievementMap::iterator itr = m_completedAchievements.find(achievementId);
-
-    if(itr != m_completedAchievements.end())
-    {
-        return &(itr->second);
-    }
-    else
-    {
-        return NULL;
-    }
-}
