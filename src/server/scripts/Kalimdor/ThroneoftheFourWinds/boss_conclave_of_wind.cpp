@@ -124,25 +124,6 @@ enum Spells
     SPELL_ACHIEVEMENT_CONCLAVE      = 88835,
 };
 
-enum GameobjectIds
-{
-    GOB_WIND_DRAFTEFFECT_CENTER     = 207922,
-    GOB_RAIDPLATFORM                = 207737,
-
-    GOB_WIND_DRAFTEFFECT_1          = 207923,
-    GOB_WIND_DRAFTEFFECT_2          = 207924,
-    GOB_WIND_DRAFTEFFECT_3          = 207925,
-    GOB_WIND_DRAFTEFFECT_4          = 207926,
-    GOB_WIND_DRAFTEFFECT_5          = 207929,
-    GOB_WIND_DRAFTEFFECT_6          = 207930,
-    GOB_WIND_DRAFTEFFECT_7          = 207927,
-    GOB_WIND_DRAFTEFFECT_8          = 207928,
-
-    GOB_DEIJING_HEALING             = 206699,
-    GOB_DEIJING_FROST               = 206700,
-    GOB_DEIJING_TORNADO             = 206701
-};
-
 enum ExistingMobs // more - see.h
 {
     NPC_TORNADO                     = 46207,
@@ -208,7 +189,7 @@ public:
             go->SetGoState(GO_STATE_ACTIVE);
             break;
 
-        case GOB_RAIDPLATFORM:
+        case GO_FLOOR_ALAKIR:
             go->SetGoState(GO_STATE_READY);
             break;
 

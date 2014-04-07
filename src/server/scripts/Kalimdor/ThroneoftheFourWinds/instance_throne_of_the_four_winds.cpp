@@ -26,10 +26,10 @@ public:
 
         void Initialize()
         {
-            uiAnshal = 0;
-            uiNezir = 0;
-            uiRohash = 0;
-            uiAlakir = 0;
+            uiAnshal    = 0;
+            uiNezir     = 0;
+            uiRohash    = 0;
+            uiAlakir    = 0;
 
             for (uint8 i = 0 ; i < ENCOUNTERS; ++i)
                 Encounter[i] = NOT_STARTED;
@@ -189,7 +189,7 @@ public:
                 Encounter[0] = data0;
                 Encounter[1] = data1;
 
-                for (uint8 i=0; i < ENCOUNTERS; ++i)
+                for (uint8 i = 0; i < ENCOUNTERS; ++i)
                     if (Encounter[i] == IN_PROGRESS)
                         Encounter[i] = NOT_STARTED;
             }

@@ -637,6 +637,7 @@ void AddSC_boss_ozumat();
 
 void AddSC_throne_of_the_four_winds(); // throne of four winds
 void AddSC_boss_conclave_of_wind();
+void AddSC_boss_alakir();
 void AddSC_instance_throne_of_the_four_winds();
 
 void AddSC_instance_blackrock_caverns(); // Blackrock Caverns
@@ -883,7 +884,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_magmus();
     AddSC_boss_moira_bronzebeard();
     AddSC_boss_tomb_of_seven();
-	AddSC_boss_coren_direbrew();
+    AddSC_boss_coren_direbrew();
     AddSC_instance_blackrock_depths();
     AddSC_boss_drakkisath();                //Blackrock Spire
     AddSC_boss_halycon();
@@ -1414,6 +1415,7 @@ void AddNorthrendScripts()
 
     AddSC_throne_of_the_four_winds(); // throne of four winds
     AddSC_boss_conclave_of_wind();
+    AddSC_boss_alakir();
     AddSC_instance_throne_of_the_four_winds();
 
     AddSC_instance_blackrock_caverns(); // Blackrock Caverns

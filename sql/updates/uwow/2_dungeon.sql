@@ -14,6 +14,9 @@ DELETE FROM `spell_script_names` WHERE `spell_id` IN
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (86492, 'spell_hurricane');
 
+UPDATE `creature_template` SET `ScriptName` = 'boss_alakir' WHERE `entry` =46753;
+UPDATE `creature_template` SET `ScriptName` = 'npc_stormling' WHERE `entry` =47175;
+
 DELETE FROM `creature` WHERE `guid` IN (1300595,1300596,1300597,1300598,1300599,1300600,1300601,1300602);
 INSERT INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`) VALUES
 (1300595, 47066, 754, 15, 1, 0, 0, -240.162, 769.122, 195.846, 5.49923, 300, 0, 0, 42, 0, 0, 0, 0, 0),

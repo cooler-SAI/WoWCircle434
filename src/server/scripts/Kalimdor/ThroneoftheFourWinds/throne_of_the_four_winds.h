@@ -42,6 +42,21 @@ enum ObjectIds
 {
     GO_FLOOR_ALAKIR                     = 207737,
     GO_HEART_OF_THE_WIND				= 207891,
+
+    GOB_WIND_DRAFTEFFECT_CENTER         = 207922,
+
+    GOB_WIND_DRAFTEFFECT_1              = 207923,
+    GOB_WIND_DRAFTEFFECT_2              = 207924,
+    GOB_WIND_DRAFTEFFECT_3              = 207925,
+    GOB_WIND_DRAFTEFFECT_4              = 207926,
+    GOB_WIND_DRAFTEFFECT_5              = 207929,
+    GOB_WIND_DRAFTEFFECT_6              = 207930,
+    GOB_WIND_DRAFTEFFECT_7              = 207927,
+    GOB_WIND_DRAFTEFFECT_8              = 207928,
+
+    GOB_DEIJING_HEALING                 = 206699,
+    GOB_DEIJING_FROST                   = 206700,
+    GOB_DEIJING_TORNADO                 = 206701
 };
 
 enum areatrig
