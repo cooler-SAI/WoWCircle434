@@ -197,7 +197,7 @@ void MapManager::LoadTransports()
         float o = 1.0f;
 
          // creates the Gameobject -- Gunship
-        if (!t->Create(lowguid, entry, mapid, x, y, z, o, 100, 0))
+        if (!t->Create(lowguid, entry, mapid, x, y, z, o, 255, 0))
         {
             delete t;
             continue;
