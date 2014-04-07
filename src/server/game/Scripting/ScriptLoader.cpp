@@ -704,6 +704,7 @@ void AddSC_boss_omnotron_defence_system();
 void AddSC_boss_maloriak();
 void AddSC_boss_chimaeron();
 void AddSC_boss_atramedes();
+void AddSC_boss_bwd_nefarian();
 
 void AddSC_instance_firelands(); // Firelands
 void AddSC_firelands();
@@ -1480,6 +1481,7 @@ void AddNorthrendScripts()
     AddSC_boss_maloriak();
     AddSC_boss_chimaeron();
     AddSC_boss_atramedes();
+    AddSC_boss_bwd_nefarian();
 
     AddSC_instance_firelands(); // Firelands
     AddSC_firelands();

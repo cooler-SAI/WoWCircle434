@@ -247,9 +247,11 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
             break;
         case GAMEOBJECT_TYPE_TRANSPORT:
             SetUInt32Value(GAMEOBJECT_LEVEL, getMSTime()/*goinfo->transport.pause*/);
+            // BWD Nef platform / BWD elevator / HOO elevator / Death whisper elevator manual setting.
+            if (goinfo->entry == 207834 || goinfo->entry == 203716 || goinfo->entry == 207547 || goinfo->entry == 202220)
+                SetManualAnim(true); // Set manual commands
             if (goinfo->transport.startOpen)
                 SetGoState(GO_STATE_ACTIVE);
-            //SetGoAnimProgress(animprogress);
             break;
         case GAMEOBJECT_TYPE_FISHINGNODE:
             SetGoAnimProgress(0);
@@ -1854,15 +1856,14 @@ void GameObject::ModifyHealth(int32 change, Unit* attackerOrHealer /*= NULL*/, u
 
     Player* player = attackerOrHealer->GetCharmerOrOwnerPlayerOrPlayerItself();
 
-    // dealing damage, send packet
-    // TODO: is there any packet for healing?
-    if (change < 0 && player)
+    if (player)
     {
         WorldPacket data(SMSG_DESTRUCTIBLE_BUILDING_DAMAGE, 8 + 8 + 8 + 4 + 4);
         data.appendPackGUID(GetGUID());
         data.appendPackGUID(attackerOrHealer->GetGUID());
         data.appendPackGUID(player->GetGUID());
-        data << uint32(-change);
+        data << int32(-change);                    // change  < 0 triggers SPELL_BUILDING_HEAL combat log event
+                                                    // change >= 0 triggers SPELL_BUILDING_DAMAGE event 
         data << uint32(spellId);
         player->GetSession()->SendPacket(&data);
     }
