@@ -21,8 +21,6 @@ REPLACE INTO `creature_text` VALUES
 ('41379', '1', '0', 'Behold, the Broodmother... Onyxia... REBORN. Perhaps my finest work.', '14', '0', '100', '0', '0', '20070', 'VO_BD_Nefarian_Intro'),
 ('41379', '2', '0', 'My dearest sibling... do you hunger? THEN FEAST UPON OUR ENEMIES!', '14', '0', '100', '0', '0', '20071', 'VO_BD_Nefarian_Intro');
 
-
-
 UPDATE `creature_template` SET `ScriptName` = 'boss_bd_nefarian' WHERE `entry` in (41376, 51104, 51105, 51106);
 UPDATE `creature_template` SET `ScriptName` = 'boss_bd_onyxia' WHERE `entry` in (41270, 51116, 51117, 51118);
 UPDATE `creature_template` SET `ScriptName` = 'npc_nefarian_intro' WHERE `entry` in (41379);
@@ -32,11 +30,17 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_chromatic_prototype' WHERE `e
 UPDATE `creature_template` SET `ScriptName` = 'npc_shadowblaze' WHERE `entry` in (42596);
 
 
+DELETE FROM `creature_template_addon` WHERE `entry` in (41376, 51104, 51105, 51106);
+
 DELETE FROM `spell_script_names` WHERE `spell_id` IN 
-(77827, 77944);
+(94116, 94117, 94118, 94128, 94129, 94130);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(77827, 'spell_nefarian_tail_lash'),
-(77944, 'spell_onyxia_lightning_discharge');
+('94116', 'spell_onyxia_lightning_discharge'),
+('94117', 'spell_onyxia_lightning_discharge'),
+('94118', 'spell_onyxia_lightning_discharge'),
+('94128', 'spell_nefarian_tail_lash'),
+('94129', 'spell_nefarian_tail_lash'),
+('94130', 'spell_nefarian_tail_lash');
 
 
 
