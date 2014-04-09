@@ -419,7 +419,7 @@ enum AuraType
     SPELL_AURA_356                                          = 356,  // Arcane Mage mastery - mod damage based on current mana
     SPELL_AURA_ENABLE_BOSS1_UNIT_FRAME                      = 357,
     SPELL_AURA_WORGEN_ALTERED_FORM                          = 358,
-    SPELL_AURA_359                                          = 359,
+    SPELL_AURA_MOD_HEALING_DONE_ON_DEBUFF                   = 359,
     SPELL_AURA_PROC_TRIGGER_SPELL_COPY                      = 360,  // Procs the same spell that caused this proc (Dragonwrath, Tarecgosa's Rest)
     SPELL_AURA_PROC_TRIGGER_SPELL_2                         = 361,
     SPELL_AURA_362                                          = 362,  // Not used in 4.3.4

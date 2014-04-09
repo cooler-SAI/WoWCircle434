@@ -13295,6 +13295,11 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
     for (AuraEffectList::const_iterator i = mHealingDonePct.begin(); i != mHealingDonePct.end(); ++i)
         AddPct(DoneTotalMod, (*i)->GetAmount());
 
+    // Healing done percent on debuff
+    AuraEffectList const& mHealingDonePctOnDebuff = GetAuraEffectsByType(SPELL_AURA_MOD_HEALING_DONE_ON_DEBUFF);
+    for (AuraEffectList::const_iterator i = mHealingDonePctOnDebuff.begin(); i != mHealingDonePctOnDebuff.end(); ++i)
+        AddPct(DoneTotalMod, (*i)->GetAmount());
+
     // done scripted mod (take it from owner)
     Unit* owner = GetOwner() ? GetOwner() : this;
     AuraEffectList const& mOverrideClassScript= owner->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
@@ -13382,12 +13387,6 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
         if (spellProto->Effects[i].Effect == SPELL_EFFECT_HEALTH_LEECH)
             DoneTotal = 0;
     }
-
-    // Vital Flame, Baleroc
-    // Need to fix 359 auras
-    if (victim->HasAura(99252))
-        if (AuraEffect const* aurEff = GetAuraEffect(99263, EFFECT_0))
-            AddPct(DoneTotalMod, aurEff->GetAmount());
 
     // Earth Shield
     if (spellProto->Id == 379)
