@@ -246,7 +246,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectUnlockGuildVaultTab,                      //173 SPELL_EFFECT_UNLOCK_GUILD_VAULT_TAB
     &Spell::EffectNULL,                                     //174 SPELL_EFFECT_174
     &Spell::EffectUnused,                                   //175 SPELL_EFFECT_175  unused
-    &Spell::EffectNULL,                                     //176 SPELL_EFFECT_176
+    &Spell::EffectSanctuary,                                //176 SPELL_EFFECT_SANCTUARY_2
     &Spell::EffectNULL,                                     //177 SPELL_EFFECT_177
     &Spell::EffectUnused,                                   //178 SPELL_EFFECT_178 unused
     &Spell::EffectNULL,                                     //179 SPELL_EFFECT_CREATE_AREATRIGGER
@@ -6110,7 +6110,19 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
 
     unitTarget->getHostileRefManager().UpdateVisibility();
 
-    unitTarget->CombatStop(false);
+    Unit::AttackerSet const& attackers = unitTarget->getAttackers();
+    for (Unit::AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end();)
+    {
+        if (!(*itr)->canSeeOrDetect(unitTarget))
+        {
+            (*(itr++))->AttackStop();
+            (*(itr++))->CombatStop(false);
+        }
+        else
+            ++itr;
+    }
+
+    unitTarget->m_lastSanctuaryTime = getMSTime();
 
     // Vanish allows to remove all threat and cast regular stealth so other spells can be used
     if (m_caster->GetTypeId() == TYPEID_PLAYER
@@ -6284,7 +6296,7 @@ void Spell::EffectStuck(SpellEffIndex /*effIndex*/)
         target->LeaveBattleground();
 
     target->TeleportTo(target->GetStartPosition(), TELE_TO_SPELL);
-    // homebind location is loaded always
+    // home bind location is loaded always
     // target->TeleportTo(target->m_homebindMapId, target->m_homebindX, target->m_homebindY, target->m_homebindZ, target->GetOrientation(), (m_caster == m_caster ? TELE_TO_SPELL : 0));
 
     // Stuck spell trigger Hearthstone cooldown
@@ -6582,7 +6594,7 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
 
     int32 duration = 0;
     
-    // Archaeology
+    // Archeology
     if (m_spellInfo->Id == 80451)
     {
         if (m_caster->ToPlayer())

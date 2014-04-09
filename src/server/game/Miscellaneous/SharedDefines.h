@@ -957,7 +957,7 @@ enum SpellEffects
     SPELL_EFFECT_UNLOCK_GUILD_VAULT_TAB             = 173, // Guild tab unlocked (guild perk)
     SPELL_EFFECT_174                                = 174,
     SPELL_EFFECT_175                                = 175, // Unused (4.3.4)
-    SPELL_EFFECT_176                                = 176, // Some kind of sanctuary effect (Vanish)
+    SPELL_EFFECT_SANCTUARY_2                        = 176, // Some kind of sanctuary effect (Vanish)
     SPELL_EFFECT_177                                = 177,
     SPELL_EFFECT_178                                = 178, // Unused (4.3.4)
     SPELL_EFFECT_CREATE_AREATRIGGER                 = 179,
@@ -1634,7 +1634,7 @@ enum Targets
     TARGET_UNK_116                     = 116,
     TARGET_UNK_117                     = 117,
     TARGET_UNK_118                     = 118,
-    TARGET_UNK_119                     = 119,
+    TARGET_RAID_MEMBERS                = 119,
     TARGET_UNK_120                     = 120,
     TARGET_UNK_121                     = 121,
     TARGET_UNK_122                     = 122,
