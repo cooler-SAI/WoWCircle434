@@ -285,6 +285,13 @@ void Spell::EffectResurrectNew(SpellEffIndex effIndex)
 
     uint32 health = damage;
     uint32 mana = m_spellInfo->Effects[effIndex].MiscValue;
+
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        if (((Player*)m_caster)->GetGuildId() == target->GetGuildId())
+            health = uint32(health * m_caster->GetTotalAuraMultiplier(SPELL_AURA_MOD_RESURRECTED_HEALTH_BY_GUILD_MEMBER));
+    }
+
     ExecuteLogEffectResurrect(effIndex, target);
     target->SetResurrectRequestData(m_caster, health, mana, 0);
     SendResurrectRequest(target);
@@ -6772,7 +6779,14 @@ void Spell::EffectResurrect(SpellEffIndex effIndex)
         if (InstanceScript* pInstance = target->GetInstanceScript())
             pInstance->UpdateResurrectionsCount();
 
-    uint32 health = target->CountPctFromMaxHealth(damage);
+    float healthPct = damage / 100.0f;
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        if (((Player*)m_caster)->GetGuildId() == target->GetGuildId())
+            healthPct *= m_caster->GetTotalAuraMultiplier(SPELL_AURA_MOD_RESURRECTED_HEALTH_BY_GUILD_MEMBER);
+    }
+
+    uint32 health = uint32(target->GetMaxHealth() * std::min(healthPct, 1.0f));
     uint32 mana   = CalculatePct(target->GetMaxPower(POWER_MANA), damage);
 
     ExecuteLogEffectResurrect(effIndex, target);
@@ -7395,7 +7409,7 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
         //fz = cMap->GetWaterLevel(fx, fy);
         fz = liqData.level;
     }
-    // if gameobject is summoning object, it should be spawned right on caster's position
+    // if gamebject is summoning object, it should be spawned right on caster's position
     else if (goinfo->type == GAMEOBJECT_TYPE_SUMMONING_RITUAL)
     {
         m_caster->GetPosition(fx, fy, fz);
@@ -8305,7 +8319,7 @@ void Spell::EffectUnlockGuildVaultTab(SpellEffIndex effIndex)
 
     if (Guild* pGuild = sGuildMgr->GetGuildById(pPlayer->GetGuildId()))
     {
-        // Only guildleader can create guild bank tabs
+        // Only guild leader can create guild bank tabs
         if (pPlayer->GetGUID() != pGuild->GetLeaderGUID())
             return;
 
@@ -8345,8 +8359,17 @@ void Spell::EffectResurrectWithAura(SpellEffIndex effIndex)
     if (target->IsRessurectRequested())       // already have one active request
         return;
 
-    uint32 health = target->CountPctFromMaxHealth(damage);
+    float healthPct = damage / 100.0f;
+
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        if (((Player*)m_caster)->GetGuildId() == target->GetGuildId())
+            healthPct *= m_caster->GetTotalAuraMultiplier(SPELL_AURA_MOD_RESURRECTED_HEALTH_BY_GUILD_MEMBER);
+    }
+
+    uint32 health = uint32(target->GetMaxHealth() * std::min(healthPct, 1.0f));
     uint32 mana   = CalculatePct(target->GetMaxPower(POWER_MANA), damage);
+
     uint32 resurrectAura = 0;
     if (sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[effIndex].TriggerSpell))
         resurrectAura = GetSpellInfo()->Effects[effIndex].TriggerSpell;
