@@ -68,14 +68,14 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
         case CMSG_REQUEST_VEHICLE_NEXT_SEAT:
             GetPlayer()->ChangeSeat(-1, true);
             break;
-        /*case CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE:
+        case CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE:
         {
             uint64 guid;        // current vehicle guid
             recvData.readPackGUID(guid);
 
-            MovementInfo movementInfo;
-            ReadMovementInfo(recvData, &movementInfo);
-            vehicle_base->m_movementInfo = movementInfo;
+            //MovementInfo movementInfo;
+            //ReadMovementInfo(recvData, &movementInfo);
+            //vehicle_base->m_movementInfo = movementInfo;
 
             uint64 accessory;        //  accessory guid
             recvData.readPackGUID(accessory);
@@ -95,7 +95,7 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
                         vehUnit->HandleSpellClick(GetPlayer(), seatId);
             }
             break;
-        }*/
+        }
         case CMSG_REQUEST_VEHICLE_SWITCH_SEAT:
         {
             uint64 guid;        // current vehicle guid
