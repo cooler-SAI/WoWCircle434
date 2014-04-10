@@ -1598,7 +1598,7 @@ bool AchievementMgr<T>::IsCompletedCriteria(AchievementCriteriaEntry const* achi
             return progress->counter >= achievementCriteria->currencyGain.count;
         case ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA:
             return achievementCriteria->win_arena.count && progress->counter >= achievementCriteria->win_arena.count;
-                 case ACHIEVEMENT_CRITERIA_TYPE_SPENT_GOLD_GUILD_REPAIRS:
+        case ACHIEVEMENT_CRITERIA_TYPE_SPENT_GOLD_GUILD_REPAIRS:
             return progress->counter >= achievementCriteria->spent_gold_guild_repairs.goldCount;
         case ACHIEVEMENT_CRITERIA_TYPE_REACH_GUILD_LEVEL:
             return progress->counter >= achievementCriteria->reach_guild_level.level;

@@ -168,7 +168,7 @@ bool MySQLConnection::Execute(const char* sql)
             uint32 lErrno = mysql_errno(m_Mysql);
 
             sLog->outInfo(LOG_FILTER_SQL, "SQL: %s", sql);
-            sLog->outError(LOG_FILTER_SQL, "[%u] %s", lErrno, mysql_error(m_Mysql));
+            sLog->outError(LOG_FILTER_SQL, "[%u] %s (%s)", lErrno, mysql_error(m_Mysql), sql);
 
             if (_HandleMySQLErrno(lErrno))  // If it returns true, an error was handled successfully (i.e. reconnection)
                 return Execute(sql);       // Try again
@@ -317,7 +317,7 @@ bool MySQLConnection::_Query(const char *sql, MYSQL_RES **pResult, MYSQL_FIELD *
         {
             uint32 lErrno = mysql_errno(m_Mysql);
             sLog->outInfo(LOG_FILTER_SQL, "SQL: %s", sql);
-            sLog->outError(LOG_FILTER_SQL, "[%u] %s", lErrno, mysql_error(m_Mysql));
+            sLog->outError(LOG_FILTER_SQL, "[%u] %s (%s)", lErrno, mysql_error(m_Mysql), sql);
 
             if (_HandleMySQLErrno(lErrno))      // If it returns true, an error was handled successfully (i.e. reconnection)
                 return _Query(sql, pResult, pFields, pRowCount, pFieldCount);    // We try again

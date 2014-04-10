@@ -91,7 +91,7 @@ public:
     bool IsAssigned() const { return _assignedTo != 0; }
     bool IsAssignedTo(uint64 guid) const { return guid == _assignedTo; }
     bool IsAssignedNotTo(uint64 guid) const { return IsAssigned() && !IsAssignedTo(guid); }
-    
+
     void Complete() { _completed = true; }
 
     uint32 GetId() const { return _id; }

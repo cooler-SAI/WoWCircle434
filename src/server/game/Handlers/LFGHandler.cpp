@@ -94,7 +94,7 @@ void WorldSession::HandleLfgLeaveOpcode(WorldPacket&  recvData)
 {
     uint32 roles, time, reason, instanceId;
     recvData >> roles >> time >> reason >> instanceId;
-
+    
     Group* group = GetPlayer()->GetGroup();
     uint64 guid = GetPlayer()->GetGUID();
     uint64 gguid = group ? group->GetGUID() : guid;
@@ -178,7 +178,6 @@ void WorldSession::HandleLfgSetRolesOpcode(WorldPacket& recvData)
     }
 
     uint64 gguid = group->GetGUID();
-
     sLFGMgr->UpdateRoleCheck(gguid, guid, roles);
 }
 
@@ -198,7 +197,6 @@ void WorldSession::HandleLfgSetBootVoteOpcode(WorldPacket& recvData)
     bool agree = recvData.ReadBit();
 
     uint64 guid = GetPlayer()->GetGUID();
-
     sLFGMgr->UpdateBoot(guid, agree);
 }
 
@@ -428,7 +426,6 @@ void WorldSession::HandleLfrJoinOpcode(WorldPacket& recvData)
 {
     uint32 entry;                                          // Raid id to search
     recvData >> entry;
-
     //SendLfrUpdateListOpcode(entry);
 }
 
@@ -436,7 +433,6 @@ void WorldSession::HandleLfrLeaveOpcode(WorldPacket& recvData)
 {
     uint32 dungeonId;                                      // Raid id queue to leave
     recvData >> dungeonId;
-
     //sLFGMgr->LeaveLfr(GetPlayer(), dungeonId);
 }
 

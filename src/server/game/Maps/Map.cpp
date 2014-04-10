@@ -662,7 +662,7 @@ void Map::CreatureRelocation(Creature* creature, float x, float y, float z, floa
             if (creature->canSwim())
                 creature->AddUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
         }
-        else
+            else
         {
             if (creature->canWalk())
                 creature->RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);

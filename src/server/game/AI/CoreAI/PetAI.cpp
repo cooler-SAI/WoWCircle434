@@ -119,13 +119,13 @@ void PetAI::UpdateAI(const uint32 diff)
 
         if (!me->HasAura(24450)) // Prowl (Bonus Ability)
         {
-            // Check before attacking to prevent pets from leaving stay position
-            if (me->GetCharmInfo()->HasCommandState(COMMAND_STAY))
-            {
-                if (me->GetCharmInfo()->IsCommandAttack() || (me->GetCharmInfo()->IsAtStay() && me->IsWithinMeleeRange(me->getVictim())))
+        // Check before attacking to prevent pets from leaving stay position
+        if (me->GetCharmInfo()->HasCommandState(COMMAND_STAY))
+        {
+            if (me->GetCharmInfo()->IsCommandAttack() || (me->GetCharmInfo()->IsAtStay() && me->IsWithinMeleeRange(me->getVictim())))
                     _DoMeleeAttackIfReady();
-            }
-            else
+        }
+        else
                 _DoMeleeAttackIfReady();
         }
     }

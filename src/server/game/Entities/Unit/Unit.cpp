@@ -2333,7 +2333,7 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spell)
         if (victim->HasInArc(M_PI, this) || victim->HasAuraType(SPELL_AURA_IGNORE_HIT_DIRECTION))
         {
             int32 deflect_chance = victim->GetTotalAuraModifier(SPELL_AURA_DEFLECT_SPELLS) * 100;
-            tmp+=deflect_chance;
+            tmp += deflect_chance;
             if (roll < tmp)
                 return SPELL_MISS_DEFLECT;
         }
@@ -6411,7 +6411,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         }
                     }
                 }
-
                 break;
             }
             // Magic Absorption
@@ -6958,7 +6957,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     triggered_spell_id = 37378;
                     break;
                 }
-                // Glyph of Succubus
+                // Glyph of Seduction
                 case 56250:
                 {
                     if (!target)
@@ -6996,7 +6995,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!target)
                         return false;
 
-                    // Procs from Prayer of healing or crit effect of heals
+                    // Procs from Prayer of Healing or crit effect of heals
                     if (procSpell->Id != 596 && !(procEx & PROC_EX_CRITICAL_HIT))
                         return false;
 
@@ -12606,12 +12605,6 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
                     if (victim->HealthBelowPct(25))
                         DoneTotalMod *= 2;
                     break;
-                // Shadow Bite (30% increase from each dot)
-                case 54049:
-                    if (isPet())
-                        if (uint8 count = victim->GetDoTsByCaster(GetOwnerGUID()))
-                            AddPct(DoneTotalMod, 30 * count);
-                    break;
                 default:
                     break;
             }
@@ -13223,7 +13216,7 @@ uint32 Unit::SpellCriticalDamageBonus(SpellInfo const* spellProto, uint32 damage
             if (spellProto->Id == 1978 || spellProto->Id == 3674)
             {
                 crit_bonus += damage / 2;
-                break;          
+                break;
             }
             // TODO: write here full calculation for melee/ranged spells
             crit_bonus += damage;
@@ -17019,17 +17012,17 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
     if (missCondition != SPELL_MISS_NONE)
         switch (missCondition)
         {
-            case SPELL_MISS_MISS:    procEx|=PROC_EX_MISS;   break;
-            case SPELL_MISS_RESIST:  procEx|=PROC_EX_RESIST; break;
-            case SPELL_MISS_DODGE:   procEx|=PROC_EX_DODGE;  break;
-            case SPELL_MISS_PARRY:   procEx|=PROC_EX_PARRY;  break;
-            case SPELL_MISS_BLOCK:   procEx|=PROC_EX_BLOCK;  break;
-            case SPELL_MISS_EVADE:   procEx|=PROC_EX_EVADE;  break;
-            case SPELL_MISS_IMMUNE:  procEx|=PROC_EX_IMMUNE; break;
-            case SPELL_MISS_IMMUNE2: procEx|=PROC_EX_IMMUNE; break;
-            case SPELL_MISS_DEFLECT: procEx|=PROC_EX_DEFLECT;break;
-            case SPELL_MISS_ABSORB:  procEx|=PROC_EX_ABSORB; break;
-            case SPELL_MISS_REFLECT: procEx|=PROC_EX_REFLECT;break;
+            case SPELL_MISS_MISS:    procEx |= PROC_EX_MISS;   break;
+            case SPELL_MISS_RESIST:  procEx |= PROC_EX_RESIST; break;
+            case SPELL_MISS_DODGE:   procEx |= PROC_EX_DODGE;  break;
+            case SPELL_MISS_PARRY:   procEx |= PROC_EX_PARRY;  break;
+            case SPELL_MISS_BLOCK:   procEx |= PROC_EX_BLOCK;  break;
+            case SPELL_MISS_EVADE:   procEx |= PROC_EX_EVADE;  break;
+            case SPELL_MISS_IMMUNE:  procEx |= PROC_EX_IMMUNE; break;
+            case SPELL_MISS_IMMUNE2: procEx |= PROC_EX_IMMUNE; break;
+            case SPELL_MISS_DEFLECT: procEx |= PROC_EX_DEFLECT;break;
+            case SPELL_MISS_ABSORB:  procEx |= PROC_EX_ABSORB; break;
+            case SPELL_MISS_REFLECT: procEx |= PROC_EX_REFLECT;break;
             default:
                 break;
         }
@@ -19574,7 +19567,8 @@ Aura* Unit::AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target)
 Aura* Unit::AddAuraWithModCharges(uint32 spellid, Unit *target, int16 charges)
 {
     Aura * aura = AddAura(spellid, target);
-    aura->SetModCharges(charges);
+    if (aura)
+        aura->SetModCharges(charges);
     return aura;
 }
 

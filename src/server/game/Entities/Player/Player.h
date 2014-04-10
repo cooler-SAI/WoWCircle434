@@ -537,6 +537,7 @@ struct EnchantDuration
     uint32 leftduration;
 };
 
+
 typedef std::list<EnchantDuration> EnchantDurationList;
 typedef std::list<Item*> ItemDurationList;
 

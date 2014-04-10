@@ -28,8 +28,8 @@ namespace VMAP
 {
     ModelInstance::ModelInstance(const ModelSpawn &spawn, WorldModel* model): ModelSpawn(spawn), iModel(model)
     {
-        iInvRot = G3D::Matrix3::fromEulerAnglesZYX(G3D::pi()*iRot.y/180.f, G3D::pi()*iRot.x/180.f, G3D::pi()*iRot.z/180.f).inverse();
-        iInvScale = 1.f/iScale;
+        iInvRot = G3D::Matrix3::fromEulerAnglesZYX(G3D::pi() * iRot.y / 180.f, G3D::pi() * iRot.x / 180.f, G3D::pi() * iRot.z / 180.f).inverse();
+        iInvScale = 1.f / iScale;
     }
 
     bool ModelInstance::intersectRay(const G3D::Ray& pRay, float& pMaxDist, bool pStopAtFirstHit) const

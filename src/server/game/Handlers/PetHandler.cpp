@@ -283,8 +283,8 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint32 spellid
                     pet->GetMotionMaster()->Clear(false);
                     pet->GetMotionMaster()->MoveIdle();
                     pet->GetMotionMaster()->MovePoint(0, x, y, z);
-
                     charmInfo->SetCommandState(COMMAND_MOVE_TO);
+
                     charmInfo->SetIsCommandAttack(false);
                     charmInfo->SetIsAtStay(true);
                     charmInfo->SetIsCommandFollow(false);
