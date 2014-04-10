@@ -460,6 +460,13 @@ struct AchievementCriteriaEntry
             uint32  duelCount;                              // 4
         } win_duel;
 
+        // ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM         = 90
+        struct
+        {
+            uint32  unused;                                 // 
+            uint32  lootCount;                              // 4
+        } loot_epic_item;
+
         // ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_POWER          = 96
         struct
         {
