@@ -3421,6 +3421,8 @@ bool SpellInfo::IsBreakingStealth(Unit* m_caster) const
         case 3600:  // Earthbind Totem
         case 99:    // Demoralizing Roar
         case 50256:
+        case 94528: // Flare
+        case 76577: // Smoke Bomb
             return false;
         default:
             break;
