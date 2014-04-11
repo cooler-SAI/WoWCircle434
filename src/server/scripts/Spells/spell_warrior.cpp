@@ -315,8 +315,8 @@ class spell_warr_whirlwind: public SpellScriptLoader
         void SelectTargets()
         {
 
-            if (GetCaster()->GetTypeId() == TYPEID_PLAYER && GetSpell()->GetUniqueTargets().size() > 4)
-                GetCaster()->ToPlayer()->SpellCooldownReduction(GetSpellInfo()->Id, 4000);
+            if (GetCaster()->GetTypeId() == TYPEID_PLAYER && GetSpell()->GetUniqueTargets().size() >= 4)
+                GetCaster()->ToPlayer()->SpellCooldownReduction(GetSpellInfo()->Id, 6000);
         }
 
         void Register()
