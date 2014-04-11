@@ -77,11 +77,11 @@ void MapManager::UnLoadTransportFromMap(Transport* t)
     UpdateData transData (t->GetMapId());
     t->BuildOutOfRangeUpdateBlock(&transData);
     WorldPacket out_packet;
-    transData.BuildPacket(&out_packet);
 
-    for (Map::PlayerList::const_iterator itr = map->GetPlayers().begin(); itr != map->GetPlayers().end(); ++itr)
-        if (t != itr->getSource()->GetTransport())
-            itr->getSource()->SendDirectMessage(&out_packet);
+    if (transData.BuildPacket(&out_packet))
+        for (Map::PlayerList::const_iterator itr = map->GetPlayers().begin(); itr != map->GetPlayers().end(); ++itr)
+            if (t != itr->getSource()->GetTransport())
+                itr->getSource()->SendDirectMessage(&out_packet);
 
     t->m_NPCPassengerSet.clear();         
     m_TransportsByInstanceIdMap[t->GetInstanceId()].erase(t);
@@ -105,8 +105,8 @@ void MapManager::LoadTransportForPlayers(Player* player)
     }
 
     WorldPacket packet;
-    transData.BuildPacket(&packet);
-    player->SendDirectMessage(&packet);
+    if (transData.BuildPacket(&packet))
+        player->SendDirectMessage(&packet);
 }
 
 void MapManager::UnLoadTransportForPlayers(Player* player)
@@ -134,8 +134,8 @@ void MapManager::UnLoadTransportForPlayers(Player* player)
     }
 
     WorldPacket packet;
-    transData.BuildPacket(&packet);
-    player->SendDirectMessage(&packet);
+    if (transData.BuildPacket(&packet))
+        player->SendDirectMessage(&packet);
 }
 
 
@@ -701,8 +701,8 @@ void Transport::UpdateForMap(Map const* targetMap)
                 UpdateData transData(GetMapId());
                 BuildCreateUpdateBlockForPlayer(&transData, itr->getSource());
                 WorldPacket packet;
-                transData.BuildPacket(&packet);
-                itr->getSource()->SendDirectMessage(&packet);
+                if (transData.BuildPacket(&packet))
+                    itr->getSource()->SendDirectMessage(&packet);
             }
         }
     }
@@ -711,11 +711,11 @@ void Transport::UpdateForMap(Map const* targetMap)
         UpdateData transData(targetMap->GetId());
         BuildOutOfRangeUpdateBlock(&transData);
         WorldPacket out_packet;
-        transData.BuildPacket(&out_packet);
 
-        for (Map::PlayerList::const_iterator itr = player.begin(); itr != player.end(); ++itr)
-            if (this != itr->getSource()->GetTransport())
-                itr->getSource()->SendDirectMessage(&out_packet);
+        if (transData.BuildPacket(&out_packet))
+            for (Map::PlayerList::const_iterator itr = player.begin(); itr != player.end(); ++itr)
+                if (this != itr->getSource()->GetTransport())
+                    itr->getSource()->SendDirectMessage(&out_packet);
     }
 }
 
@@ -874,11 +874,8 @@ void Transport::UpdatePlayerPositions()
         x = GetPositionX() + (plr->m_movementInfo.t_pos.m_positionX * cos(GetOrientation()) + plr->m_movementInfo.t_pos.m_positionY * sin(GetOrientation() + M_PI));
         y = GetPositionY() + (plr->m_movementInfo.t_pos.m_positionY * cos(GetOrientation()) + plr->m_movementInfo.t_pos.m_positionX * sin(GetOrientation()));
         z = GetPositionZ() + plr->m_movementInfo.t_pos.m_positionZ;
-        plr->Relocate(x, y, z, o);
-        UpdateData transData (plr->GetMapId());
-        WorldPacket packet;
-        transData.BuildPacket(&packet);
-        plr->SendDirectMessage(&packet);
+        //plr->Relocate(x, y, z, o);
+        plr->m_movementInfo.pos.Relocate(x, y, z, o);
     }
 }
 

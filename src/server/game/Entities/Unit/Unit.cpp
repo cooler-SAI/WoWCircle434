@@ -14163,18 +14163,6 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
             }
         }
 
-        // unsummon pet
-        Pet* pet = player->GetPet();
-        if (pet)
-        {
-            Battleground* bg = ToPlayer()->GetBattleground();
-            // don't unsummon pet in arena but SetFlag UNIT_FLAG_STUNNED to disable pet's interface
-            if (pet->GetEntry() == ENTRY_WATER_ELEMENTAL || (bg && bg->isArena())) // water elemental goes as exception
-                pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-            else
-                player->UnsummonPetTemporaryIfAny();
-        }
-
         //player->SendMovementSetCollisionHeight(player->GetCollisionHeight(true));
     }
 
@@ -14210,9 +14198,7 @@ void Unit::Dismount()
 
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_MOUNTED);
 
-    // only resummon old pet if the player is already added to a map
-    // this prevents adding a pet to a not created map which would otherwise cause a crash
-    // (it could probably happen when logging in after a previous crash)
+    // enable pet
     if (Player* player = ToPlayer())
     {
         if (Pet* pPet = player->GetPet())
@@ -14221,8 +14207,11 @@ void Unit::Dismount()
                 pPet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
         }
         else
+        {
             player->ResummonPetTemporaryUnSummonedIfAny();
+        }
     }
+    RemoveAurasByType(SPELL_AURA_MOUNTED);
 }
 
 void Unit::UpdateMount()
@@ -14463,7 +14452,16 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, bool isControlled)
     if (isInCombat() || HasUnitState(UNIT_STATE_EVADE))
         return;
 
+    for (Unit::ControlList::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
+        (*itr)->SetInCombatState(PvP, enemy, true);
+
+    if (Creature* creature = ToCreature())
+        if (IsAIEnabled && creature->AI()->IsPassived())
+            return;
+
     SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+    if (isControlled)
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
 
     if (Creature* creature = ToCreature())
     {
@@ -15017,15 +15015,6 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                 else
                     speed *= ToCreature()->GetCreatureTemplate()->speed_run;    // at this point, MOVE_WALK is never reached
             }
-            // Normalize speed by 191 aura SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED if need
-            // TODO: possible affect only on MOVE_RUN
-            if (int32 normalization = GetMaxPositiveAuraModifier(SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED))
-            {
-                // Use speed from aura
-                float max_speed = normalization / (IsControlledByPlayer() ? playerBaseMoveSpeed[mtype] : baseMoveSpeed[mtype]);
-                if (speed > max_speed)
-                    speed = max_speed;
-            }
             break;
         }
         default:
@@ -15041,16 +15030,23 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
 
     // Apply strongest slow aura mod to speed
     int32 slow = GetMaxNegativeAuraModifier(SPELL_AURA_MOD_DECREASE_SPEED);
-    if (slow)
+
+    if (int32 normalization = GetMaxPositiveAuraModifier(SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED))
     {
-        AddPct(speed, slow);
-        if (float minSpeedMod = (float)GetMaxPositiveAuraModifier(SPELL_AURA_MOD_MINIMUM_SPEED))
-        {
-            float min_speed = minSpeedMod / 100.0f;
-            if (speed < min_speed)
-                speed = min_speed;
-        }
+        if (float max_speed = (normalization / (IsControlledByPlayer() ? playerBaseMoveSpeed[MOVE_RUN] : baseMoveSpeed[MOVE_RUN])))
+            speed = max_speed;
     }
+    
+    AddPct(speed, slow);
+
+    if (float minSpeedMod = (float)GetMaxPositiveAuraModifier(SPELL_AURA_MOD_MINIMUM_SPEED))
+    {
+        float min_speed = minSpeedMod / 100.0f;
+        if (speed < min_speed)
+            speed = min_speed;
+    }
+    
+
     SetSpeed(mtype, speed, forced);
 }
 

@@ -29,6 +29,12 @@
 
 #include <cmath>
 
+template<>
+bool PetFollowMovementGenerator<Creature>::EnableWalking() const
+{
+    return i_target.isValid() && i_target->IsWalking();
+}
+
 template<class T, typename D>
 void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T &owner)
 {
@@ -133,9 +139,94 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T &owner)
     i_targetReached = false;
     i_recalculateTravel = false;
 
+    owner.UpdateAllowedPositionZ(x, y, z);
+
     Movement::MoveSplineInit init(owner);
     init.MoveTo(x,y,z);
     init.SetWalk(((D*)this)->EnableWalking());
+    // Using the same condition for facing target as the one that is used for SetInFront on movement end
+    // - applies to ChaseMovementGenerator mostly
+    if (i_angle == 0.f)
+        init.SetFacing(i_target.getTarget());
+
+    init.Launch();
+}
+
+template <>
+void TargetedMovementGeneratorMedium<Creature, PetFollowMovementGenerator<Creature> >::_setTargetLocation(Creature &owner)
+{
+    if (!i_target.isValid() || !i_target->IsInWorld())
+        return;
+
+    if (owner.HasUnitState(UNIT_STATE_NOT_MOVE))
+        return;
+
+    float x, y, z;
+    if (!i_offset)
+    {
+    }
+    else
+    {
+        float dist;
+        float size;
+
+        // Pets need special handling.
+        // We need to subtract GetObjectSize() because it gets added back further down the chain
+        //  and that makes pets too far away. Subtracting it allows pets to properly
+        //  be (GetCombatReach() + i_offset) away.
+        // Only applies when i_target is pet's owner otherwise pets and mobs end up
+        //   doing a "dance" while fighting
+        if (owner.isPet() && i_target->GetTypeId() == TYPEID_PLAYER)
+        {
+            dist = i_target->GetCombatReach();
+            size = i_target->GetCombatReach() - i_target->GetObjectSize();
+        }
+        else
+        {
+            dist = i_offset + 1.0f;
+            size = owner.GetObjectSize();
+        }
+
+        if (i_target->IsWithinDistInMap(&owner, dist))
+            return;
+
+        float angle = i_angle;
+
+        // change angle for mounted target of movement generator
+        if (i_target->GetSpeed(MOVE_RUN) > 10.0f)
+            angle -= 1.0f;
+
+        // to at i_offset distance from target and i_angle from target facing
+        i_target->GetClosePoint(x, y, z, size, i_offset, angle);
+    }
+
+    /*
+        We MUST not check the distance difference and avoid setting the new location for smaller distances.
+        By that we risk having far too many GetContactPoint() calls freezing the whole system.
+        In TargetedMovementGenerator<T>::Update() we check the distance to the target and at
+        some range we calculate a new position. The calculation takes some processor cycles due to vmaps.
+        If the distance to the target it too large to ignore,
+        but the distance to the new contact point is short enough to be ignored,
+        we will calculate a new contact point each update loop, but will never move to it.
+        The system will freeze.
+        ralf
+
+        //We don't update Mob Movement, if the difference between New destination and last destination is < BothObjectSize
+        float  bothObjectSize = i_target->GetObjectBoundingRadius() + owner.GetObjectBoundingRadius() + CONTACT_DISTANCE;
+        if ( i_destinationHolder.HasDestination() && i_destinationHolder.GetDestinationDiff(x,y,z) < bothObjectSize )
+            return;
+    */
+
+
+    PetFollowMovementGenerator<Creature>::_addUnitStateMove(owner);
+    i_targetReached = false;
+    i_recalculateTravel = false;
+
+    owner.UpdateAllowedPositionZ(x, y, z);
+
+    Movement::MoveSplineInit init(owner);
+    init.MoveTo(x,y,z);
+    init.SetWalk(((PetFollowMovementGenerator<Creature>*)this)->EnableWalking());
     // Using the same condition for facing target as the one that is used for SetInFront on movement end
     // - applies to ChaseMovementGenerator mostly
     if (i_angle == 0.f)
@@ -353,6 +444,77 @@ void FollowMovementGenerator<Creature>::MovementInform(Creature &unit)
 }
 
 //-----------------------------------------------//
+//-----------------------------------------------//
+
+
+
+template<>
+bool PetFollowMovementGenerator<Player>::EnableWalking() const
+{
+    return false;
+}
+
+template<>
+void PetFollowMovementGenerator<Player>::_updateSpeed(Player &/*u*/)
+{
+    // nothing to do for Player
+}
+
+template<>
+void PetFollowMovementGenerator<Creature>::_updateSpeed(Creature &u)
+{
+    // pet only sync speed with owner
+    if (!((Creature&)u).isPet() || !i_target.isValid() || i_target->GetGUID() != u.GetOwnerGUID())
+        return;
+
+    u.UpdateSpeed(MOVE_RUN,true);
+    u.UpdateSpeed(MOVE_WALK,true);
+    u.UpdateSpeed(MOVE_SWIM,true);
+}
+
+template<>
+void PetFollowMovementGenerator<Player>::Initialize(Player &owner)
+{
+    owner.AddUnitState(UNIT_STATE_FOLLOW|UNIT_STATE_FOLLOW_MOVE);
+    _updateSpeed(owner);
+    _setTargetLocation(owner);
+}
+template<>
+void PetFollowMovementGenerator<Creature>::Initialize(Creature &owner)
+{
+    owner.AddUnitState(UNIT_STATE_FOLLOW|UNIT_STATE_FOLLOW_MOVE);
+    _updateSpeed(owner);
+    _setTargetLocation(owner);
+}
+
+template<class T>
+void PetFollowMovementGenerator<T>::Finalize(T &owner)
+{
+    owner.ClearUnitState(UNIT_STATE_FOLLOW|UNIT_STATE_FOLLOW_MOVE);
+    _updateSpeed(owner);
+}
+
+template<class T>
+void PetFollowMovementGenerator<T>::Reset(T &owner)
+{
+    Initialize(owner);
+}
+
+template<class T>
+void PetFollowMovementGenerator<T>::MovementInform(T & /*unit*/)
+{
+}
+
+template<>
+void PetFollowMovementGenerator<Creature>::MovementInform(Creature &unit)
+{
+    // Pass back the GUIDLow of the target. If it is pet's owner then PetAI will handle
+    if (unit.AI())
+        unit.AI()->MovementInform(FOLLOW_MOTION_TYPE, i_target.getTarget()->GetGUIDLow());
+}
+
+
+//-----------------------------------------------//
 template void TargetedMovementGeneratorMedium<Player,ChaseMovementGenerator<Player> >::_setTargetLocation(Player &);
 template void TargetedMovementGeneratorMedium<Player,FollowMovementGenerator<Player> >::_setTargetLocation(Player &);
 template void TargetedMovementGeneratorMedium<Creature,ChaseMovementGenerator<Creature> >::_setTargetLocation(Creature &);
@@ -361,6 +523,11 @@ template bool TargetedMovementGeneratorMedium<Player,ChaseMovementGenerator<Play
 template bool TargetedMovementGeneratorMedium<Player,FollowMovementGenerator<Player> >::Update(Player &, const uint32 &);
 template bool TargetedMovementGeneratorMedium<Creature,ChaseMovementGenerator<Creature> >::Update(Creature &, const uint32 &);
 template bool TargetedMovementGeneratorMedium<Creature,FollowMovementGenerator<Creature> >::Update(Creature &, const uint32 &);
+template bool TargetedMovementGeneratorMedium<Creature,PetFollowMovementGenerator<Creature> >::Update(Creature &, const uint32 &);
+
+//template void TargetedMovementGeneratorMedium<Player,PetFollowMovementGenerator<Player> >::_setTargetLocation(Player &);
+//template void TargetedMovementGeneratorMedium<Creature,PetFollowMovementGenerator<Creature> >::_setTargetLocation(Creature &);
+
 
 template void ChaseMovementGenerator<Player>::_reachTarget(Player &);
 template void ChaseMovementGenerator<Creature>::_reachTarget(Creature &);
@@ -375,3 +542,7 @@ template void FollowMovementGenerator<Creature>::Finalize(Creature &);
 template void FollowMovementGenerator<Player>::Reset(Player &);
 template void FollowMovementGenerator<Creature>::Reset(Creature &);
 template void FollowMovementGenerator<Player>::MovementInform(Player &unit);
+
+//template void PetFollowMovementGenerator<Creature>::Initialize(Creature &);
+template void PetFollowMovementGenerator<Creature>::Finalize(Creature &);
+template void PetFollowMovementGenerator<Creature>::Reset(Creature &);

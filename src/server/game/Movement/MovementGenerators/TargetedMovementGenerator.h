@@ -112,5 +112,31 @@ class FollowMovementGenerator : public TargetedMovementGeneratorMedium<T, Follow
         void _updateSpeed(T &u);
 };
 
+template<class T>
+class PetFollowMovementGenerator : public TargetedMovementGeneratorMedium<T, PetFollowMovementGenerator<T> >
+{
+public:
+    PetFollowMovementGenerator(Unit &target)
+        : TargetedMovementGeneratorMedium<T, PetFollowMovementGenerator<T> >(target){}
+    PetFollowMovementGenerator(Unit &target, float offset, float angle)
+        : TargetedMovementGeneratorMedium<T, PetFollowMovementGenerator<T> >(target, offset, angle) {}
+    ~PetFollowMovementGenerator() {}
+
+    MovementGeneratorType GetMovementGeneratorType() { return FOLLOW_MOTION_TYPE; }
+
+    void Initialize(T &);
+    void Finalize(T &);
+    void Reset(T &);
+    void MovementInform(T &);
+
+    static void _clearUnitStateMove(T &u) { u.ClearUnitState(UNIT_STATE_FOLLOW_MOVE); }
+    static void _addUnitStateMove(T &u)  { u.AddUnitState(UNIT_STATE_FOLLOW_MOVE); }
+    bool EnableWalking() const;
+    bool _lostTarget(T &) const { return false; }
+    void _reachTarget(T &) {}
+private:
+    void _updateSpeed(T &u);
+};
+
 #endif
 

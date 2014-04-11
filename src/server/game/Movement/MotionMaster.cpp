@@ -274,6 +274,12 @@ void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlo
             target->GetTypeId() == TYPEID_PLAYER ? target->GetGUIDLow() : target->ToCreature()->GetDBTableGUIDLow());
         Mutate(new FollowMovementGenerator<Player>(*target,dist,angle), slot);
     }
+    else if (_owner->isPet() && target->GetTypeId() == TYPEID_PLAYER)
+    {
+        sLog->outDebug(LOG_FILTER_GENERAL, "Creature (Entry: %u GUID: %u) follow to %s (GUID: %u)",
+            _owner->GetEntry(), _owner->GetGUIDLow(), "player", target->GetGUIDLow());
+        Mutate(new PetFollowMovementGenerator<Creature>(*target,dist,angle), slot);
+    }
     else
     {
         sLog->outDebug(LOG_FILTER_GENERAL, "Creature (Entry: %u GUID: %u) follow to %s (GUID: %u)",
@@ -388,12 +394,12 @@ void MotionMaster::CustomJump(float x, float y, float z, float speedXY, float sp
     float max_height = -Movement::computeFallElevation(moveTimeHalf,false,-speedZ);
     max_height /= 15.0f;
 
+    Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);
     Movement::MoveSplineInit init(*_owner);
     init.MoveTo(x,y,z);
     init.SetParabolic(max_height, 0);
     init.SetVelocity(speedXY);
     init.Launch();
-    Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);
 }
 
 void MotionMaster::MoveFall(uint32 id/*=0*/)

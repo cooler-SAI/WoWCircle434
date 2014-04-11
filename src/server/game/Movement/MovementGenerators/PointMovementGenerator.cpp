@@ -122,11 +122,10 @@ bool EffectMovementGenerator::Update(Unit &unit, const uint32&)
 
 void EffectMovementGenerator::Finalize(Unit &unit)
 {
-    if (unit.GetTypeId() != TYPEID_UNIT)
-        return;
+    if (unit.GetTypeId() == TYPEID_UNIT)
+        if (((Creature&)unit).AI())
+            ((Creature&)unit).AI()->MovementInform(EFFECT_MOTION_TYPE, m_Id);
 
-    if (((Creature&)unit).AI())
-        ((Creature&)unit).AI()->MovementInform(EFFECT_MOTION_TYPE, m_Id);
     // Need restore previous movement since we have no proper states system
     //if (unit.isAlive() && !unit.HasUnitState(UNIT_STATE_CONFUSED|UNIT_STATE_FLEEING))
     //{
@@ -135,4 +134,10 @@ void EffectMovementGenerator::Finalize(Unit &unit)
     //    else
     //        unit.GetMotionMaster()->Initialize();
     //}
+
+    // Restore fleeing movement generator
+    if (AuraEffect * auraEff = unit.GetFirstAuraEffectByType(SPELL_AURA_MOD_FEAR))
+    {
+        unit.GetMotionMaster()->MoveFleeing(auraEff->GetCaster(), auraEff->GetBase()->GetDuration());
+    }
 }

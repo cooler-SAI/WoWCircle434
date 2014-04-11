@@ -44,10 +44,8 @@ namespace VMAP
             MapRayCallback(ModelInstance* val): prims(val), hit(false) {}
             bool operator()(const G3D::Ray& ray, uint32 entry, float& distance, bool pStopAtFirstHit=true)
             {
-                bool result = prims[entry].intersectRay(ray, distance, pStopAtFirstHit);
-                if (result)
-                    hit = true;
-                return result;
+                hit = prims[entry].intersectRay(ray, distance, pStopAtFirstHit);
+                return hit;
             }
         bool didHit() { return hit; }
     protected:
