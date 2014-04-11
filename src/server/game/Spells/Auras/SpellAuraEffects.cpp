@@ -6005,6 +6005,10 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
             {
                 target->ToPlayer()->UpdateSpellDamageAndHealingBonus();
             }
+            else if (m_spellInfo->Id == 105786)
+            {
+                target->ToPlayer()->UpdateSpellDamageAndHealingBonus();
+            }
             break;
         }
         case SPELLFAMILY_DEATHKNIGHT:
