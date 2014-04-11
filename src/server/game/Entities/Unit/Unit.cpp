@@ -5245,7 +5245,16 @@ bool Unit::HandleHasteAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             case CLASS_DRUID:           triggered_spell_id = 94318; break;
                             default: break;
                         }
-                        caster->CastSpell(caster, triggered_spell_id, true);
+                        // other targets gain ${$85759m1/3}% bonus.
+                        if (hasteSpell->Id == 85767)
+                        {
+                            int32 basepoints0 = 1;
+                            caster->CastCustomSpell(caster, triggered_spell_id, &basepoints0, 0, 0, true);
+                        }
+                        else
+                        {
+                            caster->CastSpell(caster, triggered_spell_id, true);
+                        }
                     }
                     return true;
                 }
