@@ -522,18 +522,19 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
 
                 if (target->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED))
                     amount = 70;
+                break;
             }
-            break;
+            // using same rule for SPELL_AURA_MOD_SPEED_ALWAYS and prowl
         }
         case SPELL_AURA_MOD_SPEED_ALWAYS:
         {
-            Unit * target = GetBase()->GetUnitOwner();
-            if (!target)
-                break;
-
             // Stealth / Prowl
             if (m_spellInfo->HasAura(SPELL_AURA_MOD_STEALTH))
             {
+                Unit * target = GetBase()->GetUnitOwner();
+                if (!target)
+                    break;
+
                 // Elusiveness (Racial Passive)
                 if (AuraEffect *eff = target->GetAuraEffect(21009, 0))
                     amount += eff->GetAmount();
@@ -1009,7 +1010,6 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             }
             break;
         }
-
         default:
             break;
     }
@@ -3678,12 +3678,6 @@ void AuraEffect::HandleAuraModStun(AuraApplication const* aurApp, uint8 mode, bo
 
         if (!pCaster)
             return;
-
-        if (target->isAlive() && pCaster->GetOwner() && pCaster->GetOwner()->HasAura(56250)) // Glyph of Seduction
-        {
-            target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-            target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-        }
     }
 }
 
@@ -5107,6 +5101,9 @@ void AuraEffect::HandleModMeleeRangedSpeedPct(AuraApplication const* aurApp, uin
         target->ApplyAttackTimePercentMod(OFF_ATTACK, (float)amount, apply);
         target->ApplyAttackTimePercentMod(RANGED_ATTACK, (float)amount, apply);
     }
+
+    if (target->getClass() == CLASS_DEATH_KNIGHT && target->ToPlayer())
+        target->ToPlayer()->UpdateAllRunesRegen();
 }
 
 void AuraEffect::HandleModCombatSpeedPct(AuraApplication const* aurApp, uint8 mode, bool apply) const

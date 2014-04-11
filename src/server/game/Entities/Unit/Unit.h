@@ -42,6 +42,14 @@
 #define WORLD_TRIGGER   12999
 #define SUMMON_ENABLER_STALKER 53488
 
+struct SingleCastAura
+{
+            SingleCastAura(uint32 _id, uint64 _guid) { id = _id; guid = _guid; }
+            uint32 id;
+            uint64 guid;
+};
+typedef std::list<SingleCastAura> AuraIdList;
+
 enum SpellInterruptFlags
 {
     SPELL_INTERRUPT_FLAG_MOVEMENT     = 0x01, // why need this for instant?
@@ -1250,6 +1258,7 @@ class Unit : public WorldObject
 
         typedef std::list<AuraEffect*> AuraEffectList;
         typedef std::list<Aura*> AuraList;
+        
         typedef std::list<AuraApplication *> AuraApplicationList;
         typedef std::list<DiminishingReturn> Diminishing;
         typedef std::set<uint32> ComboPointHolderSet;
@@ -1835,13 +1844,17 @@ class Unit : public WorldObject
         void _ApplyAllAuraStatMods();
 
         AuraEffectList const& GetAuraEffectsByType(AuraType type) const { return m_modAuras[type]; }
-        AuraList      & GetSingleCastAuras()       { return m_scAuras; }
-        AuraList const& GetSingleCastAuras() const { return m_scAuras; }
+        //AuraList      & GetSingleCastAuras()       { return m_scAuras; }
+        //AuraList const& GetSingleCastAuras() const { return m_scAuras; }
+        AuraIdList & GetSingleCastAuras() { return m_scAuras; }
+        AuraIdList const & GetSingleCastAuras() const { return m_scAuras; }
 
         AuraEffect* GetAuraEffect(uint32 spellId, uint8 effIndex, uint64 casterGUID = 0) const;
         AuraEffect* GetAuraEffectOfRankedSpell(uint32 spellId, uint8 effIndex, uint64 casterGUID = 0) const;
         AuraEffect* GetAuraEffect(AuraType type, SpellFamilyNames name, uint32 iconId, uint8 effIndex) const; // spell mustn't have familyflags
         AuraEffect* GetAuraEffect(AuraType type, SpellFamilyNames family, uint32 familyFlag1, uint32 familyFlag2, uint32 familyFlag3, uint64 casterGUID =0);
+        AuraEffect* GetFirstAuraEffectByType(AuraType type) const;
+
         inline AuraEffect* GetDummyAuraEffect(SpellFamilyNames name, uint32 iconId, uint8 effIndex) const { return GetAuraEffect(SPELL_AURA_DUMMY, name, iconId, effIndex);}
 
         AuraApplication * GetAuraApplication(uint32 spellId, uint64 casterGUID = 0, uint64 itemCasterGUID = 0, uint8 reqEffMask = 0, AuraApplication * except = NULL) const;
@@ -1890,6 +1903,7 @@ class Unit : public WorldObject
         int32 GetMaxPositiveAuraModifierByAffectMask(AuraType auratype, SpellInfo const* affectedSpell) const;
         int32 GetMaxNegativeAuraModifierByAffectMask(AuraType auratype, SpellInfo const* affectedSpell) const;
         int32 GetAuraAmountNoStack(AuraEffect const* effect) const;
+        int32 GetAuraCountForCaster(uint32 auraid, Unit *caster) const;
 
         float GetResistanceBuffMods(SpellSchools school, bool positive) const { return GetFloatValue(positive ? UNIT_FIELD_RESISTANCEBUFFMODSPOSITIVE+school : UNIT_FIELD_RESISTANCEBUFFMODSNEGATIVE+school); }
         void SetResistanceBuffMods(SpellSchools school, bool positive, float val) { SetFloatValue(positive ? UNIT_FIELD_RESISTANCEBUFFMODSPOSITIVE+school : UNIT_FIELD_RESISTANCEBUFFMODSNEGATIVE+school, val); }
@@ -2356,7 +2370,8 @@ class Unit : public WorldObject
         uint32 m_removedAurasCount;
 
         AuraEffectList m_modAuras[TOTAL_AURAS];
-        AuraList m_scAuras;                        // casted singlecast auras
+        //AuraList m_scAuras;                        // casted singlecast auras
+        AuraIdList m_scAuras;
         AuraApplicationList m_interruptableAuras;             // auras which have interrupt mask applied on unit
         AuraStateAurasMap m_auraStateAuras;        // Used for improve performance of aura state checks on aura apply/remove
         uint32 m_interruptMask;

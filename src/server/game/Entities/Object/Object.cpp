@@ -726,7 +726,7 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* 
 
                     if (GetTypeId() == TYPEID_UNIT)
                     {
-                        if (!target->canSeeSpellClickOn(this->ToCreature()))
+                        if (target->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK) && !target->canSeeSpellClickOn(this->ToCreature()))
                             appendValue &= ~UNIT_NPC_FLAG_SPELLCLICK;
 
                         if (appendValue & UNIT_NPC_FLAG_TRAINER)

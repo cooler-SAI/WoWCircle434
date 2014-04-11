@@ -1851,6 +1851,11 @@ void Unit::CalcAbsorbResist(Unit* victim, SpellSchoolMask schoolMask, DamageEffe
             splitDamage = RoundToInterval(splitDamage, uint32(0), uint32(dmgInfo.GetDamage()));
 
             dmgInfo.AbsorbDamage(splitDamage);
+
+            // don't damage caster if he has immunity
+            if (caster->IsImmunedToDamage((*itr)->GetSpellInfo()))
+                continue;
+
             uint32 splitted = splitDamage;
             uint32 split_absorb = 0;
             DealDamageMods(caster, splitted, &split_absorb);
@@ -3209,9 +3214,19 @@ void Unit::_AddAura(UnitAura* aura, Unit* caster)
     {
         ASSERT((IsInWorld() && !IsDuringRemoveFromWorld()) || (aura->GetCasterGUID() == GetGUID()));
         // register single target aura
-        caster->GetSingleCastAuras().push_back(aura);
+        //caster->GetSingleCastAuras().push_back(aura);
+        for (AuraIdList::iterator itr = caster->GetSingleCastAuras().begin(); itr != caster->GetSingleCastAuras().end(); ++itr)
+        {
+            if ((*itr).id == aura->GetId())
+            if (Unit* pTarget = ObjectAccessor::FindUnit((*itr).guid))
+            {
+                pTarget->RemoveAura((*itr).id, caster->GetGUID());
+                break;
+            }
+        }
+        caster->GetSingleCastAuras().push_back(SingleCastAura(aura->GetId(), GetGUID()));
         // remove other single target auras
-        Unit::AuraList tempList;
+       /* Unit::AuraList tempList;
         Unit::AuraList& scAuras = caster->GetSingleCastAuras();
         for (AuraList::const_iterator itr = scAuras.begin(); itr != scAuras.end(); ++itr)
         {
@@ -3225,7 +3240,8 @@ void Unit::_AddAura(UnitAura* aura, Unit* caster)
             for (AuraList::const_iterator t_itr = tempList.begin(); t_itr != tempList.end(); ++t_itr)
                 if (Aura* aura = *t_itr)
                     aura->Remove();
-        }
+        } 
+        */
     }
 }
 
@@ -3704,7 +3720,8 @@ void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, uint64 casterGUID, Unit*
                         newAura->UnregisterSingleTarget();
                         // bring back single target aura status to the old aura
                         aura->SetIsSingleTarget(true);
-                        caster->GetSingleCastAuras().push_back(aura);
+                        //caster->GetSingleCastAuras().push_back(aura);
+                        caster->GetSingleCastAuras().push_back(SingleCastAura(aura->GetId(), stealer->GetGUID()));
                     }
                     // FIXME: using aura->GetMaxDuration() maybe not blizzlike but it fixes stealing of spells like Innervate
                     newAura->SetLoadedState(aura->GetMaxDuration(), int32(dur), stealCharge ? 1 : aura->GetCharges(), 1, recalculateMask, &damage[0]);
@@ -3802,8 +3819,21 @@ void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase)
             ++iter;
     }
 
+    AuraIdList& scAuras = GetSingleCastAuras();
+    for (AuraIdList::iterator itr = scAuras.begin(); itr != scAuras.end(); ++itr)
+    {
+        if (Unit* pTarget = ObjectAccessor::FindUnit((*itr).guid))
+        {
+            if ((*itr).guid != GetGUID() && !pTarget->InSamePhase(newPhase))
+            {
+                pTarget->RemoveAura((*itr).id, GetGUID());
+                break;
+            }
+        }                
+    }
+
     // single target auras at other targets
-    AuraList tempList;
+    /*AuraList tempList;
     AuraList& scAuras = GetSingleCastAuras();
     for (AuraList::const_iterator itr = scAuras.begin(); itr != scAuras.end(); ++itr)
         if (Aura* aura = *itr)
@@ -3813,7 +3843,7 @@ void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase)
     if (!tempList.empty())
         for (AuraList::const_iterator itr = tempList.begin(); itr != tempList.end(); ++itr)
             if (Aura* aura = *itr)
-                aura->Remove();
+                aura->Remove();*/
 
 
     /*for (AuraList::iterator iter = scAuras.begin(); iter != scAuras.end();)
@@ -4160,6 +4190,16 @@ AuraEffect* Unit::GetAuraEffect(AuraType type, SpellFamilyNames family, uint32 f
                 continue;
             return (*i);
         }
+    }
+    return NULL;
+}
+
+AuraEffect* Unit::GetFirstAuraEffectByType(AuraType type) const
+{
+    AuraEffectList const& auras = GetAuraEffectsByType(type);
+    for (AuraEffectList::const_iterator i = auras.begin(); i != auras.end(); ++i)
+    {
+        return *i;
     }
     return NULL;
 }
@@ -4763,6 +4803,21 @@ int32 Unit::GetAuraAmountNoStack(AuraEffect const* effect) const
         }
     }
     return cur_amount;
+}
+
+int32 Unit::GetAuraCountForCaster(uint32 auraid, Unit *caster) const
+{
+    int32 count = 0;
+    if (!caster)
+        return count;
+
+    AuraApplicationMapBounds range = m_appliedAuras.equal_range(auraid);
+    for (AuraApplicationMap::const_iterator itr = range.first; itr != range.second; ++itr)
+    {
+        if (itr->second->GetBase()->GetCasterGUID() == caster->GetGUID())
+            count++;
+    }
+    return count;
 }
 
 void Unit::_RegisterDynObject(DynamicObject* dynObj)
@@ -7755,7 +7810,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!ToPlayer())
                         return false;
 
-                    if (procSpell->DmgClass == SPELL_DAMAGE_CLASS_MELEE && procSpell->AttributesEx & SPELL_ATTR1_REQ_COMBO_POINTS1)
+                    if (procSpell->DmgClass == SPELL_DAMAGE_CLASS_MELEE && procSpell->AttributesEx & SPELL_ATTR1_REQ_COMBO_POINTS1 && victim != this)
                     {
                         // better not to use cycle here otherwise the time is not always reduced
                         uint32 reductionTime = triggerAmount * ToPlayer()->GetComboPoints();
@@ -10404,6 +10459,8 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                 else
                     return false;
             }
+            else 
+                return false;
             break;
         }
         // Lock'n'Load
@@ -11385,7 +11442,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     }
     else
     {
-        if (victim->ToCreature()->IsInEvadeMode())
+        if (!victim->ToCreature() || victim->ToCreature()->IsInEvadeMode())
             return false;
     }
 
@@ -11569,9 +11626,14 @@ void Unit::ModifyAuraState(AuraStateType flag, bool apply)
 {
     if (apply)
     {
-        if (!HasFlag(UNIT_FIELD_AURASTATE, 1 << (flag-1)))
+        bool hasflag = HasFlag(UNIT_FIELD_AURASTATE, 1 << (flag-1));
+        if (hasflag)
+            RemoveFlag(UNIT_FIELD_AURASTATE, 1 << (flag-1));
+    
+        SetFlag(UNIT_FIELD_AURASTATE, 1 << (flag-1));
+
+        if (hasflag == false)
         {
-            SetFlag(UNIT_FIELD_AURASTATE, 1 << (flag-1));
             if (GetTypeId() == TYPEID_PLAYER)
             {
                 if (getClass() == CLASS_DEATH_KNIGHT && flag == AURA_STATE_DEFENSE)
@@ -18631,6 +18693,8 @@ void Unit::Kill(Unit* victim, bool durabilityLoss)
         }
     }
 
+    if (victim->GetTypeId() == TYPEID_UNIT)
+        victim->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
     if (!spiritOfRedemption)
         victim->setDeathState(JUST_DIED);
 
@@ -21460,6 +21524,20 @@ bool Unit::IsVisionObscured(Unit* victim, SpellInfo const* spellInfo) const
             return false;
         else
             return true;
+    }
+    // Victim and caster have aura with effect SPELL_AURA_INTERFERE_TARGETTING, but aura may be not smoke bomb.
+    else if (myAura != NULL && victimAura != NULL)
+    {
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            if (AuraEffect* effect = myAura->GetEffect(i))
+            {
+                if (effect->GetAuraType() != SPELL_AURA_INTERFERE_TARGETTING)
+                    continue;
+                if (effect->GetAmount() && !IsFriendlyTo(victimCaster))
+                    return true;
+            }
+        }
     }
     // Victim and caster have aura with effect SPELL_AURA_INTERFERE_TARGETTING, but aura may be not smoke bomb.
     else if (myAura != NULL && victimAura != NULL)
