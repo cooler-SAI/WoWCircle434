@@ -1562,6 +1562,22 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         }
                         break;
                     }
+                    // Power Word: Shield
+                    case 17:
+                    {
+                        // Weakened Soul
+                        if (!target->HasAura(6788))
+                            caster->CastSpell(target, 6788, true);
+
+                        // Glyph of Power Word: Shield
+                        if (AuraEffect* glyph = caster->GetAuraEffect(55672, 0))
+                        {
+                            // instantly heal m_amount% of the absorb-value
+                            int32 heal = glyph->GetAmount() * GetEffect(0)->GetAmount()/100;
+                            caster->CastCustomSpell(GetUnitOwner(), 56160, &heal, NULL, NULL, true, 0, GetEffect(0));
+                        }
+                        break;
+                    }
                     // Renew
                     case 139:
                     {
@@ -2027,6 +2043,33 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEFAULT && caster->HasAura(56226))
                             caster->CastSpell(caster, 94229, false);
                         break;
+                }
+                break;
+            case SPELLFAMILY_PRIEST:
+                if (!caster)
+                    break;
+                // Power word: shield
+                if (m_spellInfo->Id == 17)
+                {
+                    if (removeMode == AURA_REMOVE_BY_ENEMY_SPELL || removeMode == AURA_REMOVE_BY_DEFAULT)
+                    {
+                        // Rapture
+                        if (AuraEffect* auraEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PRIEST, 2894, 0))
+                        {
+                            // check cooldown (need to use spell 63853 instead of cooldown)
+                            if (caster->GetTypeId() == TYPEID_PLAYER)
+                            {
+                                if (caster->ToPlayer()->HasSpellCooldown(auraEff->GetId()))
+                                    break;
+                                
+                                caster->ToPlayer()->AddSpellCooldown(auraEff->GetId(), 0, uint32(time(NULL) + 12));
+                            }
+
+                            float multiplier = float(auraEff->GetAmount());
+                            int32 basepoints0 = int32(CalculatePct(caster->GetMaxPower(POWER_MANA), multiplier));
+                            caster->CastCustomSpell(caster, 47755, &basepoints0, NULL, NULL, true);
+                        }
+                    }
                 }
                 break;
             case SPELLFAMILY_ROGUE:
