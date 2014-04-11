@@ -41,10 +41,15 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
     }
 
     GMTicketResponse response = GMTICKET_RESPONSE_CREATE_ERROR;
+    GmTicket* ticket = sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID());
+
+    if (ticket && ticket->IsCompleted())
+        sTicketMgr->CloseTicket(ticket->GetId(), GetPlayer()->GetGUID());
+
     // Player must not have ticket
-    if (!sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))
+    if (!ticket || ticket->IsClosed())
     {
-        GmTicket* ticket = new GmTicket(GetPlayer(), recvData);
+        ticket = new GmTicket(GetPlayer(), recvData);
 
         uint32 count;
         std::list<uint32> times;
@@ -231,7 +236,7 @@ void WorldSession::HandleGMResponseResolve(WorldPacket& /*recvPacket*/)
         if (float(rand_chance()) < sWorld->getFloatConfig(CONFIG_CHANCE_OF_GM_SURVEY))
             getSurvey = 1;
 
-        WorldPacket data(SMSG_GMRESPONSE_STATUS_UPDATE, 1);
+        WorldPacket data(SMSG_GMRESPONSE_STATUS_UPDATE, 4);
         data << uint8(getSurvey);
         SendPacket(&data);
 
