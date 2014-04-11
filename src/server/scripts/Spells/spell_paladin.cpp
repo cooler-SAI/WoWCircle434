@@ -216,6 +216,8 @@ class spell_pal_holy_shock : public SpellScriptLoader
                         if (!caster->isInFront(target))
                             return SPELL_FAILED_UNIT_NOT_INFRONT;
                     }
+                    else if (!caster->IsValidAssistTarget(target))
+                        return SPELL_FAILED_BAD_TARGETS;
                 }
                 else
                     return SPELL_FAILED_BAD_TARGETS;

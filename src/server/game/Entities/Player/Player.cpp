@@ -21790,6 +21790,9 @@ void Player::SetBattlegroundEntryPoint()
         else
             m_bgData.mountSpell = 0;
 
+        if (Aura* aur = GetAura(33943))
+            m_bgData.mountSpell = 33943;
+
         // If map is dungeon find linked graveyard
         if (GetMap()->IsDungeon())
         {
@@ -22260,6 +22263,9 @@ void Player::SendInitialPacketsBeforeAddToMap()
     GetSession()->SendPacket(&data);
 
     // SMSG_SET_PROFICIENCY
+    if (getClass() == CLASS_DRUID)
+        CastSpell(this, 27762);
+
     // SMSG_SET_PCT_SPELL_MODIFIER
     // SMSG_SET_FLAT_SPELL_MODIFIER
     // SMSG_UPDATE_AURA_DURATION

@@ -66,6 +66,7 @@ class item_charging_decorder_ring : public ItemScript
 
         bool OnExpire(Player* player, ItemTemplate const* /*pItemProto*/)
         {
+            player->KilledMonsterCredit(55691, 0);
             player->AddItem(ITEM_CHARGED_DECORDER_RING, 1);
             return true;
         }

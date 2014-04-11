@@ -156,6 +156,10 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Curse of Exhaustion
             else if (spellproto->Id == 18223)
                 return DIMINISHING_LIMITONLY;
+            // Feral Charge: Bear Effect
+            else if (spellproto->Id == 45334)
+                return DIMINISHING_RANDOM_ROOT;
+            
             break;
         }
         case SPELLFAMILY_DRUID:
