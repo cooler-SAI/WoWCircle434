@@ -263,7 +263,19 @@ int Master::Run()
     }
 
     ///- Launch the world listener socket
-    uint16 wsport = uint16(sWorld->getIntConfig(CONFIG_PORT_WORLD));
+    uint16 wsport = 8085;
+    uint16 wsport_min = uint16(ConfigMgr::GetIntDefault("WorldServerPortMin", 8085));
+    uint16 wsport_max = uint16(ConfigMgr::GetIntDefault("WorldServerPortMax", 8085));
+
+    if (wsport_min == wsport_max)
+        wsport = wsport_min;
+    else
+    {
+        if (wsport_min > wsport_max)
+            std::swap(wsport_min, wsport_max);
+        wsport = urand(wsport_min, wsport_max);
+    }
+
     std::string bind_ip = ConfigMgr::GetStringDefault("BindIP", "0.0.0.0");
 
     if (sWorldSocketMgr->StartNetwork(wsport, bind_ip.c_str()) == -1)
