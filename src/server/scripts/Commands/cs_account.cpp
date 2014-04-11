@@ -289,48 +289,48 @@ public:
             return false;
         }
 
-        char* oldPassword = strtok((char*)args, " ");
-        char* newPassword = strtok(NULL, " ");
-        char* passwordConfirmation = strtok(NULL, " ");
+        if (AccountMgr::IsEmptyPassword(handler->GetSession()->GetAccountId()))
+        {
+            char* newPassword = strtok((char*)args, " ");
+            char* passwordConfirmation = strtok(NULL, " ");
 
-        if (!oldPassword || !newPassword || !passwordConfirmation)
+            if (!newPassword || !passwordConfirmation)
+            {
+                handler->SendSysMessage(LANG_CMD_SYNTAX);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+
+            if (strcmp(newPassword, passwordConfirmation) != 0)
+            {
+                handler->SendSysMessage(LANG_NEW_PASSWORDS_NOT_MATCH);
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+
+            AccountOpResult result = AccountMgr::ChangePassword(handler->GetSession()->GetAccountId(), std::string(newPassword));
+            switch (result)
+            {
+                case AOR_OK:
+                    handler->SendSysMessage(LANG_COMMAND_PASSWORD);
+                    break;
+                case AOR_PASS_TOO_LONG:
+                    handler->SendSysMessage(LANG_PASSWORD_TOO_LONG);
+                    handler->SetSentErrorMessage(true);
+                    return false;
+                default:
+                    handler->SendSysMessage(LANG_COMMAND_NOTCHANGEPASSWORD);
+                    handler->SetSentErrorMessage(true);
+                    return false;
+            }
+            return true;
+        }
+        else
         {
             handler->SendSysMessage(LANG_CMD_SYNTAX);
             handler->SetSentErrorMessage(true);
             return false;
         }
-
-        if (!AccountMgr::CheckPassword(handler->GetSession()->GetAccountId(), std::string(oldPassword)))
-        {
-            handler->SendSysMessage(LANG_COMMAND_WRONGOLDPASSWORD);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        if (strcmp(newPassword, passwordConfirmation) != 0)
-        {
-            handler->SendSysMessage(LANG_NEW_PASSWORDS_NOT_MATCH);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        AccountOpResult result = AccountMgr::ChangePassword(handler->GetSession()->GetAccountId(), std::string(newPassword));
-        switch (result)
-        {
-            case AOR_OK:
-                handler->SendSysMessage(LANG_COMMAND_PASSWORD);
-                break;
-            case AOR_PASS_TOO_LONG:
-                handler->SendSysMessage(LANG_PASSWORD_TOO_LONG);
-                handler->SetSentErrorMessage(true);
-                return false;
-            default:
-                handler->SendSysMessage(LANG_COMMAND_NOTCHANGEPASSWORD);
-                handler->SetSentErrorMessage(true);
-                return false;
-        }
-
-        return true;
     }
 
     static bool HandleAccountCommand(ChatHandler* handler, char const* /*args*/)

@@ -41,6 +41,7 @@ namespace AccountMgr
     AccountOpResult ChangeUsername(uint32 accountId, std::string newUsername, std::string newPassword);
     AccountOpResult ChangePassword(uint32 accountId, std::string newPassword);
     bool CheckPassword(uint32 accountId, std::string password);
+    bool IsEmptyPassword(uint32 accountId);
 
     uint32 GetId(std::string username);
     uint32 GetSecurity(uint32 accountId);

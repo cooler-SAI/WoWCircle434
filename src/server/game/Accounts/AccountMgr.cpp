@@ -202,6 +202,12 @@ bool CheckPassword(uint32 accountId, std::string password)
     return (result) ? true : false;
 }
 
+bool IsEmptyPassword(uint32 accountId)
+{
+    QueryResult result = LoginDatabase.PQuery("SELECT 1 FROM account WHERE id ='%d' AND sha_pass_hash = ''", accountId);
+    return result ? true : false;
+}
+
 uint32 GetCharactersCount(uint32 accountId)
 {
     uint32 charcount = 0;
