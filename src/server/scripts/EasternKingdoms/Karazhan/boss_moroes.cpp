@@ -560,9 +560,8 @@ public:
 
             if (GreaterHeal_Timer <= diff)
             {
-                Unit* target = SelectGuestTarget();
-
-                DoCast(target, SPELL_GREATERHEAL);
+                if (Unit* target = SelectGuestTarget())
+                    DoCast(target, SPELL_GREATERHEAL);
                 GreaterHeal_Timer = 17000;
             } else GreaterHeal_Timer -= diff;
 
