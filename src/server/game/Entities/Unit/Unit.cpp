@@ -5711,7 +5711,25 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 {
                     bool found = false;
                     // find target of bane
-                    AuraList & scAuras = GetSingleCastAuras();
+                    AuraIdList & scAuras = GetSingleCastAuras();
+                    for (AuraIdList::iterator iter = scAuras.begin(); iter != scAuras.end(); ++iter)
+                    {
+                        if (Unit* pOwner = ObjectAccessor::FindUnit((*iter).guid))
+                        {
+                            if ((*iter).id == 80240)
+                            {
+                                if (Aura* aur = pOwner->GetAura((*iter).id, GetGUID())) 
+                                {
+                                    if (target->GetGUID() == (*iter).guid)
+                                        return false;
+                                    target = pOwner;
+                                    basepoints0 = int32(CalculatePct(damage, aur->GetEffect(0)->GetAmount()));
+                                    found = true;
+                                }
+                            }
+                        }
+                    }
+                    /*AuraList & scAuras = GetSingleCastAuras();
                     for (AuraList::iterator iter = scAuras.begin(); iter != scAuras.end(); ++iter)
                         if( (*iter)->GetId() == 80240)
                         {
@@ -5720,7 +5738,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             target = (*iter)->GetUnitOwner();
                             basepoints0 = int32(CalculatePct(damage, (*iter)->GetEffect(0)->GetAmount()));
                             found = true;
-                        }
+                        }*/
                     // no target found, break
                     if (!found)
                         return false;
