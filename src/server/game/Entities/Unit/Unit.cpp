@@ -5900,8 +5900,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                         triggered_spell_id = procSpell->Id;
 
-                        // Fulmination
-                        if (procSpell->Id == 88767)
+                        // Fulmination              Improved Devouring Plague
+                        if (procSpell->Id == 88767 || procSpell->Id == 63675)
                             basepoints0 = damage;
 
                         break;
@@ -6479,18 +6479,15 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     return false;
 
                 triggered_spell_id = 31589; // slow
-                AuraList & scAuras = GetSingleCastAuras();
-                for (AuraList::iterator iter = scAuras.begin(); iter != scAuras.end(); ++iter)
+                AuraIdList & scAuras = GetSingleCastAuras();
+                for (AuraIdList::iterator iter = scAuras.begin(); iter != scAuras.end(); ++iter)
                 {
-                    if (Aura* aur = (*iter))
+                    if ((*iter).id == triggered_spell_id)
                     {
-                        if (aur->GetId() == triggered_spell_id)
-                        {
-                            // can update current target slow
-                            if (aur->GetOwner() == target)
-                                break;
-                            return false;
-                        }
+                        // can update current target slow
+                        if ((*iter).guid == target->GetGUID())
+                            break;
+                        return false;
                     }
                 }
                 break;
@@ -7085,10 +7082,15 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (AuraEffect const* shieldDiscipline = GetDummyAuraEffect(SPELLFAMILY_HUNTER, 566, 0))
                         basepoints0 *= (shieldDiscipline->GetAmount() + 100.0f) / 100.0f;
 
+                    // double basepoints from crit for Prayer of Healing
+                    if (procSpell->Id == 596 && (procEx & PROC_EX_CRITICAL_HIT))
+                        basepoints0 *= 2;
+
                     // Multiple effects stack, so let's try to find this aura.
                     if (AuraEffect *aurEff = target->GetAuraEffect(47753, 0))
                         basepoints0 += aurEff->GetAmount();
 
+                    // Limit up to 40%
                     if (basepoints0 > int32(GetMaxHealth()*40/100))
                         basepoints0 = int32(GetMaxHealth()*40/100);
 
@@ -7295,6 +7297,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                     int32 tickcount = GoPoH->GetMaxDuration() / GoPoH->Effects[EFFECT_0].Amplitude;
                     basepoints0 = CalculatePct(int32(damage), triggerAmount) / tickcount;
+                    basepoints0 += victim->GetRemainingPeriodicAmount(GetGUID(), triggered_spell_id, SPELL_AURA_PERIODIC_HEAL);
                     break;
                 }
                 // Oracle Healing Bonus ("Garments of the Oracle" set)
@@ -8362,7 +8365,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                     float ap = GetTotalAttackPowerValue(BASE_ATTACK);
                     int32 holy = this->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_HOLY);
-                    basepoints0 = int32((GetAttackTime(BASE_ATTACK) / 1000) * (0.0011f * ap + 0.022f * holy));
+                    basepoints0 = int32((GetHastedAttackTime(BASE_ATTACK) / 1000.0f) * (0.011f * ap + 0.022f * holy));
                     break;
                 }
                 // Long Arm of The law
@@ -10179,6 +10182,13 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
                         trigger_spell_id = 105801;
                         break;
                     }
+                    case 53695:
+                    case 53696:
+                    {
+                        int32 bp = HasAura(53696) ? 20 : 10;
+                        CastCustomSpell(victim, 68055, &bp, NULL, NULL, true, NULL, triggeredByAura);
+                        return true;
+                    }
                     default:
                         break;
                 }
@@ -10286,7 +10296,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
         case 105907:
             if (!procSpell)
                 return false;
-            if (procSpell->Id != 12294 && !roll_chance_i(50))
+            if (!(procSpell->Id == 12294 || (procSpell->Id == 23881 && roll_chance_i(50))))
                 return false;
             break;
         // Item - Mage T13 2P Bonus (Haste)
@@ -10728,12 +10738,18 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorb, Au
             if (!item)
                 return false;
 
+            float multiplier = 0.16f;
+            if (auraSpellInfo->Id == 12849)
+                multiplier = 0.32f;
+            else if (auraSpellInfo->Id == 12867)
+                multiplier = 0.48f;
+
             ItemTemplate const* weapon = item->GetTemplate();
 
             float weaponDPS = weapon->DPS;
             float attackPower = GetTotalAttackPowerValue(BASE_ATTACK) / 14.0f;
             float weaponSpeed = float(weapon->Delay) / 1000.0f;
-            basepoints0 += int32((weaponDPS + attackPower) * weaponSpeed)/6;
+            basepoints0 += int32((multiplier * (weaponDPS + attackPower) * weaponSpeed)) / 6;
             trigger_spell_id = 12721;
             break;
         }
@@ -13043,8 +13059,10 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
 {
     //! Mobs can't crit with spells. Player Totems can
     //! Fire Elemental (from totem) can too - but this part is a hack and needs more research
-    if (IS_CREATURE_GUID(GetGUID()) && !((isTotem() || isGuardian()) && IS_PLAYER_GUID(GetOwnerGUID())) && GetEntry() != 15438)
-        return false;
+    if (IS_CREATURE_GUID(GetGUID()) || IS_VEHICLE_GUID(GetGUID())) 
+        if (!((isTotem() || isGuardian()) && IS_PLAYER_GUID(GetOwnerGUID())))
+            if (GetEntry() != 15438)
+                return false;
 
     // not critting spell
     if ((spellProto->AttributesEx2 & SPELL_ATTR2_CANT_CRIT))
@@ -13311,6 +13329,21 @@ uint32 Unit::SpellCriticalDamageBonus(SpellInfo const* spellProto, uint32 damage
             crit_bonus += damage;
             break;
         }
+        case SPELL_DAMAGE_CLASS_MAGIC:
+            switch (spellProto->Id)
+            {
+                case 85692: // Doom Bolt
+                case 54049: // Shadow Bite
+                case 3110:  // Firebolt
+                case 7814:  // Lash of Pain
+                case 51963: // Gargoyle Strike
+                    crit_bonus += damage;
+                    break;
+                default:
+                    crit_bonus += damage / 2;
+                    break;
+            }
+            break;
         default:
             crit_bonus += damage / 2;                       // for spells is 50%
             break;
@@ -14515,9 +14548,10 @@ void Unit::CombatStart(Unit* target, bool initialAggro)
         SetInCombatWith(target);
         target->SetInCombatWith(this);
     }
+
     Unit* who = target->GetCharmerOrOwnerOrSelf();
     if (who->GetTypeId() == TYPEID_PLAYER)
-      SetContestedPvP(who->ToPlayer());
+        SetContestedPvP(who->ToPlayer());
 
     Player* me = GetCharmerOrOwnerPlayerOrPlayerItself();
     if (me && who->IsPvP()
@@ -17419,6 +17453,9 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                     case 49571:
                     case 49572:
                         break;
+                    case 56807: //
+                        damage += absorb;
+                        break;
                     default:
                         break; 
                 }
@@ -18499,6 +18536,7 @@ bool Unit::HandleAuraRaidProcFromChargeWithValue(AuraEffect* triggeredByAura)
             if (Unit* target = GetNextRandomRaidMemberOrPet(radius))
             {
                 CastCustomSpell(target, spellProto->Id, &heal, NULL, NULL, true, NULL, triggeredByAura, caster_guid);
+                CastCustomSpell(target, 41637, &heal, NULL, NULL, true, NULL, triggeredByAura, caster_guid);
                 if (Aura* aura = target->GetAura(spellProto->Id, caster->GetGUID()))
                     aura->SetCharges(jumps);
             }
@@ -18519,6 +18557,7 @@ bool Unit::HandleAuraRaidProcFromChargeWithValue(AuraEffect* triggeredByAura)
     return true;
 
 }
+
 bool Unit::HandleAuraRaidProcFromCharge(AuraEffect* triggeredByAura)
 {
     // aura can be deleted at casts
