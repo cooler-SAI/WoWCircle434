@@ -2477,6 +2477,43 @@ uint32 SpellInfo::CalcCastTime(Unit* caster, Spell* spell) const
     return (castTime > 0) ? uint32(castTime) : 0;
 }
 
+struct VisualIdStruct
+{
+    uint32 skill;
+    uint32 visual;
+    uint32 aura;
+    uint32 casttime;
+};
+
+const VisualIdStruct cVIS[] =
+{
+    {185, 3881, 67556, 500},    // cooking with Chef Hat.
+    {182, 91, 20552, 500},      // Cultivation (Tauren Racial) & Herbalism
+    {393, 1008, 68978, 500}     // Flayer (Vorgen Racial) & Flayer
+};
+
+void SpellInfo::UpdateCastTimeForProfessionRacicalBoost(Unit const *caster, int32 &castTime) const
+{
+    if (!caster)
+        return;
+    
+    int count = sizeof(cVIS) / sizeof(VisualIdStruct);
+    for (int i = 0; i < count; ++i)
+    {
+        if (SpellVisual[0] != cVIS[i].visual)
+            continue;
+        
+        if (!IsAbilityOfSkillType(cVIS[i].skill))
+            return;
+        
+        if (!caster->HasAura(cVIS[i].aura))
+            return;
+        
+        castTime = cVIS[i].casttime;
+        return;
+    }
+}
+
 uint32 SpellInfo::GetMaxTicks() const
 {
     int32 DotDuration = GetDuration();

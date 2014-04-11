@@ -536,6 +536,7 @@ public:
     uint32 GetMaxTicks() const;
 
     uint32 CalcCastTime(Unit* caster = NULL, Spell* spell = NULL) const;
+    void UpdateCastTimeForProfessionRacicalBoost(Unit const *caster, int32 &castTime) const;
     uint32 GetRecoveryTime() const;
     uint32 GetStackAmount(Unit *caster) const;
 
