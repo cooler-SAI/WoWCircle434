@@ -3413,9 +3413,6 @@ bool SpellInfo::IsBreakingStealth(Unit* m_caster) const
             return true;
     }
 
-    //if ((!m_caster || !m_caster->HasAuraType(SPELL_AURA_335)) && IsPositive())
-    //    return false;
-
     switch(Id)
     {
         case 3600:  // Earthbind Totem

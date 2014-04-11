@@ -2401,7 +2401,7 @@ bool WorldObject::CanDetectInvisibilityOf(WorldObject const* obj) const
     uint32 mask = obj->m_invisibility.GetFlags() & m_invisibilityDetect.GetFlags();
 
     // caster can see targets if has 335 aura
-    if (this->ToUnit() && this->ToUnit()->HasAuraType(SPELL_AURA_335) && !obj->m_invisibility.GetFlags())
+    if (this->ToUnit() && this->ToUnit()->HasAuraType(SPELL_AURA_CAN_SEE_OR_DETECT_STEALTH) && !obj->m_invisibility.GetFlags())
         return true;
 
     if (obj->ToUnit())
