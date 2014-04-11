@@ -6793,6 +6793,26 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
             {
                 switch (auraId)
                 {
+                    // Battle Guild Standart
+                    case 89481: 
+                    {
+                        switch (target->GetEntry())
+                        {
+                            case 48115: // 5%, alliance
+                            case 48633: // 10%, alliance
+                            case 48634: // 15%, alliance
+                                triggerSpellId = 90216;
+                                break;
+                            case 48636: // 5%, horde
+                            case 48637: // 10%, horde
+                            case 48638: // 15%, horde
+                                triggerSpellId = 90708;
+                                break;
+                            default:
+                                return;
+                        }
+                        break;
+                    }
                     // Earth's Vengeance, Morchok, Dragon Soul
                     case 103176:
                     {

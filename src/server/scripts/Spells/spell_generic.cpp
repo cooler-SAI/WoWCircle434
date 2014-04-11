@@ -3378,6 +3378,116 @@ public:
     }
 };
 
+class spell_gen_battle_guild_standart : public SpellScriptLoader
+{
+    public:
+        spell_gen_battle_guild_standart() : SpellScriptLoader("spell_gen_battle_guild_standart") { }
+
+        class spell_gen_battle_guild_standart_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_gen_battle_guild_standart_SpellScript);
+
+            void FilterTargets(std::list<WorldObject*>& targets)
+            {
+                if (Creature* pStandart = GetCaster()->ToCreature())
+                {
+                    if (uint32 guildId = pStandart->AI()->GetData(0))
+                        targets.remove_if(GuildCheck(pStandart->GetGUID(), guildId));
+                    else
+                        targets.clear();
+                }
+                else
+                    targets.clear();
+
+            }
+
+            void Register()
+            {
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gen_battle_guild_standart_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gen_battle_guild_standart_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ALLY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gen_battle_guild_standart_SpellScript::FilterTargets, EFFECT_2, TARGET_UNIT_SRC_AREA_ALLY);
+            }
+
+        private:
+            class GuildCheck
+            {
+                public:
+                    GuildCheck(uint64 casterGUID, uint32 guildId) : _casterGUID(casterGUID),_guildId(guildId) {}
+
+                    bool operator()(WorldObject* unit)
+                    {
+                        if (!_guildId)
+                            return true;
+
+                        if (unit->GetTypeId() != TYPEID_PLAYER)
+                            return true;
+
+                        if (unit->ToPlayer()->GetGuildId() != _guildId)
+                            return true;
+
+                        if (Aura* const aur = unit->ToPlayer()->GetAura(90216))
+                            if (aur->GetCasterGUID() != _casterGUID)
+                                return true;
+
+                        if (Aura* const aur = unit->ToPlayer()->GetAura(90708))
+                            if (aur->GetCasterGUID() != _casterGUID)
+                                return true;
+
+                        return false;
+                    }
+
+                private:
+                    uint64 _casterGUID;
+                    uint32 _guildId;
+            };
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_gen_battle_guild_standart_SpellScript();
+        }
+
+        class spell_gen_battle_guild_standart_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_gen_battle_guild_standart_AuraScript);
+
+
+            void CalcAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+            {
+                if (Unit* pStandart = GetCaster())
+                {
+                    switch (pStandart->GetEntry())
+                    {
+                        case 48115: // 5%, alliance
+                        case 48636: // 5%, horde
+                            amount = 5;
+                            break;
+                        case 48633: // 10%, alliance
+                        case 48637: // 10%, horde
+                            amount = 10;
+                            break;
+                        case 48634: // 15%, alliance
+                        case 48638: // 15%, horde
+                            amount = 15;
+                            break;
+                    }
+                }
+            }
+
+            void Register()
+            {  
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_battle_guild_standart_AuraScript::CalcAmount, EFFECT_0, SPELL_AURA_MOD_XP_PCT);
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_battle_guild_standart_AuraScript::CalcAmount, EFFECT_1, SPELL_AURA_MOD_CURRENCY_GAIN);
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_battle_guild_standart_AuraScript::CalcAmount, EFFECT_2, SPELL_AURA_MOD_FACTION_REPUTATION_GAIN);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_gen_battle_guild_standart_AuraScript();
+        }
+};
+
 void AddSC_generic_spell_scripts()
 {
     new spell_gen_absorb0_hitlimit1();
