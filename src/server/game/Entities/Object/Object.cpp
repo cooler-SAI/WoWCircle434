@@ -1874,10 +1874,39 @@ bool WorldObject::IsWithinLOSInMap(const WorldObject* obj) const
     float ox, oy, oz;
     obj->GetPosition(ox, oy, oz);
 
-    // Hack fix for Ice Tombs (Sindragosa encounter)
+
     if (obj->GetTypeId() == TYPEID_UNIT)
-        if (obj->GetEntry() == 36980 || obj->GetEntry() == 38320 || obj->GetEntry() == 38321 || obj->GetEntry() == 38322)
+        switch (obj->GetEntry())
+    {
+        // Hack fix for Ice Tombs (Sindragosa encounter)
+        case 36980:
+        case 38320:
+        case 38321:
+        case 38322:
+            // Hack fix for Burning Tendons (Spine of Deathwing)
+        case 56341:
+        case 56575:
             return true;
+        default:
+            break;
+    }
+
+    // AoE spells
+    if (GetTypeId() == TYPEID_UNIT)
+        switch (GetEntry())
+    {
+        // Hack fix for Ice Tombs (Sindragosa encounter)
+        case 36980:
+        case 38320:
+        case 38321:
+        case 38322:
+            // Hack fix for Burning Tendons (Spine of Deathwing)
+        case 56341:
+        case 56575:
+            return true;
+        default:
+            break;
+    }
 
     // Hack fix for Alysrazor
     if (GetMapId() == 720 && GetAreaId() == 5766)
