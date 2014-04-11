@@ -11689,8 +11689,8 @@ void Unit::SetOwnerGUID(uint64 owner)
     UpdateData udata(GetMapId());
     WorldPacket packet;
     BuildValuesUpdateBlockForPlayer(&udata, player);
-    udata.BuildPacket(&packet);
-    player->SendDirectMessage(&packet);
+    if (udata.BuildPacket(&packet))
+        player->SendDirectMessage(&packet);
 
     RemoveFieldNotifyFlag(UF_FLAG_OWNER);
 }

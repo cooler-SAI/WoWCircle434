@@ -453,18 +453,16 @@ bool Group::AddMember(Player* player)
                         player->BuildValuesUpdateBlockForPlayer(&newData, member);
                         if (newData.HasData())
                         {
-                            newData.BuildPacket(&newDataPacket);
-                            member->SendDirectMessage(&newDataPacket);
+                            if (newData.BuildPacket(&newDataPacket))
+                                member->SendDirectMessage(&newDataPacket);
                         }
                     }
                 }
             }
 
             if (groupData.HasData())
-            {
-                groupData.BuildPacket(&groupDataPacket);
-                player->SendDirectMessage(&groupDataPacket);
-            }
+                if (groupData.BuildPacket(&groupDataPacket))
+                    player->SendDirectMessage(&groupDataPacket);
 
             player->RemoveFieldNotifyFlag(UF_FLAG_PARTY_MEMBER);
         }
