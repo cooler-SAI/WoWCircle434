@@ -3412,6 +3412,24 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
     }
     target->UpdateSpeed(MOVE_RUN, true);
     target->UpdateMount();
+
+    if (apply && target->GetTypeId() == TYPEID_PLAYER)
+    {
+        // disable pet
+        Player *player = target->ToPlayer();
+        Pet* pet = player->GetPet();
+        if (pet)
+        {
+            if (player->CanFly())
+            {
+                player->UnsummonPetTemporaryIfAny();
+            }
+            else
+            {
+                pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+            }
+        }
+    }
 }
 
 void AuraEffect::HandleAuraAllowFlight(AuraApplication const* aurApp, uint8 mode, bool apply) const
