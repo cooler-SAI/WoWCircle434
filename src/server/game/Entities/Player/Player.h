@@ -1325,6 +1325,27 @@ private:
     PlayerTalentInfo(PlayerTalentInfo const&);
 };
 
+struct Visuals
+{
+    Visuals() : m_visHead(1), m_visShoulders(1), m_visChest(1), m_visWaist(1), m_visLegs(1), m_visFeet(1),
+    m_visWrists(1), m_visHands(1), m_visBack(1), m_visMainhand(1), m_visOffhand(1), m_visRanged(1), m_altVis(0) { }
+    
+    uint32 m_visHead;
+    uint32 m_visShoulders;
+    uint32 m_visChest;
+    uint32 m_visWaist;
+    uint32 m_visLegs;
+    uint32 m_visFeet;
+    uint32 m_visWrists;
+    uint32 m_visHands;
+    uint32 m_visBack;
+    uint32 m_visMainhand;
+    uint32 m_visOffhand;
+    uint32 m_visRanged;
+    
+    uint8 m_altVis;
+};
+
 #define SAVE_FOR_SECONDS 120
 
 class Player : public Unit, public GridObject<Player>
@@ -1387,6 +1408,8 @@ class Player : public Unit, public GridObject<Player>
         bool isDND() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DND); }
         uint8 GetChatTag() const;
         std::string autoReplyMsg;
+
+        Visuals *m_vis;
 
         uint32 GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 newfacialhair, BarberShopStyleEntry const* newSkin=NULL);
 
@@ -2052,6 +2075,10 @@ class Player : public Unit, public GridObject<Player>
         void _SaveSpellCooldowns(SQLTransaction& trans);
         void SetLastPotionId(uint32 item_id) { m_lastPotionId = item_id; }
         void UpdatePotionCooldown(Spell* spell = NULL);
+
+        // visible items
+        bool HandleChangeSlotModel(uint16 visSlot, uint32 newItem, uint16 pos);
+        void HandleAltVisSwitch();
 
         void SetResurrectRequestData(Unit* caster, uint32 health, uint32 mana, uint32 appliedAura)
         {
