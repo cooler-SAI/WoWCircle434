@@ -2991,6 +2991,21 @@ Currency.PlayersCountInResetPart = 2000
 Currency.TimeoutBetweenResets = 2500
 
 #
+# MaxJusticePoints
+# Description: Maximum justice points a character can have.
+# Default: 4000
+
+MaxJusticePoints = 4000
+
+#
+#    Currency.MaxHonorPoints
+#        Amount honor points a player can have
+#        Default: 4000
+#
+
+Currency.MaxHonorPoints = 4000
+
+#
 ###################################################################################################
 
 ###################################################################################################

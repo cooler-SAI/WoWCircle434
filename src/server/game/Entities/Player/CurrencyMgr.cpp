@@ -360,18 +360,17 @@ uint32 Player::_GetCurrencyWeekCap(const CurrencyTypesEntry* currency) const
         }
         case CURRENCY_TYPE_HONOR_POINTS:
         {
-            //uint32 honorcap = sWorld->getIntConfig(CONFIG_CURRENCY_MAX_HONOR_POINTS);
-            //if (honorcap > 0)
-            //    cap = honorcap;
-            
-            return 0;
+            uint32 honorcap = sWorld->getIntConfig(CONFIG_CURRENCY_MAX_HONOR_POINTS);
+            if (honorcap > 0)
+                cap = honorcap;
+            return cap;
         }
         case CURRENCY_TYPE_JUSTICE_POINTS:
         {
-            //uint32 justicecap = sWorld->getIntConfig(CONFIG_CURRENCY_MAX_JUSTICE_POINTS);
-            //if (justicecap > 0)
-            //    cap = justicecap;
-            return 0;
+            uint32 justicecap = sWorld->getIntConfig(CONFIG_CURRENCY_MAX_JUSTICE_POINTS);
+            if (justicecap > 0)
+                cap = justicecap;
+            return cap;
         }
     }
 
@@ -439,11 +438,13 @@ void Player::ResetCurrencyWeekCap(SQLTransaction* trans /* = NULL */)
 
 void Player::SendPvpRewards()
 {
+    uint32 F_4 = GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_BG, true);
+
     WorldPacket packet(SMSG_REQUEST_PVP_REWARDS_RESPONSE, 28);
     packet << GetBattlegroundCap();
     packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_ARENA, false);;
     packet << GetArenaCap();
-    packet << uint32(0); // Rated battleground current cap, still don't need
+    packet << uint32(F_4);
     packet << GetCurrencyOnWeek(CURRENCY_TYPE_CONQUEST_META_ARENA, false);
     packet << GetMaximumCap();
     packet << GetMaximumCap();
