@@ -2034,3 +2034,22 @@ void WorldSession::SendStreamingMovie()
 
     SendPacket(&data);
 }
+
+void WorldSession::SendServerWorldInfo()
+{
+    WorldPacket data(SMSG_WORLD_SERVER_INFO);
+    data.WriteBit(IsTrialAccount());                                      //has restriction on level
+    data.WriteBit(IsTrialAccount());                                      //has money restriction                   
+    data.WriteBit(IsTrialAccount());                                      //is ineligible for loot
+    data.ResetBits();
+    if(IsTrialAccount()) 
+        data << uint32(0);
+    data << uint8(sWorld->getBoolConfig(CONFIG_IS_TOURNAMENT_REALM));
+    if(IsTrialAccount()) 
+        data << uint32(sWorld->getIntConfig(CONFIG_TRIAL_MAX_MONEY));   //max amount of money allowed
+    if(IsTrialAccount()) 
+        data << uint32(sWorld->getIntConfig(CONFIG_TRIAL_MAX_LEVEL));   //max level allowed
+    data << uint32(540882000);                                          //UTC Time + 1 week in seconds
+    data << uint32(GetPlayer()->GetMap()->GetDifficulty());             //realm Difficulty
+    SendPacket(&data);
+}

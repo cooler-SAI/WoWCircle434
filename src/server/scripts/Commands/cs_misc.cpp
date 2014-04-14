@@ -3080,7 +3080,6 @@ public:
             return false;
 
         uint32 newItem = (uint32) atol(cId);
-        WorldSession* m_session; 
         Player* pl = handler->GetSession()->GetPlayer();
 
         if (!pl->m_vis)
@@ -3104,7 +3103,6 @@ public:
             return false;
 
         uint32 newItem = (uint32) atol(cId);
-        WorldSession* m_session; 
         Player* pl = handler->GetSession()->GetPlayer();
 
         if (!pl->m_vis)
@@ -3128,7 +3126,6 @@ public:
             return false;
 
         uint32 newItem = (uint32) atol(cId);
-        WorldSession* m_session; 
         Player* pl = handler->GetSession()->GetPlayer();
 
         if (!pl->m_vis)
@@ -3152,7 +3149,6 @@ public:
             return false;
 
         uint32 newItem = (uint32) atol(cId);
-        WorldSession* m_session; 
         Player* pl = handler->GetSession()->GetPlayer();
 
         if (!pl->m_vis)
@@ -3176,7 +3172,6 @@ public:
             return false;
 
         uint32 newItem = (uint32) atol(cId);
-        WorldSession* m_session; 
         Player* pl = handler->GetSession()->GetPlayer();
 
         if (!pl->m_vis)
@@ -3200,7 +3195,6 @@ public:
             return false;
 
         uint32 newItem = (uint32) atol(cId);
-        WorldSession* m_session; 
         Player* pl = handler->GetSession()->GetPlayer();
 
         if (!pl->m_vis)
@@ -3224,7 +3218,6 @@ public:
             return false;
 
         uint32 newItem = (uint32) atol(cId);
-        WorldSession* m_session; 
         Player* pl = handler->GetSession()->GetPlayer();
 
         if (!pl->m_vis)
@@ -3248,7 +3241,6 @@ public:
             return false;
 
         uint32 newItem = (uint32) atol(cId);
-        WorldSession* m_session; 
         Player* pl = handler->GetSession()->GetPlayer();
 
         if (!pl->m_vis)
@@ -3272,7 +3264,6 @@ public:
             return false;
 
         uint32 newItem = (uint32) atol(cId);
-        WorldSession* m_session; 
         Player* pl = handler->GetSession()->GetPlayer();
 
         if (!pl->m_vis)

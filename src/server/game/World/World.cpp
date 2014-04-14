@@ -1290,6 +1290,13 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_DATABASE_SKIP_LOAD_LOOT] = ConfigMgr::GetBoolDefault("skipLootLoading", false);
     m_bool_configs[CONFIG_DISABLE_RESTART] = ConfigMgr::GetBoolDefault("DisableRestart", true);
 
+    // Realm options and trial acc options
+    m_bool_configs[CONFIG_IS_TOURNAMENT_REALM] = ConfigMgr::GetBoolDefault("RealmServerInfo.IsTournament", false);
+    m_bool_configs[CONFIG_IS_TRIAL_ACCOUNTS] = ConfigMgr::GetBoolDefault("RealmServerInfo.TrialAccountsEnabled",true);
+    m_int_configs[CONFIG_TRIAL_MAX_LEVEL] = ConfigMgr::GetIntDefault("RealmServerInfo.TrialMaxLevel", 57);
+    m_int_configs[CONFIG_TRIAL_MAX_MONEY] = ConfigMgr::GetIntDefault("RealmServerInfo.TrialMaxMoney", 1000000);
+    m_int_configs[CONFIG_TRIAL_ACTIVATE_TIME] = ConfigMgr::GetIntDefault("RealmServerInfo.TrialActivateTime", 1209600);
+
     // Vip Commands
     m_bool_configs[CONFIG_VIP_DEBUFF_COMMAND] = ConfigMgr::GetBoolDefault("Vip.Debuff.Command", false);
     m_bool_configs[CONFIG_VIP_BANK_COMMAND] = ConfigMgr::GetBoolDefault("Vip.Bank.Command", true);

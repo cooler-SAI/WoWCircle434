@@ -271,6 +271,7 @@ class WorldSession
         void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2, 3);
         void SendSetPhaseShift(std::set<uint32> const& phaseIds, std::set<uint32> const& terrainswaps);
         void SendQueryTimeResponse();
+        void SendServerWorldInfo();
 
         void SendAuthResponse(uint8 code, bool queued, uint32 queuePos = 0);
         void SendClientCacheVersion(uint32 version);
@@ -445,6 +446,12 @@ class WorldSession
                 return false;
             return true;
         }
+
+        // Trial Accounts
+        uint32 GetTrialLeftTime() { return m_trialTime; }
+        void SetTrialLeftTime(uint32 time) { m_trialTime = time; }
+        bool IsTrialAccount() const { return m_isTrialAccount; }
+        void SetTrialAccount(bool value) { m_isTrialAccount = value; }
 
     public:                                                 // opcodes handlers
 
@@ -1131,6 +1138,8 @@ class WorldSession
         uint32 m_uiAntispamMailSentCount;
         uint32 m_uiAntispamMailSentTimer;
 
+        bool m_isTrialAccount;
+        uint32 m_trialTime;
 };
 #endif
 /// @}

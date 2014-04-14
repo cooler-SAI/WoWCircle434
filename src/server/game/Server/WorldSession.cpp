@@ -119,6 +119,9 @@ m_uiAntispamMailSentCount(0), m_uiAntispamMailSentTimer(0)
         LoginDatabase.PExecute("UPDATE account SET online = 1 WHERE id = %u;", GetAccountId());     // One-time query
     }
 
+    m_isTrialAccount = false;
+    m_trialTime = NULL;
+
     InitializeQueryCallbackParameters();
 }
 
