@@ -370,6 +370,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
         }
     }
     else
+        _player->SendQuestWindowClose(quest->GetQuestId());
         _player->PlayerTalkClass->SendQuestGiverOfferReward(quest, guid, true);
 }
 

@@ -16414,6 +16414,15 @@ void Player::SendQuestFailed(uint32 questId, InventoryResult reason)
     }
 }
 
+void Player::SendQuestWindowClose(uint32 questId)
+{
+    if (questId)
+    {
+        WorldPacket data(SMSG_QUESTGIVER_QUEST_FAILED, 4 + 4);
+        GetSession()->SendPacket(&data);
+    }
+}
+
 void Player::SendQuestTimerFailed(uint32 quest_id)
 {
     if (quest_id)

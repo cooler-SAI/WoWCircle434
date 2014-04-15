@@ -1777,6 +1777,7 @@ class Player : public Unit, public GridObject<Player>
         void SendQuestComplete(Quest const* quest);
         void SendQuestReward(Quest const* quest, uint32 XP, Object* questGiver);
         void SendQuestFailed(uint32 questId, InventoryResult reason = EQUIP_ERR_OK);
+        void SendQuestWindowClose(uint32 questId);
         void SendQuestTimerFailed(uint32 quest_id);
         void SendCanTakeQuestResponse(uint32 msg) const;
         void SendQuestConfirmAccept(Quest const* quest, Player* pReceiver);
