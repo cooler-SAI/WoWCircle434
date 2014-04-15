@@ -2936,6 +2936,17 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
     m_currentSpells[CSpellType] = pSpell;
     pSpell->SetReferencedFromCurrent(true);
 
+    WorldPacket unitFrame(SMSG_UNIT_SPELLCAST_START, 29);
+
+    unitFrame << pSpell->GetCaster()->GetGUID();
+    unitFrame << pSpell->m_targets.GetObjectTargetGUID();
+    unitFrame << pSpell->GetSpellInfo()->Id;
+    unitFrame << int32(0);                  //time casted
+    unitFrame << pSpell->GetCastTime();
+    unitFrame << uint8(0);
+
+    SendMessageToSet(&unitFrame, false);
+
     pSpell->m_selfContainer = &(m_currentSpells[pSpell->GetCurrentContainer()]);
 }
 
