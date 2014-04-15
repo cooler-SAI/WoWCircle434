@@ -13383,6 +13383,9 @@ void Player::ApplyReforgeEnchantment(Item* item, bool apply)
     if (!item)
         return;
 
+    if (item->IsBroken())
+        return;
+
     ItemReforgeEntry const* reforge = sItemReforgeStore.LookupEntry(item->GetEnchantmentId(REFORGE_ENCHANTMENT_SLOT));
     if (!reforge)
         return;
