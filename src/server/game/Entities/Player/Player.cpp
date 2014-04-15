@@ -1369,6 +1369,8 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
     switch (timer)
     {
         case FATIGUE_TIMER:
+            if (GetSession()->GetSecurity() >= AccountTypes(sWorld->getIntConfig(CONFIG_DISABLE_BREATHING)))
+                return DISABLED_MIRROR_TIMER;
             return MINUTE * IN_MILLISECONDS;
         case BREATH_TIMER:
         {
@@ -1382,9 +1384,9 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
         }
         case FIRE_TIMER:
         {
-            if (!isAlive())
+            if (!isAlive() || GetSession()->GetSecurity() >= AccountTypes(sWorld->getIntConfig(CONFIG_DISABLE_BREATHING)))
                 return DISABLED_MIRROR_TIMER;
-            return 1 * IN_MILLISECONDS;
+            return 2 * IN_MILLISECONDS;
         }
         default:
             return 0;
@@ -1493,26 +1495,29 @@ void Player::HandleDrowning(uint32 time_diff)
             SendMirrorTimer(FATIGUE_TIMER, DarkWaterTime, m_MirrorTimer[FATIGUE_TIMER], 10);
     }
 
-    if (m_MirrorTimerFlags & (UNDERWATER_INLAVA /*| UNDERWATER_INSLIME*/) && !(_lastLiquid && _lastLiquid->SpellId))
+    if (m_MirrorTimerFlags & (UNDERWATER_INLAVA | UNDERWATER_INSLIME)) //&& !(_lastLiquid && _lastLiquid->SpellId))
     {
-        // Breath timer not activated - activate it
+        // Damage timer not activated - activate it
         if (m_MirrorTimer[FIRE_TIMER] == DISABLED_MIRROR_TIMER)
+        {
             m_MirrorTimer[FIRE_TIMER] = getMaxTimer(FIRE_TIMER);
+            //SendMirrorTimer(FIRE_TIMER, m_MirrorTimer[FIRE_TIMER], m_MirrorTimer[FIRE_TIMER], -1);
+        }
         else
         {
             m_MirrorTimer[FIRE_TIMER] -= time_diff;
             if (m_MirrorTimer[FIRE_TIMER] < 0)
             {
-                m_MirrorTimer[FIRE_TIMER]+= 1*IN_MILLISECONDS;
+                m_MirrorTimer[FIRE_TIMER]+= 2*IN_MILLISECONDS;
                 // Calculate and deal damage
                 // TODO: Check this formula
-                uint32 damage = urand(600, 700);
+                uint32 damage = urand(16000, 17000);
                 if (m_MirrorTimerFlags & UNDERWATER_INLAVA)
                     EnvironmentalDamage(DAMAGE_LAVA, damage);
                 // need to skip Slime damage in Undercity,
                 // maybe someone can find better way to handle environmental damage
-                //else if (m_zoneUpdateId != 1497)
-                //    EnvironmentalDamage(DAMAGE_SLIME, damage);
+                else if (m_zoneUpdateId != 1497)
+                    EnvironmentalDamage(DAMAGE_SLIME, damage);
             }
         }
     }
