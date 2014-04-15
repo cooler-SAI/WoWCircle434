@@ -11269,7 +11269,7 @@ void Unit::setPowerType(Powers new_powertype)
     {
         default:
         case POWER_MANA:
-            return;
+            break;
         case POWER_RAGE:
             SetMaxPower(POWER_RAGE, GetCreatePowers(POWER_RAGE));
             SetPower(POWER_RAGE, 0);
