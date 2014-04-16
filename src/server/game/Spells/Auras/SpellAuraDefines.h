@@ -414,9 +414,9 @@ enum AuraType
     SPELL_AURA_351                                          = 351,
     SPELL_AURA_WORGEN_CAN_TRANSFORM                         = 352,
     SPELL_AURA_MOD_CAMOUFLAGE                               = 353,  // NYI
-    SPELL_AURA_354                                          = 354,  // Restoration Shaman mastery - mod healing based on target's health (less = more healing)
+    SPELL_AURA_MOD_HEALING_DONE_FROM_PCT_HEALTH             = 354,  // Restoration Shaman mastery - mod healing based on target's health (less = more healing)
     SPELL_AURA_355                                          = 355,
-    SPELL_AURA_356                                          = 356,  // Arcane Mage mastery - mod damage based on current mana
+    SPELL_AURA_MOD_DAMAGE_DONE_FROM_PCT_POWER               = 356,  // Arcane Mage mastery - mod damage based on current mana
     SPELL_AURA_ENABLE_BOSS1_UNIT_FRAME                      = 357,
     SPELL_AURA_WORGEN_ALTERED_FORM                          = 358,
     SPELL_AURA_MOD_HEALING_DONE_ON_DEBUFF                   = 359,

@@ -995,7 +995,7 @@ class npc_alysrazor_blazing_talon_initiate : public CreatureScript
 
             void IsSummonedBy(Unit* summoner)
             {
-                me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, 0x02);
+                me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
             }
@@ -1160,7 +1160,7 @@ class npc_alysrazor_blazing_talon_clawshaper : public CreatureScript
 
             void IsSummonedBy(Unit* summoner)
             {
-                me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, 0x02);
+                me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
                 bLeft = (me->GetPositionX() > -35.0f);
@@ -1222,7 +1222,7 @@ class npc_alysrazor_blazing_talon_clawshaper : public CreatureScript
                                     DoCast(me, SPELL_FIREHAWK_REMOVE_FORM);
                                     me->SetCanFly(true);
                                     me->SetDisableGravity(true);
-                                    me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, 0x02);
+                                    me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
                                     me->GetMotionMaster()->MovePoint(POINT_CLAWSHAPER_2, initiatePos[bLeft ? 0 : 1]);
                                 }
                                 else
@@ -1259,7 +1259,7 @@ class npc_alysrazor_blazing_broodmother : public CreatureScript
 
             void IsSummonedBy(Unit* summoner)
             {
-                me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, 0x02);
+                me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
                 DoCast(me, SPELL_BROODMOTHER_COSMETIC, true);
