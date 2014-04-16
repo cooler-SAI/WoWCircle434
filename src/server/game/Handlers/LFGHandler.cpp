@@ -1005,13 +1005,3 @@ void WorldSession::SendLfgTeleportError(uint8 err)
     data << uint32(err);                                   // Error
     SendPacket(&data);
 }
-
-/*
-void WorldSession::SendLfrUpdateListOpcode(uint32 dungeonEntry)
-{
-    sLog->outDebug(LOG_FILTER_PACKETIO, "SMSG_LFG_UPDATE_LIST %s dungeon entry: %u",
-        GetPlayer()->GetGUID(), dungeonEntry);
-    WorldPacket data(SMSG_LFG_UPDATE_LIST);
-    SendPacket(&data);
-}
-*/

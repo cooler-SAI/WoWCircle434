@@ -3707,6 +3707,263 @@ MovementStatusElements MoveCollisionHeightAck[] =
     MSEEnd,
 };
 
+MovementStatusElements MoveUpdateTeleport[] =
+{
+    MSEPositionZ,
+    MSEPositionY,
+    MSEPositionX,
+    MSEHasOrientation,
+
+    MSEHasSpline,
+    MSEHasMovementFlags,
+    MSEHasGuidByte2,
+    MSEHasGuidByte4,
+    MSEHasGuidByte6,
+    MSEHasFallData,
+    MSEHasGuidByte0,
+    MSEHasTransportData,
+    MSEHasGuidByte5,
+
+    MSEHasTransportGuidByte1,
+    MSEHasTransportGuidByte4,
+    MSEHasTransportGuidByte5,
+    MSEHasTransportGuidByte3,
+    MSEHasTransportGuidByte0,
+    MSEHasTransportTime2,
+    MSEHasTransportGuidByte7,
+    MSEHasTransportGuidByte6,
+    MSEHasTransportTime3,
+    MSEHasTransportGuidByte2,
+
+    MSEZeroBit,
+
+    MSEHasGuidByte7,
+    MSEHasGuidByte3,
+    MSEHasPitch,
+    MSEHasMovementFlags2,
+    MSEHasTimestamp,
+
+    MSEHasFallDirection,
+    MSEMovementFlags2,
+    MSEHasSplineElevation,
+    MSEMovementFlags,
+    MSEHasGuidByte1,
+
+    MSEGuidByte7,
+    MSETransportGuidByte3,
+    MSETransportGuidByte4,
+    MSETransportOrientation,
+    MSETransportTime3,
+    MSETransportGuidByte1,
+    MSETransportTime2,
+    MSETransportPositionZ,
+    MSETransportGuidByte7,
+    MSETransportGuidByte0,
+    MSETransportGuidByte6,
+    MSETransportGuidByte5,
+    MSETransportGuidByte2,
+    MSETransportSeat,
+    MSETransportTime,
+    MSETransportPositionY,
+    MSETransportPositionX,
+
+    MSEGuidByte6,
+    MSEPitch,
+    MSESplineElevation,
+    MSEOrientation,
+    MSEGuidByte2,
+    MSEGuidByte3,
+    MSEGuidByte1,
+
+    MSEFallTime,
+    MSEFallHorizontalSpeed,
+    MSEFallSinAngle,
+    MSEFallCosAngle,
+    MSEFallVerticalSpeed,
+
+    MSEGuidByte5,
+    MSEGuidByte4,
+    MSETimestamp,
+    MSEGuidByte0,
+
+    MSEEnd,
+};
+
+MovementStatusElements UpdateCollisionHeight[] =
+{
+    MSEPositionZ,
+
+    MSEGenericDword0, //MSECollisionHeight FIX this shit
+
+    MSEPositionX,
+    MSEPositionY,
+
+    MSEHasGuidByte6,
+    MSEHasGuidByte7,
+    MSEHasSpline,
+    MSEHasSplineElevation,
+
+    MSEHasTransportData,
+    MSEHasTransportGuidByte6,
+    MSEHasTransportGuidByte4,
+    MSEHasTransportGuidByte3,
+    MSEHasTransportGuidByte7,
+    MSEHasTransportGuidByte5,
+    MSEHasTransportTime3,
+    MSEHasTransportGuidByte1,
+    MSEHasTransportGuidByte0,
+    MSEHasTransportGuidByte2,
+    MSEHasTransportTime2,
+
+    MSEHasGuidByte3,
+    MSEHasOrientation,
+    MSEHasGuidByte4,
+    MSEHasGuidByte5,
+    MSEHasTimestamp,
+    MSEHasFallData,
+    MSEHasGuidByte0,
+    MSEHasPitch,
+    MSEZeroBit,
+    MSEHasGuidByte2,
+    MSEHasMovementFlags,
+    MSEHasFallDirection,
+    MSEHasGuidByte1,
+    MSEHasMovementFlags2,
+    MSEHasSpline,
+    MSEMovementFlags2,
+    MSEMovementFlags,
+
+    MSEGuidByte3,
+
+    MSETransportGuidByte7,
+    MSETransportTime,
+    MSETransportGuidByte4,
+    MSETransportTime3,
+    MSETransportTime2,
+    MSETransportGuidByte5,
+    MSETransportOrientation,
+    MSETransportPositionX,
+    MSETransportGuidByte6,
+    MSETransportGuidByte0,
+    MSETransportPositionY,
+    MSETransportGuidByte2,
+    MSETransportPositionZ,
+    MSETransportGuidByte3,
+    MSETransportGuidByte1,
+    MSETransportSeat,
+
+    MSEPitch,
+
+    MSEGuidByte6,
+
+    MSEFallCosAngle,
+    MSEFallSinAngle,
+    MSEFallHorizontalSpeed,
+    MSEFallVerticalSpeed,
+    MSEFallTime,
+
+    MSEGuidByte7,
+    MSEOrientation,
+
+    MSEGuidByte0,
+    MSEGuidByte5,
+    MSEGuidByte4,
+
+    MSESplineElevation,
+    MSETimestamp,
+
+    MSEGuidByte2,
+    MSEGuidByte1,
+
+    MSEEnd,
+};
+
+MovementStatusElements UpdateFlightSpeed[] =
+{
+    MSEPositionY,
+    MSESpeed,
+    MSEPositionX,
+    MSEPositionZ,
+
+    MSEHasGuidByte4,
+    MSEZeroBit,
+    MSEHasGuidByte5,
+    MSEHasMovementFlags,
+    MSEHasGuidByte1,
+    MSEMovementFlags,
+    MSEHasFallData,
+    MSEHasGuidByte2,
+    MSEHasOrientation,
+    MSEHasPitch,
+    MSEHasSplineElevation,
+    MSEHasGuidByte7,
+    MSEHasTimestamp,
+    MSEHasTransportData,
+
+    MSEHasTransportGuidByte3,
+    MSEHasTransportGuidByte5,
+    MSEHasTransportGuidByte1,
+    MSEHasTransportGuidByte0,
+    MSEHasTransportGuidByte6,
+    MSEHasTransportGuidByte5,
+    MSEHasTransportGuidByte2,
+    MSEHasTransportTime3,
+    MSEHasTransportGuidByte7,
+    MSEHasTransportTime2,
+
+    MSEHasGuidByte6,
+    MSEHasGuidByte3,
+    MSEHasMovementFlags2,
+    MSEHasSpline,
+    MSEMovementFlags2,
+    MSEHasFallDirection,
+    MSEHasGuidByte0,
+
+    MSESplineElevation,
+    MSEPitch,
+
+    MSEGuidByte0,
+    MSEGuidByte5,
+
+    MSETransportOrientation,
+    MSETransportTime,
+    MSETransportGuidByte5,
+    MSETransportGuidByte4,
+    MSETransportGuidByte6,
+    MSETransportPositionZ,
+    MSETransportGuidByte7,
+    MSETransportGuidByte0,
+    MSETransportGuidByte2,
+    MSETransportGuidByte3,
+    MSETransportPositionY,
+    MSETransportTime3,
+    MSETransportTime2,
+    MSETransportGuidByte1,
+    MSETransportSeat,
+    MSETransportPositionX,
+
+    MSEFallCosAngle,
+    MSEFallHorizontalSpeed,
+    MSEFallSinAngle,
+    MSEFallVerticalSpeed,
+    MSEFallTime,
+
+    MSEGuidByte1,
+    MSEGuidByte6,
+
+    MSETimestamp,
+
+    MSEGuidByte7,
+    MSEGuidByte2,
+    MSEGuidByte4,
+
+    MSEOrientation,
+
+    MSEGuidByte3,
+
+    MSEEnd,
+};
+
 MovementStatusElements* GetMovementStatusElementsSequence(Opcodes opcode)
 {
     switch (opcode)
@@ -3809,6 +4066,12 @@ MovementStatusElements* GetMovementStatusElementsSequence(Opcodes opcode)
             return MoveRootAck;
         case CMSG_FORCE_MOVE_UNROOT_ACK:
             return MoveUnRootAck;
+        case SMSG_MOVE_UPDATE_TELEPORT:
+            return MoveUpdateTeleport;
+        case SMSG_MOVE_UPDATE_COLLISION_HEIGHT:
+            return UpdateCollisionHeight;
+        case SMSG_MOVE_UPDATE_FLIGHT_SPEED:
+            return UpdateFlightSpeed;
         default:
             break;
     }

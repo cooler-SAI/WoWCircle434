@@ -1669,6 +1669,7 @@ class Unit : public WorldObject
         void SendMovementFeatherFall();
         void SendMovementWaterWalking();
         void SendMovementCanFlyChange();
+        void SendMovementSwimming();
 
         bool IsLevitating() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);}
         bool IsWalking() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_WALKING);}
@@ -2296,7 +2297,10 @@ class Unit : public WorldObject
         bool IsVisionObscured(Unit* victim, SpellInfo const* spellInfo) const;
 
         // Movement info
-        Movement::MoveSpline * movespline;
+        Movement::MoveSpline* movespline;
+        
+        void SendGravityEnable();
+        void SendGravityDisable();
 
         void OnRelocated();
 
