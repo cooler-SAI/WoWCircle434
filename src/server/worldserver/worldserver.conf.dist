@@ -131,12 +131,9 @@ MaxPingTime = 30
 #
 #    WorldServerPort
 #        Description: TCP port to reach the world server.
-#                     The server uses random port from min to max, then update `realmlist` table.
-#                     We've done it to prevent DDoS attacks.
 #        Default:     8085
 
-WorldServerPortMin = 8085
-WorldServerPortMax = 8085
+WorldServerPort = 8085
 
 #
 #    BindIP
