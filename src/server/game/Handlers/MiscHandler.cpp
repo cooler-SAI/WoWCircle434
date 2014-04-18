@@ -2053,3 +2053,53 @@ void WorldSession::SendServerWorldInfo()
     data << uint32(GetPlayer()->GetMap()->GetDifficulty());             //realm Difficulty
     SendPacket(&data);
 }
+
+void WorldSession::HandleWargameStart(WorldPacket& recvData)
+{
+    // CMSG_START_WARGAME
+    uint8 t1, t2, t3, t4, t5, selectedbg, t7, t8;
+
+    recvData >> t1;
+    recvData >> t2;
+    recvData >> t3;
+    recvData >> t4;
+    recvData >> t5;
+    recvData >> selectedbg;
+    recvData >> t7;
+    recvData >> t8;
+    BattlegroundTypeId bgtypeid;
+
+    switch (selectedbg)
+    {
+        case 4:
+            bgtypeid = BATTLEGROUND_BE; // blade edge arena
+            break;
+        case 5:
+            bgtypeid = BATTLEGROUND_NA; // nagrand arena
+            break;
+        case 7:
+            bgtypeid = BATTLEGROUND_AA; // all arenas
+            break;
+        case 9:
+            bgtypeid = BATTLEGROUND_RL; // ruins of lordaeron
+            break;
+        case 11:
+            bgtypeid = BATTLEGROUND_DS; // dalaran sewers arena
+            break;
+        case 10:
+            bgtypeid = BATTLEGROUND_RV; // ring of valor
+            break;
+        default:
+            break;
+    }
+
+    Player* player = GetPlayer();
+    Player* target = player->GetSelectedPlayer();
+
+    if (target && player)
+    {
+        sBattlegroundMgr->HandleWargameCommand(target, player, NULL, NULL, bgtypeid);
+    }
+
+    recvData.rfinish();
+}

@@ -100,6 +100,7 @@ Group::~Group()
 bool Group::Create(Player* leader)
 {
     uint64 leaderGuid = leader->GetGUID();
+    leader->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
     uint32 lowguid = sGroupMgr->GenerateGroupId();
 
     m_guid = MAKE_NEW_GUID(lowguid, 0, HIGHGUID_GROUP);
@@ -664,7 +665,11 @@ void Group::ChangeLeader(uint64 guid)
         // Update the group leader	  	
         CharacterDatabase.PExecute("UPDATE groups SET leaderGuid='%u' WHERE guid='%u'", player->GetGUIDLow(), m_dbStoreId);
     }
-
+    
+    if(Player* oldLeader = ObjectAccessor::FindPlayer(m_leaderGuid))
+        oldLeader->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
+    
+    player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
     m_leaderGuid = player->GetGUID();
     m_leaderName = player->GetName();
     ToggleGroupMemberFlag(slot, MEMBER_FLAG_ASSISTANT, false);
@@ -684,6 +689,11 @@ void Group::Disband(bool hideDestroy /* = false */)
         player = ObjectAccessor::FindPlayer(citr->guid);
         if (!player)
             continue;
+        
+        if (player->GetGroup() && player->GetGroup()->GetLeaderGUID() == player->GetGUID())
+        {
+            player->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
+        }
 
         //we cannot call _removeMember because it would invalidate member iterator
         //if we are removing player from battleground raid

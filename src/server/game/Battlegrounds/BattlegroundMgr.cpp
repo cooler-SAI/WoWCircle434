@@ -47,6 +47,7 @@
 #include "SharedDefines.h"
 #include "Formulas.h"
 #include "DisableMgr.h"
+#include "Group.h"
 
 /*********************************************************/
 /***            BATTLEGROUND MANAGER                   ***/
@@ -1204,6 +1205,22 @@ void BattlegroundMgr::SendToBattleground(Player* player, uint32 instanceId, Batt
         sLog->outError(LOG_FILTER_BATTLEGROUND, "BattlegroundMgr::SendToBattleground: Instance %u (bgType %u) not found while trying to teleport player %s", instanceId, bgTypeId, player->GetName());
 }
 
+void BattlegroundMgr::SendToBattleground(Player* player, Battleground* bg)
+{
+    if (bg)
+    {
+        uint32 mapid = bg->GetMapId();
+        float x, y, z, O;
+        uint32 team = player->GetTeam();
+        bg->GetTeamStartLoc(team, x, y, z, O);
+
+        if (bg->isRated() && player->GetTeam() != player->GetTeam())
+             player->setFactionForTeam(player->GetTeam());
+
+        player->TeleportTo(mapid, x, y, z, O);
+    }
+}
+
 void BattlegroundMgr::SendAreaSpiritHealerQueryOpcode(Player* player, Battleground* bg, uint64 guid)
 {
     WorldPacket data(SMSG_AREA_SPIRIT_HEALER_TIME, 12);
@@ -1557,3 +1574,273 @@ void BattlegroundMgr::RemoveBattleground(BattlegroundTypeId bgTypeId, uint32 ins
     bgDataStore[bgTypeId].m_Battlegrounds.erase(instanceId);
 }
 
+bool BattlegroundMgr::HandleWargameCommand(Player* initiator, Player* target, Group* igrp, Group* tgrp, BattlegroundTypeId bgTypeId)
+{
+    Battleground* arena = NULL;
+    uint8 arenatype = 0;
+
+    if (IsArenaType(bgTypeId))
+        arenatype = ARENA_TEAM_5v5;
+
+    // target join arena
+    if (!(arena = JoinPlayer(target, arena, arenatype, bgTypeId)))
+    {
+        return false;
+    }
+
+    // player join arena
+    if (!JoinPlayer(initiator, arena, arenatype, bgTypeId))
+    {
+        if (target->WarGameData)
+        {
+            target->WarGameData->removeEvent->Execute(0, 0);
+            delete (target->WarGameData->removeEvent);
+            delete target->WarGameData;
+            target->WarGameData = NULL;
+        }
+        return false;
+    }
+
+    return true;
+}
+
+
+Battleground* BattlegroundMgr::JoinPlayer(Player *player, Battleground *arena, uint8 arenatype, BattlegroundTypeId bg_typeid)
+{
+    // ignore if we already in BG or BG queue
+    if (player->InBattleground())
+        return NULL;
+
+    uint32 matchmakerRating = 0;
+
+    //check existance
+    Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(bg_typeid);
+    if (!bg)
+    {
+        sLog->outError(LOG_FILTER_BATTLEGROUND, "Battleground: template bg (all arenas) not found");
+        return NULL;
+    }
+
+    BattlegroundTypeId bgTypeId = bg->GetTypeID();
+    BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(bgTypeId, arenatype);
+    PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bg->GetMapId(), player->getLevel());
+    if (!bracketEntry)
+        return NULL;
+
+    // check if already in queue
+    if (player->GetBattlegroundQueueIndex(bgQueueTypeId) < PLAYER_MAX_BATTLEGROUND_QUEUES)
+        //player is already in this queue
+        return NULL;
+    // check if has free queue slots
+    if (!player->HasFreeBattlegroundQueueId())
+        return NULL;
+
+    if (Group* group = player->GetGroup())
+    {
+        for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+        {
+            Player* member = itr->getSource();
+
+            if (!member)
+                continue;   // this should never happen
+
+            uint32 queueSlot = member->AddBattlegroundQueueId(bgQueueTypeId);
+            WorldPacket data;
+            // send status packet (in queue)
+            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, member, queueSlot, STATUS_WAIT_QUEUE, 0, 0, arenatype);
+            member->GetSession()->SendPacket(&data);
+        }
+    }
+    else
+    {
+        uint32 queueSlot = player->AddBattlegroundQueueId(bgQueueTypeId);
+        WorldPacket data;
+        // send status packet (in queue)
+        sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, player, queueSlot, STATUS_WAIT_QUEUE, 0, 0, arenatype);
+        player->GetSession()->SendPacket(&data);
+        sLog->outDebug(LOG_FILTER_BATTLEGROUND, "Battleground: player joined queue for arena, skirmish, bg queue type %u bg type %u: GUID %u, NAME %s", bgQueueTypeId, bgTypeId, player->GetGUIDLow(), player->GetName());
+    }
+
+    sBattlegroundMgr->ScheduleQueueUpdate(matchmakerRating, arenatype, bgQueueTypeId, bgTypeId, bracketEntry->GetBracketId());
+
+    GroupQueueInfo* ginfo = new GroupQueueInfo;
+    ginfo->BgTypeId = bgTypeId;
+    ginfo->ArenaType = arenatype;
+    ginfo->ArenaTeamId = 0;
+    ginfo->IsRated = 0;
+    ginfo->IsInvitedToBGInstanceGUID = 0;
+    ginfo->JoinTime = getMSTime();
+    ginfo->RemoveInviteTime = 0;
+    ginfo->Team = player->GetTeam();
+    ginfo->ArenaTeamRating = 0;
+    ginfo->ArenaMatchmakerRating = 0;
+    ginfo->OpponentsTeamRating = 0;
+    ginfo->OpponentsMatchmakerRating = 0;
+    ginfo->Players.clear();
+
+    //add players from group to ginfo
+    if (player->GetGroup() && player->GetGroup()->GetMembersCount() > 1)
+    {
+        Group* group = player->GetGroup();
+
+        for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+        {
+            Player* member = itr->getSource();
+
+            if (!member)
+                continue;   // this should never happen
+
+            PlayerQueueInfo* info = new PlayerQueueInfo;
+            info->GroupInfo = ginfo;
+            info->LastOnlineTime = getMSTime();
+            // add the pinfo to ginfo's list
+            ginfo->Players[member->GetGUID()] = info;
+        }
+    }
+    else // just one player
+    {
+        PlayerQueueInfo* info = new PlayerQueueInfo;
+        info->GroupInfo = ginfo;
+        info->LastOnlineTime = getMSTime();
+        ginfo->Players[player->GetGUID()] = info;
+    }
+
+    if (!arena) // if theres no arena create one
+    {
+        arena = sBattlegroundMgr->CreateNewBattleground(bgTypeId, bracketEntry, arenatype, true);
+        arena->SetRated(false);
+        arena->SetWarGame(true);
+
+        if (Group* group = player->GetGroup())
+        {
+            for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+            {
+                Player* member = itr->getSource();
+
+                if (!member)
+                    continue;   // this should never happen
+
+                member->WarGameData = new WarGameData;
+                member->WarGameData->bg = arena;
+                member->WarGameData->ginfo = ginfo;
+            }
+        }
+        else // just one player
+        {
+            player->WarGameData = new WarGameData;
+            player->WarGameData->bg = arena;
+            player->WarGameData->ginfo = ginfo;
+        }
+
+        InviteWargameGroupToBG(ginfo, arena, ALLIANCE);
+    }
+    else // if there is arena add other players into it
+    {
+        if (Group* group = player->GetGroup())
+        {
+            for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+            {
+                Player* member = itr->getSource();
+
+                if (!member)
+                    continue;   // this should never happen
+
+                member->WarGameData = new WarGameData;
+                member->WarGameData->bg = arena;
+                member->WarGameData->ginfo = ginfo;
+            }
+        }
+        else // just one player
+        {
+            player->WarGameData = new WarGameData;
+            player->WarGameData->bg = arena;
+            player->WarGameData->ginfo = ginfo;
+        }
+
+        InviteWargameGroupToBG(ginfo, arena, HORDE);
+        arena->StartBattleground();
+
+        if (!sBattlegroundMgr->HasBattleground(arena))
+            sBattlegroundMgr->AddBattleground(bg);
+    }
+    return arena;
+}
+
+bool BattlegroundMgr::InviteWargameGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, uint32 side)
+{
+    // set side if needed
+    if (side)
+        ginfo->Team = side;
+
+    if (!ginfo->IsInvitedToBGInstanceGUID)
+    {
+        // not yet invited
+        // set invitation
+        ginfo->IsInvitedToBGInstanceGUID = bg->GetInstanceID();
+        BattlegroundTypeId bgTypeId = bg->GetTypeID();
+        BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(bgTypeId, bg->GetArenaType());
+
+        // set ArenaTeamId for rated matches
+        if (bg->isArena() && bg->isRated())
+            bg->SetArenaTeamIdForTeam(ginfo->Team, ginfo->ArenaTeamId);
+
+        ginfo->RemoveInviteTime = getMSTime() + INVITE_ACCEPT_WAIT_TIME;
+
+        // loop through the players
+        for (std::map<uint64, PlayerQueueInfo*>::iterator itr = ginfo->Players.begin(); itr != ginfo->Players.end(); ++itr)
+        {
+            // get the player
+            Player* player = ObjectAccessor::FindPlayer(itr->first);
+            // if offline, skip him, this should not happen - player is removed from queue when he logs out
+            if (!player)
+                continue;
+
+            // set invited player counters
+            bg->IncreaseInvitedCount(ginfo->Team);
+
+            player->SetInviteForBattlegroundQueueType(bgQueueTypeId, ginfo->IsInvitedToBGInstanceGUID);
+
+            BGQueueRemoveEvent* removeEvent = new BGQueueRemoveEvent(player->GetGUID(), ginfo->IsInvitedToBGInstanceGUID, bgTypeId, bgQueueTypeId, ginfo->RemoveInviteTime);
+            player->WarGameData->removeEvent = removeEvent;
+
+            WorldPacket data;
+
+            uint32 queueSlot = player->GetBattlegroundQueueIndex(bgQueueTypeId);
+
+            sLog->outDebug(LOG_FILTER_BATTLEGROUND, "Battleground: invited player %s (%u) to BG instance %u queueindex %u bgtype %u, I can't help it if they don't press the enter battle button.", player->GetName(), player->GetGUIDLow(), bg->GetInstanceID(), queueSlot, bg->GetTypeID());
+
+            // send status packet
+            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, player, queueSlot, STATUS_WAIT_JOIN, INVITE_ACCEPT_WAIT_TIME, 0, ginfo->ArenaType);
+            player->GetSession()->SendPacket(&data);
+        }
+        return true;
+    }
+    return false;
+}
+
+bool BattlegroundMgr::HasBattleground(Battleground *_bg)
+{
+    BattlegroundSet::iterator itr, next;
+
+    for (uint32 i = BATTLEGROUND_TYPE_NONE; i < MAX_BATTLEGROUND_TYPE_ID; ++i)
+    {
+        itr = m_Battlegrounds[i].begin();
+
+        // skip updating battleground template
+        if (itr != m_Battlegrounds[i].end())
+            ++itr;
+
+        for (; itr != m_Battlegrounds[i].end(); itr = next)
+        {
+            next = itr;
+            ++next;
+
+            Battleground* bg = itr->second;
+
+            if (bg == _bg)
+                return true;
+        }
+    }
+
+    return false;
+}

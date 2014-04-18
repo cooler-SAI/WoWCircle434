@@ -652,6 +652,8 @@ class Battleground
 
         bool IsRBG() { return m_rbgFlag; }
         void SetRBG(bool enable) { m_rbgFlag = enable; }
+        void SetWarGame(bool state) { isWarGame = state; }
+        bool IsWarGame() { return isWarGame; }
 
     protected:
         // this method is called, when BG cannot spawn its own spirit guide, or something is wrong, It correctly ends Battleground
@@ -720,6 +722,7 @@ class Battleground
         int32  m_lastMessageId;
         char const* m_Name;
         uint64 m_Guid;
+        bool isWarGame;
 
         /* Pre- and post-update hooks */
 

@@ -866,6 +866,8 @@ class WorldSession
         void HandleRequestPvpOptions(WorldPacket& recvData);
         void HandleRequestPvpReward(WorldPacket& recvData);
         void HandleRequestRatedBgStats(WorldPacket& recvData);
+        void HandleWargameStart(WorldPacket& recvData);
+
         void SendStreamingMovie();
 
         // Cemetery

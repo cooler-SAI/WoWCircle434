@@ -525,6 +525,9 @@ void WorldSession::HandleGroupSetLeaderOpcode(WorldPacket& recvData)
     if (!group->IsLeader(GetPlayer()->GetGUID()) || player->GetGroup() != group)
         return;
 
+    // remove flag from old group leader
+    GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
+
     // Prevent exploits with instance saves
     for (GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
         if (Player* plr = itr->getSource())
