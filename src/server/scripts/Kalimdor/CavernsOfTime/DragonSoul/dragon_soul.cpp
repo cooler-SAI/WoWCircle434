@@ -1274,10 +1274,10 @@ public:
             if (!tempList.empty())
             {
                 targets.clear();
-                targets.push_back(Trinity::Containers::SelectRandomContainerElement(tempList));
+                targets.push_back(CerberCore::Containers::SelectRandomContainerElement(tempList));
             }
             else
-                Trinity::Containers::RandomResizeList(targets, 1);
+                CerberCore::Containers::RandomResizeList(targets, 1);
         }
 
         void HandleDummy()

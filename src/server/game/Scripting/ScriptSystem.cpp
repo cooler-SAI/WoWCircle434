@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -27,7 +27,7 @@ ScriptPointVector const SystemMgr::_empty;
 void SystemMgr::LoadScriptTexts()
 {
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Script Texts...");
-    LoadTrinityStrings("script_texts", TEXT_SOURCE_RANGE, 1+(TEXT_SOURCE_RANGE*2));
+    LoadCerberCoreStrings("script_texts", TEXT_SOURCE_RANGE, 1+(TEXT_SOURCE_RANGE*2));
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Script Texts additional data...");
     uint32 oldMSTime = getMSTime();
@@ -89,7 +89,7 @@ void SystemMgr::LoadScriptTexts()
 void SystemMgr::LoadScriptTextsCustom()
 {
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Custom Texts...");
-    LoadTrinityStrings("custom_texts", TEXT_SOURCE_RANGE*2, 1+(TEXT_SOURCE_RANGE*3));
+    LoadCerberCoreStrings("custom_texts", TEXT_SOURCE_RANGE*2, 1+(TEXT_SOURCE_RANGE*3));
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Custom Texts additional data...");
 

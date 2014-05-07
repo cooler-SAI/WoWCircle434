@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -435,7 +435,7 @@ class npc_sanctum_sentry : public CreatureScript
                         {
                             std::list<Creature*> sanctumSentrys;
                             SanctumSentrySearcher check(me, 10.0f);
-                            Trinity::CreatureListSearcher<SanctumSentrySearcher> searcher(me, sanctumSentrys, check);
+                            CerberCore::CreatureListSearcher<SanctumSentrySearcher> searcher(me, sanctumSentrys, check);
                             me->VisitNearbyGridObject(10.0f, searcher);
                             for (std::list<Creature*>::iterator itr = sanctumSentrys.begin(); itr != sanctumSentrys.end(); ++itr)
                             {

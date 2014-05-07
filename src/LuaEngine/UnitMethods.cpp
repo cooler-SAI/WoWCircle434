@@ -991,7 +991,7 @@ int LuaUnit::SendAuctionMenu(lua_State* L, Unit* unit)
 
     if (player->getLevel() < sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ))
     {
-        player->GetSession()->SendNotification(player->GetSession()->GetTrinityString(LANG_AUCTION_REQ), sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ));
+        player->GetSession()->SendNotification(player->GetSession()->GetCerberCoreString(LANG_AUCTION_REQ), sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ));
         return 0;
     }
 
@@ -4582,7 +4582,7 @@ int LuaUnit::GetAITarget(lua_State* L, Unit* unit)
     }
 
     if (targetType == SELECT_TARGET_NEAREST || targetType == SELECT_TARGET_FARTHEST)
-        targetList.sort(Trinity::ObjectDistanceOrderPred(creature));
+        targetList.sort(CerberCore::ObjectDistanceOrderPred(creature));
 
     switch (targetType)
     {
@@ -5209,7 +5209,7 @@ int LuaUnit::GetNearestPlayer(lua_State* L, Unit* unit)
 
     Player* target = NULL;
     Eluna::NearestTypeWithEntryInRangeCheck checker(unit, distance, TYPEID_PLAYER);
-    Trinity::PlayerLastSearcher<Eluna::NearestTypeWithEntryInRangeCheck> searcher(unit, target, checker);
+    CerberCore::PlayerLastSearcher<Eluna::NearestTypeWithEntryInRangeCheck> searcher(unit, target, checker);
     unit->VisitNearbyWorldObject(distance, searcher);
 
     sEluna->PushUnit(L, target);
@@ -5225,7 +5225,7 @@ int LuaUnit::GetNearestGameObject(lua_State* L, Unit* unit)
 
     GameObject* target = NULL;
     Eluna::NearestTypeWithEntryInRangeCheck checker(unit, range, TYPEID_GAMEOBJECT, entry);
-    Trinity::GameObjectLastSearcher<Eluna::NearestTypeWithEntryInRangeCheck> searcher(unit, target, checker);
+    CerberCore::GameObjectLastSearcher<Eluna::NearestTypeWithEntryInRangeCheck> searcher(unit, target, checker);
     unit->VisitNearbyGridObject(range, searcher);
 
     sEluna->PushGO(L, target);
@@ -5241,7 +5241,7 @@ int LuaUnit::GetNearestCreature(lua_State* L, Unit* unit)
 
     Creature* target = NULL;
     Eluna::NearestTypeWithEntryInRangeCheck checker(unit, range, TYPEID_UNIT, entry);
-    Trinity::CreatureLastSearcher<Eluna::NearestTypeWithEntryInRangeCheck> searcher(unit, target, checker);
+    CerberCore::CreatureLastSearcher<Eluna::NearestTypeWithEntryInRangeCheck> searcher(unit, target, checker);
     unit->VisitNearbyGridObject(range, searcher);
 
     sEluna->PushUnit(L, target);
@@ -5254,10 +5254,10 @@ int LuaUnit::GetFriendlyUnitsInRange(lua_State* L, Unit* unit)
     float range = luaL_optnumber(L, 1, SIZE_OF_GRIDS);
 
     UnitList list;
-    Trinity::AnyFriendlyUnitInObjectRangeCheck checker(unit, unit, range);
-    Trinity::UnitListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(unit, list, checker);
+    CerberCore::AnyFriendlyUnitInObjectRangeCheck checker(unit, unit, range);
+    CerberCore::UnitListSearcher<CerberCore::AnyFriendlyUnitInObjectRangeCheck> searcher(unit, list, checker);
     unit->VisitNearbyObject(range, searcher);
-    Trinity::ObjectGUIDCheck guidCheck(unit->GetGUID());
+    CerberCore::ObjectGUIDCheck guidCheck(unit->GetGUID());
     list.remove_if (guidCheck);
 
     lua_newtable(L);
@@ -5281,10 +5281,10 @@ int LuaUnit::GetUnfriendlyUnitsInRange(lua_State* L, Unit* unit)
     float range = luaL_optnumber(L, 1, SIZE_OF_GRIDS);
 
     UnitList list;
-    Trinity::AnyUnfriendlyUnitInObjectRangeCheck checker(unit, unit, range);
-    Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(unit, list, checker);
+    CerberCore::AnyUnfriendlyUnitInObjectRangeCheck checker(unit, unit, range);
+    CerberCore::UnitListSearcher<CerberCore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(unit, list, checker);
     unit->VisitNearbyObject(range, searcher);
-    Trinity::ObjectGUIDCheck guidCheck(unit->GetGUID());
+    CerberCore::ObjectGUIDCheck guidCheck(unit->GetGUID());
     list.remove_if (guidCheck);
 
     lua_newtable(L);

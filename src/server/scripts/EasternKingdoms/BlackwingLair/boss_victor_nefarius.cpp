@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -243,7 +243,7 @@ public:
         {
             DoScriptText(SAY_GAMESBEGIN_2, me);
 
-            //Trinity::Singleton<MapManager>::Instance().GetMap(me->GetMapId(), me)->GetPlayers().begin();
+            //CerberCore::Singleton<MapManager>::Instance().GetMap(me->GetMapId(), me)->GetPlayers().begin();
             /*
             list <Player*>::const_iterator i = sMapMgr->GetMap(me->GetMapId(), me)->GetPlayers().begin();
 
@@ -357,7 +357,7 @@ public:
                         //Make super invis
                         DoCast(me, 8149);
 
-                        //Teleport self to a hiding spot (this causes errors in the Trinity log but no real issues)
+                        //Teleport self to a hiding spot (this causes errors in the CerberCore log but no real issues)
                         DoTeleportTo(HIDE_X, HIDE_Y, HIDE_Z);
                         me->AddUnitState(UNIT_STATE_FLEEING);
 

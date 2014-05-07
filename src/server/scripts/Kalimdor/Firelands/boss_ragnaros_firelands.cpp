@@ -980,7 +980,7 @@ class boss_ragnaros_firelands : public CreatureScript
                                 t_pos.push_back(floorPos[i]);
 
                             if (t_pos.size() > max)
-                                Trinity::Containers::RandomResizeList(t_pos, max);
+                                CerberCore::Containers::RandomResizeList(t_pos, max);
 
                             if (!t_pos.empty())
                                 for (std::list<Position>::const_iterator itr = t_pos.begin(); itr != t_pos.end(); ++itr)
@@ -1005,8 +1005,8 @@ class boss_ragnaros_firelands : public CreatureScript
                                 {
                                     Player* plr = (*itr)->getTarget()->ToPlayer();
                                     std::list<Player*> PlayerList;
-                                    Trinity::AnyPlayerInObjectRangeCheck checker(plr, 3.0f);
-                                    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(plr, PlayerList, checker);
+                                    CerberCore::AnyPlayerInObjectRangeCheck checker(plr, 3.0f);
+                                    CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(plr, PlayerList, checker);
                                     plr->VisitNearbyWorldObject(3.0f, searcher);
                                     if (PlayerList.size() >= minTargets)
                                     {
@@ -2127,7 +2127,7 @@ class npc_ragnaros_firelands_dreadflame_spawn : public CreatureScript
                         {
                             UnitList targets;
                             CloudburstCheck check(me);
-                            Trinity::UnitListSearcher<CloudburstCheck> searcher(me, targets, check);
+                            CerberCore::UnitListSearcher<CloudburstCheck> searcher(me, targets, check);
                             me->VisitNearbyObject(3.0f, searcher);
                             if (!targets.empty())
                             {
@@ -2207,8 +2207,8 @@ class npc_ragnaros_firelands_dreadflame : public CreatureScript
                         case EVENT_CHECK_TARGET:
                         {
                             std::list<Player*> targets;
-                            Trinity::AnyPlayerInObjectRangeCheck check(me, 3.0f, true);
-                            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, targets, check);
+                            CerberCore::AnyPlayerInObjectRangeCheck check(me, 3.0f, true);
+                            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, targets, check);
                             me->VisitNearbyObject(3.0f, searcher);
                             if (!targets.empty())
                             {
@@ -2225,7 +2225,7 @@ class npc_ragnaros_firelands_dreadflame : public CreatureScript
                         {
                             UnitList targets;
                             CloudburstCheck check(me);
-                            Trinity::UnitListSearcher<CloudburstCheck> searcher(me, targets, check);
+                            CerberCore::UnitListSearcher<CloudburstCheck> searcher(me, targets, check);
                             me->VisitNearbyObject(3.0f, searcher);
                             if (!targets.empty())
                             {
@@ -2331,7 +2331,7 @@ class spell_ragnaros_firelands_wrath_of_ragnaros_aoe : public SpellScriptLoader
                 if (!targets.empty())
                 {
                     uint32 max_size = (GetCaster()->GetMap()->Is25ManRaid() ? 3 : 1);
-                    Trinity::Containers::RandomResizeList(targets, max_size);
+                    CerberCore::Containers::RandomResizeList(targets, max_size);
                 }
             }
 
@@ -2393,10 +2393,10 @@ class spell_ragnaros_firelands_magma_trap_aoe : public SpellScriptLoader
                 if (!tempList.empty())
                 {
                     targets.clear();
-                    targets.push_back(Trinity::Containers::SelectRandomContainerElement(tempList));
+                    targets.push_back(CerberCore::Containers::SelectRandomContainerElement(tempList));
                 }
                 else
-                    Trinity::Containers::RandomResizeList(targets, 1);
+                    CerberCore::Containers::RandomResizeList(targets, 1);
             }
 
             void HandleDummy(SpellEffIndex effIndex)
@@ -2443,10 +2443,10 @@ class spell_ragnaros_firelands_sulfuras_smash_aoe : public SpellScriptLoader
                 if (!tempList.empty())
                 {
                     targets.clear();
-                    targets.push_back(Trinity::Containers::SelectRandomContainerElement(tempList));
+                    targets.push_back(CerberCore::Containers::SelectRandomContainerElement(tempList));
                 }
                 else
-                    Trinity::Containers::RandomResizeList(targets, 1);
+                    CerberCore::Containers::RandomResizeList(targets, 1);
             }
 
             void Register()

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -45,7 +45,7 @@ class SummonList : public std::list<uint64>
         {
             // We need to use a copy of SummonList here, otherwise original SummonList would be modified
             std::list<uint64> listCopy = *this;
-            Trinity::Containers::RandomResizeList<uint64, Predicate>(listCopy, predicate, max);
+            CerberCore::Containers::RandomResizeList<uint64, Predicate>(listCopy, predicate, max);
             for (iterator i = listCopy.begin(); i != listCopy.end(); )
             {
                 Creature* summon = Unit::GetCreature(*me, *i++);

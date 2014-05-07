@@ -1,5 +1,5 @@
 /*  
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -379,8 +379,8 @@ class spell_hun_pet_carrion_feeder : public SpellScriptLoader
                 float max_range = GetSpellInfo()->GetMaxRange(false);
                 WorldObject* result = NULL;
                 // search for nearby enemy corpse in range
-                Trinity::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_ENEMY);
-                Trinity::WorldObjectSearcher<Trinity::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
+                CerberCore::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_ENEMY);
+                CerberCore::WorldObjectSearcher<CerberCore::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
                 caster->GetMap()->VisitFirstFound(caster->m_positionX, caster->m_positionY, max_range, searcher);
                 if (!result)
                     return SPELL_FAILED_NO_EDIBLE_CORPSES;
@@ -691,10 +691,10 @@ public:
 
         void RemoveInvalidTargets(std::list<WorldObject*>& targets)
         {
-            targets.remove_if(Trinity::UnitAuraCheck(true, SHAMAN_SPELL_SATED));
-            targets.remove_if(Trinity::UnitAuraCheck(true, SHAMAN_SPELL_EXHAUSTION));
-            targets.remove_if(Trinity::UnitAuraCheck(true, HUNTER_SPELL_INSANITY));
-            targets.remove_if(Trinity::UnitAuraCheck(true, MAGE_SPELL_TEMPORAL_DISPLACEMENT));
+            targets.remove_if(CerberCore::UnitAuraCheck(true, SHAMAN_SPELL_SATED));
+            targets.remove_if(CerberCore::UnitAuraCheck(true, SHAMAN_SPELL_EXHAUSTION));
+            targets.remove_if(CerberCore::UnitAuraCheck(true, HUNTER_SPELL_INSANITY));
+            targets.remove_if(CerberCore::UnitAuraCheck(true, MAGE_SPELL_TEMPORAL_DISPLACEMENT));
         }
 
         void ApplyDebuff()

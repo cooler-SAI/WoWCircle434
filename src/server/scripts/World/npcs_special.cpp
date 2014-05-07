@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -1951,8 +1951,8 @@ public:
 
             // Find victim of Summon Gargoyle spell
             std::list<Unit*> targets;
-            Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30);
-            Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
+            CerberCore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30);
+            CerberCore::UnitListSearcher<CerberCore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
             me->VisitNearbyObject(30, searcher);
             for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
                 if ((*iter)->GetAura(49206, owner->GetGUID()))
@@ -3374,8 +3374,8 @@ public:
 
             // Find all the enemies
             std::list<Unit*> targets;
-            Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 5.0f);
-            Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
+            CerberCore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 5.0f);
+            CerberCore::UnitListSearcher<CerberCore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
             me->VisitNearbyObject(5.0f, searcher);
             for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
                 if (!(*iter)->isTotem())
@@ -3995,8 +3995,8 @@ class npc_searing_totem: public CreatureScript
             {
                 Unit * unit = 0;
                 float ratio = 0.0f;
-                Trinity::AnyUnitHavingBuffInObjectRangeCheck u_check(owner, owner, max_range, spell_id, false);
-                Trinity::UnitLastSearcher<Trinity::AnyUnitHavingBuffInObjectRangeCheck> checker(owner, unit, u_check);
+                CerberCore::AnyUnitHavingBuffInObjectRangeCheck u_check(owner, owner, max_range, spell_id, false);
+                CerberCore::UnitLastSearcher<CerberCore::AnyUnitHavingBuffInObjectRangeCheck> checker(owner, unit, u_check);
                 owner->VisitNearbyGridObject(max_range, checker);
 
                 if (unit)
@@ -4055,8 +4055,8 @@ class npc_searing_totem: public CreatureScript
                     !victim->isTargetableForAttack() || !me->IsWithinDistInMap(victim, max_range) ||
                     me->IsFriendlyTo(victim) || !me->canSeeOrDetect(victim) || victim->HasCrowdControlAura())
                 {
-                    Trinity::NearestAttackableNoCCUnitInObjectRangeCheck u_check(me, me, max_range);
-                    Trinity::UnitLastSearcher<Trinity::NearestAttackableNoCCUnitInObjectRangeCheck> checker1(me, victim, u_check);
+                    CerberCore::NearestAttackableNoCCUnitInObjectRangeCheck u_check(me, me, max_range);
+                    CerberCore::UnitLastSearcher<CerberCore::NearestAttackableNoCCUnitInObjectRangeCheck> checker1(me, victim, u_check);
                     me->VisitNearbyObject(max_range, checker1);
                 }
 

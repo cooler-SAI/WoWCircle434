@@ -1,5 +1,5 @@
 ################################################
-# Trinity Core World Server configuration file #
+# CerberCore Core World Server configuration file #
 ################################################
 [worldserver]
 
@@ -60,7 +60,7 @@ RealmID = 1
 #    DataDir
 #        Description: Data directory setting.
 #        Important:   DataDir needs to be quoted, as the string might contain space characters.
-#        Example:     "@prefix@/share/trinitycore"
+#        Example:     "@prefix@/share/cerbercore"
 #        Default:     "."
 
 DataDir = "."
@@ -1064,10 +1064,10 @@ BeepAtStart = 1
 #    Motd
 #        Description: Message of the Day, displayed at login.
 #                     Use '@' for a newline and be sure to escape special characters.
-#        Example:     "Welcome to John\'s Server@This server runs on Trinity Core."
-#        Default:     "Welcome to a Trinity Core server."
+#        Example:     "Welcome to John\'s Server@This server runs on CerberCore Core."
+#        Default:     "Welcome to a CerberCore Core server."
 
-Motd = "Welcome to a Trinity Core server."
+Motd = "Welcome to a CerberCore server."
 
 #
 #    Server.LoginInfo

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -300,7 +300,7 @@ class boss_general_vezax : public CreatureScript
                     if (PlayerList.empty() || PlayerList.size()<playersMin)
                         return SelectTarget(SELECT_TARGET_RANDOM, 0, 150.0f, true);
 
-                    return Trinity::Containers::SelectRandomContainerElement(PlayerList);
+                    return CerberCore::Containers::SelectRandomContainerElement(PlayerList);
                 }
                 return 0;
             }
@@ -568,10 +568,10 @@ class spell_saronite_vapors : public SpellScriptLoader // Spell 63323
                 if (Unit* caster = ObjectAccessor::FindUnit(_caster))
                 {
                     std::list<Player*> players;
-                    Trinity::AnyPlayerInObjectRangeCheck u_check(caster, 150.0f, true);
-                    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(caster, players, u_check);
+                    CerberCore::AnyPlayerInObjectRangeCheck u_check(caster, 150.0f, true);
+                    CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(caster, players, u_check);
                     caster->VisitNearbyObject(30.0f, searcher);
-                    players.sort(Trinity::ObjectDistanceOrderPred(caster));
+                    players.sort(CerberCore::ObjectDistanceOrderPred(caster));
                     for (std::list<Player*>::iterator it = players.begin(); it != players.end(); ++it)
                     {
                         if (Player* player = *it)

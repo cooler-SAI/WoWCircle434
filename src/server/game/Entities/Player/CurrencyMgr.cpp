@@ -557,7 +557,7 @@ void CurrencyMgr::RestoreResettingCap()
 
 void CurrencyMgr::CalculatingCurrencyCap(uint16 &rating, bool ratedBattleground /* = false */)
 {
-    Trinity::Currency::ConquestRatingCalculator(rating, ratedBattleground);
+    CerberCore::Currency::ConquestRatingCalculator(rating, ratedBattleground);
 }
 
 CurrencyCap* CurrencyMgr::GetCurrencyCapData(uint32 lowGuid)

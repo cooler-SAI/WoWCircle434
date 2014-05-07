@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -114,7 +114,7 @@ void WorldSession::HandleTrainerListOpcode(WorldPacket & recvData)
 
 void WorldSession::SendTrainerList(uint64 guid)
 {
-    std::string str = GetTrinityString(LANG_NPC_TAINER_HELLO);
+    std::string str = GetCerberCoreString(LANG_NPC_TAINER_HELLO);
     SendTrainerList(guid, str);
 }
 
@@ -594,12 +594,12 @@ void WorldSession::HandleStableChangeSlot(WorldPacket & recv_data)
     if (!CheckStableMaster(npcGUID))
     {
         Creature* _master = NULL;
-        //CellCoord p(Trinity::ComputeCellCoord(_player->GetPositionX(), _player->GetPositionY()));
+        //CellCoord p(CerberCore::ComputeCellCoord(_player->GetPositionX(), _player->GetPositionY()));
         //Cell cell(p);
-        Trinity::FriendlyStableMasterCheck check(_player);
-        Trinity::CreatureSearcher<Trinity::FriendlyStableMasterCheck> searcher(_player, _master, check);
+        CerberCore::FriendlyStableMasterCheck check(_player);
+        CerberCore::CreatureSearcher<CerberCore::FriendlyStableMasterCheck> searcher(_player, _master, check);
         
-        //TypeContainerVisitor<Trinity::CreatureSearcher <Trinity::FriendlyStableMasterCheck>, GridTypeMapContainer > unit_checker(searcher);
+        //TypeContainerVisitor<CerberCore::CreatureSearcher <CerberCore::FriendlyStableMasterCheck>, GridTypeMapContainer > unit_checker(searcher);
         //cell.Visit(p, unit_checker, *_player->GetMap(), *_player, _player->GetGridActivationRange());
         _player->VisitNearbyObject(5.0f, searcher);
 

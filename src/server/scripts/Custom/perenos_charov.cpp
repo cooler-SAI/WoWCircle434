@@ -32,13 +32,13 @@ public:
         if (!result || realmID != 22)
         {
             LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
-            player->ADD_GOSSIP_ITEM(0, sObjectMgr->GetTrinityString(20027, loc_idx), GOSSIP_SENDER_MAIN, CHANGE_ITEMBACK);
+            player->ADD_GOSSIP_ITEM(0, sObjectMgr->GetCerberCoreString(20027, loc_idx), GOSSIP_SENDER_MAIN, CHANGE_ITEMBACK);
             player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE,creature->GetGUID());
         }
         else
         {
             LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
-            player->ADD_GOSSIP_ITEM(0, sObjectMgr->GetTrinityString(20028, loc_idx), GOSSIP_SENDER_MAIN, CHANGE_ITEMBACK);
+            player->ADD_GOSSIP_ITEM(0, sObjectMgr->GetCerberCoreString(20028, loc_idx), GOSSIP_SENDER_MAIN, CHANGE_ITEMBACK);
             do
             {
                 Field* fields = result->Fetch();

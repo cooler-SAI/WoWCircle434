@@ -786,7 +786,7 @@ public:
                     targets.remove(pTank);
 
             uint32 max_targets = (GetCaster()->GetMap()->Is25ManRaid() ? 5 : 2);
-            Trinity::Containers::RandomResizeList(targets, max_targets);
+            CerberCore::Containers::RandomResizeList(targets, max_targets);
         }
 
         void Register()

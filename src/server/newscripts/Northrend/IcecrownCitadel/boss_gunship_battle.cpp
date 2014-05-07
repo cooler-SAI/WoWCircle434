@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2010 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -2604,8 +2604,8 @@ class npc_korkron_primalist: public CreatureScript
                             {
                                 std::list<Unit*> TargetList;
                                 Unit* finalTarget = me;
-                                Trinity::AnyFriendlyUnitInObjectRangeCheck checker(me, me, 30.0f);
-                                Trinity::UnitListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(me, TargetList, checker);
+                                CerberCore::AnyFriendlyUnitInObjectRangeCheck checker(me, me, 30.0f);
+                                CerberCore::UnitListSearcher<CerberCore::AnyFriendlyUnitInObjectRangeCheck> searcher(me, TargetList, checker);
                                 me->VisitNearbyObject(30.0f, searcher);
                                 for (std::list<Unit*>::iterator itr = TargetList.begin(); itr != TargetList.end(); ++itr)
                                     if ((*itr)->GetHealthPct() < finalTarget->GetHealthPct())

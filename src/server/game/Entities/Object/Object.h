@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -135,7 +135,7 @@ struct ObjectGuid
         {
             ASSERT(index < sizeof(uint64));
 
-#if TRINITY_ENDIAN == TRINITY_LITTLEENDIAN
+#if CERBERCORE_ENDIAN == CERBERCORE_LITTLEENDIAN
             return _data.byte[index];
 #else
             return _data.byte[7 - index];
@@ -146,7 +146,7 @@ struct ObjectGuid
         {
             ASSERT(index < sizeof(uint64));
 
-#if TRINITY_ENDIAN == TRINITY_LITTLEENDIAN
+#if CERBERCORE_ENDIAN == CERBERCORE_LITTLEENDIAN
             return _data.byte[index];
 #else
             return _data.byte[7 - index];
@@ -1074,7 +1074,7 @@ class WorldObject : public Object, public WorldLocation
         bool CanDetectStealthOf(WorldObject const* obj) const;
 };
 
-namespace Trinity
+namespace CerberCore
 {
     template<class T>
     void RandomResizeList(std::list<T> &_list, uint32 _size)

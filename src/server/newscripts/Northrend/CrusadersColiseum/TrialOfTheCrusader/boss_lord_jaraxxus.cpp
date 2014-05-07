@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2006-2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -571,7 +571,7 @@ class spell_mistress_kiss_area : public SpellScriptLoader
                     return;
 
                 // pick a random target and kiss him
-                if (WorldObject* _target = Trinity::Containers::SelectRandomContainerElement(_targets))
+                if (WorldObject* _target = CerberCore::Containers::SelectRandomContainerElement(_targets))
                 {
                     // correctly fill "targets" for the visual effect
                     targets.clear();

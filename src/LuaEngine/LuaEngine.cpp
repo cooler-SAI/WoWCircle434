@@ -103,7 +103,7 @@ void Eluna::StartEluna(bool restart)
         //! Iterate over every supported source type (creature and gameobject)
         //! Not entirely sure how this will affect units in non-loaded grids.
         {
-            TRINITY_READ_GUARD(HashMapHolder<Creature>::LockType, *HashMapHolder<Creature>::GetLock());
+            CERBERCORE_READ_GUARD(HashMapHolder<Creature>::LockType, *HashMapHolder<Creature>::GetLock());
             HashMapHolder<Creature>::MapType const& m = ObjectAccessor::GetCreatures();
             for (HashMapHolder<Creature>::MapType::const_iterator iter = m.begin(); iter != m.end(); ++iter)
                 if (iter->second->IsInWorld()) // must check?
@@ -111,7 +111,7 @@ void Eluna::StartEluna(bool restart)
                         iter->second->AIM_Initialize();
         }
         /*{
-            TRINITY_READ_GUARD(HashMapHolder<GameObject>::LockType, *HashMapHolder<GameObject>::GetLock());
+            CERBERCORE_READ_GUARD(HashMapHolder<GameObject>::LockType, *HashMapHolder<GameObject>::GetLock());
             HashMapHolder<GameObject>::MapType const& m = ObjectAccessor::GetGameObjects();
             for (HashMapHolder<GameObject>::MapType::const_iterator iter = m.begin(); iter != m.end(); ++iter)
                 if (iter->second->IsInWorld()) // must check?

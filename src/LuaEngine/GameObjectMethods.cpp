@@ -489,7 +489,7 @@ int LuaGameObject::GetNearestPlayer(lua_State* L, GameObject* go)
 
     Player* target = NULL;
     Eluna::NearestTypeWithEntryInRangeCheck checker(go, distance, TYPEID_PLAYER);
-    Trinity::PlayerLastSearcher<Eluna::NearestTypeWithEntryInRangeCheck> searcher(go, target, checker);
+    CerberCore::PlayerLastSearcher<Eluna::NearestTypeWithEntryInRangeCheck> searcher(go, target, checker);
     go->VisitNearbyObject(distance, searcher);
 
     sEluna->PushUnit(L, target);
@@ -506,7 +506,7 @@ int LuaGameObject::GetNearestGameObject(lua_State* L, GameObject* go)
 
     GameObject* target = NULL;
     Eluna::NearestTypeWithEntryInRangeCheck checker(go, range, TYPEID_GAMEOBJECT, entry);
-    Trinity::GameObjectLastSearcher<Eluna::NearestTypeWithEntryInRangeCheck> searcher(go, target, checker);
+    CerberCore::GameObjectLastSearcher<Eluna::NearestTypeWithEntryInRangeCheck> searcher(go, target, checker);
     go->VisitNearbyGridObject(range, searcher);
 
     sEluna->PushGO(L, target);
@@ -523,7 +523,7 @@ int LuaGameObject::GetNearestCreature(lua_State* L, GameObject* go)
 
     Creature* target = NULL;
     Eluna::NearestTypeWithEntryInRangeCheck checker(go, range, TYPEID_UNIT, entry);
-    Trinity::CreatureLastSearcher<Eluna::NearestTypeWithEntryInRangeCheck> searcher(go, target, checker);
+    CerberCore::CreatureLastSearcher<Eluna::NearestTypeWithEntryInRangeCheck> searcher(go, target, checker);
     go->VisitNearbyGridObject(range, searcher);
 
     sEluna->PushUnit(L, target);

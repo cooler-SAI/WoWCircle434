@@ -1018,7 +1018,7 @@ class TrashRespawnWorker
 static void AlysrazorTrashEvaded(Creature* creature)
 {
     TrashRespawnWorker check;
-    Trinity::CreatureWorker<TrashRespawnWorker> worker(creature, check);
+    CerberCore::CreatureWorker<TrashRespawnWorker> worker(creature, check);
     creature->VisitNearbyGridObject(SIZE_OF_GRIDS, worker);
 }
 
@@ -1315,11 +1315,11 @@ class npc_egg_pile : public CreatureScript
                         {
                             std::list<Creature*> eggs;
                             MoltenEggCheck check(me);
-                            Trinity::CreatureListSearcher<MoltenEggCheck> searcher(me, eggs, check);
+                            CerberCore::CreatureListSearcher<MoltenEggCheck> searcher(me, eggs, check);
                             me->VisitNearbyGridObject(20.0f, searcher);
                             if (!eggs.empty())
                             {
-                                Creature* egg = Trinity::Containers::SelectRandomContainerElement(eggs);
+                                Creature* egg = CerberCore::Containers::SelectRandomContainerElement(eggs);
                                 egg->CastSpell(egg, SPELL_SUMMON_SMOULDERING_HATCHLING, TRIGGERED_FULL_MASK);
                                 egg->SetDisplayId(MODEL_INVISIBLE_STALKER);
                                 egg->m_Events.AddEvent(new RespawnEggEvent(egg), egg->m_Events.CalculateTime(5000));

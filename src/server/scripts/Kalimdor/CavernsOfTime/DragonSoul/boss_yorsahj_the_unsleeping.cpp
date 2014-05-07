@@ -368,7 +368,7 @@ public:
                     {
                         std::list<Creature*> creatures;
                         GlobulesCheck checker;
-                        Trinity::CreatureListSearcher<GlobulesCheck> searcher(me, creatures, checker);
+                        CerberCore::CreatureListSearcher<GlobulesCheck> searcher(me, creatures, checker);
                         me->VisitNearbyObject(100.0f, searcher);
 
                         if (!creatures.empty())
@@ -885,7 +885,7 @@ public:
                     targets.remove(pTank);
 
             uint32 max_targets = (GetCaster()->GetMap()->Is25ManRaid() ? 10 : 5);
-            Trinity::Containers::RandomResizeList(targets, max_targets);
+            CerberCore::Containers::RandomResizeList(targets, max_targets);
         }
 
         void HandleScript(SpellEffIndex /*effIndex*/)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -157,8 +157,8 @@ bool FleeingMovementGenerator<T>::_getPoint(T &owner, float &x, float &y, float 
             temp_y += distance/5 * sin(angle);
             float _temp_x = temp_x;
             float _temp_y = temp_y;
-            Trinity::NormalizeMapCoord(_temp_x);
-            Trinity::NormalizeMapCoord(_temp_y);
+            CerberCore::NormalizeMapCoord(_temp_x);
+            CerberCore::NormalizeMapCoord(_temp_y);
             float _temp_z = _map->GetHeight(temp_x, temp_y, z, true);
             if (fabs(_temp_z - temp_z) > 2.0f)
             {
@@ -175,8 +175,8 @@ bool FleeingMovementGenerator<T>::_getPoint(T &owner, float &x, float &y, float 
         if (!goodCoordinates)
             continue;
 
-        Trinity::NormalizeMapCoord(temp_x);
-        Trinity::NormalizeMapCoord(temp_y);
+        CerberCore::NormalizeMapCoord(temp_x);
+        CerberCore::NormalizeMapCoord(temp_y);
         if (owner.IsWithinLOS(temp_x, temp_y, z))
         {
             bool is_water_now = _map->IsInWater(x,y,z);

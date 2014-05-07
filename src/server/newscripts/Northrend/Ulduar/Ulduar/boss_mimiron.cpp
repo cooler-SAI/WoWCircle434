@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -1118,7 +1118,7 @@ class boss_leviathan_mk_turret : public CreatureScript
                     if (playerList.empty())
                         return SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true);
                     else
-                        return Trinity::Containers::SelectRandomContainerElement(playerList);
+                        return CerberCore::Containers::SelectRandomContainerElement(playerList);
                 }
                 else
                     return 0;
@@ -2068,8 +2068,8 @@ class npc_mimiron_bomb_bot : public CreatureScript
             Unit* SelectPlayerTargetInRange(float range)
             {
                 Player* target = 0;
-                Trinity::AnyPlayerInObjectRangeCheck u_check(me, range, true);
-                Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, target, u_check);
+                CerberCore::AnyPlayerInObjectRangeCheck u_check(me, range, true);
+                CerberCore::PlayerSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, target, u_check);
                 me->VisitNearbyObject(range, searcher);
                 return target;
             }
@@ -2349,7 +2349,7 @@ class spell_frost_bomb : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                if (WorldObject* _target = Trinity::Containers::SelectRandomContainerElement(targets))
+                if (WorldObject* _target = CerberCore::Containers::SelectRandomContainerElement(targets))
                 {
                     targets.clear();
                     targets.push_back(_target);

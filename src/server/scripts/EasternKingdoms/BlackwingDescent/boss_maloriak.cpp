@@ -974,7 +974,7 @@ public:
                 targets.remove_if(GoCheck());
                 uint32 count = pInstance->GetData(DATA_MALORIAK_ABERRATIONS);
                 if (!targets.empty() && count > 0)
-                    Trinity::RandomResizeList(targets, count > 3? 3: count);
+                    CerberCore::RandomResizeList(targets, count > 3? 3: count);
                 else
                     targets.clear();
             }
@@ -1042,7 +1042,7 @@ public:
 
                 uint32 count = pInstance->GetData(DATA_MALORIAK_ABERRATIONS);
                 if (count > 0)
-                    Trinity::RandomResizeList(targets, count);
+                    CerberCore::RandomResizeList(targets, count);
                 else
                     targets.clear();
 

@@ -225,8 +225,8 @@ class instance_zulgurub : public InstanceMapScript
                 ObjectList* targets = new ObjectList();
                 if (obj)
                 {
-                    Trinity::AllWorldObjectsInRange u_check(obj, dist);
-                    Trinity::WorldObjectListSearcher<Trinity::AllWorldObjectsInRange> searcher(obj, *targets, u_check);
+                    CerberCore::AllWorldObjectsInRange u_check(obj, dist);
+                    CerberCore::WorldObjectListSearcher<CerberCore::AllWorldObjectsInRange> searcher(obj, *targets, u_check);
                     obj->VisitNearbyObject(dist, searcher);
                 }
                 return targets;

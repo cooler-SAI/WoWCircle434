@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_SMARTSCRIPTMGR_H
-#define TRINITY_SMARTSCRIPTMGR_H
+#ifndef CERBERCORE_SMARTSCRIPTMGR_H
+#define CERBERCORE_SMARTSCRIPTMGR_H
 
 #include "Common.h"
 #include "Creature.h"
@@ -510,8 +510,8 @@ enum SMART_ACTION
     SMART_ACTION_SET_HOME_POS                       = 101,    // none
     SMART_ACTION_SET_HEALTH_REGEN                   = 102,    // 0/1
     SMART_ACTION_BOSS_EVADE                         = 200,    // No Params
-    SMART_ACTION_BOSS_ANOUNCE                       = 201,    // TextId from trinity_ctring
-    SMART_ACTION_MOVE_Z                             = 202,    // TextId from trinity_ctring
+    SMART_ACTION_BOSS_ANOUNCE                       = 201,    // TextId from CERBERCORE_ctring
+    SMART_ACTION_MOVE_Z                             = 202,    // TextId from CERBERCORE_ctring
     SMART_ACTION_SET_KD                             = 203,    // Set instanse kd
 
     SMART_ACTION_END                                = 204,

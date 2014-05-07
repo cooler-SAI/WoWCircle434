@@ -518,8 +518,8 @@ class spell_venoxis_toxic_link_aura : public SpellScriptLoader
                     return;
 
                  UnitList targets;
-                 Trinity::AnyUnitHavingBuffInObjectRangeCheck u_check(GetCaster(), GetTarget(), 100, SPELL_TOXIC_LINK_AURA, true);
-                 Trinity::UnitListSearcher<Trinity::AnyUnitHavingBuffInObjectRangeCheck> searcher(GetTarget(), targets, u_check);
+                 CerberCore::AnyUnitHavingBuffInObjectRangeCheck u_check(GetCaster(), GetTarget(), 100, SPELL_TOXIC_LINK_AURA, true);
+                 CerberCore::UnitListSearcher<CerberCore::AnyUnitHavingBuffInObjectRangeCheck> searcher(GetTarget(), targets, u_check);
                  GetTarget()->VisitNearbyObject(80, searcher);
 
                  if (targets.size() < 2)

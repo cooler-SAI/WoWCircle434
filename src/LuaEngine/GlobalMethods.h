@@ -945,10 +945,10 @@ namespace LuaGlobalFunctions
             return 0;
 
         std::list<Player*> list;
-        Trinity::AnyPlayerInObjectRangeCheck checker(obj, range);
-        Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(obj, list, checker);
+        CerberCore::AnyPlayerInObjectRangeCheck checker(obj, range);
+        CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(obj, list, checker);
         obj->VisitNearbyWorldObject(range, searcher);
-        Trinity::ObjectGUIDCheck guidCheck(obj->GetGUID());
+        CerberCore::ObjectGUIDCheck guidCheck(obj->GetGUID());
         list.remove_if(guidCheck);
 
         lua_newtable(L);
@@ -974,10 +974,10 @@ namespace LuaGlobalFunctions
             return 0;
 
         std::list<Creature*> list;
-        Trinity::AnyUnitInObjectRangeCheck checker(obj, range);
-        Trinity::CreatureListSearcher<Trinity::AnyUnitInObjectRangeCheck> searcher(obj, list, checker);
+        CerberCore::AnyUnitInObjectRangeCheck checker(obj, range);
+        CerberCore::CreatureListSearcher<CerberCore::AnyUnitInObjectRangeCheck> searcher(obj, list, checker);
         obj->VisitNearbyGridObject(range, searcher);
-        Trinity::ObjectGUIDCheck guidCheck(obj->GetGUID());
+        CerberCore::ObjectGUIDCheck guidCheck(obj->GetGUID());
         list.remove_if(guidCheck);
 
         lua_newtable(L);
@@ -1005,10 +1005,10 @@ namespace LuaGlobalFunctions
         float x, y, z;
         obj->GetPosition(x, y, z);
         std::list<GameObject*> list;
-        Trinity::GameObjectInRangeCheck checker(x, y, z, range);
-        Trinity::GameObjectListSearcher<Trinity::GameObjectInRangeCheck> searcher(obj, list, checker);
+        CerberCore::GameObjectInRangeCheck checker(x, y, z, range);
+        CerberCore::GameObjectListSearcher<CerberCore::GameObjectInRangeCheck> searcher(obj, list, checker);
         obj->VisitNearbyGridObject(range, searcher);
-        Trinity::ObjectGUIDCheck guidCheck(obj->GetGUID());
+        CerberCore::ObjectGUIDCheck guidCheck(obj->GetGUID());
         list.remove_if(guidCheck);
 
         lua_newtable(L);

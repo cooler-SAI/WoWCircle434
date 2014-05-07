@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -40,7 +40,7 @@ class Field
             if (!data.value)
                 return 0;
 
-            #ifdef TRINITY_DEBUG
+            #ifdef CERBERCORE_DEBUG
             if (!IsNumeric())
             {
                 sLog->outWarn(LOG_FILTER_SQL,"Error: GetUInt8() on non-numeric field.");
@@ -57,7 +57,7 @@ class Field
             if (!data.value)
                 return 0;
 
-            #ifdef TRINITY_DEBUG
+            #ifdef CERBERCORE_DEBUG
             if (!IsNumeric())
             {
                 sLog->outWarn(LOG_FILTER_SQL,"Error: GeInt8() on non-numeric field.");
@@ -74,7 +74,7 @@ class Field
             if (!data.value)
                 return 0;
 
-            #ifdef TRINITY_DEBUG
+            #ifdef CERBERCORE_DEBUG
             if (!IsNumeric())
             {
                 sLog->outWarn(LOG_FILTER_SQL,"Error: GetUInt16() on non-numeric field.");
@@ -91,7 +91,7 @@ class Field
             if (!data.value)
                 return 0;
 
-            #ifdef TRINITY_DEBUG
+            #ifdef CERBERCORE_DEBUG
             if (!IsNumeric())
             {
                 sLog->outWarn(LOG_FILTER_SQL,"Error: GetInt16() on non-numeric field.");
@@ -108,7 +108,7 @@ class Field
             if (!data.value)
                 return 0;
 
-            #ifdef TRINITY_DEBUG
+            #ifdef CERBERCORE_DEBUG
             if (!IsNumeric())
             {
                 sLog->outWarn(LOG_FILTER_SQL,"Error: GetUInt32() on non-numeric field.");
@@ -125,7 +125,7 @@ class Field
             if (!data.value)
                 return 0;
 
-            #ifdef TRINITY_DEBUG
+            #ifdef CERBERCORE_DEBUG
             if (!IsNumeric())
             {
                 sLog->outWarn(LOG_FILTER_SQL,"Error: GetInt32() on non-numeric field.");
@@ -142,7 +142,7 @@ class Field
             if (!data.value)
                 return 0;
 
-            #ifdef TRINITY_DEBUG
+            #ifdef CERBERCORE_DEBUG
             if (!IsNumeric())
             {
                 sLog->outWarn(LOG_FILTER_SQL,"Error: GetUInt64() on non-numeric field.");
@@ -159,7 +159,7 @@ class Field
             if (!data.value)
                 return 0;
 
-            #ifdef TRINITY_DEBUG
+            #ifdef CERBERCORE_DEBUG
             if (!IsNumeric())
             {
                 sLog->outWarn(LOG_FILTER_SQL,"Error: GetInt64() on non-numeric field.");
@@ -176,7 +176,7 @@ class Field
             if (!data.value)
                 return 0.0f;
 
-            #ifdef TRINITY_DEBUG
+            #ifdef CERBERCORE_DEBUG
             if (!IsNumeric())
             {
                 sLog->outWarn(LOG_FILTER_SQL,"Error: GetFloat() on non-numeric field.");
@@ -193,7 +193,7 @@ class Field
             if (!data.value)
                 return 0.0f;
 
-            #ifdef TRINITY_DEBUG
+            #ifdef CERBERCORE_DEBUG
             if (!IsNumeric())
             {
                 sLog->outWarn(LOG_FILTER_SQL,"Error: GetDouble() on non-numeric field.");
@@ -210,7 +210,7 @@ class Field
             if (!data.value)
                 return NULL;
 
-            #ifdef TRINITY_DEBUG
+            #ifdef CERBERCORE_DEBUG
             if (IsNumeric())
             {
                 sLog->outWarn(LOG_FILTER_SQL,"Error: GetCString() on numeric field.");
@@ -343,7 +343,7 @@ class Field
         }
 
     private:
-        #ifdef TRINITY_DEBUG
+        #ifdef CERBERCORE_DEBUG
         static char const* FieldTypeToString(enum_field_types type)
         {
             switch (type)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -1707,7 +1707,7 @@ void Unit::CalcAbsorbResist(Unit* victim, SpellSchoolMask schoolMask, DamageEffe
     // We're going to call functions which can modify content of the list during iteration over it's elements
     // Let's copy the list so we can prevent iterator invalidation
     AuraEffectList vSchoolAbsorbCopy(victim->GetAuraEffectsByType(SPELL_AURA_SCHOOL_ABSORB));
-    vSchoolAbsorbCopy.sort(Trinity::AbsorbAuraOrderPred());
+    vSchoolAbsorbCopy.sort(CerberCore::AbsorbAuraOrderPred());
 
     // absorb without mana cost
     for (AuraEffectList::iterator itr = vSchoolAbsorbCopy.begin(); (itr != vSchoolAbsorbCopy.end()) && (dmgInfo.GetDamage() > 0); ++itr)
@@ -5134,7 +5134,7 @@ void Unit::SendSpellDamageImmune(Unit* target, uint32 spellId)
 
 void Unit::SendMessageUnfriendlyToSetInRange(WorldPacket* data, float fist)
 {
-    Trinity::UnfriendlyMessageDistDeliverer notifier(this, data, GetVisibilityRange());
+    CerberCore::UnfriendlyMessageDistDeliverer notifier(this, data, GetVisibilityRange());
     VisitNearbyWorldObject(GetVisibilityRange(), notifier);
 }
 
@@ -6569,14 +6569,14 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 {
                     UnitList targets;
                     {
-                        CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
+                        CellCoord p(CerberCore::ComputeCellCoord(GetPositionX(), GetPositionY()));
                         Cell cell(p);
 
-                        Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck u_check(this, 8.0f);
-                        Trinity::UnitListSearcher<Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck> checker(this, targets, u_check);
+                        CerberCore::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck u_check(this, 8.0f);
+                        CerberCore::UnitListSearcher<CerberCore::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck> checker(this, targets, u_check);
 
-                        TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck>, GridTypeMapContainer > grid_object_checker(checker);
-                        TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck>, WorldTypeMapContainer > world_object_checker(checker);
+                        TypeContainerVisitor<CerberCore::UnitListSearcher<CerberCore::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck>, GridTypeMapContainer > grid_object_checker(checker);
+                        TypeContainerVisitor<CerberCore::UnitListSearcher<CerberCore::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck>, WorldTypeMapContainer > world_object_checker(checker);
 
                         cell.Visit(p, grid_object_checker,  *GetMap(), *this, 8.0f);
                         cell.Visit(p, world_object_checker, *GetMap(), *this, 8.0f);
@@ -7455,8 +7455,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                     
                     std::list<Player*> plrList;
-                    Trinity::AnyFriendlyUnitInObjectRangeCheck check(this, this, 15.0f);
-                    Trinity::PlayerListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(this, plrList, check);
+                    CerberCore::AnyFriendlyUnitInObjectRangeCheck check(this, this, 15.0f);
+                    CerberCore::PlayerListSearcher<CerberCore::AnyFriendlyUnitInObjectRangeCheck> searcher(this, plrList, check);
                     VisitNearbyObject(15.0f, searcher);
                     if (plrList.empty())
                         return false;
@@ -7466,7 +7466,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (plrList.empty())
                         return false;
 
-                    plrList.sort(Trinity::HealthPctOrderPred());
+                    plrList.sort(CerberCore::HealthPctOrderPred());
                     plrList.resize(1);
 
                     int32 bp0 = damage;
@@ -8182,8 +8182,8 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                     
                     std::list<Player*> plrList;
-                    Trinity::AnyFriendlyUnitInObjectRangeCheck check(this, this, 15.0f);
-                    Trinity::PlayerListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(this, plrList, check);
+                    CerberCore::AnyFriendlyUnitInObjectRangeCheck check(this, this, 15.0f);
+                    CerberCore::PlayerListSearcher<CerberCore::AnyFriendlyUnitInObjectRangeCheck> searcher(this, plrList, check);
                     VisitNearbyObject(15.0f, searcher);
                     if (plrList.empty())
                         return false;
@@ -8193,7 +8193,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (plrList.empty())
                         return false;
 
-                    plrList.sort(Trinity::HealthPctOrderPred());
+                    plrList.sort(CerberCore::HealthPctOrderPred());
                     plrList.resize(1);
 
                     int32 bp0 = int32(CalculatePct(damage, 10));
@@ -18033,8 +18033,8 @@ void Unit::UpdateReactives(uint32 p_time)
 Unit* Unit::SelectNearbyTarget(Unit* exclude, float dist) const
 {
     std::list<Unit*> targets;
-    Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, this, dist);
-    Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
+    CerberCore::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, this, dist);
+    CerberCore::UnitListSearcher<CerberCore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
     VisitNearbyObject(dist, searcher);
 
     // remove current target
@@ -18058,7 +18058,7 @@ Unit* Unit::SelectNearbyTarget(Unit* exclude, float dist) const
         return NULL;
 
     // select random
-    return Trinity::Containers::SelectRandomContainerElement(targets);
+    return CerberCore::Containers::SelectRandomContainerElement(targets);
 }
 
 void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply)
@@ -19995,7 +19995,7 @@ public:
 
     virtual bool Execute(uint64 , uint32) 
     {
-        Trinity::AIRelocationNotifier notifier(m_owner);
+        CerberCore::AIRelocationNotifier notifier(m_owner);
         m_owner.VisitNearbyObject(m_owner.GetVisibilityRange(), notifier);
         return true;
     }
@@ -21027,7 +21027,7 @@ void Unit::SendTeleportPacket(Position &pos)
 bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool teleport)
 {
     // prevent crash when a bad coord is sent by the client
-    if (!Trinity::IsValidMapCoord(x, y, z, orientation))
+    if (!CerberCore::IsValidMapCoord(x, y, z, orientation))
         return false;
 
     bool turn = (GetOrientation() != orientation);
@@ -21878,8 +21878,8 @@ void Unit::DoBuffPartyOrSingle(uint32 single_buff, uint32 party_buff, Unit *targ
 void Unit::SpreadAura(uint32 spellId, float radius, bool positive, int8 count, Unit * except)
 {
     UnitList targets;
-    Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck u_check(this, radius);
-    Trinity::UnitListSearcher<Trinity::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck> searcher(this, targets, u_check);
+    CerberCore::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck u_check(this, radius);
+    CerberCore::UnitListSearcher<CerberCore::AnyUnfriendlyAttackableVisibleUnitInObjectRangeCheck> searcher(this, targets, u_check);
     this->VisitNearbyObject(radius, searcher);
 
     UnitList targets_limited; // list of targets that hasn't aura

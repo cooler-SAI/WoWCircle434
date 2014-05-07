@@ -716,7 +716,7 @@ public:
             }
 
             if (targets.size() > min_players)
-                Trinity::Containers::RandomResizeList(targets, min_players);
+                CerberCore::Containers::RandomResizeList(targets, min_players);
         }
 
         void Register()

@@ -1034,7 +1034,7 @@ public:
                         if (target && target->HasAura(SPELL_HURRICANE_CAST))
                             me->RemoveAura(SPELL_HURRICANE_CAST);
                     CouncilGameObject reset;
-                    Trinity::GameObjectWorker<CouncilGameObject> worker(me, reset);
+                    CerberCore::GameObjectWorker<CouncilGameObject> worker(me, reset);
                     me->VisitNearbyGridObject(400.0f, worker);
                     me->DespawnOrUnsummon(500);
                     break;
