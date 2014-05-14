@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -979,6 +980,16 @@ void ScriptMgr::OnPlayerEnterCombat(Player* player, Unit* enemy)
 void ScriptMgr::OnPlayerLeaveCombat(Player* player)
 {
     FOREACH_SCRIPT(PlayerScript)->OnPlayerLeaveCombat(player);
+}
+
+void ScriptMgr::OnPlayerStartWatchingMovie(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnStartWatching(player);
+}
+
+void ScriptMgr::OnPlayerEndWatchingMovie(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnEndWatching(player);
 }
 
 // Player

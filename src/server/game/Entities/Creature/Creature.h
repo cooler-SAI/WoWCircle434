@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -804,12 +805,15 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
 
         static float _GetDamageMod(int32 Rank);
 
-        float m_SightDistance, m_CombatDistance;
+        float m_SightDistance, m_CombatDistance,  _ReactDistance;
 
         void SetGUIDTransport(uint32 guid) { guid_transport=guid; }
         uint32 GetGUIDTransport() { return guid_transport; }
 
         void FarTeleportTo(Map* map, float X, float Y, float Z, float O);
+
+        void SetSeerGUID(uint64 guid) { uiSeerGUID = guid; }
+        uint64 GetSeerGUID() const { return uiSeerGUID; }
 
         bool m_isTempWorldObject; //true when possessed
         uint32 GetBossId() const { return bossid; }
@@ -864,6 +868,10 @@ class Creature : public Unit, public GridObject<Creature>, public MapCreature
         uint32 bossid;
 
         bool IsInvisibleDueToDespawn() const;
+
+        bool CanAlwaysSee(WorldObject const* obj) const;
+        bool IsAlwaysVisibleFor(WorldObject const* seer) const;
+        uint64 uiSeerGUID;
     private:
         void ForcedDespawn(uint32 timeMSToDespawn = 0);
 

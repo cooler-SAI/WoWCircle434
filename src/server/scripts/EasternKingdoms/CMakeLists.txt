@@ -263,6 +263,8 @@ set(scripts_STAT_SRCS
   EasternKingdoms/BlackwingDescent/blackwing_descent.cpp
   EasternKingdoms/BlackwingDescent/blackwing_descent.h
   EasternKingdoms/BlackwingDescent/boss_bwd_nefarian.cpp
+  EasternKingdoms/Gilneas/gilneas.h
+  EasternKingdoms/Gilneas/gilneas.cpp
 )
 
 message("  -> Prepared: Eastern Kingdoms")

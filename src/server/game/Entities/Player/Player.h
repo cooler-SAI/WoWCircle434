@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -680,7 +681,9 @@ enum PlayerExtraFlags
     PLAYER_EXTRA_GM_CHAT            = 0x0020,               // Show GM badge in chat messages
 
     // other states
-    PLAYER_EXTRA_PVP_DEATH          = 0x0100                // store PvP death status until corpse creating.
+    PLAYER_EXTRA_PVP_DEATH          = 0x0100,               // store PvP death status until corpse creating.
+    PLAYER_EXTRA_WORGEN_FORM        = 0x0200,               // Are we really need it?
+    PLAYER_EXTRA_WATCHING_MOVIE     = 0x0400
 };
 
 // 2^n values
@@ -3070,6 +3073,8 @@ class Player : public Unit, public GridObject<Player>
         VoidStorageItem* GetVoidStorageItem(uint8 slot) const;
         VoidStorageItem* GetVoidStorageItem(uint64 id, uint8& slot) const;
 
+        bool HasFlagExtraWorgenForm() const { return m_ExtraFlags & PLAYER_EXTRA_WORGEN_FORM; }
+
         void SetDamageTakenForSecond(uint32 value)
         {
             _damage_taken[0] += value;
@@ -3103,6 +3108,9 @@ class Player : public Unit, public GridObject<Player>
         void ResetHolyPowerTimer() { m_holyPowerRegenTimerCount = 0; }
 
         WarGameData* WarGameData;
+
+        uint32 GetExtraFlags() { return m_ExtraFlags; }
+        void ModExtraFlags(uint32 val, bool add) { add ? m_ExtraFlags |= val : m_ExtraFlags &= ~val; }
 
     protected:
         // Gamemaster whisper whitelist

@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -929,6 +930,7 @@ class WorldObject : public Object, public WorldLocation
         void MonsterYell(const char* text, uint32 language, uint64 TargetGuid);
         void MonsterTextEmote(const char* text, uint64 TargetGuid, bool IsBossEmote = false);
         void MonsterWhisper(const char* text, uint64 receiver, bool IsBossWhisper = false);
+        void DoPersonalScriptText(int32 textId, Player* player, bool everywhere = false);
         void MonsterSay(int32 textId, uint32 language, uint64 TargetGuid) const;
         void DebugMonsterSay(const char* msg, ...) const;
         void DebugMonsterSayTimer(const char* msg, ...) const;

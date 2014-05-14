@@ -1,6 +1,9 @@
-/* Copyright (C) 2006 - 2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
- * This program is free software licensed under GPL version 2
- * Please see the included DOCS/LICENSE.TXT for more information */
+/*
+* Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
+* Copyright (C) 2006 - 2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+* This program is free software licensed under GPL version 2
+* Please see the included DOCS/LICENSE.TXT for more information
+*/
 
 /* ScriptData
 SDName: FollowerAI
@@ -12,6 +15,7 @@ EndScriptData */
 #include "ScriptedCreature.h"
 #include "ScriptedFollowerAI.h"
 #include "Group.h"
+#include "Player.h"
 
 const float MAX_PLAYER_DISTANCE = 100.0f;
 
@@ -24,7 +28,9 @@ FollowerAI::FollowerAI(Creature* creature) : ScriptedAI(creature),
     m_uiLeaderGUID(0),
     m_uiUpdateFollowTimer(2500),
     m_uiFollowState(STATE_FOLLOW_NONE),
-    m_pQuestForFollow(NULL)
+    m_pQuestForFollow(NULL),
+    angle(PET_FOLLOW_ANGLE),
+    dist(PET_FOLLOW_DIST)
 {}
 
 void FollowerAI::AttackStart(Unit* who)
@@ -205,7 +211,7 @@ void FollowerAI::UpdateAI(const uint32 uiDiff)
                     sLog->outDebug(LOG_FILTER_TSCR, "FollowerAI is returning to leader.");
 
                     RemoveFollowState(STATE_FOLLOW_RETURNING);
-                    me->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                    me->GetMotionMaster()->MoveFollow(player, GetFollowDist(), GetFollowAngle());
                     return;
                 }
 
@@ -270,7 +276,7 @@ void FollowerAI::MovementInform(uint32 motionType, uint32 pointId)
     }
 }
 
-void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Quest* quest)
+void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Quest* quest, float f_angle, float f_dist)
 {
     if (me->getVictim())
     {
@@ -286,6 +292,8 @@ void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Qu
 
     //set variables
     m_uiLeaderGUID = player->GetGUID();
+    SetFollowAngle(f_angle);
+    SetFollowDist(f_dist);
 
     if (factionForFollower)
         me->setFaction(factionForFollower);
@@ -303,7 +311,7 @@ void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Qu
 
     AddFollowState(STATE_FOLLOW_INPROGRESS);
 
-    me->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+    me->GetMotionMaster()->MoveFollow(player, GetFollowDist(), GetFollowAngle());
 
     sLog->outDebug(LOG_FILTER_TSCR, "FollowerAI start follow %s (GUID " UI64FMTD ")", player->GetName(), m_uiLeaderGUID);
 }
@@ -327,6 +335,7 @@ Player* FollowerAI::GetLeaderForFollower()
                         sLog->outDebug(LOG_FILTER_TSCR, "FollowerAI GetLeader changed and returned new leader.");
                         m_uiLeaderGUID = member->GetGUID();
                         return member;
+                        break;
                     }
                 }
             }
@@ -382,6 +391,6 @@ void FollowerAI::SetFollowPaused(bool paused)
         RemoveFollowState(STATE_FOLLOW_PAUSED);
 
         if (Player* leader = GetLeaderForFollower())
-            me->GetMotionMaster()->MoveFollow(leader, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+            me->GetMotionMaster()->MoveFollow(leader, GetFollowDist(), GetFollowAngle());
     }
 }

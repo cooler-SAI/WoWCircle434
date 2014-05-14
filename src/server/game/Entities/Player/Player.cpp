@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -6856,6 +6857,9 @@ void Player::SendCinematicStart(uint32 CinematicSequenceId)
 
 void Player::SendMovieStart(uint32 MovieId)
 {
+    ModExtraFlags(PLAYER_EXTRA_WATCHING_MOVIE, true);
+    sScriptMgr->OnPlayerStartWatchingMovie(this);
+
     WorldPacket data(SMSG_TRIGGER_MOVIE, 4);
     data << uint32(MovieId);
     SendDirectMessage(&data);

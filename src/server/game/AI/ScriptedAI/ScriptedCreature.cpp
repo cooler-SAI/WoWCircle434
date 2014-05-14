@@ -1,9 +1,12 @@
-/* Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+/*
+* Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+* Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
 *
 * Thanks to the original authors: ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
 *
 * This program is free software licensed under GPL version 2
-* Please see the included DOCS/LICENSE.TXT for more information */
+* Please see the included DOCS/LICENSE.TXT for more information
+*/
 
 
 #include "ScriptedCreature.h"
@@ -22,6 +25,18 @@ struct TSpellSummary
     uint8 Targets;                                          // set of enum SelectTarget
     uint8 Effects;                                          // set of enum SelectEffect
 } extern* SpellSummary;
+
+void SummonList::DoAction(uint32 entry, int32 info)
+{
+    for (iterator i = begin(); i != end();)
+    {
+        Creature* summon = Unit::GetCreature(*me, *i);
+        ++i;
+        if (summon && summon->IsAIEnabled
+            && (!entry || summon->GetEntry() == entry))
+            summon->AI()->DoAction(info);
+    }
+}
 
 void SummonList::DoZoneInCombat(uint32 entry)
 {

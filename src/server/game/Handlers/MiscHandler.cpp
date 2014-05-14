@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -974,6 +975,8 @@ void WorldSession::HandleNextCinematicCamera(WorldPacket& /*recvData*/)
 void WorldSession::HandleCompleteMovie(WorldPacket& /*recvData*/)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_COMPLETE_MOVIE");
+    _player->ModExtraFlags(PLAYER_EXTRA_WATCHING_MOVIE, false);
+    sScriptMgr->OnPlayerEndWatchingMovie(_player);
 }
 
 void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
@@ -1501,6 +1504,33 @@ void WorldSession::HandleWorldStateUITimerUpdate(WorldPacket& /*recvData*/)
 void WorldSession::HandleReadyForAccountDataTimes(WorldPacket& /*recvData*/)
 {
     SendAccountDataTimes(GLOBAL_CACHE_MASK);
+}
+
+void WorldSession::SendSetPhaseShift(uint32 PhaseShift, uint32 MapID, uint32 unk1, uint32 unk2)
+{
+    if (!_player)
+        return;
+
+    WorldPacket data(SMSG_SET_PHASE_SHIFT, 4);
+    data << uint64(_player->GetGUID());
+    data << uint32(0);
+    data << uint32(0);
+
+    data << uint32(2);
+    data << uint16(PhaseShift);
+
+    if (MapID)
+    {
+        data << uint32(2);
+        data << uint16(MapID);
+    }
+    else data << uint32(0);
+
+    if (!PhaseShift)
+        data << uint32(0x08);
+    else
+        data << uint32(0);
+    SendPacket(&data);
 }
 
 void WorldSession::SendSetPhaseShift(std::set<uint32> const& phaseIds, std::set<uint32> const& terrainswaps)

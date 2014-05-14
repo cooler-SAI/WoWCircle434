@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -40,6 +41,7 @@ class SummonList : public std::list<uint64>
         void Despawn(Creature* summon) { remove(summon->GetGUID()); }
         void DespawnEntry(uint32 entry);
         void DespawnAll(uint32 time = 0);
+        void DoAction(uint32 entry, int32 info);
 
         template <class Predicate> void DoAction(int32 info, Predicate& predicate, uint16 max = 0)
         {

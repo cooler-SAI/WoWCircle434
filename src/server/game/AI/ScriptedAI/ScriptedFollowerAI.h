@@ -1,11 +1,15 @@
-/* Copyright (C) 2006 - 2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
- * This program is free software licensed under GPL version 2
- * Please see the included DOCS/LICENSE.TXT for more information */
+/*
+* Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
+* Copyright (C) 2006 - 2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+* This program is free software licensed under GPL version 2
+* Please see the included DOCS/LICENSE.TXT for more information
+*/
 
 #ifndef SC_FOLLOWERAI_H
 #define SC_FOLLOWERAI_H
 
 #include "ScriptSystem.h"
+#include "Pet.h"
 
 enum eFollowState
 {
@@ -20,48 +24,55 @@ enum eFollowState
 
 class FollowerAI : public ScriptedAI
 {
-    public:
-        explicit FollowerAI(Creature* creature);
-        ~FollowerAI() {}
+public:
+    explicit FollowerAI(Creature* creature);
+    ~FollowerAI() { }
 
-        //virtual void WaypointReached(uint32 uiPointId) = 0;
+    //virtual void WaypointReached(uint32 uiPointId) = 0;
 
-        void MovementInform(uint32 motionType, uint32 pointId);
+    void MovementInform(uint32 motionType, uint32 pointId);
 
-        void AttackStart(Unit*);
+    void AttackStart(Unit*);
 
-        void MoveInLineOfSight(Unit*);
+    void MoveInLineOfSight(Unit*);
 
-        void EnterEvadeMode();
+    void EnterEvadeMode();
 
-        void JustDied(Unit*);
+    void JustDied(Unit*);
 
-        void JustRespawned();
+    void JustRespawned();
 
-        void UpdateAI(const uint32);                        //the "internal" update, calls UpdateFollowerAI()
-        virtual void UpdateFollowerAI(const uint32);        //used when it's needed to add code in update (abilities, scripted events, etc)
+    void UpdateAI(const uint32);                        //the "internal" update, calls UpdateFollowerAI()
+    virtual void UpdateFollowerAI(const uint32);        //used when it's needed to add code in update (abilities, scripted events, etc)
 
-        void StartFollow(Player* player, uint32 factionForFollower = 0, const Quest* quest = NULL);
+    void StartFollow(Player* player, uint32 factionForFollower = 0, const Quest* quest = NULL, float f_angle = PET_FOLLOW_ANGLE, float f_dist = PET_FOLLOW_DIST);
 
-        void SetFollowPaused(bool bPaused);                 //if special event require follow mode to hold/resume during the follow
-        void SetFollowComplete(bool bWithEndEvent = false);
+    void SetFollowAngle(float f_angle) { angle = f_angle; }
+    void SetFollowDist(float f_dist) { dist = f_dist; }
 
-        bool HasFollowState(uint32 uiFollowState) { return (m_uiFollowState & uiFollowState); }
+    void SetFollowPaused(bool bPaused);                 //if special event require follow mode to hold/resume during the follow
+    void SetFollowComplete(bool bWithEndEvent = false);
 
-    protected:
-        Player* GetLeaderForFollower();
+    bool HasFollowState(uint32 uiFollowState) { return (m_uiFollowState & uiFollowState); }
 
-    private:
-        void AddFollowState(uint32 uiFollowState) { m_uiFollowState |= uiFollowState; }
-        void RemoveFollowState(uint32 uiFollowState) { m_uiFollowState &= ~uiFollowState; }
+protected:
+    Player* GetLeaderForFollower();
+    float GetFollowAngle() const { return angle; }
+    float GetFollowDist() const { return dist; }
 
-        bool AssistPlayerInCombat(Unit* who);
+private:
+    void AddFollowState(uint32 uiFollowState) { m_uiFollowState |= uiFollowState; }
+    void RemoveFollowState(uint32 uiFollowState) { m_uiFollowState &= ~uiFollowState; }
 
-        uint64 m_uiLeaderGUID;
-        uint32 m_uiUpdateFollowTimer;
-        uint32 m_uiFollowState;
+    bool AssistPlayerInCombat(Unit* who);
 
-        const Quest* m_pQuestForFollow;                     //normally we have a quest
+    uint64 m_uiLeaderGUID;
+    uint32 m_uiUpdateFollowTimer;
+    uint32 m_uiFollowState;
+    float angle;
+    float dist;
+
+    const Quest* m_pQuestForFollow;                     //normally we have a quest
 };
 
 #endif

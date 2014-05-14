@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -6712,6 +6713,123 @@ void SpellMgr::LoadDbcDataCorrections()
                 break;
             // ENDOF DRAGON SOUL SPELLS
             //
+            // gilneas
+            case 67805:
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_NEARBY_ENTRY;
+                break;
+            case 70794:
+                spellInfo->Mechanic = MECHANIC_STUN;
+                break;
+            case 69123:
+                spellInfo->Effects[0].Effect = 0;
+                break;
+            case 72349:
+                spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry (48);
+                break;
+            case 70631:
+                spellInfo->Effects[0].TargetB = TARGET_UNIT_DEST_AREA_ENEMY;
+                break;
+            case 72247:
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_DEST_AREA_ENEMY;
+                break;
+            case 71526:
+            case 71804:
+                spellInfo->Effects[0].TargetA = TARGET_DEST_DEST;
+                spellInfo->ExplicitTargetMask = TARGET_FLAG_DEST_LOCATION;
+                break;
+            case 68591:
+                spellInfo->Effects[0].TargetA = TARGET_DEST_DEST;
+                //spellInfo->Effects[0].TargetB = TARGET_NONE;
+                spellInfo->ExplicitTargetMask = TARGET_FLAG_DEST_LOCATION;
+                break;
+            case 67063:
+                spellInfo->Effects[0].TargetB = TARGET_UNIT_DEST_AREA_ENEMY;
+                spellInfo->Effects[1].TargetB = TARGET_UNIT_DEST_AREA_ENEMY;
+                spellInfo->Effects[2].TargetB = TARGET_UNIT_DEST_AREA_ENEMY;
+                break;
+            case 20463:
+                spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry (74);
+                spellInfo->RangeEntry = sSpellRangeStore.LookupEntry (74);
+                break;
+            case 68659:
+                spellInfo->Effects[1].Effect = 0;
+                break;
+            case 72768:
+                spellInfo->Effects[0].TargetA = TARGET_DEST_DEST;
+                spellInfo->ExplicitTargetMask = TARGET_FLAG_DEST_LOCATION;
+                break;
+            case 70511:
+                spellInfo->Effects[0].TargetA = TARGET_DEST_DB;
+                break;
+            case 81768:
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_CASTER;
+                break;
+            case 68235:
+                spellInfo->Effects[0].TargetA = TARGET_DEST_DB;
+                break;
+            // kezan
+            case 70472:
+                spellInfo->Effects[0].TargetA = TARGET_DEST_DB;
+                break;
+            case 36628:
+                spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_UNTARGETABLE;
+                break;
+            case 66298:
+                spellInfo->ExplicitTargetMask = TARGET_FLAG_NONE;
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_PASSENGER_0;
+                break;
+            case 69993:
+                spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry (1);
+                spellInfo->Effects[0].TargetB = TARGET_UNIT_DEST_AREA_ENTRY;
+                break;
+            case 70015:
+                spellInfo->Effects[0].TargetA = TARGET_DEST_DB;
+                break;
+            case 70016:
+                spellInfo->Effects[1].Effect = 0;
+                break;
+            case 70075:
+                spellInfo->Effects[0].TargetA = TARGET_DEST_DB;
+                spellInfo->Effects[0].MiscValueB = 3090;
+                break;
+            case 70052:
+                spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry (11);
+                spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_UNTARGETABLE;
+                break;
+            case 67020:
+                spellInfo->Effects[0].TargetA = TARGET_DEST_CASTER_FRONT;
+                spellInfo->Effects[0].TargetB = TARGET_DEST_DEST_RANDOM;
+                spellInfo->Effects[0].RadiusEntry = sSpellRadiusStore.LookupEntry (18);
+                break;
+            case 67041:
+                spellInfo->Effects[0].TargetA = TARGET_UNIT_TARGET_ANY;
+                spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_UNTARGETABLE;
+                break;
+            case 69626:
+            case 69630:
+                spellInfo->Effects[0].TargetA = TARGET_SRC_CASTER;
+                spellInfo->ExplicitTargetMask = TARGET_FLAG_DEST_LOCATION;
+                break;
+            case 70097:
+                spellInfo->ExplicitTargetMask = TARGET_FLAG_DEST_LOCATION;
+                break;
+            case 67476:
+                spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
+                break;
+            case 70251:
+                spellInfo->Effects[0].TargetA = TARGET_DEST_DB;
+                break;
+            case 59073:
+            case 59074:
+            case 59087:
+            case 67789:
+            case 68480:
+            case 68481:
+            case 68482:
+            case 68483:
+                spellInfo->AttributesEx6 |= SPELL_ATTR6_CASTABLE_WHILE_ON_VEHICLE;
+                break;
+             
             // Camouflage
             case 80325:
                 spellInfo->Effects[EFFECT_1].Effect = 0;

@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -18,13 +19,13 @@
 
 #include "ScriptLoader.h"
 
-//examples
 void AddSC_vip_commandscript();
 void AddSC_multi_vendor();
 void AddSC_custom_reward();
 void AddSC_command_arena();
 void AddSC_teleguy();
 void AddSC_midsummer_fire_festival();
+void AddSC_player_login();
 
 // spells
 void AddSC_deathknight_spell_scripts();
@@ -285,6 +286,7 @@ void AddSC_western_plaguelands();
 void AddSC_westfall();
 void AddSC_wetlands();
 void AddSC_deepholm();
+void AddSC_gilneas();
 
 //kalimdor
 void AddSC_blackfathom_deeps();              //Blackfathom Depths
@@ -374,6 +376,7 @@ void AddSC_ungoro_crater();
 void AddSC_winterspring();
 void AddSC_mount_hyjal();
 void AddSC_uldum();
+void AddSC_kezan();
 
 //northrend
 void AddSC_boss_slad_ran();
@@ -781,6 +784,7 @@ void AddScripts()
     AddBattlegroundScripts();
     AddOutdoorPvPScripts();
     AddCustomScripts();
+    AddSC_player_login();
 #endif
 }
 
@@ -1055,6 +1059,7 @@ void AddEasternKingdomsScripts()
     AddSC_westfall();
     AddSC_wetlands();
     AddSC_deepholm();
+    AddSC_gilneas();
 #endif
 }
 
@@ -1148,6 +1153,7 @@ void AddKalimdorScripts()
     AddSC_winterspring();
     AddSC_mount_hyjal(); 
     AddSC_uldum();
+    AddSC_kezan();
 #endif
 }
 

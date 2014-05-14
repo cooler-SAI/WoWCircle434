@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -334,6 +335,8 @@ class SpellScript : public _SpellScript
 
         // returns: WorldLocation which was selected as a spell destination or NULL
         WorldLocation const* GetExplTargetDest();
+
+        void GetTargetSpeedXYZ(float &speedXY, float &speedZ);
 
         void SetExplTargetDest(WorldLocation& loc);
 

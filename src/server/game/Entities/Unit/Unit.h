@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -776,6 +777,14 @@ enum MovementFlags2
     MOVEMENTFLAG2_INTERPOLATED_MOVEMENT    = 0x00000200,
     MOVEMENTFLAG2_INTERPOLATED_TURNING     = 0x00000400,
     MOVEMENTFLAG2_INTERPOLATED_PITCHING    = 0x00000800,
+};
+
+enum SplineFlags
+{
+    SPLINEFLAG_WALKMODE                    = 0x00001000,
+    SPLINEFLAG_FLYING                      = 0x00002000,
+    SPLINEFLAG_TRANSPORT                   = 0x00800000,
+    SPLINEFLAG_EXIT_VEHICLE                = 0x01000000,
 };
 
 enum UnitTypeMask
@@ -1657,7 +1666,7 @@ class Unit : public WorldObject
 
         void MonsterMoveWithSpeed(float x, float y, float z, float speed);
         //void SetFacing(float ori, WorldObject* obj = NULL);
-        //void SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint8 type, uint32 MovementFlags, uint32 Time, Player* player = NULL);
+        void SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint32 Time, Player* player = NULL);
         void SendMovementFlagUpdate(bool self = false);
 
         /*! These methods send the same packet to the client in apply and unapply case.
@@ -1772,6 +1781,7 @@ class Unit : public WorldObject
         CharmInfo* InitCharmInfo();
         void DeleteCharmInfo();
         void UpdateCharmAI();
+        void EnableAI();
         //Player* GetMoverSource() const;
         Player* m_movedPlayer;
         SharedVisionList const& GetSharedVisionList() { return m_sharedVision; }

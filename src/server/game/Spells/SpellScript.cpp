@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -1151,3 +1152,11 @@ AuraRemoveMode AuraScript::GetRemoveMod() const
     return m_auraApplication->GetRemoveMode();
 }
 
+void SpellScript::GetTargetSpeedXYZ(float &speedXY, float &speedZ)
+{
+    if (m_spell->m_targets.HasTraj())
+    {
+        speedXY = m_spell->m_targets.GetSpeedXY();
+        speedZ = m_spell->m_targets.GetSpeedZ();
+    }
+}

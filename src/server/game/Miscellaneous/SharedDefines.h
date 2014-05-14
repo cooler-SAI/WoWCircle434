@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -2194,7 +2195,8 @@ enum Emote
     EMOTE_STATE_STRANGULATE             = 473,
     EMOTE_STATE_READY_SPELL_OMNI        = 474,
     EMOTE_STATE_HOLD_JOUST              = 475,
-    EMOTE_ONESHOT_CRY_JAINA             = 476
+    EMOTE_ONESHOT_CRY_JAINA             = 476,
+    EMOTE_ONESHOT_KNOCKDOWN             = 477
 };
 
 // AnimationData.dbc

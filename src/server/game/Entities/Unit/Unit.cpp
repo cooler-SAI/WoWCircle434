@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -415,6 +416,29 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
     m_movesplineTimer.Update(t_diff);
     if (m_movesplineTimer.Passed() || arrived)
         UpdateSplinePosition();
+}
+
+void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint32 Time, Player* player)
+{
+    WorldPacket data(SMSG_MONSTER_MOVE, 12+4+1+4+4+4+12+GetPackGUID().size());
+    data.append(GetPackGUID());
+
+    data << uint8(0);                                       // new in 3.1
+    data << GetPositionX() << GetPositionY() << GetPositionZ();
+    data << getMSTime();
+
+    data << uint8(0);
+    data << uint32((GetUnitMovementFlags() & MOVEMENTFLAG_DISABLE_GRAVITY) ? SPLINEFLAG_FLYING : SPLINEFLAG_WALKMODE);
+    data << Time;                                           // Time in between points
+    data << uint32(1);                                      // 1 single waypoint
+    data << NewPosX << NewPosY << NewPosZ;                  // the single waypoint Point B
+
+    if (player)
+        player->GetSession()->SendPacket(&data);
+    else
+        SendMessageToSet(&data, true);
+
+    AddUnitState(UNIT_STATE_MOVE);
 }
 
 void Unit::UpdateSplinePosition()
@@ -16783,6 +16807,22 @@ void Unit::UpdateCharmAI()
             else
                 i_AI = new PetAI(ToCreature());
         }
+    }
+}
+
+void Unit::EnableAI()
+{
+    if (GetTypeId() == TYPEID_PLAYER)
+        return;
+
+    ToCreature()->NeedChangeAI = false;
+    ToCreature()->IsAIEnabled = true;
+
+    if (i_disabledAI)
+    {
+        delete i_AI;
+        i_AI = i_disabledAI;
+        i_disabledAI = NULL;
     }
 }
 

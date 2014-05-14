@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -154,7 +155,7 @@ m_PlayerDamageReq(0), m_lootRecipient(0), m_lootRecipientGroup(0), m_corpseRemov
 m_respawnDelay(300), m_corpseDelay(60), m_respawnradius(0.0f), m_reactState(REACT_AGGRESSIVE),
 m_defaultMovementType(IDLE_MOTION_TYPE), m_DBTableGuid(0), m_equipmentId(0), m_AlreadyCallAssistance(false),
 m_AlreadySearchedAssistance(false), m_regenHealth(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL),
-m_creatureInfo(NULL), m_creatureData(NULL), m_path_id(0), m_formation(NULL)
+m_creatureInfo(NULL), m_creatureData(NULL), m_path_id(0), m_formation(NULL), uiSeerGUID(0)
 {
     m_regenTimer = CREATURE_REGEN_INTERVAL;
     m_valuesCount = UNIT_END;
@@ -168,6 +169,7 @@ m_creatureInfo(NULL), m_creatureData(NULL), m_path_id(0), m_formation(NULL)
 
     m_SightDistance = sWorld->getFloatConfig(CONFIG_SIGHT_MONSTER);
     m_CombatDistance = 0;//MELEE_RANGE;
+    _ReactDistance = 0;
 
     ResetLootMode(); // restore default loot mode
     TriggerJustRespawned = false;
@@ -1549,6 +1551,32 @@ bool Creature::IsInvisibleDueToDespawn() const
     return true;
 }
 
+bool Creature::CanAlwaysSee(WorldObject const* obj) const
+{
+    if (IsAIEnabled && AI()->CanSeeAlways(obj))
+        return true;
+
+    return false;
+}
+
+bool Creature::IsAlwaysVisibleFor(WorldObject const* seer) const
+{
+    if (WorldObject::IsAlwaysVisibleFor(seer))
+        return true;
+
+    // Always seen by seer player and all creatures
+    if (uiSeerGUID)
+    {
+        if (seer->GetGUID() == uiSeerGUID)
+            return true;
+
+        if (seer->GetTypeId() == TYPEID_UNIT)
+            return true;
+    }
+
+    return false;
+}
+
 bool Creature::canStartAttack(Unit const* who, bool force) const
 {
     if (isCivilian())
@@ -1589,7 +1617,11 @@ bool Creature::canStartAttack(Unit const* who, bool force) const
 
 float Creature::GetAttackDistance(Unit const* player) const
 {
+    if (_ReactDistance)
+        _ReactDistance;
+
     float aggroRate = sWorld->getRate(RATE_CREATURE_AGGRO);
+   
     if (aggroRate == 0)
         return 0.0f;
 

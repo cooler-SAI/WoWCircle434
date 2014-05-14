@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -52,6 +53,7 @@
 #include "Group.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
+#include "ScriptSystem.h"
 
 uint32 GuidHigh2TypeId(uint32 guid_hi)
 {
@@ -2745,6 +2747,52 @@ void WorldObject::MonsterWhisper(const char* text, uint64 receiver, bool IsBossW
     BuildMonsterChat(&data, IsBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, text, LANG_UNIVERSAL, GetNameForLocaleIdx(loc_idx), receiver);
 
     player->GetSession()->SendPacket(&data);
+}
+
+void WorldObject::DoPersonalScriptText(int32 textId, Player* player, bool everywhere)
+{
+    if ((!player || !player->GetSession() || GetDistance2d(player) > 50.0f) && !everywhere)
+        return;
+
+    if (textId >= 0)
+    {
+        sLog->outError(LOG_FILTER_TSCR, "TSCR: DoPersonalScriptText with source entry %u (TypeId=%u, guid=%u) attempts to process text entry %i, but text entry must be negative.", GetEntry(), GetTypeId(), GetGUIDLow(), textId);
+        return;
+    }
+
+    const StringTextData* pData = sScriptSystemMgr->GetTextData(textId);
+
+    if (!pData)
+    {
+        sLog->outError(LOG_FILTER_TSCR, "TSCR: DoPersonalScriptText with source entry %u (TypeId=%u, guid=%u) could not find text entry %i.", GetEntry(), GetTypeId(), GetGUIDLow(), textId);
+        return;
+    }
+
+    sLog->outDebug(LOG_FILTER_TSCR, "TSCR: DoPersonalScriptText: text entry=%i, Sound=%u, Type=%u, Language=%u, Emote=%u", textId, pData->uiSoundId, pData->uiType, pData->uiLanguage, pData->uiEmote);
+
+    if (pData->uiSoundId)
+    {
+        if (sSoundEntriesStore.LookupEntry(pData->uiSoundId))
+            player->SendPlaySound(pData->uiSoundId, true);
+        else
+            sLog->outError(LOG_FILTER_TSCR, "TSCR: DoPersonalScriptText entry %i tried to process invalid sound id %u.", textId, pData->uiSoundId);
+    }
+
+    if (pData->uiEmote)
+    {
+        WorldPacket data(SMSG_EMOTE, 4 + 8);
+        data << uint32(pData->uiEmote);
+        data << uint64(GetGUID());
+        player->GetSession()->SendPacket(&data);
+    }
+
+    LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+    char const* text = sObjectMgr->GetCerberCoreString(textId, loc_idx);
+
+    WorldPacket chat_data(SMSG_MESSAGECHAT, 200);
+    BuildMonsterChat(&chat_data, pData->uiType, text, LANG_UNIVERSAL, GetNameForLocaleIdx(loc_idx), player->GetGUID());
+
+    player->GetSession()->SendPacket(&chat_data);
 }
 
 void WorldObject::MonsterWhisper(int32 textId, uint64 receiver, bool IsBossWhisper)

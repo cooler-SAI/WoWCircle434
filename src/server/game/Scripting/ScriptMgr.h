@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
  * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -695,6 +696,9 @@ class PlayerScript : public ScriptObject
         // Called when a player leaves combat
        virtual void OnPlayerLeaveCombat(Player* /*player*/) { }
 
+        // Called when a player start/end watch movie
+        virtual void OnStartWatching(Player* /*guid*/) { }
+        virtual void OnEndWatching(Player* /*guid*/) { }
 };
 
 
@@ -865,6 +869,8 @@ class ScriptMgr
         void OnPlayerLogout(Player* player);
         void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);        void OnPlayerEnterCombat(Player* player, Unit* enemy);
         void OnPlayerLeaveCombat(Player* player);
+        void OnPlayerStartWatchingMovie(Player* player);
+        void OnPlayerEndWatchingMovie(Player* player);
 
     public: /* GuildScript */
 
