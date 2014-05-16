@@ -50,7 +50,6 @@
 
 struct Mail;
 struct ItemExtendedCostEntry;
-struct GroupQueueInfo;
 class Channel;
 class Creature;
 class DynamicObject;
@@ -64,7 +63,6 @@ class SpellCastTargets;
 class UpdateMask;
 class PhaseMgr;
 class RatedBattleground;
-class BGQueueRemoveEvent;
 
 typedef std::deque<Mail*> PlayerMails;
 
@@ -121,13 +119,6 @@ struct PlayerTalent
 {
     PlayerSpellState state : 8;
     uint8 spec             : 8;
-};
-
-struct WarGameData
-{
-    GroupQueueInfo* ginfo;
-    Battleground* bg;
-    BGQueueRemoveEvent* removeEvent;
 };
 
 enum TalentTree // talent tabs
@@ -2401,7 +2392,6 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetTeam() const { return m_team; }
         TeamId GetTeamId() const { return m_team == ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE; }
         void setFactionForRace(uint8 race);
-        void setFactionForTeam(uint32 team);
 
         void InitDisplayIds();
 
@@ -3107,11 +3097,9 @@ class Player : public Unit, public GridObject<Player>
 
         void ResetHolyPowerTimer() { m_holyPowerRegenTimerCount = 0; }
 
-        WarGameData* WarGameData;
 
         uint32 GetExtraFlags() { return m_ExtraFlags; }
         void ModExtraFlags(uint32 val, bool add) { add ? m_ExtraFlags |= val : m_ExtraFlags &= ~val; }
-
     protected:
         // Gamemaster whisper whitelist
         WhisperListContainer WhisperList;

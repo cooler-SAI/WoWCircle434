@@ -918,8 +918,6 @@ Player::Player(WorldSession* session): Unit(true), m_achievementMgr(this), m_rep
         prohibited[i] = prohibited_struct();
     }
 
-    WarGameData = NULL;
-
     m_emote = 0;
 }
 
@@ -1600,14 +1598,6 @@ void Player::Update(uint32 p_time)
 
     // This is required for GetHealingDoneInPastSecs(), GetDamageDoneInPastSecs() and GetDamageTakenInPastSecs()!
     DmgandHealDoneTimer -= p_time;
-    if (WarGameData)
-        if (getMSTimeDiff(WarGameData->ginfo->JoinTime, getMSTime()) > 36000)
-        {
-            WarGameData->removeEvent->Execute(0, 0);
-            delete (WarGameData->removeEvent);
-            delete WarGameData;
-            WarGameData = NULL;
-        }
 
     if (DmgandHealDoneTimer <= 0)
     {
@@ -6969,27 +6959,6 @@ void Player::setFactionForRace(uint8 race)
 
     ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race);
     setFaction(rEntry ? rEntry->FactionID : 0);
-}
-
-void Player::setFactionForTeam(uint32 team)
-{
-    m_team = team;
-    uint32 faction = 0;
-
-    switch (getRace())
-    {
-        case RACE_HUMAN:			faction = 2;	break;
-        case RACE_ORC:				faction = 1;	break;
-        case RACE_DWARF:			faction = 5;	break;
-        case RACE_NIGHTELF:			faction = 6;	break;
-        case RACE_UNDEAD_PLAYER:	faction = 3;	break;
-        case RACE_TAUREN:			faction = 4;	break;
-        case RACE_GNOME:			faction = 116;	break;
-        case RACE_TROLL:			faction = 115;	break;
-        case RACE_BLOODELF:			faction = 1629;	break;
-        case RACE_DRAENEI:			faction = 1610;	break;
-    }
-    setFaction(faction);
 }
 
 ReputationRank Player::GetReputationRank(uint32 faction) const
@@ -16913,8 +16882,6 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
             currentBg->AddOrSetPlayerToCorrectBgGroup(this, m_bgData.bgTeam);
 
             SetInviteForBattlegroundQueueType(bgQueueTypeId, currentBg->GetInstanceID());
-            if (currentBg->isRated() && GetTeam() != GetTeam())
-                setFactionForTeam(GetTeam());
         }
         // Bg was not found - go to Entry Point
         else
@@ -18290,9 +18257,6 @@ void Player::_LoadGroup(PreparedQueryResult result)
     {
         if (Group* group = sGroupMgr->GetGroupByDbStoreId((*result)[0].GetUInt32()))
         {
-            if (group->IsLeader(GetGUID()))
-                SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
-
             uint8 subgroup = group->GetMemberGroup(GetGUID());
             SetGroup(group, subgroup);
             if (getLevel() >= LEVELREQUIREMENT_HEROIC)
@@ -18303,8 +18267,6 @@ void Player::_LoadGroup(PreparedQueryResult result)
             }
         }
     }
-    if (!GetGroup() || !GetGroup()->IsLeader(GetGUID()))
-        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
 }
 
 void Player::_LoadBoundInstances(PreparedQueryResult result)

@@ -28,7 +28,6 @@
 
 typedef std::map<uint32, Battleground*> BattlegroundContainer;
 typedef std::set<uint32> BattlegroundClientIdsContainer;
-typedef std::map<uint32, Battleground*> BattlegroundSet;
 
 typedef UNORDERED_MAP<uint32, BattlegroundTypeId> BattleMastersMap;
 
@@ -85,17 +84,11 @@ class BattlegroundMgr
         void BuildBattlegroundStatusPacket(WorldPacket* data, Battleground* bg, Player* player, uint8 queueSlot, uint8 statusId, uint32 time1, uint32 time2, uint8 arenaType, uint8 uiFrame = 0);
         void SendAreaSpiritHealerQueryOpcode(Player* player, Battleground* bg, uint64 guid);
 
-        // wargame system
-        bool HandleWargameCommand(Player* initiator, Player* target, Group* igrp, Group* tgrp, BattlegroundTypeId bgTypeId);
-        Battleground* JoinPlayer(Player* player, Battleground* arena, uint8 arenatype, BattlegroundTypeId bg_typeid);
-        bool InviteWargameGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, uint32 side);
-
         /* Battlegrounds */
         Battleground* GetBattlegroundThroughClientInstance(uint32 instanceId, BattlegroundTypeId bgTypeId);
         Battleground* GetBattleground(uint32 InstanceID, BattlegroundTypeId bgTypeId);
         Battleground* GetBattlegroundTemplate(BattlegroundTypeId bgTypeId);
         Battleground* CreateNewBattleground(BattlegroundTypeId bgTypeId, PvPDifficultyEntry const* bracketEntry, uint8 arenaType, bool isRated);
-        BattlegroundSet GetBattlegroundsByType(BattlegroundTypeId bgTypeId) { return m_Battlegrounds[bgTypeId]; }
 
         void AddBattleground(Battleground* bg);
         void RemoveBattleground(BattlegroundTypeId bgTypeId, uint32 instanceId);
@@ -107,9 +100,6 @@ class BattlegroundMgr
         void DeleteAllBattlegrounds();
 
         void SendToBattleground(Player* player, uint32 InstanceID, BattlegroundTypeId bgTypeId);
-        void SendToBattleground(Player* player, Battleground* bg);
-
-        bool HasBattleground(Battleground *_bg);
 
         /* Battleground queues */
         BattlegroundQueue& GetBattlegroundQueue(BattlegroundQueueTypeId bgQueueTypeId) { return m_BattlegroundQueues[bgQueueTypeId]; }
@@ -158,7 +148,6 @@ class BattlegroundMgr
         typedef std::map<BattlegroundTypeId, uint8> BattlegroundSelectionWeightMap; // TypeId and its selectionWeight
         BattlegroundSelectionWeightMap m_ArenaSelectionWeights;
         BattlegroundSelectionWeightMap m_BGSelectionWeights;
-        BattlegroundSet m_Battlegrounds[MAX_BATTLEGROUND_TYPE_ID];
         std::vector<uint64> m_QueueUpdateScheduler;
         uint32 m_NextRatedArenaUpdate;
         bool   m_ArenaTesting;

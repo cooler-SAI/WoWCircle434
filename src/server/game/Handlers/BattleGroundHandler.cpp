@@ -434,10 +434,6 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
 
     //we must use temporary variable, because GroupQueueInfo pointer can be deleted in BattlegroundQueue::RemovePlayer() function
     GroupQueueInfo ginfo;
-
-    if (GetPlayer()->WarGameData)
-        ginfo = *GetPlayer()->WarGameData->ginfo;
-
     if (bgQueueTypeId != BATTLEGROUND_QUEUE_RBG)
     {
         if (!bgQueue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
@@ -454,7 +450,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
 	
     // BGTemplateId returns BATTLEGROUND_AA when it is arena queue.
     // Do instance id search as there is no AA bg instances.
-    Battleground* bg = (GetPlayer()->WarGameData) ? GetPlayer()->WarGameData->bg : sBattlegroundMgr->GetBattleground(ginfo.IsInvitedToBGInstanceGUID, bgTypeId == BATTLEGROUND_AA ? BATTLEGROUND_TYPE_NONE : bgTypeId);
+    Battleground* bg = sBattlegroundMgr->GetBattleground(ginfo.IsInvitedToBGInstanceGUID, bgTypeId == BATTLEGROUND_AA || bgTypeId == BATTLEGROUND_RATED_10_VS_10 ? BATTLEGROUND_TYPE_NONE : bgTypeId);
     if (!bg)
     {
         if (action)
@@ -463,9 +459,8 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
                 queueSlot, unk, time, action, ginfo.IsInvitedToBGInstanceGUID);
             return;
         }
-    
-        if (!bg && action == 0)
-            bg = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId);
+        // if (!bg && action == 0)
+        bg = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId);
     
         if (!bg)
             return;
@@ -540,9 +535,6 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
             _player->SetBGTeam(ginfo.Team);
             // bg->HandleBeforeTeleportToBattleground(_player);
             sBattlegroundMgr->SendToBattleground(_player, ginfo.IsInvitedToBGInstanceGUID, bgTypeId);
-
-            (_player->WarGameData) ? sBattlegroundMgr->SendToBattleground(_player, _player->WarGameData->bg) :
-            sBattlegroundMgr->SendToBattleground(_player, ginfo.IsInvitedToBGInstanceGUID, bgTypeId);
             // add only in HandleMoveWorldPortAck()
             // bg->AddPlayer(_player, team);
     }
@@ -572,13 +564,6 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
         // default:
             // sLog->outError(LOG_FILTER_NETWORKIO, "Battleground port: unknown action %u", action);
             // break;
-    }
-    
-    if (_player->WarGameData)
-    {
-        delete _player->WarGameData->removeEvent;
-        delete _player->WarGameData;
-        _player->WarGameData = NULL;
     }
 }
 

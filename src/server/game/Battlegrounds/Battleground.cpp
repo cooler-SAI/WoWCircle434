@@ -220,7 +220,6 @@ Battleground::Battleground()
     StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_WS_HAS_BEGUN;
 
     m_rbgFlag = false;
-    isWarGame = false;
 }
 
 Battleground::~Battleground()
