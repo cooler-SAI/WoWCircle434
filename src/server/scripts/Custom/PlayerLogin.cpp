@@ -8,6 +8,8 @@
 #include "SpellAuraEffects.h"
 
 #define SPELL_KEYS_TO_THE_HOT_ROD    91551
+#define GILENAS_2                    654
+#define GILENAS                      638
 
 class PlayerLoginScript : public PlayerScript
 {
@@ -19,6 +21,8 @@ public:
         if (player->HasAura(91847))
         {
             //player->CastSpell(player, 74100, false);
+
+            // this is big hack - must teleport player to Lost Islands, but zone not scripted yet
             WorldLocation loc;
             loc.m_mapId = 1;
             loc.m_positionX = 1440.89f;
@@ -26,14 +30,14 @@ public:
             loc.m_positionZ = 12.0647f;
             player->RemoveAllAuras();
             player->SetHomebind(loc, 374);
-            player->TeleportTo(1, 1440.89f, -5021.77f, 12.0647f, 1.6081f);
+            player->TeleportTo(loc);
         }
     }
 
     void OnLogin(Player* player)
     {
-        if (player->GetMapId() == 654 && player->GetPhaseMask() == 1)
-            player->GetSession()->SendSetPhaseShift(170, 638, 0, 0);
+        if (player->GetMapId() == GILENAS_2 && player->GetPhaseMask() == 1)
+            player->GetSession()->SendSetPhaseShift(170, GILENAS, 0, 0);
 
         if (player->HasAura(SPELL_KEYS_TO_THE_HOT_ROD))
         {

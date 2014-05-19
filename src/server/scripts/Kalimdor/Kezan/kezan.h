@@ -16,6 +16,7 @@
 #include "ObjectMgr.h"
 #include "SpellInfo.h"
 #include "Vehicle.h"
+#include "Unit.h"
 
 #ifndef DEF_KEZAN_H
 #define DEF_KEZAN_H
@@ -100,6 +101,8 @@ enum eCreatures
     NPC_GOBLIN_SUPERMODEl_4                    = 37056,
     NPC_A_BAZILLION_MACAROONS_FIERY_BOULDER_CASTER = 37748,
     NPC_SASSY_HARDWRENCH                       = 37680,
+    NPC_MOOK_DISGUISE                          = 48925,
+    NPC_ELM_GENERAL_PURPOSE_BUNNY_NOT_FLOATING = 37046,
 };
 
 enum eSpells
@@ -213,6 +216,8 @@ enum eSpells
     SPELL_VISUAL_CATS_MARK                     = 15652,
     SPELL_SWASHBUCKLING_SLICE                  = 75361,
     SPELL_GASBOT_EXPLOSION                     = 70259,
+    SPELL_HONARTS_INGENIOUS_CAPOFMOOK_FOOLERY  = 67435,
+    SPELL_FIERY_BOULDER                        = 70097,
 
     PHASE_QUEST_ZONE_SPECIFIC_1                = 59073,
     PHASE_QUEST_ZONE_SPECIFIC_2                = 59074,
@@ -344,6 +349,7 @@ enum Sounds
     DEATHWING_SOUND_1                          = 23227,
     DEATHWING_SOUND_2                          = 23229,
     DEATHWING_SOUND_3                          = 23230,
+    SOUND_MECHANICAL_CHICKEN_SOUNDS            = 12205,
 };
 
 enum Menu
@@ -365,7 +371,10 @@ enum eItems
     ITEM_COOL_SHADES                           = 47047,
     ITEM_SHINY_BLING                           = 47045,
 };
-
+enum objects
+{
+    GO_KAJAMITE_CHUNK                          = 195492,
+};
 enum eScriptTexts
 {
     SASSY_SAY_LOL                              = -1987000,
@@ -795,5 +804,5 @@ static float RightBunnySummPos[7][4] =
 #define    NEW_OUTFIT             "Забо, я хочу устроить вечеринку, и мне нужен новый модный костюм"
 #define    COOL_SHADES            "Мне нужны модные темные очки. Что можно купить на эти две пачки деревянных?"
 #define    SHINY_BLING            "Продай мне самые крутые, самые яркие блестяшки!"
-
+#define    LOST_ISLES             648
 #endif

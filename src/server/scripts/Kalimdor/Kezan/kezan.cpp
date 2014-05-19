@@ -2987,10 +2987,7 @@ public:
 
                     if (q_status.CreatureOrGOCount[0] == 0)
                     {
-                        WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 8 + 4);
-                        data << uint64(me->GetGUID());
-                        data << uint32(SPELL_VISUAL_CATS_MARK);
-                        player->GetSession()->SendPacket(&data);
+                        me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
                     }
                 }
             } else
@@ -3123,10 +3120,7 @@ public:
 
                     if (q_status.CreatureOrGOCount[1] == 0)
                     {
-                        WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 8 + 4);
-                        data << uint64(me->GetGUID());
-                        data << uint32(SPELL_VISUAL_CATS_MARK);
-                        player->GetSession()->SendPacket(&data);
+                        me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
                     }
                 }
             } else
@@ -3267,10 +3261,7 @@ public:
 
                     if (q_status.CreatureOrGOCount[2] == 0)
                     {
-                        WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 8 + 4);
-                        data << uint64(me->GetGUID());
-                        data << uint32(SPELL_VISUAL_CATS_MARK);
-                        player->GetSession()->SendPacket(&data);
+                        me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
                     }
                 }
             } else
@@ -3412,10 +3403,7 @@ public:
 
                     if (q_status.CreatureOrGOCount[3] == 0)
                     {
-                        WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 8 + 4);
-                        data << uint64(me->GetGUID());
-                        data << uint32(SPELL_VISUAL_CATS_MARK);
-                        player->GetSession()->SendPacket(&data);
+                        me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
                     }
                 }
             } else
@@ -3762,10 +3750,7 @@ public:
 
                     if (q_status.ItemCount[1] == 0)
                     {
-                        WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 8 + 4);
-                        data << uint64(me->GetGUID());
-                        data << uint32(SPELL_VISUAL_CATS_MARK);
-                        player->GetSession()->SendPacket(&data);
+                        me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
                     }
                 }
             } else
@@ -3858,10 +3843,7 @@ public:
 
                     if (q_status.ItemCount[2] == 0)
                     {
-                        WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 8 + 4);
-                        data << uint64(me->GetGUID());
-                        data << uint32(SPELL_VISUAL_CATS_MARK);
-                        player->GetSession()->SendPacket(&data);
+                        me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
                     }
                 }
             } else
@@ -3954,10 +3936,7 @@ public:
 
                     if (q_status.ItemCount[0] == 0)
                     {
-                        WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 8 + 4);
-                        data << uint64(me->GetGUID());
-                        data << uint32(SPELL_VISUAL_CATS_MARK);
-                        player->GetSession()->SendPacket(&data);
+                        me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
                     }
                 }
             } else
@@ -4554,7 +4533,7 @@ public:
         }
     };
 };
-/*
+
 ///////////
 // Quests Waltz Right In 14123
 ///////////
@@ -4562,64 +4541,63 @@ public:
 class npc_villa_mook : public CreatureScript
 {
 public:
-npc_villa_mook() : CreatureScript("npc_villa_mook") { }
+    npc_villa_mook() : CreatureScript("npc_villa_mook") { }
 
-CreatureAI* GetAI(Creature* creature) const
-{
-return new npc_villa_mookAI (creature);
-}
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_villa_mookAI(creature);
+    }
 
-struct npc_villa_mookAI : public ScriptedAI
-{
-npc_villa_mookAI(Creature* creature) : ScriptedAI(creature){}
+    struct npc_villa_mookAI : public ScriptedAI
+    {
+        npc_villa_mookAI(Creature* creature) : ScriptedAI(creature) { }
 
-void EnterEvadeMode()
-{
-me->setFaction(ORIGINAL_FACTION);
-}
+        void EnterEvadeMode()
+        {
+            me->setFaction(ORIGINAL_FACTION);
+        }
 
-void MoveInLineOfSight(Unit* who)
-{
-if (who->isInCombat())
-{
-if (Player* player = who->ToPlayer())
-if (me->IsWithinDistInMap(player, 15.0f) && !me->isInCombat())
-if (player->GetQuestStatus(14123) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(14123) == QUEST_STATUS_COMPLETE)
-{
-me->setFaction(AGGRESSIVE_FACTION);
-AttackStart(player);
-}
+        void MoveInLineOfSight(Unit* who)
+        {
+            if (who->isInCombat())
+            {
+                if (Player* player = who->ToPlayer())
+                if (me->IsWithinDistInMap(player, 15.0f) && !me->isInCombat())
+                if (player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_COMPLETE)
+                {
+                    me->setFaction(AGGRESSIVE_FACTION);
+                    AttackStart(player);
+                }
 
-return;
-}
+                return;
+            }
 
-if (Player* player = who->ToPlayer())
+            if (Player* player = who->ToPlayer())
 
-if (player->GetQuestStatus(14123) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(14123) == QUEST_STATUS_COMPLETE)
-if (!player->HasAura(67435))
-{
-player->CastSpell(player, 67435, false);
+            if (player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_COMPLETE)
+            if (!player->HasAura(SPELL_HONARTS_INGENIOUS_CAPOFMOOK_FOOLERY))
+            {
+                player->CastSpell(player, SPELL_HONARTS_INGENIOUS_CAPOFMOOK_FOOLERY, false);
 
-if (player->IsVehicle())
-{
-float x, y, z, o;
-player->GetPosition(x, y, z, o);
-if (Creature* mook = player->SummonCreature(48925, x, y, z, o))
-mook->EnterVehicle(player, 0);
-}
-}
-}
+                if (player->IsVehicle())
+                {
+                    float x, y, z, o;
+                    player->GetPosition(x, y, z, o);
+                    if (Creature* mook = player->SummonCreature(NPC_MOOK_DISGUISE, x, y, z, o))
+                        mook->EnterVehicle(player, 0);
+                }
+            }
+        }
 
-void UpdateAI(const uint32 diff)
-{
-if (!UpdateVictim())
-return;
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
 
-DoMeleeAttackIfReady();
-}
+            DoMeleeAttackIfReady();
+        }
+    };
 };
-};
-*/
 
 ///////////
 // Quests Liberate the Kaja'mite 14124
@@ -4637,7 +4615,7 @@ public:
         for (int i = 0; i < 3; ++i)
         {
             go->GetRandomNearPosition(pos, 3.0f);
-            go->SummonGameObject(195492, pos.m_positionX, pos.m_positionY, pos.m_positionZ, pos.m_orientation, 0, 0, 0, 0, 60000);
+            go->SummonGameObject(GO_KAJAMITE_CHUNK, pos.m_positionX, pos.m_positionY, pos.m_positionZ, pos.m_orientation, 0, 0, 0, 0, 60000);
         }
 
         return true;
@@ -4752,7 +4730,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-        if (player->HasAura(67435))
+        if (player->HasAura(SPELL_HONARTS_INGENIOUS_CAPOFMOOK_FOOLERY))
         {
             player->SEND_GOSSIP_MENU(17550, creature->GetGUID());
             return true;
@@ -5053,7 +5031,7 @@ public:
 
                             if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
                             {
-                                chicken->PlayDirectSound(12205);
+                                chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
                                 chicken->HandleEmoteCommand(EMOTE_ONESHOT_CUSTOM_SPELL_02);
                                 chicken->CastSpell(chicken, SPELL_MECHACHICKEN_OVERLOAD, false);
                             }
@@ -5064,7 +5042,7 @@ public:
 
                             if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
                             {
-                                chicken->PlayDirectSound(12205);
+                                chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
                                 chicken->CastSpell(chicken, SPELL_MICRO_MECHACHICKEN_GROW, false);
                             }
 
@@ -5093,7 +5071,7 @@ public:
 
                             if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
                             {
-                                chicken->PlayDirectSound(12205);
+                                chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
                                 chicken->CastSpell(chicken, SPELL_MICRO_MECHACHICKEN_GROW, false);
                             }
                             break;
@@ -5106,7 +5084,7 @@ public:
 
                             if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
                             {
-                                chicken->PlayDirectSound(12205);
+                                chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
                                 chicken->CastSpell(chicken, SPELL_MICRO_MECHACHICKEN_GROW, false);
                             }
                             break;
@@ -5121,7 +5099,7 @@ public:
 
                             if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
                             {
-                                chicken->PlayDirectSound(12205);
+                                chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
                                 chicken->CastSpell(chicken, SPELL_MICRO_MECHACHICKEN_GROW, false);
                             }
                             break;
@@ -5130,7 +5108,7 @@ public:
 
                             if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
                             {
-                                chicken->PlayDirectSound(12205);
+                                chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
                                 chicken->CastSpell(chicken, SPELL_MICRO_MECHACHICKEN_GROW, false);
                             }
                             break;
@@ -5153,7 +5131,7 @@ public:
 
                             if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
                             {
-                                chicken->PlayDirectSound(12205);
+                                chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
                                 chicken->RemoveAllAuras();
                             }
 
@@ -5195,7 +5173,7 @@ public:
                             if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
                             {
                                 chicken->CastSpell(chicken, SPELL_MECHACHICKEN_EXPLOSION, false);
-                                chicken->PlayDirectSound(12205);
+                                chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
                                 chicken->DespawnOrUnsummon(3000);
                             }
                             break;
@@ -5487,7 +5465,7 @@ public:
                     uiCastTimer = urand(5000, 15000);
 
                 uint8 roll = urand(0, 401);
-                me->CastSpell(MeteorTarget[roll][0], MeteorTarget[roll][1], MeteorTarget[roll][2], 70097, false);
+                me->CastSpell(MeteorTarget[roll][0], MeteorTarget[roll][1], MeteorTarget[roll][2], SPELL_FIERY_BOULDER, false);
             } else
                 uiCastTimer -= diff;
 
@@ -5623,16 +5601,16 @@ public:
                     }
                         break;
                     case 2048:
-                    { 
-                        uint32 roll = urand(0, 5);
-                        DoScriptText(GALLYWIX_RANDOM_YELL_SECOND_PHASE - roll, me);
-                        }
+                    {
+                                 uint32 roll = urand(0, 5);
+                                 DoScriptText(GALLYWIX_RANDOM_YELL_SECOND_PHASE - roll, me);
+                    }
                         break;
                     case 12288:
-                        {
-                        uint32 roll = urand(2, 5);
-                        DoScriptText(GALLYWIX_RANDOM_YELL_SECOND_PHASE - roll, me);
-                        }
+                    {
+                                  uint32 roll = urand(2, 5);
+                                  DoScriptText(GALLYWIX_RANDOM_YELL_SECOND_PHASE - roll, me);
+                    }
                         break;
                 }
             } else
@@ -5759,7 +5737,7 @@ public:
                     me->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, bunny->GetGUID());
                     me->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_GAS_FIGHTER_GAS_STREAM);
                 } else
-                if (Creature* bunny = me->SummonCreature(37046, x, y, z, o))
+                if (Creature* bunny = me->SummonCreature(NPC_ELM_GENERAL_PURPOSE_BUNNY_NOT_FLOATING, x, y, z, o))
                 {
                     uiStreamBunnyGUID = bunny->GetGUID();
                     bunny->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
@@ -6531,7 +6509,7 @@ public:
 
     bool OnGossipHello(Player* player, GameObject* go)
     {
-        player->TeleportTo(648, -7864.02f, 1831.4f, -0.956502f, 6.12391f);
+        player->TeleportTo(LOST_ISLES, -7864.02f, 1831.4f, -0.956502f, 6.12391f);
         player->GetMotionMaster()->MoveJump(-7861.84f, 1831.27f, 8.53755f, 5.0f, 15.0f);
         return true;
     }
@@ -6544,7 +6522,7 @@ public:
 
     bool OnGossipHello(Player* player, GameObject* go)
     {
-        player->TeleportTo(648, -7879.2f, 1828.67f, 5.55337f, 0.251894f);
+        player->TeleportTo(LOST_ISLES, -7879.2f, 1828.67f, 5.55337f, 0.251894f);
         player->CastSpell(player, SPELL_LAST_CHANCE_YACHT_BOARDING_MORTAR, false);
         return true;
     }
@@ -6598,7 +6576,7 @@ void AddSC_kezan()
     new npc_kezan_partygoer();
     new npc_first_bank_of_kezan_vault();
     new npc_hired_looter();
-    //new npc_villa_mook();
+    new npc_villa_mook();
     new npc_pirate_party_crasher();
     new npc_ktc_waiter();
     new npc_kezan_socialite();

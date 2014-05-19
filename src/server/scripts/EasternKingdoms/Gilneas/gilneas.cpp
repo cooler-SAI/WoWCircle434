@@ -3040,7 +3040,7 @@ public:
 
     bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
     {
-        if (quest->GetQuestId() == 14396)
+        if (quest->GetQuestId() == QUEST_AS_THE_LAND_SHATTERS)
         {
             player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_8, false);
             player->SaveToDB();
@@ -3344,7 +3344,7 @@ public:
                 uiShootTimer = 1000;
 
                 if (me->GetDistance(me->getVictim()) > 2.0f)
-                    DoCast(me->getVictim(), 41440);
+                    DoCast(me->getVictim(), SPELL_SHOOT_QGC);
             } else
                 uiShootTimer -= diff;
 
@@ -3466,7 +3466,7 @@ public:
                 uiDespawnTimer = 10000;
                 despawn = true;
 
-                if (Creature* lorna = me->FindNearestCreature(36457, 30.0f))
+                if (Creature* lorna = me->FindNearestCreature(NPC_LORNA_CROWLEY_QTHE, 30.0f))
                 {
                     if (lSummons.empty())
                         return;
@@ -7242,7 +7242,6 @@ public:
 
                 ++itr;
             }
-
             return NULL;
         }
 
@@ -7574,12 +7573,12 @@ public:
 
             if (AranasAI->IsBattle())
             {
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Я готов присоединится к битве!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Я буду ждать следующую группу атакующих!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, npc_krennan_aranas_tbfgc_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, npc_krennan_aranas_tbfgc_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
             } else
             {
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Я готов сражаться против отрекшихся мразей!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Я еще не готов!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, npc_krennan_aranas_tbfgc_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, npc_krennan_aranas_tbfgc_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
             }
         }
 
@@ -8182,7 +8181,7 @@ public:
 
             float x, y, z = caster->GetPositionZ();
 
-            if (Creature* bat = caster->FindNearestCreature(38615, 15.0f))
+            if (Creature* bat = caster->FindNearestCreature(NPC_CAPTUREND_RIDING_BAT, 15.0f))
                 bat->GetNearPoint2D(x, y, 3.0f, bat->GetOrientation() + M_PI / 2);
             else
                 caster->GetPosition(x, y);
@@ -9794,7 +9793,7 @@ public:
 
     bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
     {
-        if (quest->GetQuestId() == 14434)
+        if (quest->GetQuestId() == QUEST_RUTTHERAN_VILLANGE)
         {
             player->RemoveAllAuras();
             WorldLocation loc;

@@ -151,6 +151,8 @@ enum CreatureIds
     NPC_BLOODFANG_STALKER_CREDIT                      = 35582,
     NPC_LORD_DARIYS_CROWLEY                           = 35230,
     NPC_STAGECOACH_HARNESS                            = 43336,
+    NPC_CAPTUREND_RIDING_BAT                          = 38615,
+    NPC_LORNA_CROWLEY_QTHE                            = 36457,
 };
 
 enum Menu
@@ -234,6 +236,8 @@ enum QuestId
     QUEST_ARCANE_MISSILES                             = 14281,
     QUEST_CHARGE                                      = 14266,
     QUEST_OLD_DIVISIONS                               = 14157,
+    QUEST_RUTTHERAN_VILLANGE                          = 14434,
+    QUEST_AS_THE_LAND_SHATTERS                        = 14396,
 };
 
 enum Movies
@@ -391,6 +395,7 @@ enum SpellIds
     SPELL_FIERY_BOULDER                     = 68591,
     SPELL_LEARN_TWO_FORMS                   = 72857,
     SPELL_BURNING                           = 72839,
+    SPELL_SHOOT_QGC                         = 41440,
 
     PHASE_QUEST_ZONE_SPECIFIC_1             = 59073,
     //PHASE_QUEST_ZONE_SPECIFIC_2                = 59074,
@@ -1170,6 +1175,10 @@ static float LiamPosition[3] ={-1920.43f, 2308.94f, 40.301f};
 #define PLAYER_SAY_CYNTHIA                                "Здесь небезопасно. Спустись в подвал фермы Алленов."
 #define PLAYER_SAY_ASHLEY                                 "Быстрее, беги к остальным в подвал."
 #define PLAYER_SAY_JAMES                                  "Твоя мать уже вся извелась! Быстрее, беги к ней в подвал!"
+#define npc_krennan_aranas_tbfgc_1                        "Я готов присоединится к битве"
+#define npc_krennan_aranas_tbfgc_2                        "Я буду ждать следующую группу атакующих!"
+#define npc_krennan_aranas_tbfgc_3                        "Я готов сражаться против отрекшихся мразей!"
+#define npc_krennan_aranas_tbfgc_4                        "Я еще не готов!"
 
 #define map_gilneas_2                                      654
 #endif
