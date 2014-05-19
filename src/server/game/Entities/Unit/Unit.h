@@ -1637,6 +1637,7 @@ class Unit : public WorldObject
         Aura *AddAuraWithModCharges(uint32 spellid, Unit *target, int16 charges);
         void SetAuraStack(uint32 spellId, Unit* target, uint32 stack);
         void SendPlaySpellVisualKit(uint32 id, uint32 impact);
+        void SendPlaySpellVisual(uint32 id);
 
         void DeMorph();
         void PlayHoverAnimation(bool enable);

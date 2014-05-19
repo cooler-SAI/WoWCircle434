@@ -19870,6 +19870,17 @@ void Unit::SendPlaySpellVisualKit(uint32 id, uint32 impact)
     SendMessageToSet(&data, true);
 }
 
+void Unit::SendPlaySpellVisual(uint32 id)
+{
+    ObjectGuid guid = me->GetGUID();
+
+    WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 8 + 4);
+    data << uint64(guid);
+    data << uint32(id);
+
+    player->GetSession()->SendPacket(&data);
+}
+
 void Unit::ApplyResilience(const Unit *pVictim, int32 *damage) const
 {
     if (IsVehicle() || pVictim->IsVehicle())
