@@ -895,7 +895,7 @@ void WorldSession::HandleGuildAchievementMembers(WorldPacket& recvPacket)
     recvPacket.ReadByteSeq(guildGuid[6]);
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GUILD_ACHIEVEMENT_MEMBERS");
-
+    /*
     if(Guild* pGuild = sGuildMgr->GetGuildByGuid(guildGuid))
     {
         if(pGuild->GetAchievementMgr().HasAchieved(achievementId))
@@ -960,6 +960,7 @@ void WorldSession::HandleGuildAchievementMembers(WorldPacket& recvPacket)
             SendPacket(&data);
         }
     }
+    */
 }
 
 void WorldSession::HandleGuildRenameRequest(WorldPacket& recvPacket)

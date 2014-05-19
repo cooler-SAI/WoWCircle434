@@ -830,38 +830,6 @@ void WorldSession::HandleLoadScreenOpcode(WorldPacket& recvPacket)
     recvPacket >> mapID;
     recvPacket.ReadBit();
 
-    // Refresh spellmods for client
-    if (Player* _player = GetPlayer())
-    {
-        Unit::AuraApplicationMap AuraList = _player->GetAppliedAuras();
-        std::list<Aura*> auraModsList;
-        for (Unit::AuraApplicationMap::iterator iter = AuraList.begin(); iter != AuraList.end(); ++iter)
-        {
-            Aura* aura = iter->second->GetBase();
-            if (!aura)
-                continue;
-
-            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-            {
-                if (AuraEffect* auraEffct = aura->GetEffect(i))
-                {
-                    if (auraEffct->GetAuraType() == SPELL_AURA_ADD_FLAT_MODIFIER || auraEffct->GetAuraType() == SPELL_AURA_ADD_PCT_MODIFIER)
-                    {
-                        auraModsList.push_back(aura);
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (!auraModsList.empty())
-            for (auto itr : auraModsList)
-                _player->RemoveAura(itr->GetSpellInfo()->Id, _player->GetGUID());
-
-        if (!auraModsList.empty())
-            for (auto itr : auraModsList)
-                _player->CastSpell(_player, itr->GetSpellInfo()->Id, true);
-    }
 }
 
 void WorldSession::HandlePlayerLogin(LoginQueryHolder* holder)

@@ -24,7 +24,7 @@
 #include "Define.h"
 #include "revision.h"
 
-#define _PACKAGENAME "Uwow"
+#define _PACKAGENAME "CerberProject Core"
 
 #if CERBERCORE_ENDIAN == CERBERCORE_BIGENDIAN
 # define _ENDIAN_STRING "big-endian"
@@ -34,11 +34,11 @@
 
 #if PLATFORM == PLATFORM_WINDOWS
 # ifdef _WIN64
-#  define _FULLVERSION _PACKAGENAME " rev.24.0 08.04.2014 " _HASH " (Win64, "_BUILD_DIRECTIVE ")"
+#  define _FULLVERSION _PACKAGENAME " 20.05.2014 " _HASH " (Win64, "_BUILD_DIRECTIVE ")"
 # else
-#  define _FULLVERSION _PACKAGENAME " rev.24.0 08.04.2014 " _HASH " (Win32, " _BUILD_DIRECTIVE ")"
+#  define _FULLVERSION _PACKAGENAME " 20.05.2014 " _HASH " (Win32, " _BUILD_DIRECTIVE ")"
 # endif
 #else
-#  define _FULLVERSION _PACKAGENAME " rev.24.0 08.04.2014 " _HASH " (Win64, " _BUILD_DIRECTIVE ")"
+#  define _FULLVERSION _PACKAGENAME " 20.05.20144 " _HASH " (Unix 64, " _BUILD_DIRECTIVE ")"
 #endif
 #endif
