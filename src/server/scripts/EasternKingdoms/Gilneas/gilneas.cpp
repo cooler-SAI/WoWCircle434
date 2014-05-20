@@ -4640,30 +4640,6 @@ public:
     }
 };
 
-class npc_koroth_the_hillbreaker : public CreatureScript
-{
-public:
-    npc_koroth_the_hillbreaker() : CreatureScript("npc_koroth_the_hillbreaker") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_koroth_the_hillbreakerAI(creature);
-    }
-
-    struct npc_koroth_the_hillbreakerAI : public ScriptedAI
-    {
-        npc_koroth_the_hillbreakerAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
-        }
-    };
-};
-
 ///////////
 // Quest Losing Your Tail 24616
 ///////////
@@ -9865,7 +9841,6 @@ void AddSC_gilneas()
     new npc_captain_asther_qiao();
     new npc_prince_liam_greymane_qiao();
     new npc_koroth_the_hillbreaker_qiao();
-    new npc_koroth_the_hillbreaker();
     new npc_dark_scout_summoner();
     new npc_dark_scout();
     new npc_lord_darius_crowley_qaod();

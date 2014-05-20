@@ -19872,7 +19872,13 @@ void Unit::SendPlaySpellVisualKit(uint32 id, uint32 impact)
 
 void Unit::SendPlaySpellVisual(uint32 id)
 {
-    ObjectGuid guid = me->GetGUID();
+
+    Player* player = ToPlayer();
+   
+    if (!player)
+        return;
+
+    ObjectGuid guid = GetGUID();
 
     WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 8 + 4);
     data << uint64(guid);
