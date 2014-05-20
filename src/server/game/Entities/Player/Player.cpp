@@ -15166,6 +15166,12 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_GUILD, 1);
     
     UpdateForQuestWorldObjects();
+    
+    if (questGiver->GetTypeId() == TYPEID_UNIT)
+        sScriptMgr->OnQuestComplete(this, (questGiver->ToCreature()), quest);
+
+    if (questGiver->GetTypeId() == TYPEID_GAMEOBJECT)
+        sScriptMgr->OnQuestComplete(this, (questGiver->ToGameObject()), quest);
 
     //lets remove flag for delayed teleports
     SetCanDelayTeleport(false);
