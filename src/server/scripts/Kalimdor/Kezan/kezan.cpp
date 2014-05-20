@@ -4,7 +4,7 @@
 *
 */
 
-#include "Kezan.h"
+#include "kezan.h"
 
 ///////////
 // Class quests and trainers
