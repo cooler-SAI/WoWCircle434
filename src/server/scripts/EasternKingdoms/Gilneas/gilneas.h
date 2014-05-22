@@ -1154,7 +1154,7 @@ static float LiamPosition[3] ={-1920.43f, 2308.94f, 40.301f};
 #define DOOR_TIMER                                        30 * IN_MILLISECONDS
 #define Gilneas2                                          654
 
-const char* GossipMenu[]=
+char* GossipMenu[]=
 {
     {"Расскажи мне подробнее о профессиях, связанных с собирательством и добычей ресурсов."},
     {"Расскажи мне подробнее о ремесленных профессиях."},
