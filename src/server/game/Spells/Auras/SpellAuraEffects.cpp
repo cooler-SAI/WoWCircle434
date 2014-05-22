@@ -2330,113 +2330,92 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
 
     Unit* target = aurApp->GetTarget();
 
-    // no-phase is also phase state so same code for apply and remove
-    uint32 newPhase = 0;
-    Unit::AuraEffectList const& phases = target->GetAuraEffectsByType(SPELL_AURA_PHASE);
-    if (!phases.empty())
+    if (Player* player = target->ToPlayer())
+    {
+        if (apply)
+        {
+            player->GetPhaseMgr().RegisterPhasingAuraEffect(this);
+            /*switch (GetMiscValueB())
+            {
+                case 170:
+                case 171:
+                case 172:
+                case 179:
+                case 181:
+                case 182:
+                    player->GetSession()->SendPhaseMapShift(GetMiscValueB(), 638);
+                    break;
+                case 183:
+                case 184:
+                    player->GetSession()->SendPhaseMapShift(GetMiscValueB(), 655);
+                    break;
+                case 186:
+                case 187:
+                case 188:
+                    player->GetSession()->SendPhaseMapShift(GetMiscValueB(), 656);
+                    break;
+                case 191:
+                case 189:
+                case 190:
+                case 194:
+                    player->GetSession()->SendPhaseMapShift(GetMiscValueB(), 656);
+                    break;
+                default:
+                    player->GetSession()->SendPhaseMapShift(GetMiscValueB());
+            }*/
+        } else
+        {
+            player->GetPhaseMgr().UnRegisterPhasingAuraEffect(this);
+ /*           switch (GetMiscValueB())
+            {
+                case 170:
+                case 171:
+                case 172:
+                case 179:
+                case 181:
+                case 182:
+                    player->GetSession()->SendPhaseMapShift(0, 638);
+                    break;
+                case 183:
+                case 184:
+                    player->GetSession()->SendPhaseMapShift(0, 655);
+                    break;
+                case 186:
+                case 187:
+                case 188:
+                    player->GetSession()->SendPhaseMapShift(0, 656);
+                    break;
+                case 191:
+                case 189:
+                case 190:
+                case 194:
+                    player->GetSession()->SendPhaseMapShift(0, 656);
+                    break;
+                default:
+                    player->GetSession()->SendPhaseMapShift(0);
+            }*/
+        }
+    } else
+    {
+        uint32 newPhase = 0;
+        Unit::AuraEffectList const& phases = target->GetAuraEffectsByType(SPELL_AURA_PHASE);
+        if (!phases.empty())
         for (Unit::AuraEffectList::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
             newPhase |= (*itr)->GetMiscValue();
 
-    // phase auras normally not expected at BG but anyway better check
-    if (Player* player = target->ToPlayer())
-    {
-        if (!newPhase)
-            newPhase = PHASEMASK_NORMAL;
-
-        // drop flag at invisible in bg
-        if (player->InBattleground())
-            if (Battleground *bg = player->GetBattleground())
-                bg->EventPlayerDroppedFlag(player);
-
-        // stop handling the effect if it was removed by linked event
-        if (apply && aurApp->GetRemoveMode())
-            return;
-
-        // GM-mode have mask 0xFFFFFFFF
-        if (player->isGameMaster())
-            newPhase = 0xFFFFFFFF;
-
-        player->SetPhaseMask(newPhase, false);
-
-        if (apply)
-        {
-            switch (GetMiscValueB())
-            {
-                case 170:
-                case 171:
-                case 172:
-                case 179:
-                case 181:
-                case 182:
-                    player->GetSession()->SendSetPhaseShift(GetMiscValueB(), 638, 0, 0);
-                break;
-                case 183:
-                case 184:
-                    player->GetSession()->SendSetPhaseShift(GetMiscValueB(), 655, 678, 0);
-                break;
-                case 186:
-                case 187:
-                case 188:
-                    player->GetSession()->SendSetPhaseShift(GetMiscValueB(), 656, 679, 0);
-                case 191:
-                case 189:
-                case 190:
-                case 194:
-                    player->GetSession()->SendSetPhaseShift(GetMiscValueB(), 656, 0, 0);
-                break;
-                default:
-                    player->GetSession()->SendSetPhaseShift(GetMiscValueB());
-            }
-        }
-        else
-        {
-            switch (GetMiscValueB())
-            {
-                case 170:
-                case 171:
-                case 172:
-                case 179:
-                case 181:
-                case 182:
-                    player->GetSession()->SendSetPhaseShift(0, 638, 0, 0);
-                break;
-                case 183:
-                case 184:
-                    player->GetSession()->SendSetPhaseShift(0, 655, 678, 0);
-                break;
-                case 186:
-                case 187:
-                case 188:
-                    player->GetSession()->SendSetPhaseShift(0, 656, 679, 0);
-                case 191:
-                case 189:
-                case 190:
-                case 194:
-                    player->GetSession()->SendSetPhaseShift(0, 656, 0, 0);
-                break;
-                default:
-                    player->GetSession()->SendSetPhaseShift(0);
-            }
-        }
-
-        player->SaveToDB();
-    }
-    else
-    {
         if (!newPhase)
         {
             newPhase = PHASEMASK_NORMAL;
             if (Creature* creature = target->ToCreature())
-                if (CreatureData const* data = sObjectMgr->GetCreatureData(creature->GetDBTableGUIDLow()))
-                    newPhase = data->phaseMask;
+            if (CreatureData const* data = sObjectMgr->GetCreatureData(creature->GetDBTableGUIDLow()))
+                newPhase = data->phaseMask;
         }
-
         target->SetPhaseMask(newPhase, false);
     }
 
     // call functions which may have additional effects after chainging state of unit
     // phase auras normally not expected at BG but anyway better check
-    if (apply)
+    if (apply && (mode & AURA_EFFECT_HANDLE_REAL))
     {
         // drop flag at invisibiliy in bg
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
@@ -2454,11 +2433,7 @@ void AuraEffect::HandleModCamouflage(AuraApplication const *aurApp, uint8 mode, 
 
     Unit *target = aurApp->GetTarget();
 
-    if (apply)
-    {
-        //
-    }
-    else
+    if (!apply)
     {
         if (Unit* pet = GetCaster()->GetGuardianPet())
             pet->RemoveAurasByType(SPELL_AURA_MOD_CAMOUFLAGE);
@@ -2523,7 +2498,8 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         case FORM_MOONKIN:                                  // 0x1F
         case FORM_SPIRITOFREDEMPTION:                       // 0x20
             break;
-        default: break;
+        default:
+            break;
     }
 
     modelid = target->GetModelForForm(form);

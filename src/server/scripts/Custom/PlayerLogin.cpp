@@ -8,8 +8,10 @@
 #include "SpellAuraEffects.h"
 
 #define SPELL_KEYS_TO_THE_HOT_ROD    91551
-#define GILENAS_2                    654
-#define GILENAS                      638
+#define Gilneas2                     654
+#define Gilneas                      uint32<638>
+#define GilneasPhase1                655
+#define GilneasPhase2                656
 
 class PlayerLoginScript : public PlayerScript
 {
@@ -36,8 +38,21 @@ public:
 
     void OnLogin(Player* player)
     {
-        if (player->GetMapId() == GILENAS_2 && player->GetPhaseMask() == 1)
-            player->GetSession()->SendSetPhaseShift(170, GILENAS, 0, 0);
+        if (player->GetMapId() == Gilneas2 && player->GetPhaseMask() == 1)
+        {
+            char* t = strtok(NULL, "638");
+            char* p = strtok(NULL, "2");
+
+            std::set<uint32> terrainswap;
+            std::set<uint32> phaseId;
+
+            terrainswap.insert((uint32)atoi(t));
+
+            if (p)
+                phaseId.insert((uint32)atoi(p));
+
+            player->GetSession()->SendSetPhaseShift(phaseId, terrainswap);
+        }
 
         if (player->HasAura(SPELL_KEYS_TO_THE_HOT_ROD))
         {

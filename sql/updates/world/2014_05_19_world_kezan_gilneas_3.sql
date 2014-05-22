@@ -50,6 +50,7 @@ UPDATE creature_template SET `AIName` = '', ScriptName ='npc_goblin_supermodel' 
 UPDATE creature_template SET `AIName` = '', ScriptName ='npc_goblin_supermodel' WHERE entry ='37057';
 UPDATE creature_template SET `AIName` = '', ScriptName ='npc_brute_enforcer' WHERE entry ='35304';
 UPDATE creature_template SET `AIName` = '', ScriptName ='npc_gasbot' WHERE entry ='37598';
+UPDATE creature_template SET `AIName` = '', ScriptName ='npc_bilgewater_buccaneer_enter' WHERE entry ='48526';
 UPDATE creature_template SET `AIName` = '', ScriptName ='npc_hotrod_escort' WHERE entry ='37676';
 UPDATE creature_template SET `AIName` = '', ScriptName ='npc_villa_mook_ls' WHERE entry ='49218';
 UPDATE creature_template SET `AIName` = '', ScriptName ='npc_forsaken_invader' WHERE entry IN (34511, 36236, 36488, 37914, 37916, 37921, 37939);
@@ -170,6 +171,12 @@ UPDATE `gameobject_template` SET `ScriptName` = 'go_ls_rope_ladder' WHERE entry 
 UPDATE `gameobject_template` SET `ScriptName` = 'go_yacht_boarding_mortar' WHERE entry = '207355';
 UPDATE `gameobject_template` SET `ScriptName` = 'go_merchant_square_door' WHERE entry = '195327';
 UPDATE `gameobject_template` SET `ScriptName` = 'go_ball_and_chain_qld' WHERE entry = '201775';
+UPDATE `gameobject_template` SET `ScriptName` = 'go_qnhnb_well' WHERE `entry` IN (201950,201951,201952);
+UPDATE `gameobject_template` SET `ScriptName` = 'go_koroth_banner' WHERE `entry` = '201594';
+UPDATE `gameobject_template` SET `ScriptName` = 'go_crate_of_mandrake_essence' WHERE `entry` = '196394';
+UPDATE `gameobject_template` SET `type`='0', `flags`='32', `data2`='5000' WHERE (`entry`='195430');
+
+DELETE FROM `spell_area` where spell in (59073,59074,59087,67789,68480,68481,68482,68483,69484,74096,60922,49417,49416,80818,94704,94567);
 
 DELETE FROM `item_script_names` WHERE `Id` = '46856';
 INSERT INTO `item_script_names` VALUES ('46856', 'item_keys_to_the_hot_rod');
@@ -211,3 +218,58 @@ UPDATE `creature_template` SET `npcflag` = npcflag + 16777216 WHERE `ScriptName`
 UPDATE `creature_template` SET `npcflag` = npcflag + 16777216 WHERE `ScriptName` = 'npc_hotrod_escort';
 UPDATE `creature_template` SET `spell1` = '69992' WHERE `ScriptName` = 'npc_bilgewater_buccaneer';
 UPDATE `creature_template` SET `speed_walk` = '0.58', `speed_run` = '1.14286' WHERE `ScriptName` = 'npc_steamwheedle_shark';
+
+UPDATE `creature_template` SET  `spell1`='67279', `VehicleId`='470', `mechanic_immune_mask`='16384' WHERE (`entry`='35317');
+
+REPLACE INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `IconName`, `castBarCaption`, `unk1`, `faction`, `flags`, `size`, `questItem1`, `questItem2`, `questItem3`, `questItem4`, `questItem5`, `questItem6`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `data24`, `data25`, `data26`, `data27`, `data28`, `data29`, `data30`, `data31`, `unkInt32`, `AIName`, `ScriptName`, `WDBVerified`) VALUES ('196403', '3', '9095', 'Black Gunpowder Keg', '', 'Retrieving', '', '0', '0', '1', '49202', '0', '0', '0', '0', '0', '1691', '196403', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '23645', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '', '', '1');
+
+UPDATE `creature_template` SET `entry`='36440', `difficulty_entry_1`='0', `difficulty_entry_2`='0', `difficulty_entry_3`='0', `KillCredit1`='0', `KillCredit2`='0', `modelid1`='30231', `modelid2`='30232', `modelid3`='0', `modelid4`='0', `name`='Drowning Watchman', `subname`='', `IconName`='Interact', `gossip_menu_id`='0', `minlevel`='5', `maxlevel`='5', `exp`='0', `exp_unk`='0', `faction_A`='2163', `faction_H`='2163', `npcflag`='0', `speed_walk`='1', `speed_run`='1.14286', `scale`='1', `rank`='0', `mindmg`='0', `maxdmg`='0', `dmgschool`='0', `attackpower`='0', `dmg_multiplier`='1', `baseattacktime`='2000', `rangeattacktime`='2000', `unit_class`='1', `unit_flags`='33280', `unit_flags2`='0', `dynamicflags`='0', `family`='0', `trainer_type`='0', `trainer_spell`='0', `trainer_class`='0', `trainer_race`='0', `minrangedmg`='0', `maxrangedmg`='0', `rangedattackpower`='0', `type`='7', `type_flags`='0', `type_flags2`='0', `lootid`='0', `pickpocketloot`='0', `skinloot`='0', `resistance1`='0', `resistance2`='0', `resistance3`='0', `resistance4`='0', `resistance5`='0', `resistance6`='0', `spell1`='0', `spell2`='0', `spell3`='0', `spell4`='0', `spell5`='0', `spell6`='0', `spell7`='0', `spell8`='0', `PetSpellDataId`='0', `VehicleId`='0', `mingold`='0', `maxgold`='0', `AIName`='', `MovementType`='0', `InhabitType`='4', `HoverHeight`='1', `Health_mod`='10', `Mana_mod`='1', `Mana_mod_extra`='1', `Armor_mod`='1', `RacialLeader`='0', `questItem1`='0', `questItem2`='0', `questItem3`='0', `questItem4`='0', `questItem5`='0', `questItem6`='0', `movementId`='0', `RegenHealth`='1', `equipment_id`='0', `mechanic_immune_mask`='0', `flags_extra`='0', `ScriptName`='npc_drowning_watchman', `WDBVerified`='1' WHERE (`entry`='36440');
+
+
+UPDATE `creature_template` SET `entry`='37786', `difficulty_entry_1`='0', `difficulty_entry_2`='0', `difficulty_entry_3`='0', `KillCredit1`='0', `KillCredit2`='0', `modelid1`='1917', `modelid2`='0', `modelid3`='0', `modelid4`='0', `name`='Brown Stag', `subname`='', `IconName`='', `gossip_menu_id`='0', `minlevel`='10', `maxlevel`='10', `exp`='0', `exp_unk`='0', `faction_A`='188', `faction_H`='188', `npcflag`='0', `speed_walk`='1', `speed_run`='1.14286', `scale`='1', `rank`='0', `mindmg`='5', `maxdmg`='10', `dmgschool`='0', `attackpower`='150', `dmg_multiplier`='2', `baseattacktime`='2000', `rangeattacktime`='2000', `unit_class`='1', `unit_flags`='0', `unit_flags2`='0', `dynamicflags`='0', `family`='0', `trainer_type`='0', `trainer_spell`='0', `trainer_class`='0', `trainer_race`='0', `minrangedmg`='0', `maxrangedmg`='0', `rangedattackpower`='0', `type`='1', `type_flags`='0', `type_flags2`='0', `lootid`='37786', `pickpocketloot`='0', `skinloot`='0', `resistance1`='0', `resistance2`='0', `resistance3`='0', `resistance4`='0', `resistance5`='0', `resistance6`='0', `spell1`='0', `spell2`='0', `spell3`='0', `spell4`='0', `spell5`='0', `spell6`='0', `spell7`='0', `spell8`='0', `PetSpellDataId`='0', `VehicleId`='0', `mingold`='0', `maxgold`='0', `AIName`='', `MovementType`='0', `InhabitType`='3', `HoverHeight`='1', `Health_mod`='1', `Mana_mod`='1', `Mana_mod_extra`='1', `Armor_mod`='1', `RacialLeader`='0', `questItem1`='50219', `questItem2`='0', `questItem3`='0', `questItem4`='0', `questItem5`='0', `questItem6`='0', `movementId`='140', `RegenHealth`='1', `equipment_id`='0', `mechanic_immune_mask`='0', `flags_extra`='0', `ScriptName`='', `WDBVerified`='1' WHERE (`entry`='37786');
+
+
+UPDATE `gameobject_template` SET `entry`='201798', `type`='3', `displayId`='9226', `name`='Kaja\'Cola', `IconName`='', `castBarCaption`='Grabbing', `unk1`='', `faction`='0', `flags`='0', `size`='1', `questItem1`='0', `questItem2`='0', `questItem3`='0', `questItem4`='0', `questItem5`='0', `questItem6`='0', `data0`='1818', `data1`='201798', `data2`='0', `data3`='1', `data4`='0', `data5`='0', `data6`='0', `data7`='0', `data8`='0', `data9`='0', `data10`='0', `data11`='0', `data12`='0', `data13`='0', `data14`='37379', `data15`='0', `data16`='0', `data17`='10046', `data18`='0', `data19`='0', `data20`='0', `data21`='0', `data22`='0', `data23`='0', `data24`='0', `data25`='0', `data26`='0', `data27`='0', `data28`='0', `data29`='0', `data30`='0', `data31`='0', `unkInt32`='0', `AIName`='', `ScriptName`='', `WDBVerified`='15595' WHERE (`entry`='201798');
+
+
+UPDATE `quest_template` SET `PrevQuestId` = '14110' WHERE `Id` = '14153';
+
+DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` IN (48526);
+INSERT INTO `npc_spellclick_spells` VALUES
+('48526', '70015', '3', '0'),
+('48526', '70075', '3', '0');
+
+DELETE FROM `conditions` WHERE `SourceGroup` = '48526';
+INSERT INTO `conditions` VALUES ('18', '48526', '70015', '0', '0', '9', '0', '24502', '0', '0', '0', '0', '', 'Npc_spellclick_spells-QuestMustBeAccepted'),
+('18', '48526', '70075', '0', '0', '8', '0', '28414', '0', '0', '1', '0', '', 'Npc_spellclick_spells-QuestMustNOTBeCompleted'),
+('18', '48526', '70075', '0', '0', '9', '0', '28414', '0', '0', '0', '0', '', 'Npc_spellclick_spells-QuestMustBeAccepted'),
+('18', '48526', '70015', '0', '0', '8', '0', '24502', '0', '0', '1', '0', '', 'Npc_spellclick_spells-QuestMustNOTBeCompleted');
+
+DELETE FROM `creature_template_addon` WHERE `entry` = '37203';
+INSERT INTO `creature_template_addon` VALUES ('37203', '0', '0', '50397184', '0', '0', '70086 89476');
+
+DELETE FROM `conditions` WHERE `SourceEntry` = '70052';
+INSERT INTO `conditions` VALUES ('13', '0', '70052', '0', '0', '18', '0', '1', '37203', '0', '0', '0', '', null);
+
+
+UPDATE `creature_template` SET `spell1` = '69992' WHERE `ScriptName` = 'npc_bilgewater_buccaneer';
+
+DELETE FROM `conditions` WHERE `SourceEntry` IN (69993, 69992);
+INSERT INTO `conditions` VALUES ('13', '0', '69993', '0', '0', '18', '0', '1', '37114', '0', '0','0', '', null),
+('13', '0', '69992', '0', '0', '18', '0', '1', '37114', '0', '0','0', '', null);
+
+
+DELETE FROM `creature_template_addon` WHERE `entry` IN (48526, 37114, 37179, 34693);
+INSERT INTO `creature_template_addon` VALUES
+('48526', '0', '0', '0', '0', '0', '80816'),
+('34693', '0', '0', '0', '0', '0', '80816 80264'),
+('37114', '0', '0', '0', '0', '0', '80816'),
+('37179', '0', '0', '0', '0', '0', '80816');
+
+UPDATE `creature_template` SET `npcflag` = '16777216' WHERE `entry` = '34830';
+
+UPDATE `quest_template` SET `RequiredNpcOrGo1` = '0', `RequiredNpcOrGoCount1`= '0', `RequiredNpcOrGo2` = '0', `RequiredNpcOrGoCount2`= '0' WHERE `Id` = '24502';
+
+
+UPDATE `gameobject_template` SET `entry`='195525', `type`='5', `displayId`='7605', `name`='First Bank of Kezan Vault', `IconName`='', `castBarCaption`='', `unk1`='', `faction`='0', `flags`='0', `size`='2', `questItem1`='0', `questItem2`='0', `questItem3`='0', `questItem4`='0', `questItem5`='0', `questItem6`='0', `data0`='0', `data1`='0', `data2`='0', `data3`='0', `data4`='0', `data5`='0', `data6`='0', `data7`='0', `data8`='0', `data9`='0', `data10`='0', `data11`='0', `data12`='0', `data13`='0', `data14`='0', `data15`='0', `data16`='0', `data17`='0', `data18`='0', `data19`='0', `data20`='0', `data21`='0', `data22`='0', `data23`='0', `data24`='0', `data25`='0', `data26`='0', `data27`='0', `data28`='0', `data29`='0', `data30`='0', `data31`='0', `unkInt32`='0', `AIName`='', `ScriptName`='', `WDBVerified`='13329' WHERE (`entry`='195525');
+

@@ -183,12 +183,16 @@ void Vehicle::ApplyAllImmunities()
     switch (GetVehicleInfo()->m_ID)
     {
         // code below prevents a bug with movable cannons
+        case 139: // Scarlet Cannon
         case 160: // Strand of the Ancients
         case 244: // Wintergrasp
         case 510: // Isle of Conquest
             _me->SetControlled(true, UNIT_STATE_ROOT);
             // why we need to apply this? we can simple add immunities to slow mechanic in DB
             _me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_DECREASE_SPEED, true);
+            break;
+        case 156: // DK's ice dragon - speed problems
+            _me->SetSpeed(MOVE_FLIGHT, 3.0f, true);
             break;
         default:
             break;

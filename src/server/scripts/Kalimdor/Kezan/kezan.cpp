@@ -731,7 +731,7 @@ public:
                 break;
             case QUEST_PIRATE_PARTY_CRASHERS:
                 player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_2);
-                player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_3, false);
+                player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_3, false); // wtf? why dont work?
                 break;
             case QUEST_A_BAZILLION_MACAROONS:
                 player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_4);
@@ -994,6 +994,8 @@ public:
         {
             Creature* troll = NULL;
 
+            Unit* caster = GetCaster();
+
             if (Unit* target = GetExplTargetUnit())
                 troll = target->ToCreature();
 
@@ -1003,6 +1005,7 @@ public:
             if (!(troll->GetEntry() == NPC_DEFIANT_TROLL))
                 return;
 
+            caster->ToPlayer()->KilledMonsterCredit(NPC_DEFIANT_TROLL, 0);  // stupid hack
             troll->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
             troll->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
             troll->RemoveAllAuras();
@@ -2136,6 +2139,55 @@ public:
 //     Fourth and Goal     28414,
 ///////////
 
+class npc_bilgewater_buccaneer_enter : public CreatureScript
+{
+public:
+    npc_bilgewater_buccaneer_enter() : CreatureScript("npc_bilgewater_buccaneer_enter") { }
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        if (player->GetQuestStatus(QUEST_NECESSARY_ROUGHNESS) == QUEST_STATUS_INCOMPLETE)
+        {
+            player->ADD_GOSSIP_ITEM(0, "Enter on Bilgewater buccaneer, go go go", 631, QUEST_NECESSARY_ROUGHNESS);
+            player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+            return true;
+        } else if (player->GetQuestStatus(QUEST_FOURTH_AND_GOAL) == QUEST_STATUS_INCOMPLETE)
+        {
+            player->ADD_GOSSIP_ITEM(0, "Enter on Bilgewater buccaneer, go go go", 631, QUEST_FOURTH_AND_GOAL);
+            player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+            return true;
+        }
+        return false;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    {
+        player->PlayerTalkClass->ClearMenus();
+        if (action == QUEST_NECESSARY_ROUGHNESS)
+        {
+            player->CastSpell(player, SPELL_NR_SUMMON_BILGEWATER_BUCCANEER, false);
+            return true;
+        } else if (action = QUEST_FOURTH_AND_GOAL)
+        {
+            player->CastSpell(player, SPELL_FaG_SUMMON_BILGEWATER_BUCCANEER, false);
+            return true;
+        }
+        return false;
+    }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_bilgewater_buccaneer_enterAI(creature);
+    }
+
+    struct npc_bilgewater_buccaneer_enterAI : public ScriptedAI
+    {
+        npc_bilgewater_buccaneer_enterAI(Creature* creature) : ScriptedAI(creature)
+        { }
+    };
+};
+
+
 class npc_coach_crosscheck : public CreatureScript
 {
 public:
@@ -2505,9 +2557,7 @@ public:
                     me->Whisper(BUCCANEER_SAY_FOOTBOMBS, uiPlayerGUID, true);
 
                     for (int i = 0; i < 8; ++i)
-                    if (Creature* shark = me->SummonCreature(NPC_STEAMWHEEDLE_SHARK,
-                        SharkSummonPos[i][0], SharkSummonPos[i][1],
-                        SharkSummonPos[i][2], SharkSummonPos[i][3], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
+                    if (Creature* shark = me->SummonCreature(NPC_STEAMWHEEDLE_SHARK, SharkSummonPos[i][0], SharkSummonPos[i][1], SharkSummonPos[i][2], SharkSummonPos[i][3], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
                     {
                         shark->SetSeerGUID(uiPlayerGUID);
                         shark->SetVisible(false);
@@ -4164,7 +4214,6 @@ public:
         if (player->GetQuestStatus(QUEST_THE_GREAT_BANK_HEIST) == QUEST_STATUS_INCOMPLETE)
         if (!player->GetVehicle())
             player->CastSpell(player, SPELL_TGBH_SUMMON_BUNNY_VEHICLE, false);
-
         return true;
     }
 };
@@ -4290,7 +4339,6 @@ public:
 
                     if (item)
                         player->SendNewItem(item, 1, true, true);
-
                 }
             } else
             {
@@ -6559,6 +6607,7 @@ void AddSC_kezan()
     new npc_kezan_citizen();
     new npc_coach_crosscheck();
     new npc_steamwheedle_shark();
+    new npc_bilgewater_buccaneer_enter();
     new npc_bilgewater_buccaneer();
     new npc_bilgewater_buccaneer_goal();
     new npc_fourth_and_goal_target();

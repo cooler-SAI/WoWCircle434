@@ -213,7 +213,7 @@ enum QuestId
     QUEST_SAVE_THE_CHILDREN                           = 14368,
     QUEST_GASPING_FOR_BREATH                          = 14395,
     QUEST_GRANDMAS_CAT                                = 14401,
-    QUEST_THE_HUNGRY_ETTIN                            = 14416,
+    QUEST_THE_HUNGRY_ETTIN                            = 14416, // todo
     QUEST_TO_GREYMANE_MANOR                           = 14465,
     QUEST_THE_KINGS_OBSERVATORY                       = 14466,
     QUEST_ALAS_GILNEAS                                = 14467,
@@ -238,6 +238,10 @@ enum QuestId
     QUEST_OLD_DIVISIONS                               = 14157,
     QUEST_RUTTHERAN_VILLANGE                          = 14434,
     QUEST_AS_THE_LAND_SHATTERS                        = 14396,
+    QUEST_NOT_QUITE_SHIPSHATE                         = 14404,
+    QUEST_PIECES_OF_THE_PAST                          = 24495,
+    QUEST_YOU_CANT_TAKE_EM_ALONE                      = 14348, // RETEST
+    QUEST_EVACUATION                                  = 14397,
 };
 
 enum Movies
@@ -315,7 +319,6 @@ enum SpellIds
     SPELL_DEMORALIZING_SHOUT                = 61044,
     SPELL_GILNEAS_PRISON_PERIODIC_FORCECAST = 66914,
     SPELL_WORGEN_BITE                       = 72870,
-    SPELL_PULL_TO                           = 67357, // not work
     SPELL_SUMMON_MASTIFF                    = 67807,
     SPELL_ATTACK_LURKER                     = 67805,
     SPELL_SHADOWSTALKER_STEALTH             = 5916,
@@ -398,22 +401,23 @@ enum SpellIds
     SPELL_SHOOT_QGC                         = 41440,
 
     PHASE_QUEST_ZONE_SPECIFIC_1             = 59073,
-    //PHASE_QUEST_ZONE_SPECIFIC_2                = 59074,
+    //PHASE_QUEST_ZONE_SPECIFIC_2             = 59074,
     PHASE_QUEST_ZONE_SPECIFIC_3             = 59087,
-    //PHASE_QUEST_ZONE_SPECIFIC_4                = 67789,
-    //PHASE_QUEST_ZONE_SPECIFIC_5                = 68480,
+    //PHASE_QUEST_ZONE_SPECIFIC_4             = 67789,
+    //PHASE_QUEST_ZONE_SPECIFIC_5             = 68480,
     PHASE_QUEST_ZONE_SPECIFIC_6             = 68481,
     PHASE_QUEST_ZONE_SPECIFIC_7             = 68482,
     PHASE_QUEST_ZONE_SPECIFIC_8             = 68483,
     PHASE_QUEST_ZONE_SPECIFIC_11            = 69484,
+    PHASE_QUEST_ZONE_SPECIFIC_12            = 69485,
     PHASE_QUEST_ZONE_SPECIFIC_19            = 74096,
 
     SPELL_QUEST_INVISIBILITY_DETECTION_1    = 60922,
     SPELL_QUEST_INVISIBILITY_DETECTION_2    = 49417,
     SPELL_QUEST_INVISIBILITY_DETECTION_3    = 49416,
-    //SPELL_QUEST_INVISIBILITY_DETECTION_4       = 80818,
-    //SPELL_QUEST_INVISIBILITY_DETECTION_5       = 94704,
-    //SPELL_QUEST_INVISIBILITY_DETECTION_6       = 94567,
+    //SPELL_QUEST_INVISIBILITY_DETECTION_4    = 80818,
+    //SPELL_QUEST_INVISIBILITY_DETECTION_5    = 94704,
+    //SPELL_QUEST_INVISIBILITY_DETECTION_6    = 94567,
 };
 
 enum NpcTexts
@@ -457,19 +461,19 @@ enum NpcTexts
     LIAM_INTRO_2                                        = -1977001,
     LIAM_INTRO_3                                        = -1977002,
     CITIZEN_SAY_WHAT_AT_THE_ROOF                        = -1977003,
-    LIAM_RANDOM_YELL                                    = -1977019,  // (-1977019 to -1977023)
-
+    LIAM_RANDOM_YELL                                    = -1977019,   // (-1977019 to -1977023)
+                                                                      
     PANICKED_CITIZEN_RANDOM_SAY                         = -1977152,  // (-1977152 to -1977154)
     GILNEAS_CITY_GUARD_RANDOM_SAY                       = -1977155,  // (-1977155 to -1977157)
-    GUARD_RANDOM_YELL                                   = -1977161,    //  -1977161 to -1977163
+    GUARD_RANDOM_YELL                                   = -1977161,  //  -1977161 to -1977163
 
-    NPC_J_CITIZEN_RANDOM_SAY                            = -1977004, // (-1977004 to -1977011)
-    NPC_CW_CITIZEN_RANDOM_SAY                           = -1977012, // (-1977012 to -1977018)
+    NPC_J_CITIZEN_RANDOM_SAY                            = -1977004,  // (-1977004 to -1977011)
+    NPC_CW_CITIZEN_RANDOM_SAY                           = -1977012,  // (-1977012 to -1977018)
 
     NPC_LORD_GODFREY_QOD_SAY                            = -1977024,
     NPC_KING_GENN_GREYMANE_QOD_SAY                      = -1977025,
 
-    RANDOM_JOSIAH_YELL                                  = -1977063,     // -1977063 to -1977068
+    RANDOM_JOSIAH_YELL                                  = -1977063,  // -1977063 to -1977068
     SAY_WORGEN_BITE                                     = -1977069,
 
     HORSE_SAY_SAVE_ARANAS                               = -1977026,
@@ -477,7 +481,7 @@ enum NpcTexts
     ARANAS_THANK                                        = -1977028,
     GOLDFREY_SAY_ARANAS_WITH_US                         = -1977029,
     ARANAS_SAY_GENN_HORSE                               = -1977140,
-    GREYMANE_RANDOM_YELL                                = -1977158,   // -1977158 to -1977160
+    GREYMANE_RANDOM_YELL                                = -1977158,  // -1977158 to -1977160
 
     GENN_SAY_IF                                         = -1977031,
     CROWLEY_SAY_NEED                                    = -1977032,
@@ -487,7 +491,7 @@ enum NpcTexts
     GENN_SAY_WE_FOOLS                                   = -1977036,
 
     CROWLEY_SAY_START                                   = -1977037,
-    CROWLEY_RANDOM_SAY                                  = -1977038, // (-1977038 -1977040)
+    CROWLEY_RANDOM_SAY                                  = -1977038,  // (-1977038 -1977040)
 
     ARANAS_SAY_YOU_CAN_CONTROL                          = -1977070,
     GODFREY_SAY_PUT_DOWN                                = -1977071,
@@ -502,14 +506,14 @@ enum NpcTexts
     NPC_ASHLEY_SAY                                      = -1977145,
     NPC_JAMES_SAY                                       = -1977146,
 
-    DROWNING_WATCHMAN_RANDOM_SAY                        = -1977141,    // -1977141 to -1977143
+    DROWNING_WATCHMAN_RANDOM_SAY                        = -1977141,  // -1977141 to -1977143
 
     SAY_THIS_CAT_IS_MINE                                = -1977048,
     YELL_DONT_MESS                                      = -1977049,
 
     LORNA_YELL_CARRIAGE                                 = -1977050,
 
-    SURVIVOR_RANDOM_SAY                                 = -1977051,    // -1977051 to -1977054
+    SURVIVOR_RANDOM_SAY                                 = -1977051,  // -1977051 to -1977054
 
     KOROTH_YELL_WHO_STEAL_BANNER                        = -1977085,
     KOROTH_YELL_FIND_YOU                                = -1977086,
@@ -544,7 +548,7 @@ enum NpcTexts
     GENN_SAY_ALL_IS_DONE                                = -1977091,
     GODFREY_SAY_BETTER_DIED                             = -1977092,
 
-    VILLAGER_RANDOM_SAY                                 = -1977093,    // (-1977093 to -1977095)
+    VILLAGER_RANDOM_SAY                                 = -1977093,  // (-1977093 to -1977095)
 
 
     LIAM_BATTLE_SPEACH_1                                = -1977096,
@@ -554,7 +558,7 @@ enum NpcTexts
     LIAM_BATTLE_SPEACH_5                                = -1977100,
     LIAM_BATTLE_SPEACH_6                                = -1977101,
     LIAM_BATTLE_FOR_GILNEAS                             = -1977102,
-    LIAM_RANDOM_BATTLE_SPEACH                           = -1977103,    // -1977103 to -1977106
+    LIAM_RANDOM_BATTLE_SPEACH                           = -1977103,  // -1977103 to -1977106
     LIAM_BATTLE_BATTLE_1                                = -1977107,
     LIAM_BATTLE_BATTLE_2                                = -1977108,
     LIAM_BATTLE_BATTLE_3                                = -1977109,
@@ -1148,37 +1152,41 @@ static float LiamPosition[3] ={-1920.43f, 2308.94f, 40.301f};
 #define SUMMON1_TTL                                       300000
 #define PATHS_COUNT                                       2
 #define DOOR_TIMER                                        30 * IN_MILLISECONDS
-#define TELL_ME_ABOUT_GATHERING_AND_MINING_PROFESSIONS    "Расскажи мне подробнее о профессиях, связанных с собирательством и добычей ресурсов."
-#define TELL_ME_ABOUT_CRAFTING_PROFESSIONS                "Расскажи мне подробнее о ремесленных профессиях."
-#define TELL_ME_ABOUT_HERBALISM                           "Расскажи мне о травничестве."
-#define TELL_ME_ABOUT_MINING                              "Расскажи мне о горном деле."
-#define TELL_ME_ABOUT_SKINNING                            "Расскажи мне о снятии шкур."
-#define TELL_ME_ABOUT_ALCHEMY                             "Расскажи мне о алхимии."
-#define TELL_ME_ABOUT_BLACKSMITHING                       "Расскажи мне о кузнечном деле."
-#define TELL_ME_ABOUT_ENCHANTING                          "Расскажи мне о наложении чар."
-#define TELL_ME_ABOUT_ENGINERING                          "Расскажи мне о инженерном деле."
-#define TELL_ME_ABOUT_INSCRIPTION                         "Расскажи мне о начертании."
-#define TELL_ME_ABOUT_JEWELCRAFTING                       "Расскажи мне о ювелирном деле."
-#define TELL_ME_ABOUT_LEATHERWORKING                      "Расскажи мне о кожевничестве."
-#define TELL_ME_ABOUT_TAILORING                           "Расскажи мне о портняжном деле."
-#define TRAIN_ME_ALCHEMY                                  "Обучи меня алхимии."
-#define TRAIN_ME_HERBALISM                                "Обучи меня травничеству."
-#define TRAIN_ME_INSCRIPTION                              "Обучи меня начертанию."
-#define TRAIN_ME_MINING                                   "Обучи меня горному делу."
-#define TRAIN_ME_BLACKSMITHING                            "Обучи меня кузнечному делу."
-#define TRAIN_ME_SKINNING                                 "Обучи меня снятию шкур."
-#define TRAIN_ME_ENGINERING                               "Обучи меня инженерному делу."
-#define TRAIN_ME_JEWELCRAFTING                            "Обучи меня ювелирному делу."
-#define TRAIN_ME_LEATHERWORKING                           "Обучи меня кожевничеству."
-#define TRAIN_ME_TAILORING                                "Обучи меня портняжному делу."
-#define TRAIN_ME_ENCHANTING                               "Обучи меня наложению чар."
-#define PLAYER_SAY_CYNTHIA                                "Здесь небезопасно. Спустись в подвал фермы Алленов."
-#define PLAYER_SAY_ASHLEY                                 "Быстрее, беги к остальным в подвал."
-#define PLAYER_SAY_JAMES                                  "Твоя мать уже вся извелась! Быстрее, беги к ней в подвал!"
-#define npc_krennan_aranas_tbfgc_1                        "Я готов присоединится к битве"
-#define npc_krennan_aranas_tbfgc_2                        "Я буду ждать следующую группу атакующих!"
-#define npc_krennan_aranas_tbfgc_3                        "Я готов сражаться против отрекшихся мразей!"
-#define npc_krennan_aranas_tbfgc_4                        "Я еще не готов!"
+#define Gilneas2                                          654
 
-#define map_gilneas_2                                      654
+const char* GossipMenu[]=
+{
+    {"Расскажи мне подробнее о профессиях, связанных с собирательством и добычей ресурсов."},
+    {"Расскажи мне подробнее о ремесленных профессиях."},
+    {"Расскажи мне о травничестве."},
+    {"Расскажи мне о горном деле."},
+    {"Расскажи мне о снятии шкур."},
+    {"Расскажи мне о алхимии."},
+    {"Расскажи мне о кузнечном деле."},
+    {"Расскажи мне о наложении чар."},
+    {"Расскажи мне о инженерном деле."},
+    {"Расскажи мне о начертании."},
+    {"Расскажи мне о ювелирном деле."},
+    {"Расскажи мне о кожевничестве."},
+    {"Расскажи мне о портняжном деле."},
+    {"Обучи меня алхимии."},
+    {"Обучи меня травничеству."},
+    {"Обучи меня начертанию."},
+    {"Обучи меня горному делу."},
+    {"Обучи меня кузнечному делу."},
+    {"Обучи меня снятию шкур."},
+    {"Обучи меня инженерному делу."},
+    {"Обучи меня ювелирному делу."},
+    {"Обучи меня кожевничеству."},
+    {"Обучи меня портняжному делу."},
+    {"Обучи меня наложению чар."},
+    {"Здесь небезопасно. Спустись в подвал фермы Алленов."},
+    {"Быстрее, беги к остальным в подвал."},
+    {"Твоя мать уже вся извелась! Быстрее, беги к ней в подвал!"},
+    {"Я готов присоединится к битве"},
+    {"Я буду ждать следующую группу атакующих!"},
+    {"Я готов сражаться против отрекшихся мразей!"},
+    {"Я еще не готов!"},
+};
+
 #endif
