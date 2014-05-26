@@ -121,9 +121,6 @@ void Vehicle::Uninstall()
 {
     sLog->outDebug(LOG_FILTER_VEHICLES, "Vehicle::Uninstall Entry: %u, GuidLow: %u", _creatureEntry, _me->GetGUIDLow());
     RemoveAllPassengers();
-
-    //if (GetBase() && GetBase()->GetTypeId() == TYPEID_UNIT)
-        //sScriptMgr->OnUninstall(this);
 }
 
 void Vehicle::Reset(bool evading /*= false*/)
@@ -297,14 +294,6 @@ void Vehicle::InstallAccessory(uint32 entry, int8 seatId, bool minion, uint8 typ
             accessory->UnSummon();
             return;
         }
-
-        // this cannot be checked instantly like this
-        // spellsystem is delaying everything to next update tick
-        //if (!accessory->IsOnVehicle(me))
-        //{
-        //    accessory->UnSummon();
-        //    return;         // Something went wrong in the spellsystem
-        //}
 
         if (GetBase()->GetTypeId() == TYPEID_UNIT)
             sScriptMgr->OnInstallAccessory(this, accessory);

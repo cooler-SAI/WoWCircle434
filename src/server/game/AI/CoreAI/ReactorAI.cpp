@@ -26,8 +26,7 @@
 
 #define REACTOR_VISIBLE_RANGE (26.46f)
 
-int
-ReactorAI::Permissible(const Creature* creature)
+int ReactorAI::Permissible(const Creature* creature)
 {
     if (creature->isCivilian() || creature->IsNeutralToAll())
         return PERMIT_BASE_REACTIVE;
@@ -35,13 +34,10 @@ ReactorAI::Permissible(const Creature* creature)
     return PERMIT_BASE_NO;
 }
 
-void
-ReactorAI::MoveInLineOfSight(Unit*)
-{
-}
+void ReactorAI::MoveInLineOfSight(Unit*)
+{ }
 
-void
-ReactorAI::UpdateAI(const uint32 /*time_diff*/)
+void ReactorAI::UpdateAI(const uint32 /*time_diff*/)
 {
     // update i_victimGuid if me->getVictim() !=0 and changed
     if (!UpdateVictim())

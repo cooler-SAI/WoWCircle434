@@ -106,25 +106,6 @@ namespace FactorySelector
         ASSERT(creature->GetCreatureTemplate());
         const MovementGeneratorCreator* mv_factory = mv_registry.GetRegistryItem(creature->GetDefaultMovementType());
 
-        /* if (mv_factory == NULL)
-        {
-            int best_val = -1;
-            StringVector l;
-            mv_registry.GetRegisteredItems(l);
-            for (StringVector::iterator iter = l.begin(); iter != l.end(); ++iter)
-            {
-            const MovementGeneratorCreator *factory = mv_registry.GetRegistryItem((*iter).c_str());
-            const SelectableMovement *p = dynamic_cast<const SelectableMovement *>(factory);
-            ASSERT(p != NULL);
-            int val = p->Permit(creature);
-            if (val > best_val)
-            {
-                best_val = val;
-                mv_factory = p;
-            }
-            }
-        }*/
-
         return (mv_factory == NULL ? NULL : mv_factory->Create(creature));
     }
 

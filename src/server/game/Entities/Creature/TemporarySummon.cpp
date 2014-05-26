@@ -281,10 +281,6 @@ void TempSummon::RemoveFromWorld()
                 owner->m_SummonNoSlot.erase(GetGUID());
         }
     }
-
-    //if (GetOwnerGUID())
-    //    sLog->outError(LOG_FILTER_UNITS, "Unit %u has owner guid when removed from world", GetEntry());
-
     Creature::RemoveFromWorld();
 }
 

@@ -38,97 +38,94 @@
 template<class TScript>
 class ScriptRegistry
 {
-    public:
+public:
 
-        typedef std::map<uint32, TScript*> ScriptMap;
-        typedef typename ScriptMap::iterator ScriptMapIterator;
+    typedef std::map<uint32, TScript*> ScriptMap;
+    typedef typename ScriptMap::iterator ScriptMapIterator;
 
-        // The actual list of scripts. This will be accessed concurrently, so it must not be modified
-        // after server startup.
-        static ScriptMap ScriptPointerList;
+    // The actual list of scripts. This will be accessed concurrently, so it must not be modified
+    // after server startup.
+    static ScriptMap ScriptPointerList;
 
-        static void AddScript(TScript* const script)
+    static void AddScript(TScript* const script)
+    {
+        ASSERT(script);
+
+        // See if the script is using the same memory as another script. If this happens, it means that
+        // someone forgot to allocate new memory for a script.
+        for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
         {
-            ASSERT(script);
-
-            // See if the script is using the same memory as another script. If this happens, it means that
-            // someone forgot to allocate new memory for a script.
-            for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
+            if (it->second == script)
             {
-                if (it->second == script)
-                {
-                    sLog->outError(LOG_FILTER_TSCR, "Script '%s' has same memory pointer as '%s'.",
-                        script->GetName().c_str(), it->second->GetName().c_str());
+                sLog->outError(LOG_FILTER_TSCR, "Script '%s' has same memory pointer as '%s'.",
+                               script->GetName().c_str(), it->second->GetName().c_str());
 
-                    return;
-                }
-            }
-
-            if (script->IsDatabaseBound())
-            {
-                // Get an ID for the script. An ID only exists if it's a script that is assigned in the database
-                // through a script name (or similar).
-                uint32 id = sObjectMgr->GetScriptId(script->GetName().c_str());
-                if (id)
-                {
-                    // Try to find an existing script.
-                    bool existing = false;
-                    for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
-                    {
-                        // If the script names match...
-                        if (it->second->GetName() == script->GetName())
-                        {
-                            // ... It exists.
-                            existing = true;
-                            break;
-                        }
-                    }
-
-                    // If the script isn't assigned -> assign it!
-                    if (!existing)
-                    {
-                        ScriptPointerList[id] = script;
-                        sScriptMgr->IncrementScriptCount();
-                    }
-                    else
-                    {
-                        // If the script is already assigned -> delete it!
-                        sLog->outError(LOG_FILTER_TSCR, "Script '%s' already assigned with the same script name, so the script can't work.",
-                            script->GetName().c_str());
-
-                        ASSERT(false); // Error that should be fixed ASAP.
-                    }
-                }
-                else
-                {
-                    // The script uses a script name from database, but isn't assigned to anything.
-                    if (script->GetName().find("example") == std::string::npos && script->GetName().find("Smart") == std::string::npos)
-                        sLog->outError(LOG_FILTER_SQL, "Script named '%s' does not have a script name assigned in database.",
-                            script->GetName().c_str());
-                }
-            }
-            else
-            {
-                // We're dealing with a code-only script; just add it.
-                ScriptPointerList[_scriptIdCounter++] = script;
-                sScriptMgr->IncrementScriptCount();
+                return;
             }
         }
 
-        // Gets a script by its ID (assigned by ObjectMgr).
-        static TScript* GetScriptById(uint32 id)
+        if (script->IsDatabaseBound())
         {
-            ScriptMapIterator it = ScriptPointerList.find(id);
-            if (it != ScriptPointerList.end())
-                return it->second;
+            // Get an ID for the script. An ID only exists if it's a script that is assigned in the database
+            // through a script name (or similar).
+            uint32 id = sObjectMgr->GetScriptId(script->GetName().c_str());
+            if (id)
+            {
+                // Try to find an existing script.
+                bool existing = false;
+                for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
+                {
+                    // If the script names match...
+                    if (it->second->GetName() == script->GetName())
+                    {
+                        // ... It exists.
+                        existing = true;
+                        break;
+                    }
+                }
 
-            return NULL;
+                // If the script isn't assigned -> assign it!
+                if (!existing)
+                {
+                    ScriptPointerList[id] = script;
+                    sScriptMgr->IncrementScriptCount();
+                } else
+                {
+                    // If the script is already assigned -> delete it!
+                    sLog->outError(LOG_FILTER_TSCR, "Script '%s' already assigned with the same script name, so the script can't work.",
+                                   script->GetName().c_str());
+
+                    ASSERT(false); // Error that should be fixed ASAP.
+                }
+            } else
+            {
+                // The script uses a script name from database, but isn't assigned to anything.
+                if (script->GetName().find("example") == std::string::npos && script->GetName().find("Smart") == std::string::npos)
+                    sLog->outError(LOG_FILTER_SQL, "Script named '%s' does not have a script name assigned in database.",
+                    script->GetName().c_str());
+            }
+        } else
+        {
+            // We're dealing with a code-only script; just add it.
+            ScriptPointerList[_scriptIdCounter++] = script;
+            sScriptMgr->IncrementScriptCount();
         }
+    }
 
-    private:
+    // Gets a script by its ID (assigned by ObjectMgr).
+    static TScript* GetScriptById(uint32 id)
+    {
+        ScriptMapIterator it = ScriptPointerList.find(id);
+        if (it != ScriptPointerList.end())
+            return it->second;
 
-        // Counter used for code-only scripts.
-        static uint32 _scriptIdCounter;
+        return NULL;
+    }
+
+private:
+
+    // Counter used for code-only scripts.
+    static uint32 _scriptIdCounter;
 };
 
 // Utility macros to refer to the script registry.
@@ -138,15 +135,15 @@ class ScriptRegistry
 
 // Utility macros for looping over scripts.
 #define FOR_SCRIPTS(T, C, E) \
-    if (SCR_REG_LST(T).empty()) \
-        return; \
-    for (SCR_REG_ITR(T) C = SCR_REG_LST(T).begin(); \
-        C != SCR_REG_LST(T).end(); ++C)
+if (SCR_REG_LST(T).empty()) \
+    return; \
+for (SCR_REG_ITR(T) C = SCR_REG_LST(T).begin(); \
+    C != SCR_REG_LST(T).end(); ++C)
 #define FOR_SCRIPTS_RET(T, C, E, R) \
-    if (SCR_REG_LST(T).empty()) \
-        return R; \
-    for (SCR_REG_ITR(T) C = SCR_REG_LST(T).begin(); \
-        C != SCR_REG_LST(T).end(); ++C)
+if (SCR_REG_LST(T).empty()) \
+    return R; \
+for (SCR_REG_ITR(T) C = SCR_REG_LST(T).begin(); \
+    C != SCR_REG_LST(T).end(); ++C)
 #define FOREACH_SCRIPT(T) \
     FOR_SCRIPTS(T, itr, end) \
     itr->second
@@ -154,12 +151,12 @@ class ScriptRegistry
 // Utility macros for finding specific scripts.
 #define GET_SCRIPT(T, I, V) \
     T* V = ScriptRegistry<T>::GetScriptById(I); \
-    if (!V) \
-        return;
+if (!V) \
+    return;
 #define GET_SCRIPT_RET(T, I, V, R) \
     T* V = ScriptRegistry<T>::GetScriptById(I); \
-    if (!V) \
-        return R;
+if (!V) \
+    return R;
 
 void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* target)
 {
@@ -217,21 +214,21 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* target)
             break;
         case CHAT_TYPE_WHISPER:
         {
-            if (target && target->GetTypeId() == TYPEID_PLAYER)
-                pSource->MonsterWhisper(iTextEntry, target->GetGUID());
-            else
-                sLog->outError(LOG_FILTER_TSCR, "DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", iTextEntry);
+                                  if (target && target->GetTypeId() == TYPEID_PLAYER)
+                                      pSource->MonsterWhisper(iTextEntry, target->GetGUID());
+                                  else
+                                      sLog->outError(LOG_FILTER_TSCR, "DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", iTextEntry);
 
-            break;
+                                  break;
         }
         case CHAT_TYPE_BOSS_WHISPER:
         {
-            if (target && target->GetTypeId() == TYPEID_PLAYER)
-                pSource->MonsterWhisper(iTextEntry, target->GetGUID(), true);
-            else
-                sLog->outError(LOG_FILTER_TSCR, "DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", iTextEntry);
+                                       if (target && target->GetTypeId() == TYPEID_PLAYER)
+                                           pSource->MonsterWhisper(iTextEntry, target->GetGUID(), true);
+                                       else
+                                           sLog->outError(LOG_FILTER_TSCR, "DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", iTextEntry);
 
-            break;
+                                       break;
         }
         case CHAT_TYPE_ZONE_YELL:
             pSource->MonsterYellToZone(iTextEntry, pData->uiLanguage, target ? target->GetGUID() : 0);
@@ -240,13 +237,11 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* target)
 }
 
 ScriptMgr::ScriptMgr()
-    : _scriptCount(0), _scheduledScripts(0)
-{
-}
+: _scriptCount(0), _scheduledScripts(0)
+{ }
 
 ScriptMgr::~ScriptMgr()
-{
-}
+{ }
 
 void ScriptMgr::Initialize()
 {
@@ -264,10 +259,10 @@ void ScriptMgr::Initialize()
 
 void ScriptMgr::Unload()
 {
-    #define SCR_CLEAR(T) \
-        for (SCR_REG_ITR(T) itr = SCR_REG_LST(T).begin(); itr != SCR_REG_LST(T).end(); ++itr) \
-            delete itr->second; \
-        SCR_REG_LST(T).clear();
+#define SCR_CLEAR(T) \
+    for (SCR_REG_ITR(T) itr = SCR_REG_LST(T).begin(); itr != SCR_REG_LST(T).end(); ++itr) \
+    delete itr->second; \
+    SCR_REG_LST(T).clear();
 
     // Clear scripts for every script type.
     SCR_CLEAR(SpellScriptLoader);
@@ -292,7 +287,7 @@ void ScriptMgr::Unload()
     SCR_CLEAR(AuctionHouseScript);
     SCR_CLEAR(GuildScript);
 
-    #undef SCR_CLEAR
+#undef SCR_CLEAR
 }
 
 void ScriptMgr::LoadDatabase()
@@ -1012,43 +1007,43 @@ void ScriptMgr::OnGroupDisband(Group* group)
 }
 
 SpellScriptLoader::SpellScriptLoader(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<SpellScriptLoader>::AddScript(this);
 }
 
 WorldScript::WorldScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<WorldScript>::AddScript(this);
 }
 
 AuctionHouseScript::AuctionHouseScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<AuctionHouseScript>::AddScript(this);
 }
 
 GuildScript::GuildScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<GuildScript>::AddScript(this);
 }
 
 ServerScript::ServerScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<ServerScript>::AddScript(this);
 }
 
 FormulaScript::FormulaScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<FormulaScript>::AddScript(this);
 }
 
 WorldMapScript::WorldMapScript(const char* name, uint32 mapId)
-    : ScriptObject(name), MapScript<Map>(mapId)
+: ScriptObject(name), MapScript<Map>(mapId)
 {
     if (GetEntry() && !GetEntry()->IsWorldMap())
         sLog->outError(LOG_FILTER_TSCR, "WorldMapScript for map %u is invalid.", mapId);
@@ -1057,7 +1052,7 @@ WorldMapScript::WorldMapScript(const char* name, uint32 mapId)
 }
 
 InstanceMapScript::InstanceMapScript(const char* name, uint32 mapId)
-    : ScriptObject(name), MapScript<InstanceMap>(mapId)
+: ScriptObject(name), MapScript<InstanceMap>(mapId)
 {
     if (GetEntry() && !GetEntry()->IsDungeon())
         sLog->outError(LOG_FILTER_TSCR, "InstanceMapScript for map %u is invalid.", mapId);
@@ -1066,7 +1061,7 @@ InstanceMapScript::InstanceMapScript(const char* name, uint32 mapId)
 }
 
 BattlegroundMapScript::BattlegroundMapScript(const char* name, uint32 mapId)
-    : ScriptObject(name), MapScript<BattlegroundMap>(mapId)
+: ScriptObject(name), MapScript<BattlegroundMap>(mapId)
 {
     if (GetEntry() && !GetEntry()->IsBattleground())
         sLog->outError(LOG_FILTER_TSCR, "BattlegroundMapScript for map %u is invalid.", mapId);
@@ -1075,73 +1070,73 @@ BattlegroundMapScript::BattlegroundMapScript(const char* name, uint32 mapId)
 }
 
 ItemScript::ItemScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<ItemScript>::AddScript(this);
 }
 
 CreatureScript::CreatureScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<CreatureScript>::AddScript(this);
 }
 
 GameObjectScript::GameObjectScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<GameObjectScript>::AddScript(this);
 }
 
 AreaTriggerScript::AreaTriggerScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<AreaTriggerScript>::AddScript(this);
 }
 
 BattlegroundScript::BattlegroundScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<BattlegroundScript>::AddScript(this);
 }
 
 OutdoorPvPScript::OutdoorPvPScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<OutdoorPvPScript>::AddScript(this);
 }
 
 CommandScript::CommandScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<CommandScript>::AddScript(this);
 }
 
 VehicleScript::VehicleScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<VehicleScript>::AddScript(this);
 }
 
 TransportScript::TransportScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<TransportScript>::AddScript(this);
 }
 
 AchievementCriteriaScript::AchievementCriteriaScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<AchievementCriteriaScript>::AddScript(this);
 }
 
 PlayerScript::PlayerScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<PlayerScript>::AddScript(this);
 }
 
 GroupScript::GroupScript(const char* name)
-    : ScriptObject(name)
+: ScriptObject(name)
 {
     ScriptRegistry<GroupScript>::AddScript(this);
 }

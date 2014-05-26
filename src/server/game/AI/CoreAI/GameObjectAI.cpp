@@ -19,7 +19,6 @@
 
 #include "GameObjectAI.h"
 
-//GameObjectAI::GameObjectAI(GameObject* g) : go(g) {}
 int GameObjectAI::Permissible(const GameObject* go)
 {
     if (go->GetAIName() == "GameObjectAI")

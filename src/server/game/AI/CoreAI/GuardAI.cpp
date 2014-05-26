@@ -33,8 +33,7 @@ int GuardAI::Permissible(Creature const* creature)
 }
 
 GuardAI::GuardAI(Creature* creature) : ScriptedAI(creature)
-{
-}
+{ }
 
 void GuardAI::EnterEvadeMode()
 {

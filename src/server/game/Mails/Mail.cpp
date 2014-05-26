@@ -41,10 +41,6 @@ MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery
             m_messageType = MAIL_GAMEOBJECT;
             m_senderId = sender->GetEntry();
             break;
-        /*case TYPEID_ITEM:
-            m_messageType = MAIL_ITEM;
-            m_senderId = sender->GetEntry();
-            break;*/
         case TYPEID_PLAYER:
             m_messageType = MAIL_NORMAL;
             m_senderId = sender->GetGUIDLow();

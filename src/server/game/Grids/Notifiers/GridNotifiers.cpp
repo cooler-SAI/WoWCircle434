@@ -197,17 +197,6 @@ void MessageDistDeliverer::Visit(DynamicObjectMapType &m)
     }
 }
 
-/*
-void
-MessageDistDeliverer::VisitObject(Player* player)
-{
-    if (!i_ownTeamOnly || (i_source.GetTypeId() == TYPEID_PLAYER && player->GetTeam() == ((Player&)i_source).GetTeam()))
-    {
-        SendPacket(player);
-    }
-}
-*/
-
 void UnfriendlyMessageDistDeliverer::Visit(PlayerMapType &m)
 {
     for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)

@@ -392,15 +392,6 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recvData)
     MovementInfo mi;
     GetPlayer()->ReadMovementInfo(recvData, &mi);
 
-    /*if (_player->m_mover->GetGUID() != mi.guid)
-    {
-        sLog->outError(LOG_FILTER_NETWORKIO, "HandleMoveNotActiveMover: incorrect mover guid: mover is " UI64FMTD " and should be " UI64FMTD " instead of " UI64FMTD,
-            _player->m_mover->GetGUID(),
-            _player->GetGUID(),
-            mi.guid);
-        return;
-    }*/
-
     if (!_player->m_movementInfo.AcceptClientChanges(_player, mi, CMSG_MOVE_NOT_ACTIVE_MOVER))
         return;
 }

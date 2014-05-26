@@ -63,12 +63,6 @@ void WorldSession::SendPartyResult(PartyOperation operation, const std::string& 
 
 void WorldSession::HandleGroupInviteOpcode(WorldPacket & recvData)
 {
-    //time_t now = time(NULL);
-    //if (now - timeLastGroupInviteCommand < 5)
-    //    return;
-    //else
-    //   timeLastGroupInviteCommand = now;
-
     ObjectGuid crossRealmGuid; // unused
 
     recvData.read_skip<uint32>(); // Non-zero in cross realm invites
@@ -337,10 +331,6 @@ void WorldSession::HandleGroupInviteResponseOpcode(WorldPacket& recvData)
 {
     recvData.ReadBit(); // unk always 0
     bool accept = recvData.ReadBit();
-
-    // Never actually received?
-    /*if (accept)
-        recvData.read_skip<uint32>(); // unk*/
 
     Group* group = GetPlayer()->GetGroupInvite();
 

@@ -86,8 +86,7 @@ void SmartAI::UpdateDespawn(const uint32 diff)
             me->SetVisible(false);
             mDespawnTime = 5000;
             mDespawnState++;
-        }
-        else
+        } else
             me->DespawnOrUnsummon();
     } else mDespawnTime -= diff;
 }
@@ -130,8 +129,8 @@ void SmartAI::StartPath(bool run, uint32 path, bool repeat, Unit* /*invoker*/)
     if (HasEscortState(SMART_ESCORT_ESCORTING))
         StopPath();
     if (path)
-        if (!LoadPath(path))
-            return;
+    if (!LoadPath(path))
+        return;
     if (!mWayPoints || mWayPoints->empty())
         return;
 
@@ -240,7 +239,7 @@ void SmartAI::EndPath(bool fail)
                         groupGuy->FailQuest(mEscortQuestID);
                 }
             }
-        }else
+        } else
         {
             for (ObjectList::iterator iter = targets->begin(); iter != targets->end(); ++iter)
             {
@@ -304,7 +303,8 @@ void SmartAI::UpdatePath(const uint32 diff)
                     mWPReached = true;
             }
             mWPPauseTimer = 0;
-        } else {
+        } else
+        {
             mWPPauseTimer -= diff;
         }
     }
@@ -327,8 +327,7 @@ void SmartAI::UpdatePath(const uint32 diff)
         if (mCurrentWPID == GetWPCount())
         {
             EndPath();
-        }
-        else if (WayPoint* wp = GetNextWayPoint())
+        } else if (WayPoint* wp = GetNextWayPoint())
         {
             SetRun(mRun);
             me->GetMotionMaster()->MovePoint(wp->id, wp->x, wp->y, wp->z);
@@ -390,7 +389,7 @@ bool SmartAI::IsEscortInvokerInRange()
         {
             Player* player = (*targets->begin())->ToPlayer();
             if (me->GetDistance(player) <= SMART_ESCORT_MAX_PLAYER_DIST)
-                        return true;
+                return true;
 
             if (Group* group = player->GetGroup())
             {
@@ -402,7 +401,7 @@ bool SmartAI::IsEscortInvokerInRange()
                         return true;
                 }
             }
-        }else
+        } else
         {
             for (ObjectList::iterator iter = targets->begin(); iter != targets->end(); ++iter)
             {
@@ -466,13 +465,11 @@ void SmartAI::EnterEvadeMode()
     {
         AddEscortState(SMART_ESCORT_RETURNING);
         ReturnToLastOOCPos();
-    }
-    else if (mFollowGuid)
+    } else if (mFollowGuid)
     {
         if (Unit* target = me->GetUnit(*me, mFollowGuid))
             me->GetMotionMaster()->MoveFollow(target, mFollowDist, mFollowAngle);
-    }
-    else
+    } else
         me->GetMotionMaster()->MoveTargetedHome();
 
     Reset();
@@ -503,8 +500,7 @@ void SmartAI::MoveInLineOfSight(Unit* who)
             {
                 who->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
                 AttackStart(who);
-            }
-            else/* if (me->GetMap()->IsDungeon())*/
+            } else
             {
                 who->SetInCombatWith(me);
                 me->AddThreat(who, 0.0f);
@@ -545,8 +541,7 @@ bool SmartAI::AssistPlayerInCombat(Unit* who)
         {
             AttackStart(who);
             return true;
-        }
-        else
+        } else
         {
             who->SetInCombatWith(me);
             me->AddThreat(who, 0.0f);
@@ -693,8 +688,7 @@ void SmartAI::SummonedCreatureDespawn(Creature* unit)
 }
 
 void SmartAI::UpdateAIWhileCharmed(const uint32 /*diff*/)
-{
-}
+{ }
 
 void SmartAI::CorpseRemoved(uint32& respawnDelay)
 {
@@ -735,8 +729,7 @@ void SmartAI::SetData(uint32 id, uint32 value)
 }
 
 void SmartAI::SetGUID(uint64 /*guid*/, int32 /*id*/)
-{
-}
+{ }
 
 uint64 SmartAI::GetGUID(int32 /*id*/)
 {
@@ -777,8 +770,7 @@ void SmartAI::sGossipSelect(Player* player, uint32 sender, uint32 action)
 }
 
 void SmartAI::sGossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/)
-{
-}
+{ }
 
 void SmartAI::sQuestAccept(Player* player, Quest const* quest)
 {
@@ -811,8 +803,7 @@ void SmartAI::SetCombatMove(bool on)
                 me->GetMotionMaster()->MoveChase(me->getVictim());
                 me->CastStop();
             }
-        }
-        else
+        } else
         {
             me->StopMoving();
             me->GetMotionMaster()->MoveIdle();
@@ -952,21 +943,21 @@ void SmartGameObjectAI::EventInform(uint32 eventId)
 
 class SmartTrigger : public AreaTriggerScript
 {
-    public:
+public:
 
-        SmartTrigger() : AreaTriggerScript("SmartTrigger") {}
+    SmartTrigger() : AreaTriggerScript("SmartTrigger") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
-        {
-            if (!player->isAlive())
-                return false;
+    bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
+    {
+        if (!player->isAlive())
+            return false;
 
-            sLog->outDebug(LOG_FILTER_DATABASE_AI, "AreaTrigger %u is using SmartTrigger script", trigger->id);
-            SmartScript script;
-            script.OnInitialize(NULL, trigger);
-            script.ProcessEventsFor(SMART_EVENT_AREATRIGGER_ONTRIGGER, player, trigger->id);
-            return true;
-        }
+        sLog->outDebug(LOG_FILTER_DATABASE_AI, "AreaTrigger %u is using SmartTrigger script", trigger->id);
+        SmartScript script;
+        script.OnInitialize(NULL, trigger);
+        script.ProcessEventsFor(SMART_EVENT_AREATRIGGER_ONTRIGGER, player, trigger->id);
+        return true;
+    }
 };
 
 void AddSC_SmartSCripts()

@@ -398,31 +398,6 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         } 
     }
 
-    /*if (mover->GetTypeId() == TYPEID_PLAYER)
-    {
-        // not have spell in spellbook or spell passive and not casted by client
-        if (((!mover->ToPlayer()->HasActiveSpell(spellId) || spellInfo->IsPassive()) && !spellInfo->IsRaidMarker()) &&
-            spellId != 101603) // Hack for Throw Totem, Echo of Baine
-        {
-            //cheater? kick? ban?
-            if (!spellInfo->IsAbilityOfSkillType(SKILL_ARCHAEOLOGY))
-            {
-                recvPacket.rfinish(); // prevent spam at ignore packet
-                return;
-            }
-        }
-    }
-    else
-    {
-        // not have spell in spellbook or spell passive and not casted by client
-        if ((mover->GetTypeId() == TYPEID_UNIT && !mover->ToCreature()->HasSpell(spellId)) || spellInfo->IsPassive())
-        {
-            //cheater? kick? ban?
-            recvPacket.rfinish(); // prevent spam at ignore packet
-            return;
-        }
-    }*/
-
     // Client is resending autoshot cast opcode when other spell is casted during shoot rotation
     // Skip it to prevent "interrupt" message
     if (spellInfo->IsAutoRepeatRangedSpell() && _player->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL)

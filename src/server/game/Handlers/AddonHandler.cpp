@@ -24,12 +24,10 @@
 #include "Log.h"
 
 AddonHandler::AddonHandler()
-{
-}
+{ }
 
 AddonHandler::~AddonHandler()
-{
-}
+{ }
 
 bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 {
@@ -131,8 +129,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 
         //if (AddOnPacked.rpos() != AddOnPacked.size())
         //    sLog->outDebug(LOG_FILTER_NETWORKIO, "packet under read!");
-    }
-    else
+    } else
     {
         sLog->outError(LOG_FILTER_NETWORKIO, "Addon packet uncompress error :(");
         return false;
