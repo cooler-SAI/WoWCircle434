@@ -11380,7 +11380,6 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
                 }
             }
             dest = ((INVENTORY_SLOT_BAG_0 << 8) | eslot);
-
             return EQUIP_ERR_OK;
         }
     }
@@ -11706,11 +11705,7 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
         if (proto->HolidayId && !IsHolidayActive((HolidayIds)proto->HolidayId))
             return EQUIP_ERR_CLIENT_LOCKED_OUT;
 
-#ifdef ELUNA
-        return sHookMgr->OnCanUseItem(this, proto->ItemId);
-#else
-		return EQUIP_ERR_OK;
-#endif
+        return EQUIP_ERR_OK;
     }
 
     return EQUIP_ERR_ITEM_NOT_FOUND;
@@ -12094,9 +12089,6 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
         ApplyEquipCooldown(pItem2);
 
-#ifdef ELUNA
-        sHookMgr->OnEquip(this, pItem2, bag, slot);
-#endif
         return pItem2;
     }
 
@@ -12104,9 +12096,6 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, pItem->GetEntry(), slot);
 
-#ifdef ELUNA
-    sHookMgr->OnEquip(this, pItem, bag, slot);
-#endif
     return pItem;
 }
 
@@ -24441,10 +24430,6 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE, item->itemid, item->count, loot->loot_type);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item->itemid, item->count);
         UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_EPIC_ITEM, item->itemid, item->count);
-
-#ifdef ELUNA
-        sHookMgr->OnLootItem(this, newitem, item->count, this->GetLootGUID());
-#endif
     }
     else
         SendEquipError(msg, NULL, NULL, item->itemid);

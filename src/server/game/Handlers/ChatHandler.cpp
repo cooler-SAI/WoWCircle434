@@ -42,7 +42,6 @@
 #include "Util.h"
 #include "ScriptMgr.h"
 #include "AccountMgr.h"
-#include "HookMgr.h"
 
 void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 {
@@ -340,10 +339,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 SendNotification(GetCerberCoreString(LANG_SAY_REQ), sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ));
                 return;
             }
-#ifdef ELUNA
-            if(!sHookMgr->OnChat(sender, type, lang, msg))
-                return;
-#endif
+
             if (type == CHAT_MSG_SAY)
                 sender->Say(msg, lang);
             else if (type == CHAT_MSG_EMOTE)
@@ -426,10 +422,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 type = CHAT_MSG_PARTY_LEADER;
 
             sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
-#ifdef ELUNA
-            if(!sHookMgr->OnChat(sender, type, lang, msg, group))
-                return;
-#endif
 
             WorldPacket data;
             ChatHandler::FillMessageData(&data, this, uint8(type), lang, NULL, 0, msg.c_str(), NULL);
@@ -442,10 +434,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId()))
                 {
                     sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, guild);
-#ifdef ELUNA
-                    if(!sHookMgr->OnChat(sender, type, lang, msg, guild))
-                        return;
-#endif
 
                     guild->BroadcastToGuild(this, false, msg, lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
                 }
@@ -458,10 +446,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId()))
                 {
                     sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, guild);
-#ifdef ELUNA
-                    if(!sHookMgr->OnChat(sender, type, lang, msg, guild))
-                        return;
-#endif
 
                     guild->BroadcastToGuild(this, true, msg, lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
                 }
@@ -483,10 +467,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 type = CHAT_MSG_RAID_LEADER;
 
             sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
-#ifdef ELUNA
-            if(!sHookMgr->OnChat(sender, type, lang, msg, group))
-                return;
-#endif
 
             WorldPacket data;
             ChatHandler::FillMessageData(&data, this, uint8(type), lang, "", 0, msg.c_str(), NULL);
@@ -499,10 +479,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 return;
 
             sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
-#ifdef ELUNA
-            if(!sHookMgr->OnChat(sender, type, lang, msg, group))
-                return;
-#endif
 
             WorldPacket data;
             //in battleground, raid warning is sent only to players in battleground - code is ok
@@ -521,10 +497,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 type = CHAT_MSG_BATTLEGROUND_LEADER;
 
             sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
-#ifdef ELUNA
-            if(!sHookMgr->OnChat(sender, type, lang, msg, group))
-                return;
-#endif
 
             WorldPacket data;
             ChatHandler::FillMessageData(&data, this, uint8(type), lang, "", 0, msg.c_str(), NULL);

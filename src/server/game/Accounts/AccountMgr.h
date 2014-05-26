@@ -58,5 +58,4 @@ namespace AccountMgr
     bool IsConsoleAccount(uint32 gmlevel);
 }
 
-#define sAccountMgr ACE_Singleton<AccountMgr, ACE_Null_Mutex>::instance()
 #endif
