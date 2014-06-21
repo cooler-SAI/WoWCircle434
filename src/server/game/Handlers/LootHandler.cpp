@@ -31,7 +31,6 @@
 #include "World.h"
 #include "Util.h"
 #include "GuildMgr.h"
-#include "HookMgr.h"
 
 void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket & recvData)
 {

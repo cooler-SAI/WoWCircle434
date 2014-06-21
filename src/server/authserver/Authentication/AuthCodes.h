@@ -30,18 +30,23 @@ enum AuthResult
     WOW_FAIL_DB_BUSY                             = 0x08,
     WOW_FAIL_VERSION_INVALID                     = 0x09,
     WOW_FAIL_VERSION_UPDATE                      = 0x0A,
+    WOW_FAIL_INVALID_SERVER                      = 0x0B,
     WOW_FAIL_SUSPENDED                           = 0x0C,
+    WOW_FAIL_FAIL_NOACCESS                       = 0x0D,
     WOW_SUCCESS_SURVEY                           = 0x0E,
     WOW_FAIL_PARENTCONTROL                       = 0x0F,
     WOW_FAIL_LOCKED_ENFORCED                     = 0x10,
     WOW_FAIL_TRIAL_ENDED                         = 0x11,
     WOW_FAIL_USE_BATTLENET                       = 0x12,
-    WOW_FAIL_TOO_FAST                            = 0x16,
-    WOW_FAIL_CHARGEBACK                          = 0x17,
+    WOW_FAIL_ANTI_INDULGENCE                     = 0x13,
+    WOW_FAIL_EXPIRED                             = 0x14,
+    WOW_FAIL_NO_GAME_ACCOUNT                     = 0x15,
+    WOW_FAIL_CHARGEBACK                          = 0x16,
+    WOW_FAIL_INTERNET_GAME_ROOM_WITHOUT_BNET     = 0x17,
     WOW_FAIL_GAME_ACCOUNT_LOCKED                 = 0x18,
-    WOW_FAIL_INTERNET_GAME_ROOM_WITHOUT_BNET     = 0x19,
-    WOW_FAIL_UNLOCKABLE_LOCK                     = 0x20,
-    WOW_FAIL_DISCONNECTED                        = 0xFF,
+    WOW_FAIL_UNLOCKABLE_LOCK                     = 0x19,
+    WOW_FAIL_CONVERSION_REQUIRED                 = 0x20,
+    WOW_FAIL_DISCONNECTED                        = 0xFF
 };
 
 enum LoginResult
@@ -62,8 +67,64 @@ enum LoginResult
     LOGIN_FAILED4                                = 0x0D,
     LOGIN_CONNECTED                              = 0x0E,
     LOGIN_PARENTALCONTROL                        = 0x0F,
-    LOGIN_LOCKED_ENFORCED                        = 0x10,
+    LOGIN_LOCKED_ENFORCED                        = 0x10
 };
+
+namespace Battlenet
+{
+    enum AuthResult
+    {
+        AUTH_OK                         = 0,
+        AUTH_INTERNAL_ERROR             = 100,
+        AUTH_CORRUPTED_MODULE           = 102,
+        AUTH_BAD_SERVER_PROOF           = 103,
+        AUTH_UNKNOWN_ACCOUNT            = 104,
+        AUTH_CLOSED                     = 105,
+        AUTH_LOGIN_TIMEOUT              = 106,
+        AUTH_NO_GAME_ACCOUNTS           = 107,
+        AUTH_INVALID_TOKEN              = 108,
+        AUTH_INVALID_PROGRAM            = 109,
+        AUTH_INVALID_OS                 = 110,
+        AUTH_UNSUPPORTED_LANGUAGE       = 111,
+        AUTH_REGION_BAD_VERSION         = 112,
+        AUTH_TEMP_OUTAGE                = 113,
+        AUTH_CANT_DOWNLOAD_MODULE       = 114,
+        AUTH_DUPLICATE_LOGON            = 115,
+        AUTH_BAD_CREDENTIALS_2          = 116,
+        AUTH_VERSION_CHECK_SUCCEEDED    = 117,
+        AUTH_BAD_VERSION_HASH           = 118,
+        AUTH_CANT_RETRIEVE_PORTAL_LIST  = 119,
+        AUTH_DARK_PORTAL_DOES_NOT_EXIST = 120,
+        AUTH_DARK_PORTAL_FILE_CORRUPTED = 121,
+        AUTH_BATTLENET_MAINTENANCE      = 122,
+        AUTH_LOGON_TOO_FAST             = 123,
+        AUTH_USE_GRUNT_LOGON            = 124,
+        AUTH_NO_GAME_ACCOUNTS_IN_REGION = 140,
+        AUTH_ACCOUNT_LOCKED             = 141,
+
+        LOGIN_SERVER_BUSY               = 200,
+        LOGIN_NO_GAME_ACCOUNT           = 201,
+        LOGIN_BANNED                    = 202,
+        LOGIN_SUSPENDED                 = 203,
+        LOGIN_GAME_ACCOUNT_LOCKED       = 204,
+        LOGIN_ALREADY_ONLINE            = 205,
+        LOGIN_NOTIME                    = 206,
+        LOGIN_EXPIRED                   = 207,
+        LOGIN_EXPIRED_2                 = 208,
+        LOGIN_PARENTALCONTROL           = 209,
+        LOGIN_TRIAL_EXPIRED             = 210,
+        LOGIN_ANTI_INDULGENCE           = 211,
+        LOGIN_INCORRECT_REGION          = 212,
+        LOGIN_LOCKED_ENFORCED           = 213,
+        LOGIN_CHARGEBACK                = 214,
+        LOGIN_IGR_WITHOUT_BNET          = 215,
+        LOGIN_UNLOCKABLE_LOCK           = 216,
+        LOGIN_IGR_REQUIRED              = 217,
+        LOGIN_PAYMENT_CHANGED           = 218,
+        LOGIN_INVALID_PAYMENT           = 219,
+        LOGIN_INVALID_ACCOUNT_STATE     = 220
+    };
+}
 
 enum ExpansionFlags
 {

@@ -47,7 +47,6 @@
 #include "DBCStores.h"
 #include "LFGMgr.h"
 #include "CalendarMgr.h"
-#include "HookMgr.h"
 
 class LoginQueryHolder : public SQLQueryHolder
 {

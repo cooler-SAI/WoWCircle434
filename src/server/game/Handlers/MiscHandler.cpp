@@ -58,7 +58,6 @@
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "DBCStore.h"
-#include "HookMgr.h"
 
 void WorldSession::HandleRepopRequestOpcode(WorldPacket& recvData)
 {

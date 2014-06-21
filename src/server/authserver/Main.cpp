@@ -145,7 +145,8 @@ extern int main(int argc, char **argv)
     }
 
     // Launch the listening network socket
-    RealmAcceptor acceptor;
+    RealmAcceptor<AuthSocket> acceptor;
+    RealmAcceptor<Battlenet::Socket> bnetacceptor;
 
     int32 rmport = ConfigMgr::GetIntDefault("RealmServerPort", 3724);
     if (rmport < 0 || rmport > 0xFFFF)
@@ -161,6 +162,13 @@ extern int main(int argc, char **argv)
     if (acceptor.open(bind_addr, ACE_Reactor::instance(), ACE_NONBLOCK) == -1)
     {
         sLog->outError(LOG_FILTER_AUTHSERVER, "Auth server can not bind to %s:%d", bind_ip.c_str(), rmport);
+        return 1;
+    }
+    
+    bind_addr.set_port_number(1119);
+    if (bnetacceptor.open(bind_addr, ACE_Reactor::instance(), ACE_NONBLOCK) == -1)
+    {
+        sLog->outError(LOG_FILTER_AUTHSERVER, "Auth server can not bind to %s:%d", bind_ip.c_str(), 1119);
         return 1;
     }
 
@@ -209,6 +217,8 @@ extern int main(int argc, char **argv)
         }
     }
 #endif
+
+    sBattlenetMgr->Load();
 
     // maximum counter for next ping
     uint32 numLoops = (ConfigMgr::GetIntDefault("MaxPingTime", 30) * (MINUTE * 1000000 / 100000));

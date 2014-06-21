@@ -23,13 +23,13 @@
 
 class LoginDatabaseConnection : public MySQLConnection
 {
-    public:
-        //- Constructors for sync and async connections
-        LoginDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) {}
-        LoginDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) {}
+public:
+    //- Constructors for sync and async connections
+    LoginDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) { }
+    LoginDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) { }
 
-        //- Loads database type specific prepared statements
-        void DoPrepareStatements();
+    //- Loads database type specific prepared statements
+    void DoPrepareStatements();
 };
 
 typedef DatabaseWorkerPool<LoginDatabaseConnection> LoginDatabaseWorkerPool;
@@ -40,7 +40,7 @@ enum LoginDatabaseStatements
         {DB}_{SEL/INS/UPD/DEL/REP}_{Summary of data changed}
         When updating more than one field, consider looking at the calling function
         name for a suiting suffix.
-    */
+        */
 
     LOGIN_SEL_REALMLIST,
     LOGIN_DEL_EXPIRED_IP_BANS,
@@ -61,6 +61,7 @@ enum LoginDatabaseStatements
     LOGIN_SEL_ACCOUNT_ID_BY_NAME,
     LOGIN_SEL_ACCOUNT_LIST_BY_NAME,
     LOGIN_SEL_ACCOUNT_INFO_BY_NAME,
+    LOGIN_SEL_ACCOUNT_INFO_BY_BNET,
     LOGIN_SEL_ACCOUNT_LIST_BY_EMAIL,
     LOGIN_SEL_NUM_CHARS_ON_REALM,
     LOGIN_SEL_ACCOUNT_BY_IP,
@@ -104,6 +105,23 @@ enum LoginDatabaseStatements
     LOGIN_SEL_REALMLIST_SECURITY_LEVEL,
     LOGIN_DEL_ACCOUNT,
     LOGIN_SEL_SUM_REALM_CHARACTERS,
+    LOGIN_INS_REALM_CHARACTERS_INIT,
+    LOGIN_GET_EMAIL_BY_ID,
+    LOGIN_UPD_EMAIL,
+    LOGIN_UPD_REG_EMAIL,
+    LOGIN_SEL_BNET_ACCOUNT_INFO,
+    LOGIN_DEL_BNET_EXPIRED_BANS,
+    LOGIN_SEL_BNET_ACTIVE_ACCOUNT_BAN,
+    LOGIN_SEL_BNET_GAME_ACCOUNTS,
+    LOGIN_SEL_BNET_GAME_ACCOUNT,
+    LOGIN_UPD_BNET_LAST_LOGIN_INFO,
+    LOGIN_SEL_BNET_CHARACTER_COUNTS,
+    LOGIN_INS_BNET_ACCOUNT,
+    LOGIN_SEL_BNET_ACCOUNT_EMAIL_BY_ID,
+    LOGIN_SEL_BNET_ACCOUNT_ID_BY_EMAIL,
+    LOGIN_UPD_BNET_PASSWORD,
+    LOGIN_SEL_BNET_CHECK_PASSWORD,
+    LOGIN_SEL_LOGON_COUNTRY,
 
     MAX_LOGINDATABASE_STATEMENTS
 };

@@ -82,7 +82,6 @@
 #include "BattlefieldMgr.h"
 #include "BattlefieldWG.h"
 #include "RatedBattleground.h"
-#include "HookMgr.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
