@@ -1,20 +1,20 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+* Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+*
+* This program is free software; you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the
+* Free Software Foundation; either version 2 of the License, or (at your
+* option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
 
 
 #include "Common.h"
@@ -71,24 +71,25 @@ void WorldSession::SendBfInvitePlayerToWar(uint64 guid, uint32 zoneId, uint32 pT
 void WorldSession::SendBfInvitePlayerToQueue(uint64 guid)
 {
     ObjectGuid guidBytes = guid;
+    bool warmup = true;
 
     WorldPacket data(SMSG_BATTLEFIELD_MGR_QUEUE_INVITE, 11);
 
     data
-        .WriteBit(true)               // unk
-        .WriteBit(false)               // Has Warmup
-        .WriteBit(true)               // unk
+        .WriteBit(1)               // unk
+        .WriteBit(!warmup)               // Has Warmup
+        .WriteBit(1)               // unk
         .WriteByteMask(guidBytes[0])
-        .WriteBit(true)               // unk
+        .WriteBit(1)               // unk
         .WriteByteMask(guidBytes[2])
         .WriteByteMask(guidBytes[6])
         .WriteByteMask(guidBytes[3])
-        .WriteBit(true)               // unk
-        .WriteBit(false)               // unk
+        .WriteBit(1)               // unk
+        .WriteBit(0)               // unk
         .WriteByteMask(guidBytes[1])
         .WriteByteMask(guidBytes[5])
         .WriteByteMask(guidBytes[4])
-        .WriteBit(true)               // unk
+        .WriteBit(1)               // unk
         .WriteByteMask(guidBytes[7])
 
         .WriteByteSeq(guidBytes[2])
@@ -126,19 +127,38 @@ void WorldSession::SendBfQueueInviteResponse(uint64 guid, uint32 ZoneId, bool Ca
         .WriteByteMask(guidBytes[6])
         .WriteByteMask(guidBytes[5])
         .WriteByteMask(guidBytes[7])
-        .WriteBit(Full)  // Logging In, VERIFYME
+        .WriteBit(Full ? 0 : 1)  // Logging In, VERIFYME
         .WriteByteMask(guidBytes[0])
         .WriteBit(!hasSecondGuid)
+        .WriteByteMask(guidBytes[4]);
+
+    if (hasSecondGuid)
+        data
+        .WriteByteMask(guidBytes[7])
+        .WriteByteMask(guidBytes[3])
+        .WriteByteMask(guidBytes[0])
         .WriteByteMask(guidBytes[4])
+        .WriteByteMask(guidBytes[2])
+        .WriteByteMask(guidBytes[6])
+        .WriteByteMask(guidBytes[1])
+        .WriteByteMask(guidBytes[5]);
 
-        // if (hasSecondGuid) 7 3 0 4 2 6 1 5
-
+    data
         .WriteByteMask(guidBytes[3])
         .WriteByteMask(guidBytes[2]);
 
-    // if (hasSecondGuid) 2 5 3 0 4 6 1 7
+    if (hasSecondGuid)
+        data
+        .WriteByteMask(guidBytes[2])
+        .WriteByteMask(guidBytes[5])
+        .WriteByteMask(guidBytes[3])
+        .WriteByteMask(guidBytes[0])
+        .WriteByteMask(guidBytes[4])
+        .WriteByteMask(guidBytes[6])
+        .WriteByteMask(guidBytes[1])
+        .WriteByteMask(guidBytes[7]);
 
-    data << uint8(CanQueue);  // Accepted
+    data << uint8(CanQueue ? 1 : 0);  // Accepted
 
     data
         .WriteByteSeq(guidBytes[1])
@@ -167,14 +187,14 @@ void WorldSession::SendBfEntered(uint64 guid)
     ObjectGuid guidBytes = guid;
 
     data
-        .WriteBit(false)              // unk
-        .WriteBit(_player->isAFK())
+        .WriteBit(0)              // unk
+        .WriteBit(_player->isAFK() ? 1 : 0)
         .WriteByteMask(guidBytes[1])
         .WriteByteMask(guidBytes[4])
         .WriteByteMask(guidBytes[5])
         .WriteByteMask(guidBytes[0])
         .WriteByteMask(guidBytes[3])
-        .WriteBit(false)              // unk
+        .WriteBit(1)              // unk
         .WriteByteMask(guidBytes[6])
         .WriteByteMask(guidBytes[7])
         .WriteByteMask(guidBytes[2])
@@ -204,7 +224,7 @@ void WorldSession::SendBfLeaveMessage(uint64 guid, BFLeaveReason reason)
         .WriteByteMask(guidBytes[0])
         .WriteByteMask(guidBytes[3])
         .WriteByteMask(guidBytes[6])
-        .WriteBit(false)               // Relocated
+        .WriteBit(0)               // Relocated
         .WriteByteMask(guidBytes[7])
         .WriteByteMask(guidBytes[4]);
 

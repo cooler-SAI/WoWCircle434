@@ -1,20 +1,20 @@
- /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
- * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+/*
+* Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+* Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+*
+* This program is free software; you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the
+* Free Software Foundation; either version 2 of the License, or (at your
+* option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /* ScriptData
 SDName: Azuremyst_Isle
@@ -67,12 +67,12 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_draenei_survivorAI (creature);
+        return new npc_draenei_survivorAI(creature);
     }
 
     struct npc_draenei_survivorAI : public ScriptedAI
     {
-        npc_draenei_survivorAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_draenei_survivorAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint64 pCaster;
 
@@ -100,7 +100,7 @@ public:
             me->SetStandState(UNIT_STAND_STATE_SLEEP);
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) { }
 
         void MoveInLineOfSight(Unit* who)
         {
@@ -221,7 +221,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_engineer_spark_overgrindAI (creature);
+        return new npc_engineer_spark_overgrindAI(creature);
     }
 
     struct npc_engineer_spark_overgrindAI : public ScriptedAI
@@ -269,8 +269,7 @@ public:
                     DoScriptText(SAY_EMOTE, me);
                     EmoteTimer = urand(120000, 150000);
                 } else EmoteTimer -= diff;
-            }
-            else if (IsTreeEvent)
+            } else if (IsTreeEvent)
                 return;
 
             if (!UpdateVictim())
@@ -299,12 +298,12 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_injured_draeneiAI (creature);
+        return new npc_injured_draeneiAI(creature);
     }
 
     struct npc_injured_draeneiAI : public ScriptedAI
     {
-        npc_injured_draeneiAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_injured_draeneiAI(Creature* creature) : ScriptedAI(creature) { }
 
         void Reset()
         {
@@ -322,11 +321,11 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) { }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) { }
 
-        void UpdateAI(const uint32 /*diff*/) {}
+        void UpdateAI(const uint32 /*diff*/) { }
     };
 
 };
@@ -370,7 +369,7 @@ public:
 
     struct npc_magwinAI : public npc_escortAI
     {
-        npc_magwinAI(Creature* creature) : npc_escortAI(creature) {}
+        npc_magwinAI(Creature* creature) : npc_escortAI(creature) { }
 
         void WaypointReached(uint32 waypointId)
         {
@@ -401,7 +400,7 @@ public:
             DoScriptText(SAY_AGGRO, me, who);
         }
 
-        void Reset() {}
+        void Reset() { }
     };
 
 };
@@ -448,7 +447,7 @@ public:
 
     struct npc_death_ravagerAI : public ScriptedAI
     {
-        npc_death_ravagerAI(Creature* creature) : ScriptedAI(creature){}
+        npc_death_ravagerAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 RendTimer;
         uint32 EnragingBiteTimer;
@@ -471,15 +470,13 @@ public:
             {
                 DoCast(me->getVictim(), SPELL_REND);
                 RendTimer = 30000;
-            }
-            else RendTimer -= diff;
+            } else RendTimer -= diff;
 
             if (EnragingBiteTimer <= diff)
             {
                 DoCast(me->getVictim(), SPELL_ENRAGING_BITE);
                 EnragingBiteTimer = 15000;
-            }
-            else EnragingBiteTimer -= diff;
+            } else EnragingBiteTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -507,92 +504,91 @@ enum BristlelimbCage
 
 class npc_stillpine_capitive : public CreatureScript
 {
-    public:
-        npc_stillpine_capitive() : CreatureScript("npc_stillpine_capitive") { }
+public:
+    npc_stillpine_capitive() : CreatureScript("npc_stillpine_capitive") { }
 
-        struct npc_stillpine_capitiveAI : public ScriptedAI
+    struct npc_stillpine_capitiveAI : public ScriptedAI
+    {
+        npc_stillpine_capitiveAI(Creature* creature) : ScriptedAI(creature)
+        { }
+
+        void Reset()
         {
-            npc_stillpine_capitiveAI(Creature* creature) : ScriptedAI(creature)
+            if (GameObject* cage = me->FindNearestGameObject(GO_BRISTELIMB_CAGE, 5.0f))
             {
+                cage->SetLootState(GO_JUST_DEACTIVATED);
+                cage->SetGoState(GO_STATE_READY);
             }
-
-            void Reset()
-            {
-                if (GameObject* cage = me->FindNearestGameObject(GO_BRISTELIMB_CAGE, 5.0f))
-                {
-                    cage->SetLootState(GO_JUST_DEACTIVATED);
-                    cage->SetGoState(GO_STATE_READY);
-                }
-                _events.Reset();
-                _player = NULL;
-                _movementComplete = false;
-            }
-
-            void StartMoving(Player* owner)
-            {
-                if (owner)
-                {
-                    DoScriptText(RAND(CAPITIVE_SAY_1, CAPITIVE_SAY_2, CAPITIVE_SAY_3), me, owner);
-                    _player = owner;
-                }
-                Position pos;
-                me->GetNearPosition(pos, 3.0f, 0.0f);
-                me->GetMotionMaster()->MovePoint(POINT_INIT, pos);
-            }
-
-            void MovementInform(uint32 type, uint32 id)
-            {
-                if (type != POINT_MOTION_TYPE || id != POINT_INIT)
-                    return;
-
-                if (_player)
-                    _player->KilledMonsterCredit(me->GetEntry(), 0);
-
-                _movementComplete = true;
-                _events.ScheduleEvent(EVENT_DESPAWN, 3500);
-            }
-
-            void UpdateAI(uint32 const diff)
-            {
-                if (!_movementComplete)
-                    return;
-
-                _events.Update(diff);
-
-                if (_events.ExecuteEvent() == EVENT_DESPAWN)
-                    me->DespawnOrUnsummon();
-            }
-
-        private:
-            Player* _player;
-            EventMap _events;
-            bool _movementComplete;
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_stillpine_capitiveAI(creature);
+            _events.Reset();
+            _player = NULL;
+            _movementComplete = false;
         }
+
+        void StartMoving(Player* owner)
+        {
+            if (owner)
+            {
+                DoScriptText(RAND(CAPITIVE_SAY_1, CAPITIVE_SAY_2, CAPITIVE_SAY_3), me, owner);
+                _player = owner;
+            }
+            Position pos;
+            me->GetNearPosition(pos, 3.0f, 0.0f);
+            me->GetMotionMaster()->MovePoint(POINT_INIT, pos);
+        }
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type != POINT_MOTION_TYPE || id != POINT_INIT)
+                return;
+
+            if (_player)
+                _player->KilledMonsterCredit(me->GetEntry(), 0);
+
+            _movementComplete = true;
+            _events.ScheduleEvent(EVENT_DESPAWN, 3500);
+        }
+
+        void UpdateAI(uint32 const diff)
+        {
+            if (!_movementComplete)
+                return;
+
+            _events.Update(diff);
+
+            if (_events.ExecuteEvent() == EVENT_DESPAWN)
+                me->DespawnOrUnsummon();
+        }
+
+    private:
+        Player* _player;
+        EventMap _events;
+        bool _movementComplete;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_stillpine_capitiveAI(creature);
+    }
 };
 
 class go_bristlelimb_cage : public GameObjectScript
 {
-    public:
-        go_bristlelimb_cage() : GameObjectScript("go_bristlelimb_cage") { }
+public:
+    go_bristlelimb_cage() : GameObjectScript("go_bristlelimb_cage") { }
 
-        bool OnGossipHello(Player* player, GameObject* go)
+    bool OnGossipHello(Player* player, GameObject* go)
+    {
+        if (player->GetQuestStatus(QUEST_THE_PROPHECY_OF_AKIDA) == QUEST_STATUS_INCOMPLETE)
         {
-            if (player->GetQuestStatus(QUEST_THE_PROPHECY_OF_AKIDA) == QUEST_STATUS_INCOMPLETE)
+            if (Creature* capitive = go->FindNearestCreature(NPC_STILLPINE_CAPITIVE, 5.0f, true))
             {
-                if (Creature* capitive = go->FindNearestCreature(NPC_STILLPINE_CAPITIVE, 5.0f, true))
-                {
-                    go->ResetDoorOrButton();
-                    CAST_AI(npc_stillpine_capitive::npc_stillpine_capitiveAI, capitive->AI())->StartMoving(player);
-                    return false;
-                }
+                go->ResetDoorOrButton();
+                CAST_AI(npc_stillpine_capitive::npc_stillpine_capitiveAI, capitive->AI())->StartMoving(player);
+                return false;
             }
-            return true;
         }
+        return true;
+    }
 };
 
 void AddSC_azuremyst_isle()

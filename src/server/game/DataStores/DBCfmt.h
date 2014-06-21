@@ -148,6 +148,7 @@ char const SpellEquippedItemsEntryfmt[]="diii";
 char const SpellAuraOptionsEntryfmt[]="niiii";
 char const SpellAuraRestrictionsEntryfmt[]="diiiiiiii";
 char const SpellCastingRequirementsEntryfmt[]="dixxixi";
+char const SpellCategoryEntryfmt[] = "dixx";
 char const SpellClassOptionsEntryfmt[]="dxiiiix";
 char const SpellCooldownsEntryfmt[]="diii";
 char const SpellLevelsEntryfmt[]="diii";

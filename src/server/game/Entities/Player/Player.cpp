@@ -81,6 +81,7 @@
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "BattlefieldWG.h"
+#include "BattlefieldTB.h"
 #include "RatedBattleground.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
@@ -4399,8 +4400,8 @@ void Player::RemoveSpellCooldown(SpellCooldowns::iterator itr, bool update /* = 
 // I am not sure which one is more efficient
 void Player::RemoveCategoryCooldown(uint32 cat)
 {
-    SpellCategoryStore::const_iterator i_scstore = sSpellCategoryStore.find(cat);
-    if (i_scstore != sSpellCategoryStore.end())
+    SpellCategoryMap::const_iterator i_scstore = sSpellCategoryMap.find(cat);
+    if (i_scstore != sSpellCategoryMap.end())
         for (SpellCategorySet::const_iterator i_scset = i_scstore->second.begin(); i_scset != i_scstore->second.end(); ++i_scset)
             RemoveSpellCooldown(*i_scset, true, true);
 
@@ -4409,8 +4410,8 @@ void Player::RemoveCategoryCooldown(uint32 cat)
 
 void Player::RemoveSpellCategoryCooldown(uint32 cat, bool update /* = false */)
 {
-    SpellCategoryStore::const_iterator ct = sSpellCategoryStore.find(cat);
-    if (ct == sSpellCategoryStore.end())
+    SpellCategoryMap::const_iterator ct = sSpellCategoryMap.find(cat);
+    if (ct == sSpellCategoryMap.end())
         return;
 
     const SpellCategorySet& ct_set = ct->second;
@@ -7523,6 +7524,18 @@ void Player::UpdateArea(uint32 newArea)
 
     UpdateAreaDependentAuras(newArea);
 
+    uint32 const areaRestFlag = (GetTeam() == ALLIANCE) ? AREA_FLAG_REST_ZONE_ALLIANCE : AREA_FLAG_REST_ZONE_HORDE;
+    if (area && area->flags & areaRestFlag)
+    {
+        SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+        SetRestType(REST_TYPE_IN_FACTION_AREA);
+    }
+    else if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) && GetRestType() == REST_TYPE_IN_FACTION_AREA)
+    {
+        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+        SetRestType(REST_TYPE_NO);
+    }
+
     // previously this was in UpdateZone (but after UpdateArea) so nothing will break
     pvpInfo.inNoPvPArea = false;
     if (area && area->IsSanctuary())    // in sanctuary
@@ -9730,8 +9743,23 @@ void Player::SendBattlefieldWorldStates()
         }
     }
 
+    if (sWorld->getBoolConfig(CONFIG_TOLBARAD_ENABLE))
+    {
+        if (BattlefieldTB* tb = (BattlefieldTB*)sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_TB))
+        {
+            if (tb->IsWarTime())
+                SendUpdateWorldState(ClockWorldState[1], uint32(time(NULL)));
+            else // Time to next battle
+            {
+                uint32 timer = tb->GetTimer() / 1000;
+                SendUpdateWorldState(ClockWorldState[1], time(NULL) + timer);
+            }
+        }
+    }
+
     SendUpdateWorldState(WORLD_STATE_ENABLE_RATED_BG, 1);
 }
+
 
 uint32 Player::GetXPRestBonus(uint32 xp)
 {
@@ -21606,6 +21634,11 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
     time_t catrecTime;
     time_t recTime;
 
+    bool isDayCd = false;
+    if (SpellCategoryEntry const* categoryEntry = sSpellCategoryStore.LookupEntry(cat))
+        if (categoryEntry->flags & SPELL_COOLDOWN_FLAG_DAY)
+            isDayCd = true;
+
     // overwrite time for selected category
     if (infinityCooldown)
     {
@@ -21655,11 +21688,20 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
         if (catrec < 0) catrec = 0;
 
         // no cooldown after applying spell mods
-        if (rec == 0 && catrec == 0)
+        if (!isDayCd &&rec == 0 && catrec == 0)
             return;
 
-        catrecTime = catrec ? curTime+catrec/IN_MILLISECONDS : 0;
-        recTime    = rec ? curTime+rec/IN_MILLISECONDS : catrecTime;
+        
+        if (!isDayCd)
+        {
+            catrecTime = catrec ? curTime + catrec / IN_MILLISECONDS : 0;
+            recTime    = rec ? curTime + rec / IN_MILLISECONDS : catrecTime;
+        }
+        else
+        {
+            catrecTime = uint32(sWorld->GetNextDailyQuestsResetTime());
+            recTime = rec ? curTime + rec / IN_MILLISECONDS : catrecTime;
+        }
     }
 
     // self spell cooldown
@@ -21669,8 +21711,8 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
     // category spells
     if (cat && catrec > 0)
     {
-        SpellCategoryStore::const_iterator i_scstore = sSpellCategoryStore.find(cat);
-        if (i_scstore != sSpellCategoryStore.end())
+        SpellCategoryMap::const_iterator i_scstore = sSpellCategoryMap.find(cat);
+        if (i_scstore != sSpellCategoryMap.end())
         {
             for (SpellCategorySet::const_iterator i_scset = i_scstore->second.begin(); i_scset != i_scstore->second.end(); ++i_scset)
             {

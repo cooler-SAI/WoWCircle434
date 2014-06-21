@@ -50,133 +50,134 @@ enum Creatures
 
 class mob_av_marshal_or_warmaster : public CreatureScript
 {
-    public:
+public:
 
-        mob_av_marshal_or_warmaster()
-            : CreatureScript("mob_av_marshal_or_warmaster") {}
+    mob_av_marshal_or_warmaster()
+        : CreatureScript("mob_av_marshal_or_warmaster")
+    { }
 
-        struct mob_av_marshal_or_warmasterAI : public ScriptedAI
+    struct mob_av_marshal_or_warmasterAI : public ScriptedAI
+    {
+        mob_av_marshal_or_warmasterAI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 ChargeTimer;
+        uint32 CleaveTimer;
+        uint32 DemoralizingShoutTimer;
+        uint32 Whirlwind1Timer;
+        uint32 Whirlwind2Timer;
+        uint32 EnrageTimer;
+        uint32 ResetTimer;
+
+        bool bHasAura;
+
+        void Reset()
         {
-            mob_av_marshal_or_warmasterAI(Creature* creature) : ScriptedAI(creature) {}
+            ChargeTimer             = urand(2 * IN_MILLISECONDS, 12 * IN_MILLISECONDS);
+            CleaveTimer             = urand(1 * IN_MILLISECONDS, 11 * IN_MILLISECONDS);
+            DemoralizingShoutTimer  = urand(2 * IN_MILLISECONDS, 2 * IN_MILLISECONDS);
+            Whirlwind1Timer         = urand(1 * IN_MILLISECONDS, 12 * IN_MILLISECONDS);
+            Whirlwind2Timer         = urand(5 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
+            EnrageTimer             = urand(5 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
+            ResetTimer              = 5 * IN_MILLISECONDS;
 
-            uint32 ChargeTimer;
-            uint32 CleaveTimer;
-            uint32 DemoralizingShoutTimer;
-            uint32 Whirlwind1Timer;
-            uint32 Whirlwind2Timer;
-            uint32 EnrageTimer;
-            uint32 ResetTimer;
+            bHasAura = false;
+        }
 
-            bool bHasAura;
+        void JustRespawned()
+        {
+            Reset();
+        }
 
-            void Reset()
+        void UpdateAI(const uint32 diff)
+        {
+            if (!bHasAura)
             {
-                ChargeTimer             = urand(2 * IN_MILLISECONDS, 12 * IN_MILLISECONDS);
-                CleaveTimer             = urand(1 * IN_MILLISECONDS, 11 * IN_MILLISECONDS);
-                DemoralizingShoutTimer  = urand(2 * IN_MILLISECONDS, 2 * IN_MILLISECONDS);
-                Whirlwind1Timer         = urand(1 * IN_MILLISECONDS, 12 * IN_MILLISECONDS);
-                Whirlwind2Timer         = urand(5 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
-                EnrageTimer             = urand(5 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
-                ResetTimer              = 5 * IN_MILLISECONDS;
-
-                bHasAura = false;
-            }
-
-            void JustRespawned()
-            {
-                Reset();
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-                if (!bHasAura)
+                switch (me->GetEntry())
                 {
-                    switch (me->GetEntry())
-                    {
-                        case NPC_NORTH_MARSHAL:
-                            DoCast(me, SPELL_NORTH_MARSHAL);
-                            break;
-                        case NPC_SOUTH_MARSHAL:
-                            DoCast(me, SPELL_SOUTH_MARSHAL);
-                            break;
-                        case NPC_STONEHEARTH_MARSHAL:
-                            DoCast(me, SPELL_STONEHEARTH_MARSHAL);
-                            break;
-                        case NPC_ICEWING_MARSHAL:
-                            DoCast(me, SPELL_ICEWING_MARSHAL);
-                            break;
-                        case NPC_EAST_FROSTWOLF_WARMASTER:
-                            DoCast(me, SPELL_EAST_FROSTWOLF_WARMASTER);
-                            break;
-                        case NPC_WEST_FROSTWOLF_WARMASTER:
-                            DoCast(me, SPELL_WEST_FROSTWOLF_WARMASTER);
-                            break;
-                        case NPC_ICEBLOOD_WARMASTER:
-                            DoCast(me, SPELL_ICEBLOOD_WARMASTER);
-                            break;
-                        case NPC_TOWER_POINT_WARMASTER:
-                            DoCast(me, SPELL_TOWER_POINT_WARMASTER);
-                            break;
-                    }
-
-                    bHasAura = true;
+                    case NPC_NORTH_MARSHAL:
+                        DoCast(me, SPELL_NORTH_MARSHAL);
+                        break;
+                    case NPC_SOUTH_MARSHAL:
+                        DoCast(me, SPELL_SOUTH_MARSHAL);
+                        break;
+                    case NPC_STONEHEARTH_MARSHAL:
+                        DoCast(me, SPELL_STONEHEARTH_MARSHAL);
+                        break;
+                    case NPC_ICEWING_MARSHAL:
+                        DoCast(me, SPELL_ICEWING_MARSHAL);
+                        break;
+                    case NPC_EAST_FROSTWOLF_WARMASTER:
+                        DoCast(me, SPELL_EAST_FROSTWOLF_WARMASTER);
+                        break;
+                    case NPC_WEST_FROSTWOLF_WARMASTER:
+                        DoCast(me, SPELL_WEST_FROSTWOLF_WARMASTER);
+                        break;
+                    case NPC_ICEBLOOD_WARMASTER:
+                        DoCast(me, SPELL_ICEBLOOD_WARMASTER);
+                        break;
+                    case NPC_TOWER_POINT_WARMASTER:
+                        DoCast(me, SPELL_TOWER_POINT_WARMASTER);
+                        break;
                 }
 
-                if (!UpdateVictim())
-                    return;
-
-                if (ChargeTimer <= diff)
-                {
-                    DoCast(me->getVictim(), SPELL_CHARGE);
-                    ChargeTimer = urand(10 * IN_MILLISECONDS, 25 * IN_MILLISECONDS);
-                } else ChargeTimer -= diff;
-
-                if (CleaveTimer <= diff)
-                {
-                    DoCast(me->getVictim(), SPELL_CLEAVE);
-                    CleaveTimer =  urand(10 * IN_MILLISECONDS, 16 * IN_MILLISECONDS);
-                } else CleaveTimer -= diff;
-
-                if (DemoralizingShoutTimer <= diff)
-                {
-                    DoCast(me->getVictim(), SPELL_DEMORALIZING_SHOUT);
-                    DemoralizingShoutTimer = urand(10 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
-                } else DemoralizingShoutTimer -= diff;
-
-                if (Whirlwind1Timer <= diff)
-                {
-                    DoCast(me->getVictim(), SPELL_WHIRLWIND1);
-                    Whirlwind1Timer = urand(6 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
-                } else Whirlwind1Timer -= diff;
-
-                if (Whirlwind2Timer <= diff)
-                {
-                    DoCast(me->getVictim(), SPELL_WHIRLWIND2);
-                    Whirlwind2Timer = urand(10 * IN_MILLISECONDS, 25 * IN_MILLISECONDS);
-                } else Whirlwind2Timer -= diff;
-
-                if (EnrageTimer <= diff)
-                {
-                    DoCast(me->getVictim(), SPELL_ENRAGE);
-                    EnrageTimer = urand(10 * IN_MILLISECONDS, 30 * IN_MILLISECONDS);
-                }else EnrageTimer -= diff;
-
-                // check if creature is not outside of building
-                if (ResetTimer <= diff)
-                {
-                    if (me->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) > 50)
-                        EnterEvadeMode();
-                    ResetTimer = 5 * IN_MILLISECONDS;
-                } else ResetTimer -= diff;
-
-                DoMeleeAttackIfReady();
+                bHasAura = true;
             }
-        };
 
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new mob_av_marshal_or_warmasterAI(creature);
+            if (!UpdateVictim())
+                return;
+
+            if (ChargeTimer <= diff)
+            {
+                DoCast(me->getVictim(), SPELL_CHARGE);
+                ChargeTimer = urand(10 * IN_MILLISECONDS, 25 * IN_MILLISECONDS);
+            } else ChargeTimer -= diff;
+
+            if (CleaveTimer <= diff)
+            {
+                DoCast(me->getVictim(), SPELL_CLEAVE);
+                CleaveTimer =  urand(10 * IN_MILLISECONDS, 16 * IN_MILLISECONDS);
+            } else CleaveTimer -= diff;
+
+            if (DemoralizingShoutTimer <= diff)
+            {
+                DoCast(me->getVictim(), SPELL_DEMORALIZING_SHOUT);
+                DemoralizingShoutTimer = urand(10 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
+            } else DemoralizingShoutTimer -= diff;
+
+            if (Whirlwind1Timer <= diff)
+            {
+                DoCast(me->getVictim(), SPELL_WHIRLWIND1);
+                Whirlwind1Timer = urand(6 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
+            } else Whirlwind1Timer -= diff;
+
+            if (Whirlwind2Timer <= diff)
+            {
+                DoCast(me->getVictim(), SPELL_WHIRLWIND2);
+                Whirlwind2Timer = urand(10 * IN_MILLISECONDS, 25 * IN_MILLISECONDS);
+            } else Whirlwind2Timer -= diff;
+
+            if (EnrageTimer <= diff)
+            {
+                DoCast(me->getVictim(), SPELL_ENRAGE);
+                EnrageTimer = urand(10 * IN_MILLISECONDS, 30 * IN_MILLISECONDS);
+            } else EnrageTimer -= diff;
+
+            // check if creature is not outside of building
+            if (ResetTimer <= diff)
+            {
+                if (me->GetDistance2d(me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY()) > 50)
+                    EnterEvadeMode();
+                ResetTimer = 5 * IN_MILLISECONDS;
+            } else ResetTimer -= diff;
+
+            DoMeleeAttackIfReady();
         }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new mob_av_marshal_or_warmasterAI(creature);
+    }
 };
 
 void AddSC_alterac_valley()

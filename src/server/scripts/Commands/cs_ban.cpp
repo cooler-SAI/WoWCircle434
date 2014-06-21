@@ -179,7 +179,7 @@ public:
         switch (mode)
         {
             case BAN_ACCOUNT:
-                if (!Utf8ToUpperOnlyLatin(nameOrIP))
+                if (!AccountMgr::normalizeString(nameOrIP))
                 {
                     handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, nameOrIP.c_str());
                     handler->SetSentErrorMessage(true);
@@ -260,7 +260,7 @@ public:
             return false;
 
         std::string accountName = nameStr;
-        if (!Utf8ToUpperOnlyLatin(accountName))
+        if (!AccountMgr::normalizeString(accountName))
         {
             handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
             handler->SetSentErrorMessage(true);
@@ -719,7 +719,7 @@ public:
         switch (mode)
         {
             case BAN_ACCOUNT:
-                if (!Utf8ToUpperOnlyLatin(nameOrIP))
+                if (!AccountMgr::normalizeString(nameOrIP))
                 {
                     handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, nameOrIP.c_str());
                     handler->SetSentErrorMessage(true);

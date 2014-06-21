@@ -106,7 +106,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject *pGo)
+        void OnGameObjectCreate(GameObject* pGo)
         {
             switch (pGo->GetEntry())
             {
@@ -227,16 +227,12 @@ public:
             case DATA_CHIMAERON:
             case DATA_MALORIAK:
             case DATA_ATRAMEDES:
-                if (GetBossState(DATA_MAGMAW) != DONE ||
-                    GetBossState(DATA_OMNOTRON) != DONE)
+                if (GetBossState(DATA_MAGMAW) != DONE || GetBossState(DATA_OMNOTRON) != DONE)
                     return false;
                 break;
             case DATA_NEFARIAN:
-                if (GetBossState(DATA_MAGMAW) != DONE ||
-                    GetBossState(DATA_OMNOTRON) != DONE ||
-                    GetBossState(DATA_MALORIAK) != DONE ||
-                    GetBossState(DATA_CHIMAERON) != DONE ||
-                    GetBossState(DATA_ATRAMEDES) != DONE)
+                if (GetBossState(DATA_MAGMAW) != DONE || GetBossState(DATA_OMNOTRON) != DONE ||
+                    GetBossState(DATA_MALORIAK) != DONE || GetBossState(DATA_CHIMAERON) != DONE ||  GetBossState(DATA_ATRAMEDES) != DONE)
                     return false;
             default:   
                 break;

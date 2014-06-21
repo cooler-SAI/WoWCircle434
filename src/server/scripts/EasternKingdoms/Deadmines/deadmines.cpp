@@ -24,61 +24,61 @@ enum Adds
 
 class go_defias_cannon : public GameObjectScript
 {
-    public:
-        go_defias_cannon() : GameObjectScript("go_defias_cannon") { }
+public:
+    go_defias_cannon() : GameObjectScript("go_defias_cannon") { }
 
-        bool OnGossipHello(Player* pPlayer, GameObject* pGo)
-        {
-            InstanceScript* pInstance = pGo->GetInstanceScript();
-            if (!pInstance)
-                return false;
-            //if (pInstance->GetData(DATA_CANNON_EVENT) != CANNON_NOT_USED)
-                //return false ;
-
-            pInstance->SetData(DATA_CANNON_EVENT, CANNON_BLAST_INITIATED);
+    bool OnGossipHello(Player* pPlayer, GameObject* pGo)
+    {
+        InstanceScript* pInstance = pGo->GetInstanceScript();
+        if (!pInstance)
             return false;
-        }
+        //if (pInstance->GetData(DATA_CANNON_EVENT) != CANNON_NOT_USED)
+        //return false ;
+
+        pInstance->SetData(DATA_CANNON_EVENT, CANNON_BLAST_INITIATED);
+        return false;
+    }
 };
 
 class deadmines_teleport : public GameObjectScript
 {
-    public:
-        deadmines_teleport() : GameObjectScript("deadmines_teleport") { }
+public:
+    deadmines_teleport() : GameObjectScript("deadmines_teleport") { }
 
-        bool OnGossipHello(Player* player, GameObject* go)
+    bool OnGossipHello(Player* player, GameObject* go)
+    {
+        bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
+        if (InstanceScript* instance = go->GetInstanceScript())
         {
-            bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+            if (instance->GetBossState(DATA_GLUBTOK) == DONE)
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Отправиться ко входу." : "Teleport to entrance.", GOSSIP_SENDER_DEADMINES_PORT, 0);
 
-            if (InstanceScript* instance = go->GetInstanceScript())
-            {
-                if (instance->GetBossState(DATA_GLUBTOK) == DONE)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Отправиться ко входу." : "Teleport to entrance.", GOSSIP_SENDER_DEADMINES_PORT, 0);
-
-                if (instance->GetBossState(DATA_ADMIRAL) == DONE)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Отправиться в потайную бухту." : "Teleport to Ironclad Cove.", GOSSIP_SENDER_DEADMINES_PORT, 3);
-                else if (instance->GetBossState(DATA_FOEREAPER) == DONE)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Отправиться в гоблинский цех." : "Teleport to The Foundry.", GOSSIP_SENDER_DEADMINES_PORT, 2);
-                else if (instance->GetBossState(DATA_HELIX) == DONE)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Отправиться в мачтовую мастерскую." : "Teleport to The Mast Room.", GOSSIP_SENDER_DEADMINES_PORT, 1);
-            }
-
-            player->SEND_GOSSIP_MENU(player->GetGossipTextId(go), go->GetGUID());
-            return true;
+            if (instance->GetBossState(DATA_ADMIRAL) == DONE)
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Отправиться в потайную бухту." : "Teleport to Ironclad Cove.", GOSSIP_SENDER_DEADMINES_PORT, 3);
+            else if (instance->GetBossState(DATA_FOEREAPER) == DONE)
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Отправиться в гоблинский цех." : "Teleport to The Foundry.", GOSSIP_SENDER_DEADMINES_PORT, 2);
+            else if (instance->GetBossState(DATA_HELIX) == DONE)
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ru ? "Отправиться в мачтовую мастерскую." : "Teleport to The Mast Room.", GOSSIP_SENDER_DEADMINES_PORT, 1);
         }
 
-        bool OnGossipSelect(Player* player, GameObject* /*go*/, uint32 sender, uint32 action)
-        {
-            player->PlayerTalkClass->ClearMenus();
-            player->CLOSE_GOSSIP_MENU();
+        player->SEND_GOSSIP_MENU(player->GetGossipTextId(go), go->GetGUID());
+        return true;
+    }
 
-            if (action >= 4)
-                return false;
+    bool OnGossipSelect(Player* player, GameObject* /*go*/, uint32 sender, uint32 action)
+    {
+        player->PlayerTalkClass->ClearMenus();
+        player->CLOSE_GOSSIP_MENU();
 
-            Position loc = deadmines_locs[action];
-            if (!player->isInCombat())
-                player->NearTeleportTo(loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), loc.GetOrientation(), false);
-            return true;
-        }
+        if (action >= 4)
+            return false;
+
+        Position loc = deadmines_locs[action];
+        if (!player->isInCombat())
+            player->NearTeleportTo(loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), loc.GetOrientation(), false);
+        return true;
+    }
 };
 
 void AddSC_deadmines()

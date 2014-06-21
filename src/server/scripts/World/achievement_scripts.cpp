@@ -1,19 +1,19 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+* Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+*
+* This program is free software; you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the
+* Free Software Foundation; either version 2 of the License, or (at your
+* option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "ScriptMgr.h"
 
@@ -26,153 +26,149 @@
 
 class achievement_resilient_victory : public AchievementCriteriaScript
 {
-    public:
-        achievement_resilient_victory() : AchievementCriteriaScript("achievement_resilient_victory") { }
+public:
+    achievement_resilient_victory() : AchievementCriteriaScript("achievement_resilient_victory") { }
 
-        bool OnCheck(Player* source, Unit* /*target*/)
-        {
-            Battleground* bg = source->GetBattleground();
-            if (!bg)
-                return false;
+    bool OnCheck(Player* source, Unit* /*target*/)
+    {
+        Battleground* bg = source->GetBattleground();
+        if (!bg)
+            return false;
 
-            if (bg->GetTypeID(true) != BATTLEGROUND_AB)
-                return false;
+        if (bg->GetTypeID(true) != BATTLEGROUND_AB)
+            return false;
 
-            if (!static_cast<BattlegroundAB*>(bg)->IsTeamScores500Disadvantage(source->GetTeam()))
-                return false;
+        if (!static_cast<BattlegroundAB*>(bg)->IsTeamScores500Disadvantage(source->GetTeam()))
+            return false;
 
-            return true;
-        }
+        return true;
+    }
 };
 
 class achievement_bg_control_all_nodes : public AchievementCriteriaScript
 {
-    public:
-        achievement_bg_control_all_nodes() : AchievementCriteriaScript("achievement_bg_control_all_nodes") { }
+public:
+    achievement_bg_control_all_nodes() : AchievementCriteriaScript("achievement_bg_control_all_nodes") { }
 
-        bool OnCheck(Player* source, Unit* /*target*/)
+    bool OnCheck(Player* source, Unit* /*target*/)
+    {
+        Battleground* bg = source->GetBattleground();
+        if (!bg)
+            return false;
+
+        if (!bg->IsAllNodesConrolledByTeam(source->GetTeam()))
+            return false;
+
+        return true;
+    }
+};
+
+class achievement_save_the_day : public AchievementCriteriaScript
+{
+public:
+    achievement_save_the_day() : AchievementCriteriaScript("achievement_save_the_day") { }
+
+    bool OnCheck(Player* source, Unit* target)
+    {
+        if (!target)
+            return false;
+
+        if (Player const* player = target->ToPlayer())
         {
             Battleground* bg = source->GetBattleground();
             if (!bg)
                 return false;
 
-            if (!bg->IsAllNodesConrolledByTeam(source->GetTeam()))
+            if (bg->GetTypeID(true) != BATTLEGROUND_WS)
                 return false;
 
-            return true;
+            if (static_cast<BattlegroundWS*>(bg)->GetFlagState(player->GetTeam()) == BG_WS_FLAG_STATE_ON_BASE)
+                return true;
         }
-};
-
-class achievement_save_the_day : public AchievementCriteriaScript
-{
-    public:
-        achievement_save_the_day() : AchievementCriteriaScript("achievement_save_the_day") { }
-
-        bool OnCheck(Player* source, Unit* target)
-        {
-            if (!target)
-                return false;
-
-            if (Player const* player = target->ToPlayer())
-            {
-                Battleground* bg = source->GetBattleground();
-                if (!bg)
-                    return false;
-
-                if (bg->GetTypeID(true) != BATTLEGROUND_WS)
-                    return false;
-
-                if (static_cast<BattlegroundWS*>(bg)->GetFlagState(player->GetTeam()) == BG_WS_FLAG_STATE_ON_BASE)
-                    return true;
-            }
-            return false;
-        }
+        return false;
+    }
 };
 
 class achievement_bg_ic_resource_glut : public AchievementCriteriaScript
 {
-    public:
-        achievement_bg_ic_resource_glut() : AchievementCriteriaScript("achievement_bg_ic_resource_glut") { }
+public:
+    achievement_bg_ic_resource_glut() : AchievementCriteriaScript("achievement_bg_ic_resource_glut") { }
 
-        bool OnCheck(Player* source, Unit* /*target*/)
-        {
-            if (source->HasAura(SPELL_OIL_REFINERY) && source->HasAura(SPELL_QUARRY))
-                return true;
+    bool OnCheck(Player* source, Unit* /*target*/)
+    {
+        if (source->HasAura(SPELL_OIL_REFINERY) && source->HasAura(SPELL_QUARRY))
+            return true;
 
-            return false;
-        }
+        return false;
+    }
 };
 
 class achievement_bg_ic_glaive_grave : public AchievementCriteriaScript
 {
-    public:
-        achievement_bg_ic_glaive_grave() : AchievementCriteriaScript("achievement_bg_ic_glaive_grave") { }
+public:
+    achievement_bg_ic_glaive_grave() : AchievementCriteriaScript("achievement_bg_ic_glaive_grave") { }
 
-        bool OnCheck(Player* source, Unit* /*target*/)
+    bool OnCheck(Player* source, Unit* /*target*/)
+    {
+        if (Creature* vehicle = source->GetVehicleCreatureBase())
         {
-            if (Creature* vehicle = source->GetVehicleCreatureBase())
-            {
-                if (vehicle->GetEntry() == NPC_GLAIVE_THROWER_H ||  vehicle->GetEntry() == NPC_GLAIVE_THROWER_A)
-                    return true;
-            }
-
-            return false;
+            if (vehicle->GetEntry() == NPC_GLAIVE_THROWER_H ||  vehicle->GetEntry() == NPC_GLAIVE_THROWER_A)
+                return true;
         }
+
+        return false;
+    }
 };
 
 class achievement_bg_ic_mowed_down : public AchievementCriteriaScript
 {
-    public:
-        achievement_bg_ic_mowed_down() : AchievementCriteriaScript("achievement_bg_ic_mowed_down") { }
+public:
+    achievement_bg_ic_mowed_down() : AchievementCriteriaScript("achievement_bg_ic_mowed_down") { }
 
-        bool OnCheck(Player* source, Unit* /*target*/)
+    bool OnCheck(Player* source, Unit* /*target*/)
+    {
+        if (Creature* vehicle = source->GetVehicleCreatureBase())
         {
-            if (Creature* vehicle = source->GetVehicleCreatureBase())
-            {
-                if (vehicle->GetEntry() == NPC_KEEP_CANNON)
-                    return true;
-            }
-
-            return false;
+            if (vehicle->GetEntry() == NPC_KEEP_CANNON)
+                return true;
         }
+
+        return false;
+    }
 };
 
 class achievement_bg_sa_artillery : public AchievementCriteriaScript
 {
-    public:
-        achievement_bg_sa_artillery() : AchievementCriteriaScript("achievement_bg_sa_artillery") { }
+public:
+    achievement_bg_sa_artillery() : AchievementCriteriaScript("achievement_bg_sa_artillery") { }
 
-        bool OnCheck(Player* source, Unit* /*target*/)
+    bool OnCheck(Player* source, Unit* /*target*/)
+    {
+        if (Creature* vehicle = source->GetVehicleCreatureBase())
         {
-            if (Creature* vehicle = source->GetVehicleCreatureBase())
-            {
-                if (vehicle->GetEntry() == NPC_ANTI_PERSONNAL_CANNON)
-                    return true;
-            }
-
-            return false;
+            if (vehicle->GetEntry() == NPC_ANTI_PERSONNAL_CANNON)
+                return true;
         }
+
+        return false;
+    }
 };
 
 class achievement_arena_kills : public AchievementCriteriaScript
 {
-    public:
-        achievement_arena_kills(char const* name, uint8 arenaType) : AchievementCriteriaScript(name),
-            _arenaType(arenaType)
-        {
-        }
+public:
+    achievement_arena_kills(char const* name, uint8 arenaType) : AchievementCriteriaScript(name), _arenaType(arenaType) { }
 
-        bool OnCheck(Player* source, Unit* /*target*/)
-        {
-            // this checks GetBattleground() for NULL already
-            if (!source->InArena())
-                return false;
+    bool OnCheck(Player* source, Unit* /*target*/)
+    {
+        // this checks GetBattleground() for NULL already
+        if (!source->InArena())
+            return false;
 
-            return source->GetBattleground()->GetArenaType() == _arenaType;
-        }
-
-    private:
-        uint8 const _arenaType;
+        return source->GetBattleground()->GetArenaType() == _arenaType;
+    }
+private:
+    uint8 const _arenaType;
 };
 
 class achievement_sickly_gazelle : public AchievementCriteriaScript
@@ -188,77 +184,71 @@ public:
         if (Player* victim = target->ToPlayer())
             if (victim->IsMounted())
                 return true;
-
         return false;
     }
 };
 
 class achievement_everything_counts : public AchievementCriteriaScript
 {
-    public:
-        achievement_everything_counts() : AchievementCriteriaScript("achievement_everything_counts") { }
+public:
+    achievement_everything_counts() : AchievementCriteriaScript("achievement_everything_counts") { }
 
-        bool OnCheck(Player* source, Unit* /*target*/)
-        {
-            Battleground* bg = source->GetBattleground();
-            if (!bg)
-                return false;
-
-            if (bg->GetTypeID(true) != BATTLEGROUND_AV)
-                return false;
-
-            if (static_cast<BattlegroundAV*>(bg)->IsBothMinesControlledByTeam(source->GetTeam()))
-                return true;
-
+    bool OnCheck(Player* source, Unit* /*target*/)
+    {
+        Battleground* bg = source->GetBattleground();
+        if (!bg)
             return false;
-        }
+
+        if (bg->GetTypeID(true) != BATTLEGROUND_AV)
+            return false;
+
+        if (static_cast<BattlegroundAV*>(bg)->IsBothMinesControlledByTeam(source->GetTeam()))
+            return true;
+        return false;
+    }
 };
 
 class achievement_bg_av_perfection : public AchievementCriteriaScript
 {
-    public:
-        achievement_bg_av_perfection() : AchievementCriteriaScript("achievement_bg_av_perfection") { }
+public:
+    achievement_bg_av_perfection() : AchievementCriteriaScript("achievement_bg_av_perfection") { }
 
-        bool OnCheck(Player* source, Unit* /*target*/)
-        {
-            Battleground* bg = source->GetBattleground();
-            if (!bg)
-                return false;
-
-            if (bg->GetTypeID(true) != BATTLEGROUND_AV)
-                return false;
-
-            if (static_cast<BattlegroundAV*>(bg)->IsAllTowersControlledAndCaptainAlive(source->GetTeam()))
-                return true;
-
+    bool OnCheck(Player* source, Unit* /*target*/)
+    {
+        Battleground* bg = source->GetBattleground();
+        if (!bg)
             return false;
-        }
+
+        if (bg->GetTypeID(true) != BATTLEGROUND_AV)
+            return false;
+
+        if (static_cast<BattlegroundAV*>(bg)->IsAllTowersControlledAndCaptainAlive(source->GetTeam()))
+            return true;
+        return false;
+    }
 };
 
 class achievement_bg_sa_defense_of_ancients : public AchievementCriteriaScript
 {
-    public:
-        achievement_bg_sa_defense_of_ancients() : AchievementCriteriaScript("achievement_bg_sa_defense_of_ancients")
-        {
-        }
+public:
+    achievement_bg_sa_defense_of_ancients() : AchievementCriteriaScript("achievement_bg_sa_defense_of_ancients") { }
 
-        bool OnCheck(Player* player, Unit* /*target*/)
-        {
-            if (!player)
-                return false;
-
-            Battleground* battleground = player->GetBattleground();
-            if (!battleground)
-                return false;
-
-            if (player->GetTeamId() == static_cast<BattlegroundSA*>(battleground)->Attackers)
-                return false;
-
-            if (!static_cast<BattlegroundSA*>(battleground)->gateDestroyed)
-                return true;
-
+    bool OnCheck(Player* player, Unit* /*target*/)
+    {
+        if (!player)
             return false;
-        }
+
+        Battleground* battleground = player->GetBattleground();
+        if (!battleground)
+            return false;
+
+        if (player->GetTeamId() == static_cast<BattlegroundSA*>(battleground)->Attackers)
+            return false;
+
+        if (!static_cast<BattlegroundSA*>(battleground)->gateDestroyed)
+            return true;
+        return false;
+    }
 };
 
 enum ArgentTournamentAreas
@@ -273,89 +263,88 @@ enum ArgentTournamentAreas
 
 class achievement_tilted : public AchievementCriteriaScript
 {
-    public:
-        achievement_tilted() : AchievementCriteriaScript("achievement_tilted") {}
+public:
+    achievement_tilted() : AchievementCriteriaScript("achievement_tilted") { }
 
-        bool OnCheck(Player* player, Unit* /*target*/)
-        {
-            if (!player)
-                return false;
+    bool OnCheck(Player* player, Unit* /*target*/)
+    {
+        if (!player)
+            return false;
 
-            bool checkArea = player->GetAreaId() == AREA_ARGENT_TOURNAMENT_FIELDS ||
-                                player->GetAreaId() == AREA_RING_OF_ASPIRANTS ||
-                                player->GetAreaId() == AREA_RING_OF_ARGENT_VALIANTS ||
-                                player->GetAreaId() == AREA_RING_OF_ALLIANCE_VALIANTS ||
-                                player->GetAreaId() == AREA_RING_OF_HORDE_VALIANTS ||
-                                player->GetAreaId() == AREA_RING_OF_CHAMPIONS;
+        bool checkArea = player->GetAreaId() == AREA_ARGENT_TOURNAMENT_FIELDS ||
+            player->GetAreaId() == AREA_RING_OF_ASPIRANTS ||
+            player->GetAreaId() == AREA_RING_OF_ARGENT_VALIANTS ||
+            player->GetAreaId() == AREA_RING_OF_ALLIANCE_VALIANTS ||
+            player->GetAreaId() == AREA_RING_OF_HORDE_VALIANTS ||
+            player->GetAreaId() == AREA_RING_OF_CHAMPIONS;
 
-            return checkArea && player->duel && player->duel->isMounted;
-        }
+        return checkArea && player->duel && player->duel->isMounted;
+    }
 };
 
 class achievement_not_even_a_scratch : public AchievementCriteriaScript
 {
-    public:
-        achievement_not_even_a_scratch() : AchievementCriteriaScript("achievement_not_even_a_scratch") { }
+public:
+    achievement_not_even_a_scratch() : AchievementCriteriaScript("achievement_not_even_a_scratch") { }
 
-        bool OnCheck(Player* source, Unit* /*target*/)
-        {
-            if (!source)
-                return false;
-
-            Battleground* battleground = source->GetBattleground();
-            if (!battleground)
-                return false;
-
-            if (static_cast<BattlegroundSA*>(battleground)->notEvenAScratch(source->GetTeam()))
-                return true;
-
+    bool OnCheck(Player* source, Unit* /*target*/)
+    {
+        if (!source)
             return false;
-        }
+
+        Battleground* battleground = source->GetBattleground();
+        if (!battleground)
+            return false;
+
+        if (static_cast<BattlegroundSA*>(battleground)->notEvenAScratch(source->GetTeam()))
+            return true;
+        return false;
+    }
 };
 
 class AchievementRewardCheck : public PlayerScript
 {
-    public:
-        AchievementRewardCheck() : PlayerScript("AchievementRewardCheck") { }
+public:
+    AchievementRewardCheck() : PlayerScript("AchievementRewardCheck") { }
 
-        void OnLogin(Player* pPlayer)
+    void OnLogin(Player* pPlayer)
+    {
+
+        std::vector<uint32> check_ids;
+        check_ids.push_back(5876); // Pulling Zoo
+        check_ids.push_back(5877); // Menagerie
+        check_ids.push_back(5866); // The Molten Front Offensive
+        check_ids.push_back(5449); // Rock Lover
+        check_ids.push_back(5860); // The 'Unbeatable?' Pterodactyl: BEATEN.
+
+        // give reward item's spell for player if he has earned achievement before fixes
+
+        for (std::vector<uint32>::const_iterator itr = check_ids.begin(); itr != check_ids.end(); ++itr)
         {
+            if (!pPlayer->HasAchieved((*itr)))
+                continue;
 
-            std::vector<uint32> check_ids;
-            check_ids.push_back(5876); // Pulling Zoo
-            check_ids.push_back(5877); // Menagerie
-            check_ids.push_back(5866); // The Molten Front Offensive
-            check_ids.push_back(5449); // Rock Lover
-            check_ids.push_back(5860); // The 'Unbeatable?' Pterodactyl: BEATEN.
-
-            // give reward item's spell for player if he has earned achievement before fixes
-            
-            for (std::vector<uint32>::const_iterator itr = check_ids.begin(); itr != check_ids.end(); ++itr)
+            uint32 spellId1 = 0;
+            uint32 spellId2 = 0;
+            switch ((*itr))
             {
-                if (!pPlayer->HasAchieved((*itr)))
-                    continue;
-
-                uint32 spellId1 = 0;
-                uint32 spellId2 = 0;
-                switch ((*itr))
-                {
-                    case 5876: spellId1 = 100970; break; // Pulling Zoo
-                    case 5877: spellId1 = 101424; break; // Menagerie
-                    case 5866: spellId1 = 97359; break; // The Molten Front Offensive
-                    case 5449: spellId1 = 84492; break; // Rock Lover
-                    case 5860: spellId1 = 78683; spellId2 = 78685; break;    // The 'Unbeatable?' Pterodactyl: BEATEN.
-                    default: break;
-                }
-
-                if (spellId1)
-                    if (!pPlayer->HasSpell(spellId1))
-                        pPlayer->learnSpell(spellId1, false);
-
-                 if (spellId2)
-                    if (!pPlayer->HasSpell(spellId2))
-                        pPlayer->learnSpell(spellId2, false);
+            case 5876: spellId1 = 100970; break; // Pulling Zoo
+            case 5877: spellId1 = 101424; break; // Menagerie
+            case 5866: spellId1 = 97359; break; // The Molten Front Offensive
+            case 5449: spellId1 = 84492; break; // Rock Lover
+            case 5860: spellId1 = 78683; spellId2 = 78685; break;    // The 'Unbeatable?' Pterodactyl: BEATEN.
+            default: break;
             }
+
+            if (spellId1)
+                if (!pPlayer->HasSpell(spellId1))
+                    pPlayer->learnSpell(spellId1, false);
+
+            if (spellId2)
+                if (!pPlayer->HasSpell(spellId2))
+                    pPlayer->learnSpell(spellId2, false);
         }
+    }
 };
 
 void AddSC_achievement_scripts()

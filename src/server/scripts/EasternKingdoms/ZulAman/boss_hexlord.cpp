@@ -17,7 +17,7 @@ enum Spells
     SPELL_DRAIN_POWER               = 44131,
     SPELL_SIPHON_SOUL               = 43501,
 
-    
+
     SPELL_FLASH_HEAL                = 43575,
     SPELL_DISPEL_MAGIC              = 43577,
 
@@ -90,12 +90,12 @@ enum Events
 enum Adds
 {
     NPC_ALYSON_ANTILE   = 24240,
-    NPC_SLITHER         = 24242, 
-    NPC_GAZAKROTH       = 24244, 
+    NPC_SLITHER         = 24242,
+    NPC_GAZAKROTH       = 24244,
     NPC_DARKHEART       = 24246,
 };
 
-const Position addPos[2] = 
+const Position addPos[2] =
 {
     {109.43f, 922.57f, 33.90f, 1.57f},
     {126.40f, 922.78f, 33.90f, 1.57f}
@@ -121,433 +121,444 @@ struct PlayerAbilityStruct
 static PlayerAbilityStruct PlayerAbility[][3] =
 {
     // 1 warrior
-    {{SPELL_WR_SPELL_REFLECT, ABILITY_TARGET_SELF, 10000},
-    {SPELL_WR_WHIRLWIND, ABILITY_TARGET_SELF, 10000},
-    {SPELL_WR_MORTAL_STRIKE, ABILITY_TARGET_VICTIM, 6000}},
-    // 2 paladin
-    {{SPELL_PA_CONSECRATION, ABILITY_TARGET_SELF, 10000},
-    {SPELL_PA_HOLY_LIGHT, ABILITY_TARGET_HEAL, 10000},
-    {SPELL_PA_AVENGING_WRATH, ABILITY_TARGET_SELF, 10000}},
-    // 3 hunter
-    {{SPELL_HU_EXPLOSIVE_TRAP, ABILITY_TARGET_SELF, 10000},
-    {SPELL_HU_FREEZING_TRAP, ABILITY_TARGET_SELF, 10000},
-    {SPELL_HU_SNAKE_TRAP, ABILITY_TARGET_SELF, 10000}},
-    // 4 rogue
-    {{SPELL_RO_WOUND_POISON, ABILITY_TARGET_VICTIM, 3000},
-    {SPELL_RO_SLICE_DICE, ABILITY_TARGET_SELF, 10000},
-    {SPELL_RO_BLIND, ABILITY_TARGET_ENEMY, 10000}},
-    // 5 priest
-    {{SPELL_PR_PAIN_SUPP, ABILITY_TARGET_HEAL, 10000},
-    {SPELL_PR_HEAL, ABILITY_TARGET_HEAL, 10000},
-    {SPELL_PR_PSYCHIC_SCREAM, ABILITY_TARGET_SELF, 10000}},
-    // 5* shadow priest
-    {{SPELL_PR_MIND_CONTROL, ABILITY_TARGET_ENEMY, 15000},
-    {SPELL_PR_MIND_BLAST, ABILITY_TARGET_ENEMY, 5000},
-    {SPELL_PR_SW_DEATH, ABILITY_TARGET_ENEMY, 10000}},
-    // 7 shaman
-    {{SPELL_SH_FIRE_NOVA, ABILITY_TARGET_SELF, 10000},
-    {SPELL_SH_HEALING_WAVE, ABILITY_TARGET_HEAL, 10000},
-    {SPELL_SH_CHAIN_LIGHT, ABILITY_TARGET_ENEMY, 8000}},
-    // 8 mage
-    {{SPELL_MG_FIREBALL, ABILITY_TARGET_ENEMY, 5000},
-    {SPELL_MG_FROSTBOLT, ABILITY_TARGET_ENEMY, 5000},
-    {SPELL_MG_ICE_LANCE, ABILITY_TARGET_SPECIAL, 2000}},
-    // 9 warlock
-    {{SPELL_WL_CURSE_OF_DOOM, ABILITY_TARGET_ENEMY, 10000},
-    {SPELL_WL_RAIN_OF_FIRE, ABILITY_TARGET_ENEMY, 10000},
-    {SPELL_WL_UNSTABLE_AFFL, ABILITY_TARGET_ENEMY, 10000}},
-    // 11 druid
-    {{SPELL_DR_LIFEBLOOM, ABILITY_TARGET_HEAL, 10000},
-    {SPELL_DR_THORNS, ABILITY_TARGET_SELF, 10000},
-    {SPELL_DR_MOONFIRE, ABILITY_TARGET_ENEMY, 8000}}
+    {
+        {SPELL_WR_SPELL_REFLECT, ABILITY_TARGET_SELF, 10000},
+        {SPELL_WR_WHIRLWIND, ABILITY_TARGET_SELF, 10000},
+        {SPELL_WR_MORTAL_STRIKE, ABILITY_TARGET_VICTIM, 6000}
+    },
+        // 2 paladin
+    {
+        {SPELL_PA_CONSECRATION, ABILITY_TARGET_SELF, 10000},
+        {SPELL_PA_HOLY_LIGHT, ABILITY_TARGET_HEAL, 10000},
+        {SPELL_PA_AVENGING_WRATH, ABILITY_TARGET_SELF, 10000}
+    },
+        // 3 hunter
+    {
+        {SPELL_HU_EXPLOSIVE_TRAP, ABILITY_TARGET_SELF, 10000},
+        {SPELL_HU_FREEZING_TRAP, ABILITY_TARGET_SELF, 10000},
+        {SPELL_HU_SNAKE_TRAP, ABILITY_TARGET_SELF, 10000}
+    },
+        // 4 rogue
+    {
+        {SPELL_RO_WOUND_POISON, ABILITY_TARGET_VICTIM, 3000},
+        {SPELL_RO_SLICE_DICE, ABILITY_TARGET_SELF, 10000},
+        {SPELL_RO_BLIND, ABILITY_TARGET_ENEMY, 10000}
+    },
+        // 5 priest
+    {
+        {SPELL_PR_PAIN_SUPP, ABILITY_TARGET_HEAL, 10000},
+        {SPELL_PR_HEAL, ABILITY_TARGET_HEAL, 10000},
+        {SPELL_PR_PSYCHIC_SCREAM, ABILITY_TARGET_SELF, 10000}
+    },
+        // 5* shadow priest
+    {
+        {SPELL_PR_MIND_CONTROL, ABILITY_TARGET_ENEMY, 15000},
+        {SPELL_PR_MIND_BLAST, ABILITY_TARGET_ENEMY, 5000},
+        {SPELL_PR_SW_DEATH, ABILITY_TARGET_ENEMY, 10000}
+    },
+        // 7 shaman
+    {
+        {SPELL_SH_FIRE_NOVA, ABILITY_TARGET_SELF, 10000},
+        {SPELL_SH_HEALING_WAVE, ABILITY_TARGET_HEAL, 10000},
+        {SPELL_SH_CHAIN_LIGHT, ABILITY_TARGET_ENEMY, 8000}
+    },
+        // 8 mage
+    {
+        {SPELL_MG_FIREBALL, ABILITY_TARGET_ENEMY, 5000},
+        {SPELL_MG_FROSTBOLT, ABILITY_TARGET_ENEMY, 5000},
+        {SPELL_MG_ICE_LANCE, ABILITY_TARGET_SPECIAL, 2000}
+    },
+        // 9 warlock
+    {
+        {SPELL_WL_CURSE_OF_DOOM, ABILITY_TARGET_ENEMY, 10000},
+        {SPELL_WL_RAIN_OF_FIRE, ABILITY_TARGET_ENEMY, 10000},
+        {SPELL_WL_UNSTABLE_AFFL, ABILITY_TARGET_ENEMY, 10000}
+    },
+        // 11 druid
+    {
+        {SPELL_DR_LIFEBLOOM, ABILITY_TARGET_HEAL, 10000},
+        {SPELL_DR_THORNS, ABILITY_TARGET_SELF, 10000},
+        {SPELL_DR_MOONFIRE, ABILITY_TARGET_ENEMY, 8000}
+    }
 };
 
 class boss_hex_lord_malacrass : public CreatureScript
 {
-    public:
+public:
+    boss_hex_lord_malacrass() : CreatureScript("boss_hex_lord_malacrass") { }
 
-        boss_hex_lord_malacrass() : CreatureScript("boss_hex_lord_malacrass") {}
-        
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new boss_hex_lord_malacrassAI(pCreature);
+    }
+
+    struct boss_hex_lord_malacrassAI : public BossAI
+    {
+        boss_hex_lord_malacrassAI(Creature* pCreature) : BossAI(pCreature, DATA_HEX_LORD_MALACRASS)
         {
-            return new boss_hex_lord_malacrassAI(pCreature);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
         }
 
-        struct boss_hex_lord_malacrassAI : public BossAI
+        uint32 PlayerClass;
+
+        void Reset()
         {
-            boss_hex_lord_malacrassAI(Creature* pCreature) : BossAI(pCreature, DATA_HEX_LORD_MALACRASS)
+            _Reset();
+
+            switch (urand(0, 5))
             {
-                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
+                case 0:
+                    me->SummonCreature(NPC_ALYSON_ANTILE, addPos[0], TEMPSUMMON_DEAD_DESPAWN);
+                    me->SummonCreature(NPC_SLITHER, addPos[1], TEMPSUMMON_DEAD_DESPAWN);
+                    break;
+                case 1:
+                    me->SummonCreature(NPC_ALYSON_ANTILE, addPos[0], TEMPSUMMON_DEAD_DESPAWN);
+                    me->SummonCreature(NPC_GAZAKROTH, addPos[1], TEMPSUMMON_DEAD_DESPAWN);
+                    break;
+                case 2:
+                    me->SummonCreature(NPC_ALYSON_ANTILE, addPos[0], TEMPSUMMON_DEAD_DESPAWN);
+                    me->SummonCreature(NPC_DARKHEART, addPos[1], TEMPSUMMON_DEAD_DESPAWN);
+                    break;
+                case 3:
+                    me->SummonCreature(NPC_GAZAKROTH, addPos[0], TEMPSUMMON_DEAD_DESPAWN);
+                    me->SummonCreature(NPC_SLITHER, addPos[1], TEMPSUMMON_DEAD_DESPAWN);
+                    break;
+                case 4:
+                    me->SummonCreature(NPC_GAZAKROTH, addPos[0], TEMPSUMMON_DEAD_DESPAWN);
+                    me->SummonCreature(NPC_DARKHEART, addPos[1], TEMPSUMMON_DEAD_DESPAWN);
+                    break;
+                case 5:
+                    me->SummonCreature(NPC_SLITHER, addPos[0], TEMPSUMMON_DEAD_DESPAWN);
+                    me->SummonCreature(NPC_DARKHEART, addPos[1], TEMPSUMMON_DEAD_DESPAWN);
+                    break;
             }
 
-            uint32 PlayerClass;
+            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 46916);
+            me->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
+        }
 
-            void Reset()
+        void EnterCombat(Unit* /*who*/)
+        {
+            events.ScheduleEvent(EVENT_SPIRIT_BOLTS, 10000);
+            events.ScheduleEvent(EVENT_DRAIN_POWER, 6000);
+            Talk(SAY_AGGRO);
+            DoZoneInCombat();
+            instance->SetBossState(DATA_HEX_LORD_MALACRASS, IN_PROGRESS);
+        }
+
+        void KilledUnit(Unit* /*victim*/)
+        {
+            Talk(SAY_KILL);
+        }
+
+        void SummonedCreatureDies(Creature* summon, Unit* killer)
+        {
+            Talk(SAY_PET);
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            _JustDied();
+            Talk(SAY_DEATH);
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                _Reset();
-
-                switch (urand(0, 5))
+                switch (eventId)
                 {
-                    case 0:
-                        me->SummonCreature(NPC_ALYSON_ANTILE, addPos[0], TEMPSUMMON_DEAD_DESPAWN);
-                        me->SummonCreature(NPC_SLITHER, addPos[1], TEMPSUMMON_DEAD_DESPAWN);
+                    case EVENT_DRAIN_POWER:
+                        DoCast(me, SPELL_DRAIN_POWER, true);
+                        events.ScheduleEvent(EVENT_DRAIN_POWER, 40000);
                         break;
-                    case 1:
-                        me->SummonCreature(NPC_ALYSON_ANTILE, addPos[0], TEMPSUMMON_DEAD_DESPAWN);
-                        me->SummonCreature(NPC_GAZAKROTH, addPos[1], TEMPSUMMON_DEAD_DESPAWN);
+                    case EVENT_SPIRIT_BOLTS:
+                        Talk(SAY_BOLTS);
+                        DoCast(me, SPELL_SPIRIT_BOLTS);
+                        events.ScheduleEvent(EVENT_SPIRIT_BOLTS, 45000);
+                        events.ScheduleEvent(EVENT_SIPHON_SOUL, 10000);
                         break;
-                    case 2:
-                        me->SummonCreature(NPC_ALYSON_ANTILE, addPos[0], TEMPSUMMON_DEAD_DESPAWN);
-                        me->SummonCreature(NPC_DARKHEART, addPos[1], TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 3:
-                        me->SummonCreature(NPC_GAZAKROTH, addPos[0], TEMPSUMMON_DEAD_DESPAWN);
-                        me->SummonCreature(NPC_SLITHER, addPos[1], TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 4:
-                        me->SummonCreature(NPC_GAZAKROTH, addPos[0], TEMPSUMMON_DEAD_DESPAWN);
-                        me->SummonCreature(NPC_DARKHEART, addPos[1], TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 5:
-                        me->SummonCreature(NPC_SLITHER, addPos[0], TEMPSUMMON_DEAD_DESPAWN);
-                        me->SummonCreature(NPC_DARKHEART, addPos[1], TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                }       
-
-                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 46916);
-                me->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
-            }
-
-            void EnterCombat(Unit* /*who*/)
-            {
-                events.ScheduleEvent(EVENT_SPIRIT_BOLTS, 10000);
-                events.ScheduleEvent(EVENT_DRAIN_POWER, 6000);
-                Talk(SAY_AGGRO);
-                DoZoneInCombat();
-                instance->SetBossState(DATA_HEX_LORD_MALACRASS, IN_PROGRESS);
-            }
-
-            void KilledUnit(Unit* /*victim*/)
-            {
-                Talk(SAY_KILL);
-            }
-            
-            void SummonedCreatureDies(Creature* summon, Unit* killer)
-            {
-                Talk(SAY_PET);
-            }
-
-            void JustDied(Unit* /*killer*/)
-            {
-                _JustDied();
-                Talk(SAY_DEATH);
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-                
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING)) 
-                    return;
-                
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                     switch (eventId)
-                     {
-                        case EVENT_DRAIN_POWER:
-                            DoCast(me, SPELL_DRAIN_POWER, true);
-                            events.ScheduleEvent(EVENT_DRAIN_POWER, 40000);
-                            break;
-                        case EVENT_SPIRIT_BOLTS:
-                            Talk(SAY_BOLTS);
-                            DoCast(me, SPELL_SPIRIT_BOLTS);
-                            events.ScheduleEvent(EVENT_SPIRIT_BOLTS, 45000);
-                            events.ScheduleEvent(EVENT_SIPHON_SOUL, 10000);
-                            break;
-                        case EVENT_SIPHON_SOUL:
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                            {
-                                PlayerClass = pTarget->getClass() - 1;
-                                if (PlayerClass == CLASS_DRUID-1)
-                                    PlayerClass = CLASS_DRUID;
-                                else if (PlayerClass == CLASS_PRIEST-1 && pTarget->HasSpell(15473))
-                                    PlayerClass = CLASS_PRIEST; // shadow priest
-
-                                DoCast(pTarget, SPELL_SIPHON_SOUL);
-                                me->ClearUnitState(UNIT_STATE_CASTING);
-                                events.ScheduleEvent(EVENT_PLAYER_ABILITY, urand(5000, 8000));
-                                events.ScheduleEvent(EVENT_PLAYER_ABILITY_OFF, 30000);
-                            }
-                            break;
-                        case EVENT_PLAYER_ABILITY:
-                            UseAbility();
-                            events.ScheduleEvent(EVENT_PLAYER_ABILITY, urand(8000, 10000));
-                            break;
-                        case EVENT_PLAYER_ABILITY_OFF:
-                            events.CancelEvent(EVENT_PLAYER_ABILITY);
-                            break;
-                     }
-                }
-
-                DoMeleeAttackIfReady();
-            }
-
-            void UseAbility()
-            {
-                uint8 random = urand(0, 2);
-                Unit* target = NULL;
-                switch (PlayerAbility[PlayerClass][random].target)
-                {
-                    case ABILITY_TARGET_SELF:
-                        target = me;
-                        break;
-                    case ABILITY_TARGET_VICTIM:
-                        target = me->getVictim();
-                        break;
-                    case ABILITY_TARGET_ENEMY:
-                    default:
-                        target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true);
-                        break;
-                    case ABILITY_TARGET_HEAL:
-                        target = DoSelectLowestHpFriendly(50, 0);
-                        break;
-                    case ABILITY_TARGET_BUFF:
+                    case EVENT_SIPHON_SOUL:
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                         {
-                            std::list<Creature*> templist = DoFindFriendlyMissingBuff(50, PlayerAbility[PlayerClass][random].spell);
-                            if (!templist.empty())
-                                target = *(templist.begin());
+                            PlayerClass = pTarget->getClass() - 1;
+                            if (PlayerClass == CLASS_DRUID-1)
+                                PlayerClass = CLASS_DRUID;
+                            else if (PlayerClass == CLASS_PRIEST-1 && pTarget->HasSpell(15473))
+                                PlayerClass = CLASS_PRIEST; // shadow priest
+
+                            DoCast(pTarget, SPELL_SIPHON_SOUL);
+                            me->ClearUnitState(UNIT_STATE_CASTING);
+                            events.ScheduleEvent(EVENT_PLAYER_ABILITY, urand(5000, 8000));
+                            events.ScheduleEvent(EVENT_PLAYER_ABILITY_OFF, 30000);
                         }
                         break;
+                    case EVENT_PLAYER_ABILITY:
+                        UseAbility();
+                        events.ScheduleEvent(EVENT_PLAYER_ABILITY, urand(8000, 10000));
+                        break;
+                    case EVENT_PLAYER_ABILITY_OFF:
+                        events.CancelEvent(EVENT_PLAYER_ABILITY);
+                        break;
                 }
-                if (target)
-                    DoCast(target, PlayerAbility[PlayerClass][random].spell, false);
             }
-        };
+
+            DoMeleeAttackIfReady();
+        }
+
+        void UseAbility()
+        {
+            uint8 random = urand(0, 2);
+            Unit* target = NULL;
+            switch (PlayerAbility[PlayerClass][random].target)
+            {
+                case ABILITY_TARGET_SELF:
+                    target = me;
+                    break;
+                case ABILITY_TARGET_VICTIM:
+                    target = me->getVictim();
+                    break;
+                case ABILITY_TARGET_ENEMY:
+                default:
+                    target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true);
+                    break;
+                case ABILITY_TARGET_HEAL:
+                    target = DoSelectLowestHpFriendly(50, 0);
+                    break;
+                case ABILITY_TARGET_BUFF:
+                {
+                                            std::list<Creature*> templist = DoFindFriendlyMissingBuff(50, PlayerAbility[PlayerClass][random].spell);
+                                            if (!templist.empty())
+                                                target = *(templist.begin());
+                }
+                    break;
+            }
+            if (target)
+                DoCast(target, PlayerAbility[PlayerClass][random].spell, false);
+        }
+    };
 };
 
 class npc_alyson_antille : public CreatureScript
 {
-    public:
+public:
+    npc_alyson_antille() : CreatureScript("npc_alyson_antille") { }
 
-        npc_alyson_antille() : CreatureScript("npc_alyson_antille") {}
-         
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_alyson_antilleAI(pCreature);
+    }
+
+    struct npc_alyson_antilleAI : public ScriptedAI
+    {
+        npc_alyson_antilleAI(Creature* pCreature) : ScriptedAI(pCreature)
+        { }
+
+        uint32 flashheal_timer;
+        uint32 dispelmagic_timer;
+
+        void Reset()
         {
-            return new npc_alyson_antilleAI(pCreature);
+            flashheal_timer = 2500;
+            dispelmagic_timer = 10000;
         }
 
-        struct npc_alyson_antilleAI : public ScriptedAI
+        void UpdateAI(const uint32 diff)
         {
-            npc_alyson_antilleAI(Creature* pCreature) : ScriptedAI(pCreature)
+            if (!UpdateVictim())
+                return;
+
+            if (flashheal_timer <= diff)
             {
-            }
-
-            uint32 flashheal_timer;
-            uint32 dispelmagic_timer;
-
-            void Reset()
-            {
-                flashheal_timer = 2500;
-                dispelmagic_timer = 10000;
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                if (flashheal_timer <= diff)
+                Unit* target = DoSelectLowestHpFriendly(99, 30000);
+                if (target)
                 {
-                    Unit* target = DoSelectLowestHpFriendly(99, 30000);
-                    if (target)
-                    {
-                        if (target->IsWithinDistInMap(me, 50))
-                            DoCast(target, SPELL_FLASH_HEAL, false);
-                        else
-                        {
-                            // bugged
-                            //me->GetMotionMaster()->Clear();
-                            //me->GetMotionMaster()->MoveChase(target, 20);
-                        }
-                    }
+                    if (target->IsWithinDistInMap(me, 50))
+                        DoCast(target, SPELL_FLASH_HEAL, false);
                     else
                     {
-                        if (urand(0, 1))
-                            target = DoSelectLowestHpFriendly(50, 0);
-                        else
-                            target = SelectTarget(SELECT_TARGET_RANDOM, 0);
-                        if (target)
-                            DoCast(target, SPELL_DISPEL_MAGIC, false);
+                        // bugged
+                        //me->GetMotionMaster()->Clear();
+                        //me->GetMotionMaster()->MoveChase(target, 20);
                     }
-                    flashheal_timer = 2500;
-                } else flashheal_timer -= diff;
+                } else
+                {
+                    if (urand(0, 1))
+                        target = DoSelectLowestHpFriendly(50, 0);
+                    else
+                        target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                    if (target)
+                        DoCast(target, SPELL_DISPEL_MAGIC, false);
+                }
+                flashheal_timer = 2500;
+            } else flashheal_timer -= diff;
 
-                DoMeleeAttackIfReady();
-            }
-        };
+            DoMeleeAttackIfReady();
+        }
+    };
 };
 class npc_gazakroth : public CreatureScript
 {
-    public:
+public:
+    npc_gazakroth() : CreatureScript("npc_gazakroth") { }
 
-        npc_gazakroth() : CreatureScript("npc_gazakroth") {}
-         
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_gazakrothAI(pCreature);
+    }
+
+    struct npc_gazakrothAI : public ScriptedAI
+    {
+        npc_gazakrothAI(Creature* pCreature) : ScriptedAI(pCreature) { }
+
+        uint32 firebolt_timer;
+
+        void Reset()
         {
-            return new npc_gazakrothAI(pCreature);
+            firebolt_timer = 2000;
         }
 
-        struct npc_gazakrothAI : public ScriptedAI
+        void UpdateAI(const uint32 diff)
         {
-            npc_gazakrothAI(Creature* pCreature) : ScriptedAI(pCreature)  {}
+            if (!UpdateVictim())
+                return;
 
-            uint32 firebolt_timer;
-
-            void Reset()
+            if (firebolt_timer <= diff)
             {
-                firebolt_timer = 2000;
-            }
+                DoCast(me->getVictim(), SPELL_FIREBOLT, false);
+                firebolt_timer = 700;
+            } else firebolt_timer -= diff;
 
-            void UpdateAI(const uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                if (firebolt_timer <= diff)
-                {
-                    DoCast(me->getVictim(), SPELL_FIREBOLT, false);
-                    firebolt_timer = 700;
-                } else firebolt_timer -= diff;
-
-                DoMeleeAttackIfReady();
-            }
-        };
+            DoMeleeAttackIfReady();
+        }
+    };
 };
 
 class npc_darkheart : public CreatureScript
 {
-    public:
+public:
+    npc_darkheart() : CreatureScript("npc_darkheart") { }
 
-        npc_darkheart() : CreatureScript("npc_darkheart") {}
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_darkheartAI(pCreature);
+    }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+    struct npc_darkheartAI : public ScriptedAI
+    {
+        npc_darkheartAI(Creature* pCreature) : ScriptedAI(pCreature) { }
+
+        uint32 psychicwail_timer;
+
+        void Reset()
         {
-            return new npc_darkheartAI(pCreature);
+            psychicwail_timer = 8000;
         }
-
-        struct npc_darkheartAI : public ScriptedAI
+        void UpdateAI(const uint32 diff)
         {
-            npc_darkheartAI(Creature* pCreature) : ScriptedAI(pCreature)  {}
+            if (!UpdateVictim())
+                return;
 
-            uint32 psychicwail_timer;
-
-            void Reset()
+            if (psychicwail_timer <= diff)
             {
-                psychicwail_timer = 8000;
-            }
-            void UpdateAI(const uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
+                DoCast(me->getVictim(), SPELL_PSYCHIC_WAIL, false);
+                psychicwail_timer = 12000;
+            } else psychicwail_timer -= diff;
 
-                if (psychicwail_timer <= diff)
-                {
-                    DoCast(me->getVictim(), SPELL_PSYCHIC_WAIL, false);
-                    psychicwail_timer = 12000;
-                } else psychicwail_timer -= diff;
-
-                DoMeleeAttackIfReady();
-            }
-        };
+            DoMeleeAttackIfReady();
+        }
+    };
 };
-
-
 
 class npc_slither : public CreatureScript
 {
-    public:
+public:
+    npc_slither() : CreatureScript("npc_slither") { }
 
-        npc_slither() : CreatureScript("npc_slither") {}
-        
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_slitherAI(pCreature);
+    }
+
+    struct npc_slitherAI : public ScriptedAI
+    {
+        npc_slitherAI(Creature* pCreature) : ScriptedAI(pCreature) { }
+
+        uint32 venomspit_timer;
+
+        void Reset()
         {
-            return new npc_slitherAI(pCreature);
+            venomspit_timer = 5000;
         }
 
-        struct npc_slitherAI : public ScriptedAI
+        void UpdateAI(const uint32 diff)
         {
-            npc_slitherAI(Creature* pCreature) : ScriptedAI(pCreature) {}
+            if (!UpdateVictim())
+                return;
 
-            uint32 venomspit_timer;
-
-            void Reset()
+            if (venomspit_timer <= diff)
             {
-                venomspit_timer = 5000;
-            }
+                if (Unit* victim = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    DoCast(victim, SPELL_VENOM_SPIT, false);
+                venomspit_timer = 2500;
+            } else venomspit_timer -= diff;
 
-            void UpdateAI(const uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                if (venomspit_timer <= diff)
-                {
-                    if (Unit* victim = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                        DoCast(victim, SPELL_VENOM_SPIT, false);
-                    venomspit_timer = 2500;
-                } else venomspit_timer -= diff;
-
-                DoMeleeAttackIfReady();
-            }
-        };
+            DoMeleeAttackIfReady();
+        }
+    };
 };
 
 class spell_hexlord_unstable_affliction : public SpellScriptLoader
 {
-    public:
-        spell_hexlord_unstable_affliction() : SpellScriptLoader("spell_hexlord_unstable_affliction") { }
+public:
+    spell_hexlord_unstable_affliction() : SpellScriptLoader("spell_hexlord_unstable_affliction") { }
 
-        class spell_hexlord_unstable_affliction_AuraScript : public AuraScript
+    class spell_hexlord_unstable_affliction_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_hexlord_unstable_affliction_AuraScript);
+
+        bool Validate(SpellInfo const* /*spell*/)
         {
-            PrepareAuraScript(spell_hexlord_unstable_affliction_AuraScript);
-
-            bool Validate(SpellInfo const* /*spell*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WL_UNSTABLE_AFFL_DISPEL))
-                    return false;
-                return true;
-            }
-
-            void HandleDispel(DispelInfo* dispelInfo)
-            {
-                if (Unit* caster = GetCaster())
-                    caster->CastSpell(dispelInfo->GetDispeller(), SPELL_WL_UNSTABLE_AFFL_DISPEL, true, NULL, GetEffect(EFFECT_0));
-            }
-
-            void Register()
-            {
-                AfterDispel += AuraDispelFn(spell_hexlord_unstable_affliction_AuraScript::HandleDispel);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_hexlord_unstable_affliction_AuraScript();
+            if (!sSpellMgr->GetSpellInfo(SPELL_WL_UNSTABLE_AFFL_DISPEL))
+                return false;
+            return true;
         }
+
+        void HandleDispel(DispelInfo* dispelInfo)
+        {
+            if (Unit* caster = GetCaster())
+                caster->CastSpell(dispelInfo->GetDispeller(), SPELL_WL_UNSTABLE_AFFL_DISPEL, true, NULL, GetEffect(EFFECT_0));
+        }
+
+        void Register()
+        {
+            AfterDispel += AuraDispelFn(spell_hexlord_unstable_affliction_AuraScript::HandleDispel);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_hexlord_unstable_affliction_AuraScript();
+    }
 };
 
 void AddSC_boss_hex_lord_malacrass()

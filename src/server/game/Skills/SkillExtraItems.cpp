@@ -139,3 +139,4 @@ bool canCreateExtraItems(Player* player, uint32 spellId, float &additionalChance
     // enable extra item creation
     return true;
 }
+

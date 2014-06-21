@@ -219,7 +219,7 @@ enum eSpells
     SPELL_HONARTS_INGENIOUS_CAPOFMOOK_FOOLERY  = 67435,
     SPELL_FIERY_BOULDER                        = 70097,
     SPELL_FaG_SUMMON_BILGEWATER_BUCCANEER      = 70075,
-    SPELL_NR_SUMMON_BILGEWATER_BUCCANEER        = 70015,
+    SPELL_NR_SUMMON_BILGEWATER_BUCCANEER       = 70015,
 
     PHASE_QUEST_ZONE_SPECIFIC_1                = 59073,
     PHASE_QUEST_ZONE_SPECIFIC_2                = 59074,
@@ -801,10 +801,10 @@ static float RightBunnySummPos[7][4] =
     {-8402.84f, 1356.28f, 111.426f, 6.230825f},
 };
 
-#define    VINNY_VENDOR           "Винни, я должен добыть хотя бы один сувенир с места катаклизма!"
-#define    GOSSIP_GO_TO_THE_BOAT  "Ну, Хамми, я готов. Можно ехать."
-#define    NEW_OUTFIT             "Забо, я хочу устроить вечеринку, и мне нужен новый модный костюм"
-#define    COOL_SHADES            "Мне нужны модные темные очки. Что можно купить на эти две пачки деревянных?"
-#define    SHINY_BLING            "Продай мне самые крутые, самые яркие блестяшки!"
+#define    VINNY_VENDOR           "Р’РёРЅРЅРё, СЏ РґРѕР»Р¶РµРЅ РґРѕР±С‹С‚СЊ С…РѕС‚СЏ Р±С‹ РѕРґРёРЅ СЃСѓРІРµРЅРёСЂ СЃ РјРµСЃС‚Р° РєР°С‚Р°РєР»РёР·РјР°!"
+#define    GOSSIP_GO_TO_THE_BOAT  "РќСѓ, РҐР°РјРјРё, СЏ РіРѕС‚РѕРІ. РњРѕР¶РЅРѕ РµС…Р°С‚СЊ."
+#define    NEW_OUTFIT             "Р—Р°Р±Рѕ, СЏ С…РѕС‡Сѓ СѓСЃС‚СЂРѕРёС‚СЊ РІРµС‡РµСЂРёРЅРєСѓ, Рё РјРЅРµ РЅСѓР¶РµРЅ РЅРѕРІС‹Р№ РјРѕРґРЅС‹Р№ РєРѕСЃС‚СЋРј"
+#define    COOL_SHADES            "РњРЅРµ РЅСѓР¶РЅС‹ РјРѕРґРЅС‹Рµ С‚РµРјРЅС‹Рµ РѕС‡РєРё. Р§С‚Рѕ РјРѕР¶РЅРѕ РєСѓРїРёС‚СЊ РЅР° СЌС‚Рё РґРІРµ РїР°С‡РєРё РґРµСЂРµРІСЏРЅРЅС‹С…?"
+#define    SHINY_BLING            "РџСЂРѕРґР°Р№ РјРЅРµ СЃР°РјС‹Рµ РєСЂСѓС‚С‹Рµ, СЃР°РјС‹Рµ СЏСЂРєРёРµ Р±Р»РµСЃС‚СЏС€РєРё!"
 #define    LOST_ISLES             648
 #endif

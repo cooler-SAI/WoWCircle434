@@ -63,9 +63,9 @@ void RARunnable::run()
 
     uint16 raport = uint16(ConfigMgr::GetIntDefault("Ra.Port", 3443));
     std::string stringip = ConfigMgr::GetStringDefault("Ra.IP", "0.0.0.0");
-    ACE_INET_Addr listenAddress(raport, stringip.c_str());
+    ACE_INET_Addr listen_addr(raport, stringip.c_str());
 
-    if (acceptor.open(listenAddress, m_Reactor) == -1)
+    if (acceptor.open(listen_addr, m_Reactor) == -1)
     {
         sLog->outError(LOG_FILTER_WORLDSERVER, "CerberCore RA can not bind to port %d on %s", raport, stringip.c_str());
         return;

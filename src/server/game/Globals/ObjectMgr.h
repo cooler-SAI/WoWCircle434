@@ -392,7 +392,7 @@ typedef UNORDERED_MAP<uint32/*cell_id*/, CellObjectGuids> CellObjectGuidsMap;
 typedef UNORDERED_MAP<uint32/*(mapid, spawnMode) pair*/, CellObjectGuidsMap> MapObjectGuids;
 
 // CerberCore string ranges
-#define MIN_CERBERCORE_STRING_ID           1                    // 'CERBERCORE_string'
+#define MIN_CERBERCORE_STRING_ID           1                    // 'cerbercore_string'
 #define MAX_CERBERCORE_STRING_ID           2000000000
 #define MIN_DB_SCRIPT_STRING_ID        MAX_CERBERCORE_STRING_ID // 'db_script_string'
 #define MAX_DB_SCRIPT_STRING_ID        2000010000
@@ -941,7 +941,7 @@ class ObjectMgr
         void ValidateSpellScripts();
 
         bool LoadCerberCoreStrings(char const* table, int32 min_value, int32 max_value);
-        bool LoadCerberCoreStrings() { return LoadCerberCoreStrings("CERBERCORE_string", MIN_CERBERCORE_STRING_ID, MAX_CERBERCORE_STRING_ID); }
+        bool LoadCerberCoreStrings() { return LoadCerberCoreStrings("cerbercore_string", MIN_CERBERCORE_STRING_ID, MAX_CERBERCORE_STRING_ID); }
         void LoadDbScriptStrings();
         void LoadCreatureClassLevelStats();
         void LoadCreatureLocales();

@@ -49,313 +49,312 @@ enum Points
 
 class boss_akilzon : public CreatureScript
 {
-    public:
-        boss_akilzon() : CreatureScript("boss_akilzon") {}
-        
-        CreatureAI* GetAI(Creature* pCreature) const
+public:
+    boss_akilzon() : CreatureScript("boss_akilzon") { }
+
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new boss_akilzonAI(pCreature);
+    }
+
+    struct boss_akilzonAI : public BossAI
+    {
+        boss_akilzonAI(Creature* pCreature) : BossAI(pCreature, DATA_AKILZON)
         {
-            return new boss_akilzonAI(pCreature);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
         }
 
-        struct boss_akilzonAI : public BossAI
+        uint64 Eagles[8];
+
+        void Reset()
         {
-            boss_akilzonAI(Creature* pCreature) : BossAI(pCreature, DATA_AKILZON)
-            {
-                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-            }
-            
-            uint64 Eagles[8];
+            _Reset();
 
-            void Reset()
-            {
-                _Reset();
+            memset(&Eagles, 0, sizeof(Eagles));
+        }
 
-                memset(&Eagles, 0, sizeof(Eagles));
-            }
+        void EnterCombat(Unit* /*who*/)
+        {
+            events.ScheduleEvent(EVENT_ELECTRICAL_STORM, 50000);
+            events.ScheduleEvent(EVENT_STATIC_DISRUPTION, 7000);
+            events.ScheduleEvent(EVENT_SUMMON_KIDNAPPER, 35000);
+            events.ScheduleEvent(EVENT_CALL_LIGHTNING, urand(3000, 5000));
+            events.ScheduleEvent(EVENT_SUMMON_EAGLE, 10000);
+            Talk(SAY_AGGRO);
+            DoZoneInCombat();
+            instance->SetBossState(DATA_AKILZON, IN_PROGRESS);
+        }
 
-            void EnterCombat(Unit* /*who*/)
-            {
-                events.ScheduleEvent(EVENT_ELECTRICAL_STORM, 50000);
-                events.ScheduleEvent(EVENT_STATIC_DISRUPTION, 7000);
-                events.ScheduleEvent(EVENT_SUMMON_KIDNAPPER, 35000);
-                events.ScheduleEvent(EVENT_CALL_LIGHTNING, urand(3000, 5000));
-                events.ScheduleEvent(EVENT_SUMMON_EAGLE, 10000);
-                Talk(SAY_AGGRO);
-                DoZoneInCombat();
-                instance->SetBossState(DATA_AKILZON, IN_PROGRESS);
-            }
+        void JustDied(Unit* /*killer*/)
+        {
+            _JustDied();
+            Talk(SAY_DEATH);
+        }
 
-            void JustDied(Unit* /*killer*/)
-            {
-                _JustDied();
-                Talk(SAY_DEATH);
-            }
-            
-            void JustSummoned(Creature* summon)
-            {
-                BossAI::JustSummoned(summon);
-            }
-            
-            void SummonedCreatureDespawn(Creature* summon)
-            {
-                BossAI::SummonedCreatureDespawn(summon);
-            }
+        void JustSummoned(Creature* summon)
+        {
+            BossAI::JustSummoned(summon);
+        }
 
-            void KilledUnit(Unit* /*victim*/)
+        void SummonedCreatureDespawn(Creature* summon)
+        {
+            BossAI::SummonedCreatureDespawn(summon);
+        }
+
+        void KilledUnit(Unit* /*victim*/)
+        {
+            Talk(SAY_KILL);
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                Talk(SAY_KILL);
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-                
-                while (uint32 eventId = events.ExecuteEvent())
+                switch (eventId)
                 {
-                     switch (eventId)
-                     {
-                        case EVENT_CALL_LIGHTNING:
-                            DoCastVictim(SPELL_CALL_LIGHTNING);
-                            events.ScheduleEvent(EVENT_CALL_LIGHTNING, urand(8000, 14000));
-                            break;
-                        case EVENT_STATIC_DISRUPTION:
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                                DoCast(pTarget, SPELL_STATIC_DISRUPTION);
-                            events.ScheduleEvent(EVENT_STATIC_DISRUPTION, urand(8000, 12000));
-                            break;
-                        case EVENT_ELECTRICAL_STORM:
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                                DoCast(pTarget, SPELL_ELECTRICAL_STORM);
-                            events.ScheduleEvent(EVENT_ELECTRICAL_STORM, 58000);
-                            events.ScheduleEvent(EVENT_SUMMON_EAGLE, 13000);
-                            events.RescheduleEvent(EVENT_STATIC_DISRUPTION, urand(13000, 17000));
-                            events.RescheduleEvent(EVENT_CALL_LIGHTNING, urand(13000, 20000));
-                            events.RescheduleEvent(EVENT_SUMMON_KIDNAPPER, urand(40000, 49000));
-                            break;
-                        case EVENT_SUMMON_EAGLE:
-                            Talk(SAY_SUMMON);
-                            for (uint8 i = 0; i < 8; i++)
+                    case EVENT_CALL_LIGHTNING:
+                        DoCastVictim(SPELL_CALL_LIGHTNING);
+                        events.ScheduleEvent(EVENT_CALL_LIGHTNING, urand(8000, 14000));
+                        break;
+                    case EVENT_STATIC_DISRUPTION:
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                            DoCast(pTarget, SPELL_STATIC_DISRUPTION);
+                        events.ScheduleEvent(EVENT_STATIC_DISRUPTION, urand(8000, 12000));
+                        break;
+                    case EVENT_ELECTRICAL_STORM:
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                            DoCast(pTarget, SPELL_ELECTRICAL_STORM);
+                        events.ScheduleEvent(EVENT_ELECTRICAL_STORM, 58000);
+                        events.ScheduleEvent(EVENT_SUMMON_EAGLE, 13000);
+                        events.RescheduleEvent(EVENT_STATIC_DISRUPTION, urand(13000, 17000));
+                        events.RescheduleEvent(EVENT_CALL_LIGHTNING, urand(13000, 20000));
+                        events.RescheduleEvent(EVENT_SUMMON_KIDNAPPER, urand(40000, 49000));
+                        break;
+                    case EVENT_SUMMON_EAGLE:
+                        Talk(SAY_SUMMON);
+                        for (uint8 i = 0; i < 8; i++)
+                        {
+                            if (!Unit::GetUnit(*me, Eagles[i]))
                             {
-                                if (!Unit::GetUnit(*me, Eagles[i]))
-                                {
-                                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                                        if (Creature* pEagle = me->SummonCreature(NPC_SOARING_EAGLE, pTarget->GetPositionX() + irand(-10, 10), pTarget->GetPositionY() + irand(-10, 10), pTarget->GetPositionZ() + urand(10, 15), pTarget->GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 0))
-                                            Eagles[i] = pEagle->GetGUID();
-                                }
+                                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                                if (Creature* pEagle = me->SummonCreature(NPC_SOARING_EAGLE, pTarget->GetPositionX() + irand(-10, 10), pTarget->GetPositionY() + irand(-10, 10), pTarget->GetPositionZ() + urand(10, 15), pTarget->GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 0))
+                                    Eagles[i] = pEagle->GetGUID();
                             }
-                            break;
-                        case EVENT_SUMMON_KIDNAPPER:
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, -SPELL_PLUCKED))
-                                if (Creature* pKidnapper = me->SummonCreature(NPC_AMANI_KIDNAPPER, pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ() + 3, pTarget->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 5000))
-                                    pTarget->CastSpell(pKidnapper, SPELL_PLUCKED, true);
-                                
-                            break;
-                     }
-                }
+                        }
+                        break;
+                    case EVENT_SUMMON_KIDNAPPER:
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, -SPELL_PLUCKED))
+                        if (Creature* pKidnapper = me->SummonCreature(NPC_AMANI_KIDNAPPER, pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ() + 3, pTarget->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 5000))
+                            pTarget->CastSpell(pKidnapper, SPELL_PLUCKED, true);
 
-                DoMeleeAttackIfReady();
+                        break;
+                }
             }
-        };
+
+            DoMeleeAttackIfReady();
+        }
+    };
 };
 
 class npc_akilzon_soaring_eagle : public CreatureScript
 {
-    public:
-        npc_akilzon_soaring_eagle() : CreatureScript("npc_akilzon_soaring_eagle") { }
-        
-        CreatureAI* GetAI(Creature* pCreature) const
+public:
+    npc_akilzon_soaring_eagle() : CreatureScript("npc_akilzon_soaring_eagle") { }
+
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_akilzon_soaring_eagleAI(pCreature);
+    }
+
+    struct npc_akilzon_soaring_eagleAI : public ScriptedAI
+    {
+        npc_akilzon_soaring_eagleAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            return new npc_akilzon_soaring_eagleAI(pCreature);
+            me->SetReactState(REACT_PASSIVE);
         }
 
-        struct npc_akilzon_soaring_eagleAI : public ScriptedAI
+        EventMap events;
+        Position homePos;
+
+        void Reset()
         {
-            npc_akilzon_soaring_eagleAI(Creature* pCreature) : ScriptedAI(pCreature) 
-            {
-                me->SetReactState(REACT_PASSIVE);
-            }
+            me->SetCanFly(true);
+            me->GetPosition(&homePos);
+            events.Reset();
+        }
 
-            EventMap events;
-            Position homePos;
+        void EnterCombat(Unit* who)
+        {
+            events.ScheduleEvent(EVENT_EAGLE_SWOOP, urand(100, 6000));
+        }
 
-            void Reset()
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type == POINT_MOTION_TYPE)
             {
-                me->SetCanFly(true);
-                me->GetPosition(&homePos);
-                events.Reset();
-            }
-            
-            void EnterCombat(Unit* who) 
-            {
-                events.ScheduleEvent(EVENT_EAGLE_SWOOP, urand(100, 6000));
-            }
-
-            void MovementInform(uint32 type, uint32 id)
-            { 
-                if (type == POINT_MOTION_TYPE)
+                if (id == EVENT_CHARGE)
                 {
-                    if (id == EVENT_CHARGE)
-                    {
-                        events.ScheduleEvent(EVENT_GO_BACK, 3000);
-                    }
-                    else if (id == POINT_HOME)
-                    {
-                        events.ScheduleEvent(EVENT_EAGLE_SWOOP, urand(2000, 10000));
-                    }
+                    events.ScheduleEvent(EVENT_GO_BACK, 3000);
+                } else if (id == POINT_HOME)
+                {
+                    events.ScheduleEvent(EVENT_EAGLE_SWOOP, urand(2000, 10000));
                 }
             }
+        }
 
-            void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
+                switch (eventId)
                 {
-                     switch (eventId)
-                     {
-                        case EVENT_GO_BACK:
-                            me->GetMotionMaster()->MovePoint(POINT_HOME, homePos);
-                            break;
-                        case EVENT_EAGLE_SWOOP:
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                                DoCast(pTarget, SPELL_EAGLE_SWOOP);
-                            break;
-                     }
+                    case EVENT_GO_BACK:
+                        me->GetMotionMaster()->MovePoint(POINT_HOME, homePos);
+                        break;
+                    case EVENT_EAGLE_SWOOP:
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                            DoCast(pTarget, SPELL_EAGLE_SWOOP);
+                        break;
                 }
             }
-        };
+        }
+    };
 };
 
 class npc_akilzon_amani_kidnapper : public CreatureScript
 {
-    public:
-        npc_akilzon_amani_kidnapper() : CreatureScript("npc_akilzon_amani_kidnapper") { }
-        
-        CreatureAI* GetAI(Creature* pCreature) const
+public:
+    npc_akilzon_amani_kidnapper() : CreatureScript("npc_akilzon_amani_kidnapper") { }
+
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_akilzon_amani_kidnapperAI(pCreature);
+    }
+
+    struct npc_akilzon_amani_kidnapperAI : public ScriptedAI
+    {
+        npc_akilzon_amani_kidnapperAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            return new npc_akilzon_amani_kidnapperAI(pCreature);
+            me->SetReactState(REACT_PASSIVE);
         }
 
-        struct npc_akilzon_amani_kidnapperAI : public ScriptedAI
+        void Reset()
         {
-            npc_akilzon_amani_kidnapperAI(Creature* pCreature) : ScriptedAI(pCreature) 
-            {
-                me->SetReactState(REACT_PASSIVE);
-            }
-
-            void Reset()
-            {
-                me->SetCanFly(true);
-            }
-        };
+            me->SetCanFly(true);
+        }
+    };
 };
 
 class spell_akilzon_electrical_storm : public SpellScriptLoader
 {
-    public:
-        spell_akilzon_electrical_storm() :  SpellScriptLoader("spell_akilzon_electrical_storm") { }
+public:
+    spell_akilzon_electrical_storm() : SpellScriptLoader("spell_akilzon_electrical_storm") { }
 
-        class spell_akilzon_electrical_storm_AuraScript : public AuraScript
+    class spell_akilzon_electrical_storm_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_akilzon_electrical_storm_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_akilzon_electrical_storm_AuraScript);
+            if (!GetTarget())
+                return;
 
-            void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            if (Player* pPlayer = GetTarget()->ToPlayer())
             {
-                if (!GetTarget())
-                    return;
-               
-                if (Player* pPlayer = GetTarget()->ToPlayer())
-                {
-                    pPlayer->CastSpell(pPlayer, SPELL_ELECTRICAL_SAFE, true);
-                    pPlayer->SetClientControl(pPlayer, 0);
-                    pPlayer->SetCanFly(true);
-                    pPlayer->AddUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
-                    pPlayer->MonsterMoveWithSpeed(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ() + 12, 15000);
-                }
+                pPlayer->CastSpell(pPlayer, SPELL_ELECTRICAL_SAFE, true);
+                pPlayer->SetClientControl(pPlayer, 0);
+                pPlayer->SetCanFly(true);
+                pPlayer->AddUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
+                pPlayer->MonsterMoveWithSpeed(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ() + 12, 15000);
             }
-
-            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-            {
-                if (!GetTarget())
-                    return;
-
-                if (Player* pPlayer = GetTarget()->ToPlayer())
-                {
-                    pPlayer->SetClientControl(pPlayer, 1);
-                    pPlayer->SetCanFly(false);
-                    pPlayer->RemoveUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
-                }                
-            }
-
-            void Register()
-            {
-                OnEffectApply += AuraEffectApplyFn(spell_akilzon_electrical_storm_AuraScript::OnApply, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-                OnEffectRemove += AuraEffectRemoveFn(spell_akilzon_electrical_storm_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_akilzon_electrical_storm_AuraScript();
         }
+
+        void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            if (!GetTarget())
+                return;
+
+            if (Player* pPlayer = GetTarget()->ToPlayer())
+            {
+                pPlayer->SetClientControl(pPlayer, 1);
+                pPlayer->SetCanFly(false);
+                pPlayer->RemoveUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
+            }
+        }
+
+        void Register()
+        {
+            OnEffectApply += AuraEffectApplyFn(spell_akilzon_electrical_storm_AuraScript::OnApply, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_akilzon_electrical_storm_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_akilzon_electrical_storm_AuraScript();
+    }
 };
 
 class ElectricalSafeCheck
 {
-    public:
-        explicit ElectricalSafeCheck() {}
+public:
+    explicit ElectricalSafeCheck() { }
 
-        bool operator()(WorldObject* object) const
-        {
-            return object->ToUnit()->HasAura(SPELL_ELECTRICAL_SAFE);
-        }
+    bool operator()(WorldObject* object) const
+    {
+        return object->ToUnit()->HasAura(SPELL_ELECTRICAL_SAFE);
+    }
 };
 
 class spell_akilzon_electrical_storm_dmg : public SpellScriptLoader
 {
-    public:
-        spell_akilzon_electrical_storm_dmg() : SpellScriptLoader("spell_akilzon_electrical_storm_dmg") { }
+public:
+    spell_akilzon_electrical_storm_dmg() : SpellScriptLoader("spell_akilzon_electrical_storm_dmg") { }
 
-        class spell_akilzon_electrical_storm_dmg_SpellScript : public SpellScript
+    class spell_akilzon_electrical_storm_dmg_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_akilzon_electrical_storm_dmg_SpellScript);
+
+        void CheckTarget(std::list<WorldObject*>& unitList)
         {
-            PrepareSpellScript(spell_akilzon_electrical_storm_dmg_SpellScript);
-
-            void CheckTarget(std::list<WorldObject*>& unitList)
-            {
-                unitList.remove_if(ElectricalSafeCheck());
-            }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_akilzon_electrical_storm_dmg_SpellScript::CheckTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_akilzon_electrical_storm_dmg_SpellScript::CheckTarget, EFFECT_1, TARGET_UNIT_SRC_AREA_ALLY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_akilzon_electrical_storm_dmg_SpellScript();
+            unitList.remove_if(ElectricalSafeCheck());
         }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_akilzon_electrical_storm_dmg_SpellScript::CheckTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_akilzon_electrical_storm_dmg_SpellScript::CheckTarget, EFFECT_1, TARGET_UNIT_SRC_AREA_ALLY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_akilzon_electrical_storm_dmg_SpellScript();
+    }
 };
 
 

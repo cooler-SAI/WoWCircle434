@@ -19032,72 +19032,6 @@ void Unit::SetControlled(bool apply, UnitState state)
     }
 }
 
-void Unit::SendGravityEnable()
-{
-    Player* player = ToPlayer();
-    if(!player)
-        return;
-
-    ObjectGuid guid = GetGUID();
-
-    WorldPacket data(SMSG_MOVE_GRAVITY_ENABLE, 1 + 8 + 4);
-    data.WriteBit(guid[1]);
-    data.WriteBit(guid[4]);
-    data.WriteBit(guid[7]);
-    data.WriteBit(guid[5]);
-    data.WriteBit(guid[2]);
-    data.WriteBit(guid[0]);
-    data.WriteBit(guid[3]);
-    data.WriteBit(guid[6]);
-
-    data.WriteByteSeq(guid[3]);
-
-    data << int32(++m_rootTimes);
-
-    data.WriteByteSeq(guid[7]);
-    data.WriteByteSeq(guid[6]);
-    data.WriteByteSeq(guid[4]);
-    data.WriteByteSeq(guid[0]);
-    data.WriteByteSeq(guid[1]);
-    data.WriteByteSeq(guid[5]);
-    data.WriteByteSeq(guid[2]);
-
-    player->GetSession()->SendPacket(&data);
-}
-
-void Unit::SendGravityDisable()
-{
-    Player* player = ToPlayer();
-   
-    if(!player)
-        return;
-
-    ObjectGuid guid = GetGUID();
-    WorldPacket data(SMSG_MOVE_GRAVITY_DISABLE, 1 + 8 + 4);
-    data.WriteBit(guid[0]);
-    data.WriteBit(guid[1]);
-    data.WriteBit(guid[5]);
-    data.WriteBit(guid[7]);
-    data.WriteBit(guid[6]);
-    data.WriteBit(guid[4]);
-    data.WriteBit(guid[3]);
-    data.WriteBit(guid[2]);
-
-    data.WriteByteSeq(guid[7]);
-    data.WriteByteSeq(guid[2]);
-    data.WriteByteSeq(guid[0]);
-
-    data << int32(++m_rootTimes);
-
-    data.WriteByteSeq(guid[5]);
-    data.WriteByteSeq(guid[1]);
-    data.WriteByteSeq(guid[3]);
-    data.WriteByteSeq(guid[4]);
-    data.WriteByteSeq(guid[6]);
-
-    player->GetSession()->SendPacket(&data);
-}
-
 void Unit::SendMoveRoot(uint32 value)
 {
     ObjectGuid guid = GetGUID();
@@ -20898,8 +20832,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     // This should be done before dismiss, because there may be some aura removal
     Vehicle* vehicle = m_vehicle;
     m_vehicle = NULL;
-   
-    SendGravityEnable();                        // SMSG_MOVE_GRAVITY_ENABLE
+
     SetControlled(false, UNIT_STATE_ROOT);      // SMSG_MOVE_FORCE_UNROOT, ~MOVEMENTFLAG_ROOT
 
     Position pos;
@@ -20984,11 +20917,7 @@ void Unit::NearTeleportTo(float x, float y, float z, float orientation, bool cas
         ToPlayer()->TeleportTo(GetMapId(), x, y, z, orientation, TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET | (casting ? TELE_TO_SPELL : 0));
     else
     {
-        //Position pos = {x, y, z, orientation};
-        //SendTeleportPacket(pos);
         //DestroyForNearbyPlayers();
-        //UpdatePosition(x, y, z, orientation, true);
-        //UpdateObjectVisibility();
         //SendMovementFlagUpdate();
         Position pos = {x, y, z, orientation};
         SendTeleportPacket(pos);
@@ -20999,9 +20928,6 @@ void Unit::NearTeleportTo(float x, float y, float z, float orientation, bool cas
 
 void Unit::SendTeleportPacket(Position &pos)
 {
-    // SMSG_MOVE_UPDATE_TELEPORT is sent to nearby players to signal the teleport
-    // MSG_MOVE_TELEPORT is sent to self in order to trigger MSG_MOVE_TELEPORT_ACK and update the position server side
-
     Position oldPos = {GetPositionX(), GetPositionY(), GetPositionZMinusOffset(), GetOrientation()};
 
     if (GetTypeId() == TYPEID_UNIT)
@@ -21010,75 +20936,65 @@ void Unit::SendTeleportPacket(Position &pos)
     ObjectGuid guid = GetGUID();
     ObjectGuid transGuid = GetTransGUID();
 
-    WorldPacket data(SMSG_MOVE_UPDATE_TELEPORT, 38);
-    WriteMovementInfo(data);
-
-    if (GetTypeId() == TYPEID_PLAYER)
+    WorldPacket data(MSG_MOVE_TELEPORT, 38);
+    data
+        .WriteByteMask(guid[6])
+        .WriteByteMask(guid[0])
+        .WriteByteMask(guid[3])
+        .WriteByteMask(guid[2])
+        .WriteBit(false)
+        .WriteBit(uint64(transGuid) != 0)
+        .WriteByteMask(guid[1]);
+    if (transGuid)
     {
-        WorldPacket data2(MSG_MOVE_TELEPORT, 38);
-        data2
-            .WriteByteMask(guid[6])
-            .WriteByteMask(guid[0])
-            .WriteByteMask(guid[3])
-            .WriteByteMask(guid[2])
-            .WriteBit(false)
-            .WriteBit(uint64(transGuid) != 0)
-            .WriteByteMask(guid[1]);
-        if (transGuid)
-        {
-            data2
-                .WriteByteMask(transGuid[1])
-                .WriteByteMask(transGuid[3])
-                .WriteByteMask(transGuid[2])
-                .WriteByteMask(transGuid[5])
-                .WriteByteMask(transGuid[0])
-                .WriteByteMask(transGuid[7])
-                .WriteByteMask(transGuid[6])
-                .WriteByteMask(transGuid[4]);
-        }
-        data2
-            .WriteByteMask(guid[4])
-            .WriteByteMask(guid[7])
-            .WriteByteMask(guid[5]);
-
-        if (transGuid)
-        {
-            data2
-                .WriteByteSeq(transGuid[6])
-                .WriteByteSeq(transGuid[5])
-                .WriteByteSeq(transGuid[1])
-                .WriteByteSeq(transGuid[7])
-                .WriteByteSeq(transGuid[0])
-                .WriteByteSeq(transGuid[2])
-                .WriteByteSeq(transGuid[4])
-                .WriteByteSeq(transGuid[3]);
-        }
-        data2 << uint32(0);  // counter
-        data2
-            .WriteByteSeq(guid[1])
-            .WriteByteSeq(guid[2])
-            .WriteByteSeq(guid[3])
-            .WriteByteSeq(guid[5]);
-
-        data2 << float(GetPositionX());
-        data2.WriteByteSeq(guid[4]);
-        data2 << float(GetOrientation());
-        data2.WriteByteSeq(guid[7]);
-        data2 << float(GetPositionZMinusOffset());
-        data2.WriteByteSeq(guid[0]);
-        data2.WriteByteSeq(guid[6]);
-        data2 << float(GetPositionY());
-        ToPlayer()->SendDirectMessage(&data2); // Send the MSG_MOVE_TELEPORT packet to self.
+        data
+            .WriteByteMask(transGuid[1])
+            .WriteByteMask(transGuid[3])
+            .WriteByteMask(transGuid[2])
+            .WriteByteMask(transGuid[5])
+            .WriteByteMask(transGuid[0])
+            .WriteByteMask(transGuid[7])
+            .WriteByteMask(transGuid[6])
+            .WriteByteMask(transGuid[4]);
     }
+    data
+        .WriteByteMask(guid[4])
+        .WriteByteMask(guid[7])
+        .WriteByteMask(guid[5]);
 
-    // Relocate the player/creature to its old position, so we can broadcast to nearby players correctly
+    if (transGuid)
+    {
+        data
+            .WriteByteSeq(transGuid[6])
+            .WriteByteSeq(transGuid[5])
+            .WriteByteSeq(transGuid[1])
+            .WriteByteSeq(transGuid[7])
+            .WriteByteSeq(transGuid[0])
+            .WriteByteSeq(transGuid[2])
+            .WriteByteSeq(transGuid[4])
+            .WriteByteSeq(transGuid[3]);
+    }
+    data << uint32(0);  // counter
+    data
+        .WriteByteSeq(guid[1])
+        .WriteByteSeq(guid[2])
+        .WriteByteSeq(guid[3])
+        .WriteByteSeq(guid[5]);
+
+    data << float(GetPositionX());
+    data.WriteByteSeq(guid[4]);
+    data << float(GetOrientation());
+    data.WriteByteSeq(guid[7]);
+    data << float(GetPositionZMinusOffset());
+    data.WriteByteSeq(guid[0]);
+    data.WriteByteSeq(guid[6]);
+    data << float(GetPositionY());
+
     if (GetTypeId() == TYPEID_PLAYER)
         Relocate(&pos);
     else
         Relocate(&oldPos);
-
-    // Broadcast the packet to everyone except self.
-    SendMessageToSet(&data, false);
+    SendMessageToSet(&data, true);
 }
 
 bool Unit::UpdatePosition(float x, float y, float z, float orientation, bool teleport)
@@ -21556,53 +21472,26 @@ void Unit::SendMovementWaterWalking()
         ToPlayer()->SendMovementSetWaterWalking(HasUnitMovementFlag(MOVEMENTFLAG_WATERWALKING));
 
     ObjectGuid guid = GetGUID();
-    bool hasFlag = HasUnitMovementFlag(MOVEMENTFLAG_WATERWALKING);
-    WorldPacket data;
-    if (hasFlag)
-    {
+    WorldPacket data(SMSG_SPLINE_MOVE_WATER_WALK, 1 + 8);
+    data
+        .WriteByteMask(guid[6])
+        .WriteByteMask(guid[1])
+        .WriteByteMask(guid[4])
+        .WriteByteMask(guid[2])
+        .WriteByteMask(guid[3])
+        .WriteByteMask(guid[7])
+        .WriteByteMask(guid[5])
+        .WriteByteMask(guid[0])
 
-        data.Initialize(SMSG_SPLINE_MOVE_WATER_WALK, 1 + 8);
-        data
-            .WriteByteMask(guid[6])
-            .WriteByteMask(guid[1])
-            .WriteByteMask(guid[4])
-            .WriteByteMask(guid[2])
-            .WriteByteMask(guid[3])
-            .WriteByteMask(guid[7])
-            .WriteByteMask(guid[5])
-            .WriteByteMask(guid[0])
+        .WriteByteSeq(guid[0])
+        .WriteByteSeq(guid[6])
+        .WriteByteSeq(guid[3])
+        .WriteByteSeq(guid[7])
+        .WriteByteSeq(guid[4])
+        .WriteByteSeq(guid[2])
+        .WriteByteSeq(guid[5])
+        .WriteByteSeq(guid[1]);
 
-            .WriteByteSeq(guid[0])
-            .WriteByteSeq(guid[6])
-            .WriteByteSeq(guid[3])
-            .WriteByteSeq(guid[7])
-            .WriteByteSeq(guid[4])
-            .WriteByteSeq(guid[2])
-            .WriteByteSeq(guid[5])
-            .WriteByteSeq(guid[1]);
-    }
-    else
-    {
-        data.Initialize(SMSG_SPLINE_MOVE_SET_LAND_WALK);
-        data
-            .WriteByteMask(guid[0])
-            .WriteByteMask(guid[4])
-            .WriteByteMask(guid[6])
-            .WriteByteMask(guid[7])
-            .WriteByteMask(guid[2])
-            .WriteByteMask(guid[5])
-            .WriteByteMask(guid[3])
-            .WriteByteMask(guid[1])
-
-            .WriteByteSeq(guid[5])
-            .WriteByteSeq(guid[7])
-            .WriteByteSeq(guid[3])
-            .WriteByteSeq(guid[4])
-            .WriteByteSeq(guid[2])
-            .WriteByteSeq(guid[1])
-            .WriteByteSeq(guid[0])
-            .WriteByteSeq(guid[6]);
-    }
     SendMessageToSet(&data, false);
 }
 
@@ -21612,53 +21501,26 @@ void Unit::SendMovementFeatherFall()
         ToPlayer()->SendMovementSetFeatherFall(HasUnitMovementFlag(MOVEMENTFLAG_FALLING_SLOW));
 
     ObjectGuid guid = GetGUID();
+    WorldPacket data(SMSG_SPLINE_MOVE_SET_FEATHER_FALL, 1 + 8);
+    data
+        .WriteByteMask(guid[3])
+        .WriteByteMask(guid[2])
+        .WriteByteMask(guid[7])
+        .WriteByteMask(guid[5])
+        .WriteByteMask(guid[4])
+        .WriteByteMask(guid[6])
+        .WriteByteMask(guid[1])
+        .WriteByteMask(guid[0])
 
-    bool hasFlag = HasUnitMovementFlag(MOVEMENTFLAG_FALLING_SLOW);
-    WorldPacket data;
-    if (hasFlag)
-    {
-        data.Initialize(SMSG_SPLINE_MOVE_SET_FEATHER_FALL, 1 + 8);
-        data
-            .WriteByteMask(guid[3])
-            .WriteByteMask(guid[2])
-            .WriteByteMask(guid[7])
-            .WriteByteMask(guid[5])
-            .WriteByteMask(guid[4])
-            .WriteByteMask(guid[6])
-            .WriteByteMask(guid[1])
-            .WriteByteMask(guid[0])
+        .WriteByteSeq(guid[1])
+        .WriteByteSeq(guid[4])
+        .WriteByteSeq(guid[7])
+        .WriteByteSeq(guid[6])
+        .WriteByteSeq(guid[2])
+        .WriteByteSeq(guid[0])
+        .WriteByteSeq(guid[5])
+        .WriteByteSeq(guid[3]);
 
-            .WriteByteSeq(guid[1])
-            .WriteByteSeq(guid[4])
-            .WriteByteSeq(guid[7])
-            .WriteByteSeq(guid[6])
-            .WriteByteSeq(guid[2])
-            .WriteByteSeq(guid[0])
-            .WriteByteSeq(guid[5])
-            .WriteByteSeq(guid[3]);
-    }
-    else
-    {
-        data.Initialize(SMSG_SPLINE_MOVE_SET_NORMAL_FALL);
-        data
-            .WriteByteMask(guid[3])
-            .WriteByteMask(guid[5])
-            .WriteByteMask(guid[1])
-            .WriteByteMask(guid[0])
-            .WriteByteMask(guid[6])
-            .WriteByteMask(guid[7])
-            .WriteByteMask(guid[2])
-            .WriteByteMask(guid[4])
-
-            .WriteByteSeq(guid[7])
-            .WriteByteSeq(guid[6])
-            .WriteByteSeq(guid[2])
-            .WriteByteSeq(guid[0])
-            .WriteByteSeq(guid[5])
-            .WriteByteSeq(guid[4])
-            .WriteByteSeq(guid[3])
-            .WriteByteSeq(guid[1]);
-    }
     SendMessageToSet(&data, false);
 }
 
@@ -21730,62 +21592,6 @@ void Unit::SendMovementCanFlyChange()
             .WriteByteSeq(guid[0]);
     }
 
-    SendMessageToSet(&data, false);
-}
-
-void Unit::SendMovementSwimming()
-{
-    if (GetTypeId() == TYPEID_PLAYER)
-        ToPlayer()->SendMovementSetWaterWalking(HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING));
-
-    ObjectGuid guid = GetGUID();
-    bool hasFlag = HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
-    WorldPacket data;
-    if (hasFlag)
-    {
-
-        data.Initialize(SMSG_SPLINE_MOVE_START_SWIM, 1 + 8);
-        data
-            .WriteByteMask(guid[1])
-            .WriteByteMask(guid[6])
-            .WriteByteMask(guid[0])
-            .WriteByteMask(guid[7])
-            .WriteByteMask(guid[5])
-            .WriteByteMask(guid[3])
-            .WriteByteMask(guid[2])
-            .WriteByteMask(guid[4])
-
-            .WriteByteSeq(guid[3])
-            .WriteByteSeq(guid[7])
-            .WriteByteSeq(guid[2])
-            .WriteByteSeq(guid[5])
-            .WriteByteSeq(guid[6])
-            .WriteByteSeq(guid[4])
-            .WriteByteSeq(guid[1])
-            .WriteByteSeq(guid[0]);
-    }
-    else
-    {
-        data.Initialize(SMSG_SPLINE_MOVE_STOP_SWIM);
-        data
-            .WriteByteMask(guid[4])
-            .WriteByteMask(guid[1])
-            .WriteByteMask(guid[5])
-            .WriteByteMask(guid[3])
-            .WriteByteMask(guid[0])
-            .WriteByteMask(guid[7])
-            .WriteByteMask(guid[2])
-            .WriteByteMask(guid[6])
-
-            .WriteByteSeq(guid[6])
-            .WriteByteSeq(guid[7])
-            .WriteByteSeq(guid[0])
-            .WriteByteSeq(guid[2])
-            .WriteByteSeq(guid[3])
-            .WriteByteSeq(guid[1])
-            .WriteByteSeq(guid[5])
-            .WriteByteSeq(guid[4]);
-    }
     SendMessageToSet(&data, false);
 }
 

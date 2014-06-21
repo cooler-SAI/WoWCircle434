@@ -26,7 +26,7 @@ enum NozdormuScriptTexts
     SAY_NOZDORMU_OUTRO_5    = 5,
 };
 
-enum Spells
+enum Spellsm
 {
     SPELL_INFINITE_BREATH               = 102569,
     SPELL_TEMPORAL_BLAST                = 102381,

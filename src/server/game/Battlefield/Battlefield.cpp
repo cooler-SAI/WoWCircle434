@@ -58,6 +58,13 @@ Battlefield::Battlefield()
     m_StartGroupingTimer = 0;
     m_StartGrouping = false;
     StalkerGuid = 0;
+
+    //m_defender = TeamIndex(urand(0, 1));
+    //m_state = BF_STATE_COOLDOWN;
+    //m_timer = 15 * MINUTE * IN_MILLISECONDS;
+    //m_queueUpdateTimer = 30000;
+    //m_scoresUpdateTimer = 5000;
+    //bAboutSend = false;
 }
 
 Battlefield::~Battlefield()
@@ -255,10 +262,6 @@ void Battlefield::InvitePlayersInZoneToWar()
 void Battlefield::InvitePlayerToWar(Player* player)
 {
     if (!player)
-        return;
-
-    // TODO : needed ?
-    if (player->isInFlight())
         return;
 
     if (player->InArena() || player->GetBattleground())

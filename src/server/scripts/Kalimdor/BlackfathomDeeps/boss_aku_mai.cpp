@@ -32,7 +32,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new boss_aku_maiAI (creature);
+        return new boss_aku_maiAI(creature);
     }
 
     struct boss_aku_maiAI : public ScriptedAI

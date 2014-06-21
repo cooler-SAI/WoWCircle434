@@ -5441,7 +5441,9 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, VINNY_VENDOR, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+        bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
+
+        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, ru ? VINNY_VENDOR : VINNY_VENDOR, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
         player->SEND_GOSSIP_MENU(50007, creature->GetGUID());
         return true;
     }

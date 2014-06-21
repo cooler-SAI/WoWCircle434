@@ -96,462 +96,463 @@ const Position addsPos[9] =
 
 struct PositionSelector : public std::unary_function<Unit*, bool>
 {
-    public:
-        
-        PositionSelector(bool b, uint32 spellId) : _b(b), _spellId(spellId) {}
+public:
 
-        bool operator()(Unit const* target) const
-        {
-            if (_spellId && target->HasAura(_spellId))
-                return false;
+    PositionSelector(bool b, uint32 spellId) : _b(b), _spellId(spellId) { }
 
-            return _b? (target->GetPositionZ() < 100.0f): (target->GetPositionZ() > 100.0f); 
-        }
+    bool operator()(Unit const* target) const
+    {
+        if (_spellId && target->HasAura(_spellId))
+            return false;
 
-    private:
-        bool _b;
-        uint32 _spellId;
+        return _b? (target->GetPositionZ() < 100.0f): (target->GetPositionZ() > 100.0f); 
+    }
+private:
+    bool _b;
+    uint32 _spellId;
 
 };
 
 class boss_bethtilac : public CreatureScript
 {
-    public:
-        boss_bethtilac() : CreatureScript("boss_bethtilac") { }
+public:
+    boss_bethtilac() : CreatureScript("boss_bethtilac") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new boss_bethtilacAI(pCreature);
+    }
+
+    struct boss_bethtilacAI : public BossAI
+    {
+        boss_bethtilacAI(Creature* pCreature) : BossAI(pCreature, DATA_BETHTILAC)
         {
-            return new boss_bethtilacAI(pCreature);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
+            me->setActive(true);
         }
 
-        struct boss_bethtilacAI : public BossAI
+        uint8 uiPhase;
+        uint8 uiCount;
+        uint8 uiSide;
+
+        void InitializeAI()
         {
-            boss_bethtilacAI(Creature* pCreature) : BossAI(pCreature, DATA_BETHTILAC)
-            {
-                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-                me->setActive(true);
-            }
+            if (!instance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(FLScriptName))
+                me->IsAIEnabled = false;
+            else if (!me->isDead())
+                Reset();
+        }
 
-            uint8 uiPhase;
-            uint8 uiCount;
-            uint8 uiSide;
+        bool AllowAchieve()
+        {
+            return false;
+        }
 
-            void InitializeAI()
-            {
-                if (!instance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(FLScriptName))
-                    me->IsAIEnabled = false;
-                else if (!me->isDead())
-                    Reset();
-            }
+        void Reset()
+        {
+            _Reset();
+            DespawnCreatures(NPC_CINDERWEB_SPINNER);
+            DespawnCreatures(NPC_SPIDERWEB_FILAMENT);
 
-            bool AllowAchieve()
-            {
-                return false;
-            }
+            DoCast(me, SPELL_ZERO_POWER, true);
+            me->SetReactState(REACT_PASSIVE);
+            //me->SetUInt32Value(UNIT_FIELD_BYTES_1, 50331648);
+            //me->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
+            uiPhase = 0;
+            uiCount = 0;
+            uiSide = 0;
+            me->SetMaxPower(POWER_MANA, 9000);
+            me->SetPower(POWER_MANA, 9000);
+        }
 
-            void Reset()
-            {
-                _Reset();
-                DespawnCreatures(NPC_CINDERWEB_SPINNER);
-                DespawnCreatures(NPC_SPIDERWEB_FILAMENT);
+        void EnterCombat(Unit* attacker)
+        {
+            uiPhase = 0;
+            uiCount = 0;
+            uiSide = 0;
+            instance->SetBossState(DATA_BETHTILAC, IN_PROGRESS);
+            me->GetMotionMaster()->MovePoint(POINT_HIGH, highPos);
+            DoZoneInCombat();
+            me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
+        }
 
-                DoCast(me, SPELL_ZERO_POWER, true);
-                me->SetReactState(REACT_PASSIVE);
-                //me->SetUInt32Value(UNIT_FIELD_BYTES_1, 50331648);
-                //me->SetUInt32Value(UNIT_FIELD_BYTES_2, 1);
-                uiPhase = 0;
-                uiCount = 0;
-                uiSide = 0;
-                me->SetMaxPower(POWER_MANA, 9000);
-                me->SetPower(POWER_MANA, 9000);
-            }
-
-            void EnterCombat(Unit* attacker)
-            {
-                uiPhase = 0;
-                uiCount = 0;
-                uiSide = 0;
-                instance->SetBossState(DATA_BETHTILAC, IN_PROGRESS);
-                me->GetMotionMaster()->MovePoint(POINT_HIGH, highPos);
-                DoZoneInCombat();
-                me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
-            }
-
-            void MovementInform(uint32 type, uint32 id)
-            {
-                if (type = POINT_MOTION_TYPE)
-                    if (id == POINT_HIGH)
-                    {
-                        me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
-                        //me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-                        //me->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        events.ScheduleEvent(EVENT_CHECK_HIGH, 5000);
-                        events.ScheduleEvent(EVENT_FILAMENT, 6000);
-                        events.ScheduleEvent(EVENT_SUMMON_DRONE, 60000);
-                        events.ScheduleEvent(EVENT_SUMMON_SPIDERLING, 30000);
-                        events.ScheduleEvent(EVENT_EMBER_FLARE, urand(7000, 8000));
-                        events.ScheduleEvent(EVENT_ENERGY, 1000);
-                    }
-            }
-
-            uint32 GetData(uint32 type)
-            {
-                if (type == DATA_PHASE)
-                    return uiPhase;
-
-                return 0;
-            }
-
-            void JustDied(Unit* /*killer*/)
-            {
-                _JustDied();
-                DespawnCreatures(NPC_CINDERWEB_SPINNER);
-                DespawnCreatures(NPC_SPIDERWEB_FILAMENT);
-
-                AddSmoulderingAura(me);
-            }
-            
-            void UpdateAI(const uint32 diff)
-            {
-                if (!UpdateVictim() || !CheckInArea(diff, 5764))
-                    return;
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                while (uint32 eventId = events.ExecuteEvent())
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type = POINT_MOTION_TYPE)
+                if (id == POINT_HIGH)
                 {
-                    switch (eventId)
-                    {
-                        case EVENT_CHECK_HIGH:
-                        {
-                            //if (!me->getVictim() || !me->IsWithinMeleeRange(me->getVictim()))
-                            std::list<Player*> PlayerList;
-                            PlayerPositionCheck checker(true);
-                            CerberCore::PlayerListSearcher<PlayerPositionCheck> searcher(me, PlayerList, checker);
-                            me->VisitNearbyWorldObject(300.0f, searcher);
-                            if (PlayerList.size() == 0)
-                                DoCastAOE(SPELL_VENOM_RAIN);
-                            events.ScheduleEvent(EVENT_CHECK_HIGH, 5000);
-                            break;
-                        }
-                        case EVENT_EMBER_FLARE:
-                            if (uiPhase == 0)
-                            {
-                                std::list<Player*> PlayerList;
-                                PlayerPositionCheck checker(true);
-                                CerberCore::PlayerListSearcher<PlayerPositionCheck> searcher(me, PlayerList, checker);
-                                me->VisitNearbyWorldObject(300.0f, searcher);
-                                if (PlayerList.size() > 0)
-                                    DoCastAOE(SPELL_EMBER_FLARE_1);
-                            }
-                            else
-                            {
-                                DoCastAOE(SPELL_EMBER_FLARE_2);
-                            }
-                            
-                            events.ScheduleEvent(EVENT_EMBER_FLARE, urand(6000, 7000)); 
-                            break;
-                        case EVENT_FILAMENT:
-                            for (uint8 i = 0; i < RAID_MODE(2, 4, 2, 4); i++)
-                                if (Creature* pFilament = me->SummonCreature(NPC_SPIDERWEB_FILAMENT, addsPos[4].GetPositionX() + irand(-8, 8), addsPos[4].GetPositionY() + irand(-8, 8), addsPos[4].GetPositionZ(), 0.0f))
-                                    pFilament->SetCanFly(true);
-                            events.ScheduleEvent(EVENT_FILAMENT, urand(20000, 25000));
-                            break;
-                        case EVENT_SUMMON_DRONE:
-                            if (Creature* pDrone = me->SummonCreature(NPC_CINDERWEB_DRONE, addsPos[3]))
-                                //pDrone->GetMotionMaster()->MovePoint(0, addsPos[5]);
-                                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true, 0)))
-                                    pDrone->GetMotionMaster()->MoveChase(pTarget);
-                            events.ScheduleEvent(EVENT_SUMMON_DRONE, 60000);
-                            break;
-                        case EVENT_SUMMON_SPIDERLING:
-                            uiSide = urand(0, 2);
-                            for (uint8 i = 0; i < 8; i++)
-                                events.ScheduleEvent(EVENT_SUMMON_SPIDERLING_1, i * 500);
-                            if (IsHeroic())
-                                for (uint8 i = 0; i < RAID_MODE(1, 2, 1, 2); ++i)
-                                    events.ScheduleEvent(EVENT_SUMMON_BROODLING_1, i * 1000);
-                            events.ScheduleEvent(EVENT_SUMMON_SPIDERLING, 30000);
-                            break;
-                        case EVENT_SUMMON_SPIDERLING_1:
-                            if (Creature* pSpiderling = me->SummonCreature(NPC_CINDERWEB_SPIDERLING, addsPos[uiSide]))
-                                pSpiderling->GetMotionMaster()->MovePoint(0, addsPos[5]);
-                            break;
-                        case EVENT_SUMMON_BROODLING_1:
-                            if (Creature* pBroodling = me->SummonCreature(NPC_ENGORGED_BROODLING, addsPos[uiSide]))
-                                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true, 0)))
-                                {
-                                    pBroodling->CastSpell(pTarget, SPELL_FIXATE_BROODLING, true);
-                                    pBroodling->ClearUnitState(UNIT_STATE_CASTING);
-                                    pBroodling->GetMotionMaster()->MoveFollow(pTarget, 0.0f, 0.0f);
-                                }
-                            break;
-                        case EVENT_ENERGY_2:
-                            //me->SetPower(POWER_MANA, 9000);
-                            break;
-                        case EVENT_ENERGY:
-                        {
-                            uint32 energy = me->GetPower(POWER_MANA);
-                            if (energy > 0)
-                                me->SetPower(POWER_MANA, energy - 100);
-                            if ((energy - 100) == 0)
-                            {
-                                uiCount++;
-                                if (uiCount < 3)
-                                {
-                                    events.RescheduleEvent(EVENT_FILAMENT, 23000);
-                                    events.RescheduleEvent(EVENT_CHECK_HIGH, 12000);
-                                    events.RescheduleEvent(EVENT_EMBER_FLARE, 14000);
-                                    events.ScheduleEvent(EVENT_ENERGY, 10000);
-                                    events.ScheduleEvent(EVENT_ENERGY_2, 8000);
-                                }
-                                else
-                                {
-                                    events.CancelEvent(EVENT_ENERGY);
-                                    events.CancelEvent(EVENT_FILAMENT);
-                                    events.CancelEvent(EVENT_CHECK_HIGH);
-                                    events.CancelEvent(EVENT_SUMMON_DRONE);
-                                    events.CancelEvent(EVENT_SUMMON_SPIDERLING);
-                                    events.RescheduleEvent(EVENT_EMBER_FLARE, 15000);
-                                    events.ScheduleEvent(EVENT_GO_DOWN, 10000);
-                                }
-                                
-                                DoCastAOE(SPELL_SMOLDERING_DEVASTATION);
-                            }
-                            else
-                                events.ScheduleEvent(EVENT_ENERGY, 1000);
-                            break;
-                        }
-                        case EVENT_GO_DOWN:
-                        {
-                            uiPhase = 1;
-                            me->GetMotionMaster()->MoveJump(addsPos[5].GetPositionX(), addsPos[5].GetPositionY(), addsPos[5].GetPositionZ(), 40.0f, 40.0f);
-                            events.ScheduleEvent(EVENT_FRENZY, 10000);
-                            events.ScheduleEvent(EVENT_THE_WIDOW_KISS, 32000);
-                            Map::PlayerList const &PlayerList = instance->instance->GetPlayers();
-                            if (!PlayerList.isEmpty())
-                            {
-                                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                                    if (Player* player = i->getSource())
-                                        if (player->GetPositionZ() > 100.0f)
-                                            player->NearTeleportTo(addsPos[5].GetPositionX(), addsPos[5].GetPositionY(), addsPos[5].GetPositionZ(), 0.0f);
-                            }
-                            break;
-                        }
-                        case EVENT_FRENZY:
-                            DoCast(me, SPELL_FRENZY);
-                            events.ScheduleEvent(EVENT_FRENZY, 7000);
-                            break;
-                        case EVENT_THE_WIDOW_KISS:
-                            DoCastVictim(SPELL_THE_WIDOW_KISS);
-                            events.ScheduleEvent(EVENT_THE_WIDOW_KISS, 34000);
-                            break;
-                    }
+                    me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
+                    //me->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+                    //me->SetUInt32Value(UNIT_FIELD_BYTES_2, 0);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    events.ScheduleEvent(EVENT_CHECK_HIGH, 5000);
+                    events.ScheduleEvent(EVENT_FILAMENT, 6000);
+                    events.ScheduleEvent(EVENT_SUMMON_DRONE, 60000);
+                    events.ScheduleEvent(EVENT_SUMMON_SPIDERLING, 30000);
+                    events.ScheduleEvent(EVENT_EMBER_FLARE, urand(7000, 8000));
+                    events.ScheduleEvent(EVENT_ENERGY, 1000);
                 }
-                
-                DoMeleeAttackIfReady();
-            }
-        private:
+        }
 
-            void DespawnCreatures(uint32 entry)
+        uint32 GetData(uint32 type)
+        {
+            if (type == DATA_PHASE)
+                return uiPhase;
+
+            return 0;
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            _JustDied();
+            DespawnCreatures(NPC_CINDERWEB_SPINNER);
+            DespawnCreatures(NPC_SPIDERWEB_FILAMENT);
+
+            AddSmoulderingAura(me);
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim() || !CheckInArea(diff, 5764))
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                std::list<Creature*> creatures;
-                GetCreatureListWithEntryInGrid(creatures, me, entry, 1000.0f);
-
-                if (creatures.empty())
-                   return;
-
-                for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
-                     (*iter)->DespawnOrUnsummon();
-            }
-
-            class PlayerPositionCheck
-            {
-                public:
-                    PlayerPositionCheck(bool bRev): _bRev(bRev) {}
-                    bool operator()(Player* u)
+                switch (eventId)
+                {
+                case EVENT_CHECK_HIGH:
                     {
-                        return _bRev? (u->GetPositionZ() > 100.0f): (u->GetPositionZ() < 100.0f);
+                        //if (!me->getVictim() || !me->IsWithinMeleeRange(me->getVictim()))
+                        std::list<Player*> PlayerList;
+                        PlayerPositionCheck checker(true);
+                        CerberCore::PlayerListSearcher<PlayerPositionCheck> searcher(me, PlayerList, checker);
+                        me->VisitNearbyWorldObject(300.0f, searcher);
+                        if (PlayerList.size() == 0)
+                            DoCastAOE(SPELL_VENOM_RAIN);
+                        events.ScheduleEvent(EVENT_CHECK_HIGH, 5000);
+                        break;
+                    }
+                case EVENT_EMBER_FLARE:
+                    if (uiPhase == 0)
+                    {
+                        std::list<Player*> PlayerList;
+                        PlayerPositionCheck checker(true);
+                        CerberCore::PlayerListSearcher<PlayerPositionCheck> searcher(me, PlayerList, checker);
+                        me->VisitNearbyWorldObject(300.0f, searcher);
+                        if (PlayerList.size() > 0)
+                            DoCastAOE(SPELL_EMBER_FLARE_1);
+                    }
+                    else
+                    {
+                        DoCastAOE(SPELL_EMBER_FLARE_2);
                     }
 
-                private:
-                    bool _bRev;
-            };
+                    events.ScheduleEvent(EVENT_EMBER_FLARE, urand(6000, 7000)); 
+                    break;
+                case EVENT_FILAMENT:
+                    for (uint8 i = 0; i < RAID_MODE(2, 4, 2, 4); i++)
+                        if (Creature* pFilament = me->SummonCreature(NPC_SPIDERWEB_FILAMENT, addsPos[4].GetPositionX() + irand(-8, 8), addsPos[4].GetPositionY() + irand(-8, 8), addsPos[4].GetPositionZ(), 0.0f))
+                            pFilament->SetCanFly(true);
+                    events.ScheduleEvent(EVENT_FILAMENT, urand(20000, 25000));
+                    break;
+                case EVENT_SUMMON_DRONE:
+                    if (Creature* pDrone = me->SummonCreature(NPC_CINDERWEB_DRONE, addsPos[3]))
+                        //pDrone->GetMotionMaster()->MovePoint(0, addsPos[5]);
+                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true, 0)))
+                                pDrone->GetMotionMaster()->MoveChase(pTarget);
+                    events.ScheduleEvent(EVENT_SUMMON_DRONE, 60000);
+                    break;
+                case EVENT_SUMMON_SPIDERLING:
+                    uiSide = urand(0, 2);
+                    for (uint8 i = 0; i < 8; i++)
+                        events.ScheduleEvent(EVENT_SUMMON_SPIDERLING_1, i * 500);
+                    if (IsHeroic())
+                        for (uint8 i = 0; i < RAID_MODE(1, 2, 1, 2); ++i)
+                            events.ScheduleEvent(EVENT_SUMMON_BROODLING_1, i * 1000);
+                    events.ScheduleEvent(EVENT_SUMMON_SPIDERLING, 30000);
+                    break;
+                case EVENT_SUMMON_SPIDERLING_1:
+                    if (Creature* pSpiderling = me->SummonCreature(NPC_CINDERWEB_SPIDERLING, addsPos[uiSide]))
+                        pSpiderling->GetMotionMaster()->MovePoint(0, addsPos[5]);
+                    break;
+                case EVENT_SUMMON_BROODLING_1:
+                    if (Creature* pBroodling = me->SummonCreature(NPC_ENGORGED_BROODLING, addsPos[uiSide]))
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true, 0)))
+                        {
+                            pBroodling->CastSpell(pTarget, SPELL_FIXATE_BROODLING, true);
+                            pBroodling->ClearUnitState(UNIT_STATE_CASTING);
+                            pBroodling->GetMotionMaster()->MoveFollow(pTarget, 0.0f, 0.0f);
+                        }
+                        break;
+                case EVENT_ENERGY_2:
+                    //me->SetPower(POWER_MANA, 9000);
+                    break;
+                case EVENT_ENERGY:
+                    {
+                        uint32 energy = me->GetPower(POWER_MANA);
+                        if (energy > 0)
+                            me->SetPower(POWER_MANA, energy - 100);
+                        if ((energy - 100) == 0)
+                        {
+                            uiCount++;
+                            if (uiCount < 3)
+                            {
+                                events.RescheduleEvent(EVENT_FILAMENT, 23000);
+                                events.RescheduleEvent(EVENT_CHECK_HIGH, 12000);
+                                events.RescheduleEvent(EVENT_EMBER_FLARE, 14000);
+                                events.ScheduleEvent(EVENT_ENERGY, 10000);
+                                events.ScheduleEvent(EVENT_ENERGY_2, 8000);
+                            }
+                            else
+                            {
+                                events.CancelEvent(EVENT_ENERGY);
+                                events.CancelEvent(EVENT_FILAMENT);
+                                events.CancelEvent(EVENT_CHECK_HIGH);
+                                events.CancelEvent(EVENT_SUMMON_DRONE);
+                                events.CancelEvent(EVENT_SUMMON_SPIDERLING);
+                                events.RescheduleEvent(EVENT_EMBER_FLARE, 15000);
+                                events.ScheduleEvent(EVENT_GO_DOWN, 10000);
+                            }
 
+                            DoCastAOE(SPELL_SMOLDERING_DEVASTATION);
+                        }
+                        else
+                            events.ScheduleEvent(EVENT_ENERGY, 1000);
+                        break;
+                    }
+                case EVENT_GO_DOWN:
+                    {
+                        uiPhase = 1;
+                        me->GetMotionMaster()->MoveJump(addsPos[5].GetPositionX(), addsPos[5].GetPositionY(), addsPos[5].GetPositionZ(), 40.0f, 40.0f);
+                        events.ScheduleEvent(EVENT_FRENZY, 10000);
+                        events.ScheduleEvent(EVENT_THE_WIDOW_KISS, 32000);
+                        Map::PlayerList const &PlayerList = instance->instance->GetPlayers();
+                        if (!PlayerList.isEmpty())
+                        {
+                            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                                if (Player* player = i->getSource())
+                                    if (player->GetPositionZ() > 100.0f)
+                                        player->NearTeleportTo(addsPos[5].GetPositionX(), addsPos[5].GetPositionY(), addsPos[5].GetPositionZ(), 0.0f);
+                        }
+                        break;
+                    }
+                case EVENT_FRENZY:
+                    DoCast(me, SPELL_FRENZY);
+                    events.ScheduleEvent(EVENT_FRENZY, 7000);
+                    break;
+                case EVENT_THE_WIDOW_KISS:
+                    DoCastVictim(SPELL_THE_WIDOW_KISS);
+                    events.ScheduleEvent(EVENT_THE_WIDOW_KISS, 34000);
+                    break;
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    private:
+
+        void DespawnCreatures(uint32 entry)
+        {
+            std::list<Creature*> creatures;
+            GetCreatureListWithEntryInGrid(creatures, me, entry, 1000.0f);
+
+            if (creatures.empty())
+                return;
+
+            for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
+                (*iter)->DespawnOrUnsummon();
+        }
+
+        class PlayerPositionCheck
+        {
+        public:
+
+            PlayerPositionCheck(bool bRev): _bRev(bRev) { }
+
+            bool operator()(Player* u)
+            {
+                return _bRev? (u->GetPositionZ() > 100.0f): (u->GetPositionZ() < 100.0f);
+            }
+
+        private:
+            bool _bRev;
         };
+
+    };
 };
 
 class npc_bethtilac_spiderweb_filament : public CreatureScript
 {
-    public:
-        npc_bethtilac_spiderweb_filament() : CreatureScript("npc_bethtilac_spiderweb_filament") { }
+public:
+    npc_bethtilac_spiderweb_filament() : CreatureScript("npc_bethtilac_spiderweb_filament") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_bethtilac_spiderweb_filamentAI(pCreature);
+    }
+
+    struct npc_bethtilac_spiderweb_filamentAI : public Scripted_NoMovementAI
+    {
+        npc_bethtilac_spiderweb_filamentAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
         {
-            return new npc_bethtilac_spiderweb_filamentAI(pCreature);
+            pInstance = me->GetInstanceScript();
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        struct npc_bethtilac_spiderweb_filamentAI : public Scripted_NoMovementAI
+        InstanceScript* pInstance;
+
+        void JustSummoned(Creature* summon)
         {
-            npc_bethtilac_spiderweb_filamentAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
+            if (me->isInCombat())
+                DoZoneInCombat(summon);
+        }
+
+        void OnSpellClick(Unit* who)
+        {
+            if (who->GetTypeId() == TYPEID_PLAYER)
             {
-                pInstance = me->GetInstanceScript();
-                me->SetReactState(REACT_PASSIVE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                uint32 i = urand(6, 8);
+                who->NearTeleportTo(addsPos[i].GetPositionX(), addsPos[i].GetPositionY(), addsPos[i].GetPositionZ(), addsPos[i].GetOrientation());
             }
+            if (me->GetOwner() && (me->GetOwner()->GetEntry() == NPC_SPIDERWEB_FILAMENT || me->GetOwner()->GetEntry() == NPC_BETHTILAC))
+                me->GetOwner()->ToCreature()->DespawnOrUnsummon();
+            me->DespawnOrUnsummon();
+        }
 
-            InstanceScript* pInstance;
-
-            void JustSummoned(Creature* summon)
-            {
-                if (me->isInCombat())
-                    DoZoneInCombat(summon);
-            }
-
-            void OnSpellClick(Unit* who)
-            {
-                if (who->GetTypeId() == TYPEID_PLAYER)
-                {
-                    uint32 i = urand(6, 8);
-                    who->NearTeleportTo(addsPos[i].GetPositionX(), addsPos[i].GetPositionY(), addsPos[i].GetPositionZ(), addsPos[i].GetOrientation());
-                }
-                if (me->GetOwner() && (me->GetOwner()->GetEntry() == NPC_SPIDERWEB_FILAMENT || me->GetOwner()->GetEntry() == NPC_BETHTILAC))
-                    me->GetOwner()->ToCreature()->DespawnOrUnsummon();
+        void IsSummonedBy(Unit* owner)
+        {
+            if (!owner)
                 me->DespawnOrUnsummon();
-            }
 
-            void IsSummonedBy(Unit* owner)
+            if (owner->GetEntry() == NPC_BETHTILAC)
             {
-                if (!owner)
-                    me->DespawnOrUnsummon();
-
-                if (owner->GetEntry() == NPC_BETHTILAC)
+                if (Creature* pSpinner = me->SummonCreature(NPC_CINDERWEB_SPINNER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
                 {
-                    if (Creature* pSpinner = me->SummonCreature(NPC_CINDERWEB_SPINNER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
-                    {
-                        pSpinner->SetCanFly(true);
-                        DoCast(pSpinner, SPELL_SPIDERWEB_FILAMENT_ANY, true);
-                        //pSpinner->CastSpell(pSpinner, SPELL_CREEPER, true);
-                        pSpinner->CastSpell(pSpinner, SPELL_TEMPERAMENT, true);
-                        //float z = pSpinner->GetMap()->GetHeight(pSpinner->GetPositionX(), pSpinner->GetPositionY(), pSpinner->GetPositionZ(), true);
-                        float z = GROUND_HEIGHT;
-                        pSpinner->GetMotionMaster()->MovePoint(0, pSpinner->GetPositionX(), pSpinner->GetPositionY(), z + 5.0f); 
-                    }
-                }
-                else if (owner->GetEntry() == NPC_SPIDERWEB_FILAMENT)
-                {
-                    DoCast(me, SPELL_SPIDERWEB_FILAMENT_DOWN, true);
-                    //float z = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, 100.0f);
+                    pSpinner->SetCanFly(true);
+                    DoCast(pSpinner, SPELL_SPIDERWEB_FILAMENT_ANY, true);
+                    //pSpinner->CastSpell(pSpinner, SPELL_CREEPER, true);
+                    pSpinner->CastSpell(pSpinner, SPELL_TEMPERAMENT, true);
+                    //float z = pSpinner->GetMap()->GetHeight(pSpinner->GetPositionX(), pSpinner->GetPositionY(), pSpinner->GetPositionZ(), true);
                     float z = GROUND_HEIGHT;
-                    me->GetMotionMaster()->MovePoint(POINT_DOWN, me->GetPositionX(), me->GetPositionY(), z); 
+                    pSpinner->GetMotionMaster()->MovePoint(0, pSpinner->GetPositionX(), pSpinner->GetPositionY(), z + 5.0f); 
                 }
             }
-
-            void MovementInform(uint32 type, uint32 data)
+            else if (owner->GetEntry() == NPC_SPIDERWEB_FILAMENT)
             {
-                if (type == POINT_MOTION_TYPE)
-                    if (data == POINT_DOWN)
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                DoCast(me, SPELL_SPIDERWEB_FILAMENT_DOWN, true);
+                //float z = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, 100.0f);
+                float z = GROUND_HEIGHT;
+                me->GetMotionMaster()->MovePoint(POINT_DOWN, me->GetPositionX(), me->GetPositionY(), z); 
             }
+        }
 
-            void UpdateAI(const uint32 diff)
-            {
-                if (pInstance->GetBossState(DATA_BETHTILAC) != IN_PROGRESS)
-                    me->DespawnOrUnsummon();
-            }
-        };
+        void MovementInform(uint32 type, uint32 data)
+        {
+            if (type == POINT_MOTION_TYPE)
+                if (data == POINT_DOWN)
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (pInstance->GetBossState(DATA_BETHTILAC) != IN_PROGRESS)
+                me->DespawnOrUnsummon();
+        }
+    };
 };
 
 class npc_bethtilac_cinderweb_spinner : public CreatureScript
 {
-    public:
-        npc_bethtilac_cinderweb_spinner() : CreatureScript("npc_bethtilac_cinderweb_spinner") { }
+public:
+    npc_bethtilac_cinderweb_spinner() : CreatureScript("npc_bethtilac_cinderweb_spinner") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_bethtilac_cinderweb_spinnerAI(pCreature);
+    }
+
+    struct npc_bethtilac_cinderweb_spinnerAI : public ScriptedAI
+    {
+        npc_bethtilac_cinderweb_spinnerAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            return new npc_bethtilac_cinderweb_spinnerAI(pCreature);
+            me->SetReactState(REACT_PASSIVE);
+            bTaunted = false;
+            owner = NULL;
+            pInstance = me->GetInstanceScript();
         }
 
-        struct npc_bethtilac_cinderweb_spinnerAI : public ScriptedAI
+        bool bTaunted;
+        Unit* owner;
+        InstanceScript* pInstance;
+        EventMap events;
+
+        void Reset()
         {
-            npc_bethtilac_cinderweb_spinnerAI(Creature* pCreature) : ScriptedAI(pCreature)
+            events.Reset();
+        }
+
+        void EnterCombat(Unit* who)
+        {
+            events.ScheduleEvent(EVENT_BURNING_ACID, urand(7000, 15000));
+            if (IsHeroic())
+                events.ScheduleEvent(EVENT_FIERY_WEB_SPIN, urand(5000, 15000));
+        }
+
+        void IsSummonedBy(Unit* who)
+        {
+            if (who)
+                owner = who;
+        }
+
+        void JustDied(Unit* who)
+        {
+            me->SetCanFly(false);
+
+            /*if (bTaunted)
+            return;
+
+            bTaunted = true;
+
+            if (owner && owner->GetEntry() == NPC_SPIDERWEB_FILAMENT)
+            if (Creature* pFilament = owner->SummonCreature(NPC_SPIDERWEB_FILAMENT, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 15000))
             {
-                me->SetReactState(REACT_PASSIVE);
-                bTaunted = false;
-                owner = NULL;
-                pInstance = me->GetInstanceScript();
-            }
+            pFilament->SetCanFly(true);
+            owner->CastSpell(pFilament, SPELL_SPIDERWEB_FILAMENT_ANY, true);
+            }*/
+        }
 
-            bool bTaunted;
-            Unit* owner;
-            InstanceScript* pInstance;
-            EventMap events;
+        void SpellHit(Unit* who, const SpellInfo* spellInfo)
+        {
+            if (bTaunted)
+                return;
 
-            void Reset()
+            if (spellInfo->HasEffect(SPELL_EFFECT_ATTACK_ME) || spellInfo->HasAura(SPELL_AURA_MOD_TAUNT))
             {
-                events.Reset();
-            }
-
-            void EnterCombat(Unit* who)
-            {
-                events.ScheduleEvent(EVENT_BURNING_ACID, urand(7000, 15000));
-                if (IsHeroic())
-                    events.ScheduleEvent(EVENT_FIERY_WEB_SPIN, urand(5000, 15000));
-            }
-
-            void IsSummonedBy(Unit* who)
-            {
-                if (who)
-                    owner = who;
-            }
-
-            void JustDied(Unit* who)
-            {
-                me->SetCanFly(false);
-
-                /*if (bTaunted)
-                    return;
-
                 bTaunted = true;
-
+                me->SetReactState(REACT_AGGRESSIVE);
                 if (owner && owner->GetEntry() == NPC_SPIDERWEB_FILAMENT)
-                    if (Creature* pFilament = owner->SummonCreature(NPC_SPIDERWEB_FILAMENT, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 15000))
+                    if (Creature* pFilament = me->SummonCreature(NPC_SPIDERWEB_FILAMENT, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 15000))
                     {
                         pFilament->SetCanFly(true);
                         owner->CastSpell(pFilament, SPELL_SPIDERWEB_FILAMENT_ANY, true);
-                    }*/
-            }
-
-            void SpellHit(Unit* who, const SpellInfo* spellInfo)
-            {
-                if (bTaunted)
-                    return;
-
-                if (spellInfo->HasEffect(SPELL_EFFECT_ATTACK_ME) || spellInfo->HasAura(SPELL_AURA_MOD_TAUNT))
-                {
-                    bTaunted = true;
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    if (owner && owner->GetEntry() == NPC_SPIDERWEB_FILAMENT)
-                        if (Creature* pFilament = me->SummonCreature(NPC_SPIDERWEB_FILAMENT, owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 15000))
-                        {
-                            pFilament->SetCanFly(true);
-                            owner->CastSpell(pFilament, SPELL_SPIDERWEB_FILAMENT_ANY, true);
-                        }
+                    }
 
                     events.CancelEvent(EVENT_FIERY_WEB_SPIN);
                     me->InterruptNonMeleeSpells(false);
@@ -559,421 +560,414 @@ class npc_bethtilac_cinderweb_spinner : public CreatureScript
                     //me->RemoveAura(SPELL_CREEPER);
                     me->RemoveAura(SPELL_TEMPERAMENT);
                     me->SetCanFly(false);
-                }
             }
+        }
 
-            void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 diff)
+        {
+            if (pInstance->GetBossState(DATA_BETHTILAC) != IN_PROGRESS)
+                me->DespawnOrUnsummon();
+
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                if (pInstance->GetBossState(DATA_BETHTILAC) != IN_PROGRESS)
-                    me->DespawnOrUnsummon();
-
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                while (uint32 eventId = events.ExecuteEvent())
+                switch (eventId)
                 {
-                    switch (eventId)
-                    {
-                        case EVENT_BURNING_ACID:
-                            DoCastAOE(SPELL_BURNING_ACID);
-                            events.ScheduleEvent(EVENT_BURNING_ACID, urand(7000, 15000));
-                            break;
-                        case EVENT_FIERY_WEB_SPIN:
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true, SPELL_FIERY_WEB_SPIN)))
-                                DoCast(pTarget, SPELL_FIERY_WEB_SPIN);
-                            events.ScheduleEvent(EVENT_FIERY_WEB_SPIN, urand(25000, 30000));
-                            break;
-                    }
+                case EVENT_BURNING_ACID:
+                    DoCastAOE(SPELL_BURNING_ACID);
+                    events.ScheduleEvent(EVENT_BURNING_ACID, urand(7000, 15000));
+                    break;
+                case EVENT_FIERY_WEB_SPIN:
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true, SPELL_FIERY_WEB_SPIN)))
+                        DoCast(pTarget, SPELL_FIERY_WEB_SPIN);
+                    events.ScheduleEvent(EVENT_FIERY_WEB_SPIN, urand(25000, 30000));
+                    break;
                 }
-
-                DoMeleeAttackIfReady();
             }
-        };
+            DoMeleeAttackIfReady();
+        }
+    };
 };
 
 class npc_bethtilac_cinderweb_drone : public CreatureScript
 {
-    public:
-        npc_bethtilac_cinderweb_drone() : CreatureScript("npc_bethtilac_cinderweb_drone") { }
+public:
+    npc_bethtilac_cinderweb_drone() : CreatureScript("npc_bethtilac_cinderweb_drone") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_bethtilac_cinderweb_droneAI(pCreature);
+    }
+
+    struct npc_bethtilac_cinderweb_droneAI : public ScriptedAI
+    {
+        npc_bethtilac_cinderweb_droneAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            return new npc_bethtilac_cinderweb_droneAI(pCreature);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
         }
 
-        struct npc_bethtilac_cinderweb_droneAI : public ScriptedAI
+        EventMap events;
+
+        void Reset()
         {
-            npc_bethtilac_cinderweb_droneAI(Creature* pCreature) : ScriptedAI(pCreature)
+            DoCast(me, SPELL_ZERO_POWER, true);
+            me->SetMaxPower(POWER_MANA, 90);
+            me->SetPower(POWER_MANA, 90);
+            DoCast(me, SPELL_ENERGIZE, true);
+            events.Reset();
+        }
+
+        void EnterCombat(Unit* who)
+        {
+            events.ScheduleEvent(EVENT_BURNING_ACID, urand(7000, 15000));
+            events.ScheduleEvent(EVENT_BOILING_SPATTER, urand(14000, 20000));
+            events.ScheduleEvent(EVENT_CHECK_TARGET, 2000);
+            events.ScheduleEvent(EVENT_CHECK_SPIDERLING, 3000);
+            if (IsHeroic())
+                events.ScheduleEvent(EVENT_FIXATE, urand(12000, 15000));
+        }
+
+        void JustDied(Unit* /*who*/)
+        {
+            for (uint8 i = 0; i < 3; ++i)
+                DoCast(me, SPELL_CREATE_CHITINOUS_FRAGMENT, true);
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-            }
-
-            EventMap events;
-
-            void Reset()
-            {
-                DoCast(me, SPELL_ZERO_POWER, true);
-                me->SetMaxPower(POWER_MANA, 90);
-                me->SetPower(POWER_MANA, 90);
-                DoCast(me, SPELL_ENERGIZE, true);
-                events.Reset();
-            }
-
-            void EnterCombat(Unit* who)
-            {
-                events.ScheduleEvent(EVENT_BURNING_ACID, urand(7000, 15000));
-                events.ScheduleEvent(EVENT_BOILING_SPATTER, urand(14000, 20000));
-                events.ScheduleEvent(EVENT_CHECK_TARGET, 2000);
-                events.ScheduleEvent(EVENT_CHECK_SPIDERLING, 3000);
-                if (IsHeroic())
-                    events.ScheduleEvent(EVENT_FIXATE, urand(12000, 15000));
-            }
-
-            void JustDied(Unit* /*who*/)
-            {
-                for (uint8 i = 0; i < 3; ++i)
-                    DoCast(me, SPELL_CREATE_CHITINOUS_FRAGMENT, true);
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                while (uint32 eventId = events.ExecuteEvent())
+                switch (eventId)
                 {
-                    switch (eventId)
+                case EVENT_FIXATE:
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true, 0)))
                     {
-                        case EVENT_FIXATE:
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true, 0)))
-                            {
-                                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
-                                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
-                                DoResetThreat();
-                                DoCast(me, SPELL_FIXATE_SELF, true);
-                                DoCast(pTarget, SPELL_FIXATE, true);
-                                me->AddThreat(pTarget, 1000000.0f);
-                                AttackStart(pTarget);
-                                events.ScheduleEvent(EVENT_FIXATE_OFF, 10000);
-                            }
-                            break;
-                        case EVENT_FIXATE_OFF:
-                            DoResetThreat();
-                            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
-                            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
-                            break;
-                        case EVENT_BOILING_SPATTER:
-                            DoCast(me, SPELL_BOILING_SPATTER);
-                            events.ScheduleEvent(EVENT_BOILING_SPATTER, urand(15000, 20000));
-                            break;
-                        case EVENT_BURNING_ACID:
-                            DoCastAOE(SPELL_BURNING_ACID);
-                            events.ScheduleEvent(EVENT_BURNING_ACID, urand(10000, 15000));
-                            break;
-                        case EVENT_CHECK_TARGET:
-                            if (me->getVictim())
-                                if (me->getVictim()->GetPositionZ() > 100.0f)
-                                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true, 0)))
-                                        AttackStart(pTarget);
-
-                            events.ScheduleEvent(EVENT_CHECK_TARGET, 2000);
-                            break;
-                        case EVENT_CHECK_SPIDERLING:
-                            if (Creature* pSpiderling = me->FindNearestCreature(NPC_CINDERWEB_SPIDERLING, 8.0f))
-                                DoCast(pSpiderling, SPELL_CONSUME_DRONE, true);
-                            events.ScheduleEvent(EVENT_CHECK_SPIDERLING, 3000);
-                            break;
+                        me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
+                        me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
+                        DoResetThreat();
+                        DoCast(me, SPELL_FIXATE_SELF, true);
+                        DoCast(pTarget, SPELL_FIXATE, true);
+                        me->AddThreat(pTarget, 1000000.0f);
+                        AttackStart(pTarget);
+                        events.ScheduleEvent(EVENT_FIXATE_OFF, 10000);
                     }
-                }
+                    break;
+                case EVENT_FIXATE_OFF:
+                    DoResetThreat();
+                    me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
+                    me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
+                    break;
+                case EVENT_BOILING_SPATTER:
+                    DoCast(me, SPELL_BOILING_SPATTER);
+                    events.ScheduleEvent(EVENT_BOILING_SPATTER, urand(15000, 20000));
+                    break;
+                case EVENT_BURNING_ACID:
+                    DoCastAOE(SPELL_BURNING_ACID);
+                    events.ScheduleEvent(EVENT_BURNING_ACID, urand(10000, 15000));
+                    break;
+                case EVENT_CHECK_TARGET:
+                    if (me->getVictim())
+                        if (me->getVictim()->GetPositionZ() > 100.0f)
+                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, PositionSelector(true, 0)))
+                                AttackStart(pTarget);
 
-                DoMeleeAttackIfReady();
+                    events.ScheduleEvent(EVENT_CHECK_TARGET, 2000);
+                    break;
+                case EVENT_CHECK_SPIDERLING:
+                    if (Creature* pSpiderling = me->FindNearestCreature(NPC_CINDERWEB_SPIDERLING, 8.0f))
+                        DoCast(pSpiderling, SPELL_CONSUME_DRONE, true);
+                    events.ScheduleEvent(EVENT_CHECK_SPIDERLING, 3000);
+                    break;
+                }
             }
-        };
+
+            DoMeleeAttackIfReady();
+        }
+    };
 };
 
 class npc_bethtilac_cinderweb_spiderling : public CreatureScript
 {
-    public:
-        npc_bethtilac_cinderweb_spiderling() : CreatureScript("npc_bethtilac_cinderweb_spiderling") { }
+public:
+    npc_bethtilac_cinderweb_spiderling() : CreatureScript("npc_bethtilac_cinderweb_spiderling") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_bethtilac_cinderweb_spiderlingAI(pCreature);
+    }
+
+    struct npc_bethtilac_cinderweb_spiderlingAI : public ScriptedAI
+    {
+        npc_bethtilac_cinderweb_spiderlingAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            return new npc_bethtilac_cinderweb_spiderlingAI(pCreature);
+            pDrone = NULL;
+            me->SetReactState(REACT_PASSIVE);
         }
 
-        struct npc_bethtilac_cinderweb_spiderlingAI : public ScriptedAI
+        Unit* pDrone;
+        EventMap events;
+
+        void EnterCombat(Unit* who)
         {
-            npc_bethtilac_cinderweb_spiderlingAI(Creature* pCreature) : ScriptedAI(pCreature)
+            events.ScheduleEvent(EVENT_CHECK_DRONE, 2000);
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                pDrone = NULL;
-                me->SetReactState(REACT_PASSIVE);
-            }
-
-            Unit* pDrone;
-            EventMap events;
-
-            void EnterCombat(Unit* who)
-            {
-                events.ScheduleEvent(EVENT_CHECK_DRONE, 2000);
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
+                switch (eventId)
                 {
-                    switch (eventId)
+                case EVENT_CHECK_DRONE:
+                    if (!pDrone || !pDrone->isAlive())
                     {
-                        case EVENT_CHECK_DRONE:
-                            if (!pDrone || !pDrone->isAlive())
+                        if (Creature* pTarget = me->FindNearestCreature(NPC_CINDERWEB_DRONE, 500.0f))
+                        {
+                            pDrone = pTarget;
+                            me->GetMotionMaster()->MovementExpired(false);
+                            me->GetMotionMaster()->MoveFollow(pDrone, 0.0f, 0.0f);
+                        }
+                        else
+                        {
+                            if (!me->isMoving())
                             {
-                                if (Creature* pTarget = me->FindNearestCreature(NPC_CINDERWEB_DRONE, 500.0f))
-                                {
-                                    pDrone = pTarget;
-                                    me->GetMotionMaster()->MovementExpired(false);
-                                    me->GetMotionMaster()->MoveFollow(pDrone, 0.0f, 0.0f);
-                                }
-                                else
-                                {
-                                    if (!me->isMoving())
-                                    {
-                                        me->GetMotionMaster()->MovementExpired(false);
-                                        me->GetMotionMaster()->MovePoint(0, addsPos[5]);
-                                    }
-                                }
+                                me->GetMotionMaster()->MovementExpired(false);
+                                me->GetMotionMaster()->MovePoint(0, addsPos[5]);
                             }
-                            events.ScheduleEvent(EVENT_CHECK_DRONE, 2000);
-                            break;
+                        }
                     }
+                    events.ScheduleEvent(EVENT_CHECK_DRONE, 2000);
+                    break;
                 }
             }
-        };
+        }
+    };
 };
 
 class npc_bethtilac_engorged_broodling : public CreatureScript
 {
-    public:
-        npc_bethtilac_engorged_broodling() : CreatureScript("npc_bethtilac_engorged_broodling") { }
+public:
+    npc_bethtilac_engorged_broodling() : CreatureScript("npc_bethtilac_engorged_broodling") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_bethtilac_engorged_broodlingAI(pCreature);
+    }
+
+    struct npc_bethtilac_engorged_broodlingAI : public ScriptedAI
+    {
+        npc_bethtilac_engorged_broodlingAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            return new npc_bethtilac_engorged_broodlingAI(pCreature);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
+            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetSpeed(MOVE_RUN, 2.0f);
         }
 
-        struct npc_bethtilac_engorged_broodlingAI : public ScriptedAI
+        bool bBurst;
+
+        void EnterCombat(Unit* who)
         {
-            npc_bethtilac_engorged_broodlingAI(Creature* pCreature) : ScriptedAI(pCreature)
+            bBurst = false;
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!bBurst && me->SelectNearestPlayer(3.0f))
             {
-                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
-                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
+                bBurst = true;
+                me->StopMoving();
+                me->GetMotionMaster()->MovementExpired(false);
                 me->SetReactState(REACT_PASSIVE);
-                me->SetSpeed(MOVE_RUN, 2.0f);
+                DoCastAOE(SPELL_VOLATILE_BURST);
+                DoCast(me, SPELL_VOLATILE_POISON, true);
+                me->DespawnOrUnsummon(30000);
             }
-
-            bool bBurst;
-
-            void EnterCombat(Unit* who)
-            {
-                bBurst = false;
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-                if (!bBurst && me->SelectNearestPlayer(3.0f))
-                {
-                    bBurst = true;
-                    me->StopMoving();
-                    me->GetMotionMaster()->MovementExpired(false);
-                    me->SetReactState(REACT_PASSIVE);
-                    DoCastAOE(SPELL_VOLATILE_BURST);
-                    DoCast(me, SPELL_VOLATILE_POISON, true);
-                    me->DespawnOrUnsummon(30000);
-                }
-            }
-        };
+        }
+    };
 };
 
 class achievement_death_from_above : public AchievementCriteriaScript
 {
-    public:
-        achievement_death_from_above() : AchievementCriteriaScript("achievement_death_from_above") { }
+public:
+    achievement_death_from_above() : AchievementCriteriaScript("achievement_death_from_above") { }
 
-        bool OnCheck(Player* source, Unit* target)
-        {
-            if (!target)
-                return false;
-
-            if (boss_bethtilac::boss_bethtilacAI* BethtilacAI = CAST_AI(boss_bethtilac::boss_bethtilacAI, target->GetAI()))
-                return BethtilacAI->AllowAchieve();
-
+    bool OnCheck(Player* source, Unit* target)
+    {
+        if (!target)
             return false;
-        }
+
+        if (boss_bethtilac::boss_bethtilacAI* BethtilacAI = CAST_AI(boss_bethtilac::boss_bethtilacAI, target->GetAI()))
+            return BethtilacAI->AllowAchieve();
+
+        return false;
+    }
 };
 
 class PositionCheck
 {
-    public:
-        PositionCheck(bool b) : _b(b) {}
+public:
+    PositionCheck(bool b) : _b(b) { }
 
-        bool operator()(WorldObject* unit)
-        {
-            return _b? (unit->GetPositionZ() > 100.0f): (unit->GetPositionZ() < 100.0f);
-        }
+    bool operator()(WorldObject* unit)
+    {
+        return _b? (unit->GetPositionZ() > 100.0f): (unit->GetPositionZ() < 100.0f);
+    }
 
-        private:
-            bool _b;
+private:
+    bool _b;
 };
 
 class spell_bethtilac_smoldering_devastation : public SpellScriptLoader
 {
-    public:
-        spell_bethtilac_smoldering_devastation() : SpellScriptLoader("spell_bethtilac_smoldering_devastation") { }
+public:
+    spell_bethtilac_smoldering_devastation() : SpellScriptLoader("spell_bethtilac_smoldering_devastation") { }
 
-        class spell_bethtilac_smoldering_devastation_SpellScript : public SpellScript
+    class spell_bethtilac_smoldering_devastation_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_bethtilac_smoldering_devastation_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
         {
-            PrepareSpellScript(spell_bethtilac_smoldering_devastation_SpellScript);
+            if (!GetCaster())
+                return;
 
-            void FilterTargets(std::list<WorldObject*>& targets)
+            targets.remove_if(PositionCheck(false));
+        }
+
+        void HandleAfterCast()
+        {
+            if (!GetCaster())
+                return;
+
+            std::list<Creature*> creatureList;
+            GetCaster()->GetCreatureListWithEntryInGrid(creatureList, NPC_DULL_CHITINOUS_FOCUS, 100.0f);
+            if (!creatureList.empty())
             {
-                if (!GetCaster())
-                    return;
-
-                targets.remove_if(PositionCheck(false));
-            }
-
-            void HandleAfterCast()
-            {
-                if (!GetCaster())
-                    return;
-
-                std::list<Creature*> creatureList;
-                GetCaster()->GetCreatureListWithEntryInGrid(creatureList, NPC_DULL_CHITINOUS_FOCUS, 100.0f);
-                if (!creatureList.empty())
+                for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
                 {
-                    for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+                    if (Creature* pFocus = (*itr)->ToCreature())
                     {
-                        if (Creature* pFocus = (*itr)->ToCreature())
-                        {
-                            pFocus->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                            pFocus->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                            pFocus->CastSpell(pFocus, SPELL_TRANSFORM_CHARGED_CHITINOUS_FOCUS, true);
-                        }
+                        pFocus->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                        pFocus->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        pFocus->CastSpell(pFocus, SPELL_TRANSFORM_CHARGED_CHITINOUS_FOCUS, true);
                     }
                 }
             }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_bethtilac_smoldering_devastation_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-                AfterCast += SpellCastFn(spell_bethtilac_smoldering_devastation_SpellScript::HandleAfterCast);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_bethtilac_smoldering_devastation_SpellScript();
         }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_bethtilac_smoldering_devastation_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+            AfterCast += SpellCastFn(spell_bethtilac_smoldering_devastation_SpellScript::HandleAfterCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_bethtilac_smoldering_devastation_SpellScript();
+    }
 };
 
 class spell_bethtilac_ember_flare : public SpellScriptLoader
 {
-    public:
-        spell_bethtilac_ember_flare() : SpellScriptLoader("spell_bethtilac_ember_flare") { }
+public:
+    spell_bethtilac_ember_flare() : SpellScriptLoader("spell_bethtilac_ember_flare") { }
 
-        class spell_bethtilac_ember_flare_SpellScript : public SpellScript
+    class spell_bethtilac_ember_flare_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_bethtilac_ember_flare_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
         {
-            PrepareSpellScript(spell_bethtilac_ember_flare_SpellScript);
+            if (!GetCaster())
+                return;
 
-            void FilterTargets(std::list<WorldObject*>& targets)
-            {
-                if (!GetCaster())
-                    return;
-
-                targets.remove_if(PositionCheck(false));
-            }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_bethtilac_ember_flare_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            }
-
-            private:
-
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_bethtilac_ember_flare_SpellScript();
+            targets.remove_if(PositionCheck(false));
         }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_bethtilac_ember_flare_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_bethtilac_ember_flare_SpellScript();
+    }
 };
 
 class spell_bethtilac_burning_acid : public SpellScriptLoader
 {
-    public:
-        spell_bethtilac_burning_acid() : SpellScriptLoader("spell_bethtilac_burning_acid") { }
+public:
+    spell_bethtilac_burning_acid() : SpellScriptLoader("spell_bethtilac_burning_acid") { }
 
-        class spell_bethtilac_burning_acid_SpellScript : public SpellScript
+    class spell_bethtilac_burning_acid_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_bethtilac_burning_acid_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
         {
-            PrepareSpellScript(spell_bethtilac_burning_acid_SpellScript);
+            if (!GetCaster())
+                return;
 
-            void FilterTargets(std::list<WorldObject*>& targets)
-            {
-                if (!GetCaster())
-                    return;
-
-                targets.remove_if(PositionCheck(true));
-            }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_bethtilac_burning_acid_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            }
-
-            private:
-
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_bethtilac_burning_acid_SpellScript();
+            targets.remove_if(PositionCheck(true));
         }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_bethtilac_burning_acid_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_bethtilac_burning_acid_SpellScript();
+    }
 };
 
 void AddSC_boss_bethtilac()

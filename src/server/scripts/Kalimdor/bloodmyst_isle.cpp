@@ -37,7 +37,7 @@ EndContentData */
 ######*/
 
 //possible creatures to be spawned
-uint32 const possibleSpawns[32] = {17322, 17661, 17496, 17522, 17340, 17352, 17333, 17524, 17654, 17348, 17339, 17345, 17359, 17353, 17336, 17550, 17330, 17701, 17321, 17680, 17325, 17320, 17683, 17342, 17715, 17334, 17341, 17338, 17337, 17346, 17344, 17327};
+uint32 const possibleSpawns[32] ={17322, 17661, 17496, 17522, 17340, 17352, 17333, 17524, 17654, 17348, 17339, 17345, 17359, 17353, 17336, 17550, 17330, 17701, 17321, 17680, 17325, 17320, 17683, 17342, 17715, 17334, 17341, 17338, 17337, 17346, 17344, 17327};
 
 class mob_webbed_creature : public CreatureScript
 {
@@ -46,16 +46,16 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new mob_webbed_creatureAI (creature);
+        return new mob_webbed_creatureAI(creature);
     }
 
     struct mob_webbed_creatureAI : public ScriptedAI
     {
-        mob_webbed_creatureAI(Creature* creature) : ScriptedAI(creature) {}
+        mob_webbed_creatureAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() {}
+        void Reset() { }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) { }
 
         void JustDied(Unit* killer)
         {
@@ -138,8 +138,7 @@ public:
         {
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELLO_CSA, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
             player->SEND_GOSSIP_MENU(9136, creature->GetGUID());
-        }
-        else
+        } else
             player->SEND_GOSSIP_MENU(9134, creature->GetGUID());
 
         return true;
@@ -184,7 +183,7 @@ public:
 
     struct npc_princess_stillpineAI : public ScriptedAI
     {
-        npc_princess_stillpineAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_princess_stillpineAI(Creature* creature) : ScriptedAI(creature) { }
 
         void MovementInform(uint32 type, uint32 id)
         {

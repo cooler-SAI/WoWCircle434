@@ -1,5 +1,4 @@
 
-
 #include "ScriptPCH.h"
 #include "blackwing_descent.h"
 
@@ -388,8 +387,8 @@ public:
                     me->AddAura(SPELL_CHILDREN_OF_DEATHWING_ONY, me);
 
                 else if (!me->FindNearestCreature(NPC_ONYXIA, 50.0f, true) && onyxiaAlive)
-                if (me->HasAura(SPELL_CHILDREN_OF_DEATHWING_ONY))
-                    me->RemoveAura(SPELL_CHILDREN_OF_DEATHWING_ONY);
+                    if (me->HasAura(SPELL_CHILDREN_OF_DEATHWING_ONY))
+                        me->RemoveAura(SPELL_CHILDREN_OF_DEATHWING_ONY);
 
                 m_uiDistanceCheckTimer = 5000;
             }
@@ -431,141 +430,141 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_INTRO:
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
-                        me->SetDisableGravity(true);
-                        me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
-                        me->SetCanFly(true);
-                        me->GetMotionMaster()->Clear();
-                        me->GetMotionMaster()->MovePoint(1, -126.518f, -233.342f, 36.358f); // Position on top of raid.
-                        break;
+                case EVENT_INTRO:
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
+                    me->SetDisableGravity(true);
+                    me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
+                    me->SetCanFly(true);
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MovePoint(1, -126.518f, -233.342f, 36.358f); // Position on top of raid.
+                    break;
 
-                    case EVENT_INTRO2:
-                        Talk(SAY_AGGRO);
-                        events.ScheduleEvent(EVENT_HAIL_OF_BONES, 100);
-                        break;
+                case EVENT_INTRO2:
+                    Talk(SAY_AGGRO);
+                    events.ScheduleEvent(EVENT_HAIL_OF_BONES, 100);
+                    break;
 
-                    case EVENT_BERSERK:
-                        me->AddAura(SPELL_BERSERK_NEF, me);
-                        break;
+                case EVENT_BERSERK:
+                    me->AddAura(SPELL_BERSERK_NEF, me);
+                    break;
 
-                    case EVENT_HAIL_OF_BONES:
-                        DoCast(me, SPELL_HAIL_OF_BONES);
-                        break;
+                case EVENT_HAIL_OF_BONES:
+                    DoCast(me, SPELL_HAIL_OF_BONES);
+                    break;
 
-                    case EVENT_MOVE:
-                        me->GetMotionMaster()->Clear();
-                        me->GetMotionMaster()->MovePoint(1, -100.123f, -221.522f, 7.156f); // Move down.
-                        events.ScheduleEvent(EVENT_LANDING, 8000);
-                        break;
+                case EVENT_MOVE:
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MovePoint(1, -100.123f, -221.522f, 7.156f); // Move down.
+                    events.ScheduleEvent(EVENT_LANDING, 8000);
+                    break;
 
-                    case EVENT_LANDING:
-                        EnterPhaseGround();
+                case EVENT_LANDING:
+                    EnterPhaseGround();
 
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
 
-                        me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        me->SetDisableGravity(false);
-                        me->SetCanFly(false);
-                        me->GetMotionMaster()->Clear();
-                        me->GetMotionMaster()->MoveChase(me->getVictim());
-                        break;
+                    me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetDisableGravity(false);
+                    me->SetCanFly(false);
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MoveChase(me->getVictim());
+                    break;
 
-                    case EVENT_SHADOWFLAME_BREATH:
-                        Talk(SAY_SHADOWFLAME);
-                        DoCastVictim(SPELL_SHADOWFLAME_BREATH);
-                        events.ScheduleEvent(EVENT_SHADOWFLAME_BREATH, urand(10000, 12000));
-                        break;
+                case EVENT_SHADOWFLAME_BREATH:
+                    Talk(SAY_SHADOWFLAME);
+                    DoCastVictim(SPELL_SHADOWFLAME_BREATH);
+                    events.ScheduleEvent(EVENT_SHADOWFLAME_BREATH, urand(10000, 12000));
+                    break;
 
-                    case EVENT_SHADOW_COWARDICE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
-                            DoCast(target, SPELL_SHADOW_COWARDICE);
-                        events.ScheduleEvent(EVENT_SHADOW_COWARDICE, urand(9000, 10000));
-                        break;
+                case EVENT_SHADOW_COWARDICE:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                        DoCast(target, SPELL_SHADOW_COWARDICE);
+                    events.ScheduleEvent(EVENT_SHADOW_COWARDICE, urand(9000, 10000));
+                    break;
 
-                    case EVENT_LIFTOFF:
-                        Talk(SAY_AIR_PHASE_2);
-                        if (GameObject* elevator = instance->instance->GetGameObject(instance->GetData64(DATA_NEFARIAN_FLOOR)))
-                            elevator->SetGoState(GO_STATE_ACTIVE);
+                case EVENT_LIFTOFF:
+                    Talk(SAY_AIR_PHASE_2);
+                    if (GameObject* elevator = instance->instance->GetGameObject(instance->GetData64(DATA_NEFARIAN_FLOOR)))
+                        elevator->SetGoState(GO_STATE_ACTIVE);
 
-                        me->GetMotionMaster()->Clear();
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
-                        me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
-                        me->SetDisableGravity(true);
-                        me->SetCanFly(true);
+                    me->GetMotionMaster()->Clear();
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
+                    me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
+                    me->SetDisableGravity(true);
+                    me->SetCanFly(true);
 
-                        events.ScheduleEvent(EVENT_FLIGHT, 1000);
-                        events.ScheduleEvent(EVENT_AIR, 1000);
-                        break;
+                    events.ScheduleEvent(EVENT_FLIGHT, 1000);
+                    events.ScheduleEvent(EVENT_AIR, 1000);
+                    break;
 
-                    case EVENT_FLIGHT:
-                        me->SetReactState(REACT_PASSIVE);
-                        me->AttackStop();
-                        me->GetMotionMaster()->Clear();
-                        me->GetMotionMaster()->MovePoint(1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 50.0f);
-                        break;
+                case EVENT_FLIGHT:
+                    me->SetReactState(REACT_PASSIVE);
+                    me->AttackStop();
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MovePoint(1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 50.0f);
+                    break;
 
-                    case EVENT_AIR:
-                        EnterPhaseAir();
-                        break;
+                case EVENT_AIR:
+                    EnterPhaseAir();
+                    break;
 
-                    case EVENT_SUMMON_CHROMATIC:
-                        me->SummonCreature(NPC_CHROMATIC_PROTO, ChromaticPositions[0], TEMPSUMMON_CORPSE_DESPAWN);
-                        me->SummonCreature(NPC_CHROMATIC_PROTO, ChromaticPositions[1], TEMPSUMMON_CORPSE_DESPAWN);
-                        me->SummonCreature(NPC_CHROMATIC_PROTO, ChromaticPositions[2], TEMPSUMMON_CORPSE_DESPAWN);
-                        break;
+                case EVENT_SUMMON_CHROMATIC:
+                    me->SummonCreature(NPC_CHROMATIC_PROTO, ChromaticPositions[0], TEMPSUMMON_CORPSE_DESPAWN);
+                    me->SummonCreature(NPC_CHROMATIC_PROTO, ChromaticPositions[1], TEMPSUMMON_CORPSE_DESPAWN);
+                    me->SummonCreature(NPC_CHROMATIC_PROTO, ChromaticPositions[2], TEMPSUMMON_CORPSE_DESPAWN);
+                    break;
 
-                    case EVENT_SHADOWFLAME_BARRAGE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
-                            DoCast(target, SPELL_SHADOWFLAME_BARRAGE);
-                        events.ScheduleEvent(EVENT_SHADOWFLAME_BARRAGE, urand(8000, 11000));
-                        break;
+                case EVENT_SHADOWFLAME_BARRAGE:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
+                        DoCast(target, SPELL_SHADOWFLAME_BARRAGE);
+                    events.ScheduleEvent(EVENT_SHADOWFLAME_BARRAGE, urand(8000, 11000));
+                    break;
 
-                    case EVENT_LAND:
-                        me->GetMotionMaster()->Clear();
-                        me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
-                        me->SetDisableGravity(false);
-                        me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
-                        me->SetCanFly(false);
-                        events.ScheduleEvent(EVENT_RETURN, 1000);
-                        events.ScheduleEvent(EVENT_GROUND, 1500);
-                        break;
+                case EVENT_LAND:
+                    me->GetMotionMaster()->Clear();
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+                    me->SetDisableGravity(false);
+                    me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
+                    me->SetCanFly(false);
+                    events.ScheduleEvent(EVENT_RETURN, 1000);
+                    events.ScheduleEvent(EVENT_GROUND, 1500);
+                    break;
 
-                    case EVENT_RETURN:
-                        me->SetReactState(REACT_PASSIVE);
-                        me->AttackStop();
-                        me->GetMotionMaster()->Clear();
-                        me->GetMotionMaster()->MovePoint(1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 50.0f);
-                        break;
+                case EVENT_RETURN:
+                    me->SetReactState(REACT_PASSIVE);
+                    me->AttackStop();
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MovePoint(1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 50.0f);
+                    break;
 
-                    case EVENT_GROUND:
-                        Talk(SAY_FINAL_PHASE);
-                        EnterPhaseFinal();
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        AttackStart(me->getVictim());
-                        me->GetMotionMaster()->Clear();
-                        me->GetMotionMaster()->MoveChase(me->getVictim());
+                case EVENT_GROUND:
+                    Talk(SAY_FINAL_PHASE);
+                    EnterPhaseFinal();
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    AttackStart(me->getVictim());
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MoveChase(me->getVictim());
 
-                        if (GameObject* elevator = instance->instance->GetGameObject(instance->GetData64(DATA_NEFARIAN_FLOOR)))
-                            elevator->SetGoState(GO_STATE_READY);
-                        break;
+                    if (GameObject* elevator = instance->instance->GetGameObject(instance->GetData64(DATA_NEFARIAN_FLOOR)))
+                        elevator->SetGoState(GO_STATE_READY);
+                    break;
 
-                    case EVENT_TAIL_LASH:
-                        DoCast(me, SPELL_TAIL_LASH);
-                        events.ScheduleEvent(EVENT_TAIL_LASH, urand(8000, 11000));
-                        break;
+                case EVENT_TAIL_LASH:
+                    DoCast(me, SPELL_TAIL_LASH);
+                    events.ScheduleEvent(EVENT_TAIL_LASH, urand(8000, 11000));
+                    break;
 
-                    case EVENT_SHADOWBLAZE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
-                            DoCast(target, SPELL_SHADOWBLAZE_SPARK);
-                        events.ScheduleEvent(EVENT_TAIL_LASH, urand(18000, 21000));
-                        break;
+                case EVENT_SHADOWBLAZE:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
+                        DoCast(target, SPELL_SHADOWBLAZE_SPARK);
+                    events.ScheduleEvent(EVENT_TAIL_LASH, urand(18000, 21000));
+                    break;
 
-                    case EVENT_REVIVE_SKELETONS:
-                        std::list<Creature*> creatures;
-                        GetCreatureListWithEntryInGrid(creatures, me, NPC_ANIM_BONE_WARR, 200.0f);
-                        if (!creatures.empty())
+                case EVENT_REVIVE_SKELETONS:
+                    std::list<Creature*> creatures;
+                    GetCreatureListWithEntryInGrid(creatures, me, NPC_ANIM_BONE_WARR, 200.0f);
+                    if (!creatures.empty())
                         for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
                         {
                             DoCast((*iter), SPELL_ANIMATE_BONES, true);
@@ -912,7 +911,6 @@ public:
                     break;
                 }
             }
-            
         }
 
         void JustDied(Unit* /*killer*/) 

@@ -1552,7 +1552,7 @@ struct WintergraspWorkshopData
     uint32 m_TeamControl;                                   // Team witch control the workshop
     GuidSet m_CreatureOnPoint[2];                           // Contain all Creature associate to this point
     GameObjectSet m_GameObjectOnPoint[2];                   // Contain all Gameobject associate to this point
-    uint32 m_NameId;                                        // Id of CERBERCORE_string witch contain name of this node, using for alert message
+    uint32 m_NameId;                                        // Id of cerbercore_string witch contain name of this node, using for alert message
 
     WintergraspWorkshopData(BattlefieldWG* WG)
     {

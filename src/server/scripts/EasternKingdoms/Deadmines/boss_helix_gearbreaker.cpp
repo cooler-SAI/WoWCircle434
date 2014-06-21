@@ -87,483 +87,471 @@ const Position oafPos[1] =
 
 class boss_helix_gearbreaker : public CreatureScript
 {
-    public:
-        boss_helix_gearbreaker() : CreatureScript("boss_helix_gearbreaker") { }
+public:
+    boss_helix_gearbreaker() : CreatureScript("boss_helix_gearbreaker") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new boss_helix_gearbreakerAI (pCreature);
+    }
+
+    struct boss_helix_gearbreakerAI : public BossAI
+    {
+        boss_helix_gearbreakerAI(Creature* pCreature) : BossAI(pCreature, DATA_HELIX)
         {
-            return new boss_helix_gearbreakerAI (pCreature);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
+            me->setActive(true);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        struct boss_helix_gearbreakerAI : public BossAI
+        void Reset() 
         {
-            boss_helix_gearbreakerAI(Creature* pCreature) : BossAI(pCreature, DATA_HELIX)
-            {
-                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-                me->setActive(true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-            }
-            
-            void Reset() 
-            {
-                _Reset();
+            _Reset();
 
-                me->SummonCreature(NPC_LUMBERING_OAF, oafPos[0]);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-            }
+            me->SummonCreature(NPC_LUMBERING_OAF, oafPos[0]);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+        }
 
-            void SummonedCreatureDies(Creature* summon, Unit* killer)
+        void SummonedCreatureDies(Creature* summon, Unit* killer)
+        {
+            if (summon->GetEntry() == NPC_LUMBERING_OAF)
             {
-                if (summon->GetEntry() == NPC_LUMBERING_OAF)
+                Talk(SAY_OAF_DEAD);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+            }
+        }
+
+        void EnterCombat(Unit* /*who*/)
+        {
+            events.ScheduleEvent(EVENT_STICKY_BOMB, 8000);
+            if (IsHeroic())
+            {
+                events.ScheduleEvent(EVENT_CHEST_BOMB, urand(8000, 12000));
+                events.ScheduleEvent(EVENT_HELIX_CREW, 5000);
+            }
+            Talk(SAY_AGGRO);
+            DoZoneInCombat();
+            instance->SetBossState(DATA_HELIX, IN_PROGRESS);
+        }
+
+        void KilledUnit(Unit * victim)
+        {
+            Talk(SAY_KILL);
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            _JustDied();
+            Talk(SAY_DEATH);
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (!me->GetVehicle())
+            {
+                if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 {
-                    Talk(SAY_OAF_DEAD);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                }
-            }
-
-            void EnterCombat(Unit* /*who*/)
-            {
-                events.ScheduleEvent(EVENT_STICKY_BOMB, 8000);
-                if (IsHeroic())
-                {
-                    events.ScheduleEvent(EVENT_CHEST_BOMB, urand(8000, 12000));
-                    events.ScheduleEvent(EVENT_HELIX_CREW, 5000);
-                }
-                Talk(SAY_AGGRO);
-                DoZoneInCombat();
-                instance->SetBossState(DATA_HELIX, IN_PROGRESS);
-            }
-
-            void KilledUnit(Unit * victim)
-            {
-                Talk(SAY_KILL);
-            }
-            
-            void JustDied(Unit* /*killer*/)
-            {
-                _JustDied();
-                Talk(SAY_DEATH);
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-                if (!UpdateVictim())
+                    //Talk(SAY_OAF_DEAD);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     return;
-
-                if (!me->GetVehicle())
-                    if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
-                    {
-                        //Talk(SAY_OAF_DEAD);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        return;
-                    }
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_CHEST_BOMB:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                            {
-                                Talk(SAY_SPELL1);
-                                DoCast(target, SPELL_CHEST_BOMB);
-                            }
-                            events.ScheduleEvent(EVENT_CHEST_BOMB, urand(15000, 20000));
-                            break;
-                        case EVENT_STICKY_BOMB:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                            {
-                                me->SummonCreature(NPC_STICKY_BOMB, 
-                                    target->GetPositionX(),
-                                    target->GetPositionY(),
-                                    target->GetPositionZ(),
-                                    0.0f);
-                            }
-                            events.ScheduleEvent(EVENT_STICKY_BOMB, urand(8000, 10000));
-                            break;
-                        case EVENT_HELIX_CREW:
-                            for (uint8 i = 0; i < 4; i++)
-                                me->SummonCreature(NPC_HELIX_CREW, helixcrewPos[i], TEMPSUMMON_CORPSE_DESPAWN);
-                            break;
-                    }
                 }
-
-                if (!me->GetVehicle())
-                    DoMeleeAttackIfReady();
             }
-        };
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_CHEST_BOMB:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    {
+                        Talk(SAY_SPELL1);
+                        DoCast(target, SPELL_CHEST_BOMB);
+                    }
+                    events.ScheduleEvent(EVENT_CHEST_BOMB, urand(15000, 20000));
+                    break;
+                case EVENT_STICKY_BOMB:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        me->SummonCreature(NPC_STICKY_BOMB, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f);
+                    events.ScheduleEvent(EVENT_STICKY_BOMB, urand(8000, 10000));
+                    break;
+                case EVENT_HELIX_CREW:
+                    for (uint8 i = 0; i < 4; i++)
+                        me->SummonCreature(NPC_HELIX_CREW, helixcrewPos[i], TEMPSUMMON_CORPSE_DESPAWN);
+                    break;
+                }
+            }
+
+            if (!me->GetVehicle())
+                DoMeleeAttackIfReady();
+        }
+    };
 };
 
 class npc_lumbering_oaf : public CreatureScript
 {
-    public:
-        npc_lumbering_oaf() : CreatureScript("npc_lumbering_oaf") { }
-     
-        CreatureAI* GetAI(Creature* pCreature) const
+public:
+    npc_lumbering_oaf() : CreatureScript("npc_lumbering_oaf") { }
+
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_lumbering_oafAI (pCreature);
+    }
+
+    struct npc_lumbering_oafAI : public ScriptedAI
+    {
+        npc_lumbering_oafAI(Creature *c) : ScriptedAI(c) 
         {
-            return new npc_lumbering_oafAI (pCreature);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
+            me->setActive(true);
         }
-     
-        struct npc_lumbering_oafAI : public ScriptedAI
+
+        InstanceScript* pInstance;
+        EventMap events;
+
+        void Reset()
         {
-            npc_lumbering_oafAI(Creature *c) : ScriptedAI(c) 
-            {
-                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-                me->setActive(true);
-            }
+            events.Reset();
+        }
 
-            InstanceScript* pInstance;
-            EventMap events;
-
-            void Reset()
+        void DoAction(const int32 action)
+        {
+            switch (action)
             {
-                events.Reset();
+            case ACTION_CHARGE:
+                events.ScheduleEvent(EVENT_CHARGE_OAF1, 500);
+                break;
             }
-     
-            void DoAction(const int32 action)
+        }
+
+        void EnterCombat(Unit* who)
+        {
+            events.ScheduleEvent(EVENT_CHARGE_OAF0, 10000);
+        }
+
+        void EnterEvadeMode()
+        {
+            me->DespawnOrUnsummon();
+        }
+
+        void DamageTaken(Unit* attacker, uint32 &damage)
+        {
+            if (me->GetHealth() <= damage)
+                me->GetVehicleKit()->RemoveAllPassengers();
+        }
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type == POINT_MOTION_TYPE)
             {
-                switch (action)
+                switch (id)
                 {
-                    case ACTION_CHARGE:
-                        events.ScheduleEvent(EVENT_CHARGE_OAF1, 500);
-                        break;
+                case POINT_START:
+                    events.ScheduleEvent(EVENT_CHARGE_OAF2, 500);
+                    break;
+                case POINT_END:
+                    events.ScheduleEvent(EVENT_CHARGE_OAF3, 500);
+                    break;
                 }
             }
+        }
 
-            void EnterCombat(Unit* who)
-            {
-                events.ScheduleEvent(EVENT_CHARGE_OAF0, 10000);
-            }
+        void UpdateAI(const uint32 diff)
+        {
 
-            void EnterEvadeMode()
-            {
-                me->DespawnOrUnsummon();
-            }
+            if (!UpdateVictim())
+                return;
 
-            void DamageTaken(Unit* attacker, uint32 &damage)
-            {
-                if (me->GetHealth() <= damage)
-                    me->GetVehicleKit()->RemoveAllPassengers();
-            }
+            events.Update(diff);
 
-            void MovementInform(uint32 type, uint32 id)
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                if (type == POINT_MOTION_TYPE)
+                switch (eventId)
                 {
-                    switch (id)
+                case EVENT_CHARGE_OAF0:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                     {
-                        case POINT_START:
-                            events.ScheduleEvent(EVENT_CHARGE_OAF2, 500);
-                            break;
-                        case POINT_END:
-                            events.ScheduleEvent(EVENT_CHARGE_OAF3, 500);
-                            break;
+                        me->SetReactState(REACT_PASSIVE);
+                        DoCast(target, SPELL_CHARGE, true);
                     }
+                    break;
+                case EVENT_CHARGE_OAF1:
+                    me->GetMotionMaster()->MovePoint(POINT_START, lumberingoafPos[1]);
+                    break;
+                case EVENT_CHARGE_OAF2:
+                    me->GetMotionMaster()->MoveCharge(lumberingoafPos[2].GetPositionX(), lumberingoafPos[2].GetPositionY(), lumberingoafPos[2].GetPositionZ(), 42.0f, POINT_END);
+                    break;
+                case EVENT_CHARGE_OAF3:
+                    DoCastAOE(SPELL_OAF_SMASH);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    if (me->getVictim())
+                        me->GetMotionMaster()->MoveChase(me->getVictim());
+                    me->RemoveAurasDueToSpell(SPELL_RIDE_OAF);
+                    events.ScheduleEvent(EVENT_CHARGE_OAF0, 30000);
+                    break;
                 }
             }
-
-            void UpdateAI(const uint32 diff)
-            {
-
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_CHARGE_OAF0:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                            {
-                                me->SetReactState(REACT_PASSIVE);
-                                DoCast(target, SPELL_CHARGE, true);
-                            }
-                            break;
-                        case EVENT_CHARGE_OAF1:
-                            me->GetMotionMaster()->MovePoint(POINT_START, lumberingoafPos[1]);
-                            break;
-                        case EVENT_CHARGE_OAF2:
-                            me->GetMotionMaster()->MoveCharge(
-                                lumberingoafPos[2].GetPositionX(),
-                                lumberingoafPos[2].GetPositionY(),
-                                lumberingoafPos[2].GetPositionZ(),
-                                42.0f, POINT_END);
-                            break;
-                        case EVENT_CHARGE_OAF3:
-                            DoCastAOE(SPELL_OAF_SMASH);
-                            me->SetReactState(REACT_AGGRESSIVE);
-                            if (me->getVictim())
-                                me->GetMotionMaster()->MoveChase(me->getVictim());
-                            me->RemoveAurasDueToSpell(SPELL_RIDE_OAF);
-                            events.ScheduleEvent(EVENT_CHARGE_OAF0, 30000);
-                            break;
-                    }
-                }
-
-                DoMeleeAttackIfReady();
-            }
-        };
+            DoMeleeAttackIfReady();
+        }
+    };
 };
 
 class npc_sticky_bomb : public CreatureScript
 {
-    public:
-        npc_sticky_bomb() : CreatureScript("npc_sticky_bomb") { }
-     
-        CreatureAI* GetAI(Creature* pCreature) const
+public:
+    npc_sticky_bomb() : CreatureScript("npc_sticky_bomb") { }
+
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_sticky_bombAI (pCreature);
+    }
+
+    struct npc_sticky_bombAI : public Scripted_NoMovementAI
+    {
+        npc_sticky_bombAI(Creature *c) : Scripted_NoMovementAI(c)
         {
-            return new npc_sticky_bombAI (pCreature);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+            pInstance = c->GetInstanceScript();
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
-     
-        struct npc_sticky_bombAI : public Scripted_NoMovementAI
+
+        InstanceScript* pInstance;
+        EventMap events;
+
+        void Reset()
         {
-            npc_sticky_bombAI(Creature *c) : Scripted_NoMovementAI(c)
-            {
-                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-                pInstance = c->GetInstanceScript();
-                me->SetReactState(REACT_PASSIVE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            }
-           
-            InstanceScript* pInstance;
-            EventMap events;
+            events.Reset();
+        }
 
-            void Reset()
-            {
-                events.Reset();
-            }
-     
-            void EnterCombat(Unit* who)
-            {
-                events.ScheduleEvent(EVENT_BOMB_READY, 6000);
-                events.ScheduleEvent(EVENT_BOMB_EXPLODE, 18000);
-            }
+        void EnterCombat(Unit* who)
+        {
+            events.ScheduleEvent(EVENT_BOMB_READY, 6000);
+            events.ScheduleEvent(EVENT_BOMB_EXPLODE, 18000);
+        }
 
-            void JustDied(Unit* killer)
+        void JustDied(Unit* killer)
+        {
+            me->DespawnOrUnsummon();
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                me->DespawnOrUnsummon();
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
+                switch (eventId)
                 {
-                    switch (eventId)
-                    {
-                        case EVENT_BOMB_READY:
-                            DoCast(me, SPELL_ARMED_STATE);
-                            break;
-                        case EVENT_BOMB_EXPLODE:
-                            DoCast(me, SPELL_EXPLODE);
-                            me->DespawnOrUnsummon(500);
-                            break;
-                    }
+                case EVENT_BOMB_READY:
+                    DoCast(me, SPELL_ARMED_STATE);
+                    break;
+                case EVENT_BOMB_EXPLODE:
+                    DoCast(me, SPELL_EXPLODE);
+                    me->DespawnOrUnsummon(500);
+                    break;
                 }
             }
-        };
+        }
+    };
 };
 
 class npc_helix_crew : public CreatureScript
 {
-    public:
-        npc_helix_crew() : CreatureScript("npc_helix_crew") { }
-     
-        CreatureAI* GetAI(Creature* pCreature) const
+public:
+    npc_helix_crew() : CreatureScript("npc_helix_crew") { }
+
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_helix_crewAI (pCreature);
+    }
+
+    struct npc_helix_crewAI : public Scripted_NoMovementAI
+    {
+        npc_helix_crewAI(Creature *c) : Scripted_NoMovementAI(c), summons(me) 
         {
-            return new npc_helix_crewAI (pCreature);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+            pInstance = c->GetInstanceScript();
         }
-     
-        struct npc_helix_crewAI : public Scripted_NoMovementAI
+
+        InstanceScript* pInstance;
+        EventMap events;
+        SummonList summons;
+
+        void Reset()
         {
-            npc_helix_crewAI(Creature *c) : Scripted_NoMovementAI(c), summons(me) 
+            if (!pInstance)
+                return;
+
+            summons.DespawnAll();
+            SetCombatMovement(false);
+        }
+
+        void JustSummoned(Creature* summon)
+        {
+            if (!pInstance)
+                return;
+
+            summons.Summon(summon);
+        }
+
+        void SummonedCreatureDespawn(Creature* summon)
+        {
+            if (!pInstance)
+                return;
+
+            summons.Despawn(summon);
+        }
+
+        void EnterCombat(Unit* who)
+        {
+            events.ScheduleEvent(EVENT_STICKY_BOMB, 8000);
+        }
+
+        void JustDied(Unit* killer)
+        {
+            if (!pInstance)
+                return;
+
+            summons.DespawnAll();
+            me->DespawnOrUnsummon();
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+
+            if (!pInstance)
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-                pInstance = c->GetInstanceScript();
-            }
-
-            InstanceScript* pInstance;
-            EventMap events;
-            SummonList summons;
-
-            void Reset()
-            {
-                if (!pInstance)
-                    return;
-                
-                summons.DespawnAll();
-                SetCombatMovement(false);
-            }
-     
-            void JustSummoned(Creature* summon)
-            {
-                if (!pInstance)
-                    return;
-
-                summons.Summon(summon);
-            }
-
-            void SummonedCreatureDespawn(Creature* summon)
-            {
-                if (!pInstance)
-                    return;
-
-                summons.Despawn(summon);
-            }
-
-            void EnterCombat(Unit* who)
-            {
-                events.ScheduleEvent(EVENT_STICKY_BOMB, 8000);
-            }
-
-            void JustDied(Unit* killer)
-            {
-                if (!pInstance)
-                    return;
-
-                summons.DespawnAll();
-                me->DespawnOrUnsummon();
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-
-                if (!pInstance)
-                    return;
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                while (uint32 eventId = events.ExecuteEvent())
+                switch (eventId)
                 {
-                    switch (eventId)
-                    {
-                        case EVENT_STICKY_BOMB:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                                me->SummonCreature(NPC_STICKY_BOMB, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000);
-                            events.ScheduleEvent(EVENT_STICKY_BOMB, urand(15000, 20000));
-                            break;
-                    }
+                case EVENT_STICKY_BOMB:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        me->SummonCreature(NPC_STICKY_BOMB, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000);
+                    events.ScheduleEvent(EVENT_STICKY_BOMB, urand(15000, 20000));
+                    break;
                 }
-                  
             }
-        };
+
+        }
+    };
 };
 
 class spell_helix_chest_bomb : public SpellScriptLoader
 {
-    public:
-        spell_helix_chest_bomb() : SpellScriptLoader("spell_helix_chest_bomb") { }
+public:
+    spell_helix_chest_bomb() : SpellScriptLoader("spell_helix_chest_bomb") { }
 
-
-        class spell_helix_chest_bomb_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_helix_chest_bomb_AuraScript)
+    class spell_helix_chest_bomb_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_helix_chest_bomb_AuraScript)
 
             void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-            {
-                if (Unit* target = aurEff->GetBase()->GetUnitOwner())
-                    target->CastSpell(target, SPELL_CHEST_BOMB_DMG, true);
-            }
-
-            void Register()
-            {
-                OnEffectRemove += AuraEffectRemoveFn(spell_helix_chest_bomb_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-             }
-        };
-
-        AuraScript* GetAuraScript() const
         {
-            return new spell_helix_chest_bomb_AuraScript();
+            if (Unit* target = aurEff->GetBase()->GetUnitOwner())
+                target->CastSpell(target, SPELL_CHEST_BOMB_DMG, true);
         }
+
+        void Register()
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_helix_chest_bomb_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_helix_chest_bomb_AuraScript();
+    }
 };
 
 class spell_helix_force_player_to_ride_oaf : public SpellScriptLoader
 {
-    public:
-        spell_helix_force_player_to_ride_oaf() : SpellScriptLoader("spell_helix_force_player_to_ride_oaf") { }
+public:
+    spell_helix_force_player_to_ride_oaf() : SpellScriptLoader("spell_helix_force_player_to_ride_oaf") { }
 
+    class spell_helix_force_player_to_ride_oaf_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_helix_force_player_to_ride_oaf_SpellScript);
 
-        class spell_helix_force_player_to_ride_oaf_SpellScript : public SpellScript
+        void HandleScript(SpellEffIndex /*effIndex*/)
         {
-            PrepareSpellScript(spell_helix_force_player_to_ride_oaf_SpellScript);
+            if (!GetCaster() || !GetHitUnit())
+                return;
 
-
-            void HandleScript(SpellEffIndex /*effIndex*/)
-            {
-                if (!GetCaster() || !GetHitUnit())
-                    return;
-
-                GetHitUnit()->CastSpell(GetCaster(), SPELL_RIDE_OAF, true);
-                GetCaster()->ToCreature()->AI()->DoAction(ACTION_CHARGE);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_helix_force_player_to_ride_oaf_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_helix_force_player_to_ride_oaf_SpellScript();
+            GetHitUnit()->CastSpell(GetCaster(), SPELL_RIDE_OAF, true);
+            GetCaster()->ToCreature()->AI()->DoAction(ACTION_CHARGE);
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_helix_force_player_to_ride_oaf_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_helix_force_player_to_ride_oaf_SpellScript();
+    }
 };
 
 void AddSC_boss_helix_gearbreaker()

@@ -221,11 +221,7 @@ public:
             summons.DespawnAll();
             pInstance->SetBossState(DATA_MAGMAW, DONE);
             pInstance->SaveToDB();
-            if (Creature* pNefarius = me->SummonCreature(NPC_LORD_VICTOR_NEFARIUS_HEROIC, 
-                me->GetPositionX(),
-                me->GetPositionY(),
-                me->GetPositionZ(),
-                0.0f))
+            if (Creature* pNefarius = me->SummonCreature(NPC_LORD_VICTOR_NEFARIUS_HEROIC, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f))
                 pNefarius->AI()->DoAction(ACTION_MAGMAW_DEATH);
         }
 
@@ -306,11 +302,7 @@ public:
                         target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
                     if (!target)
                         break;
-                    me->SummonCreature(NPC_PILLAR_OF_FLAME,
-                        target->GetPositionX(),
-                        target->GetPositionY(),
-                        target->GetPositionZ(),
-                        0.0f, TEMPSUMMON_TIMED_DESPAWN, 8000);
+                    me->SummonCreature(NPC_PILLAR_OF_FLAME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 8000);
                     events.ScheduleEvent(EVENT_PILLAR_OF_FLAME, urand(35000, 45000));
                     break;
                 case EVENT_MANGLE:
@@ -464,8 +456,7 @@ public:
         }
 
         void UpdateAI(const uint32 diff)
-        {            
-        }
+        { }
     };
 };
 
@@ -491,8 +482,7 @@ public:
         InstanceScript* pInstance;
 
         void Reset()
-        {
-        }
+        { }
 
         void JustDied(Unit* /*killer*/)
         {

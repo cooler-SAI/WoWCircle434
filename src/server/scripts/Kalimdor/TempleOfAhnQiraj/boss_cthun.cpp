@@ -75,24 +75,6 @@ enum Phases
     PHASE_CTHUN_DONE                            = 6,
 };
 
-enum Creatures
-{
-    MOB_CTHUN_PORTAL                            = 15896,
-
-    // ***** Main Phase 1 ********
-    BOSS_EYE_OF_CTHUN                           = 15589,
-    MOB_CLAW_TENTACLE                           = 15725,
-    MOB_EYE_TENTACLE                            = 15726,
-    MOB_SMALL_PORTAL                            = 15904,
-
-    // ***** Main Phase 2 ********
-    MOB_BODY_OF_CTHUN                           = 15809,
-    MOB_GIANT_CLAW_TENTACLE                     = 15728,
-    MOB_GIANT_EYE_TENTACLE                      = 15334,
-    MOB_FLESH_TENTACLE                          = 15802,
-    MOB_GIANT_PORTAL                            = 15910,
-};
-
 enum Spells
 {
     // ***** Main Phase 1 ********
@@ -158,12 +140,12 @@ enum Yells
 //Flesh tentacle positions
 const Position FleshTentaclePos[2] =
 {
-    { -8571.0f, 1990.0f, -98.0f, 1.22f},
-    { -8525.0f, 1994.0f, -98.0f, 2.12f},
+    {-8571.0f, 1990.0f, -98.0f, 1.22f},
+    {-8525.0f, 1994.0f, -98.0f, 2.12f},
 };
 
 //Kick out position
-const Position KickPos = { -8545.0f, 1984.0f, -96.0f, 0.0f};
+const Position KickPos ={-8545.0f, 1984.0f, -96.0f, 0.0f};
 
 class boss_eye_of_cthun : public CreatureScript
 {
@@ -172,7 +154,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new eye_of_cthunAI (creature);
+        return new eye_of_cthunAI(creature);
     }
 
     struct eye_of_cthunAI : public Scripted_NoMovementAI
@@ -242,9 +224,9 @@ public:
         void SpawnEyeTentacle(float x, float y)
         {
             if (Creature* Spawned = DoSpawnCreature(MOB_EYE_TENTACLE, x, y, 0, 0, TEMPSUMMON_CORPSE_DESPAWN, 500))
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    if (Spawned->AI())
-                        Spawned->AI()->AttackStart(target);
+            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+            if (Spawned->AI())
+                Spawned->AI()->AttackStart(target);
         }
 
         void UpdateAI(const uint32 diff)
@@ -400,7 +382,7 @@ public:
 
                     break;
 
-                //Transition phase
+                    //Transition phase
                 case PHASE_CTHUN_TRANSITION:
                     //Remove any target
                     me->SetTarget(0);
@@ -408,7 +390,7 @@ public:
                     me->SetVisible(false);
                     break;
 
-                //Dead phase
+                    //Dead phase
                 case PHASE_CTHUN_DONE:
                     Creature* pPortal= me->FindNearestCreature(MOB_CTHUN_PORTAL, 10);
                     if (pPortal)
@@ -476,7 +458,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new cthunAI (creature);
+        return new cthunAI(creature);
     }
 
     struct cthunAI : public Scripted_NoMovementAI
@@ -559,8 +541,8 @@ public:
             Creature* Spawned;
             Spawned = DoSpawnCreature(MOB_EYE_TENTACLE, x, y, 0, 0, TEMPSUMMON_CORPSE_DESPAWN, 500);
             if (Spawned && Spawned->AI())
-                if (Unit* target = SelectRandomNotStomach())
-                    Spawned->AI()->AttackStart(target);
+            if (Unit* target = SelectRandomNotStomach())
+                Spawned->AI()->AttackStart(target);
         }
 
         Unit* SelectRandomNotStomach()
@@ -593,7 +575,7 @@ public:
 
             //Get random but only if we have more than one unit on threat list
             if (temp.size() > 1)
-                advance (j, rand() % (temp.size() - 1));
+                advance(j, rand() % (temp.size() - 1));
 
             return (*j);
         }
@@ -701,7 +683,7 @@ public:
 
                     break;
 
-                //Body Phase
+                    //Body Phase
                 case PHASE_CTHUN_STOMACH:
                     //Remove Target field
                     me->SetTarget(0);
@@ -822,8 +804,8 @@ public:
                         {
                             //Spawn claw tentacle on the random target
                             if (Creature* spawned = me->SummonCreature(MOB_GIANT_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500))
-                                if (spawned->AI())
-                                    spawned->AI()->AttackStart(target);
+                            if (spawned->AI())
+                                spawned->AI()->AttackStart(target);
                         }
 
                         //One giant claw tentacle every minute
@@ -837,8 +819,8 @@ public:
                         {
                             //Spawn claw tentacle on the random target
                             if (Creature* spawned = me->SummonCreature(MOB_GIANT_EYE_TENTACLE, *target, TEMPSUMMON_CORPSE_DESPAWN, 500))
-                                if (spawned->AI())
-                                    spawned->AI()->AttackStart(target);
+                            if (spawned->AI())
+                                spawned->AI()->AttackStart(target);
                         }
 
                         //One giant eye tentacle every minute
@@ -847,7 +829,7 @@ public:
 
                     break;
 
-                //Weakened state
+                    //Weakened state
                 case PHASE_CTHUN_WEAK:
                     //PhaseTimer
                     if (PhaseTimer <= diff)
@@ -932,7 +914,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new eye_tentacleAI (creature);
+        return new eye_tentacleAI(creature);
     }
 
     struct eye_tentacleAI : public Scripted_NoMovementAI
@@ -1005,7 +987,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new claw_tentacleAI (creature);
+        return new claw_tentacleAI(creature);
     }
 
     struct claw_tentacleAI : public Scripted_NoMovementAI
@@ -1115,7 +1097,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new giant_claw_tentacleAI (creature);
+        return new giant_claw_tentacleAI(creature);
     }
 
     struct giant_claw_tentacleAI : public Scripted_NoMovementAI
@@ -1234,7 +1216,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new giant_eye_tentacleAI (creature);
+        return new giant_eye_tentacleAI(creature);
     }
 
     struct giant_eye_tentacleAI : public Scripted_NoMovementAI
@@ -1298,7 +1280,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new flesh_tentacleAI (creature);
+        return new flesh_tentacleAI(creature);
     }
 
     struct flesh_tentacleAI : public Scripted_NoMovementAI
@@ -1311,9 +1293,9 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             if (TempSummon* summon = me->ToTempSummon())
-                if (Unit* summoner = summon->GetSummoner())
-                    if (summoner->IsAIEnabled)
-                        summoner->GetAI()->DoAction(ACTION_FLESH_TENTACLE_KILLED);
+            if (Unit* summoner = summon->GetSummoner())
+            if (summoner->IsAIEnabled)
+                summoner->GetAI()->DoAction(ACTION_FLESH_TENTACLE_KILLED);
         }
     };
 

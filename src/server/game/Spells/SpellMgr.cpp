@@ -33,6 +33,7 @@
 #include "MapManager.h"
 #include "BattlegroundIC.h"
 #include "BattlefieldWG.h"
+#include "BattlefieldTB.h"
 #include "BattlefieldMgr.h"
 #include "InstanceScript.h"
 
@@ -7839,3 +7840,266 @@ void SpellMgr::LoadDbcDataCorrections()
 
     sLog->outInfo(LOG_FILTER_SERVER_LOADING, ">> Loaded spell dbc data corrections in %u ms", GetMSTimeDiffToNow(oldMSTime));
 }
+
+/* todo : implent this
+void SpellMgr::CheckUsedSpells(char const* table)
+{
+    uint32 countSpells = 0;
+    uint32 countMasks = 0;
+
+    //                                                 0       1               2                3                4         5           6             7          8          9         10   11
+    QueryResult *result = WorldDatabase.PQuery("SELECT spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMaskB,SpellIcon,SpellVisual,SpellCategory,EffectType,EffectAura,EffectIdx,Name,Code FROM %s",table);
+
+    if (!result)
+    {
+        BarGoLink bar(1);
+
+        bar.step();
+
+        sLog.outString();
+        sLog.outErrorDb("`%s` table is empty!",table);
+        return;
+    }
+
+    BarGoLink bar(result->GetRowCount());
+
+    do
+    {
+        Field *fields = result->Fetch();
+
+        bar.step();
+
+        uint32 spell       = fields[0].GetUInt32();
+        int32  family      = fields[1].GetInt32();
+        ClassFamilyMask familyMask = ClassFamilyMask(fields[2].GetUInt64(), fields[3].GetUInt32());
+        int32  spellIcon   = fields[4].GetInt32();
+        int32  spellVisual = fields[5].GetInt32();
+        int32  category    = fields[6].GetInt32();
+        int32  effectType  = fields[7].GetInt32();
+        int32  auraType    = fields[8].GetInt32();
+        int32  effectIdx   = fields[9].GetInt32();
+        std::string name   = fields[10].GetCppString();
+        std::string code   = fields[11].GetCppString();
+
+        // checks of correctness requirements itself
+
+        if (family < -1 || family > SPELLFAMILY_PET)
+        {
+            sLog.outError("Table '%s' for spell %u have wrong SpellFamily value(%u), skipped.",table,spell,family);
+            continue;
+        }
+
+        // TODO: spellIcon check need dbc loading
+        if (spellIcon < -1)
+        {
+            sLog.outError("Table '%s' for spell %u have wrong SpellIcon value(%u), skipped.",table,spell,spellIcon);
+            continue;
+        }
+
+        // TODO: spellVisual check need dbc loading
+        if (spellVisual < -1)
+        {
+            sLog.outError("Table '%s' for spell %u have wrong SpellVisual value(%u), skipped.",table,spell,spellVisual);
+            continue;
+        }
+
+        // TODO: for spellCategory better check need dbc loading
+        if (category < -1 || (category >=0 && sSpellCategoryMap.find(category) == sSpellCategoryMap.end()))
+        {
+            sLog.outError("Table '%s' for spell %u have wrong SpellCategory value(%u), skipped.",table,spell,category);
+            continue;
+        }
+
+        if (effectType < -1 || effectType >= TOTAL_SPELL_EFFECTS)
+        {
+            sLog.outError("Table '%s' for spell %u have wrong SpellEffect type value(%u), skipped.",table,spell,effectType);
+            continue;
+        }
+
+        if (auraType < -1 || auraType >= TOTAL_AURAS)
+        {
+            sLog.outError("Table '%s' for spell %u have wrong SpellAura type value(%u), skipped.",table,spell,auraType);
+            continue;
+        }
+
+        if (effectIdx < -1 || effectIdx >= 3)
+        {
+            sLog.outError("Table '%s' for spell %u have wrong EffectIdx value(%u), skipped.",table,spell,effectIdx);
+            continue;
+        }
+
+        // now checks of requirements
+
+        if (spell)
+        {
+            ++countSpells;
+
+            SpellEntry const* spellEntry = sSpellStore.LookupEntry(spell);
+            if(!spellEntry)
+            {
+                sLog.outError("Spell %u '%s' not exist but used in %s.",spell,name.c_str(),code.c_str());
+                continue;
+            }
+
+            SpellClassOptionsEntry const* classOptions = spellEntry->GetSpellClassOptions();
+
+            if(family >= 0 && classOptions && classOptions->SpellFamilyName != uint32(family))
+            {
+                sLog.outError("Spell %u '%s' family(%u) <> %u but used in %s.",spell,name.c_str(),classOptions->SpellFamilyName,family,code.c_str());
+                continue;
+            }
+
+            if (familyMask != ~ClassFamilyMask())
+            {
+                if (familyMask == ClassFamilyMask())
+                {
+                    if (classOptions && classOptions->SpellFamilyFlags)
+                    {
+                        sLog.outError("Spell %u '%s' not fit to (" I64FMT "," I32FMT ") but used in %s.",
+                            spell, name.c_str(), familyMask.Flags, familyMask.Flags2, code.c_str());
+                        continue;
+                    }
+                }
+                else
+                {
+                    if (!spellEntry->IsFitToFamilyMask(familyMask))
+                    {
+                        sLog.outError("Spell %u '%s' not fit to (" I64FMT "," I32FMT ") but used in %s.",
+                            spell, name.c_str(), familyMask.Flags, familyMask.Flags2, code.c_str());
+                        continue;
+                    }
+                }
+            }
+
+            if (spellIcon >= 0 && spellEntry->GetSpellIconID() != uint32(spellIcon))
+            {
+                sLog.outError("Spell %u '%s' icon(%u) <> %u but used in %s.",spell,name.c_str(),spellEntry->GetSpellIconID(),spellIcon,code.c_str());
+                continue;
+            }
+
+            if (spellVisual >= 0 && spellEntry->GetSpellVisual() != uint32(spellVisual))
+            {
+                sLog.outError("Spell %u '%s' visual(%u) <> %u but used in %s.",spell,name.c_str(),spellEntry->GetSpellVisual(),spellVisual,code.c_str());
+                continue;
+            }
+
+            if(category >= 0 && spellEntry->GetCategory() != uint32(category))
+            {
+                sLog.outError("Spell %u '%s' category(%u) <> %u but used in %s.",spell,name.c_str(),spellEntry->GetCategory(),category,code.c_str());
+                continue;
+            }
+
+            if (effectIdx >= EFFECT_INDEX_0)
+            {
+                SpellEffectEntry const* spellEffect = spellEntry->GetSpellEffect(SpellEffectIndex(effectIdx));
+
+                if(effectType >= 0 && spellEffect && spellEffect->Effect != uint32(effectType))
+                {
+                    sLog.outError("Spell %u '%s' effect%d <> %u but used in %s.",spell,name.c_str(),effectIdx+1,effectType,code.c_str());
+                    continue;
+                }
+
+                if(auraType >= 0 && spellEffect && spellEffect->EffectApplyAuraName != uint32(auraType))
+                {
+                    sLog.outError("Spell %u '%s' aura%d <> %u but used in %s.",spell,name.c_str(),effectIdx+1,auraType,code.c_str());
+                    continue;
+                }
+            }
+            else
+            {
+                if (effectType >= 0 && !IsSpellHaveEffect(spellEntry,SpellEffects(effectType)))
+                {
+                    sLog.outError("Spell %u '%s' not have effect %u but used in %s.",spell,name.c_str(),effectType,code.c_str());
+                    continue;
+                }
+
+                if (auraType >= 0 && !IsSpellHaveAura(spellEntry, AuraType(auraType)))
+                {
+                    sLog.outError("Spell %u '%s' not have aura %u but used in %s.",spell,name.c_str(),auraType,code.c_str());
+                    continue;
+                }
+            }
+        }
+        else
+        {
+            ++countMasks;
+
+            bool found = false;
+            for(uint32 spellId = 1; spellId < sSpellStore.GetNumRows(); ++spellId)
+            {
+                SpellEntry const* spellEntry = sSpellStore.LookupEntry(spellId);
+                if (!spellEntry)
+                    continue;
+
+                SpellClassOptionsEntry const* classOptions = spellEntry->GetSpellClassOptions();
+
+                if(family >=0 && classOptions && classOptions->SpellFamilyName != uint32(family))
+                    continue;
+
+                if (familyMask != ~ClassFamilyMask())
+                {
+                    if (familyMask == ClassFamilyMask())
+                    {
+                        if (classOptions && classOptions->SpellFamilyFlags)
+                            continue;
+                    }
+                    else
+                    {
+                        if (!spellEntry->IsFitToFamilyMask(familyMask))
+                            continue;
+                    }
+                }
+
+                if (spellIcon >= 0 && spellEntry->GetSpellIconID() != uint32(spellIcon))
+                    continue;
+
+                if (spellVisual >= 0 && spellEntry->GetSpellVisual() != uint32(spellVisual))
+                    continue;
+
+                if(category >= 0 && spellEntry->GetCategory() != uint32(category))
+                    continue;
+
+                if (effectIdx >= 0)
+                {
+                    SpellEffectEntry const* spellEffect = spellEntry->GetSpellEffect(SpellEffectIndex(effectIdx));
+
+                    if(effectType >=0 && spellEffect && spellEffect->Effect != uint32(effectType))
+                        continue;
+
+                    if(auraType >=0 && spellEffect && spellEffect->EffectApplyAuraName != uint32(auraType))
+                        continue;
+                }
+                else
+                {
+                    if (effectType >=0 && !IsSpellHaveEffect(spellEntry,SpellEffects(effectType)))
+                        continue;
+
+                    if (auraType >=0 && !IsSpellHaveAura(spellEntry,AuraType(auraType)))
+                        continue;
+                }
+
+                found = true;
+                break;
+            }
+
+            if (!found)
+            {
+                if (effectIdx >= 0)
+                    sLog.outError("Spells '%s' not found for family %i (" I64FMT "," I32FMT ") icon(%i) visual(%i) category(%i) effect%d(%i) aura%d(%i) but used in %s",
+                        name.c_str(),family,familyMask.Flags,familyMask.Flags2,spellIcon,spellVisual,category,effectIdx+1,effectType,effectIdx+1,auraType,code.c_str());
+                else
+                    sLog.outError("Spells '%s' not found for family %i (" I64FMT "," I32FMT ") icon(%i) visual(%i) category(%i) effect(%i) aura(%i) but used in %s",
+                        name.c_str(),family,familyMask.Flags,familyMask.Flags2,spellIcon,spellVisual,category,effectType,auraType,code.c_str());
+                continue;
+            }
+        }
+
+    }
+    while (result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString( ">> Checked %u spells and %u spell masks", countSpells, countMasks );
+}
+*/

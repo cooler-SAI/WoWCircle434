@@ -21,7 +21,6 @@
 
 #include <ace/Singleton.h>
 #include <ace/Null_Mutex.h>
-#include <ace/INET_Addr.h>
 #include "Common.h"
 
 enum RealmFlags
@@ -40,9 +39,7 @@ enum RealmFlags
 // Storage object for a realm
 struct Realm
 {
-    ACE_INET_Addr ExternalAddress;
-    ACE_INET_Addr LocalAddress;
-    ACE_INET_Addr LocalSubnetMask;
+    std::string address;
     std::string name;
     uint8 icon;
     RealmFlags flag;
@@ -51,14 +48,7 @@ struct Realm
     AccountTypes allowedSecurityLevel;
     float populationLevel;
     uint32 gamebuild;
-    uint8 Region;
-    uint8 Battlegroup;
 };
-
-namespace Battlenet
-{
-    struct RealmId;
-}
 
 /// Storage object for the list of realms on the server
 class RealmList
@@ -78,13 +68,10 @@ public:
     RealmMap::const_iterator begin() const { return m_realms.begin(); }
     RealmMap::const_iterator end() const { return m_realms.end(); }
     uint32 size() const { return m_realms.size(); }
-    Realm const* GetRealm(Battlenet::RealmId const& id) const;
 
 private:
     void UpdateRealms(bool init=false);
-    void RealmList::UpdateRealm(uint32 id, const std::string& name, ACE_INET_Addr const& address, ACE_INET_Addr const& localAddr,
-                                ACE_INET_Addr const& localSubmask, uint8 icon, RealmFlags flag, uint8 timezone, AccountTypes allowedSecurityLevel,
-                                float popu, uint32 build, uint8 region, uint8 battlegroup);
+    void UpdateRealm(uint32 ID, const std::string& name, const std::string& address, uint16 port, uint8 icon, RealmFlags flag, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, uint32 build);
 
     RealmMap m_realms;
     uint32   m_UpdateInterval;

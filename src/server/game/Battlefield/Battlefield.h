@@ -35,7 +35,8 @@ enum BattlefieldTypes
 
 enum BattlefieldIDs
 {
-    BATTLEFIELD_BATTLEID_WG                      = 1        // Wintergrasp battle
+    BATTLEFIELD_BATTLEID_WG                      = 1,       // Wintergrasp battle
+    BATTLEFIELD_BATTLEID_TB                      = 21       // Tol Barad battle
 };
 
 enum BattlefieldObjectiveStates
@@ -60,6 +61,8 @@ enum BattlefieldTimers
 {
     BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL        = 1000
 };
+
+const uint32 BFFactions[3] = { 1, 2, 35 };
 
 // some class predefs
 class Player;

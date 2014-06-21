@@ -2415,10 +2415,10 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.SoundOverrideSubclass = db2Data->SoundOverrideSubclass;
         itemTemplate.Name1 = sparse->Name;
         itemTemplate.DisplayInfoID = db2Data->DisplayId;
-        {
-            if (!sItemDisplayInfoStore.LookupEntry(itemTemplate.DisplayInfoID))
-                sLog->outError(LOG_FILTER_GENERAL, "LoadItemTemplates: Error while loading item %u from sItemSparseStore - ItemDisplayid (%u) not present in DBC. This may lead to client crash!", itemId, itemTemplate.DisplayInfoID);
-        }
+        //{
+        //    if (!sItemDisplayInfoStore.LookupEntry(itemTemplate.DisplayInfoID))
+        //        sLog->outError(LOG_FILTER_GENERAL, "LoadItemTemplates: Error while loading item %u from sItemSparseStore - ItemDisplayid (%u) not present in DBC. This may lead to client crash!", itemId, itemTemplate.DisplayInfoID);
+        //}
         itemTemplate.Quality = sparse->Quality;
         itemTemplate.Flags = sparse->Flags;
         itemTemplate.Flags2 = sparse->Flags2;
@@ -2571,10 +2571,10 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.SoundOverrideSubclass     = int(fields[3].GetInt8());
             itemTemplate.Name1                     = fields[4].GetString();
             itemTemplate.DisplayInfoID             = fields[5].GetUInt32();
-            {
-                if (!sItemDisplayInfoStore.LookupEntry(itemTemplate.DisplayInfoID))
-                    sLog->outError(LOG_FILTER_GENERAL, "LoadItemTemplates: Error while loading item %u from item_template - ItemDisplayid (%u) not present in DBC. This may lead to client crash!", itemId, itemTemplate.DisplayInfoID);
-            }
+            //{
+            //    if (!sItemDisplayInfoStore.LookupEntry(itemTemplate.DisplayInfoID))
+            //        sLog->outError(LOG_FILTER_GENERAL, "LoadItemTemplates: Error while loading item %u from item_template - ItemDisplayid (%u) not present in DBC. This may lead to client crash!", itemId, itemTemplate.DisplayInfoID);
+            //}
             itemTemplate.Quality                   = uint32(fields[6].GetUInt8());
             itemTemplate.Flags                     = uint32(fields[7].GetInt64());
             itemTemplate.Flags2                    = fields[8].GetUInt32();
@@ -2632,7 +2632,7 @@ void ObjectMgr::LoadItemTemplates()
                 
                 // Add spell into the store for correct handling
                 if (itemTemplate.Spells[i].SpellCategory > 0)
-                    sSpellCategoryStore[itemTemplate.Spells[i].SpellCategory].insert(itemTemplate.Spells[i].SpellId);
+                    sSpellCategoryMap[itemTemplate.Spells[i].SpellCategory].insert(itemTemplate.Spells[i].SpellId);
             }
 
             itemTemplate.SpellPPMRate   = 0.0f;
@@ -7786,7 +7786,7 @@ const char *ObjectMgr::GetCerberCoreString(int32 entry, LocaleConstant locale_id
     }
 
     if (entry > 0)
-        sLog->outError(LOG_FILTER_SQL, "Entry %i not found in `CERBERCORE_string` table.", entry);
+        sLog->outError(LOG_FILTER_SQL, "Entry %i not found in `cerbercore_string` table.", entry);
     else
         sLog->outError(LOG_FILTER_SQL, "CerberCore string entry %i not found in DB.", entry);
     return "<error>";

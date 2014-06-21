@@ -2,27 +2,6 @@
 #include "Spell.h"
 #include "blackwing_descent.h"
 
-
-/* 
-43404 - maloriak
-43396 - nefarian
-43407 - atramedes
-43402 - flames
-43400 - memory fog
-
-69676 - aura like ghost *all
-81271 - potion in hand  *maloriak
-81184 - fire aura
-81178 - memory fog
-
-
-INSERT INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`) VALUES (334803, 43396, 669, 15, 1, 32440, 0, 150.781, -231.196, 75.5367, 2.21657, 7200, 0, 0, 9877580, 947000, 0, 0, 0, 0);
-INSERT INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`) VALUES (334805, 43402, 669, 15, 1, 11686, 0, 166.764, -229.984, 74.9906, 3.12414, 7200, 0, 0, 697410, 62356, 0, 0, 0, 0);
-INSERT INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`) VALUES (334806, 43402, 669, 15, 1, 11686, 0, 149.431, -245.88, 74.9906, 0.593412, 7200, 0, 0, 697410, 62356, 0, 0, 0, 0);
-INSERT INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`) VALUES (334804, 43404, 669, 15, 1, 33186, 0, 149.757, -207.628, 75.5367, 4.04916, 7200, 0, 0, 30062200, 0, 0, 0, 0, 0);
-INSERT INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`) VALUES (334802, 43407, 669, 15, 1, 399, 0, 136.076, -207.644, 75.5367, 4.76475, 7200, 0, 0, 42, 0, 0, 0, 0, 0);
-*/
-
 enum ScriptTexts
 {
     SAY_AGGRO       = 0,
@@ -96,6 +75,8 @@ enum Adds
     NPC_ATRAMEDES_WHELP             = 43407,
     NPC_MALORIAK_1                  = 43404,
     NPC_LORD_VICTOR_NEFARIUS_1      = 49580,
+
+    NPC_ANCIENT_DWARVEN_SHIELD      = 42949,
 };
 
 enum Actions
@@ -134,7 +115,7 @@ const uint32 dwarvenshieldsEntry[8] =
     42958,
     42947,
     42960,
-    42949,
+    NPC_ANCIENT_DWARVEN_SHIELD,
     42951,
     42954,
     42956,
@@ -210,7 +191,7 @@ public:
 
             summons.DespawnAll();
             for (uint8 i = 0; i < 8; i++)
-                _shields[i] = me->SummonCreature(42949, dwarvenshieldsPos[i]);
+                _shields[i] = me->SummonCreature(NPC_ANCIENT_DWARVEN_SHIELD, dwarvenshieldsPos[i]);
 
             me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 15);
             me->SetFloatValue(UNIT_FIELD_COMBATREACH, 15);
@@ -243,7 +224,6 @@ public:
                 break;
             }
         }
-
 
         void SummonedCreatureDespawn(Creature* summon)
         {
@@ -373,19 +353,13 @@ public:
                     case 5:
                     case 7:
                         for (uint8 i = 0; i < 3; i++)
-                            me->SummonCreature(NPC_SONAR_PULSE,
-                            me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f);
+                            me->SummonCreature(NPC_SONAR_PULSE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f);
                         break;
                     case 1:
                     case 3:
                     case 6:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
-                        {
-                            me->SummonCreature(NPC_TRACKING_FLAMES,
-                                target->GetPositionX(), target->GetPositionY(),
-                                target->GetPositionZ(), me->GetOrientation(),
-                                TEMPSUMMON_TIMED_DESPAWN, 8000);
-                        }
+                            me->SummonCreature(NPC_TRACKING_FLAMES, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 8000);
                         break;
                     case 4:
                         Talk(SAY_FLAME);
@@ -409,10 +383,7 @@ public:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                     {
                         atramedesTarget = target;
-                        me->SummonCreature(NPC_ROARING_FLAME_TARGET,
-                            target->GetPositionX() + urand(5, 9),
-                            target->GetPositionY() + urand(5, 9),
-                            target->GetPositionZ());
+                        me->SummonCreature(NPC_ROARING_FLAME_TARGET, target->GetPositionX() + urand(5, 9), target->GetPositionY() + urand(5, 9), target->GetPositionZ());
                     }
                     break;
                 }
@@ -439,12 +410,10 @@ public:
         EventMap events;
 
         void Reset()
-        {
-        }
+        {  }
 
         void UpdateAI(const uint32 diff)
-        {
-        }
+        { }
     };
 };
 
@@ -560,8 +529,7 @@ public:
         InstanceScript* pInstance;
 
         void Reset()
-        {
-        }
+        { }
 
         void MovementInform(uint32 type, uint32 id)
         {
@@ -585,11 +553,7 @@ public:
                 return;
 
             if (!me->FindNearestCreature(NPC_ROARING_FLAME, 4.0f))
-                me->SummonCreature(NPC_ROARING_FLAME,
-                me->GetPositionX(),
-                me->GetPositionY(),
-                me->GetPositionZ(),
-                0.0f, TEMPSUMMON_TIMED_DESPAWN, 45000);
+                me->SummonCreature(NPC_ROARING_FLAME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 45000);
         }
     };
 };
@@ -636,8 +600,7 @@ public:
 
         InstanceScript* pInstance;
         void Reset()
-        {
-        }
+        { }
 
         void UpdateAI(const uint32 diff)
         {
@@ -693,6 +656,7 @@ public:
         {
             if (!GetHitUnit())
                 return;
+
             GetHitUnit()->RemoveAurasDueToSpell(SPELL_NOISY);
         }
 

@@ -24,10 +24,7 @@ EndScriptData */
 
 #include "ScriptMgr.h"
 #include "AccountMgr.h"
-#include "BattlenetAccountMgr.h"
 #include "Chat.h"
-#include "Language.h"
-#include "Player.h"
 
 class account_commandscript : public CommandScript
 {
@@ -107,16 +104,10 @@ public:
         if (!accountName || !password)
             return false;
 
-        AccountOpResult result;
-        if (strchr(accountName, '@'))
-            result = Battlenet::AccountMgr::CreateBattlenetAccount(std::string(accountName), std::string(password));
-        else
-            //result = AccountMgr::CreateAccount(std::string(accountName), std::string(password), email);
-            sLog->outError(LOG_FILTER_CHARACTER, "cant create non battlenet account result = AccountMgr::CreateAccount(std::string(accountName), std::string(password), email);");
-
+        AccountOpResult result = AccountMgr::CreateAccount(std::string(accountName), std::string(password));
         switch (result)
         {
-            case AccountOpResult::AOR_OK:
+            case AOR_OK:
                 handler->PSendSysMessage(LANG_ACCOUNT_CREATED, accountName);
                 if (handler->GetSession())
                 {
@@ -125,15 +116,15 @@ public:
                         , handler->GetSession()->GetPlayer()->GetName(), handler->GetSession()->GetPlayer()->GetGUIDLow());
                 }
                 break;
-            case AccountOpResult::AOR_NAME_TOO_LONG:
+            case AOR_NAME_TOO_LONG:
                 handler->SendSysMessage(LANG_ACCOUNT_TOO_LONG);
                 handler->SetSentErrorMessage(true);
                 return false;
-            case AccountOpResult::AOR_NAME_ALREADY_EXIST:
+            case AOR_NAME_ALREDY_EXIST:
                 handler->SendSysMessage(LANG_ACCOUNT_ALREADY_EXIST);
                 handler->SetSentErrorMessage(true);
                 return false;
-            case AccountOpResult::AOR_DB_INTERNAL_ERROR:
+            case AOR_DB_INTERNAL_ERROR:
                 handler->PSendSysMessage(LANG_ACCOUNT_NOT_CREATED_SQL_ERROR, accountName);
                 handler->SetSentErrorMessage(true);
                 return false;
@@ -159,7 +150,7 @@ public:
             return false;
 
         std::string accountName = account;
-        if (!Utf8ToUpperOnlyLatin(accountName))
+        if (!AccountMgr::normalizeString(accountName))
         {
             handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
             handler->SetSentErrorMessage(true);
@@ -183,14 +174,14 @@ public:
         AccountOpResult result = AccountMgr::DeleteAccount(accountId);
         switch (result)
         {
-            case AccountOpResult::AOR_OK:
+            case AOR_OK:
                 handler->PSendSysMessage(LANG_ACCOUNT_DELETED, accountName.c_str());
                 break;
-            case AccountOpResult::AOR_NAME_NOT_EXIST:
+            case AOR_NAME_NOT_EXIST:
                 handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
                 handler->SetSentErrorMessage(true);
                 return false;
-            case AccountOpResult::AOR_DB_INTERNAL_ERROR:
+            case AOR_DB_INTERNAL_ERROR:
                 handler->PSendSysMessage(LANG_ACCOUNT_NOT_DELETED_SQL_ERROR, accountName.c_str());
                 handler->SetSentErrorMessage(true);
                 return false;
@@ -320,10 +311,10 @@ public:
             AccountOpResult result = AccountMgr::ChangePassword(handler->GetSession()->GetAccountId(), std::string(newPassword));
             switch (result)
             {
-                case AccountOpResult::AOR_OK:
+                case AOR_OK:
                     handler->SendSysMessage(LANG_COMMAND_PASSWORD);
                     break;
-                case AccountOpResult::AOR_PASS_TOO_LONG:
+                case AOR_PASS_TOO_LONG:
                     handler->SendSysMessage(LANG_PASSWORD_TOO_LONG);
                     handler->SetSentErrorMessage(true);
                     return false;
@@ -376,7 +367,7 @@ public:
         {
             ///- Convert Account name to Upper Format
             accountName = account;
-            if (!Utf8ToUpperOnlyLatin(accountName))
+            if (!AccountMgr::normalizeString(accountName))
             {
                 handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
                 handler->SetSentErrorMessage(true);
@@ -442,7 +433,7 @@ public:
         if (isAccountNameGiven)
         {
             targetAccountName = arg1;
-            if (!Utf8ToUpperOnlyLatin(targetAccountName))
+            if (!AccountMgr::normalizeString(targetAccountName))
             {
                 handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, targetAccountName.c_str());
                 handler->SetSentErrorMessage(true);
@@ -554,7 +545,7 @@ public:
             return false;
 
         std::string accountName = account;
-       if (!Utf8ToUpperOnlyLatin(accountName))
+        if (!AccountMgr::normalizeString(accountName))
         {
             handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
             handler->SetSentErrorMessage(true);
@@ -585,14 +576,14 @@ public:
 
         switch (result)
         {
-            case AccountOpResult::AOR_OK:
+            case AOR_OK:
                 handler->SendSysMessage(LANG_COMMAND_PASSWORD);
                 break;
-            case AccountOpResult::AOR_NAME_NOT_EXIST:
+            case AOR_NAME_NOT_EXIST:
                 handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
                 handler->SetSentErrorMessage(true);
                 return false;
-            case AccountOpResult::AOR_PASS_TOO_LONG:
+            case AOR_PASS_TOO_LONG:
                 handler->SendSysMessage(LANG_PASSWORD_TOO_LONG);
                 handler->SetSentErrorMessage(true);
                 return false;

@@ -29,7 +29,7 @@ EndContentData */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-    #include "ScriptedGossip.h"
+#include "ScriptedGossip.h"
 #include "black_temple.h"
 
 /*###

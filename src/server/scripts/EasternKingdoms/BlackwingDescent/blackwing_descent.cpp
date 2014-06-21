@@ -1,4 +1,4 @@
-#include"ScriptPCH.h"
+#include "ScriptPCH.h"
 #include "blackwing_descent.h"
 
 enum ScriptTexts
@@ -154,7 +154,7 @@ enum Spells
     SPELL_LIGHTNING_CONDUCTOR           = 79888,
     SPELL_LIGHTNING_CONDUCTOR_25        = 91431,
     SPELL_LIGHTNING_CONDUCTOR_10H       = 91432,
-    SPELL_LIGHTNING_CONDUCTOR_25H       = 91433,                                    
+    SPELL_LIGHTNING_CONDUCTOR_25H       = 91433,
     SPELL_ACQUIRING_TARGET              = 79501,
     SPELL_ACQUIRING_TARGET_25           = 92035,
     SPELL_ACQUIRING_TARGET_10H          = 92036,
@@ -268,13 +268,9 @@ enum Events
 
     //spirit of burningeye
     EVENT_WHIRLWIND                 = 30,
-
     EVENT_STORMBOLT                 = 31,
-
     EVENT_BURDEN_OF_THE_CROWN       = 32,
-
     EVENT_CHAIN_LIGHTNING           = 33,
-
     EVENT_DWARVEN_THUNDERCLAP       = 34,
 
     //lord victor nefarius
@@ -376,7 +372,7 @@ public:
             GetCreatureListWithEntryInGrid(_golems, me, NPC_GOLEM_SENTRY, 200.0f);
             for (std::list<Creature*>::iterator itr = _golems.begin(); itr != _golems.end(); ++itr)
                 if ((*itr)->GetGUID() != me->GetGUID())
-                    (*itr)->AI()->AttackStart(who);            
+                    (*itr)->AI()->AttackStart(who);
 
             events.ScheduleEvent(EVENT_ELECTRICAL_DISCHARGE, urand(3000, 15000));
             events.ScheduleEvent(EVENT_FLASH_BOMB, urand(10000, 15000));
@@ -583,7 +579,7 @@ public:
             GetCreatureListWithEntryInGrid(_drudges, me, NPC_GOLEM_SENTRY, 200.0f);
             for (std::list<Creature*>::iterator itr = _drudges.begin(); itr != _drudges.end(); ++itr)
                 if ((*itr)->GetGUID() != me->GetGUID())
-                    DoCast((*itr), SPELL_VENGEFUL_RAGE);            
+                    DoCast((*itr), SPELL_VENGEFUL_RAGE);
         }
 
         void EnterCombat(Unit* who)
@@ -625,7 +621,7 @@ public:
                     for (std::list<Creature*>::iterator itr = _drudges.begin(); itr != _drudges.end(); ++itr)
                         if ((*itr)->GetGUID() != me->GetGUID() && (*itr)->isAlive())
                             if (Unit* target = (*itr)->AI()->SelectTarget(SELECT_TARGET_TOPAGGRO))
-                                DoCast(target, SPELL_DRAKONID_RUSH);                    
+                                DoCast(target, SPELL_DRAKONID_RUSH);
                     events.ScheduleEvent(EVENT_DRAKONID_RUSH, 20000);
                     break;
                 }
@@ -720,7 +716,7 @@ public:
     };
 };
 
-class npc_maimgor: public CreatureScript
+class npc_maimgor : public CreatureScript
 {
 public:
     npc_maimgor() : CreatureScript("npc_maimgor") { }
@@ -807,7 +803,7 @@ public:
     };
 };
 
-class npc_ivoroc: public CreatureScript
+class npc_ivoroc : public CreatureScript
 {
 public:
     npc_ivoroc() : CreatureScript("npc_ivoroc") { }
@@ -885,7 +881,7 @@ public:
     };
 };
 
-class npc_pyreclaw: public CreatureScript
+class npc_pyreclaw : public CreatureScript
 {
 public:
     npc_pyreclaw() : CreatureScript("npc_pyreclaw") { }
@@ -963,7 +959,7 @@ public:
     };
 };
 
-class npc_drakonid_slayer: public CreatureScript
+class npc_drakonid_slayer : public CreatureScript
 {
 public:
     npc_drakonid_slayer() : CreatureScript("npc_drakonid_slayer") { }
@@ -1045,7 +1041,7 @@ public:
     };
 };
 
-class npc_drakeadon_mongrel: public CreatureScript
+class npc_drakeadon_mongrel : public CreatureScript
 {
 public:
     npc_drakeadon_mongrel() : CreatureScript("npc_drakeadon_mongrel") { }
@@ -1152,7 +1148,7 @@ public:
     };
 };
 
-class npc_bd_spirit_of_dwarf: public CreatureScript
+class npc_bd_spirit_of_dwarf : public CreatureScript
 {
 public:
     npc_bd_spirit_of_dwarf() : CreatureScript("npc_bd_spirit_of_dwarf") { }
@@ -1472,7 +1468,7 @@ public:
         SummonList summons;
         InstanceScript* pInstance;
         bool bAllowCast;
-        Position homepos;        
+        Position homepos;
 
         void Reset()
         {
@@ -1601,7 +1597,7 @@ public:
                     break;
                 case EVENT_SHADOW_INFUSION:
                     Talk(SAY_OMNOTRON_SPELL_3);
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, 
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true,
                         RAID_MODE(SPELL_LIGHTNING_CONDUCTOR, SPELL_LIGHTNING_CONDUCTOR_25, SPELL_LIGHTNING_CONDUCTOR_10H, SPELL_LIGHTNING_CONDUCTOR_25H)))
                     {
                         pTarget->RemoveAurasDueToSpell(SPELL_LIGHTNING_CONDUCTOR);
@@ -1617,7 +1613,7 @@ public:
                     break;
                 case EVENT_ENCASING_SHADOWS:
                     Talk(SAY_OMNOTRON_SPELL_1);
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, 
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true,
                         RAID_MODE(SPELL_ACQUIRING_TARGET, SPELL_ACQUIRING_TARGET_25, SPELL_ACQUIRING_TARGET_10H, SPELL_ACQUIRING_TARGET_25H)))
                         me->AddAura(SPELL_ENCASING_SHADOWS, pTarget);
                     break;
@@ -1635,10 +1631,7 @@ public:
                     events.ScheduleEvent(EVENT_JUMP_OUT, 3000);
                     break;
                 case EVENT_JUMP_OUT:
-                    me->GetMotionMaster()->MoveJump(homepos.GetPositionX(),
-                        homepos.GetPositionY(),
-                        homepos.GetPositionZ(),
-                        40.0f, 20.0f);
+                    me->GetMotionMaster()->MoveJump(homepos.GetPositionX(), homepos.GetPositionY(), homepos.GetPositionZ(), 40.0f, 20.0f);
                     break;
                 case EVENT_OMNOTRON_INTRO:
                     Talk(SAY_OMNOTRON_INTRO);
@@ -1689,8 +1682,8 @@ public:
                     me->DespawnOrUnsummon();
                     break;
                 case EVENT_MALORIAK_DARK_MAGIC:
-                    if (GameObject* pGo = me->FindNearestGameObject(203306, 300.0f))
-                        me->CastSpell(pGo, 92831, false);
+                    if (GameObject* pGo = me->FindNearestGameObject(GO_LABROMM_CAULDRON01, 300.0f))
+                        me->CastSpell(pGo, SPELL_THROW_BLACK_BOTTLE_A, false);
                     Talk(SAY_MALORIAK_DARK);
                     break;
                 case EVENT_CHIMAERON_INTRO:
@@ -1808,7 +1801,7 @@ public:
             float distance;
             uint32 damage;
             distance = GetCaster()->GetDistance2d(GetHitUnit());
-            damage = (int)(5000*(distance/25));
+            damage = (int)(5000 * (distance / 25));
             if (damage < 5000)
                 damage = 5000;
             SetHitDamage(damage);
@@ -1816,7 +1809,7 @@ public:
 
         void Register()
         {
-            BeforeHit += SpellHitFn(spell_lord_victor_nefarius_shadow_conductor_SpellScript::HandleScript/*, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE*/);
+            BeforeHit += SpellHitFn(spell_lord_victor_nefarius_shadow_conductor_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
         }
     };
 
@@ -1831,7 +1824,6 @@ class spell_lord_victor_nefarius_encasing_shadows : public SpellScriptLoader
 public:
     spell_lord_victor_nefarius_encasing_shadows() : SpellScriptLoader("spell_lord_victor_nefarius_encasing_shadows") { }
 
-
     class spell_lord_victor_nefarius_encasing_shadows_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_lord_victor_nefarius_encasing_shadows_SpellScript);
@@ -1842,8 +1834,7 @@ public:
             if (!GetCaster() || !GetHitUnit())
                 return;
 
-            if (!GetHitUnit()->HasAura(SPELL_LIGHTNING_CONDUCTOR_10H) &&
-                !GetHitUnit()->HasAura(SPELL_LIGHTNING_CONDUCTOR_25H))
+            if (!GetHitUnit()->HasAura(SPELL_LIGHTNING_CONDUCTOR_10H) && !GetHitUnit()->HasAura(SPELL_LIGHTNING_CONDUCTOR_25H))
                 PreventHitEffect(EFFECT_0);
 
             GetHitUnit()->RemoveAurasDueToSpell(SPELL_LIGHTNING_CONDUCTOR);
@@ -1886,11 +1877,7 @@ public:
             float speedZ = float(GetSpellInfo()->Effects[effIndex].CalcValue() / 10);
             float speedXY = float(GetSpellInfo()->Effects[effIndex].MiscValue / 10);
 
-            GetHitUnit()->GetMotionMaster()->MoveJump(
-                GetCaster()->GetPositionX(),
-                GetCaster()->GetPositionY(),
-                GetCaster()->GetPositionZ(),
-                speedXY, speedZ);
+            GetHitUnit()->GetMotionMaster()->MoveJump( GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ(), speedXY, speedZ);
         }
 
         void Register()
@@ -1910,7 +1897,6 @@ class spell_lord_victor_nefarius_overcharge : public SpellScriptLoader
 public:
     spell_lord_victor_nefarius_overcharge() : SpellScriptLoader("spell_lord_victor_nefarius_overcharge") { }
 
-
     class spell_lord_victor_nefarius_overcharge_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_lord_victor_nefarius_overcharge_SpellScript);
@@ -1922,7 +1908,7 @@ public:
                 return;
 
             GetHitUnit()->RemoveAllAuras();
-            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_OVERCHARGED_POWER_GENERATOR, true); 
+            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_OVERCHARGED_POWER_GENERATOR, true);
         }
 
         void Register()

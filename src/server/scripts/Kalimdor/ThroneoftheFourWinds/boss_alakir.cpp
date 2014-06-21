@@ -43,12 +43,12 @@ enum Spells
     SPELL_ACID_RAIN_H_25            = 93281,
 
     SPELL_RENTLESS_STORM            = 88866, // PHASE THREE
-    SPELL_EYE_OFTHE_STORM           = 82724,		
+    SPELL_EYE_OFTHE_STORM           = 82724,
     SPELL_LIGHTING_ROD_N_10         = 89667,
     SPELL_LIGHTING_ROD_H_10         = 93293,
     SPELL_LIGHTING_ROD_N_25         = 93294,
     SPELL_LIGHTING_ROD_H_25         = 93295,
-    SPELL_WIND_BURST2_N_10          = 88858, 
+    SPELL_WIND_BURST2_N_10          = 88858,
     SPELL_WIND_BURST2_H_10          = 93286,
     SPELL_WIND_BURST2_N_25          = 93287,
     SPELL_WIND_BURST2_H_25          = 93288,
@@ -94,22 +94,22 @@ enum Spells
 
 Position const StormlingListPositions[5] =
 {
-    {0.0f,          0.0f,           0.0f,       0.0f},
-    {0.0f,          0.0f,           0.0f,       0.0f},
-    {0.0f,          0.0f,           0.0f,       0.0f},
-    {0.0f,          0.0f,           0.0f,       0.0f},
-    {0.0f,          0.0f,           0.0f,       0.0f}
+    {0.0f, 0.0f, 0.0f, 0.0f},
+    {0.0f, 0.0f, 0.0f, 0.0f},
+    {0.0f, 0.0f, 0.0f, 0.0f},
+    {0.0f, 0.0f, 0.0f, 0.0f},
+    {0.0f, 0.0f, 0.0f, 0.0f}
 };
 
 Position const StormlineswListPositions[7] =
 {
-    {-25.299749f,   875.881104f,    189.983994f,    0.0f},
-    {0.0f,          0.0f,           189.983994f,    0.0f},
-    {0.0f,          0.0f,           189.983994f,    0.0f},
-    {0.0f,          0.0f,           189.983994f,    0.0f},
-    {0.0f,          0.0f,           189.983994f,    0.0f},
-    {0.0f,          0.0f,           189.983994f,    0.0f},
-    {-38.400715f,   844.311096f,    189.983994f,    0.0f}
+    {-25.299749f, 875.881104f, 189.983994f, 0.0f},
+    {0.0f, 0.0f, 189.983994f, 0.0f},
+    {0.0f, 0.0f, 189.983994f, 0.0f},
+    {0.0f, 0.0f, 189.983994f, 0.0f},
+    {0.0f, 0.0f, 189.983994f, 0.0f},
+    {0.0f, 0.0f, 189.983994f, 0.0f},
+    {-38.400715f, 844.311096f, 189.983994f, 0.0f}
 };
 
 enum Events
@@ -177,8 +177,8 @@ public:
         {
             instance = pCreature->GetInstanceScript();
             _phase = PHASE_NONE;
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT,    SPELL_EFFECT_KNOCK_BACK,    true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC,  MECHANIC_GRIP,              true);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
         }
 
         void Reset()
@@ -201,7 +201,7 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
-            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)							
+            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             {
                 Player* plr = i->getSource();
                 if (plr->isAlive())
@@ -214,7 +214,7 @@ public:
 
         void KilledUnit(Unit* /*who*/)
         {
-            Talk (RAND(SAY_KILL, SAY_KILL_2));
+            Talk(RAND(SAY_KILL, SAY_KILL_2));
         }
 
         uint32 GetData(uint32 data)
@@ -241,22 +241,22 @@ public:
             switch (_phase)
             {
             case PHASE_ONE:
-                events.ScheduleEvent(EVENT_STATIC_SHOCK,        12000,  0, _phase);
-                events.ScheduleEvent(EVENT_ELECTROCUE,          20000,  0, _phase);
-                events.ScheduleEvent(EVENT_WIND_BURST,          3000,   0, _phase);
-                events.ScheduleEvent(EVENT_LIGHTNING_STRIKE,    18000,  0, _phase);
+                events.ScheduleEvent(EVENT_STATIC_SHOCK, 12000, 0, _phase);
+                events.ScheduleEvent(EVENT_ELECTROCUE, 20000, 0, _phase);
+                events.ScheduleEvent(EVENT_WIND_BURST, 3000, 0, _phase);
+                events.ScheduleEvent(EVENT_LIGHTNING_STRIKE, 18000, 0, _phase);
                 break;
 
             case PHASE_TWO:
-                events.ScheduleEvent(EVENT_STATIC_SHOCK2,       8000,   0, _phase);
-                events.ScheduleEvent(EVENT_ACID_RAIN,           2000,   0, _phase);
-                events.ScheduleEvent(EVENT_ELECTROCUE2,         5000,   0, _phase);
+                events.ScheduleEvent(EVENT_STATIC_SHOCK2, 8000, 0, _phase);
+                events.ScheduleEvent(EVENT_ACID_RAIN, 2000, 0, _phase);
+                events.ScheduleEvent(EVENT_ELECTROCUE2, 5000, 0, _phase);
                 break;
 
             case PHASE_THREE:
-                events.ScheduleEvent(EVENT_WIND_BURST2,         25000,  0, _phase);
-                events.ScheduleEvent(EVENT_LIGHTING_ROD,        20000,  0, _phase);
-                events.ScheduleEvent(EVENT_LIGHTING,            25000,  0, _phase);
+                events.ScheduleEvent(EVENT_WIND_BURST2, 25000, 0, _phase);
+                events.ScheduleEvent(EVENT_LIGHTING_ROD, 20000, 0, _phase);
+                events.ScheduleEvent(EVENT_LIGHTING, 25000, 0, _phase);
                 break;
             default:
                 break;
@@ -278,9 +278,9 @@ public:
 
             GameObject* floor = me->FindNearestGameObject(GO_FLOOR_ALAKIR, 200);
             if (floor)
-                floor->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED);	
+                floor->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED);
 
-            me->AddAura(SPELL_RELENTLESS_STORM, me);	
+            me->AddAura(SPELL_RELENTLESS_STORM, me);
 
             SendWeather(WEATHER_STATE_FINE);
 
@@ -292,7 +292,7 @@ public:
             if (PlayerList.isEmpty())
                 return;
 
-            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)							
+            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
             {
                 Player* plr = i->getSource();
                 if (plr->isAlive())
@@ -495,7 +495,7 @@ public:
         }
 
         void UpdateAI(const uint32 diff)
-        {	
+        {
             if (IsHeroic())
                 if (GravityTimer <= diff)
                 {
@@ -511,7 +511,7 @@ public:
 class npc_tornado_moving : public CreatureScript
 {
 public:
-    npc_tornado_moving() :  CreatureScript("npc_tornado_moving") { }
+    npc_tornado_moving() : CreatureScript("npc_tornado_moving") { }
 
     struct npc_tornado_movingAI : public ScriptedAI
     {
@@ -546,7 +546,7 @@ public:
             {
                 float distanceX = GetAlakir()->GetPositionX() > me->GetPositionX() ? GetAlakir()->GetPositionX() - me->GetPositionX() : me->GetPositionX() - GetAlakir()->GetPositionX();
                 float distanceY = GetAlakir()->GetPositionY() > me->GetPositionY() ? GetAlakir()->GetPositionY() - me->GetPositionY() : me->GetPositionY() - GetAlakir()->GetPositionY();
-                me->GetMotionMaster()->MovePoint(0, (distanceX < defaultDistX) ? me->GetPositionX() + MoveSide ? 1 : - 1 : me->GetPositionX(),(distanceY < defaultDistY) ? me->GetPositionY() + MoveSide ? 1 : - 1 : me->GetPositionY(),me->GetPositionZ());
+                me->GetMotionMaster()->MovePoint(0, (distanceX < defaultDistX) ? me->GetPositionX() + MoveSide ? 1 : - 1 : me->GetPositionX(), (distanceY < defaultDistY) ? me->GetPositionY() + MoveSide ? 1 : - 1 : me->GetPositionY(), me->GetPositionZ());
             }
         }
 

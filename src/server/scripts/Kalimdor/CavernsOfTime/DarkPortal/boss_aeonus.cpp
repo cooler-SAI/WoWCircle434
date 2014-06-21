@@ -51,7 +51,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new boss_aeonusAI (creature);
+        return new boss_aeonusAI(creature);
     }
 
     struct boss_aeonusAI : public ScriptedAI
@@ -98,11 +98,11 @@ public:
         {
             DoScriptText(SAY_DEATH, me);
 
-             if (instance)
-             {
-                 instance->SetData(TYPE_RIFT, DONE);
-                 instance->SetData(TYPE_MEDIVH, DONE);//FIXME: later should be removed
-             }
+            if (instance)
+            {
+                instance->SetData(TYPE_RIFT, DONE);
+                instance->SetData(TYPE_MEDIVH, DONE);//FIXME: later should be removed
+            }
         }
 
         void KilledUnit(Unit* /*victim*/)

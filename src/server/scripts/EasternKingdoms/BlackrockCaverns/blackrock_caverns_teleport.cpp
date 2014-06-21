@@ -1,7 +1,7 @@
 #include "ScriptPCH.h"
 #include "blackrock_caverns.h"
 
-class blackrock_caverns_teleport: public CreatureScript
+class blackrock_caverns_teleport : public CreatureScript
 {
 public:
     blackrock_caverns_teleport() : CreatureScript("blackrock_caverns_teleport") { }
@@ -13,13 +13,13 @@ public:
 
     struct blackrock_caverns_teleport_AI : public CreatureAI
     {
-       blackrock_caverns_teleport_AI(Creature* creature) : CreatureAI(creature) { }
+        blackrock_caverns_teleport_AI(Creature* creature) : CreatureAI(creature) { }
 
         void OnSpellClick(Unit* clicker)
         {
             if (InstanceScript* instance = me->GetInstanceScript())
-                if (instance->GetData(DATA_KARSH) != DONE)
-                    return;
+            if (instance->GetData(DATA_KARSH) != DONE)
+                return;
 
             if (me->GetDBTableGUIDLow() == 327777)
                 clicker->NearTeleportTo(284.838f, 840.364f, 95.920f, 3.881242f, false);

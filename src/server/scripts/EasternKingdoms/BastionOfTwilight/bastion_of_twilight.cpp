@@ -3,16 +3,16 @@
 
 enum ScriptTexts
 {
-    SAY_CHOGALL_0    = 0,
-    SAY_CHOGALL_1    = 1,
-    SAY_CHOGALL_2    = 2,
-    SAY_CHOGALL_3    = 3,
-    SAY_CHOGALL_4    = 4,
-    SAY_CHOGALL_5    = 5,
-    SAY_CHOGALL_6    = 6,
-    SAY_CHOGALL_7    = 7,
-    SAY_CHOGALL_8    = 8,
-    SAY_CHOGALL_9    = 9,
+    SAY_CHOGALL_0     = 0,
+    SAY_CHOGALL_1     = 1,
+    SAY_CHOGALL_2     = 2,
+    SAY_CHOGALL_3     = 3,
+    SAY_CHOGALL_4     = 4,
+    SAY_CHOGALL_5     = 5,
+    SAY_CHOGALL_6     = 6,
+    SAY_CHOGALL_7     = 7,
+    SAY_CHOGALL_8     = 8,
+    SAY_CHOGALL_9     = 9,
     SAY_CHOGALL_10    = 10,
     SAY_CHOGALL_11    = 11,
     SAY_CHOGALL_12    = 12,
@@ -23,29 +23,29 @@ enum ScriptTexts
 enum Spells
 {
     //twilight portal shaper
-    SPELL_SHADOW_BOLT            = 85544,
-    SPELL_SHAPE_PORTAL            = 85529,
-    SPELL_SHAPE_PORTAL_SUM        = 85528,
-    
+    SPELL_SHADOW_BOLT              = 85544,
+    SPELL_SHAPE_PORTAL             = 85529,
+    SPELL_SHAPE_PORTAL_SUM         = 85528,
+
     //twilight shifter
-    SPELL_TWILIGHT_SHIFT        = 85556,
+    SPELL_TWILIGHT_SHIFT           = 85556,
 
     //twilight shadow mender
     SPELL_MIND_SEAR                = 85643,
     SPELL_MIND_SEAR_DMG            = 85647,
     SPELL_UMBRAL_FLAMES            = 85664,
-    SPELL_UMBRAL_FLAMES_DMG        = 85679,  
-    SPELL_SHADOW_MENDING        = 85575,
-    SPELL_SHADOW_MENDING_HEAL    = 85577,
+    SPELL_UMBRAL_FLAMES_DMG        = 85679,
+    SPELL_SHADOW_MENDING           = 85575,
+    SPELL_SHADOW_MENDING_HEAL      = 85577,
 };
 
 enum CreaturesIds
 {
-    NPC_TWILIGHT_PORTAL_SHAPER    = 45700,
+    NPC_TWILIGHT_PORTAL_SHAPER     = 45700,
     NPC_TWILIGHT_PORTAL            = 45885,
     NPC_FACELESS_MINION            = 45703,
-    NPC_TWILIGHT_SHIFTER        = 45687,
-    NPC_TWILIGHT_SHADOW_MENDER    = 45699,
+    NPC_TWILIGHT_SHIFTER           = 45687,
+    NPC_TWILIGHT_SHADOW_MENDER     = 45699,
 };
 
 enum Events
@@ -75,7 +75,7 @@ enum Events
     EVENT_CHOGALL_DLG                = 119,
 };
 
-class npc_twilight_portal_shaper: public CreatureScript
+class npc_twilight_portal_shaper : public CreatureScript
 {
 public:
     npc_twilight_portal_shaper() : CreatureScript("npc_twilight_portal_shaper") { }
@@ -88,8 +88,7 @@ public:
     struct npc_twilight_portal_shaperAI : public ScriptedAI
     {
         npc_twilight_portal_shaperAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
-        {
-        }
+        { }
 
         SummonList summons;
         EventMap events;
@@ -104,8 +103,8 @@ public:
         {
             summons.Summon(summon);
             if (summon->GetEntry() == NPC_FACELESS_MINION)
-                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM))
-                    summon->AI()->AttackStart(pTarget);
+            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM))
+                summon->AI()->AttackStart(pTarget);
         }
 
         void SummonedCreatureDespawn(Creature* summon)
@@ -138,13 +137,13 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_SHADOW_BOLT:
-                    DoCast(me->getVictim(), SPELL_SHADOW_BOLT);
-                    events.ScheduleEvent(EVENT_SHADOW_BOLT, 2000);
-                    break;
-                case EVENT_SHAPE_PORTAL:
-                    DoCast(me, SPELL_SHAPE_PORTAL);
-                    break;
+                    case EVENT_SHADOW_BOLT:
+                        DoCast(me->getVictim(), SPELL_SHADOW_BOLT);
+                        events.ScheduleEvent(EVENT_SHADOW_BOLT, 2000);
+                        break;
+                    case EVENT_SHAPE_PORTAL:
+                        DoCast(me, SPELL_SHAPE_PORTAL);
+                        break;
                 }
             }
             DoMeleeAttackIfReady();
@@ -152,7 +151,7 @@ public:
     };
 };
 
-class npc_twilight_shifter: public CreatureScript
+class npc_twilight_shifter : public CreatureScript
 {
 public:
     npc_twilight_shifter() : CreatureScript("npc_twilight_shifter") { }
@@ -165,8 +164,7 @@ public:
     struct npc_twilight_shifterAI : public ScriptedAI
     {
         npc_twilight_shifterAI(Creature* pCreature) : ScriptedAI(pCreature)
-        {
-        }
+        { }
 
         EventMap events;
 
@@ -194,18 +192,18 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_TWILIGHT_SHIFT:
-                    DoCast(me, SPELL_TWILIGHT_SHIFT);
-                    events.ScheduleEvent(EVENT_TWILIGHT_SHIFT, urand(30000, 35000));
-                    events.ScheduleEvent(EVENT_NEXT_TARGET_ON, 3000);
-                    break;
-                case EVENT_NEXT_TARGET_ON:
-                    DoResetThreat();
-                    events.ScheduleEvent(EVENT_NEXT_TARGET_ON, 3000);
-                    break;
-                case EVENT_NEXT_TARGET_OFF:
-                    events.CancelEvent(EVENT_NEXT_TARGET_ON);
-                    break;
+                    case EVENT_TWILIGHT_SHIFT:
+                        DoCast(me, SPELL_TWILIGHT_SHIFT);
+                        events.ScheduleEvent(EVENT_TWILIGHT_SHIFT, urand(30000, 35000));
+                        events.ScheduleEvent(EVENT_NEXT_TARGET_ON, 3000);
+                        break;
+                    case EVENT_NEXT_TARGET_ON:
+                        DoResetThreat();
+                        events.ScheduleEvent(EVENT_NEXT_TARGET_ON, 3000);
+                        break;
+                    case EVENT_NEXT_TARGET_OFF:
+                        events.CancelEvent(EVENT_NEXT_TARGET_ON);
+                        break;
                 }
             }
             DoMeleeAttackIfReady();
@@ -213,7 +211,7 @@ public:
     };
 };
 
-class npc_twilight_shadow_mender: public CreatureScript
+class npc_twilight_shadow_mender : public CreatureScript
 {
 public:
     npc_twilight_shadow_mender() : CreatureScript("npc_twilight_shadow_mender") { }
@@ -226,8 +224,7 @@ public:
     struct npc_twilight_shadow_menderAI : public ScriptedAI
     {
         npc_twilight_shadow_menderAI(Creature* pCreature) : ScriptedAI(pCreature)
-        {
-        }
+        { }
 
         EventMap events;
 
@@ -257,15 +254,15 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_UMBRAL_FLAMES:
-                    DoCast(me, SPELL_UMBRAL_FLAMES);
-                    events.ScheduleEvent(EVENT_UMBRAL_FLAMES, urand(15000, 20000));
-                    break;
-                case EVENT_MIND_SEAR:
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
-                        DoCast(pTarget, SPELL_MIND_SEAR);
-                    events.ScheduleEvent(EVENT_MIND_SEAR, urand(10000, 12000));
-                    break;
+                    case EVENT_UMBRAL_FLAMES:
+                        DoCast(me, SPELL_UMBRAL_FLAMES);
+                        events.ScheduleEvent(EVENT_UMBRAL_FLAMES, urand(15000, 20000));
+                        break;
+                    case EVENT_MIND_SEAR:
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                            DoCast(pTarget, SPELL_MIND_SEAR);
+                        events.ScheduleEvent(EVENT_MIND_SEAR, urand(10000, 12000));
+                        break;
                 }
             }
             DoMeleeAttackIfReady();
@@ -273,7 +270,7 @@ public:
     };
 };
 
-class npc_chogall_dlg: public CreatureScript
+class npc_chogall_dlg : public CreatureScript
 {
 public:
     npc_chogall_dlg() : CreatureScript("npc_chogall_dlg") { }
@@ -286,8 +283,7 @@ public:
     struct npc_chogall_dlgAI : public ScriptedAI
     {
         npc_chogall_dlgAI(Creature* pCreature) : ScriptedAI(pCreature)
-        {
-        }
+        { }
 
         EventMap events;
 
@@ -300,33 +296,33 @@ public:
         {
             switch (action)
             {
-            case ACTION_AT_ENTRANCE:
-                events.ScheduleEvent(EVENT_ENTRANCE_DLG, 5000);
-                break;
-            case ACTION_AT_HALFUS_START:
-                events.ScheduleEvent(EVENT_HALFUS_DLG_1, 1000);
-                break;
-            case ACTION_AT_HALFUS_END:
-                events.ScheduleEvent(EVENT_HALFUS_DLG_2, 7000);
-                break;
-            case ACTION_AT_VALIONA_THERALION_START:
-                events.ScheduleEvent(EVENT_VALIONA_THERALION_DLG_1, 1000);
-                break;
-            case ACTION_AT_VALIONA_THERALION_END:
-                events.ScheduleEvent(EVENT_VALIONA_THERALION_DLG_2, 7000);
-                break;
-            case ACTION_AT_COUNCIL_1:
-                events.ScheduleEvent(EVENT_COUNCIL_DLG_1, 1000);
-                break;
-            case ACTION_AT_COUNCIL_2:
-                events.ScheduleEvent(EVENT_COUNCIL_DLG_2, 1000);
-                break;
-            case ACTION_AT_COUNCIL_3:
-                events.ScheduleEvent(EVENT_COUNCIL_DLG_3, 1000);
-                break;
-            case ACTION_AT_CHOGALL:
-                events.ScheduleEvent(EVENT_CHOGALL_DLG, 1000);
-                break;
+                case ACTION_AT_ENTRANCE:
+                    events.ScheduleEvent(EVENT_ENTRANCE_DLG, 5000);
+                    break;
+                case ACTION_AT_HALFUS_START:
+                    events.ScheduleEvent(EVENT_HALFUS_DLG_1, 1000);
+                    break;
+                case ACTION_AT_HALFUS_END:
+                    events.ScheduleEvent(EVENT_HALFUS_DLG_2, 7000);
+                    break;
+                case ACTION_AT_VALIONA_THERALION_START:
+                    events.ScheduleEvent(EVENT_VALIONA_THERALION_DLG_1, 1000);
+                    break;
+                case ACTION_AT_VALIONA_THERALION_END:
+                    events.ScheduleEvent(EVENT_VALIONA_THERALION_DLG_2, 7000);
+                    break;
+                case ACTION_AT_COUNCIL_1:
+                    events.ScheduleEvent(EVENT_COUNCIL_DLG_1, 1000);
+                    break;
+                case ACTION_AT_COUNCIL_2:
+                    events.ScheduleEvent(EVENT_COUNCIL_DLG_2, 1000);
+                    break;
+                case ACTION_AT_COUNCIL_3:
+                    events.ScheduleEvent(EVENT_COUNCIL_DLG_3, 1000);
+                    break;
+                case ACTION_AT_CHOGALL:
+                    events.ScheduleEvent(EVENT_CHOGALL_DLG, 1000);
+                    break;
             }
         }
 
@@ -338,41 +334,41 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_ENTRANCE_DLG:
-                    Talk(SAY_CHOGALL_0);
-                    me->DespawnOrUnsummon();
-                    break;
-                case EVENT_HALFUS_DLG_1:
-                    Talk(SAY_CHOGALL_1);
-                    me->DespawnOrUnsummon();
-                    break;
-                case EVENT_HALFUS_DLG_2:
-                    Talk(SAY_CHOGALL_2);
-                    me->DespawnOrUnsummon();
-                    break;
-                case EVENT_VALIONA_THERALION_DLG_1:
-                    Talk(SAY_CHOGALL_9);
-                    me->DespawnOrUnsummon();
-                    break;
-                case EVENT_VALIONA_THERALION_DLG_2:
-                    Talk(SAY_CHOGALL_10);
-                    me->DespawnOrUnsummon();
-                    break;
-                case EVENT_COUNCIL_DLG_1:
-                    Talk(SAY_CHOGALL_11);
-                    me->DespawnOrUnsummon();
-                    break;
-                case EVENT_COUNCIL_DLG_2:
-                    Talk(SAY_CHOGALL_12);
-                    me->DespawnOrUnsummon();
-                    break;
-                case EVENT_COUNCIL_DLG_3:
-                    Talk(SAY_CHOGALL_13);
-                    me->DespawnOrUnsummon();
-                case EVENT_CHOGALL_DLG:
-                    Talk(SAY_CHOGALL_14);
-                    me->DespawnOrUnsummon();
-                    break;
+                    case EVENT_ENTRANCE_DLG:
+                        Talk(SAY_CHOGALL_0);
+                        me->DespawnOrUnsummon();
+                        break;
+                    case EVENT_HALFUS_DLG_1:
+                        Talk(SAY_CHOGALL_1);
+                        me->DespawnOrUnsummon();
+                        break;
+                    case EVENT_HALFUS_DLG_2:
+                        Talk(SAY_CHOGALL_2);
+                        me->DespawnOrUnsummon();
+                        break;
+                    case EVENT_VALIONA_THERALION_DLG_1:
+                        Talk(SAY_CHOGALL_9);
+                        me->DespawnOrUnsummon();
+                        break;
+                    case EVENT_VALIONA_THERALION_DLG_2:
+                        Talk(SAY_CHOGALL_10);
+                        me->DespawnOrUnsummon();
+                        break;
+                    case EVENT_COUNCIL_DLG_1:
+                        Talk(SAY_CHOGALL_11);
+                        me->DespawnOrUnsummon();
+                        break;
+                    case EVENT_COUNCIL_DLG_2:
+                        Talk(SAY_CHOGALL_12);
+                        me->DespawnOrUnsummon();
+                        break;
+                    case EVENT_COUNCIL_DLG_3:
+                        Talk(SAY_CHOGALL_13);
+                        me->DespawnOrUnsummon();
+                    case EVENT_CHOGALL_DLG:
+                        Talk(SAY_CHOGALL_14);
+                        me->DespawnOrUnsummon();
+                        break;
                 }
             }
         }
@@ -402,7 +398,7 @@ public:
     }
 };
 
-class at_bt_halfus: public AreaTriggerScript
+class at_bt_halfus : public AreaTriggerScript
 {
 public:
     at_bt_halfus() : AreaTriggerScript("at_bt_halfus") { }
@@ -546,7 +542,7 @@ public:
     }
 };
 
-class npc_bt_instance_portal: public CreatureScript
+class npc_bt_instance_portal : public CreatureScript
 {
 public:
     npc_bt_instance_portal() : CreatureScript("npc_bt_instance_portal") { }
@@ -573,7 +569,7 @@ public:
                     at = sAreaTriggerStore.LookupEntry(6442);
                 else if (instance->GetBossState(DATA_HALFUS) == DONE)
                     at = sAreaTriggerStore.LookupEntry(6437);
-                
+
                 if (at)
                     clicker->NearTeleportTo(at->x, at->y, at->z, clicker->GetOrientation(), false);
             }

@@ -27,31 +27,20 @@
 namespace AccountMgr
 {
 
-AccountOpResult CreateAccount(std::string username, std::string password, std::string email)
+AccountOpResult CreateAccount(std::string username, std::string password)
 {
     if (utf8length(username) > MAX_ACCOUNT_STR)
-        return AccountOpResult::AOR_NAME_TOO_LONG;                           // username's too long
+        return AOR_NAME_TOO_LONG;                           // username's too long
 
-    Utf8ToUpperOnlyLatin(username);
-    Utf8ToUpperOnlyLatin(password);
-    Utf8ToUpperOnlyLatin(email);
+    normalizeString(username);
+    normalizeString(password);
 
     if (GetId(username))
-        return AccountOpResult::AOR_NAME_ALREADY_EXIST;                       // username does already exist
+        return AOR_NAME_ALREDY_EXIST;                       // username does already exist
 
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT);
+    LoginDatabase.PExecute("INSERT INTO account(username, sha_pass_hash, joindate) VALUES('%s', '%s', NOW())", username.c_str(), CalculateShaPassHash(username, password).c_str());
 
-    stmt->setString(0, username);
-    stmt->setString(1, CalculateShaPassHash(username, password));
-    stmt->setString(2, email);
-    stmt->setString(3, email);
-
-    LoginDatabase.DirectExecute(stmt); // Enforce saving, otherwise AddGroup can fail
-
-    stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_REALM_CHARACTERS_INIT);
-    LoginDatabase.Execute(stmt);
-
-    return AccountOpResult::AOR_OK;                                          // everything's fine
+    return AOR_OK;                                          // everything's fine
 }
 
 AccountOpResult DeleteAccount(uint32 accountId)
@@ -59,7 +48,7 @@ AccountOpResult DeleteAccount(uint32 accountId)
     // Check if accounts exists
     QueryResult result = LoginDatabase.PQuery("SELECT 1 FROM account WHERE id='%d'", accountId);
     if (!result)
-        return AccountOpResult::AOR_NAME_NOT_EXIST;
+        return AOR_NAME_NOT_EXIST;
 
     // Obtain accounts characters
     result = CharacterDatabase.PQuery("SELECT guid FROM characters WHERE account='%d'", accountId);
@@ -95,7 +84,7 @@ AccountOpResult DeleteAccount(uint32 accountId)
 
     LoginDatabase.CommitTransaction(trans);
 
-    return AccountOpResult::AOR_OK;
+    return AOR_OK;
 }
 
 AccountOpResult ChangeUsername(uint32 accountId, std::string newUsername, std::string newPassword)
@@ -103,16 +92,16 @@ AccountOpResult ChangeUsername(uint32 accountId, std::string newUsername, std::s
     // Check if accounts exists
     QueryResult result = LoginDatabase.PQuery("SELECT 1 FROM account WHERE id='%d'", accountId);
     if (!result)
-        return AccountOpResult::AOR_NAME_NOT_EXIST;
+        return AOR_NAME_NOT_EXIST;
 
     if (utf8length(newUsername) > MAX_ACCOUNT_STR)
-        return AccountOpResult::AOR_NAME_TOO_LONG;
+        return AOR_NAME_TOO_LONG;
 
     if (utf8length(newPassword) > MAX_ACCOUNT_STR)
-        return AccountOpResult::AOR_PASS_TOO_LONG;
+        return AOR_PASS_TOO_LONG;
 
-    Utf8ToUpperOnlyLatin(newUsername);
-    Utf8ToUpperOnlyLatin(newPassword);
+    normalizeString(newUsername);
+    normalizeString(newPassword);
 
     PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_USERNAME);
 
@@ -122,7 +111,7 @@ AccountOpResult ChangeUsername(uint32 accountId, std::string newUsername, std::s
 
     LoginDatabase.Execute(stmt);
 
-    return AccountOpResult::AOR_OK;
+    return AOR_OK;
 }
 
 AccountOpResult ChangePassword(uint32 accountId, std::string newPassword)
@@ -130,13 +119,13 @@ AccountOpResult ChangePassword(uint32 accountId, std::string newPassword)
     std::string username;
 
     if (!GetName(accountId, username))
-        return AccountOpResult::AOR_NAME_NOT_EXIST;                        // account doesn't exist
+        return AOR_NAME_NOT_EXIST;                          // account doesn't exist
 
     if (utf8length(newPassword) > MAX_ACCOUNT_STR)
-        return AccountOpResult::AOR_PASS_TOO_LONG;
+        return AOR_PASS_TOO_LONG;
 
-    Utf8ToUpperOnlyLatin(username);
-    Utf8ToUpperOnlyLatin(newPassword);
+    normalizeString(username);
+    normalizeString(newPassword);
 
     PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_PASSWORD);
 
@@ -145,53 +134,7 @@ AccountOpResult ChangePassword(uint32 accountId, std::string newPassword)
 
     LoginDatabase.Execute(stmt);
 
-    return AccountOpResult::AOR_OK;
-}
-
-AccountOpResult ChangeEmail(uint32 accountId, std::string newEmail)
-{
-    std::string username;
-
-    if (!GetName(accountId, username))
-        return AccountOpResult::AOR_NAME_NOT_EXIST;                          // account doesn't exist
-
-    if (utf8length(newEmail) > MAX_EMAIL_STR)
-        return AccountOpResult::AOR_EMAIL_TOO_LONG;
-
-    Utf8ToUpperOnlyLatin(username);
-    Utf8ToUpperOnlyLatin(newEmail);
-
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EMAIL);
-
-    stmt->setString(0, newEmail);
-    stmt->setUInt32(1, accountId);
-
-    LoginDatabase.Execute(stmt);
-
-    return AccountOpResult::AOR_OK;
-}
-
-AccountOpResult ChangeRegEmail(uint32 accountId, std::string newEmail)
-{
-    std::string username;
-
-    if (!GetName(accountId, username))
-        return AccountOpResult::AOR_NAME_NOT_EXIST;                          // account doesn't exist
-
-    if (utf8length(newEmail) > MAX_EMAIL_STR)
-        return AccountOpResult::AOR_EMAIL_TOO_LONG;
-
-    Utf8ToUpperOnlyLatin(username);
-    Utf8ToUpperOnlyLatin(newEmail);
-
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_REG_EMAIL);
-
-    stmt->setString(0, newEmail);
-    stmt->setUInt32(1, accountId);
-
-    LoginDatabase.Execute(stmt);
-
-    return AccountOpResult::AOR_OK;
+    return AOR_OK;
 }
 
 uint32 GetId(std::string username)
@@ -245,21 +188,6 @@ bool GetName(uint32 accountId, std::string& name)
     return false;
 }
 
-bool GetEmail(uint32 accountId, std::string& email)
-{
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_EMAIL_BY_ID);
-    stmt->setUInt32(0, accountId);
-    PreparedQueryResult result = LoginDatabase.Query(stmt);
-
-    if (result)
-    {
-        email = (*result)[0].GetString();
-        return true;
-    }
-
-    return false;
-}
-
 bool CheckPassword(uint32 accountId, std::string password)
 {
     std::string username;
@@ -267,28 +195,11 @@ bool CheckPassword(uint32 accountId, std::string password)
     if (!GetName(accountId, username))
         return false;
 
-    Utf8ToUpperOnlyLatin(username);
-    Utf8ToUpperOnlyLatin(password);
+    normalizeString(username);
+    normalizeString(password);
 
     QueryResult result = LoginDatabase.PQuery("SELECT 1 FROM account WHERE id='%d' AND sha_pass_hash='%s'", accountId, CalculateShaPassHash(username, password).c_str());
     return (result) ? true : false;
-}
-
-bool CheckEmail(uint32 accountId, std::string newEmail)
-{
-    std::string oldEmail;
-
-    // We simply return false for a non-existing email
-    if (!GetEmail(accountId, oldEmail))
-        return false;
-
-    Utf8ToUpperOnlyLatin(oldEmail);
-    Utf8ToUpperOnlyLatin(newEmail);
-
-    if (strcmp(oldEmail.c_str(), newEmail.c_str()) == 0)
-        return true;
-
-    return false;
 }
 
 bool IsEmptyPassword(uint32 accountId)

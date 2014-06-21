@@ -41,15 +41,15 @@ RASocket::~RASocket()
 
 int RASocket::open(void *)
 {
-    ACE_INET_Addr remoteAddress;
+    ACE_INET_Addr remote_addr;
 
-    if (peer().get_remote_addr(remoteAddress) == -1)
+    if (peer().get_remote_addr(remote_addr) == -1)
     {
         sLog->outError(LOG_FILTER_WORLDSERVER, "RASocket::open: peer().get_remote_addr error is %s", ACE_OS::strerror(errno));
         return -1;
     }
 
-    sLog->outDebug(LOG_FILTER_REMOTECOMMAND, "Incoming connection from %s", remoteAddress.get_host_addr());
+    sLog->outDebug(LOG_FILTER_REMOTECOMMAND, "Incoming connection from %s", remote_addr.get_host_addr());
 
     return activate();
 }
@@ -176,7 +176,9 @@ int RASocket::check_access_level(const std::string& user)
 {
     std::string safeUser = user;
 
-    Utf8ToUpperOnlyLatin(safeUser);
+    AccountMgr::normalizeString(safeUser);
+
+
 
     PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ACCESS);
     stmt->setString(0, safeUser);
@@ -207,10 +209,10 @@ int RASocket::check_access_level(const std::string& user)
 int RASocket::check_password(const std::string& user, const std::string& pass)
 {
     std::string safe_user = user;
-    Utf8ToUpperOnlyLatin(safe_user);
+    AccountMgr::normalizeString(safe_user);
 
     std::string safe_pass = pass;
-    Utf8ToUpperOnlyLatin(safe_pass);
+    AccountMgr::normalizeString(safe_pass);
 
     std::string hash = AccountMgr::CalculateShaPassHash(safe_user, safe_pass);
 

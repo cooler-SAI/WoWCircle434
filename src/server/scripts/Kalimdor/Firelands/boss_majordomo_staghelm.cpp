@@ -1,9 +1,9 @@
 
 // 570,227 -61,8299 90,4227
 /*
- * WowCircle 4.3.4
- * Dev: Ramusik
- */
+* WowCircle 4.3.4
+* Dev: Ramusik
+*/
 
 #include "ScriptPCH.h"
 #include "firelands.h"
@@ -57,8 +57,8 @@ enum Yells
     SAY_DEATH               = 4, // My studies... had only just begun...
     SAY_BERSERK             = 5, // So much power!
     SAY_KILL                = 6, // Burn.
-                                 // Soon ALL of Azeroth will burn!
-                                 // You stood in the fire!
+    // Soon ALL of Azeroth will burn!
+    // You stood in the fire!
 };
 
 enum Phases
@@ -84,382 +84,382 @@ const Position orbsPos[5] =
 
 class boss_majordomo_staghelm : public CreatureScript
 {
-    public:
-        boss_majordomo_staghelm() : CreatureScript("boss_majordomo_staghelm") { }
+public:
+    boss_majordomo_staghelm() : CreatureScript("boss_majordomo_staghelm") { }
 
-        CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new boss_majordomo_staghelmAI(creature);
+    }
+
+    struct boss_majordomo_staghelmAI : public BossAI
+    {
+        boss_majordomo_staghelmAI(Creature* creature) : BossAI(creature, DATA_STAGHELM)
         {
-            return new boss_majordomo_staghelmAI(creature);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
+            me->setActive(true);
         }
 
-        struct boss_majordomo_staghelmAI : public BossAI
+        void InitializeAI()
         {
-            boss_majordomo_staghelmAI(Creature* creature) : BossAI(creature, DATA_STAGHELM)
+            if (!instance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(FLScriptName))
+                me->IsAIEnabled = false;
+            else if (!me->isDead())
+                Reset();
+        }
+
+        void Reset()
+        {
+            _Reset();
+            me->SetMaxPower(POWER_ENERGY, 100);
+            me->SetPower(POWER_ENERGY, 0);
+            me->SetHealth(me->GetMaxHealth());
+
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CONCENTRATION_AURA);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_LEGENDARY_CONCENTRATION);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_EPIC_CONCENTRATION);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RARE_CONCENTRATION);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_UNCOMMON_CONCENTRATION);
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+
+            _currentPhase = PHASE_HUMANOID;
+            _changePhaseNum = 0;
+        }
+
+        void EnterCombat(Unit* attacker)
+        {
+            if (!instance->CheckRequiredBosses(DATA_STAGHELM, me->GetEntry(), attacker->ToPlayer()))
             {
-                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-                me->setActive(true);
+                EnterEvadeMode();
+                instance->DoNearTeleportPlayers(FLEntrancePos);
+                return;
             }
 
-            void InitializeAI()
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CONCENTRATION_AURA);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_LEGENDARY_CONCENTRATION);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_EPIC_CONCENTRATION);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RARE_CONCENTRATION);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_UNCOMMON_CONCENTRATION);
+
+            if (IsHeroic())
+                DoCast(me, SPELL_CONCENTRATION, true);
+
+            events.ScheduleEvent(EVENT_BERSERK, 600000);    // 10 min
+            events.ScheduleEvent(EVENT_CHECK_PHASE, 2000);
+
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
+            DoZoneInCombat();
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CONCENTRATION_AURA);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_LEGENDARY_CONCENTRATION);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_EPIC_CONCENTRATION);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RARE_CONCENTRATION);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_UNCOMMON_CONCENTRATION);
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+            Talk(SAY_DEATH);
+            _JustDied();
+
+            AddSmoulderingAura(me);
+        }
+
+        void JustReachedHome()
+        {
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+            _JustReachedHome();
+        }
+
+        void KilledUnit(Unit* victim)
+        {
+            if (victim->GetTypeId() == TYPEID_PLAYER)
+                Talk(SAY_KILL);
+        }
+
+        void JustSummoned(Creature* summon)
+        {
+            summons.Summon(summon);
+            switch (summon->GetEntry())
             {
-                if (!instance || static_cast<InstanceMap*>(me->GetMap())->GetScriptId() != sObjectMgr->GetScriptId(FLScriptName))
-                    me->IsAIEnabled = false;
-                else if (!me->isDead())
-                    Reset();
+            case NPC_BURNING_ORB:
+                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_DISABLE_MOVE);
+                summon->CastSpell(summon, SPELL_BURNING_ORB_PERIODIC, false);
+                break;
+            default:
+                break;
             }
 
-            void Reset()
-            {
-                _Reset();
-                me->SetMaxPower(POWER_ENERGY, 100);
-                me->SetPower(POWER_ENERGY, 0);
-                me->SetHealth(me->GetMaxHealth());
-                
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CONCENTRATION_AURA);
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_LEGENDARY_CONCENTRATION);
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_EPIC_CONCENTRATION);
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RARE_CONCENTRATION);
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_UNCOMMON_CONCENTRATION);
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+            if (me->isInCombat())
+                DoZoneInCombat(summon);
+        }
 
-                _currentPhase = PHASE_HUMANOID;
-                _changePhaseNum = 0;
+        void MovementInform(uint32 type, uint32 data)
+        {
+            if (data == EVENT_JUMP)
+            {
+                me->CastSpell(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), SPELL_LEAPING_FLAMES_PERSISTENT, true);
             }
+        }
 
-            void EnterCombat(Unit* attacker)
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim() || !CheckInArea(diff, 5769))
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            if (me->GetPower(POWER_ENERGY) == 100)
             {
-                if (!instance->CheckRequiredBosses(DATA_STAGHELM, me->GetEntry(), attacker->ToPlayer()))
+                if (_currentPhase == PHASE_CAT)
                 {
-                    EnterEvadeMode();
-                    instance->DoNearTeleportPlayers(FLEntrancePos);
-                    return;
+                    DoCast(me, SPELL_LEAPING_FLAMES_SUMMON, true);
+                    Unit* target = NULL;
+                    target = SelectTarget(SELECT_TARGET_RANDOM, 1, -20.0f, true);
+                    if (!target)
+                        target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
+                    if (target)
+                        DoCast(target, SPELL_LEAPING_FLAMES);
+                    else
+                        me->SetPower(POWER_ENERGY, 0);
                 }
-
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CONCENTRATION_AURA);
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_LEGENDARY_CONCENTRATION);
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_EPIC_CONCENTRATION);
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RARE_CONCENTRATION);
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_UNCOMMON_CONCENTRATION);
-
-                if (IsHeroic())
-                    DoCast(me, SPELL_CONCENTRATION, true);
-
-                events.ScheduleEvent(EVENT_BERSERK, 600000);    // 10 min
-                events.ScheduleEvent(EVENT_CHECK_PHASE, 2000);
-
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
-                DoZoneInCombat();
-            }
-
-            void JustDied(Unit* /*killer*/)
-            {
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CONCENTRATION_AURA);
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_LEGENDARY_CONCENTRATION);
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_EPIC_CONCENTRATION);
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RARE_CONCENTRATION);
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_UNCOMMON_CONCENTRATION);
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-                Talk(SAY_DEATH);
-                _JustDied();
-
-                AddSmoulderingAura(me);
-            }
-
-            void JustReachedHome()
-            {
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-                _JustReachedHome();
-            }
-
-            void KilledUnit(Unit* victim)
-            {
-                if (victim->GetTypeId() == TYPEID_PLAYER)
-                    Talk(SAY_KILL);
-            }
-
-            void JustSummoned(Creature* summon)
-            {
-                summons.Summon(summon);
-                switch (summon->GetEntry())
+                else if (_currentPhase == PHASE_SCORPION)
                 {
-                    case NPC_BURNING_ORB:
-                        summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_DISABLE_MOVE);
-                        summon->CastSpell(summon, SPELL_BURNING_ORB_PERIODIC, false);
-                        break;
-                    default:
-                        break;
-                }
-
-                if (me->isInCombat())
-                    DoZoneInCombat(summon);
-            }
-
-            void MovementInform(uint32 type, uint32 data)
-            {
-                if (data == EVENT_JUMP)
-                {
-                    me->CastSpell(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), SPELL_LEAPING_FLAMES_PERSISTENT, true);
+                    DoCastVictim(SPELL_FLAME_SCYTHE);
                 }
             }
 
-            void UpdateAI(const uint32 diff)
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                if (!UpdateVictim() || !CheckInArea(diff, 5769))
-                    return;
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                if (me->GetPower(POWER_ENERGY) == 100)
+                switch (eventId)
                 {
-                    if (_currentPhase == PHASE_CAT)
+                case EVENT_CHECK_PHASE:
                     {
-                        DoCast(me, SPELL_LEAPING_FLAMES_SUMMON, true);
-                        Unit* target = NULL;
-                        target = SelectTarget(SELECT_TARGET_RANDOM, 1, -20.0f, true);
-                        if (!target)
-                            target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true);
-                        if (target)
-                            DoCast(target, SPELL_LEAPING_FLAMES);
-                        else
-                            me->SetPower(POWER_ENERGY, 0);
-                    }
-                    else if (_currentPhase == PHASE_SCORPION)
-                    {
-                        DoCastVictim(SPELL_FLAME_SCYTHE);
-                    }
-                }
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_CHECK_PHASE:
+                        uint8 _phase = PHASE_CAT;
+                        if (Unit* target = me->getVictim())
                         {
-                            uint8 _phase = PHASE_CAT;
-                            if (Unit* target = me->getVictim())
-                            {
-                                std::list<Player*> PlayerList;
-                                CerberCore::AnyPlayerInObjectRangeCheck checker(target, 10.0f);
-                                CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(target, PlayerList, checker);
-                                target->VisitNearbyWorldObject(5.0f, searcher);
-                                uint8 const minTargets = Is25ManRaid() ? 18 : 7;
-                                if (PlayerList.size() >= minTargets)
-                                    _phase = PHASE_SCORPION;
-                            }
-
-                            if (_currentPhase != _phase)
-                            {
-                                me->SetPower(POWER_ENERGY, 0);
-                                me->RemoveAurasDueToSpell(SPELL_ADRENALINE);
-                                _changePhaseNum++;
-                                if (_changePhaseNum % 3 == 0)
-                                {
-                                    me->RemoveAurasDueToSpell(SPELL_CAT_FORM);
-                                    me->RemoveAurasDueToSpell(SPELL_SCORPION_FORM);
-                                    Talk(_currentPhase == PHASE_CAT ? SAY_HUMANOID_1 : SAY_HUMANOID_2);
-                                    DoCastAOE(SPELL_FIERY_CYCLONE, true);
-                                    DoCastAOE(_currentPhase == PHASE_CAT ? SPELL_SEARING_SEEDS : SPELL_BURNING_ORBS);
-                                    // Delayed Transmormation
-                                    events.ScheduleEvent(_currentPhase == PHASE_CAT ? EVENT_SCORPION_FORM : EVENT_CAT_FORM, 4500);
-                                    events.ScheduleEvent(EVENT_CHECK_PHASE, 6000);
-                                    return;
-                                }
-                                else
-                                {
-                                    // Normal Transformation
-                                    if (_phase == PHASE_CAT)
-                                    {
-                                        _currentPhase = PHASE_CAT;
-                                        Talk(SAY_TRANSFORM_2);
-                                        me->SetPower(POWER_ENERGY, 0);
-                                        DoCast(me, SPELL_CAT_FORM, true);
-                                        DoCast(me, SPELL_FURY, true);
-                                        
-                                    }
-                                    else if (_phase == PHASE_SCORPION)
-                                    {
-                                        _currentPhase = PHASE_SCORPION;
-                                        Talk(SAY_TRANSFORM_1);
-                                        me->SetPower(POWER_ENERGY, 0);
-                                        DoCast(me, SPELL_SCORPION_FORM, true);
-                                        DoCast(me, SPELL_FURY, true);
-                                    }
-                                }                                
-                            }
-
-                            events.ScheduleEvent(EVENT_CHECK_PHASE, 1000);
-                            break;
+                            std::list<Player*> PlayerList;
+                            CerberCore::AnyPlayerInObjectRangeCheck checker(target, 10.0f);
+                            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(target, PlayerList, checker);
+                            target->VisitNearbyWorldObject(5.0f, searcher);
+                            uint8 const minTargets = Is25ManRaid() ? 18 : 7;
+                            if (PlayerList.size() >= minTargets)
+                                _phase = PHASE_SCORPION;
                         }
-                        case EVENT_CAT_FORM:
-                            _currentPhase = PHASE_CAT;
-                            Talk(SAY_TRANSFORM_2);
-                            me->SetPower(POWER_ENERGY, 0);
-                            DoCast(me, SPELL_CAT_FORM, true);
-                            DoCast(me, SPELL_FURY, true);
-                            break;
-                        case EVENT_SCORPION_FORM:
-                            _currentPhase = PHASE_SCORPION;
-                            Talk(SAY_TRANSFORM_1);
-                            me->SetPower(POWER_ENERGY, 0);
-                            DoCast(me, SPELL_SCORPION_FORM, true);
-                            DoCast(me, SPELL_FURY, true);
-                            break;
-                        case EVENT_BERSERK:
-                            DoCast(me, SPELL_BERSERK);
-                            break;
-                    }
-                }
 
-                DoMeleeAttackIfReady();
+                        if (_currentPhase != _phase)
+                        {
+                            me->SetPower(POWER_ENERGY, 0);
+                            me->RemoveAurasDueToSpell(SPELL_ADRENALINE);
+                            _changePhaseNum++;
+                            if (_changePhaseNum % 3 == 0)
+                            {
+                                me->RemoveAurasDueToSpell(SPELL_CAT_FORM);
+                                me->RemoveAurasDueToSpell(SPELL_SCORPION_FORM);
+                                Talk(_currentPhase == PHASE_CAT ? SAY_HUMANOID_1 : SAY_HUMANOID_2);
+                                DoCastAOE(SPELL_FIERY_CYCLONE, true);
+                                DoCastAOE(_currentPhase == PHASE_CAT ? SPELL_SEARING_SEEDS : SPELL_BURNING_ORBS);
+                                // Delayed Transmormation
+                                events.ScheduleEvent(_currentPhase == PHASE_CAT ? EVENT_SCORPION_FORM : EVENT_CAT_FORM, 4500);
+                                events.ScheduleEvent(EVENT_CHECK_PHASE, 6000);
+                                return;
+                            }
+                            else
+                            {
+                                // Normal Transformation
+                                if (_phase == PHASE_CAT)
+                                {
+                                    _currentPhase = PHASE_CAT;
+                                    Talk(SAY_TRANSFORM_2);
+                                    me->SetPower(POWER_ENERGY, 0);
+                                    DoCast(me, SPELL_CAT_FORM, true);
+                                    DoCast(me, SPELL_FURY, true);
+
+                                }
+                                else if (_phase == PHASE_SCORPION)
+                                {
+                                    _currentPhase = PHASE_SCORPION;
+                                    Talk(SAY_TRANSFORM_1);
+                                    me->SetPower(POWER_ENERGY, 0);
+                                    DoCast(me, SPELL_SCORPION_FORM, true);
+                                    DoCast(me, SPELL_FURY, true);
+                                }
+                            }                                
+                        }
+
+                        events.ScheduleEvent(EVENT_CHECK_PHASE, 1000);
+                        break;
+                    }
+                case EVENT_CAT_FORM:
+                    _currentPhase = PHASE_CAT;
+                    Talk(SAY_TRANSFORM_2);
+                    me->SetPower(POWER_ENERGY, 0);
+                    DoCast(me, SPELL_CAT_FORM, true);
+                    DoCast(me, SPELL_FURY, true);
+                    break;
+                case EVENT_SCORPION_FORM:
+                    _currentPhase = PHASE_SCORPION;
+                    Talk(SAY_TRANSFORM_1);
+                    me->SetPower(POWER_ENERGY, 0);
+                    DoCast(me, SPELL_SCORPION_FORM, true);
+                    DoCast(me, SPELL_FURY, true);
+                    break;
+                case EVENT_BERSERK:
+                    DoCast(me, SPELL_BERSERK);
+                    break;
+                }
             }
 
-            private:
-                uint8 _currentPhase;
-                uint32 _changePhaseNum;
-        };
+            DoMeleeAttackIfReady();
+        }
+    private:
+        uint8 _currentPhase;
+        uint32 _changePhaseNum;
+    };
 };
 
 class spell_staghelm_searing_seeds_aura : public SpellScriptLoader
 {
-    public:
-        spell_staghelm_searing_seeds_aura() : SpellScriptLoader("spell_staghelm_searing_seeds_aura") { }
+public:
+    spell_staghelm_searing_seeds_aura() : SpellScriptLoader("spell_staghelm_searing_seeds_aura") { }
 
-        class spell_staghelm_searing_seeds_aura_AuraScript : public AuraScript
+    class spell_staghelm_searing_seeds_aura_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_staghelm_searing_seeds_aura_AuraScript);
+
+        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
-            PrepareAuraScript(spell_staghelm_searing_seeds_aura_AuraScript);
-
-            void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-            {
-                Aura* aura = aurEff->GetBase();
-                uint32 duration = urand(3000, 45000);
-                aura->SetDuration(duration);
-                aura->SetMaxDuration(duration);
-            }
-
-            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                GetTarget()->CastSpell(GetTarget(), SPELL_SEARING_SEEDS_EXPLOSION, true);
-            }
-
-            void Register()
-            {
-                AfterEffectApply += AuraEffectApplyFn(spell_staghelm_searing_seeds_aura_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-                AfterEffectRemove += AuraEffectRemoveFn(spell_staghelm_searing_seeds_aura_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_staghelm_searing_seeds_aura_AuraScript();
+            Aura* aura = aurEff->GetBase();
+            uint32 duration = urand(3000, 45000);
+            aura->SetDuration(duration);
+            aura->SetMaxDuration(duration);
         }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            GetTarget()->CastSpell(GetTarget(), SPELL_SEARING_SEEDS_EXPLOSION, true);
+        }
+
+        void Register()
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_staghelm_searing_seeds_aura_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_staghelm_searing_seeds_aura_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_staghelm_searing_seeds_aura_AuraScript();
+    }
 };
 
 class spell_staghelm_burning_orbs : public SpellScriptLoader
 {
-    public:
-        spell_staghelm_burning_orbs() : SpellScriptLoader("spell_staghelm_burning_orbs") { }
+public:
+    spell_staghelm_burning_orbs() : SpellScriptLoader("spell_staghelm_burning_orbs") { }
 
-        class spell_staghelm_burning_orbs_SpellScript : public SpellScript
+    class spell_staghelm_burning_orbs_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_staghelm_burning_orbs_SpellScript);
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
         {
-            PrepareSpellScript(spell_staghelm_burning_orbs_SpellScript);
-
-            void HandleDummy(SpellEffIndex /*effIndex*/)
-            {
-                Unit* caster = GetCaster();
-                uint8 const orbsCount = (GetCaster()->GetMap()->GetSpawnMode() & 1) ? 5 : 2;
-                for (uint8 i = 0; i < orbsCount; ++i)
-                    caster->CastSpell(orbsPos[i].GetPositionX(), orbsPos[i].GetPositionY(), orbsPos[i].GetPositionZ(), SPELL_BURNING_ORBS_SUMMON, true);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_staghelm_burning_orbs_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_staghelm_burning_orbs_SpellScript();
+            Unit* caster = GetCaster();
+            uint8 const orbsCount = (GetCaster()->GetMap()->GetSpawnMode() & 1) ? 5 : 2;
+            for (uint8 i = 0; i < orbsCount; ++i)
+                caster->CastSpell(orbsPos[i].GetPositionX(), orbsPos[i].GetPositionY(), orbsPos[i].GetPositionZ(), SPELL_BURNING_ORBS_SUMMON, true);
         }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_staghelm_burning_orbs_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_staghelm_burning_orbs_SpellScript();
+    }
 };
 
 class spell_staghelm_concentration_aura : public SpellScriptLoader
 {
-    public:
-        spell_staghelm_concentration_aura() : SpellScriptLoader("spell_staghelm_concentration_aura") { }
+public:
+    spell_staghelm_concentration_aura() : SpellScriptLoader("spell_staghelm_concentration_aura") { }
 
-        class spell_staghelm_concentration_aura_AuraScript : public AuraScript
+    class spell_staghelm_concentration_aura_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_staghelm_concentration_aura_AuraScript);
+
+        void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
         {
-            PrepareAuraScript(spell_staghelm_concentration_aura_AuraScript);
+            if (!GetUnitOwner())
+                return;
 
-            void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
+            if (AuraEffect* aurEff = GetAura()->GetEffect(EFFECT_0))
             {
-                if (!GetUnitOwner())
+                int32 oldamount = GetUnitOwner()->GetPower(POWER_ALTERNATE_POWER);
+                int32 newamount = oldamount + 5;
+                if (newamount > 100)
+                    newamount = 100;
+
+                if (newamount == oldamount)
                     return;
 
-                if (AuraEffect* aurEff = GetAura()->GetEffect(EFFECT_0))
+                if (oldamount < 100 && newamount == 100)
                 {
-                    int32 oldamount = GetUnitOwner()->GetPower(POWER_ALTERNATE_POWER);
-                    int32 newamount = oldamount + 5;
-                    if (newamount > 100)
-                        newamount = 100;
-                    if (newamount == oldamount)
-                        return;
-
-                    if (oldamount < 100 && newamount == 100)
-                    {
-                        GetUnitOwner()->RemoveAura(SPELL_EPIC_CONCENTRATION);
-                        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_LEGENDARY_CONCENTRATION, true);
-                    }
-                    else if (oldamount < 75 && newamount >= 75)
-                    {
-                        GetUnitOwner()->RemoveAura(SPELL_RARE_CONCENTRATION);
-                        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_EPIC_CONCENTRATION, true);
-                    }
-                    else if (oldamount < 50 && newamount >= 50)
-                    {
-                        GetUnitOwner()->RemoveAura(SPELL_UNCOMMON_CONCENTRATION);
-                        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_RARE_CONCENTRATION, true);
-                    }
-                    else if (oldamount < 25 && newamount >= 25)
-                    {
-                        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_UNCOMMON_CONCENTRATION, true);
-                    }
-                    else if (newamount < 25)
-                    {
-                        GetUnitOwner()->RemoveAura(SPELL_LEGENDARY_CONCENTRATION);
-                        GetUnitOwner()->RemoveAura(SPELL_EPIC_CONCENTRATION);
-                        GetUnitOwner()->RemoveAura(SPELL_RARE_CONCENTRATION);
-                        GetUnitOwner()->RemoveAura(SPELL_UNCOMMON_CONCENTRATION);
-                    }
-                    GetUnitOwner()->SetPower(POWER_ALTERNATE_POWER, newamount);
+                    GetUnitOwner()->RemoveAura(SPELL_EPIC_CONCENTRATION);
+                    GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_LEGENDARY_CONCENTRATION, true);
                 }
+                else if (oldamount < 75 && newamount >= 75)
+                {
+                    GetUnitOwner()->RemoveAura(SPELL_RARE_CONCENTRATION);
+                    GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_EPIC_CONCENTRATION, true);
+                }
+                else if (oldamount < 50 && newamount >= 50)
+                {
+                    GetUnitOwner()->RemoveAura(SPELL_UNCOMMON_CONCENTRATION);
+                    GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_RARE_CONCENTRATION, true);
+                }
+                else if (oldamount < 25 && newamount >= 25)
+                {
+                    GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_UNCOMMON_CONCENTRATION, true);
+                }
+                else if (newamount < 25)
+                {
+                    GetUnitOwner()->RemoveAura(SPELL_LEGENDARY_CONCENTRATION);
+                    GetUnitOwner()->RemoveAura(SPELL_EPIC_CONCENTRATION);
+                    GetUnitOwner()->RemoveAura(SPELL_RARE_CONCENTRATION);
+                    GetUnitOwner()->RemoveAura(SPELL_UNCOMMON_CONCENTRATION);
+                }
+                GetUnitOwner()->SetPower(POWER_ALTERNATE_POWER, newamount);
             }
-
-            void Register()
-            {
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_staghelm_concentration_aura_AuraScript::HandlePeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_staghelm_concentration_aura_AuraScript();
         }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_staghelm_concentration_aura_AuraScript::HandlePeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_staghelm_concentration_aura_AuraScript();
+    }
 };
 
 void AddSC_boss_majordomo_staghelm()

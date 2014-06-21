@@ -54,9 +54,9 @@ enum Events
 const int area_dx = 44;
 const int area_dy = 51;
 
-const Position posJanalai = {-33.93f, 1149.27f, 19.0f, 0.0f};
+const Position posJanalai ={-33.93f, 1149.27f, 19.0f, 0.0f};
 
-const Position posFireWall[4] = 
+const Position posFireWall[4] =
 {
     {-33.89f, 1122.81f, 18.80f, 1.58f},
     {-10.28f, 1149.97f, 18.80f, 3.14f},
@@ -64,7 +64,7 @@ const Position posFireWall[4] =
     {-53.62f, 1150.03f, 18.80f, 0.00f}
 };
 
-const Position posHatchersWay[2][5] = 
+const Position posHatchersWay[2][5] =
 {
     {
         {-87.46f, 1170.09f, 6.0f, 0.0f},
@@ -124,430 +124,424 @@ const Position posEggs[36] =
 
 class boss_janalai : public CreatureScript
 {
-    public:
+public:
+    boss_janalai() : CreatureScript("boss_janalai") { }
 
-        boss_janalai() : CreatureScript("boss_janalai") {}
-        
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new boss_janalaiAI(pCreature);
+    }
+
+    struct boss_janalaiAI : public BossAI
+    {
+        boss_janalaiAI(Creature* pCreature) : BossAI(pCreature, DATA_JANALAI)
         {
-            return new boss_janalaiAI(pCreature);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
         }
 
-        struct boss_janalaiAI : public BossAI
+        bool bEnraged;
+
+        uint8 bombsCount;
+        uint64 FireBombsGUID[40];
+
+        void Reset()
         {
-            boss_janalaiAI(Creature* pCreature) : BossAI(pCreature, DATA_JANALAI)
+            _Reset();
+
+            for (uint8 i = 0; i < 36; ++i)
+                me->SummonCreature(NPC_EGG, posEggs[i], TEMPSUMMON_DEAD_DESPAWN);
+
+            memset(&FireBombsGUID, 0, sizeof(FireBombsGUID));
+            bombsCount = 0;
+            bEnraged = false;
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            _JustDied();
+            Talk(SAY_DEATH);
+        }
+
+        void KilledUnit(Unit* /*victim*/)
+        {
+            Talk(SAY_KILL);
+        }
+
+        void EnterCombat(Unit* /*who*/)
+        {
+            bEnraged = false;
+            Talk(SAY_AGGRO);
+            events.ScheduleEvent(EVENT_FLAME_BREATH, 7000);
+            events.ScheduleEvent(EVENT_SUMMON_HATCHERS, 13000);
+            events.ScheduleEvent(EVENT_TELEPORT, 55000);
+            DoZoneInCombat();
+            instance->SetBossState(DATA_JANALAI, IN_PROGRESS);
+        }
+
+        void Firewall()
+        {
+            for (uint8 i = 0; i < 4; i++)
             {
-                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
+                if (Creature* pTrigger = me->SummonCreature(NPC_WORLD_TRIGGER, posFireWall[i], TEMPSUMMON_TIMED_DESPAWN, 12000))
+                    pTrigger->CastSpell(pTrigger, SPELL_FIRE_WALL, true);
+            }
+        }
+
+        void SpawnBombs()
+        {
+            float dx, dy;
+            for (uint8 i = 0; i < 40; ++i)
+            {
+                dx = float(irand(-area_dx / 2, area_dx / 2));
+                dy = float(irand(-area_dy / 2, area_dy / 2));
+
+                if (Creature* pBomb = DoSpawnCreature(NPC_FIRE_BOMB, dx, dy, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
+                    FireBombsGUID[i] = pBomb->GetGUID();
+            }
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            EnterEvadeIfOutOfCombatArea(diff);
+
+            if (me->HealthBelowPct(35) && !bEnraged)
+            {
+                bEnraged = true;
+                Talk(SAY_35);
+                DoCast(me, SPELL_FRENZY, true);
+                events.CancelEvent(EVENT_SUMMON_HATCHERS);
+                DoCast(me, SPELL_HATCH_ALL);
+                return;
             }
 
-            bool bEnraged;
+            events.Update(diff);
 
-            uint8 bombsCount;
-            uint64 FireBombsGUID[40];
-
-            void Reset()
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                _Reset();
-
-                for (uint8 i = 0; i < 36; ++i)
-                    me->SummonCreature(NPC_EGG, posEggs[i], TEMPSUMMON_DEAD_DESPAWN);
-
-                memset(&FireBombsGUID, 0, sizeof(FireBombsGUID));
-                bombsCount = 0;
-                bEnraged = false;
-            }
-
-            void JustDied(Unit* /*killer*/)
-            {
-                _JustDied();
-                Talk(SAY_DEATH);
-            }
-
-            void KilledUnit(Unit* /*victim*/)
-            {
-                Talk(SAY_KILL);
-            }
-
-            void EnterCombat(Unit* /*who*/)
-            {
-                bEnraged = false;
-                Talk(SAY_AGGRO);
-                events.ScheduleEvent(EVENT_FLAME_BREATH, 7000);
-                events.ScheduleEvent(EVENT_SUMMON_HATCHERS, 13000);
-                events.ScheduleEvent(EVENT_TELEPORT, 55000);
-                DoZoneInCombat();
-                instance->SetBossState(DATA_JANALAI, IN_PROGRESS);
-            }
-
-            void Firewall()
-            {
-                for (uint8 i = 0; i < 4; i++)
+                switch (eventId)
                 {
-                    if (Creature* pTrigger = me->SummonCreature(NPC_WORLD_TRIGGER, posFireWall[i], TEMPSUMMON_TIMED_DESPAWN, 12000))
-                        pTrigger->CastSpell(pTrigger, SPELL_FIRE_WALL, true);
+                    case EVENT_FLAME_BREATH:
+                        me->SetReactState(REACT_PASSIVE);
+                        me->AttackStop();
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                            DoCast(pTarget, SPELL_FLAME_BREATH);
+                        events.ScheduleEvent(EVENT_CONTINUE, 3000);
+                        events.ScheduleEvent(EVENT_FLAME_BREATH, 9000);
+                        break;
+                    case EVENT_CONTINUE:
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        AttackStart(me->getVictim());
+                        break;
+                    case EVENT_SUMMON_HATCHERS:
+                        Talk(SAY_HATCHER);
+                        if (!summons.HasEntry(NPC_AMANISHI_HATCHER1))
+                            me->SummonCreature(NPC_AMANISHI_HATCHER1, posHatchersWay[0][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                        if (!summons.HasEntry(NPC_AMANISHI_HATCHER2))
+                            me->SummonCreature(NPC_AMANISHI_HATCHER2, posHatchersWay[1][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                        events.ScheduleEvent(EVENT_SUMMON_HATCHERS, 90000);
+                        break;
+                    case EVENT_SPAWN_BOMBS:
+                        me->SetReactState(REACT_PASSIVE);
+                        me->AttackStop();
+                        bombsCount = 0;
+                        Talk(SAY_FIRE_BOMB);
+                        SpawnBombs();
+                        events.ScheduleEvent(EVENT_SUMMON_BOMBS, 1000);
+                        break;
+                    case EVENT_SUMMON_BOMBS:
+                        if (bombsCount < 40)
+                        {
+                            if (Creature* pBomb = Creature::GetCreature(*me, FireBombsGUID[bombsCount]))
+                                DoCast(pBomb, SPELL_FIRE_BOMB_THROW, true);
+                            bombsCount++;
+                            events.ScheduleEvent(EVENT_SUMMON_BOMBS, 100);
+                        } else
+                            events.ScheduleEvent(EVENT_DETONATE_BOMBS, 2000);
+                        break;
+                    case EVENT_DETONATE_BOMBS:
+                        for (uint8 i = 0; i < 40; ++i)
+                        if (Creature* pBomb = Creature::GetCreature(*me, FireBombsGUID[i]))
+                        {
+                            pBomb->RemoveAllAuras();
+                            pBomb->CastSpell(pBomb, SPELL_FIRE_BOMB_DAMAGE, true);
+                        }
+                        events.ScheduleEvent(EVENT_CONTINUE, 1000);
+                        break;
+                    case EVENT_TELEPORT:
+                        me->SetReactState(REACT_PASSIVE);
+                        me->AttackStop();
+                        events.RescheduleEvent(EVENT_SUMMON_HATCHERS, events.GetNextEventTime(EVENT_SUMMON_HATCHERS) + 7000);
+                        events.RescheduleEvent(EVENT_FLAME_BREATH, events.GetNextEventTime(EVENT_FLAME_BREATH) + 7000);
+                        Firewall();
+                        DoCast(me, SPELL_TELE_TO_CENTER, true);
+                        events.ScheduleEvent(EVENT_SPAWN_BOMBS, 2000);
+                        break;
+
                 }
             }
 
-            void SpawnBombs()
-            {
-                float dx, dy;
-                for (uint8 i = 0; i < 40; ++i)
-                {
-                    dx = float(irand(-area_dx / 2, area_dx / 2));
-                    dy = float(irand(-area_dy / 2, area_dy / 2));
-
-                    if (Creature* pBomb = DoSpawnCreature(NPC_FIRE_BOMB, dx, dy, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
-                        FireBombsGUID[i] = pBomb->GetGUID();
-                }
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                EnterEvadeIfOutOfCombatArea(diff);
-                
-                if (me->HealthBelowPct(35) && !bEnraged)
-                {
-                    bEnraged = true;
-                    Talk(SAY_35);
-                    DoCast(me, SPELL_FRENZY, true);
-                    events.CancelEvent(EVENT_SUMMON_HATCHERS);
-                    DoCast(me, SPELL_HATCH_ALL);
-                    return;
-                }
-
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                     switch (eventId)
-                     {
-                        case EVENT_FLAME_BREATH:
-                            me->SetReactState(REACT_PASSIVE);
-                            me->AttackStop();
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                                DoCast(pTarget, SPELL_FLAME_BREATH);
-                            events.ScheduleEvent(EVENT_CONTINUE, 3000);
-                            events.ScheduleEvent(EVENT_FLAME_BREATH, 9000);
-                            break;
-                        case EVENT_CONTINUE:
-                            me->SetReactState(REACT_AGGRESSIVE);
-                            AttackStart(me->getVictim());
-                            break;
-                        case EVENT_SUMMON_HATCHERS:
-                            Talk(SAY_HATCHER);
-                            if (!summons.HasEntry(NPC_AMANISHI_HATCHER1))
-                                me->SummonCreature(NPC_AMANISHI_HATCHER1, posHatchersWay[0][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-                            if (!summons.HasEntry(NPC_AMANISHI_HATCHER2))
-                                me->SummonCreature(NPC_AMANISHI_HATCHER2, posHatchersWay[1][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-                            events.ScheduleEvent(EVENT_SUMMON_HATCHERS, 90000);
-                            break;
-                        case EVENT_SPAWN_BOMBS:
-                            me->SetReactState(REACT_PASSIVE);
-                            me->AttackStop();
-                            bombsCount = 0;
-                            Talk(SAY_FIRE_BOMB);
-                            SpawnBombs();
-                            events.ScheduleEvent(EVENT_SUMMON_BOMBS, 1000);
-                            break;
-                        case EVENT_SUMMON_BOMBS:
-                            if (bombsCount < 40)
-                            {
-                                if (Creature* pBomb = Creature::GetCreature(*me, FireBombsGUID[bombsCount]))
-                                    DoCast(pBomb, SPELL_FIRE_BOMB_THROW, true);
-                                bombsCount++;
-                                events.ScheduleEvent(EVENT_SUMMON_BOMBS, 100);
-                            }
-                            else
-                                events.ScheduleEvent(EVENT_DETONATE_BOMBS, 2000);
-                            break;
-                        case EVENT_DETONATE_BOMBS:
-                            for (uint8 i = 0; i < 40; ++i)
-                                if (Creature* pBomb = Creature::GetCreature(*me, FireBombsGUID[i]))
-                                {
-                                    pBomb->RemoveAllAuras();
-                                    pBomb->CastSpell(pBomb, SPELL_FIRE_BOMB_DAMAGE, true);
-                                }
-                            events.ScheduleEvent(EVENT_CONTINUE, 1000);
-                            break;
-                        case EVENT_TELEPORT:
-                            me->SetReactState(REACT_PASSIVE);
-                            me->AttackStop();
-                            events.RescheduleEvent(EVENT_SUMMON_HATCHERS, events.GetNextEventTime(EVENT_SUMMON_HATCHERS) + 7000);
-                            events.RescheduleEvent(EVENT_FLAME_BREATH, events.GetNextEventTime(EVENT_FLAME_BREATH) + 7000);
-                            Firewall();
-                            DoCast(me, SPELL_TELE_TO_CENTER, true);
-                            events.ScheduleEvent(EVENT_SPAWN_BOMBS, 2000);
-                            break;
-
-                     }
-                }
-
-                DoMeleeAttackIfReady();
-            }
-        };
+            DoMeleeAttackIfReady();
+        }
+    };
 };
 
 class npc_janalai_hatcher : public CreatureScript
 {
-    public:
-        npc_janalai_hatcher() : CreatureScript("npc_janalai_hatcher") {}
+public:
+    npc_janalai_hatcher() : CreatureScript("npc_janalai_hatcher") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_janalai_hatcherAI(pCreature);
+    }
+
+    struct npc_janalai_hatcherAI : public ScriptedAI
+    {
+        npc_janalai_hatcherAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            return new npc_janalai_hatcherAI(pCreature);
+            me->SetSpeed(MOVE_RUN, 0.8f);
+            me->SetReactState(REACT_PASSIVE);
+            pInstance = pCreature->GetInstanceScript();
         }
 
-        struct npc_janalai_hatcherAI : public ScriptedAI
+        InstanceScript* pInstance;
+
+        uint32 waypoint;
+        uint32 WaitTimer;
+
+        bool side;
+        bool hasChangedSide;
+        bool isHatching;
+
+        void Reset()
         {
-            npc_janalai_hatcherAI(Creature* pCreature) : ScriptedAI(pCreature)
+            side =(me->GetEntry() ==  24504);
+            waypoint = 0;
+            isHatching = false;
+            hasChangedSide = false;
+            WaitTimer = 1;
+        }
+        void MovementInform(uint32, uint32)
+        {
+            if (waypoint == 5)
             {
-                me->SetSpeed(MOVE_RUN, 0.8f);
-                me->SetReactState(REACT_PASSIVE);
-                pInstance = pCreature->GetInstanceScript();
-            }
-
-            InstanceScript* pInstance;
-
-            uint32 waypoint;
-            uint32 WaitTimer;
-
-            bool side;
-            bool hasChangedSide;
-            bool isHatching;
-
-            void Reset()
-            {
-                side =(me->GetEntry() ==  24504);
-                waypoint = 0;
-                isHatching = false;
-                hasChangedSide = false;
+                isHatching = true;
+                WaitTimer = 5000;
+            } else
                 WaitTimer = 1;
-            }
-            void MovementInform(uint32, uint32)
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!pInstance || !(pInstance->GetBossState(DATA_JANALAI) == IN_PROGRESS))
             {
-                if (waypoint == 5)
-                {
-                    isHatching = true;
-                    WaitTimer = 5000;
-                }
-                else
-                    WaitTimer = 1;
+                me->DespawnOrUnsummon();
+                return;
             }
 
-            void UpdateAI(const uint32 diff)
+            if (!isHatching)
             {
-                if (!pInstance || !(pInstance->GetBossState(DATA_JANALAI) == IN_PROGRESS))
+                if (WaitTimer)
                 {
-                    me->DespawnOrUnsummon();
-                    return;
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MovePoint(0, posHatchersWay[side][waypoint]);
+                    ++waypoint;
+                    WaitTimer = 0;
                 }
-
-                if (!isHatching)
+            } else
+            {
+                if (WaitTimer <= diff)
                 {
-                    if (WaitTimer)
+                    if (me->FindNearestCreature(NPC_EGG, 50.0f))
                     {
-                        me->GetMotionMaster()->Clear();
-                        me->GetMotionMaster()->MovePoint(0, posHatchersWay[side][waypoint]);
-                        ++waypoint;
-                        WaitTimer = 0;
-                    }
-                }
-                else
-                {
-                    if (WaitTimer <= diff)
+                        DoCast(SPELL_HATCH_EGG);
+                        WaitTimer = 6000;
+                    } else if (!hasChangedSide)
                     {
-                        if (me->FindNearestCreature(NPC_EGG, 50.0f))
-                        {
-                            DoCast(SPELL_HATCH_EGG);
-                            WaitTimer = 6000;
-                        }
-                        else if (!hasChangedSide)
-                        {
-                            side = side ? 0 : 1;
-                            isHatching = false;
-                            waypoint = 3;
-                            WaitTimer = 1;
-                            hasChangedSide = true;
-                        }
-                        else
-                            me->DespawnOrUnsummon();
+                        side = side ? 0 : 1;
+                        isHatching = false;
+                        waypoint = 3;
+                        WaitTimer = 1;
+                        hasChangedSide = true;
+                    } else
+                        me->DespawnOrUnsummon();
 
-                    } else WaitTimer -= diff;
-                }
+                } else WaitTimer -= diff;
             }
-        };
+        }
+    };
 };
 
 class npc_janalai_egg : public CreatureScript
 {
-    public:
-        npc_janalai_egg(): CreatureScript("npc_janalai_egg") {}
+public:
+    npc_janalai_egg() : CreatureScript("npc_janalai_egg") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_janalai_eggAI(pCreature);
+    }
+
+    struct npc_janalai_eggAI : public ScriptedAI
+    {
+        npc_janalai_eggAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            return new npc_janalai_eggAI(pCreature);
+            me->SetReactState(REACT_PASSIVE);
         }
 
-        struct npc_janalai_eggAI : public ScriptedAI
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
-            npc_janalai_eggAI(Creature* pCreature) : ScriptedAI(pCreature)
+            if (spell->Id == SPELL_HATCH_EGG || spell->Id == SPELL_HATCH_ALL)
             {
-                me->SetReactState(REACT_PASSIVE);
+                DoCast(SPELL_SUMMON_HATCHLING);
+                me->DespawnOrUnsummon();
             }
-
-            void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
-            {
-                if (spell->Id == SPELL_HATCH_EGG || spell->Id == SPELL_HATCH_ALL)
-                {
-                    DoCast(SPELL_SUMMON_HATCHLING);
-                    me->DespawnOrUnsummon();
-                }
-            }
-        };
+        }
+    };
 };
 
 class npc_janalai_firebomb : public CreatureScript
 {
-    public:
-        npc_janalai_firebomb() : CreatureScript("npc_janalai_firebomb") {}
+public:
+    npc_janalai_firebomb() : CreatureScript("npc_janalai_firebomb") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_janalai_firebombAI(pCreature);
+    }
+
+    struct npc_janalai_firebombAI : public ScriptedAI
+    {
+        npc_janalai_firebombAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            return new npc_janalai_firebombAI(pCreature);
+            me->SetReactState(REACT_PASSIVE);
         }
 
-        struct npc_janalai_firebombAI : public ScriptedAI
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
-            npc_janalai_firebombAI(Creature* pCreature) : ScriptedAI(pCreature)
+            if (spell->Id == SPELL_FIRE_BOMB_THROW)
             {
-                me->SetReactState(REACT_PASSIVE);
+                DoCast(me, SPELL_FIRE_BOMB_DUMMY, true);
             }
-
-            void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
-            {
-                if (spell->Id == SPELL_FIRE_BOMB_THROW)
-                {
-                    DoCast(me, SPELL_FIRE_BOMB_DUMMY, true);
-                }
-            }
-      };
+        }
+    };
 };
 
 class npc_janalai_hatchling : public CreatureScript
 {
-    public:
-        npc_janalai_hatchling() : CreatureScript("npc_janalai_hatchling")  {}
+public:
+    npc_janalai_hatchling() : CreatureScript("npc_janalai_hatchling") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_janalai_hatchlingAI(pCreature);
+    }
+
+    struct npc_janalai_hatchlingAI : public ScriptedAI
+    {
+        npc_janalai_hatchlingAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            return new npc_janalai_hatchlingAI(pCreature);
+            pInstance = pCreature->GetInstanceScript();
         }
 
-        struct npc_janalai_hatchlingAI : public ScriptedAI
+        InstanceScript* pInstance;
+        EventMap events;
+
+        void Reset()
         {
-            npc_janalai_hatchlingAI(Creature* pCreature) : ScriptedAI(pCreature)
+            events.Reset();
+            if (me->GetPositionY() > 1150)
+                me->GetMotionMaster()->MovePoint(0, posHatchersWay[0][3].GetPositionX()+rand()%4-2, 1150.0f+rand()%4-2, posHatchersWay[0][3].GetPositionZ());
+            else
+                me->GetMotionMaster()->MovePoint(0, posHatchersWay[1][3].GetPositionX()+rand()%4-2, 1150.0f+rand()%4-2, posHatchersWay[1][3].GetPositionZ());
+
+            //me->SetUnitMovementFlags(MOVEMENTFLAG_DISABLE_GRAVITY);
+        }
+
+        void EnterCombat(Unit* /*who*/)
+        {
+            events.ScheduleEvent(EVENT_FLAMEBUFFET, urand(7000, 15000));
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!pInstance || !(pInstance->GetBossState(DATA_JANALAI) == IN_PROGRESS))
             {
-                pInstance = pCreature->GetInstanceScript();
+                me->DisappearAndDie();
+                return;
             }
 
-            InstanceScript* pInstance;
-            EventMap events;
+            if (!UpdateVictim())
+                return;
 
-            void Reset()
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                events.Reset();
-                if (me->GetPositionY() > 1150)
-                    me->GetMotionMaster()->MovePoint(0, posHatchersWay[0][3].GetPositionX()+rand()%4-2, 1150.0f+rand()%4-2, posHatchersWay[0][3].GetPositionZ());
-                else
-                    me->GetMotionMaster()->MovePoint(0, posHatchersWay[1][3].GetPositionX()+rand()%4-2, 1150.0f+rand()%4-2, posHatchersWay[1][3].GetPositionZ());
-
-                //me->SetUnitMovementFlags(MOVEMENTFLAG_DISABLE_GRAVITY);
-            }
-
-            void EnterCombat(Unit* /*who*/) 
-            {
-                events.ScheduleEvent(EVENT_FLAMEBUFFET, urand(7000, 15000));
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-                if (!pInstance || !(pInstance->GetBossState(DATA_JANALAI) == IN_PROGRESS))
+                switch (eventId)
                 {
-                    me->DisappearAndDie();
-                    return;
+                    case EVENT_FLAMEBUFFET:
+                        DoCastVictim(SPELL_FLAMEBUFFET);
+                        break;
                 }
-
-                if (!UpdateVictim())
-                    return;
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                     switch (eventId)
-                     {
-                        case EVENT_FLAMEBUFFET:
-                            DoCastVictim(SPELL_FLAMEBUFFET);
-                            break;
-                     }
-                }
-
-                DoMeleeAttackIfReady();
             }
-        };
+
+            DoMeleeAttackIfReady();
+        }
+    };
 };
 
 class spell_janalai_flame_breath : public SpellScriptLoader
 {
-    public:
-        spell_janalai_flame_breath() : SpellScriptLoader("spell_janalai_flame_breath") { }
+public:
+    spell_janalai_flame_breath() : SpellScriptLoader("spell_janalai_flame_breath") { }
 
-        class spell_janalai_flame_breath_AuraScript : public AuraScript
+    class spell_janalai_flame_breath_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_janalai_flame_breath_AuraScript);
+
+        bool Load()
         {
-            PrepareAuraScript(spell_janalai_flame_breath_AuraScript);
-            
-            bool Load()
-            {
-                count = 0;
-                return true;
-            }
-
-            void PeriodicTick(AuraEffect const* aurEff)
-            {
-                if (!GetCaster())
-                    return;
-
-                count++;
-                Position pos;
-                GetCaster()->GetNearPosition(pos, 4.0f * count, 0.0f);
-                GetCaster()->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_FLAME_BREATH_1, true);
-            }
-
-            void Register()
-            {
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_janalai_flame_breath_AuraScript::PeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-            }
-
-        private:
-            uint8 count;
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_janalai_flame_breath_AuraScript();
+            count = 0;
+            return true;
         }
+
+        void PeriodicTick(AuraEffect const* aurEff)
+        {
+            if (!GetCaster())
+                return;
+
+            count++;
+            Position pos;
+            GetCaster()->GetNearPosition(pos, 4.0f * count, 0.0f);
+            GetCaster()->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), SPELL_FLAME_BREATH_1, true);
+        }
+
+        void Register()
+        {
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_janalai_flame_breath_AuraScript::PeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+        }
+
+    private:
+        uint8 count;
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_janalai_flame_breath_AuraScript();
+    }
 };
 
 void AddSC_boss_janalai()

@@ -32,7 +32,7 @@ enum Spells
 
 #define GOSSIP_ITEM_MORRIDUNE "Please port me to Darnassus"
 
-const Position HomePosition = {-815.817f, -145.299f, -25.870f, 0};
+const Position HomePosition ={-815.817f, -145.299f, -25.870f, 0};
 
 class go_blackfathom_altar : public GameObjectScript
 {
@@ -74,7 +74,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_blackfathom_deeps_eventAI (creature);
+        return new npc_blackfathom_deeps_eventAI(creature);
     }
 
     struct npc_blackfathom_deeps_eventAI : public ScriptedAI
@@ -140,40 +140,38 @@ public:
             {
                 case NPC_AKU_MAI_SNAPJAW:
                 {
-                    if (ravageTimer <= diff)
-                    {
-                        DoCastVictim(SPELL_RAVAGE);
-                        ravageTimer = urand(9000, 14000);
-                    } else ravageTimer -= diff;
-                    break;
+                                            if (ravageTimer <= diff)
+                                            {
+                                                DoCastVictim(SPELL_RAVAGE);
+                                                ravageTimer = urand(9000, 14000);
+                                            } else ravageTimer -= diff;
+                                            break;
                 }
                 case NPC_MURKSHALLOW_SOFTSHELL:
                 case NPC_BARBED_CRUSTACEAN:
                 {
-                    if (!Flee && HealthBelowPct(15))
-                    {
-                        Flee = true;
-                        me->DoFleeToGetAssistance();
-                    }
-                    break;
+                                              if (!Flee && HealthBelowPct(15))
+                                              {
+                                                  Flee = true;
+                                                  me->DoFleeToGetAssistance();
+                                              }
+                                              break;
                 }
                 case NPC_AKU_MAI_SERVANT:
                 {
-                    if (frostBoltVolleyTimer <= diff)
-                    {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                            DoCast(target, SPELL_FROST_BOLT_VOLLEY);
-                        frostBoltVolleyTimer = urand(5000, 8000);
-                    }
-                    else frostBoltVolleyTimer -= diff;
+                                            if (frostBoltVolleyTimer <= diff)
+                                            {
+                                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                                                    DoCast(target, SPELL_FROST_BOLT_VOLLEY);
+                                                frostBoltVolleyTimer = urand(5000, 8000);
+                                            } else frostBoltVolleyTimer -= diff;
 
-                    if (frostNovaTimer <= diff)
-                    {
-                        DoCastAOE(SPELL_FROST_NOVA, false);
-                        frostNovaTimer = urand(25000, 30000);
-                    }
-                    else frostNovaTimer -= diff;
-                    break;
+                                            if (frostNovaTimer <= diff)
+                                            {
+                                                DoCastAOE(SPELL_FROST_NOVA, false);
+                                                frostNovaTimer = urand(25000, 30000);
+                                            } else frostNovaTimer -= diff;
+                                            break;
                 }
             }
 
@@ -183,8 +181,8 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             if (me->isSummon()) //we are not a normal spawn.
-                if (instance)
-                    instance->SetData(DATA_EVENT, instance->GetData(DATA_EVENT) + 1);
+            if (instance)
+                instance->SetData(DATA_EVENT, instance->GetData(DATA_EVENT) + 1);
         }
     };
 };
@@ -223,7 +221,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_morriduneAI (creature);
+        return new npc_morriduneAI(creature);
     }
 
     struct npc_morriduneAI : public npc_escortAI

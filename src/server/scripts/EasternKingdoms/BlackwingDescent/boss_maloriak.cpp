@@ -1,5 +1,5 @@
-#include"ScriptPCH.h"
-#include"Spell.h"
+#include "ScriptPCH.h"
+#include "Spell.h"
 #include "GameObjectAI.h"
 #include "blackwing_descent.h"
 
@@ -27,7 +27,6 @@ enum Spells
     SPELL_FROST_IMBUED              = 78895,
     SPELL_THROW_GREEN_BOTTLE_A      = 77937,
     SPELL_THROW_GREEN_BOTTLE_B      = 77938,
-    SPELL_THROW_BLACK_BOTTLE_A      = 92831,
     SPELL_THROW_BLACK_BOTTLE_B      = 92837,
     SPELL_DRINK_BLACK_BOTTLE        = 92828,
     SPELL_DARK_IMBUED               = 92716,
@@ -135,11 +134,9 @@ enum Others
     DATA_TRAPPED_PLAYER = 1,
 };
 
-const Position maloriakHomePos = 
-{-105.826f, -470.104f, 73.45f, 1.67f};
+const Position maloriakHomePos =  {-105.826f, -470.104f, 73.45f, 1.67f};
 
-const Position maloriakGreenPos = 
-{-106.61f, -437.49f, 73.40f, 4.70f};
+const Position maloriakGreenPos = {-106.61f, -437.49f, 73.40f, 4.70f};
 
 const Position aberrationPos[2] = 
 {
@@ -215,7 +212,7 @@ public:
             else
                 events.ScheduleEvent(EVENT_FIRE_PHASE, 15000);
             events.ScheduleEvent(EVENT_ARCANE_STORM, 10000);
-            events.ScheduleEvent(EVENT_BERSERK, IsHeroic()? 9*MINUTE*IN_MILLISECONDS : 7*MINUTE*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_BERSERK, IsHeroic()? 9 * MINUTE * IN_MILLISECONDS : 7 * MINUTE * IN_MILLISECONDS);
             Talk(SAY_AGGRO);
             DoZoneInCombat();
             if (IsHeroic())
@@ -340,21 +337,21 @@ public:
                 case EVENT_FIRE_PHASE:
                     me->SetReactState(REACT_PASSIVE);
                     EventDarkSkills(false);
-                    if (GameObject* pGo = me->FindNearestGameObject(203306, 300.0f))
+                    if (GameObject* pGo = me->FindNearestGameObject(GO_LABROMM_CAULDRON01, 300.0f))
                         me->CastSpell(pGo, SPELL_THROW_RED_BOTTLE_A, false);
                     me->GetMotionMaster()->MovePoint(POINT_FIRE, maloriakHomePos);
                     break;
                 case EVENT_FROST_PHASE:
                     me->SetReactState(REACT_PASSIVE);
                     EventFireSkills(false);
-                    if (GameObject* pGo = me->FindNearestGameObject(203306, 300.0f))
+                    if (GameObject* pGo = me->FindNearestGameObject(GO_LABROMM_CAULDRON01, 300.0f))
                         me->CastSpell(pGo, SPELL_THROW_BLUE_BOTTLE_A, false);
                     me->GetMotionMaster()->MovePoint(POINT_FROST, maloriakHomePos);
                     break;
                 case EVENT_GREEN_PHASE:
                     me->SetReactState(REACT_PASSIVE);
                     EventFrostSkills(false);
-                    if (GameObject* pGo = me->FindNearestGameObject(203306, 300.0f))
+                    if (GameObject* pGo = me->FindNearestGameObject(GO_LABROMM_CAULDRON01, 300.0f))
                         me->CastSpell(pGo, SPELL_THROW_GREEN_BOTTLE_A, false);
                     me->GetMotionMaster()->MovePoint(POINT_GREEN, maloriakHomePos);
                     break;
@@ -452,7 +449,6 @@ public:
                 DoMeleeAttackIfReady();
         }
     private:
-
         void EventFireSkills(bool on)
         {
             if (on)
@@ -857,8 +853,7 @@ public:
         EventMap events;
 
         void Reset()
-        {
-        }
+        { }
 
         void EnterCombat(Unit* who)
         {
@@ -883,7 +878,6 @@ public:
                     break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -929,7 +923,7 @@ public:
         if (!obj->ToGameObject())
             return true;
 
-        return (obj->ToGameObject()->GetEntry() != 206704);
+        return (obj->ToGameObject()->GetEntry() != GO_GROWTH_CHAMBER);
     }
 };
 
@@ -952,7 +946,6 @@ class spell_maloriak_release_aberrations : public SpellScriptLoader
 {
 public:
     spell_maloriak_release_aberrations() : SpellScriptLoader("spell_maloriak_release_aberrations") { }
-
 
     class spell_maloriak_release_aberrations_SpellScript : public SpellScript
     {
@@ -1021,7 +1014,6 @@ class spell_maloriak_release_all_minions : public SpellScriptLoader
 public:
     spell_maloriak_release_all_minions() : SpellScriptLoader("spell_maloriak_release_all_minions") { }
 
-
     class spell_maloriak_release_all_minions_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_maloriak_release_all_minions_SpellScript);
@@ -1035,7 +1027,7 @@ public:
             {
                 std::list<WorldObject*> tempGos;
                 for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                    if ((*itr)->GetEntry() == 206705)
+                    if ((*itr)->GetEntry() == GO_LARGE_GROWTH_CHAMBER)
                         tempGos.push_back((*itr));
 
                 targets.remove_if(GoCheck());
@@ -1058,9 +1050,9 @@ public:
             if (!GetCaster() || !GetHitGObj() || effIndex != EFFECT_0)
                 return;
 
-            if (GetHitGObj()->GetEntry() == 206704)
+            if (GetHitGObj()->GetEntry() == GO_GROWTH_CHAMBER)
                 GetCaster()->SummonCreature(NPC_ABERRATION, (GetHitGObj()->GetPositionX() < -100.0f? aberrationPos[0]: aberrationPos[1]), TEMPSUMMON_CORPSE_DESPAWN);
-            else if (GetHitGObj()->GetEntry() == 206705)
+            else if (GetHitGObj()->GetEntry() == GO_LARGE_GROWTH_CHAMBER)
                 GetCaster()->SummonCreature(NPC_PRIME_SUBJECT, (GetHitGObj()->GetPositionX() < -100.0f? aberrationPos[0]: aberrationPos[1]), TEMPSUMMON_CORPSE_DESPAWN); 
         }
 
@@ -1089,7 +1081,6 @@ class spell_maloriak_debilitating_slime : public SpellScriptLoader
 public:
     spell_maloriak_debilitating_slime() : SpellScriptLoader("spell_maloriak_debilitating_slime") { }
 
-
     class spell_maloriak_debilitating_slime_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_maloriak_debilitating_slime_SpellScript);
@@ -1115,7 +1106,6 @@ class spell_maloriak_shatter : public SpellScriptLoader
 {
 public:
     spell_maloriak_shatter() : SpellScriptLoader("spell_maloriak_shatter") { }
-
 
     class spell_maloriak_shatter_SpellScript : public SpellScript
     {
@@ -1200,7 +1190,6 @@ class spell_maloriak_drink_bottle : public SpellScriptLoader
 {
 public:
     spell_maloriak_drink_bottle() : SpellScriptLoader("spell_maloriak_drink_bottle") { }
-
 
     class spell_maloriak_drink_bottle_SpellScript : public SpellScript
     {

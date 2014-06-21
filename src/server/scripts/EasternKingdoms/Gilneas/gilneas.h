@@ -17,6 +17,11 @@
 #include "SpellInfo.h"
 #include "Vehicle.h"
 #include "Language.h"
+
+#include "WorldSession.h"
+#include "Language.h"
+#include "Group.h"
+
 #include <math.h>
 
 #ifndef DEF_GILNEAS_H
@@ -1153,6 +1158,8 @@ static float LiamPosition[3] ={-1920.43f, 2308.94f, 40.301f};
 #define PATHS_COUNT                                       2
 #define DOOR_TIMER                                        30 * IN_MILLISECONDS
 #define Gilneas2                                          654
+
+//bool ru = player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU;
 
 const char* GossipMenu[]=
 {

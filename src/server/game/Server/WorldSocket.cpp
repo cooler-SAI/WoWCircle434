@@ -816,11 +816,11 @@ int WorldSocket::HandleSendAuthSession()
     WorldPacket packet(SMSG_AUTH_CHALLENGE, 37);
     BigNumber seed1;
     seed1.SetRand(16 * 8);
-    packet.append(seed1.AsByteArray(16).get(), 16);               // new encryption seeds
+    packet.append(seed1.AsByteArray(16), 16);               // new encryption seeds
 
     BigNumber seed2;
     seed2.SetRand(16 * 8);
-    packet.append(seed2.AsByteArray(16).get(), 16);               // new encryption seeds
+    packet.append(seed2.AsByteArray(16), 16);               // new encryption seeds
 
     packet << m_Seed;
     packet << uint8(1);
@@ -891,37 +891,26 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         return -1;
     }
 
+    // Get the account information from the Authserver database
+    std::string safe_account = account; // Duplicate, else will screw the SHA hash verification below
+    LoginDatabase.EscapeString(safe_account);
+    // No SQL injection, username escaped.
 
-        // Get the account information from the realmd database
-    //         0           1        2       3          4         5       6          7   8
-    // SELECT id, sessionkey, last_ip, locked, expansion, mutetime, locale, recruiter, os FROM account WHERE username = ?
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(account.find('#') == std::string::npos ? LOGIN_SEL_ACCOUNT_INFO_BY_NAME : LOGIN_SEL_ACCOUNT_INFO_BY_BNET);
-
-    stmt->setString(0, account);
-
-
-    PreparedQueryResult result = LoginDatabase.Query(stmt);
-
-    //// Get the account information from the Authserver database
-    //std::string safe_account = account; // Duplicate, else will screw the SHA hash verification below
-    //LoginDatabase.EscapeString(safe_account);
-    //// No SQL injection, username escaped.
-
-    //QueryResult result = LoginDatabase.PQuery ("SELECT "
-    //                            "id, "                      //0
-    //                            "sessionkey, "              //1
-    //                            "last_ip, "                 //2
-    //                            "locked, "                  //3
-    //                            "v, "                       //4
-    //                            "s, "                       //5
-    //                            "expansion, "               //6
-    //                            "mutetime, "                //7
-    //                            "locale, "                  //8
-    //                            "recruiter,"                //9
-    //                            "os "                       //10
-    //                            "FROM account "
-    //                            "WHERE username = '%s'",
-    //                            safe_account.c_str ());
+    QueryResult result = LoginDatabase.PQuery ("SELECT "
+                                "id, "                      //0
+                                "sessionkey, "              //1
+                                "last_ip, "                 //2
+                                "locked, "                  //3
+                                "v, "                       //4
+                                "s, "                       //5
+                                "expansion, "               //6
+                                "mutetime, "                //7
+                                "locale, "                  //8
+                                "recruiter,"                //9
+                                "os "                       //10
+                                "FROM account "
+                                "WHERE username = '%s'",
+                                safe_account.c_str ());
 
     // Stop if the account is not found
     if (!result)
@@ -988,12 +977,14 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     std::string os = fields[10].GetString();
 
     // Checks gmlevel per Realm
-    stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_GMLEVEL_BY_REALMID);
-
-    stmt->setUInt32(0, id);
-    stmt->setInt32(1, int32(realmID));
-
-    result = LoginDatabase.Query(stmt);
+    result =
+    LoginDatabase.PQuery ("SELECT "
+                              "gmlevel "             //0
+                              "FROM account_access "
+                              "WHERE id = '%d'"
+                              " AND (RealmID = '%d'"
+                              " OR RealmID = '-1')",
+                              id, realmID);
 
     if (!result)
         security = 0;
@@ -1004,12 +995,13 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     }
 
     // Re-check account ban (same check as in Authserver)
-    stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_BANS);
-
-    stmt->setUInt32(0, id);
-    stmt->setString(1, GetRemoteAddress());
-
-    PreparedQueryResult banresult = LoginDatabase.Query(stmt);
+    QueryResult banresult = LoginDatabase.PQuery("SELECT "
+                                "bandate, "
+                                "unbandate "
+                                "FROM account_banned "
+                                "WHERE id = '%u' "
+                                "AND active = 1",
+                                id);
 
     if (banresult) // if account banned
     {
@@ -1092,12 +1084,13 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     // Update the last_ip in the database
     // No SQL injection, username escaped.
-    stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LAST_IP);
+    LoginDatabase.EscapeString(address);
 
-    stmt->setString(0, address);
-    stmt->setString(1, account);
-
-    LoginDatabase.Execute(stmt);
+    LoginDatabase.PExecute("UPDATE account "
+                            "SET last_ip = '%s' "
+                            "WHERE username = '%s'",
+                            address.c_str(),
+                            safe_account.c_str());
 
     // NOTE ATM the socket is single-threaded, have this in mind ...
     ACE_NEW_RETURN(m_Session, WorldSession(id, this, AccountTypes(security), isPremium, expansion, mutetime, locale, recruiter, isRecruiter), -1);

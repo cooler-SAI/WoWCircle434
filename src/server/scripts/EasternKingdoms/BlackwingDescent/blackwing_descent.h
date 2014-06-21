@@ -51,6 +51,14 @@ enum GOs
 {
     GO_INNER_CHAMBER_DOOR           = 205830,
     GO_NEFARIAN_FLOOR               = 207834,
+    GO_LABROMM_CAULDRON01           = 203306,
+    GO_GROWTH_CHAMBER               = 206704,
+    GO_LARGE_GROWTH_CHAMBER         = 206705,
+};
+
+enum sharedSpells
+{
+    SPELL_THROW_BLACK_BOTTLE_A      = 92831,
 };
 
 enum NefariusActions

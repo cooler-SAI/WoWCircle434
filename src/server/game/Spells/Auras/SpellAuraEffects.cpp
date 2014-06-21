@@ -8219,6 +8219,7 @@ void AuraEffect::HandleAuraProgressBar(AuraApplication const* aurApp, uint8 mode
             case 93103: //Cho'gall Corruption
             case 78949: // Onyxia Discharge - target is same as caster.
             case 98229: // Majordomo Heroic Concentration
+            case 106843:
                 target->SetPower(POWER_ALTERNATE_POWER, 0);
                 target->SetMaxPower(POWER_ALTERNATE_POWER, 100);
                 break;

@@ -32,8 +32,7 @@ void SummonList::DoAction(uint32 entry, int32 info)
     {
         Creature* summon = Unit::GetCreature(*me, *i);
         ++i;
-        if (summon && summon->IsAIEnabled
-            && (!entry || summon->GetEntry() == entry))
+        if (summon && summon->IsAIEnabled && (!entry || summon->GetEntry() == entry))
             summon->AI()->DoAction(info);
     }
 }
@@ -44,8 +43,7 @@ void SummonList::DoZoneInCombat(uint32 entry)
     {
         Creature* summon = Unit::GetCreature(*me, *i);
         ++i;
-        if (summon && summon->IsAIEnabled
-            && (!entry || summon->GetEntry() == entry))
+        if (summon && summon->IsAIEnabled && (!entry || summon->GetEntry() == entry))
             summon->AI()->DoZoneInCombat();
     }
 }
@@ -109,11 +107,7 @@ bool SummonList::HasEntry(uint32 entry)
     return false;
 }
 
-ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature),
-    me(creature),
-    IsFleeing(false),
-    _evadeCheckCooldown(2500),
-    _isCombatMovementAllowed(true)
+ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature), me(creature), IsFleeing(false), _evadeCheckCooldown(2500), _isCombatMovementAllowed(true)
 {
     _isHeroic = me->GetMap()->IsHeroic();
     _difficulty = Difficulty(me->GetMap()->GetSpawnMode());
@@ -478,11 +472,8 @@ void Scripted_NoMovementAI::AttackStart(Unit* target)
 
 // BossAI - for instanced bosses
 
-BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
-    instance(creature->GetInstanceScript()),
-    summons(creature),
-    _boundary(instance ? instance->GetBossBoundary(bossId) : NULL),
-    _bossId(bossId)
+BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature), instance(creature->GetInstanceScript()), summons(creature),
+    _boundary(instance ? instance->GetBossBoundary(bossId) : NULL), _bossId(bossId)
 {
     _checkareaTimer = 1000;
 }
@@ -616,9 +607,7 @@ void BossAI::UpdateAI(uint32 const diff)
 
 // WorldBossAI - for non-instanced bosses
 
-WorldBossAI::WorldBossAI(Creature* creature) :
-    ScriptedAI(creature),
-    summons(creature)
+WorldBossAI::WorldBossAI(Creature* creature) : ScriptedAI(creature), summons(creature)
 {
 }
 

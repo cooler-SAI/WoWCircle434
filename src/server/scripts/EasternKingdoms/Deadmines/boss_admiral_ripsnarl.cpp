@@ -21,7 +21,7 @@ enum Spells
     SPELL_RIPSNARLS_FOG_AURA            = 89247,
     SPELL_RIPSNARL_ACHIEVEMENT          = 95647,
     SPELL_RIPSNARL_CANCEL_ACHIEVEMENT   = 95648,
-    
+
     SPELL_FOG_1                         = 88768,
     SPELL_FOG_2                         = 88755,
 
@@ -49,7 +49,7 @@ enum Spells
 
 enum Adds
 {
-    NPC_VAPOR   = 47714, 
+    NPC_VAPOR   = 47714,
     NPC_DUMMY_2 = 45979, // 88755
     NPC_DUMMY_1 = 47242, // 88768
 };
@@ -68,17 +68,17 @@ enum Events
 
 #define ACTION_COALESCE 1
 
-const Position dummyPos[38] = 
+const Position dummyPos[38] =
 {
     {-62.6927f, -814.031f, 41.3843f},
     {-67.6128f, -814.219f, 40.944f},
     {-68.1302f, -822.918f, 40.888f},
     {-62.6597f, -823.653f, 41.4015f},
-    {-56.901f, -818.264f, 41.954f},
-    {-72.9931f, -825.99f, 40.4834f},
-    {-68.934f, -829.365f, 40.8772f},
+    {-56.901f,  -818.264f, 41.954f},
+    {-72.9931f, -825.99f,  40.4834f},
+    {-68.934f,  -829.365f, 40.8772f},
     {-60.9792f, -835.979f, 41.5982f},
-    {-65.401f, -833.352f, 41.2017f},
+    {-65.401f,  -833.352f, 41.2017f},
     {-56.9514f, -832.986f, 41.9731f},
     {-53.2882f, -810.453f, 42.2844f},
     {-73.9705f, -819.941f, 40.3588f},
@@ -94,7 +94,7 @@ const Position dummyPos[38] =
     {-82.5642f, -830.498f, 39.7044f},
     {-47.6163f, -808.856f, 42.8273f},
     {-55.0469f, -805.922f, 42.1087f},
-    {-60.0f, -807.571f, 41.6455f},
+    {-60.0f,    -807.571f, 41.6455f},
     {-66.6615f, -805.149f, 41.0334f},
     {-72.8733f, -808.346f, 40.4807f},
     {-79.3229f, -806.665f, 39.93f},
@@ -103,319 +103,309 @@ const Position dummyPos[38] =
     {-101.122f, -813.936f, 38.2438f},
     {-104.384f, -819.276f, 38.0203f},
     {-101.174f, -824.677f, 38.2535f},
-    {-99.684f, -818.974f, 38.3542f},
+    {-99.684f,  -818.974f, 38.3542f},
     {-95.3628f, -828.319f, 38.6867f},
-    {-88.1024f, -831.63f, 39.2559f},
+    {-88.1024f, -831.63f,  39.2559f},
     {-79.2431f, -834.884f, 39.9758f},
-    {-70.941f, -835.523f, 40.6859f}
+    {-70.941f,  -835.523f, 40.6859f}
 };
 
 class boss_admiral_ripsnarl : public CreatureScript
 {
-    public:
-        boss_admiral_ripsnarl() : CreatureScript("boss_admiral_ripsnarl") { }
+public:
+    boss_admiral_ripsnarl() : CreatureScript("boss_admiral_ripsnarl") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new boss_admiral_ripsnarlAI(pCreature);
+    }
+
+    struct boss_admiral_ripsnarlAI : public BossAI
+    {
+        boss_admiral_ripsnarlAI(Creature* pCreature) : BossAI(pCreature, DATA_ADMIRAL)
         {
-            return new boss_admiral_ripsnarlAI (pCreature);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
+            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
+            me->setActive(true);
         }
 
-        struct boss_admiral_ripsnarlAI : public BossAI
+        void Reset()
         {
-            boss_admiral_ripsnarlAI(Creature* pCreature) : BossAI(pCreature, DATA_ADMIRAL)
+            _Reset();
+
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->SetVisible(true);
+
+            stage = 0;
+            SetFog(false);
+        }
+
+        void SetFog(bool enabled)
+        {
+            std::list<Creature*> dummies;
+            GetCreatureListWithEntryInGrid(dummies, me, NPC_DUMMY_1, 75);
+            for (std::list<Creature*>::const_iterator itr = dummies.begin(); itr != dummies.end(); ++itr)
+                if (enabled)
+                    (*itr)->CastSpell(*itr, SPELL_FOG_1, true);
+                else
+                    (*itr)->RemoveAurasDueToSpell(SPELL_FOG_1);
+
+            std::list<Creature*> bigDummies;
+            GetCreatureListWithEntryInGrid(bigDummies, me, NPC_DUMMY_2, 75);
+            for (std::list<Creature*>::const_iterator itr = bigDummies.begin(); itr != bigDummies.end(); ++itr)
+                if (enabled)
+                    (*itr)->CastSpell(*itr, SPELL_FOG_2, true);
+                else
+                    (*itr)->RemoveAurasDueToSpell(SPELL_FOG_2);
+        }
+
+        void EnterCombat(Unit* who)
+        {
+            Talk(SAY_AGGRO);
+
+            events.ScheduleEvent(EVENT_SWIPE, urand(5000, 10000));
+            if (IsHeroic())
+                events.ScheduleEvent(EVENT_GO_FOR_THE_THROAT, urand(5000, 10000));
+
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RIPSNARL_ACHIEVEMENT);
+            instance->DoResetAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, ACHIEVEMENT_CRITERIA_CONDITION_UNK13, 28179);
+            DoZoneInCombat();
+            SetFog(false);
+            instance->SetBossState(DATA_ADMIRAL, IN_PROGRESS);
+        }
+
+        void KilledUnit(Unit * victim)
+        {
+            if (victim && victim->GetTypeId() == TYPEID_PLAYER)
+                Talk(SAY_KILL);
+        }
+
+        void JustDied(Unit* killer)
+        {
+            _JustDied();
+            Talk(SAY_DEATH);
+            SetFog(false);
+
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RIPSNARL_ACHIEVEMENT);
+        }
+
+        void DoAction(const int32 action)
+        {
+            if (action == ACTION_COALESCE)
+                DoCastAOE(SPELL_RIPSNARL_ACHIEVEMENT);
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            if (me->HealthBelowPct(75) && stage == 0)
             {
-                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-                me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-                me->setActive(true);
+                stage = 1;
+                EnterSpecialPhase();
+                for (uint8 i = 0; i < 38; i++)
+                    me->SummonCreature(NPC_DUMMY_1, dummyPos[i]);
+                events.ScheduleEvent(EVENT_SUMMON_VAPOR, 5000);
+                SetFog(true);
+                return;
+            } else if (me->HealthBelowPct(50) && stage == 1)
+            {
+                stage = 2;
+                EnterSpecialPhase();
+                return;
+            } else if (me->HealthBelowPct(25) && stage == 2)
+            {
+                stage = 3;
+                EnterSpecialPhase();
+                me->SummonCreature(NPC_DUMMY_2, centershipPos);
+                return;
+            } else if (IsHeroic() && me->HealthBelowPct(10) && stage == 3)
+            {
+                stage = 4;
+                for (uint8 i = 0; i < 3; i++)
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        DoCast(target, SPELL_VAPOR_SUMMON);
+                return;
             }
 
-            void Reset()
+            if (uint32 eventId = events.ExecuteEvent())
             {
-                _Reset();
-
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->SetVisible(true);
-
-                stage = 0;
-                SetFog(false);
-            }
-
-            void SetFog(bool enabled)
-            {
-                std::list<Creature*> dummies;
-                GetCreatureListWithEntryInGrid(dummies, me, NPC_DUMMY_1, 75);
-                for (std::list<Creature*>::const_iterator itr = dummies.begin(); itr != dummies.end(); ++itr)
-                    if (enabled)
-                        (*itr)->CastSpell(*itr, SPELL_FOG_1, true);
-                    else
-                        (*itr)->RemoveAurasDueToSpell(SPELL_FOG_1);
-
-                std::list<Creature*> bigDummies;
-                GetCreatureListWithEntryInGrid(bigDummies, me, NPC_DUMMY_2, 75);
-                for (std::list<Creature*>::const_iterator itr = bigDummies.begin(); itr != bigDummies.end(); ++itr)
-                    if (enabled)
-                        (*itr)->CastSpell(*itr, SPELL_FOG_2, true);
-                    else
-                        (*itr)->RemoveAurasDueToSpell(SPELL_FOG_2);
-            }
-
-            void EnterCombat(Unit* who) 
-            {
-                Talk(SAY_AGGRO);
-
-                events.ScheduleEvent(EVENT_SWIPE, urand(5000, 10000));
-                if (IsHeroic())
-                    events.ScheduleEvent(EVENT_GO_FOR_THE_THROAT, urand(5000, 10000));
-
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RIPSNARL_ACHIEVEMENT);
-                instance->DoResetAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, ACHIEVEMENT_CRITERIA_CONDITION_UNK13, 28179);
-                DoZoneInCombat();
-                SetFog(false);
-                instance->SetBossState(DATA_ADMIRAL, IN_PROGRESS);
-            }
-
-            void KilledUnit(Unit * victim)
-            {
-                if (victim && victim->GetTypeId() == TYPEID_PLAYER)
-                    Talk(SAY_KILL);
-            }
-
-            void JustDied(Unit* killer)
-            {
-                _JustDied();
-                Talk(SAY_DEATH);
-                SetFog(false);
-
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_RIPSNARL_ACHIEVEMENT);
-            }
-
-            void DoAction(const int32 action)
-            {
-                if (action == ACTION_COALESCE)
-                    DoCastAOE(SPELL_RIPSNARL_ACHIEVEMENT);
-            }
-
-            void UpdateAI(const uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                if (me->HealthBelowPct(75) && stage == 0)
+                switch (eventId)
                 {
-                    stage = 1;
-                    EnterSpecialPhase();
-                    for (uint8 i = 0; i < 38; i++)
-                        me->SummonCreature(NPC_DUMMY_1, dummyPos[i]);
-                    events.ScheduleEvent(EVENT_SUMMON_VAPOR, 5000);
-                    SetFog(true);
-                    return;
-                }
-                else if (me->HealthBelowPct(50) && stage == 1)
-                {
-                    stage = 2;
-                    EnterSpecialPhase();
-                    return;
-                }
-                else if (me->HealthBelowPct(25) && stage == 2)
-                {
-                    stage = 3;
-                    EnterSpecialPhase();
-                    me->SummonCreature(NPC_DUMMY_2, centershipPos);
-                    return;
-                }
-                else if (IsHeroic() && me->HealthBelowPct(10) && stage == 3)
-                {
-                    stage = 4;
-                    for (uint8 i = 0; i < 3; i++)
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                            DoCast(target, SPELL_VAPOR_SUMMON);
-                    return;
-                }
+                case EVENT_SWIPE:
+                    DoCast(me->getVictim(), SPELL_SWIPE);
+                    events.ScheduleEvent(EVENT_SWIPE, urand(8000, 10000));
+                    break;
+                case EVENT_CONTINUE:
+                    me->SetVisible(true);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    if (IsHeroic())
+                        events.ScheduleEvent(EVENT_GO_FOR_THE_THROAT, urand(5000, 10000));
 
-                if (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                     {
-                        case EVENT_SWIPE:
-                            DoCast(me->getVictim(), SPELL_SWIPE);
-                            events.ScheduleEvent(EVENT_SWIPE, urand(8000, 10000));
-                            break;
-                        case EVENT_CONTINUE:
-                            me->SetVisible(true);
-                            me->SetReactState(REACT_AGGRESSIVE);
-                            if (IsHeroic())
-                                events.ScheduleEvent(EVENT_GO_FOR_THE_THROAT, urand(5000, 10000));
-                            
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                            {
-                                AttackStart(pTarget);
-                                DoCast(pTarget, SPELL_GO_FOR_THE_THROAT);
-                            }
-                            break;
-                        case EVENT_GO_FOR_THE_THROAT:
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                                DoCast(pTarget, SPELL_GO_FOR_THE_THROAT);
-                            events.ScheduleEvent(EVENT_GO_FOR_THE_THROAT, urand(10000, 20000));
-                            break;
-                        case EVENT_SUMMON_VAPOR:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0, true))
-                                DoCast(target, SPELL_VAPOR_SUMMON);
-                            events.ScheduleEvent(EVENT_SUMMON_VAPOR, 5000);
-                            break;
+                        AttackStart(pTarget);
+                        DoCast(pTarget, SPELL_GO_FOR_THE_THROAT);
                     }
+                    break;
+                case EVENT_GO_FOR_THE_THROAT:
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        DoCast(pTarget, SPELL_GO_FOR_THE_THROAT);
+                    events.ScheduleEvent(EVENT_GO_FOR_THE_THROAT, urand(10000, 20000));
+                    break;
+                case EVENT_SUMMON_VAPOR:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0, true))
+                        DoCast(target, SPELL_VAPOR_SUMMON);
+                    events.ScheduleEvent(EVENT_SUMMON_VAPOR, 5000);
+                    break;
                 }
-
-                DoMeleeAttackIfReady();
             }
+            DoMeleeAttackIfReady();
+        }
+    private:
+        uint8 stage;
 
-        private:
+        void EnterSpecialPhase()
+        {
+            me->AttackStop();
+            me->SetReactState(REACT_PASSIVE);
+            events.CancelEvent(EVENT_GO_FOR_THE_THROAT);
+            me->SetVisible(false);
 
-            uint8 stage;
+            DoResetThreat();
 
-            void EnterSpecialPhase()
-            {
-                me->AttackStop();
-                me->SetReactState(REACT_PASSIVE);
-                events.CancelEvent(EVENT_GO_FOR_THE_THROAT);
-                me->SetVisible(false);
-                
-                DoResetThreat();
+            me->RemoveAurasDueToSpell(SPELL_THRIST_OF_BLOOD_AURA);
 
-                me->RemoveAurasDueToSpell(SPELL_THRIST_OF_BLOOD_AURA);
+            Talk(SAY_SPELL4);
 
-                Talk(SAY_SPELL4);
-
-                events.ScheduleEvent(EVENT_CONTINUE, urand(15000, 30000));
-            }
-        };
+            events.ScheduleEvent(EVENT_CONTINUE, urand(15000, 30000));
+        }
+    };
 };
 
 class npc_admiral_ripsnarl_vapor : public CreatureScript
 {
-    public:
-        npc_admiral_ripsnarl_vapor() : CreatureScript("npc_admiral_ripsnarl_vapor") { }
-     
-        CreatureAI* GetAI(Creature* pCreature) const
+public:
+    npc_admiral_ripsnarl_vapor() : CreatureScript("npc_admiral_ripsnarl_vapor") { }
+
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_admiral_ripsnarl_vaporAI(pCreature);
+    }
+
+    struct npc_admiral_ripsnarl_vaporAI : public ScriptedAI
+    {
+        npc_admiral_ripsnarl_vaporAI(Creature* pCreature) : ScriptedAI(pCreature) { }
+
+        void Reset()
         {
-            return new npc_admiral_ripsnarl_vaporAI(pCreature);
+            events.Reset();
         }
-     
-        struct npc_admiral_ripsnarl_vaporAI : public ScriptedAI
+
+        void IsSummonedBy(Unit* /*owner*/)
         {
-            npc_admiral_ripsnarl_vaporAI(Creature* pCreature) : ScriptedAI(pCreature) 
-            {
-            }
-     
-            void Reset()
-            {
-                events.Reset();
-            }
+            if (IsHeroic())
+                DoCast(me, SPELL_CONDENSATION_1, true);
+        }
 
-            void IsSummonedBy(Unit* /*owner*/)
+        void SpellHit(Unit* /*who*/, const SpellInfo* spellInfo)
+        {
+            if (spellInfo->Id == SPELL_CONDENSE_1_1)
+                events.ScheduleEvent(EVENT_SWIRLING_VAPOR, urand(3000, 7000));
+            else if (spellInfo->Id == SPELL_CONDENSE_2_1)
             {
-                if (IsHeroic())
-                    DoCast(me, SPELL_CONDENSATION_1, true);
+                events.CancelEvent(EVENT_SWIRLING_VAPOR);
+                events.ScheduleEvent(EVENT_CONDENSING_VAPOR, urand(3000, 7000));
+            } else if (spellInfo->Id == SPELL_CONDENSE_3_1)
+            {
+                events.CancelEvent(EVENT_CONDENSING_VAPOR);
+                events.ScheduleEvent(EVENT_FREEZING_VAPOR, urand(3000, 7000));
+                events.ScheduleEvent(EVENT_COALESCE, urand(3000, 10000));
             }
+        }
 
-            void SpellHit(Unit* /*who*/, const SpellInfo* spellInfo)
+        void UpdateAI(const uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            if (uint32 eventId = events.ExecuteEvent())
             {
-                if (spellInfo->Id == SPELL_CONDENSE_1_1)
-                    events.ScheduleEvent(EVENT_SWIRLING_VAPOR, urand(3000, 7000));
-                else if (spellInfo->Id == SPELL_CONDENSE_2_1)
+                switch (eventId)
                 {
-                    events.CancelEvent(EVENT_SWIRLING_VAPOR);
-                    events.ScheduleEvent(EVENT_CONDENSING_VAPOR, urand(3000, 7000));
+                case EVENT_SWIRLING_VAPOR:
+                    DoCastVictim(SPELL_SWIRLING_VAPOR);
+                    break;
+                case EVENT_CONDENSING_VAPOR:
+                    DoCastVictim(SPELL_CONDENSING_VAPOR);
+                    break;
+                case EVENT_FREEZING_VAPOR:
+                    DoCastVictim(SPELL_FREEZING_VAPOR);
+                    break;
+                case EVENT_COALESCE:
+                    DoCastAOE(SPELL_COALESCE);
+                    break;
+                default:
+                    break;
                 }
-                else if (spellInfo->Id == SPELL_CONDENSE_3_1)
-                {
-                    events.CancelEvent(EVENT_CONDENSING_VAPOR);
-                    events.ScheduleEvent(EVENT_FREEZING_VAPOR, urand(3000, 7000));
-                    events.ScheduleEvent(EVENT_COALESCE, urand(3000, 10000));
-                }
-            }
+            };
+            DoMeleeAttackIfReady();
+        }
 
-            void UpdateAI(const uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                if (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_SWIRLING_VAPOR:
-                            DoCastVictim(SPELL_SWIRLING_VAPOR);
-                            break;
-                        case EVENT_CONDENSING_VAPOR:
-                            DoCastVictim(SPELL_CONDENSING_VAPOR);
-                            break;
-                        case EVENT_FREEZING_VAPOR:
-                            DoCastVictim(SPELL_FREEZING_VAPOR);
-                            break;
-                        case EVENT_COALESCE:
-                            DoCastAOE(SPELL_COALESCE);
-                            break;
-                        default:
-                            break;
-                    }
-                };
-
-                DoMeleeAttackIfReady();
-            }
-
-        private:
-            EventMap events;
-        };
+    private:
+        EventMap events;
+    };
 };
 
 class spell_admiral_ripsnarl_coalesce : public SpellScriptLoader
 {
-    public:
-        spell_admiral_ripsnarl_coalesce() : SpellScriptLoader("spell_admiral_ripsnarl_coalesce") { }
+public:
+    spell_admiral_ripsnarl_coalesce() : SpellScriptLoader("spell_admiral_ripsnarl_coalesce") { }
 
-        class spell_admiral_ripsnarl_coalesce_SpellScript : public SpellScript
+    class spell_admiral_ripsnarl_coalesce_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_admiral_ripsnarl_coalesce_SpellScript);
+
+        void HandleAfterCast()
         {
-            PrepareSpellScript(spell_admiral_ripsnarl_coalesce_SpellScript);
+            if (!GetCaster())
+                return;
 
-            void HandleAfterCast()
-            {
-                if (!GetCaster())
-                    return;
-
-                if (Creature* pAdmiral = GetCaster()->FindNearestCreature(NPC_ADMIRAL_RIPSNARL, 100.0f))
-                    pAdmiral->AI()->DoAction(ACTION_COALESCE);
-            }
-
-            void Register()
-            {
-                AfterCast += SpellCastFn(spell_admiral_ripsnarl_coalesce_SpellScript::HandleAfterCast);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_admiral_ripsnarl_coalesce_SpellScript();
+            if (Creature* pAdmiral = GetCaster()->FindNearestCreature(NPC_ADMIRAL_RIPSNARL, 100.0f))
+                pAdmiral->AI()->DoAction(ACTION_COALESCE);
         }
+
+        void Register()
+        {
+            AfterCast += SpellCastFn(spell_admiral_ripsnarl_coalesce_SpellScript::HandleAfterCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_admiral_ripsnarl_coalesce_SpellScript();
+    }
 };
 
 void AddSC_boss_admiral_ripsnarl()

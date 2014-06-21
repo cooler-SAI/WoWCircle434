@@ -764,7 +764,7 @@ public:
             return false;
 
         std::string accountName = accountStr;
-        if (!Utf8ToUpperOnlyLatin(accountName))
+        if (!AccountMgr::normalizeString(accountName))
         {
             handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
             handler->SetSentErrorMessage(true);
