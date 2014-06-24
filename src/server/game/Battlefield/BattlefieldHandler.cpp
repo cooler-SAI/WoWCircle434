@@ -284,7 +284,7 @@ void WorldSession::HandleBfQueueInviteResponse(WorldPacket& recvData)
     if (accepted)
         bf->PlayerAcceptInviteToQueue(_player);
 }
-
+ 
 //Send by client on clicking in accept or refuse of invitation windows for join game
 void WorldSession::HandleBfEntryInviteResponse(WorldPacket& recvData)
 {
@@ -325,6 +325,40 @@ void WorldSession::HandleBfEntryInviteResponse(WorldPacket& recvData)
     else
         if (_player->GetZoneId() == bf->GetZoneId())
             bf->KickPlayerFromBattlefield(_player->GetGUID());
+}
+
+ void WorldSession::HandleBfQueueRequest(WorldPacket& recvData)
+{
+    uint8 accepted;
+    ObjectGuid guid;
+
+    recvData
+        .ReadByteMask(guid[0])
+        .ReadByteMask(guid[3])
+        .ReadByteMask(guid[7])
+        .ReadByteMask(guid[4])
+        .ReadByteMask(guid[6])
+        .ReadByteMask(guid[2])
+        .ReadByteMask(guid[1])
+        .ReadByteMask(guid[5])
+
+        .ReadByteSeq(guid[6])
+        .ReadByteSeq(guid[3])
+        .ReadByteSeq(guid[2])
+        .ReadByteSeq(guid[4])
+        .ReadByteSeq(guid[7])
+        .ReadByteSeq(guid[1])
+        .ReadByteSeq(guid[5])
+        .ReadByteSeq(guid[0]);
+
+    sLog->outError(LOG_FILTER_GENERAL, "HandleBattlefieldInviteResponse: GUID:"UI64FMTD" Accepted:%u", (uint64)guid, accepted);
+
+    Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid);
+    if (!bf)
+        return;
+
+    if (accepted)
+        bf->PlayerAcceptInviteToQueue(_player);
 }
 
 void WorldSession::HandleBfExitRequest(WorldPacket& recvData)

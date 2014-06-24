@@ -893,10 +893,11 @@ class WorldSession
         void SendBfInvitePlayerToWar(uint64 guid, uint32 zoneId, uint32 pTime);
         void SendBfInvitePlayerToQueue(uint64 guid);
         void SendBfQueueInviteResponse(uint64 guid, uint32 zoneId, bool canQueue = true, bool full = false);
-        void SendBfEntered(uint64 guid);
-        void SendBfLeaveMessage(uint64 guid, BFLeaveReason reason = BF_LEAVE_REASON_EXITED);
         void HandleBfQueueInviteResponse(WorldPacket& recvData);
         void HandleBfEntryInviteResponse(WorldPacket& recvData);
+        void SendBfEntered(uint64 guid);
+        void SendBfLeaveMessage(uint64 guid, BFLeaveReason reason = BF_LEAVE_REASON_EXITED);
+        void HandleBfQueueRequest(WorldPacket& recvData);
         void HandleBfExitRequest(WorldPacket& recvData);
 
         // Looking for Dungeon/Raid
