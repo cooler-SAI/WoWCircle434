@@ -190,9 +190,9 @@ void TempSummon::InitStats(uint32 duration)
 
     if (owner)
     {
-        if (uint8 slot = uint8(m_Properties->Slot))
+        int32 slot = m_Properties->Slot;
+        if (slot > 0)
         {
-            ASSERT(slot < MAX_SUMMON_SLOT);
             if (owner->m_SummonSlot[slot] && owner->m_SummonSlot[slot] != GetGUID())
             {
                 Creature* oldSummon = GetMap()->GetCreature(owner->m_SummonSlot[slot]);
@@ -201,8 +201,6 @@ void TempSummon::InitStats(uint32 duration)
             }
             owner->m_SummonSlot[slot] = GetGUID();
         }
-        else
-            owner->m_SummonNoSlot.insert(GetGUID());
     }
 
     if (m_Properties->Faction)
@@ -269,17 +267,11 @@ void TempSummon::RemoveFromWorld()
 
     if (m_Properties)
     {
-        if(Unit* owner = GetSummoner())
-        {
-            if (uint8 slot = uint8(m_Properties->Slot))
-            {
-                ASSERT(slot < MAX_SUMMON_SLOT);
+        int32 slot = m_Properties->Slot;
+        if (slot > 0)
+            if (Unit* owner = GetSummoner())
                 if (owner->m_SummonSlot[slot] == GetGUID())
                     owner->m_SummonSlot[slot] = 0;
-            }
-            else
-                owner->m_SummonNoSlot.erase(GetGUID());
-        }
     }
     Creature::RemoveFromWorld();
 }
