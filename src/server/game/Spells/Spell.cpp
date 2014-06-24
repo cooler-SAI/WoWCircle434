@@ -4431,7 +4431,7 @@ void Spell::SendSpellStart()
         castFlags |= CAST_FLAG_POWER_LEFT_SELF;
 
     if ((m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNES) || m_spellInfo->HasEffect(SPELL_EFFECT_ACTIVATE_RUNE))
-        castFlags |= CAST_FLAG_UNKNOWN_19;
+        castFlags |= CAST_FLAG_NO_GCD;
 
     if ( m_casttime && ( m_spellInfo->HasEffect( SPELL_EFFECT_HEAL ) || m_spellInfo->HasEffect( SPELL_EFFECT_HEAL_PCT ) ) 
         || m_spellInfo->IsPeriodicHeal() ) {
@@ -4557,18 +4557,20 @@ void Spell::SendSpellGo()
         && m_spellInfo->RuneCostID
         && m_spellInfo->PowerType == POWER_RUNES)
     {
-        castFlags |= CAST_FLAG_UNKNOWN_19;                   // same as in SMSG_SPELL_START
+        castFlags |= CAST_FLAG_NO_GCD;
         castFlags |= CAST_FLAG_RUNE_LIST;                    // rune cooldowns list
     }
 
     if (m_spellInfo->HasEffect(SPELL_EFFECT_ACTIVATE_RUNE))
     {
         castFlags |= CAST_FLAG_RUNE_LIST;                    // rune cooldowns list
-        castFlags |= CAST_FLAG_UNKNOWN_19;                   // same as in SMSG_SPELL_START
     }
 
     if (m_targets.HasTraj())
         castFlags |= CAST_FLAG_ADJUST_MISSILE;
+
+    if (!m_spellInfo->StartRecoveryTime)
+        castFlags |= CAST_FLAG_NO_GCD;
 
     WorldPacket data(SMSG_SPELL_GO, 50);                    // guess size
 
