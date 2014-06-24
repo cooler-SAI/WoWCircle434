@@ -1607,7 +1607,7 @@ void Group::UpdatePlayerOutOfRange(Player* player)
     for (GroupReference* itr = GetFirstMember(); itr != NULL; itr = itr->next())
     {
         member = itr->getSource();
-        if (member && !member->IsWithinDist(player, member->GetSightRange(), false))
+        if (member && member != player && (!member->IsInMap(player) || !member->IsWithinDist(player, member->GetSightRange(), false)))
             member->GetSession()->SendPacket(&data);
     }
 }
