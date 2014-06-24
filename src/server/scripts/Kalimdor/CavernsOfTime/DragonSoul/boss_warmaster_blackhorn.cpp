@@ -3,8 +3,6 @@
 #include "MoveSplineInit.h"
 #include "boss_warmaster_blackhorn.h"
 
-// ÑËÀÂÀ È ÑÏÐÀÂÅÄËÈÂÎÑÒÜ!
-// Íà÷àòü áîé?
 enum ScriptedTextBlackhorn
 {
     SAY_AGGRO       = 0,
@@ -728,7 +726,6 @@ public:
                     break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     private:
@@ -739,7 +736,7 @@ public:
         {
         public:
 
-            TwilightFlamesSelector() {}
+            TwilightFlamesSelector() { }
 
             bool operator()(Unit const* target) const
             {
@@ -1717,7 +1714,7 @@ public:
         class TargetCheck
         {
         public:
-            TargetCheck(Creature* owner) : _owner(owner) {}
+            TargetCheck(Creature* owner) : _owner(owner) { }
 
             bool operator()(WorldObject* unit)
             {
@@ -1860,7 +1857,7 @@ public:
                 if (GetCaster()->GetDistance((*itr)) >= 15.0f)
                     new_targets.push_back((*itr));
 
-            if (new_targets.size() >=2)
+            if (new_targets.size() >= 2)
             {
                 targets.clear();
                 targets.push_back(CerberCore::Containers::SelectRandomContainerElement(new_targets));

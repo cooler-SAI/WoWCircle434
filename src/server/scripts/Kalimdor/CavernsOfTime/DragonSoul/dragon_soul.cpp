@@ -7,21 +7,14 @@ enum Adds
     NPC_HARBRINGER_OF_DESTRUCTION   = 55967,
     NPC_ARCANE_WARDEN               = 56141,
     NPC_FORCE_OF_DESTRUCTION        = 56143,
-    NPC_TIME_WARDEN_1               = 56142,
     NPC_PORTENT_OF_TWILIGHT         = 56144,
-    NPC_TIME_WARDEN_2               = 57474,
     NPC_CHAMPION_OF_TIME            = 55913,
-    NPC_DREAM_WARDEN                = 56140,
-    NPC_LIFE_WARDEN_1               = 56139,
-    NPC_LIFE_WARDEN_2               = 57473,
     NPC_CHAMPION_OF_LIFE            = 55911,
     NPC_CHAMPION_OF_MAGIC           = 55912,
     NPC_CHAMPION_OF_EMERALD_DREAM   = 55914,
     NPC_FACELESS_DESTROYER          = 57746,
     NPC_FACELESS_CORRUPTOR          = 57749,
     NPC_RUIN_TENTACLE               = 57751,
-    NPC_DREAM_WARDEN_1              = 56140,
-    NPC_DREAM_WARDEN_2              = 57475,
     NPC_TWILIGHT_ASSAULTER_1        = 56249,
     NPC_TWILIGHT_ASSAULTER_2        = 56250,
     NPC_TWILIGHT_ASSAULTER_3        = 56251,
@@ -254,7 +247,6 @@ public:
                     break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -326,7 +318,6 @@ public:
                     break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -409,7 +400,6 @@ public:
                     break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -482,7 +472,6 @@ public:
                     break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -987,7 +976,6 @@ public:
                     break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
 
@@ -1080,7 +1068,6 @@ public:
         EventMap events;
     };
 };
-
 
 class npc_dragon_soul_teleport : public CreatureScript
 {
@@ -1187,9 +1174,7 @@ public:
 
     struct npc_dragon_soul_thrallAI : public ScriptedAI
     {
-        npc_dragon_soul_thrallAI(Creature* pCreature) : ScriptedAI(pCreature)
-        {
-        }
+        npc_dragon_soul_thrallAI(Creature* pCreature) : ScriptedAI(pCreature) { }
 
         void DoAction(const int32 action)
         {
@@ -1239,7 +1224,6 @@ public:
                 }
             }
         }
-
     private:
         EventMap events;
     };
@@ -1248,7 +1232,7 @@ public:
 class spell_dragon_soul_trigger_spell_from_aoe : public SpellScriptLoader
 {
 public:
-    spell_dragon_soul_trigger_spell_from_aoe(char const* scriptName, uint32 triggerId) : SpellScriptLoader(scriptName), _triggerId(triggerId){ }
+    spell_dragon_soul_trigger_spell_from_aoe(char const* scriptName, uint32 triggerId) : SpellScriptLoader(scriptName), _triggerId(triggerId) { }
 
     class spell_dragon_soul_trigger_spell_from_aoe_SpellScript : public SpellScript
     {
@@ -1296,7 +1280,6 @@ public:
             }
             AfterHit += SpellHitFn(spell_dragon_soul_trigger_spell_from_aoe_SpellScript::HandleDummy);
         }
-
     private:
         uint32 _triggerId;
     };
@@ -1305,7 +1288,6 @@ public:
     {
         return new spell_dragon_soul_trigger_spell_from_aoe_SpellScript(_triggerId);
     }
-
 private:
     uint32 _triggerId;
 };
@@ -1376,7 +1358,7 @@ public:
         class ManaCheck
         {
         public:
-            ManaCheck() {}
+            ManaCheck() { }
 
             bool operator()(WorldObject* unit)
             {
@@ -1385,7 +1367,6 @@ public:
                 return (unit->ToPlayer()->getPowerType() != POWER_MANA);
             }
         };
-
     };
 
     SpellScript* GetSpellScript() const
@@ -1393,6 +1374,390 @@ public:
         return new spell_dragon_soul_cobalt_globule_mana_void_SpellScript();
     }
 };
+
+class npc_warden_dream : public CreatureScript
+{
+public:
+    npc_warden_dream() : CreatureScript("npc_ds_warden_dream") { }
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        InstanceScript* instance = creature->GetInstanceScript();
+        if (player->isInCombat() || !instance)
+            return true;
+
+        if (instance->GetBossState(NPC_MORCHOK) == DONE)
+        {
+            if (instance->GetBossState(NPC_ZONOZZ) != DONE)
+            {
+                if (Creature* mount = player->SummonCreature(NPC_DREAM_WARDEN_2, WaypointsValeera[0]))
+                {
+                    player->CastSpell(mount, VEHICLE_SPELL_RIDE_HARDCODED, true);
+                }
+            }
+            else
+            {
+                creature->MonsterSay("[Полководец Зон'озз] уже мертв. Продолжайте свой путь!", LANG_UNIVERSAL, 0);
+            }
+        }
+        else
+        {
+            creature->MonsterSay("[Морхок] все еще жив. Не дайте ему разрушить башню!", LANG_UNIVERSAL, 0);
+        }
+
+        player->CLOSE_GOSSIP_MENU();
+        return true;
+    }
+
+    struct npc_warden_dreamAI : public ScriptedAI
+    {
+        npc_warden_dreamAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!me->HasAura(SPELL_WARDEN_RING_GREEN))
+                me->AddAura(SPELL_WARDEN_RING_GREEN, me);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_warden_dreamAI(creature);
+    }
+};
+
+class npc_warden_time : public CreatureScript
+{
+public:
+    npc_warden_time() : CreatureScript("npc_ds_warden_time") { }
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        InstanceScript* instance = creature->GetInstanceScript();
+        if (player->isInCombat() || !instance)
+            return true;
+
+        if (instance->GetBossState(NPC_MORCHOK) == DONE)
+        {
+            if (instance->GetBossState(NPC_YORSAHJ) != DONE)
+            {
+                if (Creature* mount = player->SummonCreature(NPC_TIME_WARDEN_2, WaypointsEiendormi[1]))
+                {
+                    player->CastSpell(mount, VEHICLE_SPELL_RIDE_HARDCODED, true);
+                }
+            }
+            else
+            {
+                creature->MonsterSay("[Йор'садж Неспящий] уже мертв. Продолжайте свой путь!", LANG_UNIVERSAL, 0);
+            }
+        }
+        else
+        {
+            creature->MonsterSay("[Морхок] все еще жив. Не дайте ему разрушить башню!", LANG_UNIVERSAL, 0);
+        }
+
+        player->CLOSE_GOSSIP_MENU();
+        return true;
+    }
+
+    struct npc_warden_timeAI : public ScriptedAI
+    {
+        npc_warden_timeAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!me->HasAura(SPELL_WARDEN_RING_YELLOW))
+                me->AddAura(SPELL_WARDEN_RING_YELLOW, me);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_warden_timeAI(creature);
+    }
+};
+
+class npc_warden_life : public CreatureScript
+{
+public:
+    npc_warden_life() : CreatureScript("npc_ds_warden_life") { }
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        InstanceScript* instance = creature->GetInstanceScript();
+        if (player->isInCombat() || !instance)
+            return true;
+
+        if (instance->GetBossState(NPC_YORSAHJ) == DONE && instance->GetBossState(NPC_ZONOZZ) == DONE)
+        {
+            if (Creature* mount = player->SummonCreature(NPC_LIFE_WARDEN_2, WaypointsNethestrasz[2]))
+            {
+                player->CastSpell(mount, VEHICLE_SPELL_RIDE_HARDCODED, true);
+            }
+        }
+        else
+        {
+            if (instance->GetBossState(NPC_YORSAHJ) != DONE && instance->GetBossState(NPC_ZONOZZ) != DONE)
+            {
+                creature->MonsterSay("[Полководец Зон'озз] и [Йор'садж Неспящий] все еще живы!", LANG_UNIVERSAL, 0);
+            }
+            else if(instance->GetBossState(NPC_YORSAHJ) != DONE)
+            {
+                creature->MonsterSay("[Йор'садж Неспящий] все еще жив!", LANG_UNIVERSAL, 0);
+            }
+            else
+            {
+                creature->MonsterSay("[Полководец Зон'озз] все еще жив!", LANG_UNIVERSAL, 0);
+            }
+        }
+
+        player->CLOSE_GOSSIP_MENU();
+        return true;
+    }
+
+    struct npc_warden_lifeAI : public ScriptedAI
+    {
+        npc_warden_lifeAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (!me->HasAura(SPELL_WARDEN_RING_ORANGE))
+                me->AddAura(SPELL_WARDEN_RING_ORANGE, me);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_warden_lifeAI(creature);
+    }
+};
+
+/* ---------------------------------------------
+-- Warden mounts                              --
+---------------------------------------------*/
+
+class npc_mount_dream : public CreatureScript
+{
+public:
+    npc_mount_dream() : CreatureScript("npc_ds_mount_dream") { }
+
+    struct npc_mount_dreamAI : public ScriptedAI
+    {
+        npc_mount_dreamAI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint8 curID;
+
+        void Reset()
+        {
+            curID = 1;
+            HelperFuncs::MoveSpline(*me, WaypointsValeera, 6, 32);
+        } 
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (me->movespline->currentPathIdx() > curID)
+            {
+                switch(++curID)
+                {
+                case 4:
+                    if (Unit* player = me->GetVehicleKit()->GetPassenger(0))
+                    {
+                        Position pos;
+                        me->GetPosition(&pos);
+                        player->ExitVehicle();
+                        player->GetMotionMaster()->Clear();
+                        player->CastSpell(player, VEHICLE_SPELL_PARACHUTE, true);
+                        player->SummonCreature(NPC_HALO_JUMP_PARACHUTE_2, pos);
+                    }
+                    break;
+                case 5:
+                    me->DespawnOrUnsummon(0);
+                    break;
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_mount_dreamAI(creature);
+    }
+};
+
+class npc_mount_time : public CreatureScript
+{
+public:
+    npc_mount_time() : CreatureScript("npc_ds_mount_time") { }
+
+    struct npc_mount_timeAI : public ScriptedAI
+    {
+        npc_mount_timeAI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint8 curID;
+
+        void Reset()
+        {
+            curID = 1;
+            HelperFuncs::MoveSpline(*me, WaypointsEiendormi, 6, 46);
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (me->movespline->currentPathIdx() > curID)
+            {
+                switch(++curID)
+                {
+                case 4:
+                    if (Unit* player = me->GetVehicleKit()->GetPassenger(0))
+                    {
+                        Position pos;
+                        me->GetPosition(&pos);
+                        player->ExitVehicle();
+                        player->GetMotionMaster()->Clear();
+                        player->CastSpell(player, VEHICLE_SPELL_PARACHUTE, true);
+                        player->SummonCreature(NPC_HALO_JUMP_PARACHUTE, pos);
+                    }
+                    break;
+                case 5:
+                    me->DespawnOrUnsummon(0);
+                    break;
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_mount_timeAI(creature);
+    }
+};
+
+class npc_mount_life : public CreatureScript
+{
+public:
+    npc_mount_life() : CreatureScript("npc_ds_mount_life") { }
+
+    struct npc_mount_lifeAI : public ScriptedAI
+    {
+        npc_mount_lifeAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset()
+        {
+            HelperFuncs::MoveSpline(*me, WaypointsNethestrasz, 10, 46);
+        }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if (me->movespline->currentPathIdx() == 9)
+            {
+                me->DespawnOrUnsummon();
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_mount_lifeAI(creature);
+    }
+};
+
+/* ---------------------------------------------
+-- Parachute's                                --
+---------------------------------------------*/
+
+//class npc_parachute_1 : public CreatureScript
+//{
+//public:
+//    npc_parachute_1() : CreatureScript("npc_ds_parachute_1") { }
+//
+//    struct npc_parachute_1AI : public ScriptedAI
+//    {
+//        npc_parachute_1AI(Creature* creature) : ScriptedAI(creature) { }
+//
+//        uint32 timer; 
+//
+//        void Reset()
+//        {
+//            timer = 0;
+//        }
+//
+//        void UpdateAI(const uint32 diff)
+//        {
+//            if (timer < 4000)
+//            {
+//                timer += diff;
+//                if (timer >= 4000)
+//                {
+//                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+//                    {
+//                        me->UpdatePosition(summoner->m_positionX, summoner->m_positionY, summoner->m_positionZ, 0, true);
+//                        summoner->GetMotionMaster()->Clear();
+//                        summoner->CastSpell(me, VEHICLE_SPELL_RIDE_HARDCODED, true);
+//                        HelperFuncs::MoveSpline(*me, WaypointsParachute1, 3, 24);
+//                    }
+//                }
+//            }
+//
+//            if (me->movespline->currentPathIdx() == 2)
+//            {
+//                me->GetVehicleKit()->RemoveAllPassengers();
+//                me->DespawnOrUnsummon();
+//            }
+//        }
+//    };
+//
+//    CreatureAI* GetAI(Creature* creature) const
+//    {
+//        return new npc_parachute_1AI(creature);
+//    }
+//};
+//
+//class npc_parachute_2 : public CreatureScript
+//{
+//public:
+//    npc_parachute_2() : CreatureScript("npc_ds_parachute_2") { }
+//
+//    struct npc_parachute_2AI : public ScriptedAI
+//    {
+//        npc_parachute_2AI(Creature* creature) : ScriptedAI(creature) { }
+//
+//        uint32 timer; 
+//
+//        void Reset()
+//        {
+//            timer = 0;
+//        }
+//
+//        void UpdateAI(const uint32 diff)
+//        {
+//            if (timer < 4000)
+//            {
+//                timer += diff;
+//                if (timer >= 4000)
+//                {
+//                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+//                    {
+//                        me->UpdatePosition(summoner->m_positionX, summoner->m_positionY, summoner->m_positionZ, 0, true);
+//                        summoner->GetMotionMaster()->Clear();
+//                        summoner->CastSpell(me, VEHICLE_SPELL_RIDE_HARDCODED, true);
+//                        HelperFuncs::MoveSpline(*me, WaypointsParachute2, 3, 24);
+//                    }
+//                }
+//            }
+//
+//            if (me->movespline->currentPathIdx() == 2)
+//            {
+//                me->GetVehicleKit()->RemoveAllPassengers();
+//                me->DespawnOrUnsummon();
+//            }
+//        }
+//    };
+//
+//    CreatureAI* GetAI(Creature* creature) const
+//    {
+//        return new npc_parachute_2AI(creature);
+//    }
+//};
 
 void AddSC_dragon_soul()
 {
@@ -1417,4 +1782,13 @@ void AddSC_dragon_soul()
     new spell_dragon_soul_cobalt_globule_mana_void();
     //new spell_dragon_soul_trigger_spell_from_aoe("spell_dragon_soul_claw_of_gorath_tentacle_toss_aoe_1", SPELL_TENTACLE_TOSS_SCRIPT_1);
     //new spell_dragon_soul_trigger_spell_from_aoe("spell_dragon_soul_claw_of_gorath_tentacle_toss_aoe_2", SPELL_TENTACLE_TOSS_SUMMON);
+
+    new npc_warden_time();
+    new npc_warden_dream();
+    new npc_warden_life();
+    new npc_mount_life();
+    new npc_mount_time();
+    new npc_mount_dream();
+    //new npc_parachute_1();
+    //new npc_parachute_2();
 }

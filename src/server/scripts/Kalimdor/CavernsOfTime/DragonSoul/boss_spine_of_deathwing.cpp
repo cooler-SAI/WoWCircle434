@@ -11,7 +11,8 @@ enum ScriptedTexts
     SAY_DEATHWING_TALK              = 5,
 };
 
-#define SPELL_BURST				RAID_MODE<uint32>(105219, 109371, 109372, 109373)
+#define SPELL_BURST	RAID_MODE<uint32>(105219, 109371, 109372, 109373)
+
 enum Spells
 {
     // Deathwing

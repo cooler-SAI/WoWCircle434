@@ -388,7 +388,6 @@ public:
             DoMeleeAttackIfReady();
         }
     private:
-
         uint64 _stompguid1;
         uint64 _stompguid2;
         bool bEnrage;
@@ -432,7 +431,7 @@ public:
 
         void Reset()
         {
-            //me->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+            pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
 
             events.Reset();
             summons.DespawnAll();
@@ -444,7 +443,7 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            //me->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+            pInstance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
         }
 
         void SetGUID(uint64 guid, int32 type)
@@ -489,7 +488,7 @@ public:
 
         void JustSummoned(Creature* summon)
         {
-            //me->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
+            pInstance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
 
             summons.Summon(summon);
             if (me->isInCombat())
@@ -561,7 +560,6 @@ public:
             DoMeleeAttackIfReady();
         }
     private:
-
         EventMap events;
         SummonList summons;
         InstanceScript* pInstance;
@@ -613,7 +611,6 @@ public:
         }
     };
 };
-
 
 class spell_morchok_target_selected : public SpellScriptLoader
 { 
@@ -712,7 +709,6 @@ public:
 
 class spell_morchok_resonating_crystal_dmg : public SpellScriptLoader
 {
-
 public:
     spell_morchok_resonating_crystal_dmg() : SpellScriptLoader("spell_morchok_resonating_crystal_dmg") { }
 
@@ -769,8 +765,8 @@ public:
             float ticks = aurEff->GetTickNumber();
             int counter = (int)floor(ticks / 5) + 1;
 
-            if(Unit* me = GetCaster())
-                if(ticks == 1 || ticks == 5 || ticks == 10 || ticks == 15)
+            if (Unit* me = GetCaster())
+                if (ticks == 1 || ticks == 5 || ticks == 10 || ticks == 15)
                 {
                     float _angle;
                     float radius = 10.0f;
@@ -782,22 +778,22 @@ public:
                         //blackblood 1
                         _angle = me->GetOrientation() + M_PI / 4;
                         me->GetNearPosition(_pos, radius, _angle);
-                        if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
+                        if (BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
                             me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
                         //blackblood 2
                         _angle = me->GetOrientation() + M_PI / 2;
                         me->GetNearPosition(_pos, radius, _angle);
-                        if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
+                        if (BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
                             me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
                         //blackblood 3
                         _angle = me->GetOrientation() + (3 * M_PI) / 4;
                         me->GetNearPosition(_pos, radius, _angle);
-                        if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
+                        if (BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
                             me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
                         //blackblood 4
                         _angle = me->GetOrientation() + M_PI;
                         me->GetNearPosition(_pos, radius, _angle);
-                        if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
+                        if (BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
                             me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
                         //blackblood 5
                         _angle = me->GetOrientation() + M_PI / 4 + M_PI;
@@ -807,7 +803,7 @@ public:
                         //blackblood 6
                         _angle = me->GetOrientation() + M_PI / 2 + M_PI;
                         me->GetNearPosition(_pos, radius, _angle);
-                        if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
+                        if (BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
                             me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
                         //blackblood 7
                         _angle = me->GetOrientation() + (3 * M_PI) / 4 + M_PI;
@@ -817,7 +813,7 @@ public:
                         //blackblood 8
                         _angle = me->GetOrientation() + M_PI * 2;
                         me->GetNearPosition(_pos, radius, _angle);
-                        if(BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
+                        if (BlackBloodPositionSelect(fallingfragments, _pos.GetPositionX(), _pos.GetPositionY(), me))
                             me->CastSpell(_pos.GetPositionX(), _pos.GetPositionY(), _pos.GetPositionZ(), SPELL_BLACK_BLOOD_OF_THE_EARTH_DUMMY, true);
                         radius += 10.0f;
                     }
@@ -866,7 +862,6 @@ private:
 
 class spell_morchok_black_blood_of_the_earth_dmg : public SpellScriptLoader
 {
-
 public:
     spell_morchok_black_blood_of_the_earth_dmg() : SpellScriptLoader("spell_morchok_black_blood_of_the_earth_dmg") { }
 
@@ -1019,20 +1014,19 @@ public:
 
         void OnPeriodic(AuraEffect const* /*aurEff*/)
         {
-            if(amount > 0)
+            if (amount > 0)
                 amount -= 20;
+
             if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_1))
                 effect->ChangeAmount(amount);
         }
 
-        // function registering
         void Register()
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_morchok_resonating_crystal_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    // function which creates AuraScript
     AuraScript* GetAuraScript() const
     {
         return new spell_morchok_resonating_crystal_AuraScript();

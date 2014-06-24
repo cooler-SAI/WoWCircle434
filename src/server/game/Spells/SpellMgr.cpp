@@ -6712,6 +6712,24 @@ void SpellMgr::LoadDbcDataCorrections()
             case 106676:
                 spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
                 break;
+            case 106588: // EXPOSE_WEAKNESS
+            case 106613:
+            case 106624:
+            case 106600: 
+            //case 105875: // Hemorrhage
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                break;
+            case 105863: // Hemorrhage
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_DEST_DEST;
+                break;
+            case 105969: // REGENERATIVE_BLOOD_SCALE
+            case 110208: // REGENERATIVE_BLOOD_HEAL
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+                break;
+            case 109102:
+                spellInfo->Effects[EFFECT_0].TargetA = TARGET_DEST_DEST;
+                spellInfo->Effects[EFFECT_1].TargetA = TARGET_DEST_DEST;
+                break;
             // ENDOF DRAGON SOUL SPELLS
             //
             // gilneas

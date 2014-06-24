@@ -44,6 +44,7 @@ public:
             memset(uiLesserCacheofTheAspects, 0, sizeof(uiLesserCacheofTheAspects));
             memset(uiBackPlates, 0, sizeof(uiBackPlates));
             memset(uiGreaterCacheofTheAspects, 0, sizeof(uiGreaterCacheofTheAspects));
+            memset(uiPlatforms, 0, sizeof(uiPlatforms));
 
             bHagaraEvent = 0;
         }
@@ -227,6 +228,10 @@ public:
             case DATA_BACK_PLATE_1:         return uiBackPlates[0];
             case DATA_BACK_PLATE_2:         return uiBackPlates[1];
             case DATA_BACK_PLATE_3:         return uiBackPlates[2];
+            case DATA_PLATFORM_1:           return uiPlatforms[0];
+            case DATA_PLATFORM_2:           return uiPlatforms[1];
+            case DATA_PLATFORM_3:           return uiPlatforms[2];
+            case DATA_PLATFORM_4:           return uiPlatforms[3];
             case DATA_GREATER_CACHE_10N:    return uiGreaterCacheofTheAspects[0];
             case DATA_GREATER_CACHE_25N:    return uiGreaterCacheofTheAspects[1];
             case DATA_GREATER_CACHE_10H:    return uiGreaterCacheofTheAspects[2];
@@ -234,8 +239,9 @@ public:
             case DATA_ALLIANCE_SHIP:        return uiAllianceShipGUID;
             case NPC_THRALL_2:              return Maelstrom_trall;
             case DATA_SPINE:                return uiSpineGuid;
-            case DATA_DAMAGE_DEATHWING:     return DeathwingGUID;
-            default: return 0;
+            case DATA_DEATHWING:            return DeathwingGUID;
+            default:
+                return 0;
             }
             return 0;
         }
@@ -290,7 +296,6 @@ public:
                             pTeleport->CastSpell(pTeleport, SPELL_TELEPORT_VISUAL_ACTIVE, true);
                         }
             }
-
 
             return true;
         }
@@ -371,12 +376,12 @@ public:
         uint64 uiSpineGuid;
 
         uint64 DeathwingGUID;
-
         uint64 Maelstrom_trall;
         uint64 Maelstrom_kalecgos;
         uint64 Maelstrom_ysera;
         uint64 Maelstrom_nozdormy;
         uint64 Maelstrom_alexstrasza;
+        uint64 uiPlatforms[4];
 
         std::vector<uint64> teleportGUIDs;
 

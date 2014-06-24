@@ -1,3 +1,12 @@
+#include "ScriptMgr.h"
+#include "Creature.h"
+#include "CreatureAI.h"
+#include "CreatureGroups.h"
+#include "MoveSpline.h"
+#include "MoveSplineFlag.h"
+#include "MoveSplineInit.h"
+#include "Vehicle.h"
+
 #ifndef DEF_DRAGONSOUL_H
 #define DEF_DRAGONSOUL_H
 // 109247 - ds nerf real
@@ -38,6 +47,10 @@ enum Datas
     DATA_GREATER_CACHE_25N  = 23,
     DATA_GREATER_CACHE_10H  = 24,
     DATA_GREATER_CACHE_25H  = 25,
+    DATA_PLATFORM_1         = 26,
+    DATA_PLATFORM_2         = 27,
+    DATA_PLATFORM_3         = 28,
+    DATA_PLATFORM_4         = 29,
 };
 
 enum CreatureIds
@@ -91,10 +104,20 @@ enum CreatureIds
     NPC_ALEXSTRASZA_2                           = 58207, // after madness
     NPC_YSERA_2                                 = 58209, // after madness
     NPC_CORRUPTION_PARASITE                     = 57479,
-    NPC_CONGEALING_BLOOD                        = 57798,
     NPC_ELEMENTIUM_FRAGMENT                     = 56724,
     NPC_ELEMENTIUM_TERROR                       = 56710,
     NPC_MUTATED_CORRUPTION                      = 56471,
+    NPC_PLATFROM                                = 56307,
+
+    NPC_TIME_WARDEN_1                           = 56142,
+    NPC_TIME_WARDEN_2                           = 57474, // mount
+    NPC_LIFE_WARDEN_1                           = 56139,
+    NPC_LIFE_WARDEN_2                           = 57473, // mount
+    NPC_DREAM_WARDEN_1                          = 56140,
+    NPC_DREAM_WARDEN_2                          = 57475, // mount
+    NPC_HALO_JUMP_PARACHUTE                     = 57629, // mount & dream 
+    NPC_HALO_JUMP_PARACHUTE_2                   = 57630, // mount & time 
+
 };
 
 enum GameObjects
@@ -144,17 +167,15 @@ enum SharedSpells
     SPELL_WARDEN_RING_GREEN                     = 95514,
     SPELL_WARDEN_RING_ORANGE                    = 110468,
     SPELL_WARDEN_RING_YELLOW                    = 110469,
-
-    SPELL_AGONUZUNG_PAIN                        = 106548,
 };
 
 const Position teleportPos[6] =
 {
-    {-1779.503662f, -2393.439941f,      45.61f,     3.20f   },  // Wyrmrest Temple/Base
-    {-1854.233154f, -3068.658691f,      -178.34f,   0.46f   },  // Yor'sahj The Unsleeping
-    {-1743.647827f, -1835.132568f,      -220.51f,   4.53f   },  // Warlord Zon'ozz
-    {-1781.188477f, -2375.122559f,      341.35f,    4.43f   },  // Wyrmrest Summit
-    {13629.356445f, 13612.099609f,      123.49f,    3.14f   },  // Hagara
+    {-1779.503662f,  -2393.439941f,     45.61f,     3.20f   },  // Wyrmrest Temple/Base
+    {-1854.233154f,  -3068.658691f,     -178.34f,   0.46f   },  // Yor'sahj The Unsleeping
+    {-1743.647827f,  -1835.132568f,     -220.51f,   4.53f   },  // Warlord Zon'ozz
+    {-1781.188477f,  -2375.122559f,     341.35f,    4.43f   },  // Wyrmrest Summit
+    {13629.356445f,  13612.099609f,     123.49f,    3.14f   },  // Hagara
     {-13854.668945f, -13666.967773f,    275.f,      1.60f   },  // Spine
 };
 
@@ -169,4 +190,73 @@ const Position skyfirePos           = {13444.9f,        -12133.3f,      151.21f,
 const Position spinedeathwingPos    = {-13852.5f,       -13665.38f,     297.3786f,  1.53589f};
 
 void WhisperToAllPlayerInZone(int32 TextId, Creature* sender);
+
+Position const WaypointsParachute1[3] =
+{
+    { -1772, -3037, 100 },
+    { -1772, -3037, -50 },
+    { -1854, -3072, -175 },
+};
+
+Position const WaypointsParachute2[3] =
+{
+    { -1761, -1914, 100 },
+    { -1761, -1914, -50 },
+    { -1745, -1845, -216 },
+};
+
+Position const WaypointsValeera[6] =
+{
+    { -1794, -2363, 48 },
+    { -1794, -2316, 69 },
+    { -1820, -2195, 98 },
+    { -1848, -2042, 150 },
+    { -1761, -1914, 164 },
+    { -1676, -1889, 170 },
+};
+
+Position const WaypointsEiendormi[6] =
+{
+    { -1777, -2423, 47 },
+    { -1778, -2473, 70 },
+    { -1805, -2617, 103 },
+    { -1796, -2870, 148 },
+    { -1772, -3037, 168 },
+    { -1691, -3128, 237 },
+};
+
+Position const WaypointsNethestrasz[10] =
+{
+    { -1756, -2386, 48 },
+    { -1697, -2384, 80 },
+    { -1650, -2327, 115 },
+    { -1800, -2254, 123 },
+    { -1915, -2408, 194 },
+    { -1779, -2536, 231 },
+    { -1677, -2382, 262 },
+    { -1759, -2307, 308 },
+    { -1806, -2320, 357 },
+    { -1801, -2366, 341 },
+};
+
+namespace HelperFuncs
+{
+    static void MoveSpline(Creature& creature, const Position* wps, int count, float speed = 32.0f)
+    {		
+        Movement::MoveSplineInit init(creature);
+
+        for (int i = 0; i < count; i++)
+        {
+            init.Path().push_back(G3D::Vector3(wps[i].m_positionX, wps[i].m_positionY, wps[i].m_positionZ));
+        }
+
+        init.SetFirstPointId(0);
+        init.SetFly();
+        init.SetSmooth();
+        init.SetUncompressed();
+        init.SetVelocity(speed);
+        init.Launch();
+    }
+};
+
 #endif

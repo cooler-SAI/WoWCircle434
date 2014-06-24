@@ -35,7 +35,7 @@ enum Spells
     SPELL_MANA_VOID                 = 105530,
     SPELL_MANA_VOID_DUMMY_2         = 105534,
     SPELL_MANA_VOID_DUMMY_3         = 105536,
-    SPELL_MANA_DIFFUSION            = 108228, //105539,
+    SPELL_MANA_DIFFUSION            = 108228, // 105539,
     SPELL_CORRUPTED_MINIONS_AURA    = 105636,
     SPELL_CORRUPTED_MINIONS_SUMMON  = 105637,
     SPELL_PSYCHIC_SLICE             = 105671,
@@ -209,7 +209,7 @@ public:
             events.ScheduleEvent(EVENT_BERSERK, 10 * MINUTE * IN_MILLISECONDS);
             events.ScheduleEvent(EVENT_VOID_BOLT, 6000);
             events.ScheduleEvent(EVENT_CALL_BLOOD_1, 22000);
-            events.ScheduleEvent(EVENT_CHECK_POSITION, 5*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_CHECK_POSITION, 5 * IN_MILLISECONDS);
 
             DoZoneInCombat();
             instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
@@ -224,7 +224,6 @@ public:
 
             Talk(SAY_DEATH);
             DoCastAOE(SPELL_YORSAHJ_WHISPER_DEATH, true);
-
         }
 
         bool AllowAchieve(uint32 Id)
@@ -324,7 +323,6 @@ public:
                     bContinue = false;
                     bShuma = false;
 
-                    //me->NearTeleportTo(centerPos.GetPositionX(), centerPos.GetPositionY(), centerPos.GetPositionZ(), centerPos.GetOrientation());
                     me->GetMotionMaster()->MovePoint(POINT_CENTER, centerPos);
                     break;
                 case EVENT_CALL_BLOOD_2:
@@ -343,13 +341,26 @@ public:
                         {
                             switch ((*itr))
                             {
-                            case NPC_CRIMSON_GLOBULE: i = 0; break;
-                            case NPC_ACIDIC_GLOBULE: i = 1; break;
-                            case NPC_GLOWING_GLOBULE: i = 2;break;
-                            case NPC_DARK_GLOBULE: i = 3; break;
-                            case NPC_SHADOWED_GLOBULE: i = 4; break;
-                            case NPC_COBALT_GLOBULE: i = 5; break;
-                            default: return;
+                            case NPC_CRIMSON_GLOBULE:
+                                i = 0;
+                                break;
+                            case NPC_ACIDIC_GLOBULE:
+                                i = 1;
+                                break;
+                            case NPC_GLOWING_GLOBULE:
+                                i = 2;
+                                break;
+                            case NPC_DARK_GLOBULE:
+                                i = 3;
+                                break;
+                            case NPC_SHADOWED_GLOBULE:
+                                i = 4;
+                                break;
+                            case NPC_COBALT_GLOBULE:
+                                i = 5;
+                                break;
+                            default:
+                                return;
                             }
 
                             if (Creature* pGlobule = me->SummonCreature((*itr), globulesPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000))
@@ -403,7 +414,8 @@ public:
                                     DoCast(me, SPELL_COBALT_BLOOD_OF_SHUMA, true);
                                     events.ScheduleEvent(EVENT_MANA_VOID_1, urand(2000, 3000));
                                     break;
-                                default: break;
+                                default:
+                                    break;
                                 }
                                 (*itr)->DespawnOrUnsummon();
                             }
@@ -531,16 +543,13 @@ public:
         class GlobulesCheck
         {
         public:
-            GlobulesCheck() {}
+            GlobulesCheck() { }
 
             bool operator()(Creature* u)
             {
-                if ((u->GetEntry() == NPC_CRIMSON_GLOBULE || 
-                    u->GetEntry() == NPC_ACIDIC_GLOBULE ||
-                    u->GetEntry() == NPC_GLOWING_GLOBULE ||
-                    u->GetEntry() == NPC_DARK_GLOBULE || 
-                    u->GetEntry() == NPC_SHADOWED_GLOBULE ||
-                    u->GetEntry() == NPC_COBALT_GLOBULE) && 
+                if ((u->GetEntry()  == NPC_CRIMSON_GLOBULE  ||  u->GetEntry() == NPC_ACIDIC_GLOBULE ||
+                    u->GetEntry()   == NPC_GLOWING_GLOBULE  ||  u->GetEntry() == NPC_DARK_GLOBULE || 
+                    u->GetEntry()   == NPC_SHADOWED_GLOBULE ||  u->GetEntry() == NPC_COBALT_GLOBULE) && 
                     u->isAlive())
                     return true;
                 return false;
@@ -589,13 +598,26 @@ public:
         {
             switch(me->GetEntry())
             { 
-            case NPC_CRIMSON_GLOBULE: DoCast(me, SPELL_AURA_TALL_RED, true); break;
-            case NPC_ACIDIC_GLOBULE: DoCast(me, SPELL_AURA_TALL_GREEN, true); break;
-            case NPC_GLOWING_GLOBULE: DoCast(me, SPELL_AURA_TALL_YELLOW, true); break;
-            case NPC_DARK_GLOBULE: DoCast(me, SPELL_AURA_TALL_BLACK, true); break;
-            case NPC_SHADOWED_GLOBULE: DoCast(me, SPELL_AURA_TALL_PURPLE, true); break;
-            case NPC_COBALT_GLOBULE: DoCast(me, SPELL_AURA_TALL_BLUE, true); break;
-            default: break;
+            case NPC_CRIMSON_GLOBULE:
+                DoCast(me, SPELL_AURA_TALL_RED, true);
+                break;
+            case NPC_ACIDIC_GLOBULE:
+                DoCast(me, SPELL_AURA_TALL_GREEN, true);
+                break;
+            case NPC_GLOWING_GLOBULE:
+                DoCast(me, SPELL_AURA_TALL_YELLOW, true);
+                break;
+            case NPC_DARK_GLOBULE:
+                DoCast(me, SPELL_AURA_TALL_BLACK, true);
+                break;
+            case NPC_SHADOWED_GLOBULE:
+                DoCast(me, SPELL_AURA_TALL_PURPLE, true);
+                break;
+            case NPC_COBALT_GLOBULE:
+                DoCast(me, SPELL_AURA_TALL_BLUE, true);
+                break;
+            default:
+                break;
             }
         }
 
@@ -804,14 +826,24 @@ public:
 
             switch (GetSpellInfo()->Id)
             {
-            case SPELL_YORSAHJ_WHISPER_AGGRO: textId = SAY_AGGRO_1;  break;
-            case SPELL_YORSAHJ_WHISPER_DEATH: textId = SAY_DEATH_1; break;
-            case SPELL_YORSAHJ_WHISPER_INTRO: textId = SAY_INTRO_1; break;
-            case SPELL_YORSAHJ_WHISPER_KILL: textId = SAY_KILL_1; break;
-            case SPELL_YORSAHJ_WHISPER_SPELL: textId = SAY_SPELL_1; break;
-            default: return;
+            case SPELL_YORSAHJ_WHISPER_AGGRO:
+                textId = SAY_AGGRO_1; 
+                break;
+            case SPELL_YORSAHJ_WHISPER_DEATH:
+                textId = SAY_DEATH_1;
+                break;
+            case SPELL_YORSAHJ_WHISPER_INTRO:
+                textId = SAY_INTRO_1;
+                break;
+            case SPELL_YORSAHJ_WHISPER_KILL:
+                textId = SAY_KILL_1;
+                break;
+            case SPELL_YORSAHJ_WHISPER_SPELL:
+                textId = SAY_SPELL_1;
+                break;
+            default:
+                return;
             }
-
             sCreatureTextMgr->SendChat(GetCaster()->ToCreature(), textId, GetHitUnit()->GetGUID(), CHAT_MSG_MONSTER_WHISPER, LANG_ADDON, TEXT_RANGE_AREA);
         }
 
@@ -939,14 +971,13 @@ public:
         class ManaCheck
         {
         public:
-            ManaCheck() {}
+            ManaCheck() { }
 
             bool operator()(WorldObject* unit)
             {
                 return (!unit->ToUnit() || unit->ToUnit()->getPowerType() != POWER_MANA);
             }
         };
-
     };
 
     SpellScript* GetSpellScript() const
