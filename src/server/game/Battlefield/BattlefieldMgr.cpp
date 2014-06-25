@@ -1,6 +1,4 @@
 /*
-* Copyright (C) 2011-2012 DarkCore <http://www.darkpeninsula.eu/>
-* Copyright (C) 2011-2012 Project SkyFire <http://www.projectskyfire.org/>
 * Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
 *
@@ -28,12 +26,10 @@
 BattlefieldMgr::BattlefieldMgr()
 {
     m_UpdateTimer = 0;
-    //sLog->outDebug(LOG_FILTER_BATTLEFIELD, "Instantiating BattlefieldMgr");
 }
 
 BattlefieldMgr::~BattlefieldMgr()
 {
-    //sLog->outDebug(LOG_FILTER_BATTLEFIELD, "Deleting BattlefieldMgr");
     for (BattlefieldSet::iterator itr = m_BattlefieldSet.begin(); itr != m_BattlefieldSet.end(); ++itr)
         delete *itr;
 }
@@ -41,33 +37,16 @@ BattlefieldMgr::~BattlefieldMgr()
 void BattlefieldMgr::InitBattlefield()
 {
     Battlefield* pBf = new BattlefieldWG;
-    // respawn, init variables
     if (!pBf->SetupBattlefield())
-    {
-        sLog->outString();
-        sLog->outString("Battlefield : Wintergrasp init failed.");
         delete pBf;
-    }
     else
-    {
         m_BattlefieldSet.push_back(pBf);
-        sLog->outString();
-        sLog->outString("Battlefield : Wintergrasp successfully initiated.");
-    }
 
-    //For Cataclysm: Tol Barad
     pBf = new BattlefieldTB;
-    // respawn, init variables
-    if(!pBf->SetupBattlefield())
-    {
-        sLog->outError(LOG_FILTER_GENERAL, "Battlefield : Tol Barad init failed.");
+    if (!pBf->SetupBattlefield())
         delete pBf;
-    }
     else
-    {
         m_BattlefieldSet.push_back(pBf);
-        sLog->outError(LOG_FILTER_GENERAL, "Battlefield : Tol Barad successfully initiated.");
-    } 
 }
 
 void BattlefieldMgr::AddZone(uint32 zoneid, Battlefield *handle)
@@ -95,7 +74,6 @@ void BattlefieldMgr::HandlePlayerLeaveZone(Player * player, uint32 zoneid)
     if (itr == m_BattlefieldMap.end())
         return;
 
-    // teleport: remove once in removefromworld, once in updatezone
     if (!itr->second->HasPlayer(player))
         return;
     itr->second->HandlePlayerLeaveZone(player, zoneid);
@@ -107,7 +85,6 @@ Battlefield *BattlefieldMgr::GetBattlefieldToZoneId(uint32 zoneid)
     BattlefieldMap::iterator itr = m_BattlefieldMap.find(zoneid);
     if (itr == m_BattlefieldMap.end())
     {
-        // no handle for this zone, return
         return NULL;
     }
     if (!itr->second->IsEnabled())

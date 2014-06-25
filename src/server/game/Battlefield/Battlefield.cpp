@@ -50,7 +50,6 @@ Battlefield::Battlefield()
     m_BattleTime                = 0;
     m_NoWarBattleTime           = 0;
     m_TimeForAcceptInvite       = 20;
-    m_uiKickDontAcceptTimer     = 1000;
 
     m_uiKickAfkPlayersTimer     = 1000;
 
@@ -59,13 +58,6 @@ Battlefield::Battlefield()
     m_StartGrouping             = false;
     StalkerGuid                 = 0;
     m_TowerBonus                = 0;
-
-    //m_defender = TeamIndex(urand(0, 1));
-    //m_state = BF_STATE_COOLDOWN;
-    //m_timer = 15 * MINUTE * IN_MILLISECONDS;
-    //m_queueUpdateTimer = 30000;
-    //m_scoresUpdateTimer = 5000;
-    //bAboutSend = false;
 }
 
 Battlefield::~Battlefield()
@@ -79,17 +71,13 @@ Battlefield::~Battlefield()
     m_capturePoints.clear();
 }
 
-// Called when a player enters the zone
 void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
 {
-    // If battle is started,
-    // If not full of players > invite player to join the war
-    // If full of players > announce to player that BF is full and kick him after a few second if he desn't leave
     if (IsWarTime())
     {
-        if (m_PlayersInWar[player->GetTeamId()].size() + m_InvitedPlayers[player->GetTeamId()].size() < m_MaxPlayer) // Vacant spaces
+        if (m_PlayersInWar[player->GetTeamId()].size() + m_InvitedPlayers[player->GetTeamId()].size() < m_MaxPlayer)
             InvitePlayerToWar(player);
-        else // No more vacant places
+        else
         {
             // TODO: Send a packet to announce it to player
             m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = time(NULL) + 10;
@@ -98,27 +86,23 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
     }
     else
     {
-        // If time left is < 15 minutes invite player to join queue
         if (m_Timer <= m_StartGroupingTimer)
             InvitePlayerToQueue(player);
     }
 
-    // Add player in the list of player in zone
     m_players[player->GetTeamId()].insert(player->GetGUID());
     OnPlayerEnterZone(player);
 }
 
-// Called when a player leave the zone
 void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
 {
     if (IsWarTime())
     {
-        // If the player is participating to the battle
         if (m_PlayersInWar[player->GetTeamId()].find(player->GetGUID()) != m_PlayersInWar[player->GetTeamId()].end())
         {
             m_PlayersInWar[player->GetTeamId()].erase(player->GetGUID());
             player->GetSession()->SendBfLeaveMessage(m_Guid);
-            if (Group* group = player->GetGroup()) // Remove the player from the raid group
+            if (Group* group = player->GetGroup())
                 group->RemoveMember(player->GetGUID());
 
             OnPlayerLeaveWar(player);
@@ -140,16 +124,14 @@ bool Battlefield::Update(uint32 diff)
 {
     if (m_Timer <= diff)
     {
-        // Battlefield ends on time
         if (IsWarTime())
             EndBattle(true);
-        else // Time to start a new battle!
+        else
             StartBattle();
     }
     else
         m_Timer -= diff;
 
-    // Invite players a few minutes before the battle's beginning
     if (!IsWarTime() && !m_StartGrouping && m_Timer <= m_StartGroupingTimer)
     {
         m_StartGrouping = true;
@@ -167,25 +149,6 @@ bool Battlefield::Update(uint32 diff)
         }
         else
             m_uiKickAfkPlayersTimer -= diff;
-
-        // Kick players who chose not to accept invitation to the battle
-        if (m_uiKickDontAcceptTimer <= diff)
-        {
-            for (int team = 0; team < 2; team++)
-                for (PlayerTimerMap::iterator itr = m_InvitedPlayers[team].begin(); itr != m_InvitedPlayers[team].end(); ++itr)
-                    if ((*itr).second <= time(NULL))
-                        KickPlayerFromBattlefield((*itr).first);
-
-            InvitePlayersInZoneToWar();
-            for (int team = 0; team < 2; team++)
-                for (PlayerTimerMap::iterator itr = m_PlayersWillBeKick[team].begin(); itr != m_PlayersWillBeKick[team].end(); ++itr)
-                    if ((*itr).second <= time(NULL))
-                        KickPlayerFromBattlefield((*itr).first);
-
-            m_uiKickDontAcceptTimer = 1000;
-        }
-        else
-            m_uiKickDontAcceptTimer -= diff;
 
         for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
             if (itr->second->Update(diff))
@@ -254,7 +217,7 @@ void Battlefield::InvitePlayersInZoneToWar()
                     continue;
                 if (m_PlayersInWar[player->GetTeamId()].size() + m_InvitedPlayers[player->GetTeamId()].size() < m_MaxPlayer)
                     InvitePlayerToWar(player);
-                else // Battlefield is full of players
+                else
                     m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = time(NULL) + 10;
             }
         }
@@ -271,7 +234,6 @@ void Battlefield::InvitePlayerToWar(Player* player)
         return;
     }
 
-    // If the player does not match minimal level requirements for the battlefield, kick him
     if (player->getLevel() < m_MinLevel)
     {
         if (m_PlayersWillBeKick[player->GetTeamId()].count(player->GetGUID()) == 0)
@@ -279,7 +241,6 @@ void Battlefield::InvitePlayerToWar(Player* player)
         return;
     }
 
-    // Check if player is not already in war
     if (m_PlayersInWar[player->GetTeamId()].count(player->GetGUID()) || m_InvitedPlayers[player->GetTeamId()].count(player->GetGUID()))
         return;
 
@@ -353,7 +314,6 @@ void Battlefield::EndBattle(bool endByTimer)
 
     OnBattleEnd(endByTimer);
 
-    // Reset battlefield timer
     m_Timer = m_NoWarBattleTime;
     SendInitWorldStatesToAll();
 }
@@ -376,23 +336,17 @@ bool Battlefield::HasPlayer(Player* player) const
     return m_players[player->GetTeamId()].find(player->GetGUID()) != m_players[player->GetTeamId()].end();
 }
 
-// Called in WorldSession::HandleBfQueueInviteResponse
 void Battlefield::PlayerAcceptInviteToQueue(Player* player)
 {
-    // Add player in queue
     m_PlayersInQueue[player->GetTeamId()].insert(player->GetGUID());
-    // Send notification
     player->GetSession()->SendBfQueueInviteResponse(m_Guid, m_ZoneId);
 }
 
-// Called in WorldSession::HandleBfExitRequest
 void Battlefield::AskToLeaveQueue(Player* player)
 {
-    // Remove player from queue
     m_PlayersInQueue[player->GetTeamId()].erase(player->GetGUID());
 }
 
-// Called in WorldSession::HandleBfEntryInviteResponse
 void Battlefield::PlayerAcceptInviteToWar(Player* player)
 {
     if (!IsWarTime())
@@ -407,7 +361,7 @@ void Battlefield::PlayerAcceptInviteToWar(Player* player)
         if (player->isAFK())
             player->ToggleAFK();
 
-        OnPlayerJoinWar(player);                               //for scripting
+        OnPlayerJoinWar(player);
     }
 }
 
@@ -467,27 +421,18 @@ WorldPacket Battlefield::BuildWarningAnnPacket(std::string msg)
     return data;
 }
 
-void Battlefield::SendWarningToAllInZone(uint32 entry)
+void Battlefield::SendWarningToAllInZone(uint32 entry,...)
 {
-    if (Unit* unit = sObjectAccessor->FindUnit(StalkerGuid))
-        if (Creature* stalker = unit->ToCreature())
-            // FIXME: replaced CHAT_TYPE_END with CHAT_MSG_BG_SYSTEM_NEUTRAL to fix compile, it's a guessed change :/
-                sCreatureTextMgr->SendChat(stalker, (uint8) entry, 0, CHAT_MSG_BG_SYSTEM_NEUTRAL, LANG_ADDON, TEXT_RANGE_ZONE);
+    const char *format = sObjectMgr->GetCerberCoreStringForDBCLocale(entry);
+    va_list ap;
+    char str [1024];
+    va_start(ap, entry);
+    vsnprintf(str, 1024, format, ap);
+    va_end(ap);
+    std::string msg = (std::string)str;
+    WorldPacket data = BuildWarningAnnPacket(msg);
+    BroadcastPacketToZone(data);
 }
-
-/*void Battlefield::SendWarningToAllInWar(int32 entry,...)
-{
-const char *format = sObjectMgr->GetCerberCoreStringForDBCLocale(entry);
-va_list ap;
-char str [1024];
-va_start(ap, entry);
-vsnprintf(str,1024,format, ap);
-va_end(ap);
-std::string msg = (std::string)str;
-
-WorldPacket data = BuildWarningAnnPacket(msg);
-BroadcastPacketWar(data);
-}*/
 
 void Battlefield::SendWarningToPlayer(Player* player, uint32 entry)
 {
@@ -593,9 +538,6 @@ bool Battlefield::AddOrSetPlayerToCorrectBfGroup(Player* player)
 //***************Spirit Guide System*******************
 //*****************************************************
 
-//--------------------
-//-Battlefield Method-
-//--------------------
 BfGraveyard* Battlefield::GetGraveyardById(uint32 id)
 {
     if (id < m_GraveyardList.size())
@@ -670,16 +612,13 @@ void Battlefield::RemovePlayerFromResurrectQueue(uint64 playerGuid)
 void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, uint64 guid)
 {
     WorldPacket data(SMSG_AREA_SPIRIT_HEALER_TIME, 12);
-    uint32 time = m_LastResurectTimer;  // resurrect every 30 seconds
+    uint32 time = m_LastResurectTimer;
 
     data << guid << time;
     ASSERT(player && player->GetSession());
     player->GetSession()->SendPacket(&data);
 }
 
-// ----------------------
-// - BfGraveyard Method -
-// ----------------------
 BfGraveyard::BfGraveyard(Battlefield* battlefield)
 {
     m_Bf = battlefield;
@@ -740,17 +679,14 @@ void BfGraveyard::Resurrect()
 
     for (GuidSet::const_iterator itr = m_ResurrectQueue.begin(); itr != m_ResurrectQueue.end(); ++itr)
     {
-        // Get player object from his guid
         Player* player = sObjectAccessor->FindPlayer(*itr);
         if (!player)
             continue;
 
-        // Check  if the player is in world and on the good graveyard
         if (player->IsInWorld())
             if (Unit* spirit = sObjectAccessor->FindUnit(m_SpiritGuide[m_ControlTeam]))
                 spirit->CastSpell(spirit, SPELL_SPIRIT_HEAL, true);
 
-        // Resurect player
         player->CastSpell(player, SPELL_RESURRECTION_VISUAL, true);
         player->ResurrectPlayer(1.0f);
         player->CastSpell(player, 6962, true);
@@ -762,7 +698,6 @@ void BfGraveyard::Resurrect()
     m_ResurrectQueue.clear();
 }
 
-// For changing graveyard control
 void BfGraveyard::GiveControlTo(TeamId team)
 {
     // Guide switching
@@ -773,7 +708,6 @@ void BfGraveyard::GiveControlTo(TeamId team)
     m_SpiritGuide[team]->SetVisible(true);*/
 
     m_ControlTeam = team;
-    // Teleport to other graveyard, player witch were on this graveyard
     RelocateDeadPlayers();
 }
 
@@ -810,7 +744,6 @@ Creature* Battlefield::SpawnCreature(uint32 entry, Position pos, TeamId team)
 
 Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, float o, TeamId team)
 {
-    //Get map object
     Map* map = const_cast < Map * >(sMapMgr->CreateBaseMap(m_MapId));
     if (!map)
     {
@@ -834,26 +767,21 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
         sLog->outError(LOG_FILTER_BATTLEFIELD, "Battlefield::SpawnCreature: entry %u does not exist.", entry);
         return NULL;
     }
-    // force using DB speeds -- do we really need this?
+
     creature->SetSpeed(MOVE_WALK, cinfo->speed_walk);
     creature->SetSpeed(MOVE_RUN, cinfo->speed_run);
-
-    // Set creature in world
     map->AddToMap(creature);
     creature->setActive(true);
 
     return creature;
 }
 
-// Method for spawning gameobject on map
 GameObject* Battlefield::SpawnGameObject(uint32 entry, uint32 mapid, float x, float y, float z, float o)
 {
-    // Get map object
     Map* map = const_cast<Map*>(sMapMgr->CreateBaseMap(mapid));
     if (!map)
         return 0;
 
-    // Create gameobject
     GameObject* go = new GameObject;
     if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, map, PHASEMASK_NORMAL, x, y, z, o, 0, 0, 0, 0, 100, GO_STATE_READY))
     {
@@ -863,7 +791,6 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, uint32 mapid, float x, fl
         return NULL;
     }
 
-    // Add to world
     map->AddToMap(go);
     go->setActive(true);
 
@@ -906,7 +833,7 @@ GuidSet::iterator BfCapturePoint::HandlePlayerLeave(Player* player)
     GuidSet::iterator current = m_activePlayers[player->GetTeamId()].find(player->GetGUID());
 
     if (current == m_activePlayers[player->GetTeamId()].end())
-        return current; // return end()
+        return current;
 
     m_activePlayers[player->GetTeamId()].erase(current++);
     return current;
@@ -917,11 +844,8 @@ void BfCapturePoint::SendChangePhase()
     if (!m_capturePoint)
         return;
 
-    // send this too, sometimes the slider disappears, dunno why :(
     SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldState1, 1);
-    // send these updates to only the ones in this objective
     SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate2, (uint32) ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f));
-    // send this too, sometimes it resets :S
     SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate3, m_neutralValuePct);
 }
 
@@ -933,7 +857,6 @@ bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
 
     m_capturePoint = capturePoint;
 
-    // check info existence
     GameObjectTemplate const* goinfo = capturePoint->GetGOInfo();
     if (goinfo->type != GAMEOBJECT_TYPE_CAPTURE_POINT)
     {
@@ -941,7 +864,6 @@ bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
         return false;
     }
 
-    // get the needed values from goinfo
     m_maxValue = goinfo->capturePoint.maxTime;
     m_maxSpeed = m_maxValue / (goinfo->capturePoint.minTime ? goinfo->capturePoint.minTime : 60);
     m_neutralValuePct = goinfo->capturePoint.neutralPercent;
@@ -965,7 +887,7 @@ bool BfCapturePoint::DelCapturePoint()
 {
     if (m_capturePoint)
     {
-        m_capturePoint->SetRespawnTime(0);                  // not save respawn time
+        m_capturePoint->SetRespawnTime(0);
         m_capturePoint->Delete();
         m_capturePoint = NULL;
     }
@@ -1006,7 +928,6 @@ bool BfCapturePoint::Update(uint32 diff)
             if (m_activePlayers[(*itr)->GetTeamId()].insert((*itr)->GetGUID()).second)
                 HandlePlayerEnter(*itr);
 
-    // get the difference of numbers
     float fact_diff = ((float) m_activePlayers[0].size() - (float) m_activePlayers[1].size()) * diff / BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL;
     if (G3D::fuzzyEq(fact_diff, 0.0f))
         return false;
@@ -1016,7 +937,6 @@ bool BfCapturePoint::Update(uint32 diff)
 
     if (fact_diff < 0)
     {
-        // horde is in majority, but it's already horde-controlled -> no change
         if (m_State == BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE && m_value <= -m_maxValue)
             return false;
 
@@ -1027,7 +947,6 @@ bool BfCapturePoint::Update(uint32 diff)
     }
     else
     {
-        // ally is in majority, but it's already ally-controlled -> no change
         if (m_State == BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE && m_value >= m_maxValue)
             return false;
 
@@ -1044,33 +963,30 @@ bool BfCapturePoint::Update(uint32 diff)
 
     m_value += fact_diff;
 
-    if (m_value < -m_minValue)                              // red
+    if (m_value < -m_minValue)
     {
         if (m_value < -m_maxValue)
             m_value = -m_maxValue;
         m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE;
         m_team = TEAM_HORDE;
     }
-    else if (m_value > m_minValue)                          // blue
+    else if (m_value > m_minValue)
     {
         if (m_value > m_maxValue)
             m_value = m_maxValue;
         m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE;
         m_team = TEAM_ALLIANCE;
     }
-    else if (oldValue * m_value <= 0)                       // grey, go through mid point
+    else if (oldValue * m_value <= 0)
     {
-        // if challenger is ally, then n->a challenge
         if (Challenger == ALLIANCE)
             m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE;
-        // if challenger is horde, then n->h challenge
         else if (Challenger == HORDE)
             m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE;
         m_team = TEAM_NEUTRAL;
     }
-    else                                                    // grey, did not go through mid point
+    else
     {
-        // old phase and current are on the same side, so one team challenges the other
         if (Challenger == ALLIANCE && (m_OldState == BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE || m_OldState == BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE))
             m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE;
         else if (Challenger == HORDE && (m_OldState == BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE || m_OldState == BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE))
@@ -1083,7 +999,6 @@ bool BfCapturePoint::Update(uint32 diff)
 
     if (m_OldState != m_State)
     {
-        //sLog->outError(LOG_FILTER_BATTLEFIELD, "%u->%u", m_OldState, m_State);
         if (oldTeam != m_team)
             ChangeTeam(oldTeam);
         return true;
@@ -1095,7 +1010,7 @@ bool BfCapturePoint::Update(uint32 diff)
 void BfCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)
 {
     for (uint8 team = 0; team < 2; ++team)
-        for (GuidSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end(); ++itr)  // send to all players present in the area
+        for (GuidSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end(); ++itr)
             if (Player* player = sObjectAccessor->FindPlayer(*itr))
                 player->SendUpdateWorldState(field, value);
 }
@@ -1115,7 +1030,6 @@ void BfCapturePoint::SendObjectiveComplete(uint32 id, uint64 guid)
         return;
     }
 
-    // send to all players present in the area
     for (GuidSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end(); ++itr)
         if (Player* player = sObjectAccessor->FindPlayer(*itr))
             player->KilledMonsterCredit(id, guid);
@@ -1201,7 +1115,6 @@ bool BfCapturePoint::SetCapturePointData(uint32 entry, uint32 map, float x, floa
 {
     sLog->outDebug(LOG_FILTER_BATTLEGROUND, "Creating capture point %u", entry);
 
-    // check info existence
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo || goinfo->type != GAMEOBJECT_TYPE_CAPTURE_POINT)
     {
@@ -1211,7 +1124,6 @@ bool BfCapturePoint::SetCapturePointData(uint32 entry, uint32 map, float x, floa
 
     if (m_capturePoint = m_Bf->SpawnGameObject(entry,map,x,y,z,o))
     {    
-        // get the needed values from goinfo
         m_maxValue = goinfo->capturePoint.maxTime;
         m_maxSpeed = m_maxValue / (goinfo->capturePoint.minTime ? goinfo->capturePoint.minTime : 60);
         m_neutralValuePct = goinfo->capturePoint.neutralPercent;

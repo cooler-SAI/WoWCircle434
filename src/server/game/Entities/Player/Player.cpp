@@ -9743,19 +9743,19 @@ void Player::SendBattlefieldWorldStates()
         }
     }
 
-    if (sWorld->getBoolConfig(CONFIG_TOLBARAD_ENABLE))
-    {
-        if (BattlefieldTB* tb = (BattlefieldTB*)sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_TB))
-        {
-            if (tb->IsWarTime())
-                SendUpdateWorldState(TBClockWorldState[1], uint32(time(NULL)));
-            else // Time to next battle
-            {
-                uint32 timer = tb->GetTimer() / 1000;
-                SendUpdateWorldState(TBClockWorldState[1], time(NULL) + timer);
-            }
-        }
-    }
+    //if (sWorld->getBoolConfig(CONFIG_TOLBARAD_ENABLE))
+    //{
+    //    if (BattlefieldTB* tb = (BattlefieldTB*)sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_TB))
+    //    {
+    //        if (tb->IsWarTime())
+    //            SendUpdateWorldState(TBClockWorldState[1], uint32(time(NULL)));
+    //        else // Time to next battle
+    //        {
+    //            uint32 timer = tb->GetTimer() / 1000;
+    //            SendUpdateWorldState(TBClockWorldState[1], time(NULL) + timer);
+    //        }
+    //    }
+    //}
 
     SendUpdateWorldState(WORLD_STATE_ENABLE_RATED_BG, 1);
 }
