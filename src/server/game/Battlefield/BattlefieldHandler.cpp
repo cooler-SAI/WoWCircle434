@@ -69,27 +69,27 @@ void WorldSession::SendBfInvitePlayerToQueue(uint64 guid)
     WorldPacket data(SMSG_BATTLEFIELD_MGR_QUEUE_INVITE, 5);
 
     data
-        .WriteBit(1)               // unk
+        .WriteBit(1)
         .WriteBit(!warmup)
-        .WriteBit(1)               // unk
+        .WriteBit(1)
         .WriteByteMask(guidBytes[0])
-        .WriteBit(1)               // unk
+        .WriteBit(1)
         .WriteByteMask(guidBytes[2])
         .WriteByteMask(guidBytes[6])
         .WriteByteMask(guidBytes[3])
-        .WriteBit(1)               // unk
-        .WriteBit(0)               // unk
+        .WriteBit(1)
+        .WriteBit(0)
         .WriteByteMask(guidBytes[1])
         .WriteByteMask(guidBytes[5])
         .WriteByteMask(guidBytes[4])
-        .WriteBit(1)               // unk
+        .WriteBit(1)
         .WriteByteMask(guidBytes[7])
 
         .WriteByteSeq(guidBytes[2])
         .WriteByteSeq(guidBytes[3])
         .WriteByteSeq(guidBytes[6]);
 
-    data << uint8(1);               // Warmup
+    data << uint8(1);   // Warmup
 
     data
         .WriteByteSeq(guidBytes[5])
@@ -175,14 +175,14 @@ void WorldSession::SendBfEntered(uint64 guid)
     WorldPacket data(SMSG_BATTLEFIELD_MGR_ENTERED, 11);
 
     data
-        .WriteBit(0)              // unk
+        .WriteBit(0)
         .WriteBit(isAFK)
         .WriteByteMask(guidBytes[1])
         .WriteByteMask(guidBytes[4])
         .WriteByteMask(guidBytes[5])
         .WriteByteMask(guidBytes[0])
         .WriteByteMask(guidBytes[3])
-        .WriteBit(1)              // unk
+        .WriteBit(1)
         .WriteByteMask(guidBytes[6])
         .WriteByteMask(guidBytes[7])
         .WriteByteMask(guidBytes[2])
@@ -211,11 +211,11 @@ void WorldSession::SendBfLeaveMessage(uint64 guid, BFLeaveReason reason)
         .WriteByteMask(guidBytes[0])
         .WriteByteMask(guidBytes[3])
         .WriteByteMask(guidBytes[6])
-        .WriteBit(0)               // Relocated
+        .WriteBit(0)    // Relocated
         .WriteByteMask(guidBytes[7])
         .WriteByteMask(guidBytes[4]);
 
-    data << uint8(2);               // BattleStatus
+    data << uint8(2);   // BattleStatus
     data
         .WriteByteSeq(guidBytes[1])
         .WriteByteSeq(guidBytes[7])
@@ -223,7 +223,7 @@ void WorldSession::SendBfLeaveMessage(uint64 guid, BFLeaveReason reason)
         .WriteByteSeq(guidBytes[2])
         .WriteByteSeq(guidBytes[3]);
 
-    data << uint8(reason);          // Reason
+    data << uint8(reason);  // Reason
 
     data
         .WriteByteSeq(guidBytes[6])
@@ -261,12 +261,14 @@ void WorldSession::HandleBfQueueInviteResponse(WorldPacket& recvData)
         .ReadByteSeq(guid[0])
         .ReadByteSeq(guid[5]);
 
+    if (!accepted)
+        return;
+
     Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid);
     if (!bf)
         return;
-
-    if (accepted)
-        bf->PlayerAcceptInviteToQueue(_player);
+    
+    bf->PlayerAcceptInviteToQueue(_player);
 }
 
 void WorldSession::HandleBfEntryInviteResponse(WorldPacket& recvData)
@@ -310,7 +312,6 @@ void WorldSession::HandleBfEntryInviteResponse(WorldPacket& recvData)
 
 void WorldSession::HandleBfQueueRequest(WorldPacket& recvData)
 {
-    uint8 accepted;
     ObjectGuid guid;
 
     recvData
@@ -332,12 +333,18 @@ void WorldSession::HandleBfQueueRequest(WorldPacket& recvData)
         .ReadByteSeq(guid[5])
         .ReadByteSeq(guid[0]);
 
-    Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid);
-    if (!bf)
-        return;
 
-    if (accepted)
-        bf->PlayerAcceptInviteToQueue(_player);
+    if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid))
+    {
+        if (bf->IsWarTime())
+            bf->InvitePlayerToWar(_player);
+        else
+        {
+            uint32 timer = bf->GetTimer() / 1000;
+            if (timer < 15 * MINUTE)
+                bf->InvitePlayerToQueue(_player);
+        }
+    }
 }
 
 void WorldSession::HandleBfExitRequest(WorldPacket& recvData)
