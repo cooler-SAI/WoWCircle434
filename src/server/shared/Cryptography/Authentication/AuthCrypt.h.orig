@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2008-2014 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,19 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef OPENSSL_CRYPTO_H
-#define OPENSSL_CRYPTO_H
+#ifndef _AUTHCRYPT_H
+#define _AUTHCRYPT_H
 
-/**
-* A group of functions which setup openssl crypto module to work properly in multithreaded enviroment
-* If not setup properly - it will crash
-*/
-namespace OpenSSLCrypto
+#include "Cryptography/ARC4.h"
+
+class BigNumber;
+
+class AuthCrypt
 {
-    /// Needs to be called before threads using openssl are spawned
-    void threadsSetup();
-    /// Needs to be called after threads using openssl are despawned
-    void threadsCleanup();
-}
+    public:
+        AuthCrypt();
+        ~AuthCrypt();
 
+        void Init(BigNumber* K);
+        void DecryptRecv(uint8 *, size_t);
+        void EncryptSend(uint8 *, size_t);
+
+        bool IsInitialized() const { return _initialized; }
+
+    private:
+        ARC4 _clientDecrypt;
+        ARC4 _serverEncrypt;
+        bool _initialized;
+};
 #endif
