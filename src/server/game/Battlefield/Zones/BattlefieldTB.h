@@ -369,29 +369,29 @@ enum eTBTeamControl
 
 enum eTBText // TODO!
 {
-    BATTLEFIELD_TB_TEXT_WORKSHOP_NAME_NE    = 13100,
-    BATTLEFIELD_TB_TEXT_WORKSHOP_NAME_NW    = 13101,
-    BATTLEFIELD_TB_TEXT_WORKSHOP_NAME_SE    = 13102,
-    BATTLEFIELD_TB_TEXT_WORKSHOP_NAME_SW    = 13103,
-    BATTLEFIELD_TB_TEXT_WORKSHOP_ATTACK     = 13104,
-    BATTLEFIELD_TB_TEXT_WORKSHOP_TAKEN      = 13105,
-    BATTLEFIELD_TB_TEXT_ALLIANCE            = 13106,
-    BATTLEFIELD_TB_TEXT_HORDE               = 13107,
-    BATTLEFIELD_TB_TEXT_WILL_START          = 13108,
-    BATTLEFIELD_TB_TEXT_START               = 13109,
-    BATTLEFIELD_TB_TEXT_FIRSTRANK           = 13110,
+    BATTLEFIELD_TB_TEXT_WORKSHOP_NAME_NE    = 13100, //?
+    BATTLEFIELD_TB_TEXT_WORKSHOP_NAME_NW    = 13101, //?
+    BATTLEFIELD_TB_TEXT_WORKSHOP_NAME_SE    = 13102, //?
+    BATTLEFIELD_TB_TEXT_WORKSHOP_NAME_SW    = 13103, //?
+    BATTLEFIELD_TB_TEXT_WORKSHOP_ATTACK     = 13104, //?
+    BATTLEFIELD_TB_TEXT_WORKSHOP_TAKEN      = 13105, //?
+    BATTLEFIELD_TB_TEXT_ALLIANCE            = 13106, // 
+    BATTLEFIELD_TB_TEXT_HORDE               = 13107, // 
+    BATTLEFIELD_TB_TEXT_WILL_START          = 13108, //?
+    BATTLEFIELD_TB_TEXT_START               = 13109, //
+    BATTLEFIELD_TB_TEXT_FIRSTRANK           = 13110, //?
     BATTLEFIELD_TB_TEXT_SECONDRANK          = 13111,
     BATTLEFIELD_TB_TEXT_KEEPTOWER_NAME_NE   = 13112,
     BATTLEFIELD_TB_TEXT_KEEPTOWER_NAME_NW   = 13113,
     BATTLEFIELD_TB_TEXT_KEEPTOWER_NAME_SE   = 13114,
     BATTLEFIELD_TB_TEXT_KEEPTOWER_NAME_SW   = 13115,
-    BATTLEFIELD_TB_TEXT_TOWER_DAMAGE        = 13115,
-    BATTLEFIELD_TB_TEXT_TOWER_DESTROY       = 13117,
-    BATTLEFIELD_TB_TEXT_TOWER_NAME_S        = 13118,
-    BATTLEFIELD_TB_TEXT_TOWER_NAME_E        = 13119,
-    BATTLEFIELD_TB_TEXT_TOWER_NAME_W        = 13120,
-    BATTLEFIELD_TB_TEXT_DEFEND_KEEP         = 13121,
-    BATTLEFIELD_TB_TEXT_WIN_KEEP            = 13122,
+    BATTLEFIELD_TB_TEXT_TOWER_DAMAGE        = 13115, //
+    BATTLEFIELD_TB_TEXT_TOWER_DESTROY       = 13117, //
+    BATTLEFIELD_TB_TEXT_TOWER_NAME_S        = 13118, //?
+    BATTLEFIELD_TB_TEXT_TOWER_NAME_E        = 13119, //?
+    BATTLEFIELD_TB_TEXT_TOWER_NAME_W        = 13120, //?
+    BATTLEFIELD_TB_TEXT_DEFEND_KEEP         = 13121, //?
+    BATTLEFIELD_TB_TEXT_WIN_KEEP            = 13122, //
 };
 
 enum eTBObject
@@ -697,8 +697,8 @@ struct BfTBWorkShopDataBase
 const BfTBWorkShopDataBase TBWorkShopDataBase[TB_MAX_WORKSHOP]=
 {
     {WS_TB_SOUTH_CAPTURE_POINT, BATTLEFIELD_TB_NOTH_CP, BATTLEFIELD_TB_TEXT_WIN_KEEP, { -896.960000f, 979.497000f, 121.441000f, 3.124123f, GAMEOBJECT_TB_NORTH_CAPTURE_POINT_AD, GAMEOBJECT_TB_NORTH_CAPTURE_POINT_HD}},
-    {WS_TB_EAST_CAPTURE_POINT,  BATTLEFIELD_TB_EAST_CP, BATTLEFIELD_TB_TEXT_WIN_KEEP, { -1492.34000f, 1309.87000f, 152.961000f, -0.82030f, GAMEOBJECT_TB_EAST_CAPTURE_POINT_AD, GAMEOBJECT_TB_EAST_CAPTURE_POINT_HD}},
-    {WS_TB_WEST_CAPTURE_POINT,  BATTLEFIELD_TB_WEST_CP, BATTLEFIELD_TB_TEXT_WIN_KEEP, { -1437.00000f, 685.556000f, 123.421000f, 0.802851f, GAMEOBJECT_TB_WEST_CAPTURE_POINT_AD, GAMEOBJECT_TB_WEST_CAPTURE_POINT_HD}},
+    {WS_TB_EAST_CAPTURE_POINT,  BATTLEFIELD_TB_EAST_CP, BATTLEFIELD_TB_TEXT_WIN_KEEP, { -1492.34000f, 1309.87000f, 152.961000f, -0.82030f, GAMEOBJECT_TB_EAST_CAPTURE_POINT_AD,  GAMEOBJECT_TB_EAST_CAPTURE_POINT_HD}},
+    {WS_TB_WEST_CAPTURE_POINT,  BATTLEFIELD_TB_WEST_CP, BATTLEFIELD_TB_TEXT_WIN_KEEP, { -1437.00000f, 685.556000f, 123.421000f, 0.802851f, GAMEOBJECT_TB_WEST_CAPTURE_POINT_AD,  GAMEOBJECT_TB_WEST_CAPTURE_POINT_HD}},
 };
 
 
@@ -774,8 +774,8 @@ struct BfTBGameObjectBuilding
     {
         m_TB->OnDestroyed();
 
-        m_TB->SetTimer(m_TB->GetTimer() + 5 * 60 * 1000);
-        m_TB->SendUpdateWorldState(WS_TB_BATTLE_TIMER, (time(NULL) + m_TB->GetTimer() / 1000));
+        m_TB->SetTimer(m_TB->GetTimer() + 5 * MINUTE * IN_MILLISECONDS);
+        m_TB->SendUpdateWorldState(WS_TB_BATTLE_TIMER, (uint32(time(NULL) + m_TB->GetTimer() / 1000)));
 
         for (int i = 0; i < BUILDING_MAX_DIFF; i++)
         {
@@ -785,7 +785,7 @@ struct BfTBGameObjectBuilding
                 m_TB->SendUpdateWorldState(m_WorldState + i, 0);
         }
 
-        m_State = BATTLEFIELD_TB_OBJECTSTATE_ALLIANCE_DESTROY-(m_Team*3);
+        m_State = BATTLEFIELD_TB_OBJECTSTATE_ALLIANCE_DESTROY - (m_Team * 3);
 
         if (m_NameId)
             m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_TOWER_DESTROY, sObjectMgr->GetCerberCoreStringForDBCLocale(m_NameId));
@@ -893,7 +893,7 @@ struct BfTBWorkShopData
                     }
                 }
 
-                m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_WORKSHOP_ATTACK,sObjectMgr->GetCerberCoreStringForDBCLocale(m_NameId),
+                m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_WORKSHOP_ATTACK, sObjectMgr->GetCerberCoreStringForDBCLocale(m_NameId),
                     sObjectMgr->GetCerberCoreStringForDBCLocale(m_TeamControl ? BATTLEFIELD_TB_TEXT_ALLIANCE:BATTLEFIELD_TB_TEXT_HORDE));
                 break;
             }
@@ -910,7 +910,7 @@ struct BfTBWorkShopData
                 m_State = BATTLEFIELD_TB_OBJECTSTATE_ALLIANCE_INTACT;
 
                 if (!init)
-                    m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_WORKSHOP_TAKEN,sObjectMgr->GetCerberCoreStringForDBCLocale(m_NameId),
+                    m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_WORKSHOP_TAKEN, sObjectMgr->GetCerberCoreStringForDBCLocale(m_NameId),
                     sObjectMgr->GetCerberCoreStringForDBCLocale(BATTLEFIELD_TB_TEXT_ALLIANCE));
 
                 m_TeamControl = team;
@@ -929,7 +929,7 @@ struct BfTBWorkShopData
                 m_State = BATTLEFIELD_TB_OBJECTSTATE_HORDE_INTACT;
 
                 if (!init)
-                    m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_WORKSHOP_TAKEN,sObjectMgr->GetCerberCoreStringForDBCLocale(m_NameId),
+                    m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_WORKSHOP_TAKEN, sObjectMgr->GetCerberCoreStringForDBCLocale(m_NameId),
                     sObjectMgr->GetCerberCoreStringForDBCLocale(BATTLEFIELD_TB_TEXT_HORDE));
 
                 m_TeamControl = team;
@@ -945,7 +945,7 @@ struct BfTBWorkShopData
 
     void Save()
     {
-        sWorld->setWorldState(m_WorldState,m_State);
+        sWorld->setWorldState(m_WorldState, m_State);
     }
 };
 

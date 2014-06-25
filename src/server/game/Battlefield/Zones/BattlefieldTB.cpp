@@ -346,7 +346,7 @@ void BattlefieldTB::OnBattleStart()
         if (Player* plr = itr->second)
         {
             plr->SendUpdateWorldState(WS_TB_BATTLE_TIMER_ENABLED, 1);
-            plr->SendUpdateWorldState(WS_TB_BATTLE_TIMER, (time(NULL) + GetTimer() / 1000));
+            plr->SendUpdateWorldState(WS_TB_BATTLE_TIMER, (uint32(time(NULL) + GetTimer() / 1000));
             plr->SendUpdateWorldState(WS_TB_COUNTER_BUILDINGS, 0);
             plr->SendUpdateWorldState(WS_TB_COUNTER_BUILDINGS_ENABLED, 1);
             plr->SendUpdateWorldState(WS_TB_HORDE_DEFENCE, GetDefenderTeam() == TEAM_HORDE ? 1 : 0);
@@ -696,14 +696,12 @@ void BattlefieldTB::OnBattleEnd(bool endbytimer)
                         switch (plr->GetTeamId())
                         {
                         case TEAM_ALLIANCE:
-                            DoPlaySoundToAll(BATTLEFIELD_TB_ALLIANCE_WINS);
                             plr->CastSpell(plr, SPELL_TB_VICTORY_REWARD_ALLIANCE, true);
                             plr->CastSpell(plr, SPELL_TB_TOL_BARAD_VETERAN, true);
                             plr->CastSpell(plr, SPELL_TB_TOL_BARAD_TOWER_BONUS, true);
                             IncrementQuest(plr, QUEST_TB_TOL_BARAD_VICTORY_IN_TOL_BARAD_A, true);
                             break;
                         case TEAM_HORDE:
-                            DoPlaySoundToAll(BATTLEFIELD_TB_HORDE_WINS);
                             plr->CastSpell(plr, SPELL_TB_VICTORY_REWARD_HORDE, true);
                             plr->CastSpell(plr, SPELL_TB_TOL_BARAD_VETERAN, true);
                             plr->CastSpell(plr, SPELL_TB_TOL_BARAD_TOWER_BONUS, true);
@@ -763,13 +761,13 @@ void BattlefieldTB::OnBattleEnd(bool endbytimer)
 void BattlefieldTB::FillInitialWorldStates(WorldPacket& data)
 {
     data << uint32(WS_TB_BATTLE_TIMER_ENABLED) << uint32(IsWarTime() ? 1 : 0);
-    data << uint32(WS_TB_BATTLE_TIMER) << uint32(IsWarTime() ? (time(NULL) + GetTimer() / 1000) : 0);
+    data << uint32(WS_TB_BATTLE_TIMER) << uint32(IsWarTime() ? uint32(time(NULL) + GetTimer() / 1000) : 0);
     data << uint32(WS_TB_COUNTER_BUILDINGS) << uint32(0);
     data << uint32(WS_TB_COUNTER_BUILDINGS_ENABLED) << uint32(IsWarTime() ? 1 : 0);
     data << uint32(WS_TB_HORDE_DEFENCE) << uint32(IsWarTime() ? (GetDefenderTeam() == TEAM_HORDE ? 1 : 0) : 0);
     data << uint32(WS_TB_ALLIANCE_DEFENCE) << uint32(IsWarTime() ? (GetDefenderTeam() == TEAM_ALLIANCE ? 1 : 0) : 0);
     data << uint32(WS_TB_NEXT_BATTLE_TIMER_ENABLED) << uint32(IsWarTime() ? 0 : 1);
-    data << uint32(WS_TB_NEXT_BATTLE_TIMER) << uint32(!IsWarTime() ? time(NULL) + (GetTimer() / 1000) : 0);
+    data << uint32(WS_TB_NEXT_BATTLE_TIMER) << uint32(!IsWarTime() ? uint32(time(NULL) + GetTimer() / 1000) : 0);
     data << uint32(WS_TB_ALLIANCE_ATTACK) << uint32(IsWarTime() ? (GetAttackerTeam() == TEAM_ALLIANCE ? 1 : 0) : 0);
     data << uint32(WS_TB_HORDE_ATTACK) << uint32(IsWarTime() ? (GetAttackerTeam() == TEAM_HORDE ? 1 : 0) : 0);
 
