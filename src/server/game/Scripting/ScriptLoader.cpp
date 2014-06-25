@@ -286,6 +286,7 @@ void AddSC_westfall();
 void AddSC_wetlands();
 void AddSC_deepholm();
 void AddSC_gilneas();
+void AddSC_tol_barad();
 
 //kalimdor
 void AddSC_blackfathom_deeps();              //Blackfathom Depths
@@ -1058,6 +1059,7 @@ void AddEasternKingdomsScripts()
     AddSC_wetlands();
     AddSC_deepholm();
     AddSC_gilneas();
+    AddSC_tol_barad();
 #endif
 }
 

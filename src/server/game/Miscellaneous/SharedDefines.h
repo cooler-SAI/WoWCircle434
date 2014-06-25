@@ -25,6 +25,12 @@
 
 #define MAX_CREATURE_BASE_HP 4
 
+enum WorldStateType
+{
+    WORLD_STATE_REMOVE              = 0,
+    WORLD_STATE_ADD                 = 1
+};
+
 enum SpellEffIndex
 {
     EFFECT_0 = 0,

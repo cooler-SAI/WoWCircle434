@@ -1279,21 +1279,22 @@ void World::LoadConfigSettings(bool reload)
 
     /* BattleFields  */
     // call ScriptMgr if we're reloading the configuration
-    m_bool_configs[CONFIG_WINTERGRASP_ENABLE]               = ConfigMgr::GetBoolDefault("Wintergrasp.Enable", false);
-    m_int_configs[CONFIG_WINTERGRASP_PLR_MAX]               = ConfigMgr::GetIntDefault("Wintergrasp.PlayerMax", 100);
-    m_int_configs[CONFIG_WINTERGRASP_PLR_MIN]               = ConfigMgr::GetIntDefault("Wintergrasp.PlayerMin", 0);
-    m_int_configs[CONFIG_WINTERGRASP_PLR_MIN_LVL]           = ConfigMgr::GetIntDefault("Wintergrasp.PlayerMinLvl", 77);
-    m_int_configs[CONFIG_WINTERGRASP_BATTLETIME]            = ConfigMgr::GetIntDefault("Wintergrasp.BattleTimer", 30);
-    m_int_configs[CONFIG_WINTERGRASP_NOBATTLETIME]          = ConfigMgr::GetIntDefault("Wintergrasp.NoBattleTimer", 150);
+    m_bool_configs[CONFIG_WINTERGRASP_ENABLE]               = ConfigMgr::GetBoolDefault("Wintergrasp.Enable",           true);
+    m_int_configs[CONFIG_WINTERGRASP_PLR_MAX]               = ConfigMgr::GetIntDefault("Wintergrasp.PlayerMax",         100);
+    m_int_configs[CONFIG_WINTERGRASP_PLR_MIN]               = ConfigMgr::GetIntDefault("Wintergrasp.PlayerMin",         0);
+    m_int_configs[CONFIG_WINTERGRASP_PLR_MIN_LVL]           = ConfigMgr::GetIntDefault("Wintergrasp.PlayerMinLvl",      77);
+    m_int_configs[CONFIG_WINTERGRASP_BATTLETIME]            = ConfigMgr::GetIntDefault("Wintergrasp.BattleTimer",       30);
+    m_int_configs[CONFIG_WINTERGRASP_NOBATTLETIME]          = ConfigMgr::GetIntDefault("Wintergrasp.NoBattleTimer",     150);
     m_int_configs[CONFIG_WINTERGRASP_RESTART_AFTER_CRASH]   = ConfigMgr::GetIntDefault("Wintergrasp.CrashRestartTimer", 10);
 
-    m_bool_configs[CONFIG_TOLBARAD_ENABLE]                  = ConfigMgr::GetBoolDefault("Tolbarad.Enable", false);
-    m_int_configs[CONFIG_TOLBARAD_PLR_MAX]                  = ConfigMgr::GetIntDefault("Tolbarad.PlayerMax", 100);
-    m_int_configs[CONFIG_TOLBARAD_PLR_MIN]                  = ConfigMgr::GetIntDefault("Tolbarad.PlayerMin", 0);
-    m_int_configs[CONFIG_TOLBARAD_PLR_MIN_LVL]              = ConfigMgr::GetIntDefault("Tolbarad.PlayerMinLvl", 83);
-    m_int_configs[CONFIG_TOLBARAD_BATTLETIME]               = ConfigMgr::GetIntDefault("Tolbarad.BattleTimer", 15);
-    m_int_configs[CONFIG_TOLBARAD_NOBATTLETIME]             = ConfigMgr::GetIntDefault("Tolbarad.NoBattleTimer", 150);
-    m_int_configs[CONFIG_TOLBARAD_RESTART_AFTER_CRASH]      = ConfigMgr::GetIntDefault("Tolbarad.CrashRestartTimer", 10);
+    m_bool_configs[CONFIG_TOL_BARAD_ENABLE]                 = ConfigMgr::GetBoolDefault("Tolbarad.Enable",              true);
+    m_int_configs[CONFIG_TOL_BARAD_PLR_MAX]                 = ConfigMgr::GetIntDefault("Tolbarad.PlayerMax",            100);
+    m_int_configs[CONFIG_TOL_BARAD_PLR_MIN]                 = ConfigMgr::GetIntDefault("Tolbarad.PlayerMin",            0);
+    m_int_configs[CONFIG_TOL_BARAD_PLR_MIN_LVL]             = ConfigMgr::GetIntDefault("Tolbarad.PlayerMinLvl",         85);
+    m_int_configs[CONFIG_TOL_BARAD_BATTLETIME]              = ConfigMgr::GetIntDefault("Tolbarad.BattleTimer",          30);
+    m_int_configs[CONFIG_TOL_BARAD_NOBATTLETIME]            = ConfigMgr::GetIntDefault("Tolbarad.NoBattleTimer",        150);
+    m_int_configs[CONFIG_TOL_BARAD_RESTART_AFTER_CRASH]     = ConfigMgr::GetIntDefault("Tolbarad.CrashRestartTimer",    10);
+
     /* BattleFields end */
 
     // loading boost

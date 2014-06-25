@@ -1,10 +1,12 @@
 /*
-* Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
-* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+* Copyright (C) 2011-2012 DarkCore <http://www.darkpeninsula.eu/>
+* Copyright (C) 2011-2012 Project SkyFire <http://www.projectskyfire.org/>
+* Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
+* Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
-* Free Software Foundation; either version 2 of the License, or (at your
+* Free Software Foundation; either version 3 of the License, or (at your
 * option) any later version.
 *
 * This program is distributed in the hope that it will be useful, but WITHOUT
@@ -42,27 +44,30 @@ void BattlefieldMgr::InitBattlefield()
     // respawn, init variables
     if (!pBf->SetupBattlefield())
     {
-        sLog->outInfo(LOG_FILTER_GENERAL, "Battlefield : Wintergrasp init failed.");
+        sLog->outString();
+        sLog->outString("Battlefield : Wintergrasp init failed.");
         delete pBf;
     }
     else
     {
         m_BattlefieldSet.push_back(pBf);
-        sLog->outInfo(LOG_FILTER_GENERAL, "Battlefield : Wintergrasp successfully initiated.");
+        sLog->outString();
+        sLog->outString("Battlefield : Wintergrasp successfully initiated.");
     }
 
-    //pBf = new BattlefieldTB;
-    //// respawn, init variables
-    //if(!pBf->SetupBattlefield())
-    //{
-    //    sLog->outDebug(LOG_FILTER_BATTLEFIELD, "Battlefield : Tol Barad init failed.");
-    //    delete pBf;
-    //}
-    //else
-    //{
-    //    m_BattlefieldSet.push_back(pBf);
-    //    sLog->outDebug(LOG_FILTER_BATTLEFIELD, "Battlefield : Tol Barad successfully initiated.");
-    //}
+    //For Cataclysm: Tol Barad
+    pBf = new BattlefieldTB;
+    // respawn, init variables
+    if(!pBf->SetupBattlefield())
+    {
+        sLog->outError(LOG_FILTER_GENERAL, "Battlefield : Tol Barad init failed.");
+        delete pBf;
+    }
+    else
+    {
+        m_BattlefieldSet.push_back(pBf);
+        sLog->outError(LOG_FILTER_GENERAL, "Battlefield : Tol Barad successfully initiated.");
+    } 
 }
 
 void BattlefieldMgr::AddZone(uint32 zoneid, Battlefield *handle)

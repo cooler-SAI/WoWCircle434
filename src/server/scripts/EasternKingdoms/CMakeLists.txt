@@ -199,6 +199,7 @@ set(scripts_STAT_SRCS
   EasternKingdoms/westfall.cpp
   EasternKingdoms/silverpine_forest.cpp
   EasternKingdoms/deepholm.cpp
+  EasternKingdoms/tol_barad.cpp
   EasternKingdoms/Karazhan/instance_karazhan.cpp
   EasternKingdoms/Karazhan/boss_nightbane.cpp
   EasternKingdoms/Karazhan/karazhan.cpp

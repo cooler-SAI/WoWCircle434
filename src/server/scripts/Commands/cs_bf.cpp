@@ -1,19 +1,19 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+* Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+*
+* This program is free software; you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the
+* Free Software Foundation; either version 2 of the License, or (at your
+* option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /* ScriptData
 Name: bf_commandscript
@@ -69,6 +69,9 @@ public:
         if (battleid == 1)
             handler->SendGlobalGMSysMessage("Wintergrasp (Command start used)");
 
+        if (battleid == 2)
+            handler->SendGlobalGMSysMessage("Tol Barad (Command start used)");
+
         return true;
     }
 
@@ -90,6 +93,9 @@ public:
 
         if (battleid == 1)
             handler->SendGlobalGMSysMessage("Wintergrasp (Command stop used)");
+
+        if (battleid == 2)
+            handler->SendGlobalGMSysMessage("Tol Barad (Command stop used)");
 
         return true;
     }
@@ -113,12 +119,18 @@ public:
             bf->ToggleBattlefield(false);
             if (battleid == 1)
                 handler->SendGlobalGMSysMessage("Wintergrasp is disabled");
+
+            if (battleid == 2)
+                handler->SendGlobalGMSysMessage("Tol Barad is disabled");	
         }
         else
         {
             bf->ToggleBattlefield(true);
             if (battleid == 1)
                 handler->SendGlobalGMSysMessage("Wintergrasp is enabled");
+
+            if (battleid == 2)
+                handler->SendGlobalGMSysMessage("Tol Barad is enabled");
         }
 
         return true;
@@ -141,6 +153,9 @@ public:
         bf->EndBattle(false);
         if (battleid == 1)
             handler->SendGlobalGMSysMessage("Wintergrasp (Command switch used)");
+
+        if (battleid == 2)
+            handler->SendGlobalGMSysMessage("Tol Barad (Command switch used)");
 
         return true;
     }
@@ -169,6 +184,9 @@ public:
         bf->SendInitWorldStatesToAll();
         if (battleid == 1)
             handler->SendGlobalGMSysMessage("Wintergrasp (Command timer used)");
+
+        if (battleid == 2)
+            handler->SendGlobalGMSysMessage("Tol Barad (Command timer used)");
 
         return true;
     }

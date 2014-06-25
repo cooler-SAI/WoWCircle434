@@ -9748,11 +9748,11 @@ void Player::SendBattlefieldWorldStates()
         if (BattlefieldTB* tb = (BattlefieldTB*)sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_TB))
         {
             if (tb->IsWarTime())
-                SendUpdateWorldState(ClockWorldState[1], uint32(time(NULL)));
+                SendUpdateWorldState(TBClockWorldState[1], uint32(time(NULL)));
             else // Time to next battle
             {
                 uint32 timer = tb->GetTimer() / 1000;
-                SendUpdateWorldState(ClockWorldState[1], time(NULL) + timer);
+                SendUpdateWorldState(TBClockWorldState[1], time(NULL) + timer);
             }
         }
     }

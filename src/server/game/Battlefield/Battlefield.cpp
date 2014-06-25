@@ -1,20 +1,20 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+* Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+*
+* This program is free software; you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the
+* Free Software Foundation; either version 2 of the License, or (at your
+* option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
 
 
 #include "Battlefield.h"
@@ -35,29 +35,30 @@
 
 Battlefield::Battlefield()
 {
-    m_Timer = 0;
-    m_IsEnabled = true;
-    m_isActive = false;
-    m_DefenderTeam = TEAM_NEUTRAL;
+    m_Timer                     = 0;
+    m_IsEnabled                 = true;
+    m_isActive                  = false;
+    m_DefenderTeam              = TEAM_NEUTRAL;
 
-    m_Guid = 0;
-    m_TypeId = 0;
-    m_BattleId = 0;
-    m_ZoneId = 0;
-    m_MapId = 0;
-    m_MaxPlayer = 0;
-    m_MinPlayer = 0;
-    m_BattleTime = 0;
-    m_NoWarBattleTime = 0;
-    m_TimeForAcceptInvite = 20;
-    m_uiKickDontAcceptTimer = 1000;
+    m_Guid                      = 0;
+    m_TypeId                    = 0;
+    m_BattleId                  = 0;
+    m_ZoneId                    = 0;
+    m_MapId                     = 0;
+    m_MaxPlayer                 = 0;
+    m_MinPlayer                 = 0;
+    m_BattleTime                = 0;
+    m_NoWarBattleTime           = 0;
+    m_TimeForAcceptInvite       = 20;
+    m_uiKickDontAcceptTimer     = 1000;
 
-    m_uiKickAfkPlayersTimer = 1000;
+    m_uiKickAfkPlayersTimer     = 1000;
 
-    m_LastResurectTimer = 30 * IN_MILLISECONDS;
-    m_StartGroupingTimer = 0;
-    m_StartGrouping = false;
-    StalkerGuid = 0;
+    m_LastResurectTimer         = 30 * IN_MILLISECONDS;
+    m_StartGroupingTimer        = 0;
+    m_StartGrouping             = false;
+    StalkerGuid                 = 0;
+    m_TowerBonus                = 0;
 
     //m_defender = TeamIndex(urand(0, 1));
     //m_state = BF_STATE_COOLDOWN;
@@ -416,10 +417,10 @@ void Battlefield::TeamCastSpell(TeamId team, int32 spellId)
         for (GuidSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
             if (Player* player = sObjectAccessor->FindPlayer(*itr))
                 player->CastSpell(player, uint32(spellId), true);
-    else
-        for (GuidSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
-            if (Player* player = sObjectAccessor->FindPlayer(*itr))
-                player->RemoveAuraFromStack(uint32(-spellId));
+            else
+                for (GuidSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
+                    if (Player* player = sObjectAccessor->FindPlayer(*itr))
+                        player->RemoveAuraFromStack(uint32(-spellId));
 }
 
 void Battlefield::BroadcastPacketToZone(WorldPacket& data) const
@@ -471,21 +472,21 @@ void Battlefield::SendWarningToAllInZone(uint32 entry)
     if (Unit* unit = sObjectAccessor->FindUnit(StalkerGuid))
         if (Creature* stalker = unit->ToCreature())
             // FIXME: replaced CHAT_TYPE_END with CHAT_MSG_BG_SYSTEM_NEUTRAL to fix compile, it's a guessed change :/
-            sCreatureTextMgr->SendChat(stalker, (uint8) entry, 0, CHAT_MSG_BG_SYSTEM_NEUTRAL, LANG_ADDON, TEXT_RANGE_ZONE);
+                sCreatureTextMgr->SendChat(stalker, (uint8) entry, 0, CHAT_MSG_BG_SYSTEM_NEUTRAL, LANG_ADDON, TEXT_RANGE_ZONE);
 }
 
 /*void Battlefield::SendWarningToAllInWar(int32 entry,...)
 {
-    const char *format = sObjectMgr->GetCerberCoreStringForDBCLocale(entry);
-    va_list ap;
-    char str [1024];
-    va_start(ap, entry);
-    vsnprintf(str,1024,format, ap);
-    va_end(ap);
-    std::string msg = (std::string)str;
+const char *format = sObjectMgr->GetCerberCoreStringForDBCLocale(entry);
+va_list ap;
+char str [1024];
+va_start(ap, entry);
+vsnprintf(str,1024,format, ap);
+va_end(ap);
+std::string msg = (std::string)str;
 
-    WorldPacket data = BuildWarningAnnPacket(msg);
-    BroadcastPacketWar(data);
+WorldPacket data = BuildWarningAnnPacket(msg);
+BroadcastPacketWar(data);
 }*/
 
 void Battlefield::SendWarningToPlayer(Player* player, uint32 entry)
@@ -767,9 +768,9 @@ void BfGraveyard::GiveControlTo(TeamId team)
     // Guide switching
     // Note: Visiblity changes are made by phasing
     /*if (m_SpiritGuide[1 - team])
-        m_SpiritGuide[1 - team]->SetVisible(false);
+    m_SpiritGuide[1 - team]->SetVisible(false);
     if (m_SpiritGuide[team])
-        m_SpiritGuide[team]->SetVisible(true);*/
+    m_SpiritGuide[team]->SetVisible(true);*/
 
     m_ControlTeam = team;
     // Teleport to other graveyard, player witch were on this graveyard
@@ -845,10 +846,10 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
 }
 
 // Method for spawning gameobject on map
-GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z, float o)
+GameObject* Battlefield::SpawnGameObject(uint32 entry, uint32 mapid, float x, float y, float z, float o)
 {
     // Get map object
-    Map* map = const_cast<Map*>(sMapMgr->CreateBaseMap(571)); // *vomits*
+    Map* map = const_cast<Map*>(sMapMgr->CreateBaseMap(mapid));
     if (!map)
         return 0;
 
@@ -1104,14 +1105,14 @@ void BfCapturePoint::SendObjectiveComplete(uint32 id, uint64 guid)
     uint8 team;
     switch (m_State)
     {
-        case BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE:
-            team = 0;
-            break;
-        case BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE:
-            team = 1;
-            break;
-        default:
-            return;
+    case BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE:
+        team = 0;
+        break;
+    case BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE:
+        team = 1;
+        break;
+    default:
+        return;
     }
 
     // send to all players present in the area
@@ -1123,4 +1124,111 @@ void BfCapturePoint::SendObjectiveComplete(uint32 id, uint64 guid)
 bool BfCapturePoint::IsInsideObjective(Player* player) const
 {
     return m_activePlayers[player->GetTeamId()].find(player->GetGUID()) != m_activePlayers[player->GetTeamId()].end();
+}
+
+bool Battlefield::IncrementQuest(Player *player, uint32 quest, bool complete)
+{
+    if (!player)
+        return false;
+
+    Quest const* pQuest = sObjectMgr->GetQuestTemplate(quest);
+    if (!pQuest || player->GetQuestStatus(quest) == QUEST_STATUS_NONE)
+        return false;
+
+    if (complete)
+    {
+        player->CompleteQuest(quest);
+        return true;
+    }
+    else
+    {
+        for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+        {
+            int32 creature = pQuest->RequiredNpcOrGo[i];
+            if (uint32 spell_id = pQuest->RequiredSpellCast[i])
+            {
+                player->CastedCreatureOrGO(creature, 0, spell_id);
+                return true;
+            }
+            else if (creature > 0)
+            {
+                player->KilledMonsterCredit(creature, 0);
+                return true;
+            }
+            else if (creature < 0)
+            {
+                player->CastedCreatureOrGO(creature, 0, 0);
+                return true;
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+void BfGraveyard::Initialize(uint32 horde_entry, uint32 alliance_entry, float x, float y, float z, float o, TeamId startcontrol, uint32 gy)
+{
+    m_ControlTeam = startcontrol;
+
+    if (Creature* cre = m_Bf->SpawnCreature(horde_entry,x,y,z,o,TEAM_HORDE))
+    {
+        m_SpiritGuide[TEAM_HORDE] = cre->GetGUID();
+        cre->SetReactState(REACT_PASSIVE);
+        if (m_ControlTeam==TEAM_ALLIANCE)
+        {
+            cre->SetVisible(false);
+        }
+    }
+    else
+        sLog->outError(LOG_FILTER_BATTLEFIELD, "BfGraveYard::Init can't spawn horde spiritguide %u", horde_entry);
+
+    if (Creature* cre = m_Bf->SpawnCreature(alliance_entry, x, y, z, o, TEAM_ALLIANCE))
+    {
+        m_SpiritGuide[TEAM_ALLIANCE] = cre->GetGUID();
+        cre->SetReactState(REACT_PASSIVE);
+        if (m_ControlTeam==TEAM_HORDE)
+        {
+            cre->SetVisible(false);
+        }
+    }
+    else
+        sLog->outError(LOG_FILTER_BATTLEFIELD, "BfGraveYard::Init can't spawn alliance spiritguide %u", alliance_entry);
+
+    m_GraveyardId = gy;
+}
+
+bool BfCapturePoint::SetCapturePointData(uint32 entry, uint32 map, float x, float y, float z, float o)
+{
+    sLog->outDebug(LOG_FILTER_BATTLEGROUND, "Creating capture point %u", entry);
+
+    // check info existence
+    GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
+    if (!goinfo || goinfo->type != GAMEOBJECT_TYPE_CAPTURE_POINT)
+    {
+        sLog->outError(LOG_FILTER_OUTDOORPVP, "OutdoorPvP: GO %u is not capture point!", entry);
+        return false;
+    }
+
+    if (m_capturePoint = m_Bf->SpawnGameObject(entry,map,x,y,z,o))
+    {    
+        // get the needed values from goinfo
+        m_maxValue = goinfo->capturePoint.maxTime;
+        m_maxSpeed = m_maxValue / (goinfo->capturePoint.minTime ? goinfo->capturePoint.minTime : 60);
+        m_neutralValuePct = goinfo->capturePoint.neutralPercent;
+        m_minValue = m_maxValue * goinfo->capturePoint.neutralPercent / 100;
+        m_capturePointEntry = entry;
+        if (m_team == TEAM_ALLIANCE)
+        {
+            m_value = m_maxValue;
+            m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE;
+        }
+        else 
+        {
+            m_value = -m_maxValue;
+            m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE;
+        }
+        return true;
+    }
+    else
+        return false;
 }
