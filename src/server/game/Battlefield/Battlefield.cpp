@@ -700,13 +700,6 @@ void BfGraveyard::Resurrect()
 
 void BfGraveyard::GiveControlTo(TeamId team)
 {
-    // Guide switching
-    // Note: Visiblity changes are made by phasing
-    /*if (m_SpiritGuide[1 - team])
-    m_SpiritGuide[1 - team]->SetVisible(false);
-    if (m_SpiritGuide[team])
-    m_SpiritGuide[team]->SetVisible(true);*/
-
     m_ControlTeam = team;
     RelocateDeadPlayers();
 }

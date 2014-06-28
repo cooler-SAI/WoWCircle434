@@ -91,7 +91,7 @@ public:
     virtual GuidSet::iterator HandlePlayerLeave(Player* player);
     bool IsInsideObjective(Player* player) const;
     virtual bool Update(uint32 diff);
-    virtual void ChangeTeam(TeamId /*oldTeam*/) {}
+    virtual void ChangeTeam(TeamId /*oldTeam*/) { }
     virtual void SendChangePhase();
 
     bool SetCapturePointData(GameObject* capturePoint);
@@ -134,8 +134,7 @@ public:
         if (!m_SpiritGuide[0] || !m_SpiritGuide[1])
             return false;
 
-        if (!sObjectAccessor->FindUnit(m_SpiritGuide[0]) ||
-            !sObjectAccessor->FindUnit(m_SpiritGuide[1]))
+        if (!sObjectAccessor->FindUnit(m_SpiritGuide[0]) || !sObjectAccessor->FindUnit(m_SpiritGuide[1]))
             return false;
 
         return (m_SpiritGuide[0] == guid || m_SpiritGuide[1] == guid);
@@ -166,7 +165,7 @@ public:
     void InvitePlayersInZoneToQueue();
     void InvitePlayersInQueueToWar();
     void InvitePlayersInZoneToWar();
-    virtual void HandleKill(Player* /*killer*/, Unit* /*killed*/) {};
+    virtual void HandleKill(Player* /*killer*/, Unit* /*killed*/) { };
 
     uint32 GetTypeId() { return m_TypeId; }
     uint32 GetZoneId() { return m_ZoneId; }
@@ -271,7 +270,7 @@ protected:
     std::vector<uint64> m_Data64;
     std::vector<uint32> m_Data32;
     void KickAfkPlayers();
-    virtual void SendRemoveWorldStates(Player* /*player*/) {}
+    virtual void SendRemoveWorldStates(Player* /*player*/) { }
     void BroadcastPacketToZone(WorldPacket& data) const;
     void BroadcastPacketToQueue(WorldPacket& data) const;
     void BroadcastPacketToWar(WorldPacket& data) const;

@@ -346,7 +346,7 @@ void BattlefieldTB::OnBattleStart()
         if (Player* plr = itr->second)
         {
             plr->SendUpdateWorldState(WS_TB_BATTLE_TIMER_ENABLED, 1);
-            plr->SendUpdateWorldState(WS_TB_BATTLE_TIMER, (uint32(time(NULL) + GetTimer() / 1000));
+            plr->SendUpdateWorldState(WS_TB_BATTLE_TIMER, uint32(time(NULL) + GetTimer() / 1000));
             plr->SendUpdateWorldState(WS_TB_COUNTER_BUILDINGS, 0);
             plr->SendUpdateWorldState(WS_TB_COUNTER_BUILDINGS_ENABLED, 1);
             plr->SendUpdateWorldState(WS_TB_HORDE_DEFENCE, GetDefenderTeam() == TEAM_HORDE ? 1 : 0);
@@ -485,6 +485,84 @@ void BattlefieldTB::OnBattleEnd(bool endbytimer)
         sWorld->setWorldState(WS_TB_UNK_2, time(NULL) + 86400);
     }
 
+    sLog->outError(LOG_FILTER_BATTLEFIELD,"void BattlefieldTB::OnBattleEnd(bool endbytimer)");
+
+    for (uint8 team = 0; team < 2; ++team)
+    {
+        for (GuidSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
+        {
+            if (Player* plr = sObjectMgr->GetPlayerByLowGUID((*itr)))
+            {
+                if (endbytimer)
+                {
+                    sLog->outError(LOG_FILTER_BATTLEFIELD,"if (endbytimer)");
+                    if (plr->GetTeamId() == GetDefenderTeam())
+                    {
+                        sLog->outError(LOG_FILTER_BATTLEFIELD,"if (plr->GetTeamId() == GetDefenderTeam())");
+                        switch (plr->GetTeamId())
+                        {
+                        case TEAM_ALLIANCE:
+                            plr->CastSpell(plr, SPELL_TB_VICTORY_REWARD_ALLIANCE, true);
+                            plr->CastSpell(plr, SPELL_TB_TOL_BARAD_VETERAN, true);
+                            plr->CastSpell(plr, SPELL_TB_TOL_BARAD_TOWER_BONUS, true);
+                            IncrementQuest(plr, QUEST_TB_TOL_BARAD_VICTORY_IN_TOL_BARAD_A, true);
+                            break;
+                        case TEAM_HORDE:
+                            plr->CastSpell(plr, SPELL_TB_VICTORY_REWARD_HORDE, true);
+                            plr->CastSpell(plr, SPELL_TB_TOL_BARAD_VETERAN, true);
+                            plr->CastSpell(plr, SPELL_TB_TOL_BARAD_TOWER_BONUS, true);
+                            IncrementQuest(plr, QUEST_TB_TOL_BARAD_VICTORY_IN_TOL_BARAD_H, true);
+                            break;
+                        }
+
+                        DoCompleteOrIncrementAchievement(ACHIEVEMENT_TOL_BARAD_VICTORY, plr, 1);
+
+                        if (m_Data32[BATTLEFIELD_TB_DATA_DESTROYED] == 0)
+                            plr->CastSpell(plr, SPELL_TB_TOL_BARAD_TOWER_DEFENDED, true);
+                    }
+                    else
+                    {
+                        sLog->outError(LOG_FILTER_BATTLEFIELD,"! (plr->GetTeamId() == GetDefenderTeam())");
+                        switch (plr->GetTeamId())
+                        {
+                            sLog->outError(LOG_FILTER_BATTLEFIELD,"! (plr->GetTeamId() == GetDefenderTeam()) plr->GetTeamId()");
+                        case TEAM_ALLIANCE:
+                            IncrementQuest(plr, QUEST_TB_TOL_BARAD_VICTORY_IN_TOL_BARAD_A, true);
+                            break;
+                        case TEAM_HORDE:
+                            IncrementQuest(plr, QUEST_TB_TOL_BARAD_VICTORY_IN_TOL_BARAD_H, true);
+                            break;
+                        }
+                        plr->CastSpell(plr, SPELL_TB_LOOSER_REWARD, true);
+                        plr->RepopAtGraveyard();
+                    }
+                }
+                else
+                {
+                    if (plr->GetTeamId() == GetAttackerTeam())
+                    {
+                        sLog->outError(LOG_FILTER_BATTLEFIELD,"if (plr->GetTeamId() == GetAttackerTeam())");
+                        switch (team)
+                        {
+                        case TEAM_ALLIANCE:
+                            plr->CastSpell(plr, SPELL_TB_VICTORY_REWARD_ALLIANCE, true);
+                            break;
+                        case TEAM_HORDE:
+                            plr->CastSpell(plr, SPELL_TB_VICTORY_REWARD_HORDE, true);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        plr->CastSpell(plr, SPELL_TB_LOOSER_REWARD, true);
+                        plr->RepopAtGraveyard();
+                    }
+                }
+            }
+        }
+        m_PlayersInWar[team].clear();
+    }
+
     for (TbGameObjectBuilding::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
         if ((*itr))
             (*itr)->Rebuild();
@@ -554,19 +632,17 @@ void BattlefieldTB::OnBattleEnd(bool endbytimer)
             if (Creature* creature = unit->ToCreature())
                 HideNpc(creature);
 
+    int i = 0;
+    GuidSet questgivers = GetDefenderTeam() == TEAM_ALLIANCE ? questgiversA : questgiversH;
+    for (GuidSet::const_iterator itr = questgivers.begin(); itr != questgivers.end(); ++itr)
     {
-        int i = 0;
-        GuidSet questgivers = GetDefenderTeam() == TEAM_ALLIANCE ? questgiversA : questgiversH;
-        for (GuidSet::const_iterator itr = questgivers.begin(); itr != questgivers.end(); ++itr)
+        if (Unit* unit = sObjectAccessor->FindUnit((*itr)))
         {
-            if (Unit* unit = sObjectAccessor->FindUnit((*itr)))
+            if (Creature* creature = unit->ToCreature())
             {
-                if (Creature* creature = unit->ToCreature())
-                {
-                    if (!i || i == sWorld->getWorldState(WS_TB_UNK))
-                        ShowNpc(creature, true);
-                    i++;
-                }
+                if (!i || i == sWorld->getWorldState(WS_TB_UNK))
+                    ShowNpc(creature, true);
+                i++;
             }
         }
     }
@@ -683,77 +759,6 @@ void BattlefieldTB::OnBattleEnd(bool endbytimer)
         }
     }
 
-    for (uint8 team = 0; team < 2; ++team)
-    {
-        for (GuidSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
-        {
-            if (Player* plr = sObjectMgr->GetPlayerByLowGUID((*itr)))
-            {
-                if (endbytimer)
-                {
-                    if (plr->GetTeamId() == GetDefenderTeam())
-                    {
-                        switch (plr->GetTeamId())
-                        {
-                        case TEAM_ALLIANCE:
-                            plr->CastSpell(plr, SPELL_TB_VICTORY_REWARD_ALLIANCE, true);
-                            plr->CastSpell(plr, SPELL_TB_TOL_BARAD_VETERAN, true);
-                            plr->CastSpell(plr, SPELL_TB_TOL_BARAD_TOWER_BONUS, true);
-                            IncrementQuest(plr, QUEST_TB_TOL_BARAD_VICTORY_IN_TOL_BARAD_A, true);
-                            break;
-                        case TEAM_HORDE:
-                            plr->CastSpell(plr, SPELL_TB_VICTORY_REWARD_HORDE, true);
-                            plr->CastSpell(plr, SPELL_TB_TOL_BARAD_VETERAN, true);
-                            plr->CastSpell(plr, SPELL_TB_TOL_BARAD_TOWER_BONUS, true);
-                            IncrementQuest(plr, QUEST_TB_TOL_BARAD_VICTORY_IN_TOL_BARAD_H, true);
-                            break;
-                        }
-
-                        DoCompleteOrIncrementAchievement(ACHIEVEMENT_TOL_BARAD_VICTORY, plr);
-
-                        if (m_Data32[BATTLEFIELD_TB_DATA_DESTROYED] == 0)
-                            plr->CastSpell(plr, SPELL_TB_TOL_BARAD_TOWER_DEFENDED, true);
-                    }
-                    else
-                    {
-                        switch (plr->GetTeamId())
-                        {
-                        case TEAM_ALLIANCE:
-                            IncrementQuest(plr, QUEST_TB_TOL_BARAD_VICTORY_IN_TOL_BARAD_A, true);
-                            break;
-                        case TEAM_HORDE:
-                            IncrementQuest(plr, QUEST_TB_TOL_BARAD_VICTORY_IN_TOL_BARAD_H, true);
-                            break;
-                        }
-                        plr->CastSpell(plr, SPELL_TB_LOOSER_REWARD, true);
-                        plr->RepopAtGraveyard();
-                    }
-                }
-                else
-                {
-                    if (plr->GetTeamId() == GetAttackerTeam())
-                    {
-                        switch (team)
-                        {
-                        case TEAM_ALLIANCE:
-                            plr->CastSpell(plr, SPELL_TB_VICTORY_REWARD_ALLIANCE, true);
-                            break;
-                        case TEAM_HORDE:
-                            plr->CastSpell(plr, SPELL_TB_VICTORY_REWARD_HORDE, true);
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        plr->CastSpell(plr, SPELL_TB_LOOSER_REWARD, true);
-                        plr->RepopAtGraveyard();
-                    }
-                }
-            }
-        }
-        m_PlayersInWar[team].clear();
-    }
-
     m_Data32[BATTLEFIELD_TB_DATA_CAPTURED] = 0;
     m_Data32[BATTLEFIELD_TB_DATA_DESTROYED] = 0;
 }
@@ -796,18 +801,18 @@ void BattlefieldTB::FillInitialWorldStates(WorldPacket& data)
                 else
                     data << (uint32)((*itr)->m_WorldState + i) << uint32(0);
                 break;
-                /*case ALLIANCE_ATTACK:
+            case ALLIANCE_ATTACK:
                 if ((*itr)->m_State == BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE || (*itr)->m_State == BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE)
-                data << (uint32)((*itr)->m_WorldState + ALLIANCE_ATTACK) << uint32(1);
+                    data << (uint32)((*itr)->m_WorldState + ALLIANCE_ATTACK) << uint32(1);
                 else
-                data << (uint32)((*itr)->m_WorldState + ALLIANCE_ATTACK) << uint32(0);
+                    data << (uint32)((*itr)->m_WorldState + ALLIANCE_ATTACK) << uint32(0);
                 break;
-                case HORDE_ATTACK:
+            case HORDE_ATTACK:
                 if ((*itr)->m_State == BF_CAPTUREPOINT_OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE || (*itr)->m_State == BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE)
-                data << (uint32)((*itr)->m_WorldState + HORDE_ATTACK) << uint32(1);
+                    data << (uint32)((*itr)->m_WorldState + HORDE_ATTACK) << uint32(1);
                 else
-                data << (uint32)((*itr)->m_WorldState + HORDE_ATTACK) << uint32(0);
-                break;*/
+                    data << (uint32)((*itr)->m_WorldState + HORDE_ATTACK) << uint32(0);
+                break;
             default:
                 data << (uint32)((*itr)->m_WorldState + NEUTRAL) << uint32(1);
             }

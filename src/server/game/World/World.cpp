@@ -1290,8 +1290,8 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_TOL_BARAD_ENABLE]                 = ConfigMgr::GetBoolDefault("Tolbarad.Enable",              true);
     m_int_configs[CONFIG_TOL_BARAD_PLR_MAX]                 = ConfigMgr::GetIntDefault("Tolbarad.PlayerMax",            100);
     m_int_configs[CONFIG_TOL_BARAD_PLR_MIN]                 = ConfigMgr::GetIntDefault("Tolbarad.PlayerMin",            0);
-    m_int_configs[CONFIG_TOL_BARAD_PLR_MIN_LVL]             = ConfigMgr::GetIntDefault("Tolbarad.PlayerMinLvl",         85);
-    m_int_configs[CONFIG_TOL_BARAD_BATTLETIME]              = ConfigMgr::GetIntDefault("Tolbarad.BattleTimer",          30);
+    m_int_configs[CONFIG_TOL_BARAD_PLR_MIN_LVL]             = ConfigMgr::GetIntDefault("Tolbarad.PlayerMinLvl",         83);
+    m_int_configs[CONFIG_TOL_BARAD_BATTLETIME]              = ConfigMgr::GetIntDefault("Tolbarad.BattleTimer",          15);
     m_int_configs[CONFIG_TOL_BARAD_NOBATTLETIME]            = ConfigMgr::GetIntDefault("Tolbarad.NoBattleTimer",        150);
     m_int_configs[CONFIG_TOL_BARAD_RESTART_AFTER_CRASH]     = ConfigMgr::GetIntDefault("Tolbarad.CrashRestartTimer",    10);
 

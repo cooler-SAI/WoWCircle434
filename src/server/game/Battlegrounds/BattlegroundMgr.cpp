@@ -1,20 +1,20 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+* Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+*
+* This program is free software; you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the
+* Free Software Foundation; either version 2 of the License, or (at your
+* option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
 
 
 #include "Common.h"
@@ -52,11 +52,8 @@
 /***            BATTLEGROUND MANAGER                   ***/
 /*********************************************************/
 
-BattlegroundMgr::BattlegroundMgr() :
-    m_NextRatedArenaUpdate(sWorld->getIntConfig(CONFIG_ARENA_RATED_UPDATE_TIMER)),
-    m_ArenaTesting(false), m_Testing(false)
-{
-}
+BattlegroundMgr::BattlegroundMgr() : m_NextRatedArenaUpdate(sWorld->getIntConfig(CONFIG_ARENA_RATED_UPDATE_TIMER)), m_ArenaTesting(false), m_Testing(false)
+{ }
 
 BattlegroundMgr::~BattlegroundMgr()
 {
@@ -102,7 +99,7 @@ void BattlegroundMgr::Update(uint32 diff)
                 bgs.erase(itrDelete);
                 BattlegroundClientIdsContainer& clients = itr1->second.m_ClientBattlegroundIds[bg->GetBracketId()];
                 if (!clients.empty())
-                     clients.erase(bg->GetClientInstanceID());
+                    clients.erase(bg->GetClientInstanceID());
 
                 delete bg;
             }
@@ -140,9 +137,7 @@ void BattlegroundMgr::Update(uint32 diff)
             sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BattlegroundMgr: UPDATING ARENA QUEUES");
             for (int qtype = BATTLEGROUND_QUEUE_2v2; qtype <= BATTLEGROUND_QUEUE_5v5; ++qtype)
                 for (int bracket = BG_BRACKET_ID_FIRST; bracket < MAX_BATTLEGROUND_BRACKETS; ++bracket)
-                    m_BattlegroundQueues[qtype].BattlegroundQueueUpdate(diff,
-                        BATTLEGROUND_AA, BattlegroundBracketId(bracket),
-                        BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId(qtype)), true, 0);
+                    m_BattlegroundQueues[qtype].BattlegroundQueueUpdate(diff, BATTLEGROUND_AA, BattlegroundBracketId(bracket), BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId(qtype)), true, 0);
 
             m_NextRatedArenaUpdate = sWorld->getIntConfig(CONFIG_ARENA_RATED_UPDATE_TIMER);
         }
@@ -163,7 +158,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket *data, Battlegro
 
     switch (StatusID)
     {
-        case STATUS_NONE:
+    case STATUS_NONE:
         {
             data->Initialize(SMSG_BATTLEFIELD_STATUS, 1 + 8 + 12);
 
@@ -189,7 +184,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket *data, Battlegro
             data->WriteByteSeq(playerGuid[4]);
             break;
         }
-        case STATUS_WAIT_QUEUE:
+    case STATUS_WAIT_QUEUE:
         {
             data->Initialize(SMSG_BATTLEFIELD_STATUS_QUEUED, 3 + 16 + 24 + 3);
 
@@ -241,7 +236,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket *data, Battlegro
             data->WriteByteSeq(playerGuid[4]);
             break;
         }
-        case STATUS_WAIT_JOIN:
+    case STATUS_WAIT_JOIN:
         {
             data->Initialize(SMSG_BATTLEFIELD_STATUS_NEEDCONFIRMATION, 16 + 3 + 24 + 3);
 
@@ -291,7 +286,7 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket *data, Battlegro
             data->WriteByteSeq(playerGuid[3]);
             break;
         }
-        case STATUS_IN_PROGRESS:
+    case STATUS_IN_PROGRESS:
         {
             data->Initialize(SMSG_BATTLEFIELD_STATUS_ACTIVE, 3 + 16 + 28 + 3);
 
@@ -349,8 +344,8 @@ void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket *data, Battlegro
             data->WriteByteSeq(playerGuid[7]);
             break;
         }
-        case STATUS_WAIT_LEAVE:
-            break;
+    case STATUS_WAIT_LEAVE:
+        break;
     }
 }
 
@@ -784,7 +779,7 @@ Battleground* BattlegroundMgr::GetBattleground(uint32 instanceId, BattlegroundTy
         BattlegroundContainer const& bgs = it->second.m_Battlegrounds;
         BattlegroundContainer::const_iterator itr = bgs.find(instanceId);
         if (itr != bgs.end())
-           return itr->second;
+            return itr->second;
     }
 
     return NULL;
@@ -834,14 +829,14 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId original
 
     switch (originalBgTypeId)
     {
-        case BATTLEGROUND_RB:
-        case BATTLEGROUND_RATED_10_VS_10:
-            isRandom = true;
-        case BATTLEGROUND_AA:
-            bgTypeId = GetRandomBG(originalBgTypeId);
-            break;
-        default:
-            break;
+    case BATTLEGROUND_RB:
+    case BATTLEGROUND_RATED_10_VS_10:
+        isRandom = true;
+    case BATTLEGROUND_AA:
+        bgTypeId = GetRandomBG(originalBgTypeId);
+        break;
+    default:
+        break;
     }
 
     // get the template BG
@@ -857,51 +852,51 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId original
     // create a copy of the BG template
     switch (bgTypeId)
     {
-        case BATTLEGROUND_AV:
-            bg = new BattlegroundAV(*(BattlegroundAV*)bg_template);
-            break;
-        case BATTLEGROUND_WS:
-            bg = new BattlegroundWS(*(BattlegroundWS*)bg_template);
-            break;
-        case BATTLEGROUND_AB:
-            bg = new BattlegroundAB(*(BattlegroundAB*)bg_template);
-            break;
-        case BATTLEGROUND_NA:
-            bg = new BattlegroundNA(*(BattlegroundNA*)bg_template);
-            break;
-        case BATTLEGROUND_BE:
-            bg = new BattlegroundBE(*(BattlegroundBE*)bg_template);
-            break;
-        case BATTLEGROUND_EY:
-            bg = new BattlegroundEY(*(BattlegroundEY*)bg_template);
-            break;
-        case BATTLEGROUND_RL:
-            bg = new BattlegroundRL(*(BattlegroundRL*)bg_template);
-            break;
-        case BATTLEGROUND_SA:
-            bg = new BattlegroundSA(*(BattlegroundSA*)bg_template);
-            break;
-        case BATTLEGROUND_DS:
-            bg = new BattlegroundDS(*(BattlegroundDS*)bg_template);
-            break;
-        case BATTLEGROUND_RV:
-            bg = new BattlegroundRV(*(BattlegroundRV*)bg_template);
-            break;
-        case BATTLEGROUND_IC:
-            bg = new BattlegroundIC(*(BattlegroundIC*)bg_template);
-            break;
-        case BATTLEGROUND_TP:
-            bg = new BattlegroundTP(*(BattlegroundTP*)bg_template);
-            break;
-        case BATTLEGROUND_BFG:
-            bg = new BattlegroundBFG(*(BattlegroundBFG*)bg_template);
-            break;
-        case BATTLEGROUND_RB:
-        case BATTLEGROUND_AA:
-            bg = new Battleground(*bg_template);
-            break;
-        default:
-            return NULL;
+    case BATTLEGROUND_AV:
+        bg = new BattlegroundAV(*(BattlegroundAV*)bg_template);
+        break;
+    case BATTLEGROUND_WS:
+        bg = new BattlegroundWS(*(BattlegroundWS*)bg_template);
+        break;
+    case BATTLEGROUND_AB:
+        bg = new BattlegroundAB(*(BattlegroundAB*)bg_template);
+        break;
+    case BATTLEGROUND_NA:
+        bg = new BattlegroundNA(*(BattlegroundNA*)bg_template);
+        break;
+    case BATTLEGROUND_BE:
+        bg = new BattlegroundBE(*(BattlegroundBE*)bg_template);
+        break;
+    case BATTLEGROUND_EY:
+        bg = new BattlegroundEY(*(BattlegroundEY*)bg_template);
+        break;
+    case BATTLEGROUND_RL:
+        bg = new BattlegroundRL(*(BattlegroundRL*)bg_template);
+        break;
+    case BATTLEGROUND_SA:
+        bg = new BattlegroundSA(*(BattlegroundSA*)bg_template);
+        break;
+    case BATTLEGROUND_DS:
+        bg = new BattlegroundDS(*(BattlegroundDS*)bg_template);
+        break;
+    case BATTLEGROUND_RV:
+        bg = new BattlegroundRV(*(BattlegroundRV*)bg_template);
+        break;
+    case BATTLEGROUND_IC:
+        bg = new BattlegroundIC(*(BattlegroundIC*)bg_template);
+        break;
+    case BATTLEGROUND_TP:
+        bg = new BattlegroundTP(*(BattlegroundTP*)bg_template);
+        break;
+    case BATTLEGROUND_BFG:
+        bg = new BattlegroundBFG(*(BattlegroundBFG*)bg_template);
+        break;
+    case BATTLEGROUND_RB:
+    case BATTLEGROUND_AA:
+        bg = new Battleground(*bg_template);
+        break;
+    default:
+        return NULL;
     }
 
     bg->SetBracket(bracketEntry);
@@ -926,58 +921,58 @@ bool BattlegroundMgr::CreateBattleground(CreateBattlegroundData& data)
     Battleground* bg = NULL;
     switch (data.bgTypeId)
     {
-        case BATTLEGROUND_AV:
-            bg = new BattlegroundAV;
-            break;
-        case BATTLEGROUND_WS:
-            bg = new BattlegroundWS;
-            break;
-        case BATTLEGROUND_AB:
-            bg = new BattlegroundAB;
-            break;
-        case BATTLEGROUND_NA:
-            bg = new BattlegroundNA;
-            break;
-        case BATTLEGROUND_BE:
-            bg = new BattlegroundBE;
-            break;
-        case BATTLEGROUND_EY:
-            bg = new BattlegroundEY;
-            break;
-        case BATTLEGROUND_RL:
-            bg = new BattlegroundRL;
-            break;
-        case BATTLEGROUND_SA:
-            bg = new BattlegroundSA;
-            break;
-        case BATTLEGROUND_DS:
-            bg = new BattlegroundDS;
-            break;
-        case BATTLEGROUND_RV:
-            bg = new BattlegroundRV;
-            break;
-        case BATTLEGROUND_IC:
-            bg = new BattlegroundIC;
-            break;
-        case BATTLEGROUND_AA:
-            bg = new Battleground;
-            break;
-        case BATTLEGROUND_RB:
-            bg = new Battleground;
-            bg->SetRandom(true);
-            break;
-        case BATTLEGROUND_RATED_10_VS_10:
-            bg = new Battleground;
-            bg->SetRandom(true);
-            break;
-        case BATTLEGROUND_TP:
-            bg = new BattlegroundTP;
-            break;
-        case BATTLEGROUND_BFG:
-            bg = new BattlegroundBFG;
-            break;
-        default:
-            return false;
+    case BATTLEGROUND_AV:
+        bg = new BattlegroundAV;
+        break;
+    case BATTLEGROUND_WS:
+        bg = new BattlegroundWS;
+        break;
+    case BATTLEGROUND_AB:
+        bg = new BattlegroundAB;
+        break;
+    case BATTLEGROUND_NA:
+        bg = new BattlegroundNA;
+        break;
+    case BATTLEGROUND_BE:
+        bg = new BattlegroundBE;
+        break;
+    case BATTLEGROUND_EY:
+        bg = new BattlegroundEY;
+        break;
+    case BATTLEGROUND_RL:
+        bg = new BattlegroundRL;
+        break;
+    case BATTLEGROUND_SA:
+        bg = new BattlegroundSA;
+        break;
+    case BATTLEGROUND_DS:
+        bg = new BattlegroundDS;
+        break;
+    case BATTLEGROUND_RV:
+        bg = new BattlegroundRV;
+        break;
+    case BATTLEGROUND_IC:
+        bg = new BattlegroundIC;
+        break;
+    case BATTLEGROUND_AA:
+        bg = new Battleground;
+        break;
+    case BATTLEGROUND_RB:
+        bg = new Battleground;
+        bg->SetRandom(true);
+        break;
+    case BATTLEGROUND_RATED_10_VS_10:
+        bg = new Battleground;
+        bg->SetRandom(true);
+        break;
+    case BATTLEGROUND_TP:
+        bg = new BattlegroundTP;
+        break;
+    case BATTLEGROUND_BFG:
+        bg = new BattlegroundBFG;
+        break;
+    default:
+        return false;
     }
 
     bg->SetMapId(data.MapID);
@@ -1139,15 +1134,16 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
 
     data->Initialize(SMSG_BATTLEFIELD_LIST);
 
-    *data << uint32(winner_conquest)                        // Winner Conquest Reward or Random Winner Conquest Reward
-          << uint32(winner_conquest)                        // Winner Conquest Reward or Random Winner Conquest Reward
-          << uint32(loser_honor)                            // Loser Honor Reward or Random Loser Honor Reward
-          << uint32(bgTypeId)                               // battleground id
-          << uint32(loser_honor)                            // Loser Honor Reward or Random Loser Honor Reward
-          << uint32(winner_honor)                           // Winner Honor Reward or Random Winner Honor Reward
-          << uint32(winner_honor)                           // Winner Honor Reward or Random Winner Honor Reward
-          << uint8(bracketEntry->maxLevel)                  // max level
-          << uint8(bracketEntry->minLevel);                 // min level
+    *data
+        << uint32(winner_conquest)                        // Winner Conquest Reward or Random Winner Conquest Reward
+        << uint32(winner_conquest)                        // Winner Conquest Reward or Random Winner Conquest Reward
+        << uint32(loser_honor)                            // Loser Honor Reward or Random Loser Honor Reward
+        << uint32(bgTypeId)                               // battleground id
+        << uint32(loser_honor)                            // Loser Honor Reward or Random Loser Honor Reward
+        << uint32(winner_honor)                           // Winner Honor Reward or Random Winner Honor Reward
+        << uint32(winner_honor)                           // Winner Honor Reward or Random Winner Honor Reward
+        << uint8(bracketEntry->maxLevel)                  // max level
+        << uint8(bracketEntry->minLevel);                 // min level
 
     data->WriteByteMask(guidBytes[0]);
     data->WriteByteMask(guidBytes[1]);
@@ -1217,56 +1213,56 @@ void BattlegroundMgr::SendAreaSpiritHealerQueryOpcode(Player* player, Battlegrou
 bool BattlegroundMgr::IsArenaType(BattlegroundTypeId bgTypeId)
 {
     return bgTypeId == BATTLEGROUND_AA
-            || bgTypeId == BATTLEGROUND_BE
-            || bgTypeId == BATTLEGROUND_NA
-            || bgTypeId == BATTLEGROUND_DS
-            || bgTypeId == BATTLEGROUND_RV
-            || bgTypeId == BATTLEGROUND_RL;
+        || bgTypeId == BATTLEGROUND_BE
+        || bgTypeId == BATTLEGROUND_NA
+        || bgTypeId == BATTLEGROUND_DS
+        || bgTypeId == BATTLEGROUND_RV
+        || bgTypeId == BATTLEGROUND_RL;
 }
 
 BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgTypeId, uint8 arenaType)
 {
     switch (bgTypeId)
     {
-        case BATTLEGROUND_WS:
-            return BATTLEGROUND_QUEUE_WS;
-        case BATTLEGROUND_AB:
-            return BATTLEGROUND_QUEUE_AB;
-        case BATTLEGROUND_AV:
-            return BATTLEGROUND_QUEUE_AV;
-        case BATTLEGROUND_EY:
-            return BATTLEGROUND_QUEUE_EY;
-        case BATTLEGROUND_SA:
-            return BATTLEGROUND_QUEUE_SA;
-        case BATTLEGROUND_IC:
-            return BATTLEGROUND_QUEUE_IC;
-        case BATTLEGROUND_TP:
-            return BATTLEGROUND_QUEUE_TP;
-        case BATTLEGROUND_BFG:
-            return BATTLEGROUND_QUEUE_BFG;
-        case BATTLEGROUND_RB:
-            return BATTLEGROUND_QUEUE_RB;
-        case BATTLEGROUND_RATED_10_VS_10:
-            return BATTLEGROUND_QUEUE_RBG;
-        case BATTLEGROUND_AA:
-        case BATTLEGROUND_NA:
-        case BATTLEGROUND_RL:
-        case BATTLEGROUND_BE:
-        case BATTLEGROUND_DS:
-        case BATTLEGROUND_RV:
-            switch (arenaType)
-            {
-                case ARENA_TYPE_2v2:
-                    return BATTLEGROUND_QUEUE_2v2;
-                case ARENA_TYPE_3v3:
-                    return BATTLEGROUND_QUEUE_3v3;
-                case ARENA_TYPE_5v5:
-                    return BATTLEGROUND_QUEUE_5v5;
-                default:
-                    return BATTLEGROUND_QUEUE_NONE;
-            }
+    case BATTLEGROUND_WS:
+        return BATTLEGROUND_QUEUE_WS;
+    case BATTLEGROUND_AB:
+        return BATTLEGROUND_QUEUE_AB;
+    case BATTLEGROUND_AV:
+        return BATTLEGROUND_QUEUE_AV;
+    case BATTLEGROUND_EY:
+        return BATTLEGROUND_QUEUE_EY;
+    case BATTLEGROUND_SA:
+        return BATTLEGROUND_QUEUE_SA;
+    case BATTLEGROUND_IC:
+        return BATTLEGROUND_QUEUE_IC;
+    case BATTLEGROUND_TP:
+        return BATTLEGROUND_QUEUE_TP;
+    case BATTLEGROUND_BFG:
+        return BATTLEGROUND_QUEUE_BFG;
+    case BATTLEGROUND_RB:
+        return BATTLEGROUND_QUEUE_RB;
+    case BATTLEGROUND_RATED_10_VS_10:
+        return BATTLEGROUND_QUEUE_RBG;
+    case BATTLEGROUND_AA:
+    case BATTLEGROUND_NA:
+    case BATTLEGROUND_RL:
+    case BATTLEGROUND_BE:
+    case BATTLEGROUND_DS:
+    case BATTLEGROUND_RV:
+        switch (arenaType)
+        {
+        case ARENA_TYPE_2v2:
+            return BATTLEGROUND_QUEUE_2v2;
+        case ARENA_TYPE_3v3:
+            return BATTLEGROUND_QUEUE_3v3;
+        case ARENA_TYPE_5v5:
+            return BATTLEGROUND_QUEUE_5v5;
         default:
             return BATTLEGROUND_QUEUE_NONE;
+        }
+    default:
+        return BATTLEGROUND_QUEUE_NONE;
     }
 }
 
@@ -1274,30 +1270,30 @@ BattlegroundTypeId BattlegroundMgr::BGTemplateId(BattlegroundQueueTypeId bgQueue
 {
     switch (bgQueueTypeId)
     {
-        case BATTLEGROUND_QUEUE_WS:
-            return BATTLEGROUND_WS;
-        case BATTLEGROUND_QUEUE_AB:
-            return BATTLEGROUND_AB;
-        case BATTLEGROUND_QUEUE_AV:
-            return BATTLEGROUND_AV;
-        case BATTLEGROUND_QUEUE_EY:
-            return BATTLEGROUND_EY;
-        case BATTLEGROUND_QUEUE_SA:
-            return BATTLEGROUND_SA;
-        case BATTLEGROUND_QUEUE_IC:
-            return BATTLEGROUND_IC;
-        case BATTLEGROUND_QUEUE_TP:
-            return BATTLEGROUND_TP;
-        case BATTLEGROUND_QUEUE_BFG:
-            return BATTLEGROUND_BFG;
-        case BATTLEGROUND_QUEUE_RB:
-            return BATTLEGROUND_RB;
-        case BATTLEGROUND_QUEUE_2v2:
-        case BATTLEGROUND_QUEUE_3v3:
-        case BATTLEGROUND_QUEUE_5v5:
-            return BATTLEGROUND_AA;
-        default:
-            return BattlegroundTypeId(0);                   // used for unknown template (it existed and do nothing)
+    case BATTLEGROUND_QUEUE_WS:
+        return BATTLEGROUND_WS;
+    case BATTLEGROUND_QUEUE_AB:
+        return BATTLEGROUND_AB;
+    case BATTLEGROUND_QUEUE_AV:
+        return BATTLEGROUND_AV;
+    case BATTLEGROUND_QUEUE_EY:
+        return BATTLEGROUND_EY;
+    case BATTLEGROUND_QUEUE_SA:
+        return BATTLEGROUND_SA;
+    case BATTLEGROUND_QUEUE_IC:
+        return BATTLEGROUND_IC;
+    case BATTLEGROUND_QUEUE_TP:
+        return BATTLEGROUND_TP;
+    case BATTLEGROUND_QUEUE_BFG:
+        return BATTLEGROUND_BFG;
+    case BATTLEGROUND_QUEUE_RB:
+        return BATTLEGROUND_RB;
+    case BATTLEGROUND_QUEUE_2v2:
+    case BATTLEGROUND_QUEUE_3v3:
+    case BATTLEGROUND_QUEUE_5v5:
+        return BATTLEGROUND_AA;
+    default:
+        return BattlegroundTypeId(0);                   // used for unknown template (it existed and do nothing)
     }
 }
 
@@ -1305,14 +1301,14 @@ uint8 BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId bgQueueTypeId)
 {
     switch (bgQueueTypeId)
     {
-        case BATTLEGROUND_QUEUE_2v2:
-            return ARENA_TYPE_2v2;
-        case BATTLEGROUND_QUEUE_3v3:
-            return ARENA_TYPE_3v3;
-        case BATTLEGROUND_QUEUE_5v5:
-            return ARENA_TYPE_5v5;
-        default:
-            return 0;
+    case BATTLEGROUND_QUEUE_2v2:
+        return ARENA_TYPE_2v2;
+    case BATTLEGROUND_QUEUE_3v3:
+        return ARENA_TYPE_3v3;
+    case BATTLEGROUND_QUEUE_5v5:
+        return ARENA_TYPE_5v5;
+    default:
+        return 0;
     }
 }
 
@@ -1408,15 +1404,15 @@ HolidayIds BattlegroundMgr::BGTypeToWeekendHolidayId(BattlegroundTypeId bgTypeId
 {
     switch (bgTypeId)
     {
-        case BATTLEGROUND_AV: return HOLIDAY_CALL_TO_ARMS_AV;
-        case BATTLEGROUND_EY: return HOLIDAY_CALL_TO_ARMS_EY;
-        case BATTLEGROUND_WS: return HOLIDAY_CALL_TO_ARMS_WS;
-        case BATTLEGROUND_SA: return HOLIDAY_CALL_TO_ARMS_SA;
-        case BATTLEGROUND_AB: return HOLIDAY_CALL_TO_ARMS_AB;
-        case BATTLEGROUND_IC: return HOLIDAY_CALL_TO_ARMS_IC;
-        case BATTLEGROUND_TP: return HOLIDAY_CALL_TO_ARMS_TP;
-        case BATTLEGROUND_BFG: return HOLIDAY_CALL_TO_ARMS_BFG;
-        default: return HOLIDAY_NONE;
+    case BATTLEGROUND_AV: return HOLIDAY_CALL_TO_ARMS_AV;
+    case BATTLEGROUND_EY: return HOLIDAY_CALL_TO_ARMS_EY;
+    case BATTLEGROUND_WS: return HOLIDAY_CALL_TO_ARMS_WS;
+    case BATTLEGROUND_SA: return HOLIDAY_CALL_TO_ARMS_SA;
+    case BATTLEGROUND_AB: return HOLIDAY_CALL_TO_ARMS_AB;
+    case BATTLEGROUND_IC: return HOLIDAY_CALL_TO_ARMS_IC;
+    case BATTLEGROUND_TP: return HOLIDAY_CALL_TO_ARMS_TP;
+    case BATTLEGROUND_BFG: return HOLIDAY_CALL_TO_ARMS_BFG;
+    default: return HOLIDAY_NONE;
     }
 }
 
@@ -1424,15 +1420,15 @@ BattlegroundTypeId BattlegroundMgr::WeekendHolidayIdToBGType(HolidayIds holiday)
 {
     switch (holiday)
     {
-        case HOLIDAY_CALL_TO_ARMS_AV: return BATTLEGROUND_AV;
-        case HOLIDAY_CALL_TO_ARMS_EY: return BATTLEGROUND_EY;
-        case HOLIDAY_CALL_TO_ARMS_WS: return BATTLEGROUND_WS;
-        case HOLIDAY_CALL_TO_ARMS_SA: return BATTLEGROUND_SA;
-        case HOLIDAY_CALL_TO_ARMS_AB: return BATTLEGROUND_AB;
-        case HOLIDAY_CALL_TO_ARMS_IC: return BATTLEGROUND_IC;
-        case HOLIDAY_CALL_TO_ARMS_TP: return BATTLEGROUND_TP;
-        case HOLIDAY_CALL_TO_ARMS_BFG: return BATTLEGROUND_BFG;
-        default: return BATTLEGROUND_TYPE_NONE;
+    case HOLIDAY_CALL_TO_ARMS_AV: return BATTLEGROUND_AV;
+    case HOLIDAY_CALL_TO_ARMS_EY: return BATTLEGROUND_EY;
+    case HOLIDAY_CALL_TO_ARMS_WS: return BATTLEGROUND_WS;
+    case HOLIDAY_CALL_TO_ARMS_SA: return BATTLEGROUND_SA;
+    case HOLIDAY_CALL_TO_ARMS_AB: return BATTLEGROUND_AB;
+    case HOLIDAY_CALL_TO_ARMS_IC: return BATTLEGROUND_IC;
+    case HOLIDAY_CALL_TO_ARMS_TP: return BATTLEGROUND_TP;
+    case HOLIDAY_CALL_TO_ARMS_BFG: return BATTLEGROUND_BFG;
+    default: return BATTLEGROUND_TYPE_NONE;
     }
 }
 
@@ -1448,20 +1444,20 @@ uint32 BattlegroundMgr::GetBgQuestId(BattlegroundTypeId bgTypeId, uint32 faction
 
     switch (bgTypeId)
     {
-        case BATTLEGROUND_AB:
-            questId = (faction == ALLIANCE) ? QUEST_CALL_TO_ARMS_AB_A : QUEST_CALL_TO_ARMS_AB_H;
-            break;
-        case BATTLEGROUND_AV:
-            questId = (faction == ALLIANCE) ? QUEST_CALL_TO_ARMS_AV_A : QUEST_CALL_TO_ARMS_AV_H;
-            break;
-        case BATTLEGROUND_EY: 
-            questId = (faction == ALLIANCE) ? QUEST_CALL_TO_ARMS_EY_A : QUEST_CALL_TO_ARMS_EY_H;
-            break;
-        case BATTLEGROUND_WS:
-            questId = (faction == ALLIANCE) ? QUEST_CALL_TO_ARMS_WS_A : QUEST_CALL_TO_ARMS_WS_H;
-            break;
-        default:
-            return 0;
+    case BATTLEGROUND_AB:
+        questId = (faction == ALLIANCE) ? QUEST_CALL_TO_ARMS_AB_A : QUEST_CALL_TO_ARMS_AB_H;
+        break;
+    case BATTLEGROUND_AV:
+        questId = (faction == ALLIANCE) ? QUEST_CALL_TO_ARMS_AV_A : QUEST_CALL_TO_ARMS_AV_H;
+        break;
+    case BATTLEGROUND_EY: 
+        questId = (faction == ALLIANCE) ? QUEST_CALL_TO_ARMS_EY_A : QUEST_CALL_TO_ARMS_EY_H;
+        break;
+    case BATTLEGROUND_WS:
+        questId = (faction == ALLIANCE) ? QUEST_CALL_TO_ARMS_WS_A : QUEST_CALL_TO_ARMS_WS_H;
+        break;
+    default:
+        return 0;
     }
 
     return questId;
@@ -1475,13 +1471,13 @@ BattlegroundTypeId BattlegroundMgr::GetRandomBG(BattlegroundTypeId bgTypeId)
     BattlegroundSelectionWeightMap selectionWeights;
 
     if (bgTypeId == BATTLEGROUND_RATED_10_VS_10)
-        switch (urand(0,2))
-        {
-            case 0: return BATTLEGROUND_WS;
-            case 1: return BATTLEGROUND_TP;
-            case 2: return BATTLEGROUND_BFG;
-        }
-	
+        switch (urand(0, 2))
+    {
+        case 0: return BATTLEGROUND_WS;
+        case 1: return BATTLEGROUND_TP;
+        case 2: return BATTLEGROUND_BFG;
+    }
+
     if (bgTypeId == BATTLEGROUND_AA)
     {
         for (BattlegroundSelectionWeightMap::const_iterator it = m_ArenaSelectionWeights.begin(); it != m_ArenaSelectionWeights.end(); ++it)

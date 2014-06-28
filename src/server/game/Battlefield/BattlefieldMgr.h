@@ -40,7 +40,7 @@ public:
     void HandlePlayerResurrects(Player * player, uint32 areaflag);
     Battlefield* GetBattlefieldToZoneId(uint32 zoneid);
     Battlefield* GetBattlefieldByBattleId(uint32 battleid);
-    Battlefield *GetBattlefieldByGUID(uint64 guid);
+    Battlefield* GetBattlefieldByGUID(uint64 guid);
     ZoneScript* GetZoneScript(uint32 zoneId);
     void AddZone(uint32 zoneid, Battlefield * handle);
     void Update(uint32 diff);
@@ -48,7 +48,7 @@ public:
     bool CanTalkTo(Player * player, Creature * creature, GossipMenuItems gso);
     void HandleDropFlag(Player * player, uint32 spellId);
     typedef std::vector < Battlefield * >BattlefieldSet;
-    typedef std::map < uint32 /* zoneid */ , Battlefield * >BattlefieldMap;
+    typedef std::map < uint32 /* zoneid */ , Battlefield* >BattlefieldMap;
 private:
     BattlefieldSet m_BattlefieldSet;
     BattlefieldMap m_BattlefieldMap;

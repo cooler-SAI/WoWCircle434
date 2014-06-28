@@ -302,17 +302,12 @@ public:
 
     bool Update(uint32 diff);
     void OnCreatureCreate(Creature *creature, bool add);
-    void BrokenWallOrTower(TeamId team);
     void SendInitWorldStatesTo(Player* player);
     void SendInitWorldStatesToAll();
-    void AddDamagedTower(TeamId team);
-    void UpdateDamagedTowerCount(TeamId team);
     void AddBrokenTower(TeamId team);
     void AddPlayerToResurrectQueue(uint64 npc_guid, uint64 player_guid);
 
     void RewardMarkOfHonor(Player *plr, uint32 count);
-
-    void UpdateVehicleCountTB();
 
     void FillInitialWorldStates(WorldPacket& data);
 
@@ -341,7 +336,7 @@ protected:
     GuidSet CanonList;
     GameObjectSet DefenderPortalList;
     GameObjectSet m_KeepGameObject[2];
-    GuidSet m_PlayersIsSpellImu;  //Player is dead
+    GuidSet m_PlayersIsSpellImu;
     uint32 m_saveTimer;
 };
 
@@ -766,8 +761,6 @@ struct BfTBGameObjectBuilding
 
         if (m_NameId)
             m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_TOWER_DAMAGE, sObjectMgr->GetCerberCoreStringForDBCLocale(m_NameId));
-
-        m_TB->AddDamagedTower(m_TB->GetAttackerTeam());
     }
 
     void Destroyed()
@@ -775,7 +768,7 @@ struct BfTBGameObjectBuilding
         m_TB->OnDestroyed();
 
         m_TB->SetTimer(m_TB->GetTimer() + 5 * MINUTE * IN_MILLISECONDS);
-        m_TB->SendUpdateWorldState(WS_TB_BATTLE_TIMER, (uint32(time(NULL) + m_TB->GetTimer() / 1000)));
+        m_TB->SendUpdateWorldState(WS_TB_BATTLE_TIMER, uint32(time(NULL) + m_TB->GetTimer() / 1000));
 
         for (int i = 0; i < BUILDING_MAX_DIFF; i++)
         {
@@ -791,10 +784,9 @@ struct BfTBGameObjectBuilding
             m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_TOWER_DESTROY, sObjectMgr->GetCerberCoreStringForDBCLocale(m_NameId));
 
         m_TB->AddBrokenTower(TeamId(m_Team));
-        m_TB->BrokenWallOrTower(TeamId(m_Team));
     }
 
-    void Init(GameObject* go,uint32 type,uint32 worldstate,uint32 nameid)
+    void Init(GameObject* go, uint32 type, uint32 worldstate, uint32 nameid)
     {
         m_Build = go;
         m_Type = type;
@@ -863,7 +855,7 @@ struct BfTBWorkShopData
         m_NameId = nameid;
     }
 
-    void ChangeControl(uint8 team, bool init/* for first call in setup*/)
+    void ChangeControl(uint8 team, bool init)
     {
         if (!init)
             m_TB->CapturePoint(team);
