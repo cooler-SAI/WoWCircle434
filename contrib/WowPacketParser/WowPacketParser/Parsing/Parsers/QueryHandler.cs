@@ -105,9 +105,6 @@ namespace WowPacketParser.Parsing.Parsers
 
             creature.SubName = packet.ReadCString("Sub Name");
 
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V5_0_5_16048))
-                packet.ReadCString("Unk String");
-
             creature.IconName = packet.ReadCString("Icon Name");
 
             creature.TypeFlags = packet.ReadEnum<CreatureTypeFlag>("Type Flags", TypeCode.UInt32);

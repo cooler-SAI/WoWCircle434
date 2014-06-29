@@ -117,9 +117,6 @@ namespace WowPacketParser.Misc
             var arr = ReadToEnd();
             var newarr = new byte[inflatedSize];
 
-            if (ClientVersion.RemovedInVersion(ClientVersionBuild.V4_3_0_15005))
-                keepStream = false;
-
             if (keepStream)
             {
                 int idx = ConnectionIndex;
@@ -162,9 +159,6 @@ namespace WowPacketParser.Misc
         {
             var arr = ReadBytes(arrSize);
             var newarr = new byte[inflatedSize];
-
-            if (ClientVersion.RemovedInVersion(ClientVersionBuild.V4_3_0_15005))
-                keepStream = false;
 
             if (keepStream)
             {

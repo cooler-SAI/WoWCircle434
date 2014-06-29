@@ -168,14 +168,6 @@ namespace WowPacketParser.Parsing.Parsers
             packet.ReadGuid("GUID");
         }
 
-        [Parser(Opcode.CMSG_SET_SELECTION, ClientVersionBuild.V5_1_0_16309)]
-        public static void HandleSetSelection510(Packet packet)
-        {
-            var guid = packet.StartBitStream(0, 1, 2, 4, 7, 3, 6, 5);
-            packet.ParseBitStream(guid, 4, 1, 5, 2, 6, 7, 0, 3);
-            packet.WriteGuid("Guid", guid);
-        }
-
         [Parser(Opcode.CMSG_GRANT_LEVEL)]
         [Parser(Opcode.CMSG_ACCEPT_LEVEL_GRANT)]
         [Parser(Opcode.SMSG_PROPOSE_LEVEL_GRANT)]
@@ -188,18 +180,6 @@ namespace WowPacketParser.Parsing.Parsers
         public static void HandleRequestVehicleSwitchSeat(Packet packet)
         {
             packet.ReadPackedGuid("GUID");
-            packet.ReadByte("Seat");
-        }
-
-        [Parser(Opcode.CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE)]
-        public static void HandleChangeSeatsOnControlledVehicle(Packet packet)
-        {
-            var guid = packet.ReadPackedGuid("Vehicle GUID");
-
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V3_3_3a_11723))
-                MovementHandler.ReadMovementInfo(ref packet, guid);
-
-            packet.ReadPackedGuid("Accessory GUID");
             packet.ReadByte("Seat");
         }
 
@@ -247,64 +227,6 @@ namespace WowPacketParser.Parsing.Parsers
             packet.ReadCString("Text");
         }
 
-        [Parser(Opcode.CMSG_SET_ACTION_BUTTON, ClientVersionBuild.Zero, ClientVersionBuild.V5_1_0_16309)]
-        public static void HandleActionButton(Packet packet)
-        {
-            packet.ReadByte("Button");
-            var data = packet.ReadInt32();
-            var type = (ActionButtonType)((data & 0xFF000000) >> 24);
-            var action = (data & 0x00FFFFFF);
-            packet.WriteLine("Type: " + type + " ID: " + action);
-        }
-
-        [Parser(Opcode.CMSG_SET_ACTION_BUTTON, ClientVersionBuild.V5_1_0_16309)]
-        public static void HandleSetActionButton(Packet packet)
-        {
-            packet.ReadByte("Slot Id");
-            var actionId = packet.StartBitStream(0, 7, 6, 1, 3, 5, 2, 4);
-            packet.ParseBitStream(actionId, 3, 0, 1, 4, 7, 2, 6, 5);
-            packet.WriteLine("Action Id: {0}", BitConverter.ToUInt32(actionId, 0));
-        }
-
-        [Parser(Opcode.SMSG_RESURRECT_REQUEST)]
-        public static void HandleResurrectRequest(Packet packet)
-        {
-            packet.ReadGuid("GUID");
-            packet.ReadUInt32("Name length");
-            packet.ReadCString("Resurrector Name");
-            packet.ReadBoolean("Resurrection Sickness");
-            packet.ReadBoolean("Use Timer");
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V4_0_6a_13623))
-                packet.ReadEntryWithName<Int32>(StoreNameType.Spell, "Spell ID");   // Used only for: <if (Spell ID == 83968 && Unit_HasAura(95223) return 1;>
-        }
-
-        [Parser(Opcode.CMSG_RESURRECT_RESPONSE)]
-        public static void HandleResurrectResponse(Packet packet)
-        {
-            packet.ReadGuid("GUID");
-            packet.ReadBoolean("Accept");
-        }
-
-        [Parser(Opcode.CMSG_REPOP_REQUEST)]
-        public static void HandleRepopRequest(Packet packet)
-        {
-            packet.ReadBoolean("Accept");
-        }
-
-        [Parser(Opcode.SMSG_FEATURE_SYSTEM_STATUS, ClientVersionBuild.Zero, ClientVersionBuild.V4_3_0_15005)]
-        public static void HandleFeatureSystemStatus(Packet packet)
-        {
-            packet.ReadBoolean("Enable Complaint Chat");
-            packet.ReadBoolean("Enable Voice Chat");
-
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V4_2_2_14545))
-                packet.ReadInt32("Complain System Status");
-            else if (ClientVersion.AddedInVersion(ClientVersionBuild.V4_2_0_14333))
-            {
-                packet.ReadByte("Complain System Status");
-                packet.ReadInt32("Unknown Mail Url Related Value");
-            }
-        }
 
         [Parser(Opcode.SMSG_FEATURE_SYSTEM_STATUS, ClientVersionBuild.V4_3_0_15005, ClientVersionBuild.V4_3_4_15595)]
         public static void HandleFeatureSystemStatus430(Packet packet)
@@ -443,8 +365,6 @@ namespace WowPacketParser.Parsing.Parsers
         public static void HandleClientAreaTrigger(Packet packet)
         {
             packet.ReadInt32("Area Trigger Id");
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V5_1_0_16309))
-                packet.ReadByte("Unk Byte");
         }
 
         [Parser(Opcode.SMSG_PRE_RESURRECT)]
