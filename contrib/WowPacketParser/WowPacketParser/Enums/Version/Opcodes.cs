@@ -1,19 +1,5 @@
 ﻿using System.Globalization;
-using WowPacketParser.Enums.Version.V3_3_5a_12340;
-using WowPacketParser.Enums.Version.V4_0_3_13329;
-using WowPacketParser.Enums.Version.V4_0_6_13596;
-using WowPacketParser.Enums.Version.V4_1_0_13914;
-using WowPacketParser.Enums.Version.V4_2_0_14480;
-using WowPacketParser.Enums.Version.V4_2_2_14545;
-using WowPacketParser.Enums.Version.V4_3_0_15005;
-using WowPacketParser.Enums.Version.V4_3_2_15211;
-using WowPacketParser.Enums.Version.V4_3_3_15354;
 using WowPacketParser.Enums.Version.V4_3_4_15595;
-using WowPacketParser.Enums.Version.V5_0_4_16016;
-using WowPacketParser.Enums.Version.V5_0_5_16048;
-using WowPacketParser.Enums.Version.V5_1_0_16309;
-using WowPacketParser.Enums.Version.V5_2_0_16650;
-using WowPacketParser.Enums.Version.V5_3_0_16981;
 using WowPacketParser.Misc;
 
 namespace WowPacketParser.Enums.Version
@@ -51,64 +37,28 @@ namespace WowPacketParser.Enums.Version
                 case ClientVersionBuild.V3_3_3_11685:
                 case ClientVersionBuild.V3_3_3a_11723:
                 case ClientVersionBuild.V3_3_5a_12340:
-                {
-                    return Opcodes_3_3_5.Opcodes();
-                }
                 case ClientVersionBuild.V4_0_3_13329:
-                {
-                    return Opcodes_4_0_3.Opcodes();
-                }
                 case ClientVersionBuild.V4_0_6_13596:
                 case ClientVersionBuild.V4_0_6a_13623:
-                {
-                    return Opcodes_4_0_6.Opcodes();
-                }
                 case ClientVersionBuild.V4_1_0_13914:
                 case ClientVersionBuild.V4_1_0a_14007:
-                {
-                    return Opcodes_4_1_0.Opcodes();
-                }
                 case ClientVersionBuild.V4_2_0_14333:
                 case ClientVersionBuild.V4_2_0a_14480:
-                {
-                    return Opcodes_4_2_0.Opcodes();
-                }
                 case ClientVersionBuild.V4_2_2_14545:
-                {
-                    return Opcodes_4_2_2.Opcodes();
-                }
                 case ClientVersionBuild.V4_3_0_15005:
                 case ClientVersionBuild.V4_3_0a_15050:
-                {
-                    return Opcodes_4_3_0.Opcodes();
-                }
                 case ClientVersionBuild.V4_3_2_15211:
-                {
-                    return Opcodes_4_3_2.Opcodes();
-                }
                 case ClientVersionBuild.V4_3_3_15354:
-                {
-                    return Opcodes_4_3_3.Opcodes();
-                }
                 case ClientVersionBuild.V4_3_4_15595:
                 {
                     return Opcodes_4_3_4.Opcodes();
                 }
                 case ClientVersionBuild.V5_0_4_16016:
-                {
-                    return Opcodes_5_0_4.Opcodes();
-                }
                 case ClientVersionBuild.V5_0_5_16048:
                 case ClientVersionBuild.V5_0_5a_16057:
                 case ClientVersionBuild.V5_0_5b_16135:
-                {
-                    return Opcodes_5_0_5.Opcodes();
-                }
                 case ClientVersionBuild.V5_1_0_16309:
                 case ClientVersionBuild.V5_1_0a_16357:
-                {
-                    return Opcodes_5_1_0.Opcodes();
-                }
                 case ClientVersionBuild.V5_2_0_16650:
                 case ClientVersionBuild.V5_2_0_16669:
                 case ClientVersionBuild.V5_2_0_16683:
@@ -119,21 +69,15 @@ namespace WowPacketParser.Enums.Version
                 case ClientVersionBuild.V5_2_0_16733:
                 case ClientVersionBuild.V5_2_0_16769:
                 case ClientVersionBuild.V5_2_0_16826:
-                {
-                    return Opcodes_5_2_0.Opcodes();
-                }
                 case ClientVersionBuild.V5_3_0_16981:
                 case ClientVersionBuild.V5_3_0_16983:
                 case ClientVersionBuild.V5_3_0_16992:
                 case ClientVersionBuild.V5_3_0_17055:
                 case ClientVersionBuild.V5_3_0_17116:
                 case ClientVersionBuild.V5_3_0_17128:
-                {
-                    return Opcodes_5_3_0.Opcodes();
-                }
                 default:
                 {
-                    return Opcodes_3_3_5.Opcodes();
+                    return Opcodes_4_3_4.Opcodes();
                 }
             }
         }

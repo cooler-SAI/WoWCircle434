@@ -122,29 +122,24 @@ namespace WowPacketParser.Misc
                     case ClientVersionBuild.V3_2_2a_10505:
                     case ClientVersionBuild.V3_3_0_10958:
                     case ClientVersionBuild.V3_3_0a_11159:
-                        return ClientVersionBuild.V3_3_0a_11159;
                     case ClientVersionBuild.V3_3_3_11685:
                     case ClientVersionBuild.V3_3_3a_11723:
                     case ClientVersionBuild.V3_3_5a_12340:
-                        return ClientVersionBuild.V3_3_5a_12340;
                     case ClientVersionBuild.V4_0_6_13596:
                     case ClientVersionBuild.V4_0_6a_13623:
                     case ClientVersionBuild.V4_1_0_13914:
                     case ClientVersionBuild.V4_1_0a_14007:
-                        return ClientVersionBuild.V4_0_6_13596;
                     case ClientVersionBuild.V4_2_0_14333:
                     case ClientVersionBuild.V4_2_0a_14480:
-                        return ClientVersionBuild.V4_2_0_14333;
                     case ClientVersionBuild.V4_3_0_15005:
                     case ClientVersionBuild.V4_3_0a_15050:
-                        return ClientVersionBuild.V4_3_0a_15050;
+                    case ClientVersionBuild.V4_3_4_15595:
+                        return ClientVersionBuild.V4_3_4_15595;
                     case ClientVersionBuild.V5_0_5_16048:
                     case ClientVersionBuild.V5_0_5a_16057:
                     case ClientVersionBuild.V5_0_5b_16135:
-                        return ClientVersionBuild.V5_0_5_16048;
                     case ClientVersionBuild.V5_1_0_16309:
                     case ClientVersionBuild.V5_1_0a_16357:
-                        return ClientVersionBuild.V5_1_0_16309;
                     case ClientVersionBuild.V5_2_0_16650:
                     case ClientVersionBuild.V5_2_0_16669:
                     case ClientVersionBuild.V5_2_0_16683:
@@ -155,14 +150,12 @@ namespace WowPacketParser.Misc
                     case ClientVersionBuild.V5_2_0_16733:
                     case ClientVersionBuild.V5_2_0_16769:
                     case ClientVersionBuild.V5_2_0_16826:
-                        return ClientVersionBuild.V5_2_0_16826;
                     case ClientVersionBuild.V5_3_0_16981:
                     case ClientVersionBuild.V5_3_0_16983:
                     case ClientVersionBuild.V5_3_0_16992:
                     case ClientVersionBuild.V5_3_0_17055:
                     case ClientVersionBuild.V5_3_0_17116:
                     case ClientVersionBuild.V5_3_0_17128:
-                        return ClientVersionBuild.V5_3_0_16981;
                     default:
                         return Build;
                 }
