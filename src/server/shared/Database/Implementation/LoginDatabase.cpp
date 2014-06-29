@@ -83,4 +83,5 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PREPARE_STATEMENT(LOGIN_SEL_REALMLIST_SECURITY_LEVEL, "SELECT allowedSecurityLevel from realmlist WHERE id = ?", CONNECTION_SYNCH);
     PREPARE_STATEMENT(LOGIN_DEL_ACCOUNT, "DELETE FROM account WHERE id = ?", CONNECTION_ASYNC);
     PREPARE_STATEMENT(LOGIN_SEL_SUM_REALM_CHARACTERS, "SELECT SUM(numchars) FROM realmcharacters WHERE acctid = ?", CONNECTION_ASYNC);
+    PREPARE_STATEMENT(LOGIN_INS_BUG_TICKET, "INSERT INTO bug_tickets ( realm, guid, message, createTime, pool, mapId, posX, posY, posZ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", CONNECTION_ASYNC);
 }
