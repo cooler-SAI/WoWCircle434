@@ -484,9 +484,9 @@ void OpcodeTable::Initialize()
     DEFINE_OPCODE_HANDLER(CMSG_SPLIT_ITEM,                              STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleSplitItemOpcode           );
     DEFINE_OPCODE_HANDLER(CMSG_STANDSTATECHANGE,                        STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleStandStateChangeOpcode    );
     DEFINE_OPCODE_HANDLER(CMSG_STOP_DANCE,                              STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
-    DEFINE_OPCODE_HANDLER(CMSG_SUBMIT_BUG,                              STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
-    DEFINE_OPCODE_HANDLER(CMSG_SUBMIT_COMPLAIN,                         STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
-    DEFINE_OPCODE_HANDLER(CMSG_SUGGESTION_SUBMIT,                       STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
+    DEFINE_OPCODE_HANDLER(CMSG_SUBMIT_BUG,                              STATUS_LOGGEDIN,  PROCESS_INPLACE,      &WorldSession::HandleSubmitBugOpcode           );
+    DEFINE_OPCODE_HANDLER(CMSG_SUBMIT_COMPLAIN,                         STATUS_LOGGEDIN,  PROCESS_INPLACE,      &WorldSession::HandleSubmitComplainOpcode      );
+    DEFINE_OPCODE_HANDLER(CMSG_SUGGESTION_SUBMIT,                       STATUS_LOGGEDIN,  PROCESS_INPLACE,      &WorldSession::HandleSubmitSuggestionOpcode    );
     DEFINE_OPCODE_HANDLER(CMSG_SUMMON_RESPONSE,                         STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleSummonResponseOpcode      );
     DEFINE_OPCODE_HANDLER(CMSG_SUSPEND_TOKEN,                           STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
     DEFINE_OPCODE_HANDLER(CMSG_SWAP_INV_ITEM,                           STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleSwapInvItemOpcode         );

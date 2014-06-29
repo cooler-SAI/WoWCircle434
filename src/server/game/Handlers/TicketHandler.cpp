@@ -1,20 +1,20 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+* Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+*
+* This program is free software; you can redistribute it and/or modify it
+* under the terms of the GNU General Public License as published by the
+* Free Software Foundation; either version 2 of the License, or (at your
+* option) any later version.
+*
+* This program is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+* more details.
+*
+* You should have received a copy of the GNU General Public License along
+* with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
 
 
 #include "zlib.h"
@@ -27,6 +27,119 @@
 #include "World.h"
 #include "WorldSession.h"
 #include "Util.h"
+
+//Todo Database Support
+void WorldSession::HandleSubmitComplainOpcode(WorldPacket& recvData)
+{
+    float posX, posY, posZ, posO;
+    uint32 mapID;
+
+    ObjectGuid guid;
+
+    guid[5] = recvData.ReadBit();
+    guid[0] = recvData.ReadBit();
+    guid[1] = recvData.ReadBit();
+
+    uint32 length = recvData.ReadBits(12);
+
+    guid[3] = recvData.ReadBit();
+    guid[2] = recvData.ReadBit();
+    guid[4] = recvData.ReadBit();
+    guid[7] = recvData.ReadBit();
+
+    //guid:4 options:0 length :0;posY:648.581055 ,posX:-8851.486328 ,posZ:96.454063 ,MAP:0 ,poso:2.151366 , unk:0 text:           //SPAM
+    //guid:4 options:10 length :0;posY:648.581055 ,posX:-8851.486328 ,posZ:96.454063 ,MAP:0 ,poso:2.151366 , unk:0 text:          //Ausdrucksweise
+
+    uint32 options = recvData.ReadBits(4); // ##
+
+    guid[6] = recvData.ReadBit();
+
+    recvData.ReadByteSeq(guid[3]);
+    recvData.ReadByteSeq(guid[5]);
+    recvData.ReadByteSeq(guid[1]);
+    recvData.ReadByteSeq(guid[2]);
+    recvData.ReadByteSeq(guid[6]);
+    recvData.ReadByteSeq(guid[0]);
+
+    std::string text = recvData.ReadString(length);
+
+    recvData.ReadByteSeq(guid[7]);
+    recvData.ReadByteSeq(guid[4]);
+
+    recvData >> posY;
+    recvData >> posZ;	    
+    recvData >> posX;	
+    recvData >> mapID;
+    recvData >> posO;
+
+    recvData.ReadBit();
+
+    uint32 count = recvData.ReadBits(22);
+    uint32* strLength = new uint32[count];
+
+    // sLog->outInfo(LOG_FILTER_SERVER_LOADING,"CMSG_SUBMIT_COMPLAIN:: count:%u guid:%u option:%u length :%u;posY:%f ,posX:%f ,posZ:%f ,MAP:%u ,poso:%f  text:%s",count,guid,options,length,posY,posX,posZ,mapID,posO,text.c_str());
+
+    switch(options)
+    {    
+    case COMPLAIN_CHEATER:
+    case COMPLAIN_PLAYER_NAME:
+    case COMPLAIN_GUILD_NAME:
+    case COMPLAIN_ARENA_NAME:
+        break;
+    case COMPLAIN_SPAM:
+    case COMPLAIN_BAD_LANG:
+        for (uint32 i = 0; i < count; ++i)
+            strLength[i] = recvData.ReadBits(13);
+
+        for (uint32 i = 0; i < count; ++i)
+        {
+            sLog->outInfo(LOG_FILTER_SERVER_LOADING, "time : %u", recvData.ReadPackedTime());
+            sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Text : %s", recvData.ReadString(strLength[i]).c_str());
+        }
+        break;
+    default:
+        sLog->outInfo(LOG_FILTER_SERVER_LOADING, "CMSG_SUBMIT_COMPLAIN::UNKNOW option:%u", options);
+
+    }
+}
+
+//Todo Questlog AuraLog PhaseLog!
+void WorldSession::HandleSubmitBugOpcode(WorldPacket& recvData)
+{
+    float posX, posY, posZ, posO;
+    uint32 mapID;
+
+    uint32 length = recvData.ReadBits(12);
+    std::string bug = recvData.ReadString(length);
+
+    recvData >> posY;
+    recvData >> posZ;
+    recvData >> posX;
+    recvData >> mapID;
+    recvData >> posO;
+
+    SQLTransaction trans = SQLTransaction(NULL);
+
+    //    0     1      2      3          4      5      6     7     8          
+    // realm, guid, message, createTime, pool, mapId, posX, posY, posZ
+    uint8 index = 0;
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_BUG_TICKET);
+    stmt->setUInt32(index, realmID);
+    stmt->setUInt32(++index, GUID_LOPART(GetPlayer()->GetGUID()));
+    stmt->setString(++index, bug);
+    stmt->setUInt32(++index, uint32(time(NULL)));
+    stmt->setString(++index, "change Line" /*GetNode()->GetName()*/);
+    stmt->setUInt16(++index, uint16(mapID));
+    stmt->setFloat (++index, (float)posX);
+    stmt->setFloat (++index, (float)posY);
+    stmt->setFloat (++index, (float)posZ);
+
+    LoginDatabase.ExecuteOrAppend(trans, stmt);
+}
+void WorldSession::HandleSubmitSuggestionOpcode(WorldPacket& recvData)
+{
+    HandleSubmitBugOpcode(recvData);  //If you want a separate table for the suggestions. Do it !! Same opcode Structure HandleSubmitBugOpcode
+}
 
 void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
 {
