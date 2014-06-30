@@ -31,7 +31,7 @@ void WorldSession::SendBfInvitePlayerToWar(uint64 guid, uint32 zoneId, uint32 pT
 {
     ObjectGuid guidBytes = guid;
 
-    WorldPacket data(SMSG_BATTLEFIELD_MGR_ENTRY_INVITE, 16);
+    WorldPacket data(SMSG_BATTLEFIELD_MGR_ENTRY_INVITE, 12);
 
     data
         .WriteByteMask(guidBytes[5])
@@ -57,6 +57,8 @@ void WorldSession::SendBfInvitePlayerToWar(uint64 guid, uint32 zoneId, uint32 pT
     data
         .WriteByteSeq(guidBytes[7])
         .WriteByteSeq(guidBytes[5]);
+
+    sLog->outError(LOG_FILTER_BATTLEFIELD, "SendBfInvitePlayerToQueue: battlefieldGuid: " UI64FMTD " ZoneId: %u , zoneId: %u , pTime: %u ",  guidBytes, zoneId, pTime);
 
     SendPacket(&data);
 }
@@ -89,7 +91,8 @@ void WorldSession::SendBfInvitePlayerToQueue(uint64 guid)
         .WriteByteSeq(guidBytes[3])
         .WriteByteSeq(guidBytes[6]);
 
-    data << uint8(1);   // Warmup
+    if (warmup)
+        data << uint8(2);
 
     data
         .WriteByteSeq(guidBytes[5])
@@ -97,6 +100,8 @@ void WorldSession::SendBfInvitePlayerToQueue(uint64 guid)
         .WriteByteSeq(guidBytes[4])
         .WriteByteSeq(guidBytes[1])
         .WriteByteSeq(guidBytes[7]);
+
+    sLog->outError(LOG_FILTER_BATTLEFIELD, "SendBfInvitePlayerToQueue: battlefieldGuid: " UI64FMTD " ZoneId: %u , warmup: %u ",  guidBytes, warmup);
 
     SendPacket(&data);
 }
@@ -107,7 +112,7 @@ void WorldSession::SendBfQueueInviteResponse(uint64 guid, uint32 ZoneId, bool Ca
     const bool warmup = true;
     ObjectGuid guidBytes = guid;
 
-    WorldPacket data(SMSG_BATTLEFIELD_MGR_QUEUE_REQUEST_RESPONSE, 16);
+    WorldPacket data(SMSG_BATTLEFIELD_MGR_QUEUE_REQUEST_RESPONSE, 11);
 
     data
         .WriteByteMask(guidBytes[1])
@@ -163,6 +168,8 @@ void WorldSession::SendBfQueueInviteResponse(uint64 guid, uint32 ZoneId, bool Ca
 
     data << uint32(ZoneId);
 
+    sLog->outError(LOG_FILTER_BATTLEFIELD, "SendBfLeaveMessage: battlefieldGuid: " UI64FMTD " ZoneId: %u , CanQueue: %u , Full: %u , hasSecondGuid: %u , warmup: %u",  guidBytes, ZoneId, CanQueue, Full, hasSecondGuid, warmup);
+
     SendPacket(&data);
 }
 
@@ -172,7 +179,7 @@ void WorldSession::SendBfEntered(uint64 guid)
     uint8 isAFK = _player->isAFK() ? 1 : 0;
     ObjectGuid guidBytes = guid;
 
-    WorldPacket data(SMSG_BATTLEFIELD_MGR_ENTERED, 11);
+    WorldPacket data(SMSG_BATTLEFIELD_MGR_ENTERED, 7);
 
     data
         .WriteBit(0)
@@ -196,12 +203,15 @@ void WorldSession::SendBfEntered(uint64 guid)
         .WriteByteSeq(guidBytes[2])
         .WriteByteSeq(guidBytes[6]);
 
+    sLog->outError(LOG_FILTER_BATTLEFIELD, "SendBfEntered: battlefieldGuid: " UI64FMTD " isAFK: %u", guidBytes, isAFK);
+
     SendPacket(&data);
 }
 
 void WorldSession::SendBfLeaveMessage(uint64 guid, BFLeaveReason reason)
 {
     ObjectGuid guidBytes = guid;
+    uint8 BattleStatus = 2;
 
     WorldPacket data(SMSG_BATTLEFIELD_MGR_EJECTED, 11);
     data
@@ -215,7 +225,7 @@ void WorldSession::SendBfLeaveMessage(uint64 guid, BFLeaveReason reason)
         .WriteByteMask(guidBytes[7])
         .WriteByteMask(guidBytes[4]);
 
-    data << uint8(2);   // BattleStatus
+    data << uint8(BattleStatus);
     data
         .WriteByteSeq(guidBytes[1])
         .WriteByteSeq(guidBytes[7])
@@ -229,6 +239,8 @@ void WorldSession::SendBfLeaveMessage(uint64 guid, BFLeaveReason reason)
         .WriteByteSeq(guidBytes[6])
         .WriteByteSeq(guidBytes[0])
         .WriteByteSeq(guidBytes[5]);
+
+    sLog->outError(LOG_FILTER_BATTLEFIELD, "SendBfLeaveMessage: battlefieldGuid: " UI64FMTD " reason: %u", guidBytes, reason);
 
     SendPacket(&data);
 }
@@ -261,14 +273,16 @@ void WorldSession::HandleBfQueueInviteResponse(WorldPacket& recvData)
         .ReadByteSeq(guid[0])
         .ReadByteSeq(guid[5]);
 
+    sLog->outError(LOG_FILTER_BATTLEFIELD, "HandleQueueInviteResponse: battlefieldGuid: " UI64FMTD " accepted: %u", guid, accepted);
+
     if (!accepted)
         return;
 
-    Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid);
-    if (!bf)
-        return;
-    
-    bf->PlayerAcceptInviteToQueue(_player);
+    //Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid);
+    //if (!bf)
+    //return;
+    if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_TB))
+        bf->PlayerAcceptInviteToQueue(_player);
 }
 
 void WorldSession::HandleBfEntryInviteResponse(WorldPacket& recvData)
@@ -299,15 +313,22 @@ void WorldSession::HandleBfEntryInviteResponse(WorldPacket& recvData)
         .ReadByteSeq(guid[7])
         .ReadByteSeq(guid[5]);
 
-    Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid);
-    if (!bf)
-        return;
+    sLog->outError(LOG_FILTER_GENERAL, "HandleBattlefieldInviteResponse: GUID:" UI64FMTD " Accepted:%u", uint64(guid), accepted);
 
+    //Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid);
+    //if (!bf)
+    //    return;
+
+    Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_TB);
     if (accepted)
+    {
         bf->PlayerAcceptInviteToWar(_player);
+    }
     else
+    {
         if (_player->GetZoneId() == bf->GetZoneId())
             bf->KickPlayerFromBattlefield(_player->GetGUID());
+    }
 }
 
 void WorldSession::HandleBfQueueRequest(WorldPacket& recvData)
@@ -333,16 +354,25 @@ void WorldSession::HandleBfQueueRequest(WorldPacket& recvData)
         .ReadByteSeq(guid[5])
         .ReadByteSeq(guid[0]);
 
+    sLog->outError(LOG_FILTER_GENERAL, "HandleBattlefieldInviteResponse: GUID:" UI64FMTD "", uint64(guid));
 
-    if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid))
+    //if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid))
+
+    if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_TB))
     {
         if (bf->IsWarTime())
+        {
             bf->InvitePlayerToWar(_player);
+            sLog->outError(LOG_FILTER_GENERAL, "HandleBattlefieldInviteResponse: GUID:" UI64FMTD " IsWarTime:%u", uint64(guid), bf->IsWarTime());
+        }
         else
         {
             uint32 timer = bf->GetTimer() / 1000;
             if (timer < 15 * MINUTE)
+            {
+                sLog->outError(LOG_FILTER_GENERAL, "HandleBattlefieldInviteResponse: GUID:" UI64FMTD " timer:%u", uint64(guid), uint32(timer));
                 bf->InvitePlayerToQueue(_player);
+            }
         }
     }
 }
@@ -370,6 +400,10 @@ void WorldSession::HandleBfExitRequest(WorldPacket& recvData)
         .ReadByteSeq(guid[7])
         .ReadByteSeq(guid[6]);
 
-    if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid))
+    //if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid))
+    if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_TB))
+    {
         bf->AskToLeaveQueue(_player);
+        sLog->outError(LOG_FILTER_GENERAL, "HandleBattlefieldInviteResponse: GUID:" UI64FMTD " AskToLeaveQueue", uint64(guid));
+    }
 }
