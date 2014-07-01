@@ -22261,3 +22261,39 @@ void Unit::WriteMovementInfo(WorldPacket &data)
         }
     }
 }
+
+void Unit::CastWithDelay(uint32 delay, Unit* victim, uint32 spellid, bool triggered, bool repeat)
+{
+    class CastDelayEvent : public BasicEvent
+    {
+    public:
+        CastDelayEvent(Unit* _me, Unit* _victim, uint32 const& _spellId, bool const& _triggered, bool const& _repeat, uint32 const& _delay) :
+            me(_me), victim(_victim), spellId(_spellId), triggered(_triggered), repeat(_repeat), delay(_delay) { }
+
+        bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+        {
+            me->CastSpell(victim, spellId, triggered);
+            if (repeat)
+                me->CastWithDelay(delay, victim, spellId, triggered, repeat);
+            return true;
+        }
+
+    private:
+        Unit* me;
+        Unit* victim;
+        uint32 const spellId;
+        uint32 const delay;
+        bool const triggered;
+        bool const repeat;
+    };
+
+    m_Events.AddEvent(new CastDelayEvent(this, victim, spellid, triggered, repeat, delay), m_Events.CalculateTime(delay));
+}
+
+void Unit::AddSpellCooldown(uint32 spellid, uint32 itemid, time_t end_time)
+{
+    SpellCooldown sc;
+    sc.end = end_time;
+    sc.itemid = itemid;
+    m_spellCooldowns[spellid] = sc;
+}

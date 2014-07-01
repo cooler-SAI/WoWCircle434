@@ -334,13 +334,6 @@ struct CUFProfile
     // More fields can be added to BoolOptions without changing DB schema (up to 32, currently 27)
 };
 
-struct SpellCooldown
-{
-    time_t end;
-    uint32 itemid;
-};
-
-typedef std::map<uint32, SpellCooldown> SpellCooldowns;
 typedef std::list<uint32> SpellCooldownToRemove;
 typedef UNORDERED_MAP<uint32 /*instanceId*/, time_t/*releaseTime*/> InstanceTimeMap;
 
