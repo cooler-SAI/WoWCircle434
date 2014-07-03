@@ -73,34 +73,34 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Event)
-            if (uiEventTimer <= diff)
-            {
-                switch (uiEventPhase)
+                if (uiEventTimer <= diff)
                 {
-                    case 0:
+                    switch (uiEventPhase)
                     {
-                              std::list<Creature*> lCitizen;
-                              me->GetCreatureListWithEntryInGrid(lCitizen, 44086, 35.0f);
+                    case 0:
+                        {
+                            std::list<Creature*> lCitizen;
+                            me->GetCreatureListWithEntryInGrid(lCitizen, 44086, 35.0f);
 
-                              if (!lCitizen.empty())
-                              {
-                                  uint8 roll = urand(0, lCitizen.size() - 1);
-                                  std::list<Creature*>::iterator itr = lCitizen.begin();
-                                  std::advance(itr, roll);
-                                  Creature* citizen = *itr;
+                            if (!lCitizen.empty())
+                            {
+                                uint8 roll = urand(0, lCitizen.size() - 1);
+                                std::list<Creature*>::iterator itr = lCitizen.begin();
+                                std::advance(itr, roll);
+                                Creature* citizen = *itr;
 
-                                  if (citizen)
-                                  {
-                                      ++uiEventPhase;
-                                      uiEventTimer = urand(5000, 10000);
-                                      uint8 roll = urand(0, 2);
-                                      DoScriptText(PANICKED_CITIZEN_RANDOM_SAY - roll, citizen);
-                                      return;
-                                  }
-                              }
+                                if (citizen)
+                                {
+                                    ++uiEventPhase;
+                                    uiEventTimer = urand(5000, 10000);
+                                    uint8 roll = urand(0, 2);
+                                    DoScriptText(PANICKED_CITIZEN_RANDOM_SAY - roll, citizen);
+                                    return;
+                                }
+                            }
 
-                              uiEventTimer = urand(10000, 40000);
-                    }
+                            uiEventTimer = urand(10000, 40000);
+                        }
                         break;
                     case 1:
                         --uiEventPhase;
@@ -108,14 +108,14 @@ public:
                         uint8 roll = urand(0, 2);
                         DoScriptText(GILNEAS_CITY_GUARD_RANDOM_SAY - roll, me);
                         break;
-                }
-            } else
-                uiEventTimer -= diff;
+                    }
+                } else
+                    uiEventTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -172,13 +172,13 @@ public:
             Flying = true;
             me->SetCanFly(true);
             AddWaypoint(0,
-                        CrowFlyPos[point_id].FirstCoord.x + irand(-4, 4),
-                        CrowFlyPos[point_id].FirstCoord.y + irand(-4, 4),
-                        CrowFlyPos[point_id].FirstCoord.z + irand(-4, 4));
+                CrowFlyPos[point_id].FirstCoord.x + irand(-4, 4),
+                CrowFlyPos[point_id].FirstCoord.y + irand(-4, 4),
+                CrowFlyPos[point_id].FirstCoord.z + irand(-4, 4));
             AddWaypoint(0,
-                        CrowFlyPos[point_id].SecondCoord.x + irand(-4, 4),
-                        CrowFlyPos[point_id].SecondCoord.y + irand(-4, 4),
-                        CrowFlyPos[point_id].SecondCoord.z + irand(-4, 4));
+                CrowFlyPos[point_id].SecondCoord.x + irand(-4, 4),
+                CrowFlyPos[point_id].SecondCoord.y + irand(-4, 4),
+                CrowFlyPos[point_id].SecondCoord.z + irand(-4, 4));
             Start();
         }
 
@@ -202,9 +202,9 @@ public:
         void MoveInLineOfSight(Unit* who)
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
-            if (me->IsWithinDistInMap(who, 15.0f))
-            if (!Flying)
-                FlyAway();
+                if (me->IsWithinDistInMap(who, 15.0f))
+                    if (!Flying)
+                        FlyAway();
         }
 
         void UpdateAI(const uint32 diff)
@@ -227,8 +227,8 @@ public:
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_LOCKDOWN)
-        if (Creature* citizen = creature->FindNearestCreature(NPC_PANCKED_CITIZEN, 20.0f))
-            citizen->DoPersonalScriptText(CITIZEN_SAY_WHAT_AT_THE_ROOF, player);
+            if (Creature* citizen = creature->FindNearestCreature(NPC_PANCKED_CITIZEN, 20.0f))
+                citizen->DoPersonalScriptText(CITIZEN_SAY_WHAT_AT_THE_ROOF, player);
 
         return true;
     }
@@ -254,19 +254,19 @@ public:
 
                 switch (uiSayCount)
                 {
-                    case 1:
-                        DoScriptText(LIAM_INTRO_1, me);
-                        uiSayTimer = 12000;
-                        break;
-                    case 2:
-                        DoScriptText(LIAM_INTRO_2, me);
-                        uiSayTimer = 12000;
-                        break;
-                    case 3:
-                        DoScriptText(LIAM_INTRO_3, me);
-                        uiSayTimer = 18000;
-                        uiSayCount = 0;
-                        break;
+                case 1:
+                    DoScriptText(LIAM_INTRO_1, me);
+                    uiSayTimer = 12000;
+                    break;
+                case 2:
+                    DoScriptText(LIAM_INTRO_2, me);
+                    uiSayTimer = 12000;
+                    break;
+                case 3:
+                    DoScriptText(LIAM_INTRO_3, me);
+                    uiSayTimer = 18000;
+                    uiSayCount = 0;
+                    break;
                 }
             } else
                 uiSayTimer -= diff;
@@ -353,19 +353,19 @@ public:
                 Unit* target = NULL;
 
                 if (target = me->FindNearestCreature(NPC_RAMPAGING_WORGEN, 40.0f))
-                if (target != me->getVictim())
-                {
-                    me->getThreatManager().modifyThreatPercent(me->getVictim(), -100);
-                    me->CombatStart(target);
-                    me->AddThreat(target, 1000);
-                }
+                    if (target != me->getVictim())
+                    {
+                        me->getThreatManager().modifyThreatPercent(me->getVictim(), -100);
+                        me->CombatStart(target);
+                        me->AddThreat(target, 1000);
+                    }
 
-                if (!me->IsWithinMeleeRange(me->getVictim(), 0.0f))
-                {
-                    me->Attack(me->getVictim(), false);
-                    me->CastSpell(me->getVictim(), SPELL_SHOOT, false);
-                } else
-                    me->Attack(me->getVictim(), true);
+                    if (!me->IsWithinMeleeRange(me->getVictim(), 0.0f))
+                    {
+                        me->Attack(me->getVictim(), false);
+                        me->CastSpell(me->getVictim(), SPELL_SHOOT, false);
+                    } else
+                        me->Attack(me->getVictim(), true);
             } else
                 uiShootTimer -= diff;
 
@@ -378,10 +378,10 @@ public:
                 uiSayTimer -= diff;
 
             if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-            if (me->getVictim()->GetHealthPct() < 90)
-                miss = true;
-            else
-                miss = false;
+                if (me->getVictim()->GetHealthPct() < 90)
+                    miss = true;
+                else
+                    miss = false;
 
             DoMeleeAttackIfReady();
         }
@@ -418,18 +418,18 @@ public:
 
             switch (me->GetEntry())
             {
-                case NPC_RAMPAGING_WORGEN:
-                    uiEnemyEntry = NPC_GILNEAS_CITY_GUARD;
-                    break;
-                case NPC_BLOODFANG_WORGEN:
-                    uiEnemyEntry = NPC_GILNEAN_ROYAL_GUARD;
-                    break;
-                case NPC_FRENZIED_STALKER:
-                    uiEnemyEntry = NPC_NORTHGATE_REBEL;
-                    break;
-                default:
-                    uiEnemyEntry = 0;
-                    break;
+            case NPC_RAMPAGING_WORGEN:
+                uiEnemyEntry = NPC_GILNEAS_CITY_GUARD;
+                break;
+            case NPC_BLOODFANG_WORGEN:
+                uiEnemyEntry = NPC_GILNEAN_ROYAL_GUARD;
+                break;
+            case NPC_FRENZIED_STALKER:
+                uiEnemyEntry = NPC_NORTHGATE_REBEL;
+                break;
+            default:
+                uiEnemyEntry = 0;
+                break;
             }
         }
 
@@ -441,8 +441,8 @@ public:
             Unit* victim = NULL;
 
             if (victim = me->getVictim())
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                return;
+                if (victim->GetTypeId() == TYPEID_PLAYER)
+                    return;
 
             if (victim)
                 me->getThreatManager().modifyThreatPercent(victim, -100);
@@ -463,10 +463,10 @@ public:
             }
 
             if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-            if (me->getVictim()->GetHealthPct() < 90)
-                miss = true;
-            else
-                miss = false;
+                if (me->getVictim()->GetHealthPct() < 90)
+                    miss = true;
+                else
+                    miss = false;
 
             DoMeleeAttackIfReady();
         }
@@ -507,25 +507,25 @@ public:
 
             switch (me->GetEntry())
             {
-                case NPC_GILNEAS_CITY_GUARD:
-                    uiEnemyEntry = NPC_RAMPAGING_WORGEN;
-                    break;
-                case NPC_GILNEAN_ROYAL_GUARD:
-                    uiEnemyEntry = NPC_BLOODFANG_WORGEN;
-                    break;
-                case NPC_GILNEAS_CITY_GUARD_PHASE_4:
-                    CanSay = true;
-                    uiEnemyEntry = NPC_AFFLICTED_GILNEAN;
-                    break;
-                case NPC_NORTHGATE_REBEL_PHASE_5:
-                    uiEnemyEntry = NPC_BLOODFANG_STALKER_PHASE_5;
-                    break;
-                case NPC_NORTHGATE_REBEL:
-                    uiEnemyEntry = NPC_FRENZIED_STALKER;
-                    break;
-                default:
-                    uiEnemyEntry = 0;
-                    break;
+            case NPC_GILNEAS_CITY_GUARD:
+                uiEnemyEntry = NPC_RAMPAGING_WORGEN;
+                break;
+            case NPC_GILNEAN_ROYAL_GUARD:
+                uiEnemyEntry = NPC_BLOODFANG_WORGEN;
+                break;
+            case NPC_GILNEAS_CITY_GUARD_PHASE_4:
+                CanSay = true;
+                uiEnemyEntry = NPC_AFFLICTED_GILNEAN;
+                break;
+            case NPC_NORTHGATE_REBEL_PHASE_5:
+                uiEnemyEntry = NPC_BLOODFANG_STALKER_PHASE_5;
+                break;
+            case NPC_NORTHGATE_REBEL:
+                uiEnemyEntry = NPC_FRENZIED_STALKER;
+                break;
+            default:
+                uiEnemyEntry = 0;
+                break;
             }
 
             if (me->GetEntry() == NPC_GILNEAS_CITY_GUARD_PHASE_4)
@@ -551,55 +551,55 @@ public:
                 return;
 
             if (CanSay)
-            if (uiYellTimer <= diff)
-            {
-                uiYellTimer = urand(50000, 100000);
-                uint8 roll = urand(0, 2);
-                DoScriptText(GUARD_RANDOM_YELL - roll, me);
-            } else
-                uiYellTimer -= diff;
-
-            if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-            if (me->getVictim()->GetHealthPct() < 90)
-                miss = true;
-            else
-                miss = false;
-
-            if (uiShootTimer <= diff)
-            {
-                uiShootTimer = 2500;
-                Unit* target = NULL;
-
-                if (!me->IsWithinMeleeRange(me->getVictim(), 0.0f))
-                if (uiEnemyEntry)
-                if (target = me->FindNearestCreature(uiEnemyEntry, 40.0f))
-                if (target != me->getVictim())
+                if (uiYellTimer <= diff)
                 {
-                    me->getThreatManager().modifyThreatPercent(me->getVictim(), -100);
-                    me->CombatStart(target);
-                    me->AddThreat(target, 1000);
-                }
-
-                if (!me->IsWithinMeleeRange(me->getVictim(), 0.0f))
-                {
-                    if (me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
-                    {
-                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-                        me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
-                        me->SendMeleeAttackStop(me->getVictim());
-                    }
-
-                    me->CastSpell(me->getVictim(), SPELL_SHOOT, false);
+                    uiYellTimer = urand(50000, 100000);
+                    uint8 roll = urand(0, 2);
+                    DoScriptText(GUARD_RANDOM_YELL - roll, me);
                 } else
-                if (!me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
-                {
-                    me->AddUnitState(UNIT_STATE_MELEE_ATTACKING);
-                    me->SendMeleeAttackStart(me->getVictim());
-                }
-            } else
-                uiShootTimer -= diff;
+                    uiYellTimer -= diff;
 
-            DoMeleeAttackIfReady();
+                if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
+                    if (me->getVictim()->GetHealthPct() < 90)
+                        miss = true;
+                    else
+                        miss = false;
+
+                if (uiShootTimer <= diff)
+                {
+                    uiShootTimer = 2500;
+                    Unit* target = NULL;
+
+                    if (!me->IsWithinMeleeRange(me->getVictim(), 0.0f))
+                        if (uiEnemyEntry)
+                            if (target = me->FindNearestCreature(uiEnemyEntry, 40.0f))
+                                if (target != me->getVictim())
+                                {
+                                    me->getThreatManager().modifyThreatPercent(me->getVictim(), -100);
+                                    me->CombatStart(target);
+                                    me->AddThreat(target, 1000);
+                                }
+
+                                if (!me->IsWithinMeleeRange(me->getVictim(), 0.0f))
+                                {
+                                    if (me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
+                                    {
+                                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+                                        me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
+                                        me->SendMeleeAttackStop(me->getVictim());
+                                    }
+
+                                    me->CastSpell(me->getVictim(), SPELL_SHOOT, false);
+                                } else
+                                    if (!me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
+                                    {
+                                        me->AddUnitState(UNIT_STATE_MELEE_ATTACKING);
+                                        me->SendMeleeAttackStart(me->getVictim());
+                                    }
+                } else
+                    uiShootTimer -= diff;
+
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -630,9 +630,9 @@ public:
             if (point == 1)
             {
                 if (me->isSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                if (Player* player = summoner->ToPlayer())
-                    player->KilledMonsterCredit(NPC_QEMS_KILL_CREDIT, 0);
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if (Player* player = summoner->ToPlayer())
+                            player->KilledMonsterCredit(NPC_QEMS_KILL_CREDIT, 0);
 
                 SetEscortPaused(true);
                 pause = true;
@@ -655,12 +655,12 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (pause)
-            if (uiEventTimer <= diff)
-            {
-                pause = false;
-                SetEscortPaused(false);
-            } else
-                uiEventTimer -= diff;
+                if (uiEventTimer <= diff)
+                {
+                    pause = false;
+                    SetEscortPaused(false);
+                } else
+                    uiEventTimer -= diff;
         }
     };
 
@@ -696,10 +696,10 @@ public:
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 if (me->isSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    AttackStart(summoner);
-                else
-                    me->DespawnOrUnsummon();
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        AttackStart(summoner);
+                    else
+                        me->DespawnOrUnsummon();
             }
         }
 
@@ -708,21 +708,21 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (pause)
-            if (uiPauseTimer <= diff)
-            {
-                pause = false;
-                SetEscortPaused(false);
-            } else
-                uiPauseTimer -= diff;
+                if (uiPauseTimer <= diff)
+                {
+                    pause = false;
+                    SetEscortPaused(false);
+                } else
+                    uiPauseTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            if (!enrage && me->HealthBelowPct(30))
-            {
-                DoCast(SPELL_CW_WORGEN_ENRAGE);
-                enrage = true;
-            }
+                if (!enrage && me->HealthBelowPct(30))
+                {
+                    DoCast(SPELL_CW_WORGEN_ENRAGE);
+                    enrage = true;
+                }
         }
     };
 
@@ -787,13 +787,13 @@ public:
 
         switch (roll)
         {
-            case ACTION_JUST_CITIZEN:
-                SummonQuestCreature(NPC_J_CITIZEN, true, go, player);
-                break;
-            case ACTION_CITIZEN_AND_WORGEN:
-                SummonQuestCreature(NPC_CW_CITIZEN, true, go, player);
-                SummonQuestCreature(NPC_CW_WORGEN, false, go, player);
-                break;
+        case ACTION_JUST_CITIZEN:
+            SummonQuestCreature(NPC_J_CITIZEN, true, go, player);
+            break;
+        case ACTION_CITIZEN_AND_WORGEN:
+            SummonQuestCreature(NPC_CW_CITIZEN, true, go, player);
+            SummonQuestCreature(NPC_CW_WORGEN, false, go, player);
+            break;
         }
 
         return false;
@@ -817,16 +817,16 @@ public:
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_OLD_DIVISIONS)
-        if (Creature* godfrey = creature->FindNearestCreature(NPC_LORD_GODFREY_QOD, 20.0f))
-        {
-            godfrey->DoPersonalScriptText(NPC_LORD_GODFREY_QOD_SAY, player);
-            Psc new_psc;
-            new_psc.uiPersonalTimer = 5000;
-            new_psc.uiPlayerGUID = player->GetGUID();
-            CAST_AI(npc_king_genn_greymane_qodAI, creature->AI())->lPlayerList.push_back(new_psc);
-        }
+            if (Creature* godfrey = creature->FindNearestCreature(NPC_LORD_GODFREY_QOD, 20.0f))
+            {
+                godfrey->DoPersonalScriptText(NPC_LORD_GODFREY_QOD_SAY, player);
+                Psc new_psc;
+                new_psc.uiPersonalTimer = 5000;
+                new_psc.uiPlayerGUID = player->GetGUID();
+                CAST_AI(npc_king_genn_greymane_qodAI, creature->AI())->lPlayerList.push_back(new_psc);
+            }
 
-        return true;
+            return true;
     }
 
     struct npc_king_genn_greymane_qodAI : public ScriptedAI
@@ -841,17 +841,17 @@ public:
                 return;
 
             for (std::list<Psc>::iterator itr = lPlayerList.begin(); itr != lPlayerList.end();)
-            if ((*itr).uiPersonalTimer <= diff)
-            {
-                if (Player* player = Unit::GetPlayer(*me, (*itr).uiPlayerGUID))
-                    me->DoPersonalScriptText(NPC_KING_GENN_GREYMANE_QOD_SAY, player);
+                if ((*itr).uiPersonalTimer <= diff)
+                {
+                    if (Player* player = Unit::GetPlayer(*me, (*itr).uiPlayerGUID))
+                        me->DoPersonalScriptText(NPC_KING_GENN_GREYMANE_QOD_SAY, player);
 
-                itr = lPlayerList.erase(itr);
-            } else
-            {
-                (*itr).uiPersonalTimer -= diff;
-                ++itr;
-            }
+                    itr = lPlayerList.erase(itr);
+                } else
+                {
+                    (*itr).uiPersonalTimer -= diff;
+                    ++itr;
+                }
         }
     };
 };
@@ -884,18 +884,18 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
             if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            {
-                me->CombatStart(summoner);
-                me->AddThreat(summoner, 100500);
-            }
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                {
+                    me->CombatStart(summoner);
+                    me->AddThreat(summoner, 100500);
+                }
         }
 
         void WaypointReached(uint32 point)
         {
             if (point == 2)
-            if (me->GetEntry() == NPC_WORGEN_ALPHA_SW || NPC_WORGEN_RUNT_SW)
-                StartAttack();
+                if (me->GetEntry() == NPC_WORGEN_ALPHA_SW || NPC_WORGEN_RUNT_SW)
+                    StartAttack();
 
             if (point == 5)
                 StartAttack();
@@ -992,30 +992,30 @@ public:
             GetNearPoint2D(WorgenPosT2[id][0], WorgenPosT2[id][1], x, y, 3.0f + rand()%90, WorgenPosT2[id][3]);
 
             if (Creature* worgen = me->SummonCreature(entry, x, y, WorgenPosT2[id][2] + 2.0f, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
-            if (npc_escortAI* npc_escort = CAST_AI(npc_worgen_attacker::npc_worgen_attackerAI, worgen->AI()))
-            {
-                npc_escort->AddWaypoint(0, WorgenPosT2[id][0], WorgenPosT2[id][1], WorgenPosT2[id][2], 0, true);
-                const Position src ={WorgenPosT2[7][0], WorgenPosT2[7][1], WorgenPosT2[7][2], WorgenPosT2[7][3]};
-                Position dst;
-                worgen->GetRandomPoint(src, 5.0f, dst);
-                npc_escort->AddWaypoint(1, dst.GetPositionX(), dst.GetPositionY(), dst.GetPositionZ());
-                npc_escort->AddWaypoint(2, -1679.73f, 1442.12f, 52.3705f);
-                npc_escort->Start(true, true);
-                npc_escort->SetDespawnAtEnd(false);
-            }
+                if (npc_escortAI* npc_escort = CAST_AI(npc_worgen_attacker::npc_worgen_attackerAI, worgen->AI()))
+                {
+                    npc_escort->AddWaypoint(0, WorgenPosT2[id][0], WorgenPosT2[id][1], WorgenPosT2[id][2], 0, true);
+                    const Position src ={WorgenPosT2[7][0], WorgenPosT2[7][1], WorgenPosT2[7][2], WorgenPosT2[7][3]};
+                    Position dst;
+                    worgen->GetRandomPoint(src, 5.0f, dst);
+                    npc_escort->AddWaypoint(1, dst.GetPositionX(), dst.GetPositionY(), dst.GetPositionZ());
+                    npc_escort->AddWaypoint(2, -1679.73f, 1442.12f, 52.3705f);
+                    npc_escort->Start(true, true);
+                    npc_escort->SetDespawnAtEnd(false);
+                }
         }
 
         void SummonFirstWave()
         {
             if (Creature* worgen = me->SummonCreature(NPC_WORGEN_ALPHA_FW, WorgenPosT1[0][0], WorgenPosT1[0][1], WorgenPosT1[0][2], WorgenPosT1[0][3], TEMPSUMMON_DEAD_DESPAWN, 500))
-            for (int i = 0; i < 2; ++i)
-            {
-                float x, y;
-                worgen->GetNearPoint2D(x, y, urand(1, 4), WorgenPosT1[0][3] + M_PI / 2);
-                me->SummonCreature(NPC_WORGEN_RUNT_FW, x, y, WorgenPosT1[0][2], WorgenPosT1[0][3], TEMPSUMMON_DEAD_DESPAWN, 500);
-                worgen->GetNearPoint2D(x, y, urand(1, 5), WorgenPosT1[0][3] - M_PI / 2);
-                me->SummonCreature(NPC_WORGEN_RUNT_FW, x, y, WorgenPosT1[0][2], WorgenPosT1[0][3], TEMPSUMMON_DEAD_DESPAWN, 500);
-            }
+                for (int i = 0; i < 2; ++i)
+                {
+                    float x, y;
+                    worgen->GetNearPoint2D(x, y, urand(1, 4), WorgenPosT1[0][3] + M_PI / 2);
+                    me->SummonCreature(NPC_WORGEN_RUNT_FW, x, y, WorgenPosT1[0][2], WorgenPosT1[0][3], TEMPSUMMON_DEAD_DESPAWN, 500);
+                    worgen->GetNearPoint2D(x, y, urand(1, 5), WorgenPosT1[0][3] - M_PI / 2);
+                    me->SummonCreature(NPC_WORGEN_RUNT_FW, x, y, WorgenPosT1[0][2], WorgenPosT1[0][3], TEMPSUMMON_DEAD_DESPAWN, 500);
+                }
         }
 
         void SummonSecondWave()
@@ -1032,16 +1032,16 @@ public:
         void JustSummoned(Creature* summoned)
         {
             if (summoned->GetEntry() == NPC_WORGEN_ALPHA_FW || summoned->GetEntry() == NPC_WORGEN_RUNT_FW)
-            if (npc_escortAI* worgen = CAST_AI(npc_worgen_attacker::npc_worgen_attackerAI, summoned->AI()))
-            {
-                worgen->AddWaypoint(1, WorgenPosT1[0][0], WorgenPosT1[0][1], WorgenPosT1[0][2]);
-                worgen->AddWaypoint(2, WorgenPosT1[1][0], WorgenPosT1[1][1], WorgenPosT1[1][2]);
-                worgen->AddWaypoint(3, WorgenPosT1[2][0], WorgenPosT1[2][1], WorgenPosT1[2][2], 0, true);
-                worgen->AddWaypoint(4, WorgenPosT1[3][0], WorgenPosT1[3][1], WorgenPosT1[3][2]);
-                worgen->AddWaypoint(5, -1679.73f, 1442.12f, 52.3705f);
-                worgen->Start(true, true);
-                worgen->SetDespawnAtEnd(false);
-            }
+                if (npc_escortAI* worgen = CAST_AI(npc_worgen_attacker::npc_worgen_attackerAI, summoned->AI()))
+                {
+                    worgen->AddWaypoint(1, WorgenPosT1[0][0], WorgenPosT1[0][1], WorgenPosT1[0][2]);
+                    worgen->AddWaypoint(2, WorgenPosT1[1][0], WorgenPosT1[1][1], WorgenPosT1[1][2]);
+                    worgen->AddWaypoint(3, WorgenPosT1[2][0], WorgenPosT1[2][1], WorgenPosT1[2][2], 0, true);
+                    worgen->AddWaypoint(4, WorgenPosT1[3][0], WorgenPosT1[3][1], WorgenPosT1[3][2]);
+                    worgen->AddWaypoint(5, -1679.73f, 1442.12f, 52.3705f);
+                    worgen->Start(true, true);
+                    worgen->SetDespawnAtEnd(false);
+                }
         }
 
         void UpdateAI(const uint32 diff)
@@ -1054,14 +1054,14 @@ public:
 
                     switch (uiType)
                     {
-                        case TYPE_FIRST_WAVE:
-                            uiType = TYPE_SECOND_WAVE;
-                            SummonFirstWave();
-                            break;
-                        case TYPE_SECOND_WAVE:
-                            uiType = TYPE_FIRST_WAVE;
-                            SummonSecondWave();
-                            break;
+                    case TYPE_FIRST_WAVE:
+                        uiType = TYPE_SECOND_WAVE;
+                        SummonFirstWave();
+                        break;
+                    case TYPE_SECOND_WAVE:
+                        uiType = TYPE_FIRST_WAVE;
+                        SummonSecondWave();
+                        break;
                     }
                 } else
                     uiSummonTimer -= diff;
@@ -1130,11 +1130,11 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Event)
-            if (uiEventTimer <= diff)
-            {
-                if (Creature* lorna = me->FindNearestCreature(NPC_LORNA_CROWLEY, 30.0f))
-                    switch (uiPase)
+                if (uiEventTimer <= diff)
                 {
+                    if (Creature* lorna = me->FindNearestCreature(NPC_LORNA_CROWLEY, 30.0f))
+                        switch (uiPase)
+                    {
                         case 1:
                             ++uiPase;
                             uiEventTimer = 1000;
@@ -1155,14 +1155,14 @@ public:
                             me->GetMotionMaster()->MoveJump(x, y, z, 25.0f, 10.0f);
                             lorna->CastSpell(me, SPELL_FAKE_SHOT, false);
                             break;
-                }
-            } else
-                uiEventTimer -= diff;
+                    }
+                } else
+                    uiEventTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -1225,11 +1225,11 @@ public:
                 uint32 uiPhase = me->GetPhaseMask();
 
                 for (Map::PlayerList::const_iterator i = PlList.begin(); i != PlList.end(); ++i)
-                if (Player* player = i->getSource())
-                if (uiPhase == player->GetPhaseMask())
-                if (me->GetDistance(player) < 35.0f)
-                if (abs(z - player->GetPositionZ()) < 5.0f)
-                    me->DoPersonalScriptText(RANDOM_JOSIAH_YELL - roll, player);
+                    if (Player* player = i->getSource())
+                        if (uiPhase == player->GetPhaseMask())
+                            if (me->GetDistance(player) < 35.0f)
+                                if (abs(z - player->GetPositionZ()) < 5.0f)
+                                    me->DoPersonalScriptText(RANDOM_JOSIAH_YELL - roll, player);
             } else
                 uiRandomSpeachTimer -= diff;
 
@@ -1263,10 +1263,10 @@ public:
     bool OnQuestComplete(Player* player, Creature* creature, const Quest* quest)
     {
         if (quest->GetQuestId() == QUEST_FROM_THE_SHADOWS)
-        if (Unit* charm = Unit::GetCreature(*creature, player->GetMinionGUID()))
-        if (charm->GetEntry() == NPC_GILNEAS_MASTIFF)
-        if (Creature* mastiff = charm->ToCreature())
-            mastiff->DespawnOrUnsummon();
+            if (Unit* charm = Unit::GetCreature(*creature, player->GetMinionGUID()))
+                if (charm->GetEntry() == NPC_GILNEAS_MASTIFF)
+                    if (Creature* mastiff = charm->ToCreature())
+                        mastiff->DespawnOrUnsummon();
 
         return true;
     }
@@ -1414,12 +1414,12 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
             if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            if (Vehicle* vehicle = summoner->GetVehicle())
-            if (vehicle->HasEmptySeat(1))
-                me->EnterVehicle(vehicle->GetBase(), 1);
-            else
-                me->DespawnOrUnsummon();
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if (Vehicle* vehicle = summoner->GetVehicle())
+                        if (vehicle->HasEmptySeat(1))
+                            me->EnterVehicle(vehicle->GetBase(), 1);
+                        else
+                            me->DespawnOrUnsummon();
         }
 
         void UpdateAI(const uint32 diff)
@@ -1451,9 +1451,9 @@ public:
                 return;
 
             if (Vehicle* vehicle = me->GetVehicleKit())
-            if (Unit* passenger = vehicle->GetPassenger(0))
-            if (Player* player = passenger->ToPlayer())
-                who->DoPersonalScriptText(ARANAS_SAY_GENN_HORSE, player);
+                if (Unit* passenger = vehicle->GetPassenger(0))
+                    if (Player* player = passenger->ToPlayer())
+                        who->DoPersonalScriptText(ARANAS_SAY_GENN_HORSE, player);
 
             SetEscortPaused(false);
             AranasIsSave = true;
@@ -1465,69 +1465,69 @@ public:
         {
             switch (point)
             {
-                case 17:
-                    if (Unit* passenger = me->GetVehicleKit()->GetPassenger(0))
-                    {
-                        if (Creature* aranas = passenger->FindNearestCreature(NPC_KRENNAN_ARANAS, 50.0f))
+            case 17:
+                if (Unit* passenger = me->GetVehicleKit()->GetPassenger(0))
+                {
+                    if (Creature* aranas = passenger->FindNearestCreature(NPC_KRENNAN_ARANAS, 50.0f))
                         if (Vehicle* vehicle = me->GetVehicleKit())
-                        if (Unit* passenger = vehicle->GetPassenger(0))
+                            if (Unit* passenger = vehicle->GetPassenger(0))
+                                if (Player* player = passenger->ToPlayer())
+                                    aranas->DoPersonalScriptText(ARANAS_SAY_SAVE_ME, player);
+
+                    me->Whisper(HORSE_SAY_SAVE_ARANAS, passenger->GetGUID(), true);
+                }
+                break;
+            case 18:
+                if (!AranasIsSave)
+                {
+                    SetEscortPaused(true);
+                    me->SetSpeed(MOVE_WALK, 0, true);
+                    me->SetSpeed(MOVE_RUN, 0, true);
+                }
+                break;
+            case 40:
+                if (Vehicle* vehicle = me->GetVehicleKit())
+                    if (Unit* passenger = vehicle->GetPassenger(0))
                         if (Player* player = passenger->ToPlayer())
-                            aranas->DoPersonalScriptText(ARANAS_SAY_SAVE_ME, player);
+                        {
+                            std::list<Creature*> lGuards;
+                            me->GetCreatureListWithEntryInGrid(lGuards, NPC_GUARD_QSKA, 90.0f);
 
-                        me->Whisper(HORSE_SAY_SAVE_ARANAS, passenger->GetGUID(), true);
-                    }
-                    break;
-                case 18:
-                    if (!AranasIsSave)
-                    {
-                        SetEscortPaused(true);
-                        me->SetSpeed(MOVE_WALK, 0, true);
-                        me->SetSpeed(MOVE_RUN, 0, true);
-                    }
-                    break;
-                case 40:
-                    if (Vehicle* vehicle = me->GetVehicleKit())
+                            if (!lGuards.empty())
+                                for (std::list<Creature*>::const_iterator itr = lGuards.begin(); itr != lGuards.end(); ++itr)
+                                    if ((*itr)->isAlive())
+                                        if (Creature* worgen = (*itr)->FindNearestCreature(NPC_WORGEN_QSKA, 90.0f))
+                                            (*itr)->CastSpell(worgen, SPELL_SHOOT_QSKA, false);
+                        }
+                        break;
+            case 41:
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->CombatStop();
+                break;
+            case 42:
+                if (Vehicle* vehicle = me->GetVehicleKit())
                     if (Unit* passenger = vehicle->GetPassenger(0))
-                    if (Player* player = passenger->ToPlayer())
-                    {
-                        std::list<Creature*> lGuards;
-                        me->GetCreatureListWithEntryInGrid(lGuards, NPC_GUARD_QSKA, 90.0f);
+                        if (Player* player = passenger->ToPlayer())
+                        {
+                            player->KilledMonsterCredit(NPC_QSKA_KILL_CREDIT, 0);
 
-                        if (!lGuards.empty())
-                        for (std::list<Creature*>::const_iterator itr = lGuards.begin(); itr != lGuards.end(); ++itr)
-                        if ((*itr)->isAlive())
-                        if (Creature* worgen = (*itr)->FindNearestCreature(NPC_WORGEN_QSKA, 90.0f))
-                            (*itr)->CastSpell(worgen, SPELL_SHOOT_QSKA, false);
-                    }
-                    break;
-                case 41:
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->CombatStop();
-                    break;
-                case 42:
-                    if (Vehicle* vehicle = me->GetVehicleKit())
-                    if (Unit* passenger = vehicle->GetPassenger(0))
-                    if (Player* player = passenger->ToPlayer())
-                    {
-                        player->KilledMonsterCredit(NPC_QSKA_KILL_CREDIT, 0);
-
-                        if (Unit* passenger_2 = vehicle->GetPassenger(1))
-                        if (Creature* aranas = passenger_2->ToCreature())
-                            aranas->DoPersonalScriptText(ARANAS_THANK, player);
-                    }
-                    break;
-                case 43:
-                    if (Vehicle* vehicle = me->GetVehicleKit())
-                    {
-                        if (Unit* passenger = vehicle->GetPassenger(1))
+                            if (Unit* passenger_2 = vehicle->GetPassenger(1))
+                                if (Creature* aranas = passenger_2->ToCreature())
+                                    aranas->DoPersonalScriptText(ARANAS_THANK, player);
+                        }
+                        break;
+            case 43:
+                if (Vehicle* vehicle = me->GetVehicleKit())
+                {
+                    if (Unit* passenger = vehicle->GetPassenger(1))
                         if (Creature* aranas = passenger->ToCreature())
                             aranas->DespawnOrUnsummon();
 
-                        vehicle->RemoveAllPassengers();
-                    }
+                    vehicle->RemoveAllPassengers();
+                }
 
-                    me->DespawnOrUnsummon();
-                    break;
+                me->DespawnOrUnsummon();
+                break;
             }
         }
 
@@ -1556,56 +1556,56 @@ public:
             creature->GetNearPoint2D(x, y, 2.0f, player->GetOrientation() + M_PI / 2);
 
             if (Creature* horse = player->SummonCreature(NPC_GENN_HORSE, x, y, creature->GetPositionZ(), creature->GetOrientation()))
-            if (npc_vehicle_escortAI* escort = CAST_AI(npc_vehicle_escortAI, horse->AI()))
-            {
-                escort->AddWaypoint(1, -1799.37f, 1400.21f, 19.8951f);
-                escort->AddWaypoint(2, -1798.23f, 1396.9f, 19.8993f);
-                escort->AddWaypoint(3, -1795.03f, 1388.01f, 19.8898f);
-                escort->AddWaypoint(4, -1790.16f, 1378.7f, 19.8016f);
-                escort->AddWaypoint(5, -1786.41f, 1372.97f, 19.8406f);
-                escort->AddWaypoint(6, -1779.72f, 1364.88f, 19.8131f);
-                escort->AddWaypoint(7, -1774.43f, 1359.87f, 19.7021f);
-                escort->AddWaypoint(8, -1769.0f, 1356.76f, 19.7439f);
-                escort->AddWaypoint(9, -1762.64f, 1356.02f, 19.7979f);
-                escort->AddWaypoint(10, -1758.91f, 1356.08f, 19.8635f);
-                escort->AddWaypoint(11, -1751.95f, 1356.8f, 19.8273f);
-                escort->AddWaypoint(12, -1745.66f, 1357.21f, 19.7993f);
-                escort->AddWaypoint(13, -1738.7f, 1356.64f, 19.7822f);
-                escort->AddWaypoint(14, -1731.79f, 1355.51f, 19.7149f);
-                escort->AddWaypoint(15, -1724.89f, 1354.29f, 19.8661f);
-                escort->AddWaypoint(16, -1718.03f, 1352.93f, 19.7824f);
-                escort->AddWaypoint(17, -1707.68f, 1351.16f, 19.7811f);
-                escort->AddWaypoint(18, -1673.04f, 1344.91f, 15.1353f, 0, true);
-                escort->AddWaypoint(19, -1673.04f, 1344.91f, 15.1353f);
-                escort->AddWaypoint(20, -1669.32f, 1346.55f, 15.1353f);
-                escort->AddWaypoint(21, -1666.45f, 1349.89f, 15.1353f);
-                escort->AddWaypoint(22, -1665.61f, 1353.85f, 15.1353f);
-                escort->AddWaypoint(23, -1666.04f, 1358.01f, 15.1353f);
-                escort->AddWaypoint(24, -1669.79f, 1360.71f, 15.1353f);
-                escort->AddWaypoint(25, -1673.1f, 1362.11f, 15.1353f);
-                escort->AddWaypoint(26, -1677.12f, 1361.57f, 15.1353f);
-                escort->AddWaypoint(27, -1679.9f, 1360.1f, 15.1353f);
-                escort->AddWaypoint(28, -1682.79f, 1357.56f, 15.1353f);
-                escort->AddWaypoint(29, -1682.79f, 1357.56f, 15.1353f);
-                escort->AddWaypoint(30, -1689.07f, 1352.39f, 15.1353f);
-                escort->AddWaypoint(31, -1691.91f, 1351.83f, 15.1353f);
-                escort->AddWaypoint(32, -1703.81f, 1351.82f, 19.7604f);
-                escort->AddWaypoint(33, -1707.26f, 1352.38f, 19.7826f);
-                escort->AddWaypoint(34, -1712.25f, 1353.55f, 19.7826f);
-                escort->AddWaypoint(35, -1718.2f, 1356.51f, 19.7164f);
-                escort->AddWaypoint(36, -1741.5f, 1372.04f, 19.9569f);
-                escort->AddWaypoint(37, -1746.23f, 1375.8f, 19.9817f);
-                escort->AddWaypoint(38, -1751.06f, 1380.53f, 19.8424f);
-                escort->AddWaypoint(39, -1754.97f, 1386.34f, 19.8474f);
-                escort->AddWaypoint(40, -1760.77f, 1394.37f, 19.9282f);
-                escort->AddWaypoint(41, -1765.11f, 1402.07f, 19.8816f);
-                escort->AddWaypoint(42, -1768.24f, 1410.2f, 19.7833f);
-                escort->AddWaypoint(43, -1772.26f, 1420.48f, 19.9029f);
-                escort->Start(true);
-                player->CastSpell(player, SPELL_QUEST_INVISIBILITY_DETECTION_3, false);
-                player->EnterVehicle(horse, 0);
-                horse->EnableAI();
-            }
+                if (npc_vehicle_escortAI* escort = CAST_AI(npc_vehicle_escortAI, horse->AI()))
+                {
+                    escort->AddWaypoint(1, -1799.37f, 1400.21f, 19.8951f);
+                    escort->AddWaypoint(2, -1798.23f, 1396.9f, 19.8993f);
+                    escort->AddWaypoint(3, -1795.03f, 1388.01f, 19.8898f);
+                    escort->AddWaypoint(4, -1790.16f, 1378.7f, 19.8016f);
+                    escort->AddWaypoint(5, -1786.41f, 1372.97f, 19.8406f);
+                    escort->AddWaypoint(6, -1779.72f, 1364.88f, 19.8131f);
+                    escort->AddWaypoint(7, -1774.43f, 1359.87f, 19.7021f);
+                    escort->AddWaypoint(8, -1769.0f, 1356.76f, 19.7439f);
+                    escort->AddWaypoint(9, -1762.64f, 1356.02f, 19.7979f);
+                    escort->AddWaypoint(10, -1758.91f, 1356.08f, 19.8635f);
+                    escort->AddWaypoint(11, -1751.95f, 1356.8f, 19.8273f);
+                    escort->AddWaypoint(12, -1745.66f, 1357.21f, 19.7993f);
+                    escort->AddWaypoint(13, -1738.7f, 1356.64f, 19.7822f);
+                    escort->AddWaypoint(14, -1731.79f, 1355.51f, 19.7149f);
+                    escort->AddWaypoint(15, -1724.89f, 1354.29f, 19.8661f);
+                    escort->AddWaypoint(16, -1718.03f, 1352.93f, 19.7824f);
+                    escort->AddWaypoint(17, -1707.68f, 1351.16f, 19.7811f);
+                    escort->AddWaypoint(18, -1673.04f, 1344.91f, 15.1353f, 0, true);
+                    escort->AddWaypoint(19, -1673.04f, 1344.91f, 15.1353f);
+                    escort->AddWaypoint(20, -1669.32f, 1346.55f, 15.1353f);
+                    escort->AddWaypoint(21, -1666.45f, 1349.89f, 15.1353f);
+                    escort->AddWaypoint(22, -1665.61f, 1353.85f, 15.1353f);
+                    escort->AddWaypoint(23, -1666.04f, 1358.01f, 15.1353f);
+                    escort->AddWaypoint(24, -1669.79f, 1360.71f, 15.1353f);
+                    escort->AddWaypoint(25, -1673.1f, 1362.11f, 15.1353f);
+                    escort->AddWaypoint(26, -1677.12f, 1361.57f, 15.1353f);
+                    escort->AddWaypoint(27, -1679.9f, 1360.1f, 15.1353f);
+                    escort->AddWaypoint(28, -1682.79f, 1357.56f, 15.1353f);
+                    escort->AddWaypoint(29, -1682.79f, 1357.56f, 15.1353f);
+                    escort->AddWaypoint(30, -1689.07f, 1352.39f, 15.1353f);
+                    escort->AddWaypoint(31, -1691.91f, 1351.83f, 15.1353f);
+                    escort->AddWaypoint(32, -1703.81f, 1351.82f, 19.7604f);
+                    escort->AddWaypoint(33, -1707.26f, 1352.38f, 19.7826f);
+                    escort->AddWaypoint(34, -1712.25f, 1353.55f, 19.7826f);
+                    escort->AddWaypoint(35, -1718.2f, 1356.51f, 19.7164f);
+                    escort->AddWaypoint(36, -1741.5f, 1372.04f, 19.9569f);
+                    escort->AddWaypoint(37, -1746.23f, 1375.8f, 19.9817f);
+                    escort->AddWaypoint(38, -1751.06f, 1380.53f, 19.8424f);
+                    escort->AddWaypoint(39, -1754.97f, 1386.34f, 19.8474f);
+                    escort->AddWaypoint(40, -1760.77f, 1394.37f, 19.9282f);
+                    escort->AddWaypoint(41, -1765.11f, 1402.07f, 19.8816f);
+                    escort->AddWaypoint(42, -1768.24f, 1410.2f, 19.7833f);
+                    escort->AddWaypoint(43, -1772.26f, 1420.48f, 19.9029f);
+                    escort->Start(true);
+                    player->CastSpell(player, SPELL_QUEST_INVISIBILITY_DETECTION_3, false);
+                    player->EnterVehicle(horse, 0);
+                    horse->EnableAI();
+                }
         }
 
         return true;
@@ -1678,8 +1678,8 @@ public:
                     cannon->CastSpell(cannon, SPELL_CANNON_FIRE, false);
 
                 for (std::list<Creature*>::iterator itr = lSummons.begin(); itr != lSummons.end(); ++itr)
-                if ((*itr)->isAlive())
-                    (*itr)->Kill(*itr);
+                    if ((*itr)->isAlive())
+                        (*itr)->Kill(*itr);
 
                 lSummons.clear();
             }
@@ -1688,22 +1688,22 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Event)
-            if (uiEventTimer <= diff)
-            {
-                ++uiPhase;
-
-                switch (uiPhase)
+                if (uiEventTimer <= diff)
                 {
+                    ++uiPhase;
+
+                    switch (uiPhase)
+                    {
                     case 1:
                         uiEventTimer = 1500;
 
                         for (int i = 0; i < 13; ++i)
-                        if (Creature* worgen = me->SummonCreature(NPC_BLOODFANG_RIPPER_QSKA, WorgenSummonPos[i][0], WorgenSummonPos[i][1], WorgenSummonPos[i][2], WorgenSummonPos[i][3]))
-                        {
-                            lSummons.push_back(worgen);
-                            worgen->GetMotionMaster()->MovePoint(0, -1751.874f + irand(-3, 3), 1377.457f + irand(-3, 3), 19.930f);
-                        }
-                        break;
+                            if (Creature* worgen = me->SummonCreature(NPC_BLOODFANG_RIPPER_QSKA, WorgenSummonPos[i][0], WorgenSummonPos[i][1], WorgenSummonPos[i][2], WorgenSummonPos[i][3]))
+                            {
+                                lSummons.push_back(worgen);
+                                worgen->GetMotionMaster()->MovePoint(0, -1751.874f + irand(-3, 3), 1377.457f + irand(-3, 3), 19.930f);
+                            }
+                            break;
                     case 2:
                         uiEventTimer = 2000;
                         if (Creature* cannon = me->FindNearestCreature(NPC_COMMANDEERED_CANNON, 40.0f))
@@ -1714,14 +1714,14 @@ public:
                         if (Creature* cannon = me->FindNearestCreature(NPC_COMMANDEERED_CANNON, 40.0f))
                             cannon->CastSpell(cannon, SPELL_CANNON_FIRE, false);
                         break;
-                }
-            } else
-                uiEventTimer -= diff;
+                    }
+                } else
+                    uiEventTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -1787,10 +1787,10 @@ public:
         void DeletePlayer(uint64 uiPlayerGUID)
         {
             for (std::list<Psc_qtr>::iterator itr = lPlayerList.begin(); itr != lPlayerList.end();)
-            if (itr->uiPlayerGUID == uiPlayerGUID)
-                itr = lPlayerList.erase(itr);
-            else
-                ++itr;
+                if (itr->uiPlayerGUID == uiPlayerGUID)
+                    itr = lPlayerList.erase(itr);
+                else
+                    ++itr;
         }
 
         void UpdateAI(const uint32 diff)
@@ -1799,14 +1799,14 @@ public:
                 return;
 
             for (std::list<Psc_qtr>::iterator itr = lPlayerList.begin(); itr != lPlayerList.end();)
-            if ((*itr).uiPersonalTimer <= diff)
-            {
-                ++(*itr).uiSpeachId;
-
-                if (Player* player = Unit::GetPlayer(*me, (*itr).uiPlayerGUID))
+                if ((*itr).uiPersonalTimer <= diff)
                 {
-                    switch ((*itr).uiSpeachId)
+                    ++(*itr).uiSpeachId;
+
+                    if (Player* player = Unit::GetPlayer(*me, (*itr).uiPlayerGUID))
                     {
+                        switch ((*itr).uiSpeachId)
+                        {
                         case 1:
                             (*itr).uiPersonalTimer = 7000;
                             if (Creature* crowley = me->FindNearestCreature(NPC_LORD_CROWLEY_QTR, 30.0f))
@@ -1831,13 +1831,13 @@ public:
                             me->DoPersonalScriptText(GENN_SAY_WE_FOOLS, player);
                             itr = lPlayerList.erase(itr);
                             break;
+                        }
                     }
+                } else
+                {
+                    (*itr).uiPersonalTimer -= diff;
+                    ++itr;
                 }
-            } else
-            {
-                (*itr).uiPersonalTimer -= diff;
-                ++itr;
-            }
         }
     };
 };
@@ -1865,27 +1865,27 @@ public:
         {
             switch (point)
             {
-                case 1:
-                    if (Vehicle* vehicle = me->GetVehicleKit())
+            case 1:
+                if (Vehicle* vehicle = me->GetVehicleKit())
                     if (Unit* crowley = vehicle->GetPassenger(1))
-                    if (Unit* passenger = vehicle->GetPassenger(0))
-                    if (Player* player = passenger->ToPlayer())
-                        crowley->DoPersonalScriptText(CROWLEY_SAY_START, player);
-                    break;
-                case 26:
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    break;
-                case 29:
-                    if (Vehicle* vehicle = me->GetVehicleKit())
-                    {
                         if (Unit* passenger = vehicle->GetPassenger(0))
-                            passenger->ExitVehicle();
+                            if (Player* player = passenger->ToPlayer())
+                                crowley->DoPersonalScriptText(CROWLEY_SAY_START, player);
+                break;
+            case 26:
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                break;
+            case 29:
+                if (Vehicle* vehicle = me->GetVehicleKit())
+                {
+                    if (Unit* passenger = vehicle->GetPassenger(0))
+                        passenger->ExitVehicle();
 
-                        if (Unit* passenger = vehicle->GetPassenger(1))
-                            passenger->ToCreature()->DespawnOrUnsummon();
-                    }
-                    me->DespawnOrUnsummon();
-                    break;
+                    if (Unit* passenger = vehicle->GetPassenger(1))
+                        passenger->ToCreature()->DespawnOrUnsummon();
+                }
+                me->DespawnOrUnsummon();
+                break;
             }
         }
 
@@ -1899,10 +1899,10 @@ public:
                 uint8 roll = urand(0, 2);
 
                 if (Vehicle* vehicle = me->GetVehicleKit())
-                if (Unit* crowley = vehicle->GetPassenger(1))
-                if (Unit* passenger = vehicle->GetPassenger(0))
-                if (Player* player = passenger->ToPlayer())
-                    crowley->DoPersonalScriptText(CROWLEY_RANDOM_SAY - roll, player);
+                    if (Unit* crowley = vehicle->GetPassenger(1))
+                        if (Unit* passenger = vehicle->GetPassenger(0))
+                            if (Player* player = passenger->ToPlayer())
+                                crowley->DoPersonalScriptText(CROWLEY_RANDOM_SAY - roll, player);
             } else
                 uiRandomSpeachTimer -= diff;
         }
@@ -2071,7 +2071,7 @@ public:
     {
         PrepareSpellScript(spell_summon_crowley_horse_SpellScript)
 
-        void OnSummon(SpellEffIndex effIndex)
+            void OnSummon(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
 
@@ -2160,7 +2160,7 @@ public:
     {
         PrepareSpellScript(spell_summon_crowley_horse_second_round_SpellScript)
 
-        void OnSummon(SpellEffIndex effIndex)
+            void OnSummon(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
 
@@ -2252,9 +2252,9 @@ public:
             player->SaveToDB();
 
             if (creature->isSummon())
-            if (Unit* summoner = creature->ToTempSummon()->GetSummoner())
-            if (Creature* krennan = summoner->ToCreature())
-                krennan->AI()->DoAction(ACTION_EVENT_DONE);
+                if (Unit* summoner = creature->ToTempSummon()->GetSummoner())
+                    if (Creature* krennan = summoner->ToCreature())
+                        krennan->AI()->DoAction(ACTION_EVENT_DONE);
         }
         return true;
     }
@@ -2325,9 +2325,9 @@ public:
                 if (uiEventTimer <= diff)
                 {
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    if (Player* player = summoner->ToPlayer())
-                        switch (uiPhase)
-                    {
+                        if (Player* player = summoner->ToPlayer())
+                            switch (uiPhase)
+                        {
                             case 1:
                                 uiEventTimer = 2000;
                                 if (!(player->GetExtraFlags() & PLAYER_EXTRA_WATCHING_MOVIE))
@@ -2401,7 +2401,7 @@ public:
                                     greymane->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                                 }
                                 break;
-                    }
+                        }
                 } else
                     uiEventTimer -= diff;
             }
@@ -2630,8 +2630,8 @@ public:
             Unit* victim = NULL;
 
             if (victim = me->getVictim())
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                return;
+                if (victim->GetTypeId() == TYPEID_PLAYER)
+                    return;
 
             if (victim)
                 me->getThreatManager().modifyThreatPercent(victim, -100);
@@ -2643,39 +2643,39 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (shoot)
-            if (uiShootTimer <= diff)
-            {
-                shoot = false;
-                uiShootTimer = 3000;
-                std::list<Creature*> liamList;
-                GetCreatureListWithEntryInGrid(liamList, me, NPC_PRINCE_LIAM_GREYMANE_QYCTEA, 50.0f);
+                if (uiShootTimer <= diff)
+                {
+                    shoot = false;
+                    uiShootTimer = 3000;
+                    std::list<Creature*> liamList;
+                    GetCreatureListWithEntryInGrid(liamList, me, NPC_PRINCE_LIAM_GREYMANE_QYCTEA, 50.0f);
 
-                if (liamList.empty())
-                    ShootEvent();
-                else
-                    (*liamList.begin())->CastSpell(me, SPELL_SHOOT_QYCTEA, false);
-            } else
-                uiShootTimer -= diff;
+                    if (liamList.empty())
+                        ShootEvent();
+                    else
+                        (*liamList.begin())->CastSpell(me, SPELL_SHOOT_QYCTEA, false);
+                } else
+                    uiShootTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            if (me->getVictim() && me->getVictim()->GetTypeId() == TYPEID_UNIT)
-            {
-                if (me->getVictim()->GetHealthPct() < 90)
-                    miss = true;
-                else
-                    miss = false;
-            }
+                if (me->getVictim() && me->getVictim()->GetTypeId() == TYPEID_UNIT)
+                {
+                    if (me->getVictim()->GetHealthPct() < 90)
+                        miss = true;
+                    else
+                        miss = false;
+                }
 
-            if (uiRestitchingTimer <= diff)
-            {
-                uiRestitchingTimer = 8000;
-                DoCast(SPELL_RESTITCHING);
-            } else
-                uiRestitchingTimer -= diff;
+                if (uiRestitchingTimer <= diff)
+                {
+                    uiRestitchingTimer = 8000;
+                    DoCast(SPELL_RESTITCHING);
+                } else
+                    uiRestitchingTimer -= diff;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -2742,46 +2742,46 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (respawn)
-            if (uiRespawnTimer <= diff)
-            {
-                respawn = false;
-                uiRespawnTimer = 10000;
-                me->DespawnOrUnsummon();
-            } else
-                uiRespawnTimer -= diff;
-
-            if (CanCast)
-            if (uiCastTimer <= diff)
-            {
-                uiCastTimer = urand(5000, 20000);
-                float x, y, z;
-                me->GetNearPoint2D(x, y, urand(100, 150), me->GetOrientation());
-                z = me->GetBaseMap()->GetHeight(x, y, MAX_HEIGHT);
-                me->CastSpell(x, y, z, SPELL_FIERY_BOULDER, false);
-            } else
-                uiCastTimer -= diff;
-
-            if (jump)
-            if (uiJumpTimer <= diff)
-            {
-                jump = false;
-                uiJumpTimer = 2000;
-
-                if (Vehicle* vehicle = me->GetVehicleKit())
-                if (Unit* passenger = vehicle->GetPassenger(1))
-                if (Player* player = passenger->ToPlayer())
+                if (uiRespawnTimer <= diff)
                 {
-                    me->AddAura(SPELL_LAUNCH, player);
-                    player->ExitVehicle();
-                    player->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
-                }
-            } else
-                uiJumpTimer -= diff;
+                    respawn = false;
+                    uiRespawnTimer = 10000;
+                    me->DespawnOrUnsummon();
+                } else
+                    uiRespawnTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (CanCast)
+                    if (uiCastTimer <= diff)
+                    {
+                        uiCastTimer = urand(5000, 20000);
+                        float x, y, z;
+                        me->GetNearPoint2D(x, y, urand(100, 150), me->GetOrientation());
+                        z = me->GetBaseMap()->GetHeight(x, y, MAX_HEIGHT);
+                        me->CastSpell(x, y, z, SPELL_FIERY_BOULDER, false);
+                    } else
+                        uiCastTimer -= diff;
 
-            DoMeleeAttackIfReady();
+                    if (jump)
+                        if (uiJumpTimer <= diff)
+                        {
+                            jump = false;
+                            uiJumpTimer = 2000;
+
+                            if (Vehicle* vehicle = me->GetVehicleKit())
+                                if (Unit* passenger = vehicle->GetPassenger(1))
+                                    if (Player* player = passenger->ToPlayer())
+                                    {
+                                        me->AddAura(SPELL_LAUNCH, player);
+                                        player->ExitVehicle();
+                                        player->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
+                                    }
+                        } else
+                            uiJumpTimer -= diff;
+
+                        if (!UpdateVictim())
+                            return;
+
+                        DoMeleeAttackIfReady();
         }
     };
 };
@@ -2795,7 +2795,7 @@ public:
     {
         PrepareSpellScript(spell_launch_qtbs_SpellScript)
 
-        void Function(SpellEffIndex effIndex)
+            void Function(SpellEffIndex effIndex)
         {
             Unit* caster = GetCaster();
             bool CheckCast = false;
@@ -2805,30 +2805,30 @@ public:
             z = GetExplTargetDest()->GetPositionZ();
 
             for (int i = 0; i < 16; ++i)
-            if (sqrt(pow(x - CheckSpellPos[i][0], 2) + pow(y - CheckSpellPos[i][1], 2) + pow(z - CheckSpellPos[i][2], 2)) < 10.0f)
-            {
-                CheckCast = true;
-                break;
-            }
+                if (sqrt(pow(x - CheckSpellPos[i][0], 2) + pow(y - CheckSpellPos[i][1], 2) + pow(z - CheckSpellPos[i][2], 2)) < 10.0f)
+                {
+                    CheckCast = true;
+                    break;
+                }
 
-            if (!CheckCast)
-                return;
+                if (!CheckCast)
+                    return;
 
-            if (Vehicle* vehicle = caster->GetVehicleKit())
-            if (Unit* passenger = vehicle->GetPassenger(0))
-            if (passenger->GetTypeId() == TYPEID_PLAYER)
-            {
-                passenger->ChangeSeat(1);
-                caster->EnableAI();
-                float speedXY = 10.0f, speedZ = 10.0f;
-                GetTargetSpeedXYZ(speedXY, speedZ);
-                CAST_AI(npc_forsaken_catapult_qtbs::npc_forsaken_catapult_qtbsAI, caster->ToCreature()->AI())->speedXY = speedXY;
-                CAST_AI(npc_forsaken_catapult_qtbs::npc_forsaken_catapult_qtbsAI, caster->ToCreature()->AI())->speedZ = speedZ;
-                CAST_AI(npc_forsaken_catapult_qtbs::npc_forsaken_catapult_qtbsAI, caster->ToCreature()->AI())->x = x;
-                CAST_AI(npc_forsaken_catapult_qtbs::npc_forsaken_catapult_qtbsAI, caster->ToCreature()->AI())->y = y;
-                CAST_AI(npc_forsaken_catapult_qtbs::npc_forsaken_catapult_qtbsAI, caster->ToCreature()->AI())->z = z;
-                CAST_AI(npc_forsaken_catapult_qtbs::npc_forsaken_catapult_qtbsAI, caster->ToCreature()->AI())->jump = true;
-            }
+                if (Vehicle* vehicle = caster->GetVehicleKit())
+                    if (Unit* passenger = vehicle->GetPassenger(0))
+                        if (passenger->GetTypeId() == TYPEID_PLAYER)
+                        {
+                            passenger->ChangeSeat(1);
+                            caster->EnableAI();
+                            float speedXY = 10.0f, speedZ = 10.0f;
+                            GetTargetSpeedXYZ(speedXY, speedZ);
+                            CAST_AI(npc_forsaken_catapult_qtbs::npc_forsaken_catapult_qtbsAI, caster->ToCreature()->AI())->speedXY = speedXY;
+                            CAST_AI(npc_forsaken_catapult_qtbs::npc_forsaken_catapult_qtbsAI, caster->ToCreature()->AI())->speedZ = speedZ;
+                            CAST_AI(npc_forsaken_catapult_qtbs::npc_forsaken_catapult_qtbsAI, caster->ToCreature()->AI())->x = x;
+                            CAST_AI(npc_forsaken_catapult_qtbs::npc_forsaken_catapult_qtbsAI, caster->ToCreature()->AI())->y = y;
+                            CAST_AI(npc_forsaken_catapult_qtbs::npc_forsaken_catapult_qtbsAI, caster->ToCreature()->AI())->z = z;
+                            CAST_AI(npc_forsaken_catapult_qtbs::npc_forsaken_catapult_qtbsAI, caster->ToCreature()->AI())->jump = true;
+                        }
         }
 
         void Register()
@@ -2873,20 +2873,20 @@ public:
         void SpellHit(Unit* caster, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_SAVE_JAMES)
-            if (Player* player = caster->ToPlayer())
-            {
-                Event = true;
-                uiPlayerGUID = player->GetGUID();
-                player->Say(GossipMenu[26], LANG_UNIVERSAL);
-                player->KilledMonsterCredit(36289, 0);
-            }
+                if (Player* player = caster->ToPlayer())
+                {
+                    Event = true;
+                    uiPlayerGUID = player->GetGUID();
+                    player->Say(GossipMenu[26], LANG_UNIVERSAL);
+                    player->KilledMonsterCredit(36289, 0);
+                }
         }
 
         void WaypointReached(uint32 point)
         {
             if (point == 7)
-            if (GameObject* door = me->FindNearestGameObject(GO_DOOR_TO_THE_BASEMENT, 10.0f))
-                door->UseDoorOrButton();
+                if (GameObject* door = me->FindNearestGameObject(GO_DOOR_TO_THE_BASEMENT, 10.0f))
+                    door->UseDoorOrButton();
         }
 
         void UpdateAI(const uint32 diff)
@@ -2894,18 +2894,18 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (Event)
-            if (uiEventTimer <= diff)
-            {
-                Event = false;
-                uiEventTimer = 3500;
-
-                if (Player* player = Unit::GetPlayer(*me, uiPlayerGUID))
+                if (uiEventTimer <= diff)
                 {
-                    Start(false, true);
-                    DoScriptText(NPC_JAMES_SAY, me, player);
-                }
-            } else
-                uiEventTimer -= diff;
+                    Event = false;
+                    uiEventTimer = 3500;
+
+                    if (Player* player = Unit::GetPlayer(*me, uiPlayerGUID))
+                    {
+                        Start(false, true);
+                        DoScriptText(NPC_JAMES_SAY, me, player);
+                    }
+                } else
+                    uiEventTimer -= diff;
         }
     };
 };
@@ -2936,20 +2936,20 @@ public:
         void SpellHit(Unit* caster, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_SAVE_ASHLEY)
-            if (Player* player = caster->ToPlayer())
-            {
-                Event = true;
-                uiPlayerGUID = player->GetGUID();
-                player->Say(GossipMenu[25], LANG_UNIVERSAL);
-                player->KilledMonsterCredit(36288, 0);
-            }
+                if (Player* player = caster->ToPlayer())
+                {
+                    Event = true;
+                    uiPlayerGUID = player->GetGUID();
+                    player->Say(GossipMenu[25], LANG_UNIVERSAL);
+                    player->KilledMonsterCredit(36288, 0);
+                }
         }
 
         void WaypointReached(uint32 point)
         {
             if (point == 16)
-            if (GameObject* door = me->FindNearestGameObject(GO_DOOR_TO_THE_BASEMENT, 10.0f))
-                door->UseDoorOrButton();
+                if (GameObject* door = me->FindNearestGameObject(GO_DOOR_TO_THE_BASEMENT, 10.0f))
+                    door->UseDoorOrButton();
         }
 
         void UpdateAI(const uint32 diff)
@@ -2957,18 +2957,18 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (Event)
-            if (uiEventTimer <= diff)
-            {
-                Event = false;
-                uiEventTimer = 3500;
-
-                if (Player* player = Unit::GetPlayer(*me, uiPlayerGUID))
+                if (uiEventTimer <= diff)
                 {
-                    Start(false, true);
-                    DoScriptText(NPC_ASHLEY_SAY, me, player);
-                }
-            } else
-                uiEventTimer -= diff;
+                    Event = false;
+                    uiEventTimer = 3500;
+
+                    if (Player* player = Unit::GetPlayer(*me, uiPlayerGUID))
+                    {
+                        Start(false, true);
+                        DoScriptText(NPC_ASHLEY_SAY, me, player);
+                    }
+                } else
+                    uiEventTimer -= diff;
         }
     };
 };
@@ -2999,20 +2999,20 @@ public:
         void SpellHit(Unit* caster, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_SAVE_CYNTHIA)
-            if (Player* player = caster->ToPlayer())
-            {
-                Event = true;
-                uiPlayerGUID = player->GetGUID();
-                player->Say(GossipMenu[24], LANG_UNIVERSAL);
-                player->KilledMonsterCredit(36287, 0);
-            }
+                if (Player* player = caster->ToPlayer())
+                {
+                    Event = true;
+                    uiPlayerGUID = player->GetGUID();
+                    player->Say(GossipMenu[24], LANG_UNIVERSAL);
+                    player->KilledMonsterCredit(36287, 0);
+                }
         }
 
         void WaypointReached(uint32 point)
         {
             if (point == 8)
-            if (GameObject* door = me->FindNearestGameObject(GO_DOOR_TO_THE_BASEMENT, 10.0f))
-                door->UseDoorOrButton();
+                if (GameObject* door = me->FindNearestGameObject(GO_DOOR_TO_THE_BASEMENT, 10.0f))
+                    door->UseDoorOrButton();
         }
 
         void UpdateAI(const uint32 diff)
@@ -3020,18 +3020,18 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (Event)
-            if (uiEventTimer <= diff)
-            {
-                Event = false;
-                uiEventTimer = 3500;
-
-                if (Player* player = Unit::GetPlayer(*me, uiPlayerGUID))
+                if (uiEventTimer <= diff)
                 {
-                    Start(false, true);
-                    DoScriptText(NPC_CYNTHIA_SAY, me, player);
-                }
-            } else
-                uiEventTimer -= diff;
+                    Event = false;
+                    uiEventTimer = 3500;
+
+                    if (Player* player = Unit::GetPlayer(*me, uiPlayerGUID))
+                    {
+                        Start(false, true);
+                        DoScriptText(NPC_CYNTHIA_SAY, me, player);
+                    }
+                } else
+                    uiEventTimer -= diff;
         }
     };
 };
@@ -3127,17 +3127,17 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (despawn)
-            if (uiDespawnTimer <= diff)
-            {
-                if (GameObject* go = me->FindNearestGameObject(GO_SPARKLES, 10.0f))
-                    go->Delete();
+                if (uiDespawnTimer <= diff)
+                {
+                    if (GameObject* go = me->FindNearestGameObject(GO_SPARKLES, 10.0f))
+                        go->Delete();
 
-                reset = true;
-                despawn = false;
-                uiDespawnTimer = 10000;
-                me->DespawnOrUnsummon();
-            } else
-                uiDespawnTimer -= diff;
+                    reset = true;
+                    despawn = false;
+                    uiDespawnTimer = 10000;
+                    me->DespawnOrUnsummon();
+                } else
+                    uiDespawnTimer -= diff;
         }
     };
 };
@@ -3164,23 +3164,23 @@ public:
                     return;
 
                 if (who->GetDistance(-1897.0f, 2519.97f, 1.50667f) < 5.0f)
-                if (Unit* unit = who->GetVehicleBase())
-                {
-                    if (Creature* watchman = who->ToCreature())
+                    if (Unit* unit = who->GetVehicleBase())
                     {
-                        uint8 roll = urand(0, 2);
-                        DoScriptText(DROWNING_WATCHMAN_RANDOM_SAY - roll, watchman);
-                        watchman->DespawnOrUnsummon(15000);
-                        watchman->SetStandState(UNIT_STAND_STATE_KNEEL);
-                        CAST_AI(npc_drowning_watchman::npc_drowning_watchmanAI, watchman->AI())->exit = true;
-                        CAST_AI(npc_drowning_watchman::npc_drowning_watchmanAI, watchman->AI())->reset = true;
-                        who->ExitVehicle();
-                        unit->RemoveAura(SPELL_RESCUE_DROWNING_WATCHMAN);
-                    }
+                        if (Creature* watchman = who->ToCreature())
+                        {
+                            uint8 roll = urand(0, 2);
+                            DoScriptText(DROWNING_WATCHMAN_RANDOM_SAY - roll, watchman);
+                            watchman->DespawnOrUnsummon(15000);
+                            watchman->SetStandState(UNIT_STAND_STATE_KNEEL);
+                            CAST_AI(npc_drowning_watchman::npc_drowning_watchmanAI, watchman->AI())->exit = true;
+                            CAST_AI(npc_drowning_watchman::npc_drowning_watchmanAI, watchman->AI())->reset = true;
+                            who->ExitVehicle();
+                            unit->RemoveAura(SPELL_RESCUE_DROWNING_WATCHMAN);
+                        }
 
-                    if (Player* player = unit->ToPlayer())
-                        player->KilledMonsterCredit(NPC_QGFB_KILL_CREDIT, 0);
-                }
+                        if (Player* player = unit->ToPlayer())
+                            player->KilledMonsterCredit(NPC_QGFB_KILL_CREDIT, 0);
+                    }
             }
         }
 
@@ -3219,14 +3219,14 @@ public:
         void WaypointReached(uint32 point)
         {
             if (point == 1)
-            if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            {
-                me->UpdateEntry(NPC_WAHL_WORGEN);
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                AttackStart(summoner);
-            }
+                if (me->isSummon())
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    {
+                        me->UpdateEntry(NPC_WAHL_WORGEN);
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        AttackStart(summoner);
+                    }
         }
 
         void UpdateAI(const uint32 diff)
@@ -3282,13 +3282,13 @@ public:
             {
                 me->HandleEmoteCommand(EMOTE_ONESHOT_KNEEL);
                 if (me->isSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                if (Creature* chance = summoner->ToCreature())
-                {
-                    Catch = true;
-                    Summon = true;
-                    chance->AI()->DoAction(ACTION_CHANCE_DESPAWN);
-                }
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if (Creature* chance = summoner->ToCreature())
+                        {
+                            Catch = true;
+                            Summon = true;
+                            chance->AI()->DoAction(ACTION_CHANCE_DESPAWN);
+                        }
             }
         }
 
@@ -3304,54 +3304,54 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Catch)
-            if (uiCatchTimer <= diff)
-            {
-                Catch = false;
-                uiCatchTimer = 1000;
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                me->SetReactState(REACT_AGGRESSIVE);
-
-                if (Player* player = Unit::GetPlayer(*me, uiPlayerGUID))
-                    AttackStart(player);
-            } else
-                uiCatchTimer -= diff;
-
-            if (Summon)
-            if (uiSummonTimer <= diff)
-            {
-                Summon = false;
-                uiSummonTimer = 1500;
-
-                if (Creature* wahl = me->SummonCreature(NPC_WAHL, -2098.366f, 2352.075f, 7.160643f))
+                if (uiCatchTimer <= diff)
                 {
-                    DoScriptText(YELL_DONT_MESS, wahl);
+                    Catch = false;
+                    uiCatchTimer = 1000;
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetReactState(REACT_AGGRESSIVE);
 
-                    if (npc_escortAI* npc_escort = CAST_AI(npc_wahl::npc_wahlAI, wahl->AI()))
+                    if (Player* player = Unit::GetPlayer(*me, uiPlayerGUID))
+                        AttackStart(player);
+                } else
+                    uiCatchTimer -= diff;
+
+                if (Summon)
+                    if (uiSummonTimer <= diff)
                     {
-                        npc_escort->AddWaypoint(0, -2106.54f, 2342.69f, 6.93668f);
-                        npc_escort->AddWaypoint(1, -2106.12f, 2334.90f, 7.36691f);
-                        npc_escort->AddWaypoint(2, -2117.80f, 2357.15f, 5.88139f);
-                        npc_escort->AddWaypoint(3, -2111.46f, 2366.22f, 7.17151f);
-                        npc_escort->Start(false, true);
-                    }
-                }
+                        Summon = false;
+                        uiSummonTimer = 1500;
 
-            } else
-                uiSummonTimer -= diff;
+                        if (Creature* wahl = me->SummonCreature(NPC_WAHL, -2098.366f, 2352.075f, 7.160643f))
+                        {
+                            DoScriptText(YELL_DONT_MESS, wahl);
 
-            if (!UpdateVictim())
-                return;
+                            if (npc_escortAI* npc_escort = CAST_AI(npc_wahl::npc_wahlAI, wahl->AI()))
+                            {
+                                npc_escort->AddWaypoint(0, -2106.54f, 2342.69f, 6.93668f);
+                                npc_escort->AddWaypoint(1, -2106.12f, 2334.90f, 7.36691f);
+                                npc_escort->AddWaypoint(2, -2117.80f, 2357.15f, 5.88139f);
+                                npc_escort->AddWaypoint(3, -2111.46f, 2366.22f, 7.17151f);
+                                npc_escort->Start(false, true);
+                            }
+                        }
 
-            if (uiShootTimer <= diff)
-            {
-                uiShootTimer = 1000;
+                    } else
+                        uiSummonTimer -= diff;
 
-                if (me->GetDistance(me->getVictim()) > 2.0f)
-                    DoCast(me->getVictim(), SPELL_SHOOT_QGC);
-            } else
-                uiShootTimer -= diff;
+                    if (!UpdateVictim())
+                        return;
 
-            DoMeleeAttackIfReady();
+                    if (uiShootTimer <= diff)
+                    {
+                        uiShootTimer = 1000;
+
+                        if (me->GetDistance(me->getVictim()) > 2.0f)
+                            DoCast(me->getVictim(), SPELL_SHOOT_QGC);
+                    } else
+                        uiShootTimer -= diff;
+
+                    DoMeleeAttackIfReady();
         }
     };
 };
@@ -3400,13 +3400,13 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Despawn)
-            if (uiDespawnTimer <= diff)
-            {
-                uiDespawnTimer = 500;
-                Despawn = false;
-                me->DespawnOrUnsummon();
-            } else
-                uiDespawnTimer -= diff;
+                if (uiDespawnTimer <= diff)
+                {
+                    uiDespawnTimer = 500;
+                    Despawn = false;
+                    me->DespawnOrUnsummon();
+                } else
+                    uiDespawnTimer -= diff;
         }
     };
 };
@@ -3460,8 +3460,8 @@ public:
                     return;
 
                 for (std::vector<Creature*>::const_iterator itr = lSummons.begin(); itr != lSummons.end(); ++itr)
-                if (*itr)
-                    (*itr)->DespawnOrUnsummon();
+                    if (*itr)
+                        (*itr)->DespawnOrUnsummon();
 
                 lSummons.clear();
             } else
@@ -3480,23 +3480,23 @@ public:
                         return;
 
                     for (std::vector<Creature*>::const_iterator itr = lSummons.begin(); itr != lSummons.end(); ++itr)
-                    if (*itr)
-                    {
-                        player->KilledMonsterCredit(NPC_MOUNTAIN_HORSE_KILL_CREDIT, 0);
-                        (*itr)->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
-                        (*itr)->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
-                        (*itr)->DespawnOrUnsummon();
-                    }
+                        if (*itr)
+                        {
+                            player->KilledMonsterCredit(NPC_MOUNTAIN_HORSE_KILL_CREDIT, 0);
+                            (*itr)->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+                            (*itr)->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+                            (*itr)->DespawnOrUnsummon();
+                        }
 
-                    lSummons.clear();
+                        lSummons.clear();
                 } else
                 {
                     if (lSummons.empty())
                         return;
 
                     for (std::vector<Creature*>::const_iterator itr = lSummons.begin(); itr != lSummons.end(); ++itr)
-                    if (*itr)
-                        (*itr)->DespawnOrUnsummon();
+                        if (*itr)
+                            (*itr)->DespawnOrUnsummon();
 
                     lSummons.clear();
                 }
@@ -3512,13 +3512,13 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (despawn)
-            if (uiDespawnTimer <= diff)
-            {
-                despawn = false;
-                uiDespawnTimer = 10000;
-                me->DespawnOrUnsummon();
-            } else
-                uiDespawnTimer -= diff;
+                if (uiDespawnTimer <= diff)
+                {
+                    despawn = false;
+                    uiDespawnTimer = 10000;
+                    me->DespawnOrUnsummon();
+                } else
+                    uiDespawnTimer -= diff;
         }
     };
 };
@@ -3540,16 +3540,16 @@ public:
             me->SetReactState(REACT_PASSIVE);
 
             if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            if (Player* player = summoner->ToPlayer())
-            {
-                StartFollow(player);
-                me->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, player->GetGUID());
-                me->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_ROPE_CHANNEL);
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if (Player* player = summoner->ToPlayer())
+                    {
+                        StartFollow(player);
+                        me->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, player->GetGUID());
+                        me->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_ROPE_CHANNEL);
 
-                if (Creature* horse = player->GetVehicleCreatureBase())
-                    horse->AI()->JustSummoned(me);
-            }
+                        if (Creature* horse = player->GetVehicleCreatureBase())
+                            horse->AI()->JustSummoned(me);
+                    }
         }
     };
 };
@@ -3563,15 +3563,15 @@ public:
     {
         PrepareSpellScript(spell_round_up_horse_SpellScript)
 
-        void Trigger(SpellEffIndex effIndex)
+            void Trigger(SpellEffIndex effIndex)
         {
             Unit* target = GetExplTargetUnit();
 
             if (Creature* horse = target->ToCreature())
-            if (horse->GetEntry() == NPC_MOUNTAIN_HORSE_VEHICLE)
-            if (Vehicle* vehicle = target->GetVehicleKit())
-            if (vehicle->HasEmptySeat(0))
-                return;
+                if (horse->GetEntry() == NPC_MOUNTAIN_HORSE_VEHICLE)
+                    if (Vehicle* vehicle = target->GetVehicleKit())
+                        if (vehicle->HasEmptySeat(0))
+                            return;
 
             PreventHitDefaultEffect(effIndex);
         }
@@ -3613,30 +3613,30 @@ public:
         {
             switch (point)
             {
-                case 3:
-                    if (GameObject* go = me->FindNearestGameObject(GO_FIRST_GATE, 30.0f))
-                        go->UseDoorOrButton();
-                    break;
-                case 11:
-                    if (GameObject* go = me->FindNearestGameObject(GO_SECOND_GATE, 30.0f))
-                        go->UseDoorOrButton();
-                    break;
-                case 12:
-                    if (me->isSummon())
+            case 3:
+                if (GameObject* go = me->FindNearestGameObject(GO_FIRST_GATE, 30.0f))
+                    go->UseDoorOrButton();
+                break;
+            case 11:
+                if (GameObject* go = me->FindNearestGameObject(GO_SECOND_GATE, 30.0f))
+                    go->UseDoorOrButton();
+                break;
+            case 12:
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    if (Player* player = summoner->ToPlayer())
-                    {
-                        WorldLocation loc ;
-                        loc.m_mapId       = Gilneas2;
-                        loc.m_positionX   = -1586.57f;
-                        loc.m_positionY   = 2551.24f;
-                        loc.m_positionZ   = 130.218f;
-                        player->SetHomebind(loc, 817);
-                        player->CompleteQuest(QUEST_TO_GREYMANE_MANOR);
-                        player->SaveToDB();
-                    }
-                    me->DespawnOrUnsummon();
-                    break;
+                        if (Player* player = summoner->ToPlayer())
+                        {
+                            WorldLocation loc ;
+                            loc.m_mapId       = Gilneas2;
+                            loc.m_positionX   = -1586.57f;
+                            loc.m_positionY   = 2551.24f;
+                            loc.m_positionZ   = 130.218f;
+                            player->SetHomebind(loc, 817);
+                            player->CompleteQuest(QUEST_TO_GREYMANE_MANOR);
+                            player->SaveToDB();
+                        }
+                        me->DespawnOrUnsummon();
+                        break;
             }
         }
 
@@ -3660,25 +3660,25 @@ public:
             player->GetNearPoint2D(x, y, 2.0f, player->GetOrientation() + M_PI / 4);
 
             if (Creature* horse = player->SummonCreature(NPC_SWIFT_MOUNTAIN_HORSE, x, y, player->GetPositionZ(), player->GetOrientation()))
-            if (npc_vehicle_escortAI* escort = CAST_AI(npc_vehicle_escortAI, horse->AI()))
-            {
-                player->EnterVehicle(horse, 0);
-                horse->EnableAI();
-                escort->AddWaypoint(0, -1902.86f, 2263.62f, 42.3231f);
-                escort->AddWaypoint(1, -1875.48f, 2292.34f, 42.2551f);
-                escort->AddWaypoint(2, -1852.71f, 2302.98f, 41.8658f);
-                escort->AddWaypoint(3, -1832.20f, 2321.67f, 37.9518f, 2000);
-                escort->AddWaypoint(4, -1799.26f, 2345.02f, 35.7393f);
-                escort->AddWaypoint(5, -1784.89f, 2365.27f, 39.1875f);
-                escort->AddWaypoint(6, -1777.29f, 2413.63f, 52.9219f);
-                escort->AddWaypoint(7, -1767.03f, 2449.39f, 63.1745f);
-                escort->AddWaypoint(8, -1751.81f, 2463.86f, 69.9014f);
-                escort->AddWaypoint(9, -1718.04f, 2465.80f, 80.5825f);
-                escort->AddWaypoint(10, -1705.98f, 2469.33f, 84.9378f);
-                escort->AddWaypoint(11, -1691.09f, 2494.77f, 95.5378f, 2000);
-                escort->AddWaypoint(12, -1672.92f, 2515.75f, 97.8955f);
-                escort->Start(true);
-            }
+                if (npc_vehicle_escortAI* escort = CAST_AI(npc_vehicle_escortAI, horse->AI()))
+                {
+                    player->EnterVehicle(horse, 0);
+                    horse->EnableAI();
+                    escort->AddWaypoint(0, -1902.86f, 2263.62f, 42.3231f);
+                    escort->AddWaypoint(1, -1875.48f, 2292.34f, 42.2551f);
+                    escort->AddWaypoint(2, -1852.71f, 2302.98f, 41.8658f);
+                    escort->AddWaypoint(3, -1832.20f, 2321.67f, 37.9518f, 2000);
+                    escort->AddWaypoint(4, -1799.26f, 2345.02f, 35.7393f);
+                    escort->AddWaypoint(5, -1784.89f, 2365.27f, 39.1875f);
+                    escort->AddWaypoint(6, -1777.29f, 2413.63f, 52.9219f);
+                    escort->AddWaypoint(7, -1767.03f, 2449.39f, 63.1745f);
+                    escort->AddWaypoint(8, -1751.81f, 2463.86f, 69.9014f);
+                    escort->AddWaypoint(9, -1718.04f, 2465.80f, 80.5825f);
+                    escort->AddWaypoint(10, -1705.98f, 2469.33f, 84.9378f);
+                    escort->AddWaypoint(11, -1691.09f, 2494.77f, 95.5378f, 2000);
+                    escort->AddWaypoint(12, -1672.92f, 2515.75f, 97.8955f);
+                    escort->Start(true);
+                }
         }
         return true;
     }
@@ -3758,45 +3758,45 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Event)
-            if (uiEventTimer <= diff)
-            {
-                Event = false;
-
-                if (Unit* carriage = me->GetVehicleKit()->GetPassenger(2))
+                if (uiEventTimer <= diff)
                 {
-                    carriage->SetPhaseMask(EXODUS_PHASE_MASK, false);
-                    float x, y, z, o;
-                    me->GetPosition(x, y, z, o);
+                    Event = false;
 
-                    if (Creature* marie = me->SummonCreature(NPC_QE_MARIE_ALLEN, x, y, z, o))
-                        marie->EnterVehicle(carriage, 1);
-
-                    if (Creature* gwen = me->SummonCreature(NPC_QE_GWEN_ARMSTEAD, x, y, z, o))
+                    if (Unit* carriage = me->GetVehicleKit()->GetPassenger(2))
                     {
-                        gwen->EnterVehicle(carriage, 4);
-                        gwen->m_movementInfo.t_pos.m_orientation = M_PI;
+                        carriage->SetPhaseMask(EXODUS_PHASE_MASK, false);
+                        float x, y, z, o;
+                        me->GetPosition(x, y, z, o);
+
+                        if (Creature* marie = me->SummonCreature(NPC_QE_MARIE_ALLEN, x, y, z, o))
+                            marie->EnterVehicle(carriage, 1);
+
+                        if (Creature* gwen = me->SummonCreature(NPC_QE_GWEN_ARMSTEAD, x, y, z, o))
+                        {
+                            gwen->EnterVehicle(carriage, 4);
+                            gwen->m_movementInfo.t_pos.m_orientation = M_PI;
+                        }
+
+                        if (Creature* krennan = me->SummonCreature(NPC_QE_KRENNAN_ARANAS, x, y, z, o))
+                        {
+                            krennan->EnterVehicle(carriage, 3);
+                            krennan->m_movementInfo.t_pos.m_orientation = M_PI;
+                        }
+
+                        if (Creature* watchman = me->SummonCreature(NPC_QE_DUSKHAVEN_WATCHMAN, x, y, z, o))
+                        {
+                            watchman->EnterVehicle(carriage, 2);
+                            watchman->m_movementInfo.t_pos.m_orientation = M_PI;
+                        }
+
+                        if (Creature* watchman = me->SummonCreature(NPC_QE_DUSKHAVEN_WATCHMAN_GUN, x, y, z, o))
+                            watchman->EnterVehicle(carriage, 5);
+
+                        if (Creature* lorna = me->SummonCreature(NPC_QE_LORNA_CROWLEY, x, y, z, o))
+                            lorna->EnterVehicle(carriage, 6);
                     }
-
-                    if (Creature* krennan = me->SummonCreature(NPC_QE_KRENNAN_ARANAS, x, y, z, o))
-                    {
-                        krennan->EnterVehicle(carriage, 3);
-                        krennan->m_movementInfo.t_pos.m_orientation = M_PI;
-                    }
-
-                    if (Creature* watchman = me->SummonCreature(NPC_QE_DUSKHAVEN_WATCHMAN, x, y, z, o))
-                    {
-                        watchman->EnterVehicle(carriage, 2);
-                        watchman->m_movementInfo.t_pos.m_orientation = M_PI;
-                    }
-
-                    if (Creature* watchman = me->SummonCreature(NPC_QE_DUSKHAVEN_WATCHMAN_GUN, x, y, z, o))
-                        watchman->EnterVehicle(carriage, 5);
-
-                    if (Creature* lorna = me->SummonCreature(NPC_QE_LORNA_CROWLEY, x, y, z, o))
-                        lorna->EnterVehicle(carriage, 6);
-                }
-            } else
-                uiEventTimer -= diff;
+                } else
+                    uiEventTimer -= diff;
         }
     };
 };
@@ -3823,15 +3823,15 @@ public:
             SummonList.clear();
 
             if (creature->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            if (Player* player = summoner->ToPlayer())
-            {
-                me->SetPhaseMask(EXODUS_PHASE_MASK, false);
-                me->SetSeerGUID(player->GetGUID());
-                me->SetVisible(false);
-                player->CompleteQuest(QUEST_EXODUS);
-                Event = true;
-            }
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if (Player* player = summoner->ToPlayer())
+                    {
+                        me->SetPhaseMask(EXODUS_PHASE_MASK, false);
+                        me->SetSeerGUID(player->GetGUID());
+                        me->SetVisible(false);
+                        player->CompleteQuest(QUEST_EXODUS);
+                        Event = true;
+                    }
         }
 
         uint64 uiCarriageGUID;
@@ -3845,21 +3845,21 @@ public:
         {
             switch (point)
             {
-                case 93:
-                    if (GameObject* go = me->FindNearestGameObject(GO_KINGS_GATE, 30.0f))
-                        go->UseDoorOrButton();
-                    break;
-                case 155:
-                    Event = true;
-                    GetCreatureListWithEntryInGrid(OrgeList, me, NPC_QE_OGRE_AMBUSHER, 50.0f);
-                    if (Unit* carriage = me->GetVehicleKit()->GetPassenger(2))
+            case 93:
+                if (GameObject* go = me->FindNearestGameObject(GO_KINGS_GATE, 30.0f))
+                    go->UseDoorOrButton();
+                break;
+            case 155:
+                Event = true;
+                GetCreatureListWithEntryInGrid(OrgeList, me, NPC_QE_OGRE_AMBUSHER, 50.0f);
+                if (Unit* carriage = me->GetVehicleKit()->GetPassenger(2))
                     if (Unit* lorna = carriage->GetVehicleKit()->GetPassenger(6))
-                    if (Unit* passenger = carriage->GetVehicleKit()->GetPassenger(0))
-                    if (Player* player = passenger->ToPlayer())
-                        lorna->DoPersonalScriptText(LORNA_YELL_CARRIAGE, player);
-                    break;
-                case 180:
-                    if (me->isSummon())
+                        if (Unit* passenger = carriage->GetVehicleKit()->GetPassenger(0))
+                            if (Player* player = passenger->ToPlayer())
+                                lorna->DoPersonalScriptText(LORNA_YELL_CARRIAGE, player);
+                break;
+            case 180:
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     {
                         summoner->ExitVehicle();
@@ -3870,8 +3870,8 @@ public:
                             player->SaveToDB();
                     }
                     break;
-                case 197:
-                    for (std::list<Creature*>::const_iterator itr = SummonList.begin(); itr != SummonList.end(); ++itr)
+            case 197:
+                for (std::list<Creature*>::const_iterator itr = SummonList.begin(); itr != SummonList.end(); ++itr)
                     if (*itr)
                     {
                         (*itr)->ExitVehicle();
@@ -3917,93 +3917,93 @@ public:
                 horse->SetPhaseMask(EXODUS_PHASE_MASK, false);
 
             if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            if (Unit* carriage = me->GetVehicleKit()->GetPassenger(2))
-            {
-                carriage->SetPhaseMask(EXODUS_PHASE_MASK, false);
-                float x, y, z, o;
-                me->GetPosition(x, y, z, o);
-
-                if (Creature* marie = me->SummonCreature(NPC_QE_MARIE_ALLEN, x, y, z, o))
-                {
-                    marie->SetSeerGUID(summoner->GetGUID());
-                    marie->SetVisible(false);
-                    marie->EnterVehicle(carriage, 1);
-                }
-
-                if (Creature* gwen = me->SummonCreature(NPC_QE_GWEN_ARMSTEAD, x, y, z, o))
-                {
-                    gwen->SetSeerGUID(summoner->GetGUID());
-                    gwen->SetVisible(false);
-                    gwen->EnterVehicle(carriage, 4);
-                    gwen->m_movementInfo.t_pos.m_orientation = M_PI;
-                }
-
-                if (Creature* krennan = me->SummonCreature(NPC_QE_KRENNAN_ARANAS, x, y, z, o))
-                {
-                    krennan->SetSeerGUID(summoner->GetGUID());
-                    krennan->SetVisible(false);
-                    krennan->EnterVehicle(carriage, 3);
-                    krennan->m_movementInfo.t_pos.m_orientation = M_PI;
-                }
-
-                if (Creature* watchman = me->SummonCreature(NPC_QE_DUSKHAVEN_WATCHMAN, x, y, z, o))
-                {
-                    watchman->SetSeerGUID(summoner->GetGUID());
-                    watchman->SetVisible(false);
-                    watchman->EnterVehicle(carriage, 2);
-                    watchman->m_movementInfo.t_pos.m_orientation = M_PI;
-                }
-
-                if (Creature* watchman = me->SummonCreature(NPC_QE_DUSKHAVEN_WATCHMAN_GUN, x, y, z, o))
-                {
-                    watchman->SetSeerGUID(summoner->GetGUID());
-                    watchman->SetVisible(false);
-                    watchman->EnterVehicle(carriage, 5);
-                }
-
-                if (Creature* lorna = me->SummonCreature(NPC_QE_LORNA_CROWLEY, x, y, z, o))
-                {
-                    lorna->SetSeerGUID(summoner->GetGUID());
-                    lorna->SetVisible(false);
-                    lorna->EnterVehicle(carriage, 6);
-                }
-
-                summoner->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_11);
-                summoner->CastSpell(summoner, PHASE_QUEST_ZONE_SPECIFIC_19, false);
-                summoner->EnterVehicle(carriage, 0);
-
-                if (Creature* mastiff = me->FindNearestCreature(NPC_QE_YOUNG_MASTIFF, 30.0f))
-                {
-                    float x, y, z, o;
-                    mastiff->GetPosition(x, y, z, o);
-
-                    if (Creature* summon_mastiff = me->SummonCreature(NPC_QE_YOUNG_MASTIFF, x, y, z, o))
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if (Unit* carriage = me->GetVehicleKit()->GetPassenger(2))
                     {
-                        summon_mastiff->SetSeerGUID(summoner->GetGUID());
-                        summon_mastiff->SetVisible(false);
-                        summon_mastiff->GetMotionMaster()->Clear();
-                        summon_mastiff->GetMotionMaster()->MoveFollow(me, 1.0f, M_PI / 2, MOTION_SLOT_CONTROLLED);
+                        carriage->SetPhaseMask(EXODUS_PHASE_MASK, false);
+                        float x, y, z, o;
+                        me->GetPosition(x, y, z, o);
+
+                        if (Creature* marie = me->SummonCreature(NPC_QE_MARIE_ALLEN, x, y, z, o))
+                        {
+                            marie->SetSeerGUID(summoner->GetGUID());
+                            marie->SetVisible(false);
+                            marie->EnterVehicle(carriage, 1);
+                        }
+
+                        if (Creature* gwen = me->SummonCreature(NPC_QE_GWEN_ARMSTEAD, x, y, z, o))
+                        {
+                            gwen->SetSeerGUID(summoner->GetGUID());
+                            gwen->SetVisible(false);
+                            gwen->EnterVehicle(carriage, 4);
+                            gwen->m_movementInfo.t_pos.m_orientation = M_PI;
+                        }
+
+                        if (Creature* krennan = me->SummonCreature(NPC_QE_KRENNAN_ARANAS, x, y, z, o))
+                        {
+                            krennan->SetSeerGUID(summoner->GetGUID());
+                            krennan->SetVisible(false);
+                            krennan->EnterVehicle(carriage, 3);
+                            krennan->m_movementInfo.t_pos.m_orientation = M_PI;
+                        }
+
+                        if (Creature* watchman = me->SummonCreature(NPC_QE_DUSKHAVEN_WATCHMAN, x, y, z, o))
+                        {
+                            watchman->SetSeerGUID(summoner->GetGUID());
+                            watchman->SetVisible(false);
+                            watchman->EnterVehicle(carriage, 2);
+                            watchman->m_movementInfo.t_pos.m_orientation = M_PI;
+                        }
+
+                        if (Creature* watchman = me->SummonCreature(NPC_QE_DUSKHAVEN_WATCHMAN_GUN, x, y, z, o))
+                        {
+                            watchman->SetSeerGUID(summoner->GetGUID());
+                            watchman->SetVisible(false);
+                            watchman->EnterVehicle(carriage, 5);
+                        }
+
+                        if (Creature* lorna = me->SummonCreature(NPC_QE_LORNA_CROWLEY, x, y, z, o))
+                        {
+                            lorna->SetSeerGUID(summoner->GetGUID());
+                            lorna->SetVisible(false);
+                            lorna->EnterVehicle(carriage, 6);
+                        }
+
+                        summoner->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_11);
+                        summoner->CastSpell(summoner, PHASE_QUEST_ZONE_SPECIFIC_19, false);
+                        summoner->EnterVehicle(carriage, 0);
+
+                        if (Creature* mastiff = me->FindNearestCreature(NPC_QE_YOUNG_MASTIFF, 30.0f))
+                        {
+                            float x, y, z, o;
+                            mastiff->GetPosition(x, y, z, o);
+
+                            if (Creature* summon_mastiff = me->SummonCreature(NPC_QE_YOUNG_MASTIFF, x, y, z, o))
+                            {
+                                summon_mastiff->SetSeerGUID(summoner->GetGUID());
+                                summon_mastiff->SetVisible(false);
+                                summon_mastiff->GetMotionMaster()->Clear();
+                                summon_mastiff->GetMotionMaster()->MoveFollow(me, 1.0f, M_PI / 2, MOTION_SLOT_CONTROLLED);
+                            }
+                        }
+
+                        for (int i = 0; i < 198; ++i)
+                            AddWaypoint(i, HarnessWP[i][0], HarnessWP[i][1], HarnessWP[i][2]);
+
+                        Start(true);
+
+                        if (GameObject* go = me->FindNearestGameObject(GO_GREYMANE_GATE, 30.0f))
+                            go->UseDoorOrButton();
                     }
-                }
-
-                for (int i = 0; i < 198; ++i)
-                    AddWaypoint(i, HarnessWP[i][0], HarnessWP[i][1], HarnessWP[i][2]);
-
-                Start(true);
-
-                if (GameObject* go = me->FindNearestGameObject(GO_GREYMANE_GATE, 30.0f))
-                    go->UseDoorOrButton();
-            }
         }
 
         void UpdateAI(const uint32 diff)
         {
             if (Event)
-            if (uiEventTimer <= diff)
-            {
-                switch (uiEventPhase)
+                if (uiEventTimer <= diff)
                 {
+                    switch (uiEventPhase)
+                    {
                     case 0:
                         Event = false;
                         StartEvent();
@@ -4017,12 +4017,12 @@ public:
                         Event = false;
                         OrgeList.clear();
                         break;
-                }
-                ++uiEventPhase;
-            } else
-                uiEventTimer -= diff;
+                    }
+                    ++uiEventPhase;
+                } else
+                    uiEventTimer -= diff;
 
-            npc_vehicle_escortAI::UpdateAI(diff);
+                npc_vehicle_escortAI::UpdateAI(diff);
         }
     };
 };
@@ -4036,7 +4036,7 @@ public:
     {
         PrepareSpellScript(spell_summon_carriage_SpellScript)
 
-        void SummonHarness(SpellEffIndex effIndex)
+            void SummonHarness(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
 
@@ -4100,25 +4100,25 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (despawn)
-            if (uiDespawnTimer <= diff)
-            {
-                despawn = false;
-                summon = false;
-                uiDespawnTimer = 2000;
-                me->DespawnOrUnsummon();
-            } else
-                uiDespawnTimer -= diff;
+                if (uiDespawnTimer <= diff)
+                {
+                    despawn = false;
+                    summon = false;
+                    uiDespawnTimer = 2000;
+                    me->DespawnOrUnsummon();
+                } else
+                    uiDespawnTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-            if (me->getVictim()->GetHealthPct() < 90)
-                miss = true;
-            else
-                miss = false;
+                if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
+                    if (me->getVictim()->GetHealthPct() < 90)
+                        miss = true;
+                    else
+                        miss = false;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -4144,13 +4144,13 @@ public:
             miss = false;
 
             if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            {
-                summoner->getThreatManager().resetAllAggro();
-                me->getThreatManager().resetAllAggro();
-                me->CombatStart(summoner);
-                summoner->CombatStart(me);
-            }
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                {
+                    summoner->getThreatManager().resetAllAggro();
+                    me->getThreatManager().resetAllAggro();
+                    me->CombatStart(summoner);
+                    summoner->CombatStart(me);
+                }
         }
 
         void DamageTaken(Unit* attacker, uint32 &/*damage*/)
@@ -4161,8 +4161,8 @@ public:
             Unit* victim = NULL;
 
             if (victim = me->getVictim())
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                return;
+                if (victim->GetTypeId() == TYPEID_PLAYER)
+                    return;
 
             if (victim)
                 me->getThreatManager().modifyThreatPercent(victim, -100);
@@ -4174,14 +4174,14 @@ public:
         void JustDied(Unit* /*who*/)
         {
             if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            {
-                uint8 roll = urand(0, 3);
-                DoScriptText(SURVIVOR_RANDOM_SAY - roll, summoner);
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                {
+                    uint8 roll = urand(0, 3);
+                    DoScriptText(SURVIVOR_RANDOM_SAY - roll, summoner);
 
-                if (Creature* surv = summoner->ToCreature())
-                    CAST_AI(npc_crash_survivor::npc_crash_survivorAI, surv->AI())->despawn = true;
-            }
+                    if (Creature* surv = summoner->ToCreature())
+                        CAST_AI(npc_crash_survivor::npc_crash_survivorAI, surv->AI())->despawn = true;
+                }
         }
 
         void UpdateAI(const uint32 diff)
@@ -4190,10 +4190,10 @@ public:
                 return;
 
             if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-            if (me->getVictim()->GetHealthPct() < 90)
-                miss = true;
-            else
-                miss = false;
+                if (me->getVictim()->GetHealthPct() < 90)
+                    miss = true;
+                else
+                    miss = false;
 
             DoMeleeAttackIfReady();
         }
@@ -4240,19 +4240,19 @@ public:
         void FinishEscort()
         {
             if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            {
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                {
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
-                if (Creature* capitan = summoner->ToCreature())
-                    capitan->AI()->DoAction(ACTION_KOROTH_ATTACK);
+                    if (Creature* capitan = summoner->ToCreature())
+                        capitan->AI()->DoAction(ACTION_KOROTH_ATTACK);
 
-                if (summoner->isSummon())
-                if (Unit* _summoner = summoner->ToTempSummon()->GetSummoner())
-                if (Player* player = _summoner->ToPlayer())
-                    me->DoPersonalScriptText(KOROTH_YELL_MY_BANNER, player, true);
-            }
+                    if (summoner->isSummon())
+                        if (Unit* _summoner = summoner->ToTempSummon()->GetSummoner())
+                            if (Player* player = _summoner->ToPlayer())
+                                me->DoPersonalScriptText(KOROTH_YELL_MY_BANNER, player, true);
+                }
         }
 
         void WaypointReached(uint32 point)
@@ -4331,39 +4331,39 @@ public:
         void DoAction(const int32 action)
         {
             if (action == ACTION_KOROTH_ATTACK)
-            if (Creature* koroth = Unit::GetCreature(*me, uiKorothGUID))
-            {
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                AttackStart(koroth);
-                me->AddThreat(koroth, 100500);
-                koroth->AddThreat(me, 100500);
-                float x, y, z;
-                koroth->GetNearPoint(koroth, x, y, z, 0.0f, 1.0f, koroth->GetOrientation() + M_PI);
-                me->GetMotionMaster()->MoveCharge(x, y, z);
-
-                if (lSoldiers.empty())
-                    return;
-
-                for (std::list<sSoldier>::iterator itr = lSoldiers.begin(); itr != lSoldiers.end(); ++itr)
+                if (Creature* koroth = Unit::GetCreature(*me, uiKorothGUID))
                 {
-                    Creature* soldier = itr->soldier;
-                    soldier->SetReactState(REACT_AGGRESSIVE);
-                    soldier->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    soldier->AI()->AttackStart(koroth);
-                    soldier->AddThreat(koroth, 100500);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    AttackStart(koroth);
+                    me->AddThreat(koroth, 100500);
+                    koroth->AddThreat(me, 100500);
+                    float x, y, z;
+                    koroth->GetNearPoint(koroth, x, y, z, 0.0f, 1.0f, koroth->GetOrientation() + M_PI);
+                    me->GetMotionMaster()->MoveCharge(x, y, z);
 
-                    if (soldier->GetEntry() == NPC_FORSAKEN_CATAPULT_QIAO)
+                    if (lSoldiers.empty())
+                        return;
+
+                    for (std::list<sSoldier>::iterator itr = lSoldiers.begin(); itr != lSoldiers.end(); ++itr)
                     {
-                        koroth->AddThreat(soldier, 100500);
-                        koroth->AI()->AttackStart(soldier);
-                        continue;
-                    }
+                        Creature* soldier = itr->soldier;
+                        soldier->SetReactState(REACT_AGGRESSIVE);
+                        soldier->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        soldier->AI()->AttackStart(koroth);
+                        soldier->AddThreat(koroth, 100500);
 
-                    koroth->AddThreat(soldier, 10000);
-                    soldier->GetMotionMaster()->MoveCharge(x, y, z);
+                        if (soldier->GetEntry() == NPC_FORSAKEN_CATAPULT_QIAO)
+                        {
+                            koroth->AddThreat(soldier, 100500);
+                            koroth->AI()->AttackStart(soldier);
+                            continue;
+                        }
+
+                        koroth->AddThreat(soldier, 10000);
+                        soldier->GetMotionMaster()->MoveCharge(x, y, z);
+                    }
                 }
-            }
         }
 
         void StartMoveTo(float x, float y, float z)
@@ -4426,31 +4426,31 @@ public:
         void StartEvent()
         {
             if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            if (Player* player = summoner->ToPlayer())
-            {
-                uint64 uiPlayerGUID = player->GetGUID();
-
-                for (int i = 1; i < 4; ++i)
+                if (Player* player = summoner->ToPlayer())
                 {
-                    SummonSoldier(uiPlayerGUID, NPC_FORSAKEN_SOLDIER_QIAO, i * 2, M_PI);
-                    SummonSoldier(uiPlayerGUID, NPC_FORSAKEN_SOLDIER_QIAO, i * 2, M_PI -  M_PI / (2 * i));
-                    SummonSoldier(uiPlayerGUID, NPC_FORSAKEN_SOLDIER_QIAO, i * 2, M_PI +  M_PI / (2 * i));
+                    uint64 uiPlayerGUID = player->GetGUID();
+
+                    for (int i = 1; i < 4; ++i)
+                    {
+                        SummonSoldier(uiPlayerGUID, NPC_FORSAKEN_SOLDIER_QIAO, i * 2, M_PI);
+                        SummonSoldier(uiPlayerGUID, NPC_FORSAKEN_SOLDIER_QIAO, i * 2, M_PI -  M_PI / (2 * i));
+                        SummonSoldier(uiPlayerGUID, NPC_FORSAKEN_SOLDIER_QIAO, i * 2, M_PI +  M_PI / (2 * i));
+                    }
+
+                    SummonSoldier(uiPlayerGUID, NPC_FORSAKEN_CATAPULT_QIAO, 8.0f, M_PI);
+
+                    for (int i = 0; i < 18; ++i)
+                        AddWaypoint(i, AstherWP[i][0], AstherWP[i][1], AstherWP[i][2]);
+
+                    Start();
                 }
-
-                SummonSoldier(uiPlayerGUID, NPC_FORSAKEN_CATAPULT_QIAO, 8.0f, M_PI);
-
-                for (int i = 0; i < 18; ++i)
-                    AddWaypoint(i, AstherWP[i][0], AstherWP[i][1], AstherWP[i][2]);
-
-                Start();
-            }
         }
 
         void WaypointReached(uint32 point)
         {
             if (point == 15)
-            if (Creature* koroth = me->SummonCreature(NPC_KOROTH_THE_HILLBREAKER_QIAO_FRIEND, -2213.64f, 1863.51f, 15.404f))
-                uiKorothGUID = koroth->GetGUID();
+                if (Creature* koroth = me->SummonCreature(NPC_KOROTH_THE_HILLBREAKER_QIAO_FRIEND, -2213.64f, 1863.51f, 15.404f))
+                    uiKorothGUID = koroth->GetGUID();
         }
 
         void UpdateAI(const uint32 diff)
@@ -4532,43 +4532,43 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (!lPlayerList.empty())
-            for (std::list<Psc_qiao>::iterator itr = lPlayerList.begin(); itr != lPlayerList.end();)
-            if (itr->uiEventTimer <= diff)
-            {
-                ++itr->uiPhase;
+                for (std::list<Psc_qiao>::iterator itr = lPlayerList.begin(); itr != lPlayerList.end();)
+                    if (itr->uiEventTimer <= diff)
+                    {
+                        ++itr->uiPhase;
 
-                if (Player* player = Unit::GetPlayer(*me, itr->uiPlayerGUID))
-                    switch (itr->uiPhase)
-                {
-                        case 1:
-                            itr->uiEventTimer = 8000;
-                            me->DoPersonalScriptText(LIAN_SAY_HERE_FORSAKEN, player, true);
-                            break;
-                        case 2:
-                            itr->uiEventTimer = 5000;
-                            me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                            me->DoPersonalScriptText(LIAM_YELL_YOU_CANT, player, true);
-                            break;
-                        case 3:
-                            itr->uiEventTimer = 3000;
-                            me->CastSpell(me, SPELL_PUSH_BANNER, false);
-                            break;
-                        case 4:
-                            if (Creature* capitan = Unit::GetCreature(*me, itr->uiCapitanGUID))
-                                capitan->DoPersonalScriptText(CAPITAN_YELL_WILL_ORDER, player, true);
-                            itr = lPlayerList.erase(itr);
-                            break;
-                }
-            } else
-            {
-                itr->uiEventTimer -= diff;
-                ++itr;
-            }
+                        if (Player* player = Unit::GetPlayer(*me, itr->uiPlayerGUID))
+                            switch (itr->uiPhase)
+                        {
+                            case 1:
+                                itr->uiEventTimer = 8000;
+                                me->DoPersonalScriptText(LIAN_SAY_HERE_FORSAKEN, player, true);
+                                break;
+                            case 2:
+                                itr->uiEventTimer = 5000;
+                                me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                                me->DoPersonalScriptText(LIAM_YELL_YOU_CANT, player, true);
+                                break;
+                            case 3:
+                                itr->uiEventTimer = 3000;
+                                me->CastSpell(me, SPELL_PUSH_BANNER, false);
+                                break;
+                            case 4:
+                                if (Creature* capitan = Unit::GetCreature(*me, itr->uiCapitanGUID))
+                                    capitan->DoPersonalScriptText(CAPITAN_YELL_WILL_ORDER, player, true);
+                                itr = lPlayerList.erase(itr);
+                                break;
+                        }
+                    } else
+                    {
+                        itr->uiEventTimer -= diff;
+                        ++itr;
+                    }
 
-            if (!UpdateVictim())
-                return;
+                    if (!UpdateVictim())
+                        return;
 
-            DoMeleeAttackIfReady();
+                    DoMeleeAttackIfReady();
         }
     };
 };
@@ -4606,18 +4606,18 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Event)
-            if (uiEventTimer <=  diff)
-            {
-                Event = false;
-                uiEventTimer = 5000;
-                DoScriptText(KOROTH_YELL_FIND_YOU, me);
-            } else
-                uiEventTimer -= diff;
+                if (uiEventTimer <=  diff)
+                {
+                    Event = false;
+                    uiEventTimer = 5000;
+                    DoScriptText(KOROTH_YELL_FIND_YOU, me);
+                } else
+                    uiEventTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -4630,16 +4630,16 @@ public:
     bool OnGossipHello(Player* player, GameObject* go)
     {
         if (player->GetQuestStatus(QUEST_INTRODUCTIONS_ARE_IN_ORDER) == QUEST_STATUS_INCOMPLETE)
-        if (Creature* koroth = go->FindNearestCreature(NPC_KOROTH_THE_HILLBREAKER_QIAO, 30.0f))
-        {
-            DoScriptText(KOROTH_YELL_WHO_STEAL_BANNER, koroth);
-            float x, y;
-            go->GetNearPoint2D(x, y, 5.0f, go->GetOrientation() + M_PI / 2);
-            koroth->GetMotionMaster()->MovePoint(POINT_BANNER, x, y, go->GetPositionZ());
-            CAST_AI(npc_koroth_the_hillbreaker_qiao::npc_koroth_the_hillbreaker_qiaoAI, koroth->AI())->Event = true;
-        }
+            if (Creature* koroth = go->FindNearestCreature(NPC_KOROTH_THE_HILLBREAKER_QIAO, 30.0f))
+            {
+                DoScriptText(KOROTH_YELL_WHO_STEAL_BANNER, koroth);
+                float x, y;
+                go->GetNearPoint2D(x, y, 5.0f, go->GetOrientation() + M_PI / 2);
+                koroth->GetMotionMaster()->MovePoint(POINT_BANNER, x, y, go->GetPositionZ());
+                CAST_AI(npc_koroth_the_hillbreaker_qiao::npc_koroth_the_hillbreaker_qiaoAI, koroth->AI())->Event = true;
+            }
 
-        return false;
+            return false;
     }
 };
 
@@ -4664,20 +4664,20 @@ public:
         void MoveInLineOfSight(Unit* who)
         {
             if (Player* player = who->ToPlayer())
-            if (me->IsWithinDistInMap(player, 20.0f) && player->GetQuestStatus(QUEST_LOSING_YOUR_TAIL) == QUEST_STATUS_INCOMPLETE)
-            {
-                if (player->isInCombat())
-                    return;
-
-                if (Creature* scout = me->SummonCreature(NPC_DARK_SCOUT, -2239.28f, 1429.67f, -22.86f))
+                if (me->IsWithinDistInMap(player, 20.0f) && player->GetQuestStatus(QUEST_LOSING_YOUR_TAIL) == QUEST_STATUS_INCOMPLETE)
                 {
-                    scout->AddAura(SPELL_FREEZING_TRAP, player);
-                    DoScriptText(NPC_DARK_SCOUT_SAY_CATCH, scout);
-                    scout->Whisper(NPC_DARK_SCOUT_SAY_FREE, player->GetGUID(), true);
-                    scout->AI()->AttackStart(player);
-                    scout->CastSpell(who, SPELL_AIMED_SHOT, false);
+                    if (player->isInCombat())
+                        return;
+
+                    if (Creature* scout = me->SummonCreature(NPC_DARK_SCOUT, -2239.28f, 1429.67f, -22.86f))
+                    {
+                        scout->AddAura(SPELL_FREEZING_TRAP, player);
+                        DoScriptText(NPC_DARK_SCOUT_SAY_CATCH, scout);
+                        scout->Whisper(NPC_DARK_SCOUT_SAY_FREE, player->GetGUID(), true);
+                        scout->AI()->AttackStart(player);
+                        scout->CastSpell(who, SPELL_AIMED_SHOT, false);
+                    }
                 }
-            }
         }
 
         void UpdateAI(const uint32 diff)
@@ -4738,14 +4738,14 @@ public:
                 return;
 
             if (shot)
-            if (uiShotTimer <= diff)
-            {
-                uiShotTimer = 2000;
-                DoCast(me->getVictim(), SPELL_AIMED_SHOT);
-            } else
-                uiShotTimer -= diff;
+                if (uiShotTimer <= diff)
+                {
+                    uiShotTimer = 2000;
+                    DoCast(me->getVictim(), SPELL_AIMED_SHOT);
+                } else
+                    uiShotTimer -= diff;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -4759,7 +4759,7 @@ public:
     {
         PrepareSpellScript(spell_belysras_talisman_SpellScript)
 
-        void DispellStun(SpellEffIndex effIndex)
+            void DispellStun(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
 
@@ -4772,8 +4772,8 @@ public:
             if (Aura* aur = caster->GetAura(SPELL_FREEZING_TRAP))
             {
                 if (Unit* owner = aur->GetCaster())
-                if (Creature* scout = owner->ToCreature())
-                    scout->AI()->DoAction(ACTION_PLAYER_IS_FREE);
+                    if (Creature* scout = owner->ToCreature())
+                        scout->AI()->DoAction(ACTION_PLAYER_IS_FREE);
 
                 caster->RemoveAura(SPELL_FREEZING_TRAP);
             }
@@ -4917,19 +4917,19 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Event)
-            if (uiEventTimer <= diff)
-            {
-                Event = false;
-                DoScriptText(TOBIAS_SAY_FALL_BACK, me);
-                lSummons.DoAction(NPC_TALDOREN_TRACKER, ACTION_BACK);
-                me->DespawnOrUnsummon(2000);
-            } else
-                uiEventTimer -= diff;
+                if (uiEventTimer <= diff)
+                {
+                    Event = false;
+                    DoScriptText(TOBIAS_SAY_FALL_BACK, me);
+                    lSummons.DoAction(NPC_TALDOREN_TRACKER, ACTION_BACK);
+                    me->DespawnOrUnsummon(2000);
+                } else
+                    uiEventTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -4943,7 +4943,7 @@ public:
     {
         PrepareSpellScript(spell_horn_of_taldoren_SpellScript)
 
-        void SummonWorgens(SpellEffIndex effIndex)
+            void SummonWorgens(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
 
@@ -5006,36 +5006,36 @@ public:
 
             switch (go->GetEntry())
             {
-                case GO_WELL_OF_FURY:
-                    if (itr->second.CreatureOrGOCount[0] == 0)
-                    {
-                        player->CastedCreatureOrGO(go->GetEntry(), go->GetGUID(), 0);
-                        SummonPersonalTrigger(player, go);
+            case GO_WELL_OF_FURY:
+                if (itr->second.CreatureOrGOCount[0] == 0)
+                {
+                    player->CastedCreatureOrGO(go->GetEntry(), go->GetGUID(), 0);
+                    SummonPersonalTrigger(player, go);
 
-                        if (Creature* lyros = go->FindNearestCreature(NPC_LYROS_SWIFTWIND, 30.0f))
-                            lyros->DoPersonalScriptText(LYROS_SAY_WELL_OF_FURY, player);
-                    }
-                    break;
-                case GO_WELL_OF_TRANQUILITY:
-                    if (itr->second.CreatureOrGOCount[1] == 0)
-                    {
-                        player->CastedCreatureOrGO(go->GetEntry(), go->GetGUID(), 0);
-                        SummonPersonalTrigger(player, go);
+                    if (Creature* lyros = go->FindNearestCreature(NPC_LYROS_SWIFTWIND, 30.0f))
+                        lyros->DoPersonalScriptText(LYROS_SAY_WELL_OF_FURY, player);
+                }
+                break;
+            case GO_WELL_OF_TRANQUILITY:
+                if (itr->second.CreatureOrGOCount[1] == 0)
+                {
+                    player->CastedCreatureOrGO(go->GetEntry(), go->GetGUID(), 0);
+                    SummonPersonalTrigger(player, go);
 
-                        if (Creature* vassandra = go->FindNearestCreature(37873, 30.0f))
-                            vassandra->DoPersonalScriptText(VASSANDRA_SAY_WELL_OF_TRANQUILITY, player);
-                    }
-                    break;
-                case GO_WELL_OF_BALANCE:
-                    if (itr->second.CreatureOrGOCount[2] == 0)
-                    {
-                        player->CastedCreatureOrGO(go->GetEntry(), go->GetGUID(), 0);
-                        SummonPersonalTrigger(player, go);
+                    if (Creature* vassandra = go->FindNearestCreature(37873, 30.0f))
+                        vassandra->DoPersonalScriptText(VASSANDRA_SAY_WELL_OF_TRANQUILITY, player);
+                }
+                break;
+            case GO_WELL_OF_BALANCE:
+                if (itr->second.CreatureOrGOCount[2] == 0)
+                {
+                    player->CastedCreatureOrGO(go->GetEntry(), go->GetGUID(), 0);
+                    SummonPersonalTrigger(player, go);
 
-                        if (Creature* talran = go->FindNearestCreature(36814, 30.0f))
-                            talran->DoPersonalScriptText(TALRAN_SAY_WELL_OF_BALANCE, player);
-                    }
-                    break;
+                    if (Creature* talran = go->FindNearestCreature(36814, 30.0f))
+                        talran->DoPersonalScriptText(TALRAN_SAY_WELL_OF_BALANCE, player);
+                }
+                break;
             }
         }
         return true;
@@ -5059,8 +5059,8 @@ public:
         void WaypointReached(uint32 point)
         {
             if (point == 2)
-            if (Creature* crowley = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QNHNB, 30.0f))
-                me->SetFacingToObject(crowley);
+                if (Creature* crowley = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QNHNB, 30.0f))
+                    me->SetFacingToObject(crowley);
         }
 
         void UpdateAI(const uint32 diff)
@@ -5094,35 +5094,35 @@ public:
         void WaypointReached(uint32 point)
         {
             if (point == 1)
-            if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            if (Player* player = summoner->ToPlayer())
-            {
-                SetRun(false);
-                say = true;
-                me->DoPersonalScriptText(LORNA_YELL_FATHER, player);
-            }
+                if (me->isSummon())
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if (Player* player = summoner->ToPlayer())
+                        {
+                            SetRun(false);
+                            say = true;
+                            me->DoPersonalScriptText(LORNA_YELL_FATHER, player);
+                        }
 
-            if (point == 2)
-            if (Creature* crowley = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QNHNB, 30.0f))
-                me->SetFacingToObject(crowley);
+                        if (point == 2)
+                            if (Creature* crowley = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QNHNB, 30.0f))
+                                me->SetFacingToObject(crowley);
         }
 
         void UpdateAI(const uint32 diff)
         {
             if (say)
-            if (uiSayTimer <= diff)
-            {
-                say = false;
+                if (uiSayTimer <= diff)
+                {
+                    say = false;
 
-                if (Creature* crowley = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QNHNB, 30.0f))
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                if (Player* player = summoner->ToPlayer())
-                    crowley->DoPersonalScriptText(CROWLEY_YELL_LORNA, player);
-            } else
-                uiSayTimer -= diff;
+                    if (Creature* crowley = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QNHNB, 30.0f))
+                        if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                            if (Player* player = summoner->ToPlayer())
+                                crowley->DoPersonalScriptText(CROWLEY_YELL_LORNA, player);
+                } else
+                    uiSayTimer -= diff;
 
-            npc_escortAI::UpdateAI(diff);
+                npc_escortAI::UpdateAI(diff);
         }
     };
 };
@@ -5164,30 +5164,30 @@ public:
             }
 
             if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            if (Player* player = summoner->ToPlayer())
-            {
-                Start(false);
-                SetDespawnAtEnd(false);
-                me->setActive(true);
-
-                if (Creature* lorna = player->SummonCreature(NPC_LORNA_CROWLEY_QNHNB, -2104.00f, 1282.00f, -83.7271f))
+                if (Player* player = summoner->ToPlayer())
                 {
-                    uiLornaGUID = lorna->GetGUID();
-                    lorna->SetSeerGUID(player->GetGUID());
-                    lorna->SetVisible(false);
-                    CAST_AI(npc_lorna_crowley_qnhnb::npc_lorna_crowley_qnhnbAI, lorna->AI())->Start(false, true);
-                    CAST_AI(npc_lorna_crowley_qnhnb::npc_lorna_crowley_qnhnbAI, lorna->AI())->SetDespawnAtEnd(false);
-                }
+                    Start(false);
+                    SetDespawnAtEnd(false);
+                    me->setActive(true);
 
-                if (Creature* godfrey = player->SummonCreature(NPC_LORD_GODFREY_QNHNB, -2110.44f, 1288.52f, -83.5184f))
-                {
-                    uiGodfreyGUID = godfrey->GetGUID();
-                    godfrey->SetSeerGUID(player->GetGUID());
-                    godfrey->SetVisible(false);
-                    CAST_AI(npc_lord_godfrey_qnhnb::npc_lord_godfrey_qnhnbAI, godfrey->AI())->Start(false);
-                    CAST_AI(npc_lord_godfrey_qnhnb::npc_lord_godfrey_qnhnbAI, godfrey->AI())->SetDespawnAtEnd(false);
+                    if (Creature* lorna = player->SummonCreature(NPC_LORNA_CROWLEY_QNHNB, -2104.00f, 1282.00f, -83.7271f))
+                    {
+                        uiLornaGUID = lorna->GetGUID();
+                        lorna->SetSeerGUID(player->GetGUID());
+                        lorna->SetVisible(false);
+                        CAST_AI(npc_lorna_crowley_qnhnb::npc_lorna_crowley_qnhnbAI, lorna->AI())->Start(false, true);
+                        CAST_AI(npc_lorna_crowley_qnhnb::npc_lorna_crowley_qnhnbAI, lorna->AI())->SetDespawnAtEnd(false);
+                    }
+
+                    if (Creature* godfrey = player->SummonCreature(NPC_LORD_GODFREY_QNHNB, -2110.44f, 1288.52f, -83.5184f))
+                    {
+                        uiGodfreyGUID = godfrey->GetGUID();
+                        godfrey->SetSeerGUID(player->GetGUID());
+                        godfrey->SetVisible(false);
+                        CAST_AI(npc_lord_godfrey_qnhnb::npc_lord_godfrey_qnhnbAI, godfrey->AI())->Start(false);
+                        CAST_AI(npc_lord_godfrey_qnhnb::npc_lord_godfrey_qnhnbAI, godfrey->AI())->SetDespawnAtEnd(false);
+                    }
                 }
-            }
         }
 
         void WaypointReached(uint32 point)
@@ -5206,60 +5206,60 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (Event)
-            if (uiEventTimer <= diff)
-            {
-                ++uiPhase;
-
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                if (Player* player = summoner->ToPlayer())
-                    switch (uiPhase)
+                if (uiEventTimer <= diff)
                 {
-                        case 1:
-                            uiEventTimer= 13000;
-                            if (Creature* godfrey = Unit::GetCreature(*me, uiGodfreyGUID))
-                            {
-                                godfrey->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
-                                godfrey->DoPersonalScriptText(GODFREY_SAY_LOW, player);
-                            }
-                            break;
-                        case 2:
-                            uiEventTimer= 8000;
-                            if (Creature* crowley = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QNHNB, 30.0f))
-                                crowley->DoPersonalScriptText(CROWLEY_YELL_FROG, player);
-                            break;
-                        case 3:
-                            uiEventTimer= 4000;
-                            DoCast(SPELL_WORGEN_COMBAT_TRANSFORM_FX);
-                            me->DoPersonalScriptText(GREYMANE_SAY_NO_FRIEND, player);
-                            break;
-                        case 4:
-                            uiEventTimer= 2000;
-                            if (Creature* godfrey = Unit::GetCreature(*me, uiGodfreyGUID))
-                                godfrey->DoPersonalScriptText(GODFREY_YELL_CANT_BE, player);
-                            break;
-                        case 5:
-                            uiEventTimer= 11000;
-                            if (Creature* crowley = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QNHNB, 30.0f))
-                            {
-                                crowley->HandleEmoteCommand(EMOTE_ONESHOT_YES);
-                                crowley->DoPersonalScriptText(CROWLEY_SAY_YES_GENN, player);
-                            }
-                            break;
-                        case 6:
-                            uiEventTimer= 15000;
-                            me->DoPersonalScriptText(CREYMANE_SAY_HELD, player);
-                            break;
-                        case 7:
-                            Event = false;
-                            if (Creature* godfrey = Unit::GetCreature(*me, uiGodfreyGUID))
-                                godfrey->DespawnOrUnsummon();
-                            if (Creature* lorna = Unit::GetCreature(*me, uiLornaGUID))
-                                lorna->DespawnOrUnsummon();
-                            me->DespawnOrUnsummon();
-                            break;
-                }
-            } else
-                uiEventTimer -= diff;
+                    ++uiPhase;
+
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if (Player* player = summoner->ToPlayer())
+                            switch (uiPhase)
+                        {
+                            case 1:
+                                uiEventTimer= 13000;
+                                if (Creature* godfrey = Unit::GetCreature(*me, uiGodfreyGUID))
+                                {
+                                    godfrey->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                                    godfrey->DoPersonalScriptText(GODFREY_SAY_LOW, player);
+                                }
+                                break;
+                            case 2:
+                                uiEventTimer= 8000;
+                                if (Creature* crowley = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QNHNB, 30.0f))
+                                    crowley->DoPersonalScriptText(CROWLEY_YELL_FROG, player);
+                                break;
+                            case 3:
+                                uiEventTimer= 4000;
+                                DoCast(SPELL_WORGEN_COMBAT_TRANSFORM_FX);
+                                me->DoPersonalScriptText(GREYMANE_SAY_NO_FRIEND, player);
+                                break;
+                            case 4:
+                                uiEventTimer= 2000;
+                                if (Creature* godfrey = Unit::GetCreature(*me, uiGodfreyGUID))
+                                    godfrey->DoPersonalScriptText(GODFREY_YELL_CANT_BE, player);
+                                break;
+                            case 5:
+                                uiEventTimer= 11000;
+                                if (Creature* crowley = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QNHNB, 30.0f))
+                                {
+                                    crowley->HandleEmoteCommand(EMOTE_ONESHOT_YES);
+                                    crowley->DoPersonalScriptText(CROWLEY_SAY_YES_GENN, player);
+                                }
+                                break;
+                            case 6:
+                                uiEventTimer= 15000;
+                                me->DoPersonalScriptText(CREYMANE_SAY_HELD, player);
+                                break;
+                            case 7:
+                                Event = false;
+                                if (Creature* godfrey = Unit::GetCreature(*me, uiGodfreyGUID))
+                                    godfrey->DespawnOrUnsummon();
+                                if (Creature* lorna = Unit::GetCreature(*me, uiLornaGUID))
+                                    lorna->DespawnOrUnsummon();
+                                me->DespawnOrUnsummon();
+                                break;
+                        }
+                } else
+                    uiEventTimer -= diff;
         }
     };
 };
@@ -5273,7 +5273,7 @@ public:
     {
         PrepareSpellScript(spell_worgen_combat_transform_fx_SpellScript)
 
-        void Transform(SpellEffIndex effIndex)
+            void Transform(SpellEffIndex effIndex)
         {
             Unit* target = GetCaster();
 
@@ -5281,8 +5281,8 @@ public:
                 return;
 
             if (Creature* greymane = target->ToCreature())
-            if (greymane->GetEntry() == NPC_KING_GENN_GREYMANE_HUMAN)
-                greymane->SetDisplayId(NPC_KING_GENN_GREYMANE_WORGEN);
+                if (greymane->GetEntry() == NPC_KING_GENN_GREYMANE_HUMAN)
+                    greymane->SetDisplayId(NPC_KING_GENN_GREYMANE_WORGEN);
         }
 
         void Register()
@@ -5328,19 +5328,19 @@ public:
         {
             switch (point)
             {
-                case 1:
-                    if (me->isSummon())
+            case 1:
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    if (Player* player = summoner->ToPlayer())
-                    {
-                        me->DoPersonalScriptText(TOBIAS_SAY_FORSAKEN, player);
-                        InPosition = true;
-                        SetEscortPaused(true);
-                    }
-                    break;
-                case 3:
-                    me->DespawnOrUnsummon();
-                    break;
+                        if (Player* player = summoner->ToPlayer())
+                        {
+                            me->DoPersonalScriptText(TOBIAS_SAY_FORSAKEN, player);
+                            InPosition = true;
+                            SetEscortPaused(true);
+                        }
+                        break;
+            case 3:
+                me->DespawnOrUnsummon();
+                break;
             }
         }
 
@@ -5349,30 +5349,30 @@ public:
             npc_vehicle_escortAI::UpdateAI(diff);
 
             if (InPosition)
-            if (uiSpeachTimer <= diff)
-            {
-                ++uiSpeachId;
-
-                if (me->isSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                if (Player* player = summoner->ToPlayer())
-                    switch (uiSpeachId)
+                if (uiSpeachTimer <= diff)
                 {
-                        case 1:
-                            uiSpeachTimer = 7000;
-                            if (Creature* crowley = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QAOD, 30.0f))
-                                crowley->DoPersonalScriptText(CROWLEY_SAY_IMMEDIATELY, player);
-                            break;
-                        case 2:
-                            me->DoPersonalScriptText(TOBIAS_SAY_OK, player);
-                            uiSpeachTimer = 3000;
-                            break;
-                        case 3:
-                            SetEscortPaused(false);
-                            break;
-                }
-            } else
-                uiSpeachTimer -= diff;
+                    ++uiSpeachId;
+
+                    if (me->isSummon())
+                        if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                            if (Player* player = summoner->ToPlayer())
+                                switch (uiSpeachId)
+                            {
+                                case 1:
+                                    uiSpeachTimer = 7000;
+                                    if (Creature* crowley = me->FindNearestCreature(NPC_LORD_DARIUS_CROWLEY_QAOD, 30.0f))
+                                        crowley->DoPersonalScriptText(CROWLEY_SAY_IMMEDIATELY, player);
+                                    break;
+                                case 2:
+                                    me->DoPersonalScriptText(TOBIAS_SAY_OK, player);
+                                    uiSpeachTimer = 3000;
+                                    break;
+                                case 3:
+                                    SetEscortPaused(false);
+                                    break;
+                            }
+                } else
+                    uiSpeachTimer -= diff;
         }
     };
 };
@@ -5385,33 +5385,33 @@ public:
     bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_AT_OUR_DOORSTEP)
-        if (Creature* tobias = player->SummonCreature(NPC_TOBIAS_MISTMANTLE_QAOD, -2079.345f, 1327.531f, -83.0644f))
-        {
-            tobias->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-            tobias->SetSeerGUID(player->GetGUID());
-            tobias->SetVisible(false);
-
-            if (npc_vehicle_escortAI* escort = CAST_AI(npc_vehicle_escortAI, tobias->AI()))
+            if (Creature* tobias = player->SummonCreature(NPC_TOBIAS_MISTMANTLE_QAOD, -2079.345f, 1327.531f, -83.0644f))
             {
-                for (int i = 0; i < 4; ++i)
-                    escort->AddWaypoint(i, TobiasWP[i][0], TobiasWP[i][1], TobiasWP[i][2]);
+                tobias->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                tobias->SetSeerGUID(player->GetGUID());
+                tobias->SetVisible(false);
 
-                escort->Start(true);
+                if (npc_vehicle_escortAI* escort = CAST_AI(npc_vehicle_escortAI, tobias->AI()))
+                {
+                    for (int i = 0; i < 4; ++i)
+                        escort->AddWaypoint(i, TobiasWP[i][0], TobiasWP[i][1], TobiasWP[i][2]);
+
+                    escort->Start(true);
+                }
             }
-        }
 
-        if (quest->GetQuestId() == QUEST_NEITHER_HUMAN_NOR_BEAST)
-        {
-            player->CastSpell(player, SPELL_LEARN_TWO_FORMS, false);
-
-            if (Creature* greymane = player->SummonCreature(NPC_KING_GENN_GREYMANE_HUMAN, -2111.09f, 1286.12f, -83.1804f))
+            if (quest->GetQuestId() == QUEST_NEITHER_HUMAN_NOR_BEAST)
             {
-                greymane->SetSeerGUID(player->GetGUID());
-                greymane->SetVisible(false);
-            }
-        }
+                player->CastSpell(player, SPELL_LEARN_TWO_FORMS, false);
 
-        return true;
+                if (Creature* greymane = player->SummonCreature(NPC_KING_GENN_GREYMANE_HUMAN, -2111.09f, 1286.12f, -83.1804f))
+                {
+                    greymane->SetSeerGUID(player->GetGUID());
+                    greymane->SetVisible(false);
+                }
+            }
+
+            return true;
     }
 };
 
@@ -5483,9 +5483,9 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Event)
-            if (uiEventTimer <= diff)
-                switch (uiPhase)
-            {
+                if (uiEventTimer <= diff)
+                    switch (uiPhase)
+                {
                     case 0:
                         uiPhase = 1;
                         uiEventTimer = 1500;
@@ -5499,10 +5499,10 @@ public:
                         Start(false, true, 0, NULL, true);
                         SetSpeedZ(25.0f);
                         break;
-            } else
-                uiEventTimer -= diff;
+                } else
+                    uiEventTimer -= diff;
 
-            npc_escortAI::UpdateAI(diff);
+                npc_escortAI::UpdateAI(diff);
         }
     };
 };
@@ -5827,21 +5827,21 @@ public:
             }
 
             for (int i = 0; i < 15; ++i)
-            if (Creature* militia = me->SummonCreature(NPC_GILNEAN_MILITIA, -1797.62f, 1709.17f, 22.1583f))
-            {
-                GreymaneMilitia.push_back(militia->GetGUID());
-
-                if (npc_escortAI* escort = CAST_AI(npc_escortAI, militia->AI()))
+                if (Creature* militia = me->SummonCreature(NPC_GILNEAN_MILITIA, -1797.62f, 1709.17f, 22.1583f))
                 {
-                    int roll_x = irand(-3, 3);
-                    int roll_y = irand(-3, 3);
+                    GreymaneMilitia.push_back(militia->GetGUID());
 
-                    for (int j = 0; j < 12; ++j)
-                        escort->AddWaypoint(j, GreymaneWP[j][0] + roll_x, GreymaneWP[j][1] + roll_y, GreymaneWP[j][2]);
+                    if (npc_escortAI* escort = CAST_AI(npc_escortAI, militia->AI()))
+                    {
+                        int roll_x = irand(-3, 3);
+                        int roll_y = irand(-3, 3);
 
-                    escort->Start(true, true);
+                        for (int j = 0; j < 12; ++j)
+                            escort->AddWaypoint(j, GreymaneWP[j][0] + roll_x, GreymaneWP[j][1] + roll_y, GreymaneWP[j][2]);
+
+                        escort->Start(true, true);
+                    }
                 }
-            }
         }
 
         void SummonCrowley()
@@ -5860,41 +5860,41 @@ public:
             }
 
             for (int i = 0; i < 12; ++i)
-            if (Creature* worgen = me->SummonCreature(NPC_WORGEN_WARRIOR, WorgenSummPos[i][0], WorgenSummPos[i][1], WorgenSummPos[i][2]))
-            {
-                WorgenList.push_back(worgen->GetGUID());
-
-                if (npc_escortAI* escort = CAST_AI(npc_escortAI, worgen->AI()))
+                if (Creature* worgen = me->SummonCreature(NPC_WORGEN_WARRIOR, WorgenSummPos[i][0], WorgenSummPos[i][1], WorgenSummPos[i][2]))
                 {
-                    int roll_x = irand(-3, 3);
-                    int roll_y = irand(-3, 3);
+                    WorgenList.push_back(worgen->GetGUID());
 
-                    for (int j = 0; j < 46; ++j)
-                        escort->AddWaypoint(j, FWorgenWP[j][0] + roll_x, FWorgenWP[j][1] + roll_y, FWorgenWP[j][2]);
+                    if (npc_escortAI* escort = CAST_AI(npc_escortAI, worgen->AI()))
+                    {
+                        int roll_x = irand(-3, 3);
+                        int roll_y = irand(-3, 3);
 
-                    escort->Start(true, true);
+                        for (int j = 0; j < 46; ++j)
+                            escort->AddWaypoint(j, FWorgenWP[j][0] + roll_x, FWorgenWP[j][1] + roll_y, FWorgenWP[j][2]);
+
+                        escort->Start(true, true);
+                    }
                 }
-            }
         }
 
         void DoAction(const int32 action)
         {
             switch (action)
             {
-                case ACTION_CANNON_AT_POSITION:
-                    if (uiBattlePhase == PHASE_MILITARY_DISTRICT)
-                        Event = true;
-                    break;
-                case ACTION_GOREROT_DIED:
-                    if (Creature* crowley = Unit::GetCreature(*me, uiCrowleyGUID))
-                        crowley->AI()->DoAction(ACTION_GOREROT_DIED);
-                    uiBattlePhase = PHASE_GREYMANE_COURT;
-                    BreakEscortPaused();
-                    break;
-                case ACTION_FINISH_TBFGC:
-                    Event = false;
-                    Finish = true;
-                    break;
+            case ACTION_CANNON_AT_POSITION:
+                if (uiBattlePhase == PHASE_MILITARY_DISTRICT)
+                    Event = true;
+                break;
+            case ACTION_GOREROT_DIED:
+                if (Creature* crowley = Unit::GetCreature(*me, uiCrowleyGUID))
+                    crowley->AI()->DoAction(ACTION_GOREROT_DIED);
+                uiBattlePhase = PHASE_GREYMANE_COURT;
+                BreakEscortPaused();
+                break;
+            case ACTION_FINISH_TBFGC:
+                Event = false;
+                Finish = true;
+                break;
             }
         }
 
@@ -5922,30 +5922,30 @@ public:
             }
 
             for (int i = 0; i < 3; ++i)
-            if (Creature* cannon = me->SummonCreature(NPC_EMBERSTONE_CANNON, SummonCannonPos[i][0],
-                SummonCannonPos[i][1], SummonCannonPos[i][2], SummonCannonPos[i][3]))
-            {
-                CannonList.push_back(cannon->GetGUID());
-                float x, y, z, o;
-                cannon->GetPosition(x, y, z, o);
-
-                if (Creature* villager = cannon->SummonCreature(NPC_FREED_EMBERSTONE_VILLAGER, x, y, z, o))
+                if (Creature* cannon = me->SummonCreature(NPC_EMBERSTONE_CANNON, SummonCannonPos[i][0],
+                    SummonCannonPos[i][1], SummonCannonPos[i][2], SummonCannonPos[i][3]))
                 {
-                    villager->EnterVehicle(cannon);
-                    cannon->EnableAI();
+                    CannonList.push_back(cannon->GetGUID());
+                    float x, y, z, o;
+                    cannon->GetPosition(x, y, z, o);
+
+                    if (Creature* villager = cannon->SummonCreature(NPC_FREED_EMBERSTONE_VILLAGER, x, y, z, o))
+                    {
+                        villager->EnterVehicle(cannon);
+                        cannon->EnableAI();
+                    }
+
+                    if (npc_escortAI* escort = CAST_AI(npc_escortAI, cannon->AI()))
+                    {
+                        int roll_x = irand(-3, 3);
+                        int roll_y = irand(-3, 3);
+
+                        for (int j = 0; j < 11; ++j)
+                            escort->AddWaypoint(j, CannonWP[j][0] + roll_x, CannonWP[j][1] + roll_y, CannonWP[j][2]);
+
+                        escort->Start(false, true);
+                    }
                 }
-
-                if (npc_escortAI* escort = CAST_AI(npc_escortAI, cannon->AI()))
-                {
-                    int roll_x = irand(-3, 3);
-                    int roll_y = irand(-3, 3);
-
-                    for (int j = 0; j < 11; ++j)
-                        escort->AddWaypoint(j, CannonWP[j][0] + roll_x, CannonWP[j][1] + roll_y, CannonWP[j][2]);
-
-                    escort->Start(false, true);
-                }
-            }
         }
 
         void DamageTaken(Unit* /*damager*/, uint32 &damage)
@@ -5978,20 +5978,20 @@ public:
             SetEscortPaused(false);
 
             if (Creature* myriam = Unit::GetCreature(*me, uiMyriamGUID))
-            if (npc_escortAI* escort = CAST_AI(npc_escortAI, myriam->AI()))
-                escort->SetEscortPaused(false);
+                if (npc_escortAI* escort = CAST_AI(npc_escortAI, myriam->AI()))
+                    escort->SetEscortPaused(false);
 
             if (Creature* almyra = Unit::GetCreature(*me, uiAlmyraGUID))
-            if (npc_escortAI* escort = CAST_AI(npc_escortAI, almyra->AI()))
-                escort->SetEscortPaused(false);
+                if (npc_escortAI* escort = CAST_AI(npc_escortAI, almyra->AI()))
+                    escort->SetEscortPaused(false);
 
             if (Creature* lorna = Unit::GetCreature(*me, uiLornaGUID))
-            if (npc_escortAI* escort = CAST_AI(npc_escortAI, lorna->AI()))
-                escort->SetEscortPaused(false);
+                if (npc_escortAI* escort = CAST_AI(npc_escortAI, lorna->AI()))
+                    escort->SetEscortPaused(false);
 
             if (Creature* crowley = Unit::GetCreature(*me, uiCrowleyGUID))
-            if (npc_escortAI* escort = CAST_AI(npc_escortAI, crowley->AI()))
-                escort->SetEscortPaused(false);
+                if (npc_escortAI* escort = CAST_AI(npc_escortAI, crowley->AI()))
+                    escort->SetEscortPaused(false);
 
             if (!FirstWave.empty())
             {
@@ -6001,8 +6001,8 @@ public:
                     ++itr;
 
                     if (militia)
-                    if (npc_escortAI* escort = CAST_AI(npc_escortAI, militia->AI()))
-                        escort->SetEscortPaused(false);
+                        if (npc_escortAI* escort = CAST_AI(npc_escortAI, militia->AI()))
+                            escort->SetEscortPaused(false);
                 }
             }
 
@@ -6014,8 +6014,8 @@ public:
                     ++itr;
 
                     if (militia)
-                    if (npc_escortAI* escort = CAST_AI(npc_escortAI, militia->AI()))
-                        escort->SetEscortPaused(false);
+                        if (npc_escortAI* escort = CAST_AI(npc_escortAI, militia->AI()))
+                            escort->SetEscortPaused(false);
                 }
             }
 
@@ -6027,8 +6027,8 @@ public:
                     ++itr;
 
                     if (militia)
-                    if (npc_escortAI* escort = CAST_AI(npc_escortAI, militia->AI()))
-                        escort->SetEscortPaused(false);
+                        if (npc_escortAI* escort = CAST_AI(npc_escortAI, militia->AI()))
+                            escort->SetEscortPaused(false);
                 }
             }
 
@@ -6040,8 +6040,8 @@ public:
                     ++itr;
 
                     if (worgen)
-                    if (npc_escortAI* escort = CAST_AI(npc_escortAI, worgen->AI()))
-                        escort->SetEscortPaused(false);
+                        if (npc_escortAI* escort = CAST_AI(npc_escortAI, worgen->AI()))
+                            escort->SetEscortPaused(false);
                 }
             }
         }
@@ -6054,88 +6054,88 @@ public:
             Start(true, true);
 
             if (Creature* myriam = Unit::GetCreature(*me, uiMyriamGUID))
-            if (npc_escortAI* escort = CAST_AI(npc_escortAI, myriam->AI()))
-            {
-                for (int i = 0; i < 96; ++i)
-                    escort->AddWaypoint(i, SWaveWP[i][0], SWaveWP[i][1], SWaveWP[i][2]);
-
-                escort->Start(true, true);
-            }
-
-            if (Creature* almyra = Unit::GetCreature(*me, uiAlmyraGUID))
-            if (npc_escortAI* escort = CAST_AI(npc_escortAI, almyra->AI()))
-            {
-                for (int i = 0; i < 87; ++i)
-                    escort->AddWaypoint(i, TWaveWP[i][0], TWaveWP[i][1], TWaveWP[i][2]);
-
-                escort->Start(true, true);
-            }
-
-            for (std::list<uint64>::const_iterator itr = FirstWave.begin(); itr != FirstWave.end();)
-            {
-                Creature* militia = Unit::GetCreature(*me, *itr);
-                ++itr;
-
-                if (militia)
+                if (npc_escortAI* escort = CAST_AI(npc_escortAI, myriam->AI()))
                 {
-                    militia->AI()->SetData(DATA_WP_PAUSE, 30);
+                    for (int i = 0; i < 96; ++i)
+                        escort->AddWaypoint(i, SWaveWP[i][0], SWaveWP[i][1], SWaveWP[i][2]);
 
-                    if (npc_escortAI* escort = CAST_AI(npc_escortAI, militia->AI()))
-                    {
-                        int32 roll_x = irand(-3, 3);
-                        int32 roll_y = irand(-3, 3);
-
-                        for (int i = 0; i < 96; ++i)
-                            escort->AddWaypoint(i, FWaveWP[i][0] + roll_x, FWaveWP[i][1] + roll_y, FWaveWP[i][2]);
-
-                        escort->Start(true, true);
-                    }
+                    escort->Start(true, true);
                 }
-            }
 
-            for (std::list<uint64>::const_iterator itr = SecondWave.begin(); itr != SecondWave.end();)
-            {
-                Creature* militia = Unit::GetCreature(*me, *itr);
-                ++itr;
-
-                if (militia)
-                {
-                    militia->AI()->SetData(DATA_WP_PAUSE, 30);
-
-                    if (npc_escortAI* escort = CAST_AI(npc_escortAI, militia->AI()))
+                if (Creature* almyra = Unit::GetCreature(*me, uiAlmyraGUID))
+                    if (npc_escortAI* escort = CAST_AI(npc_escortAI, almyra->AI()))
                     {
-                        int32 roll_x = irand(-3, 3);
-                        int32 roll_y = irand(-3, 3);
-
-                        for (int i = 0; i < 96; ++i)
-                            escort->AddWaypoint(i, SWaveWP[i][0] + roll_x, SWaveWP[i][1] + roll_y, SWaveWP[i][2]);
-
-                        escort->Start(true, true);
-                    }
-                }
-            }
-
-            for (std::list<uint64>::const_iterator itr = ThirdWave.begin(); itr != ThirdWave.end();)
-            {
-                Creature* militia = Unit::GetCreature(*me, *itr);
-                ++itr;
-
-                if (militia)
-                {
-                    militia->AI()->SetData(DATA_WP_PAUSE, 17);
-
-                    if (npc_escortAI* escort = CAST_AI(npc_escortAI, militia->AI()))
-                    {
-                        int32 roll_x = irand(-3, 3);
-                        int32 roll_y = irand(-3, 3);
-
                         for (int i = 0; i < 87; ++i)
-                            escort->AddWaypoint(i, TWaveWP[i][0] + roll_x, TWaveWP[i][1] + roll_y, TWaveWP[i][2]);
+                            escort->AddWaypoint(i, TWaveWP[i][0], TWaveWP[i][1], TWaveWP[i][2]);
 
                         escort->Start(true, true);
                     }
-                }
-            }
+
+                    for (std::list<uint64>::const_iterator itr = FirstWave.begin(); itr != FirstWave.end();)
+                    {
+                        Creature* militia = Unit::GetCreature(*me, *itr);
+                        ++itr;
+
+                        if (militia)
+                        {
+                            militia->AI()->SetData(DATA_WP_PAUSE, 30);
+
+                            if (npc_escortAI* escort = CAST_AI(npc_escortAI, militia->AI()))
+                            {
+                                int32 roll_x = irand(-3, 3);
+                                int32 roll_y = irand(-3, 3);
+
+                                for (int i = 0; i < 96; ++i)
+                                    escort->AddWaypoint(i, FWaveWP[i][0] + roll_x, FWaveWP[i][1] + roll_y, FWaveWP[i][2]);
+
+                                escort->Start(true, true);
+                            }
+                        }
+                    }
+
+                    for (std::list<uint64>::const_iterator itr = SecondWave.begin(); itr != SecondWave.end();)
+                    {
+                        Creature* militia = Unit::GetCreature(*me, *itr);
+                        ++itr;
+
+                        if (militia)
+                        {
+                            militia->AI()->SetData(DATA_WP_PAUSE, 30);
+
+                            if (npc_escortAI* escort = CAST_AI(npc_escortAI, militia->AI()))
+                            {
+                                int32 roll_x = irand(-3, 3);
+                                int32 roll_y = irand(-3, 3);
+
+                                for (int i = 0; i < 96; ++i)
+                                    escort->AddWaypoint(i, SWaveWP[i][0] + roll_x, SWaveWP[i][1] + roll_y, SWaveWP[i][2]);
+
+                                escort->Start(true, true);
+                            }
+                        }
+                    }
+
+                    for (std::list<uint64>::const_iterator itr = ThirdWave.begin(); itr != ThirdWave.end();)
+                    {
+                        Creature* militia = Unit::GetCreature(*me, *itr);
+                        ++itr;
+
+                        if (militia)
+                        {
+                            militia->AI()->SetData(DATA_WP_PAUSE, 17);
+
+                            if (npc_escortAI* escort = CAST_AI(npc_escortAI, militia->AI()))
+                            {
+                                int32 roll_x = irand(-3, 3);
+                                int32 roll_y = irand(-3, 3);
+
+                                for (int i = 0; i < 87; ++i)
+                                    escort->AddWaypoint(i, TWaveWP[i][0] + roll_x, TWaveWP[i][1] + roll_y, TWaveWP[i][2]);
+
+                                escort->Start(true, true);
+                            }
+                        }
+                    }
         }
 
         void EnterEvadeMode()
@@ -6182,8 +6182,8 @@ public:
                         militia->GetNearPoint2D(x, y, j * 2, o + M_PI);
 
                         if (Creature* new_militia = me->SummonCreature(NPC_GILNEAN_MILITIA, x, y, z, o))
-                        if (npc_escortAI* npc = CAST_AI(npc_escortAI, new_militia->AI()))
-                            ThirdWave.push_back(new_militia->GetGUID());
+                            if (npc_escortAI* npc = CAST_AI(npc_escortAI, new_militia->AI()))
+                                ThirdWave.push_back(new_militia->GetGUID());
                     }
                 }
             }
@@ -6193,33 +6193,33 @@ public:
         {
             switch (point)
             {
-                case 30:
-                    SetEscortPaused(true);
-                    SetFacingToLiam();
-                    if (uiBattlePhase == PHASE_MERCHANT_SQUARE)
+            case 30:
+                SetEscortPaused(true);
+                SetFacingToLiam();
+                if (uiBattlePhase == PHASE_MERCHANT_SQUARE)
                     if (uiDeadBossCount <= 0)
                         Event = true;
                     else
                         EscortFinished = true;
-                    break;
-                case 44:
-                    DoScriptText(LIAM_BATTLE_BATTLE_3, me);
-                    SummonCrowley();
-                    break;
-                case 58:
-                    Event = true;
-                    break;
-                case 59:
-                    SetEscortPaused(true);
-                    break;
-                case 61:
-                    if (Creature* crowley = Unit::GetCreature(*me, uiCrowleyGUID))
-                        DoScriptText(CROWLEY_BATTLE_BATTLE_2, crowley);
-                    break;
-                case 80:
-                    Event = true;
-                    SummonKingCreaymane();
-                    break;
+                break;
+            case 44:
+                DoScriptText(LIAM_BATTLE_BATTLE_3, me);
+                SummonCrowley();
+                break;
+            case 58:
+                Event = true;
+                break;
+            case 59:
+                SetEscortPaused(true);
+                break;
+            case 61:
+                if (Creature* crowley = Unit::GetCreature(*me, uiCrowleyGUID))
+                    DoScriptText(CROWLEY_BATTLE_BATTLE_2, crowley);
+                break;
+            case 80:
+                Event = true;
+                SummonKingCreaymane();
+                break;
             }
         }
 
@@ -6228,227 +6228,227 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (!Finish && Fail)
-            if (uiFailTimer <= diff)
-            {
-                Fail = false;
-                uiFailTimer = 900000;
-                DespawnEvent(0);
-            } else
-                uiFailTimer -= diff;
-
-            if (EscortFinished)
-            if (uiDeadBossCount <= 0)
-            {
-                uiSubPhase = 0;
-                uiEventTimer = 0;
-                EscortFinished = false;
-                Event = true;
-            }
-
-            if (Event)
-            if (uiEventTimer <= diff)
-                switch (uiBattlePhase)
-            {
-                    case PHASE_INTRO:
-                        ++uiSubPhase;
-                        switch (uiSubPhase)
-                        {
-                            case 1:
-                                uiEventTimer = 7500;
-                                DoScriptText(LIAM_BATTLE_SPEACH_1, me);
-                                break;
-                            case 2:
-                                uiEventTimer = 8500;
-                                DoScriptText(LIAM_BATTLE_SPEACH_2, me);
-                                break;
-                            case 3:
-                                uiEventTimer = 10500;
-                                DoScriptText(LIAM_BATTLE_SPEACH_3, me);
-                                break;
-                            case 4:
-                                uiEventTimer = 8500;
-                                DoScriptText(LIAM_BATTLE_SPEACH_4, me);
-                                break;
-                            case 5:
-                                uiEventTimer = 10500;
-                                DoScriptText(LIAM_BATTLE_SPEACH_5, me);
-                                break;
-                            case 6:
-                                uiEventTimer = 4500;
-                                DoScriptText(LIAM_BATTLE_SPEACH_6, me);
-                                break;
-                            case 7:
-                                Event = false;
-                                StartBattle();
-                                uiSubPhase = 0;
-                                uiBattlePhase = PHASE_MERCHANT_SQUARE;
-                                me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
-                                DoScriptText(LIAM_BATTLE_FOR_GILNEAS, me);
-                                break;
-                        }
-                        break;
-                    case PHASE_MERCHANT_SQUARE:
-                        ++uiSubPhase;
-                        switch (uiSubPhase)
-                        {
-                            case 1:
-                                uiEventTimer = 6500;
-                                SummonLorna();
-                                DoScriptText(LIAM_BATTLE_BATTLE_1, me);
-                                break;
-                            case 2:
-                                uiSubPhase = 0;
-                                Event = false;
-                                uiEventTimer = 7000;
-                                BreakEscortPaused();
-                                uiBattlePhase = PHASE_MILITARY_DISTRICT;
-                                break;
-                        }
-                        break;
-                    case PHASE_MILITARY_DISTRICT:
-                        ++uiSubPhase;
-                        switch (uiSubPhase)
-                        {
-                            case 1:
-                                uiEventTimer = 8000;
-                                DoScriptText(LIAM_BATTLE_BATTLE_2, me);
-                                break;
-                            case 2:
-                                Event = false;
-                                uiEventTimer = 7000;
-                                if (Creature* lorna = Unit::GetCreature(*me, uiLornaGUID))
-                                    DoScriptText(LORNA_BATTLE_BATTLE_2, lorna);
-                                break;
-                            case 3:
-                                uiEventTimer = 25000;
-                                me->SummonCreature(NPC_GOREROT, -1671.78f, 1449.64f, 52.287f);
-                                if (Creature* crowley = Unit::GetCreature(*me, uiCrowleyGUID))
-                                    crowley->AI()->DoAction(ACTION_GOREROT_FIGHT);
-                                break;
-                            case 4:
-                                Event = false;
-                                uiSubPhase = 0;
-                                uiEventTimer = 10000;
-                                if (Creature* crowley = Unit::GetCreature(*me, uiCrowleyGUID))
-                                    DoScriptText(CROWLEY_BATTLE_BATTLE_1, crowley);
-                                break;
-                        }
-                        break;
-                    case PHASE_GREYMANE_COURT:
-                        ++uiSubPhase;
-                        switch (uiSubPhase)
-                        {
-                            case 1:
-                                uiEventTimer = 21000;
-                                if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
-                                    DoScriptText(GREYMANE_BATTLE_BATTLE_1, greymane);
-                                break;
-                            case 2:
-                                Event = false;
-                                uiSubPhase = 0;
-                                uiEventTimer = 2000;
-                                if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
-                                    greymane->AI()->DoAction(ACTION_CAN_ATTACK);
-                                break;
-                        }
-                        break;
-            } else
-                uiEventTimer -= diff;
-
-            if (Finish)
-            {
-                if (uiEventTimer <= diff)
+                if (uiFailTimer <= diff)
                 {
-                    ++uiSubPhase;
-                    switch (uiSubPhase)
-                    {
-                        case 1:
-                            uiEventTimer = 3000;
-                            if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
-                                DoScriptText(SYLVANAS_KILL_LIAM, sylvanas);
-                            Aura = false;
-                            me->Dismount();
-                            me->RemoveAllAuras();
-                            break;
-                        case 2:
-                            uiEventTimer = 4000;
-                            if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
-                            {
-                                SetRun(true);
-                                DoScriptText(LIAM_BATTLE_DEATH_1, me);
-                                float x, y, z = greymane->GetPositionZ();
-                                greymane->GetNearPoint2D(x, y, 0.5f, greymane->GetOrientation());
-                                if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
-                                    DoStartMovement(sylvanas, 1.0f);
-                            }
-                            break;
-                        case 3:
-                            uiEventTimer = 3000;
-                            if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
-                            {
-                                sylvanas->CastSpell(me, SPELL_SHOOT_LIAM, false);
-                                DoCast(SPELL_BFGC_COMPLETE);
-                                if (me->isSummon())
-                                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                                if (Creature* krennan = summoner->ToCreature())
-                                    krennan->AI()->DoAction(ACTION_BATTLE_COMPLETE);
-                                sylvanas->GetMotionMaster()->MovePoint(0, -1628.85f, 1626.61f, 20.4884f);
-                                sylvanas->DespawnOrUnsummon(2000);
-                                if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
-                                    DoScriptText(GREYMANE_YELL_LIAM, greymane);
-                            }
-                            break;
-                        case 4:
-                            uiEventTimer = 5000;
-                            if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
-                                greymane->SetStandState(UNIT_STAND_STATE_KNEEL);
-                            SetFacingToLiam();
-                            break;
-                        case 5:
-                            uiEventTimer = 3000;
-                            DoScriptText(LIAM_BATTLE_DEATH_2, me);
-                            break;
-                        case 6:
-                            DespawnEvent(30000);
-                            Finish = false;
-                            DoScriptText(LIAM_BATTLE_DEATH_3, me);
-                            break;
-                    }
+                    Fail = false;
+                    uiFailTimer = 900000;
+                    DespawnEvent(0);
                 } else
-                    uiEventTimer -= diff;
-            }
+                    uiFailTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (EscortFinished)
+                    if (uiDeadBossCount <= 0)
+                    {
+                        uiSubPhase = 0;
+                        uiEventTimer = 0;
+                        EscortFinished = false;
+                        Event = true;
+                    }
 
-            if (uiRandomSpechTimer <= diff)
-            {
-                uiRandomSpechTimer = urand(10000, 30000);
-                uint8 roll = urand(0, 3);
-                DoScriptText(LIAM_RANDOM_BATTLE_SPEACH - roll, me);
-            } else
-                uiRandomSpechTimer -= diff;
+                    if (Event)
+                        if (uiEventTimer <= diff)
+                            switch (uiBattlePhase)
+                        {
+                            case PHASE_INTRO:
+                                ++uiSubPhase;
+                                switch (uiSubPhase)
+                                {
+                                case 1:
+                                    uiEventTimer = 7500;
+                                    DoScriptText(LIAM_BATTLE_SPEACH_1, me);
+                                    break;
+                                case 2:
+                                    uiEventTimer = 8500;
+                                    DoScriptText(LIAM_BATTLE_SPEACH_2, me);
+                                    break;
+                                case 3:
+                                    uiEventTimer = 10500;
+                                    DoScriptText(LIAM_BATTLE_SPEACH_3, me);
+                                    break;
+                                case 4:
+                                    uiEventTimer = 8500;
+                                    DoScriptText(LIAM_BATTLE_SPEACH_4, me);
+                                    break;
+                                case 5:
+                                    uiEventTimer = 10500;
+                                    DoScriptText(LIAM_BATTLE_SPEACH_5, me);
+                                    break;
+                                case 6:
+                                    uiEventTimer = 4500;
+                                    DoScriptText(LIAM_BATTLE_SPEACH_6, me);
+                                    break;
+                                case 7:
+                                    Event = false;
+                                    StartBattle();
+                                    uiSubPhase = 0;
+                                    uiBattlePhase = PHASE_MERCHANT_SQUARE;
+                                    me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                                    DoScriptText(LIAM_BATTLE_FOR_GILNEAS, me);
+                                    break;
+                                }
+                                break;
+                            case PHASE_MERCHANT_SQUARE:
+                                ++uiSubPhase;
+                                switch (uiSubPhase)
+                                {
+                                case 1:
+                                    uiEventTimer = 6500;
+                                    SummonLorna();
+                                    DoScriptText(LIAM_BATTLE_BATTLE_1, me);
+                                    break;
+                                case 2:
+                                    uiSubPhase = 0;
+                                    Event = false;
+                                    uiEventTimer = 7000;
+                                    BreakEscortPaused();
+                                    uiBattlePhase = PHASE_MILITARY_DISTRICT;
+                                    break;
+                                }
+                                break;
+                            case PHASE_MILITARY_DISTRICT:
+                                ++uiSubPhase;
+                                switch (uiSubPhase)
+                                {
+                                case 1:
+                                    uiEventTimer = 8000;
+                                    DoScriptText(LIAM_BATTLE_BATTLE_2, me);
+                                    break;
+                                case 2:
+                                    Event = false;
+                                    uiEventTimer = 7000;
+                                    if (Creature* lorna = Unit::GetCreature(*me, uiLornaGUID))
+                                        DoScriptText(LORNA_BATTLE_BATTLE_2, lorna);
+                                    break;
+                                case 3:
+                                    uiEventTimer = 25000;
+                                    me->SummonCreature(NPC_GOREROT, -1671.78f, 1449.64f, 52.287f);
+                                    if (Creature* crowley = Unit::GetCreature(*me, uiCrowleyGUID))
+                                        crowley->AI()->DoAction(ACTION_GOREROT_FIGHT);
+                                    break;
+                                case 4:
+                                    Event = false;
+                                    uiSubPhase = 0;
+                                    uiEventTimer = 10000;
+                                    if (Creature* crowley = Unit::GetCreature(*me, uiCrowleyGUID))
+                                        DoScriptText(CROWLEY_BATTLE_BATTLE_1, crowley);
+                                    break;
+                                }
+                                break;
+                            case PHASE_GREYMANE_COURT:
+                                ++uiSubPhase;
+                                switch (uiSubPhase)
+                                {
+                                case 1:
+                                    uiEventTimer = 21000;
+                                    if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
+                                        DoScriptText(GREYMANE_BATTLE_BATTLE_1, greymane);
+                                    break;
+                                case 2:
+                                    Event = false;
+                                    uiSubPhase = 0;
+                                    uiEventTimer = 2000;
+                                    if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
+                                        greymane->AI()->DoAction(ACTION_CAN_ATTACK);
+                                    break;
+                                }
+                                break;
+                        } else
+                            uiEventTimer -= diff;
 
-            if (uiShootTimer <= diff)
-            {
-                uiShootTimer = 1500;
-                DoCast(me->getVictim(), SPELL_SHOOT);
-            } else
-                uiShootTimer -= diff;
+                        if (Finish)
+                        {
+                            if (uiEventTimer <= diff)
+                            {
+                                ++uiSubPhase;
+                                switch (uiSubPhase)
+                                {
+                                case 1:
+                                    uiEventTimer = 3000;
+                                    if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
+                                        DoScriptText(SYLVANAS_KILL_LIAM, sylvanas);
+                                    Aura = false;
+                                    me->Dismount();
+                                    me->RemoveAllAuras();
+                                    break;
+                                case 2:
+                                    uiEventTimer = 4000;
+                                    if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
+                                    {
+                                        SetRun(true);
+                                        DoScriptText(LIAM_BATTLE_DEATH_1, me);
+                                        float x, y, z = greymane->GetPositionZ();
+                                        greymane->GetNearPoint2D(x, y, 0.5f, greymane->GetOrientation());
+                                        if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
+                                            DoStartMovement(sylvanas, 1.0f);
+                                    }
+                                    break;
+                                case 3:
+                                    uiEventTimer = 3000;
+                                    if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
+                                    {
+                                        sylvanas->CastSpell(me, SPELL_SHOOT_LIAM, false);
+                                        DoCast(SPELL_BFGC_COMPLETE);
+                                        if (me->isSummon())
+                                            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                                                if (Creature* krennan = summoner->ToCreature())
+                                                    krennan->AI()->DoAction(ACTION_BATTLE_COMPLETE);
+                                        sylvanas->GetMotionMaster()->MovePoint(0, -1628.85f, 1626.61f, 20.4884f);
+                                        sylvanas->DespawnOrUnsummon(2000);
+                                        if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
+                                            DoScriptText(GREYMANE_YELL_LIAM, greymane);
+                                    }
+                                    break;
+                                case 4:
+                                    uiEventTimer = 5000;
+                                    if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
+                                        greymane->SetStandState(UNIT_STAND_STATE_KNEEL);
+                                    SetFacingToLiam();
+                                    break;
+                                case 5:
+                                    uiEventTimer = 3000;
+                                    DoScriptText(LIAM_BATTLE_DEATH_2, me);
+                                    break;
+                                case 6:
+                                    DespawnEvent(30000);
+                                    Finish = false;
+                                    DoScriptText(LIAM_BATTLE_DEATH_3, me);
+                                    break;
+                                }
+                            } else
+                                uiEventTimer -= diff;
+                        }
 
-            if (uiMultiShotTimer <= diff)
-            {
-                uiMultiShotTimer = 3000;
-                DoCast(me->getVictim(), SPELL_MULTI_SHOT);
-            } else
-                uiMultiShotTimer -= diff;
+                        if (!UpdateVictim())
+                            return;
 
-            if (uiChallengingShoutTimer <= diff)
-            {
-                uiChallengingShoutTimer = urand(10000, 30000);
-                DoCast(SPELL_CHALLENGING_SHOUT);
-            } else
-                uiChallengingShoutTimer -= diff;
+                        if (uiRandomSpechTimer <= diff)
+                        {
+                            uiRandomSpechTimer = urand(10000, 30000);
+                            uint8 roll = urand(0, 3);
+                            DoScriptText(LIAM_RANDOM_BATTLE_SPEACH - roll, me);
+                        } else
+                            uiRandomSpechTimer -= diff;
+
+                        if (uiShootTimer <= diff)
+                        {
+                            uiShootTimer = 1500;
+                            DoCast(me->getVictim(), SPELL_SHOOT);
+                        } else
+                            uiShootTimer -= diff;
+
+                        if (uiMultiShotTimer <= diff)
+                        {
+                            uiMultiShotTimer = 3000;
+                            DoCast(me->getVictim(), SPELL_MULTI_SHOT);
+                        } else
+                            uiMultiShotTimer -= diff;
+
+                        if (uiChallengingShoutTimer <= diff)
+                        {
+                            uiChallengingShoutTimer = urand(10000, 30000);
+                            DoCast(SPELL_CHALLENGING_SHOUT);
+                        } else
+                            uiChallengingShoutTimer -= diff;
         }
     };
 };
@@ -6502,30 +6502,30 @@ public:
         void WaypointReached(uint32 point)
         {
             if (point == uiPausePoint)
-            if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            if (Creature* liam = summoner->ToCreature())
-            {
-                if (point == 17)
-                {
-                    if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MERCHANT_SQUARE)
-                        SetEscortPaused(true);
+                if (me->isSummon())
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if (Creature* liam = summoner->ToCreature())
+                        {
+                            if (point == 17)
+                            {
+                                if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MERCHANT_SQUARE)
+                                    SetEscortPaused(true);
 
-                    uiPausePoint = 46;
-                }
+                                uiPausePoint = 46;
+                            }
 
-                if (point == 30)
-                {
-                    if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MERCHANT_SQUARE)
-                        SetEscortPaused(true);
+                            if (point == 30)
+                            {
+                                if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MERCHANT_SQUARE)
+                                    SetEscortPaused(true);
 
-                    uiPausePoint = 59;
-                }
+                                uiPausePoint = 59;
+                            }
 
-                if (point == 46 || point == 59)
-                if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
-                    SetEscortPaused(true);
-            }
+                            if (point == 46 || point == 59)
+                                if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
+                                    SetEscortPaused(true);
+                        }
         }
 
         void UpdateAI(const uint32 diff)
@@ -6617,20 +6617,20 @@ public:
         {
             switch (point)
             {
-                case 30:
-                    if (me->isSummon())
+            case 30:
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    if (Creature* liam = summoner->ToCreature())
-                    if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MERCHANT_SQUARE)
-                        SetEscortPaused(true);
-                    break;
-                case 59:
-                    if (me->isSummon())
+                        if (Creature* liam = summoner->ToCreature())
+                            if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MERCHANT_SQUARE)
+                                SetEscortPaused(true);
+                break;
+            case 59:
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    if (Creature* liam = summoner->ToCreature())
-                    if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
-                        SetEscortPaused(true);
-                    break;
+                        if (Creature* liam = summoner->ToCreature())
+                            if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
+                                SetEscortPaused(true);
+                break;
             }
         }
 
@@ -6717,41 +6717,41 @@ public:
         {
             switch (point)
             {
-                case 9:
-                    if (me->isSummon())
+            case 9:
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     {
                         if (Creature* ranger = summoner->SummonCreature(NPC_DARK_RANGER_ELITE, -1572.91f, 1319.44f, 35.556f))
-                        if (npc_escortAI* escort = CAST_AI(npc_escortAI, ranger->AI()))
-                        {
-                            for (int i = 0; i < 31; ++i)
-                                escort->AddWaypoint(i, FDarkRangerWP[i][0], FDarkRangerWP[i][1], FDarkRangerWP[i][2]);
-                            escort->Start(true, true, 0, NULL, false, true);
-                        }
+                            if (npc_escortAI* escort = CAST_AI(npc_escortAI, ranger->AI()))
+                            {
+                                for (int i = 0; i < 31; ++i)
+                                    escort->AddWaypoint(i, FDarkRangerWP[i][0], FDarkRangerWP[i][1], FDarkRangerWP[i][2]);
+                                escort->Start(true, true, 0, NULL, false, true);
+                            }
 
-                        if (Creature* ranger = summoner->SummonCreature(NPC_DARK_RANGER_ELITE, -1570.32f, 1318.69f, 35.556f))
-                        if (npc_escortAI* escort = CAST_AI(npc_escortAI, ranger->AI()))
-                        {
-                            for (int i = 0; i < 30; ++i)
-                                escort->AddWaypoint(i, SDarkRangerWP[i][0], SDarkRangerWP[i][1], SDarkRangerWP[i][2]);
-                            escort->Start(true, true, 0, NULL, false, true);
-                        }
+                            if (Creature* ranger = summoner->SummonCreature(NPC_DARK_RANGER_ELITE, -1570.32f, 1318.69f, 35.556f))
+                                if (npc_escortAI* escort = CAST_AI(npc_escortAI, ranger->AI()))
+                                {
+                                    for (int i = 0; i < 30; ++i)
+                                        escort->AddWaypoint(i, SDarkRangerWP[i][0], SDarkRangerWP[i][1], SDarkRangerWP[i][2]);
+                                    escort->Start(true, true, 0, NULL, false, true);
+                                }
                     }
                     break;
-                case 17:
-                    if (me->isSummon())
+            case 17:
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    if (Creature* liam = summoner->ToCreature())
-                    if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MERCHANT_SQUARE)
-                        SetEscortPaused(true);
-                    break;
-                case 46:
-                    if (me->isSummon())
+                        if (Creature* liam = summoner->ToCreature())
+                            if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MERCHANT_SQUARE)
+                                SetEscortPaused(true);
+                break;
+            case 46:
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    if (Creature* liam = summoner->ToCreature())
-                    if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
-                        SetEscortPaused(true);
-                    break;
+                        if (Creature* liam = summoner->ToCreature())
+                            if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
+                                SetEscortPaused(true);
+                break;
             }
         }
 
@@ -6776,8 +6776,8 @@ public:
                 if (me->GetHealthPct() < 30.0f)
                     DoCast(SPELL_HOLY_NOVA);
                 else
-                if (Unit* target = DoSelectLowestHpFriendly(35.0f, 1))
-                    DoCast(target, SPELL_HOLY_NOVA);
+                    if (Unit* target = DoSelectLowestHpFriendly(35.0f, 1))
+                        DoCast(target, SPELL_HOLY_NOVA);
             } else
                 uiFlashHealTimer -= diff;
         }
@@ -6814,9 +6814,9 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            if (Creature* liam = summoner->ToCreature())
-                CAST_AI(npc_prince_liam_greymane_tbfgc::npc_prince_liam_greymane_tbfgcAI, liam->AI())->KilledBoss();
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if (Creature* liam = summoner->ToCreature())
+                        CAST_AI(npc_prince_liam_greymane_tbfgc::npc_prince_liam_greymane_tbfgcAI, liam->AI())->KilledBoss();
         }
 
         void UpdateAI(const uint32 diff)
@@ -6866,13 +6866,13 @@ public:
         void WaypointReached(uint32 point)
         {
             if (point == 10)
-            if (Vehicle* vehicle = me->GetVehicleKit())
-            if (Unit* passenger = vehicle->GetPassenger(0))
-            if (Creature* villager = passenger->ToCreature())
-            {
-                villager->ExitVehicle();
-                villager->DespawnOrUnsummon(25000);
-            }
+                if (Vehicle* vehicle = me->GetVehicleKit())
+                    if (Unit* passenger = vehicle->GetPassenger(0))
+                        if (Creature* villager = passenger->ToCreature())
+                        {
+                            villager->ExitVehicle();
+                            villager->DespawnOrUnsummon(25000);
+                        }
         }
 
         void UpdateAI(const uint32 diff)
@@ -6926,20 +6926,20 @@ public:
         {
             switch (point)
             {
-                case 8:
-                    DoScriptText(LORNA_BATTLE_BATTLE_1, me);
-                    if (me->isSummon())
+            case 8:
+                DoScriptText(LORNA_BATTLE_BATTLE_1, me);
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    if (Creature* liam = summoner->ToCreature())
-                        liam->AI()->DoAction(ACTION_CANNON_AT_POSITION);
-                    break;
-                case 41:
-                    if (me->isSummon())
+                        if (Creature* liam = summoner->ToCreature())
+                            liam->AI()->DoAction(ACTION_CANNON_AT_POSITION);
+                break;
+            case 41:
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    if (Creature* liam = summoner->ToCreature())
-                    if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
-                        SetEscortPaused(true);
-                    break;
+                        if (Creature* liam = summoner->ToCreature())
+                            if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
+                                SetEscortPaused(true);
+                break;
             }
         }
 
@@ -7020,11 +7020,11 @@ public:
         void WaypointReached(uint32 point)
         {
             if (point == 10)
-            if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            if (Creature* liam = summoner->ToCreature())
-            if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
-                SetEscortPaused(true);
+                if (me->isSummon())
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if (Creature* liam = summoner->ToCreature())
+                            if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
+                                SetEscortPaused(true);
         }
 
         void DamageTaken(Unit* /*damager*/, uint32 &damage)
@@ -7041,62 +7041,62 @@ public:
                 return;
 
             if (gorerot)
-            if (uiJumpTimer <= diff)
-            {
-                jump = true;
-                uiJumpTimer = 8000;
-                me->AddUnitState(UNIT_STATE_ROOT);
-                me->AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
-                me->GetMotionMaster()->MoveJump(-1690.97f, 1430.47f, 40.9132f, 10.0f, 15.0f);
-            } else
-                uiJumpTimer -= diff;
-
-            if (jump)
-            if (uiFeralLeapTimer <= diff)
-            {
-                jump = false;
-                uiFeralLeapTimer = 1500;
-                float x, y, z;
-
-                if (Unit* target = me->getVictim())
+                if (uiJumpTimer <= diff)
                 {
-                    target->GetPosition(x, y, z);
-                    me->CastSpell(x, y, z, SPELL_FERAL_LEAP, false);
-                }
-
-                me->ClearUnitState(UNIT_STATE_ROOT);
-                me->RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
-            } else
-                uiFeralLeapTimer -= diff;
-
-            if (!jump)
-            {
-                if (uiSliceAndDiceTimer <= diff)
-                {
-                    uiSliceAndDiceTimer = 30000;
-                    DoCast(SPELL_SLICE_AND_DICE);
+                    jump = true;
+                    uiJumpTimer = 8000;
+                    me->AddUnitState(UNIT_STATE_ROOT);
+                    me->AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
+                    me->GetMotionMaster()->MoveJump(-1690.97f, 1430.47f, 40.9132f, 10.0f, 15.0f);
                 } else
-                    uiSliceAndDiceTimer -= diff;
+                    uiJumpTimer -= diff;
 
-                if (uiTauntTimer <= diff)
-                {
-                    uiTauntTimer = 10000;
-                    DoCast(me->getVictim(), SPELL_TAUNT);
-                } else
-                    uiTauntTimer -= diff;
-
-                if (uiInterceptTimer <= diff)
-                {
-                    uiInterceptTimer = 11000;
-
-                    if (Unit* target = me->getVictim())
+                if (jump)
+                    if (uiFeralLeapTimer <= diff)
                     {
-                        if (me->getVictim() && me->IsInRange(me->getVictim(), 8.0f, 25.0f, false))
-                            DoCast(me->getVictim(), SPELL_INTERCEPT);
+                        jump = false;
+                        uiFeralLeapTimer = 1500;
+                        float x, y, z;
+
+                        if (Unit* target = me->getVictim())
+                        {
+                            target->GetPosition(x, y, z);
+                            me->CastSpell(x, y, z, SPELL_FERAL_LEAP, false);
+                        }
+
+                        me->ClearUnitState(UNIT_STATE_ROOT);
+                        me->RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT);
+                    } else
+                        uiFeralLeapTimer -= diff;
+
+                    if (!jump)
+                    {
+                        if (uiSliceAndDiceTimer <= diff)
+                        {
+                            uiSliceAndDiceTimer = 30000;
+                            DoCast(SPELL_SLICE_AND_DICE);
+                        } else
+                            uiSliceAndDiceTimer -= diff;
+
+                        if (uiTauntTimer <= diff)
+                        {
+                            uiTauntTimer = 10000;
+                            DoCast(me->getVictim(), SPELL_TAUNT);
+                        } else
+                            uiTauntTimer -= diff;
+
+                        if (uiInterceptTimer <= diff)
+                        {
+                            uiInterceptTimer = 11000;
+
+                            if (Unit* target = me->getVictim())
+                            {
+                                if (me->getVictim() && me->IsInRange(me->getVictim(), 8.0f, 25.0f, false))
+                                    DoCast(me->getVictim(), SPELL_INTERCEPT);
+                            }
+                        } else
+                            uiInterceptTimer -= diff;
                     }
-                } else
-                    uiInterceptTimer -= diff;
-            }
         }
     };
 };
@@ -7141,11 +7141,11 @@ public:
         void WaypointReached(uint32 point)
         {
             if (point == 10)
-            if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            if (Creature* liam = summoner->ToCreature())
-            if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
-                SetEscortPaused(true);
+                if (me->isSummon())
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if (Creature* liam = summoner->ToCreature())
+                            if (liam->AI()->GetData(DATA_CURRENT_PHASE) == PHASE_MILITARY_DISTRICT)
+                                SetEscortPaused(true);
         }
 
         void UpdateAI(const uint32 diff)
@@ -7199,17 +7199,17 @@ public:
                 DoScriptText(GOREROT_YELL_CRUSH, me);
 
                 if (me->isSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    AttackStart(summoner);
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        AttackStart(summoner);
             }
         }
 
         void JustDied(Unit* /*killer*/)
         {
             if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            if (Creature* liam = summoner->ToTempSummon())
-                liam->AI()->DoAction(ACTION_GOREROT_DIED);
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if (Creature* liam = summoner->ToTempSummon())
+                        liam->AI()->DoAction(ACTION_GOREROT_DIED);
         }
 
         Creature* GetFreeWorgen(std::list<Creature*> List) const
@@ -7240,17 +7240,17 @@ public:
                 if (Vehicle* vehicle = me->GetVehicleKit())
                 {
                     for (int i = 0; i < 2; ++i)
-                    if (vehicle->HasEmptySeat(i))
-                    if (Creature* worgen = GetFreeWorgen(WorgenList))
-                    {
-                        worgen->EnterVehicle(me, i);
-                        worgen->m_movementInfo.t_pos.m_orientation = M_PI;
-                    }
+                        if (vehicle->HasEmptySeat(i))
+                            if (Creature* worgen = GetFreeWorgen(WorgenList))
+                            {
+                                worgen->EnterVehicle(me, i);
+                                worgen->m_movementInfo.t_pos.m_orientation = M_PI;
+                            }
 
-                    for (int i = 2; i < 4; ++i)
-                    if (vehicle->HasEmptySeat(i))
-                    if (Creature* worgen = GetFreeWorgen(WorgenList))
-                        worgen->EnterVehicle(me, i);
+                            for (int i = 2; i < 4; ++i)
+                                if (vehicle->HasEmptySeat(i))
+                                    if (Creature* worgen = GetFreeWorgen(WorgenList))
+                                        worgen->EnterVehicle(me, i);
                 }
             }
 
@@ -7272,12 +7272,12 @@ public:
                 uint8 roll = urand(0, 4);
 
                 if (Vehicle* vehicle = me->GetVehicleKit())
-                if (Unit* passenger = vehicle->GetPassenger(roll))
-                {
-                    passenger->ExitVehicle();
-                    DoCast(passenger, SPELL_SMASH);
-                    FreePlace = true;
-                }
+                    if (Unit* passenger = vehicle->GetPassenger(roll))
+                    {
+                        passenger->ExitVehicle();
+                        DoCast(passenger, SPELL_SMASH);
+                        FreePlace = true;
+                    }
             } else
                 uiSmashTimer -= diff;
 
@@ -7351,13 +7351,13 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (sylvanas && can_attack)
-            if (uiSylvanasTimer <= diff)
-            {
-                if (Creature* Sylvanas = me->FindNearestCreature(NPC_LADY_SYLVANAS_WINDRUNNER_TBFGC, 50.0f))
+                if (uiSylvanasTimer <= diff)
                 {
-                    ++uiPhase;
-                    switch (uiPhase)
+                    if (Creature* Sylvanas = me->FindNearestCreature(NPC_LADY_SYLVANAS_WINDRUNNER_TBFGC, 50.0f))
                     {
+                        ++uiPhase;
+                        switch (uiPhase)
+                        {
                         case 1:
                             uiSylvanasTimer = 1000;
                             DoCast(SPELL_GREYMANE_TRANSFORM);
@@ -7373,12 +7373,12 @@ public:
                             Sylvanas->GetNearPoint2D(x, y, 3.0f, Sylvanas->GetOrientation());
                             me->GetMotionMaster()->MoveJump(x, y, z, 10.0f, 10.0f);
                             break;
+                        }
                     }
-                }
-            } else
-                uiSylvanasTimer -= diff;
+                } else
+                    uiSylvanasTimer -= diff;
 
-            npc_escortAI::UpdateAI(diff);
+                npc_escortAI::UpdateAI(diff);
         }
     };
 };
@@ -7414,11 +7414,11 @@ public:
         void MoveInLineOfSight(Unit* who)
         {
             if (!move)
-            if (who->GetEntry() == NPC_KING_GENN_GREYMANE_TBFGC && me->IsWithinDistInMap(who, 25.0f))
-            {
-                move = true;
-                who->ToCreature()->AI()->DoAction(ACTION_ATTACK_SYLVANAS);
-            }
+                if (who->GetEntry() == NPC_KING_GENN_GREYMANE_TBFGC && me->IsWithinDistInMap(who, 25.0f))
+                {
+                    move = true;
+                    who->ToCreature()->AI()->DoAction(ACTION_ATTACK_SYLVANAS);
+                }
         }
 
         void UpdateAI(const uint32 diff)
@@ -7436,9 +7436,9 @@ public:
                 me->CombatStop();
 
                 if (me->isSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                if (Creature* liam = summoner->ToCreature())
-                    liam->AI()->DoAction(ACTION_FINISH_TBFGC);
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if (Creature* liam = summoner->ToCreature())
+                            liam->AI()->DoAction(ACTION_FINISH_TBFGC);
             }
 
             if (uiShootTimer <= diff)
@@ -7524,13 +7524,13 @@ public:
 
         switch (uiAction)
         {
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                if (npc_krennan_aranas_tbfgcAI* aranas = CAST_AI(npc_krennan_aranas_tbfgcAI, creature->AI()))
-                    aranas->TelepotPlayer(player);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 3:
-                CAST_AI(npc_krennan_aranas_tbfgcAI, creature->AI())->StartEvent();
-                break;
+        case GOSSIP_ACTION_INFO_DEF + 1:
+            if (npc_krennan_aranas_tbfgcAI* aranas = CAST_AI(npc_krennan_aranas_tbfgcAI, creature->AI()))
+                aranas->TelepotPlayer(player);
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 3:
+            CAST_AI(npc_krennan_aranas_tbfgcAI, creature->AI())->StartEvent();
+            break;
         }
 
         player->CLOSE_GOSSIP_MENU();
@@ -7548,22 +7548,22 @@ public:
         */
 
         if (player->GetQuestStatus(QUEST_THE_BATTLE_FOR_GILNEAS_CITY) == QUEST_STATUS_INCOMPLETE)
-        if (npc_krennan_aranas_tbfgcAI* AranasAI = CAST_AI(npc_krennan_aranas_tbfgcAI, creature->AI()))
-        {
+            if (npc_krennan_aranas_tbfgcAI* AranasAI = CAST_AI(npc_krennan_aranas_tbfgcAI, creature->AI()))
+            {
 
-            if (AranasAI->IsBattle())
-            {
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, GossipMenu[27], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[28], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            } else
-            {
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, GossipMenu[29], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[30], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                if (AranasAI->IsBattle())
+                {
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, GossipMenu[27], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[28], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                } else
+                {
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, GossipMenu[29], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[30], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                }
             }
-        }
 
-        player->SEND_GOSSIP_MENU(MENU_START_BATTLE, creature->GetGUID());
-        return true;
+            player->SEND_GOSSIP_MENU(MENU_START_BATTLE, creature->GetGUID());
+            return true;
     }
 
     struct npc_krennan_aranas_tbfgcAI : public ScriptedAI
@@ -7674,10 +7674,10 @@ public:
             for (std::list<Psc_qthfs>::iterator itr = lPlayers.begin(); itr != lPlayers.end();)
             {
                 if ((*itr).uiPlayerGUID == player)
-                if (Unit::GetCreature(*me, (*itr).uiTobiasGUID))
-                    return;
-                else
-                    itr = lPlayers.erase(itr);
+                    if (Unit::GetCreature(*me, (*itr).uiTobiasGUID))
+                        return;
+                    else
+                        itr = lPlayers.erase(itr);
                 else
                     ++itr;
             }
@@ -7729,10 +7729,10 @@ public:
         void DespawnPersonalTobias(uint64 player)
         {
             for (std::list<Psc_qthfs>::iterator itr = lPlayers.begin(); itr != lPlayers.end();)
-            if ((*itr).uiPlayerGUID == player)
-                itr = lPlayers.erase(itr);
-            else
-                ++itr;
+                if ((*itr).uiPlayerGUID == player)
+                    itr = lPlayers.erase(itr);
+                else
+                    ++itr;
         }
     };
 };
@@ -7781,22 +7781,22 @@ public:
             if (Player* player = GetPlayerForEscort())
                 switch (point)
             {
-                    case 1:
-                        me->DoPersonalScriptText(TOBIAS_SAY_GO, player);
-                        Event = true;
-                        uiEventTimer = 2000;
-                        uiPhase = 0;
-                        break;
-                    case 5:
-                    case 13:
-                        Event = true;
-                        break;
-                    case 24:
-                        me->DoPersonalScriptText(TOBIAS_SAY_HIDE, player);
-                        break;
-                    case 27:
-                        Event = true;
-                        break;
+                case 1:
+                    me->DoPersonalScriptText(TOBIAS_SAY_GO, player);
+                    Event = true;
+                    uiEventTimer = 2000;
+                    uiPhase = 0;
+                    break;
+                case 5:
+                case 13:
+                    Event = true;
+                    break;
+                case 24:
+                    me->DoPersonalScriptText(TOBIAS_SAY_HIDE, player);
+                    break;
+                case 27:
+                    Event = true;
+                    break;
             }
         }
 
@@ -7854,143 +7854,143 @@ public:
             if (uiFailTimer <= diff)
             {
                 if (Player* player = GetPlayerForEscort())
-                if (player->GetQuestStatus(QUEST_THE_HUNT_FOR_SYLVANAS) == QUEST_STATUS_INCOMPLETE)
-                    player->FailQuest(QUEST_THE_HUNT_FOR_SYLVANAS);
+                    if (player->GetQuestStatus(QUEST_THE_HUNT_FOR_SYLVANAS) == QUEST_STATUS_INCOMPLETE)
+                        player->FailQuest(QUEST_THE_HUNT_FOR_SYLVANAS);
 
                 DespawnEvent();
             } else
                 uiFailTimer -= diff;
 
             if (CheckSwim)
-            if (Player* player = GetPlayerForEscort())
-            if (!player->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
-            {
-                CheckSwim = false;
-
-                if (player->GetQuestStatus(QUEST_THE_HUNT_FOR_SYLVANAS) == QUEST_STATUS_INCOMPLETE)
-                    player->FailQuest(QUEST_THE_HUNT_FOR_SYLVANAS);
-
-                if (Ide)
-                {
-                    DoScriptText(PLAYER_SAY_ME_NOOB, player);
-
-                    if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
-                    {
-                        sylvanas->DoPersonalScriptText(SYLVANAS_YELL_FISH, player);
-                        sylvanas->CastSpell(player, SPELL_SHOOT_QSKA, false);
-                    }
-                }
-
-                DespawnEvent();
-            }
-
-            if (Event)
-            if (uiEventTimer <= diff)
-            {
-                ++uiPhase;
-
                 if (Player* player = GetPlayerForEscort())
-                    switch (uiPhase)
-                {
-                        case 1:
-                            Event = false;
-                            uiEventTimer = 500;
-                            me->Whisper(TOBIAS_RAID_BOSS_WHISPER, player->GetGUID(), true);
-                            break;
-                        case 2:
-                            Event = false;
-                            uiEventTimer = 500;
-                            me->DoPersonalScriptText(TOBIAS_SAY_NOT_SEEN, player);
-                            SetEscortPaused(false);
-                            break;
-                        case 3:
-                            uiEventTimer = 8000;
-                            if (Creature* general = me->FindNearestCreature(NPC_FORSAKEN_GENERAL_QTHFS, 50.0f))
-                                general->DoPersonalScriptText(FORSAKEN_GENERAL_YELL, player, true);
-                            break;
-                        case 4:
-                            Event = false;
-                            me->DoPersonalScriptText(TOBIAS_SAY_DID_YOU_HEAR, player);
-                            break;
-                        case 5:
-                            if (player->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
+                    if (!player->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
+                    {
+                        CheckSwim = false;
+
+                        if (player->GetQuestStatus(QUEST_THE_HUNT_FOR_SYLVANAS) == QUEST_STATUS_INCOMPLETE)
+                            player->FailQuest(QUEST_THE_HUNT_FOR_SYLVANAS);
+
+                        if (Ide)
+                        {
+                            DoScriptText(PLAYER_SAY_ME_NOOB, player);
+
+                            if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
                             {
-                                Event = false;
-                                CheckSwim = true;
-                                SummonSilvanas(player->GetGUID());
-                            } else
-                                --uiPhase;
-                            break;
-                        case 6:
-                            uiEventTimer = 8000;
-                            if (Creature* warhowl = Unit::GetCreature(*me, uiWarhowlGUID))
-                            {
-                                if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
-                                    sylvanas->SetFacingToObject(warhowl);
-                                warhowl->DoPersonalScriptText(WARHOWL_SAY_LOSING, player);
+                                sylvanas->DoPersonalScriptText(SYLVANAS_YELL_FISH, player);
+                                sylvanas->CastSpell(player, SPELL_SHOOT_QSKA, false);
                             }
-                            break;
-                        case 7:
-                            uiEventTimer = 6000;
-                            if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
-                                sylvanas->DoPersonalScriptText(SYLVANAS_SAY_ASSURE, player);
-                            break;
-                        case 8:
-                            uiEventTimer = 10000;
-                            if (Creature* warhowl = Unit::GetCreature(*me, uiWarhowlGUID))
-                                warhowl->DoPersonalScriptText(WARHOWL_SAY_PLAGUE, player);
-                            break;
-                        case 9:
-                            uiEventTimer = 12000;
-                            if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
-                                sylvanas->DoPersonalScriptText(SYLVANAS_SAY_TONE, player);
-                            break;
-                        case 10:
-                            uiEventTimer = 7000;
-                            if (Creature* warhowl = Unit::GetCreature(*me, uiWarhowlGUID))
-                                warhowl->DoPersonalScriptText(WARHOWL_SAY_GOOD_BY, player);
-                            break;
-                        case 11:
-                            uiEventTimer = 12000;
-                            if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
-                                sylvanas->DoPersonalScriptText(SYLVANAS_SAY_GO_WITH_HONOR, player);
-                            if (Creature* warhowl = Unit::GetCreature(*me, uiWarhowlGUID))
-                            if (npc_escortAI* escort = CAST_AI(npc_escortAI, warhowl->AI()))
-                                escort->SetEscortPaused(false);
-                            if (Creature* crenshaw = Unit::GetCreature(*me, uiCrenshawGUID))
-                            if (npc_escortAI* escort = CAST_AI(npc_escortAI, crenshaw->AI()))
-                                escort->SetEscortPaused(false);
-                            break;
-                        case 12:
-                            uiEventTimer = 9000;
-                            if (Creature* crenshaw = Unit::GetCreature(*me, uiCrenshawGUID))
-                                crenshaw->DoPersonalScriptText(CRENSHAW_SAY_ORDER, player);
-                            break;
-                        case 13:
-                            uiEventTimer = 12000;
-                            if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
-                                sylvanas->DoPersonalScriptText(SYLVANAS_SAY_WHAT_QUESTION, player);
-                            break;
-                        case 14:
-                            uiEventTimer = 7000;
-                            CheckSwim = false;
-                            player->CompleteQuest(QUEST_THE_HUNT_FOR_SYLVANAS);
-                            if (Creature* crenshaw = Unit::GetCreature(*me, uiCrenshawGUID))
-                                crenshaw->DoPersonalScriptText(CRENSHAW_AS_YOU_WISH, player);
-                            if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
-                            if (npc_escortAI* escort = CAST_AI(npc_escortAI, sylvanas->AI()))
-                                escort->SetEscortPaused(false);
-                            break;
-                        case 15:
-                            Event = false;
-                            if (Creature* crenshaw = Unit::GetCreature(*me, uiCrenshawGUID))
-                            if (npc_escortAI* escort = CAST_AI(npc_escortAI, crenshaw->AI()))
-                                escort->SetEscortPaused(false);
-                            me->DespawnOrUnsummon();
-                            break;
-                }
-            } else
-                uiEventTimer -= diff;
+                        }
+
+                        DespawnEvent();
+                    }
+
+                    if (Event)
+                        if (uiEventTimer <= diff)
+                        {
+                            ++uiPhase;
+
+                            if (Player* player = GetPlayerForEscort())
+                                switch (uiPhase)
+                            {
+                                case 1:
+                                    Event = false;
+                                    uiEventTimer = 500;
+                                    me->Whisper(TOBIAS_RAID_BOSS_WHISPER, player->GetGUID(), true);
+                                    break;
+                                case 2:
+                                    Event = false;
+                                    uiEventTimer = 500;
+                                    me->DoPersonalScriptText(TOBIAS_SAY_NOT_SEEN, player);
+                                    SetEscortPaused(false);
+                                    break;
+                                case 3:
+                                    uiEventTimer = 8000;
+                                    if (Creature* general = me->FindNearestCreature(NPC_FORSAKEN_GENERAL_QTHFS, 50.0f))
+                                        general->DoPersonalScriptText(FORSAKEN_GENERAL_YELL, player, true);
+                                    break;
+                                case 4:
+                                    Event = false;
+                                    me->DoPersonalScriptText(TOBIAS_SAY_DID_YOU_HEAR, player);
+                                    break;
+                                case 5:
+                                    if (player->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
+                                    {
+                                        Event = false;
+                                        CheckSwim = true;
+                                        SummonSilvanas(player->GetGUID());
+                                    } else
+                                        --uiPhase;
+                                    break;
+                                case 6:
+                                    uiEventTimer = 8000;
+                                    if (Creature* warhowl = Unit::GetCreature(*me, uiWarhowlGUID))
+                                    {
+                                        if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
+                                            sylvanas->SetFacingToObject(warhowl);
+                                        warhowl->DoPersonalScriptText(WARHOWL_SAY_LOSING, player);
+                                    }
+                                    break;
+                                case 7:
+                                    uiEventTimer = 6000;
+                                    if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
+                                        sylvanas->DoPersonalScriptText(SYLVANAS_SAY_ASSURE, player);
+                                    break;
+                                case 8:
+                                    uiEventTimer = 10000;
+                                    if (Creature* warhowl = Unit::GetCreature(*me, uiWarhowlGUID))
+                                        warhowl->DoPersonalScriptText(WARHOWL_SAY_PLAGUE, player);
+                                    break;
+                                case 9:
+                                    uiEventTimer = 12000;
+                                    if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
+                                        sylvanas->DoPersonalScriptText(SYLVANAS_SAY_TONE, player);
+                                    break;
+                                case 10:
+                                    uiEventTimer = 7000;
+                                    if (Creature* warhowl = Unit::GetCreature(*me, uiWarhowlGUID))
+                                        warhowl->DoPersonalScriptText(WARHOWL_SAY_GOOD_BY, player);
+                                    break;
+                                case 11:
+                                    uiEventTimer = 12000;
+                                    if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
+                                        sylvanas->DoPersonalScriptText(SYLVANAS_SAY_GO_WITH_HONOR, player);
+                                    if (Creature* warhowl = Unit::GetCreature(*me, uiWarhowlGUID))
+                                        if (npc_escortAI* escort = CAST_AI(npc_escortAI, warhowl->AI()))
+                                            escort->SetEscortPaused(false);
+                                    if (Creature* crenshaw = Unit::GetCreature(*me, uiCrenshawGUID))
+                                        if (npc_escortAI* escort = CAST_AI(npc_escortAI, crenshaw->AI()))
+                                            escort->SetEscortPaused(false);
+                                    break;
+                                case 12:
+                                    uiEventTimer = 9000;
+                                    if (Creature* crenshaw = Unit::GetCreature(*me, uiCrenshawGUID))
+                                        crenshaw->DoPersonalScriptText(CRENSHAW_SAY_ORDER, player);
+                                    break;
+                                case 13:
+                                    uiEventTimer = 12000;
+                                    if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
+                                        sylvanas->DoPersonalScriptText(SYLVANAS_SAY_WHAT_QUESTION, player);
+                                    break;
+                                case 14:
+                                    uiEventTimer = 7000;
+                                    CheckSwim = false;
+                                    player->CompleteQuest(QUEST_THE_HUNT_FOR_SYLVANAS);
+                                    if (Creature* crenshaw = Unit::GetCreature(*me, uiCrenshawGUID))
+                                        crenshaw->DoPersonalScriptText(CRENSHAW_AS_YOU_WISH, player);
+                                    if (Creature* sylvanas = Unit::GetCreature(*me, uiSylvanasGUID))
+                                        if (npc_escortAI* escort = CAST_AI(npc_escortAI, sylvanas->AI()))
+                                            escort->SetEscortPaused(false);
+                                    break;
+                                case 15:
+                                    Event = false;
+                                    if (Creature* crenshaw = Unit::GetCreature(*me, uiCrenshawGUID))
+                                        if (npc_escortAI* escort = CAST_AI(npc_escortAI, crenshaw->AI()))
+                                            escort->SetEscortPaused(false);
+                                    me->DespawnOrUnsummon();
+                                    break;
+                            }
+                        } else
+                            uiEventTimer -= diff;
         }
     };
 };
@@ -8018,19 +8018,19 @@ public:
         {
             switch (point)
             {
-                case 2:
-                    if (me->isSummon())
+            case 2:
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    if (Creature* tobias = summoner->ToCreature())
-                        CAST_AI(npc_tobias_mistmantle_qthfs::npc_tobias_mistmantle_qthfsAI, tobias->AI())->Ide = true;
-                    break;
-                case 3:
-                    SetEscortPaused(true);
-                    if (me->isSummon())
+                        if (Creature* tobias = summoner->ToCreature())
+                            CAST_AI(npc_tobias_mistmantle_qthfs::npc_tobias_mistmantle_qthfsAI, tobias->AI())->Ide = true;
+                break;
+            case 3:
+                SetEscortPaused(true);
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    if (Creature* tobias = summoner->ToCreature())
-                        CAST_AI(npc_tobias_mistmantle_qthfs::npc_tobias_mistmantle_qthfsAI, tobias->AI())->Event = true;
-                    break;
+                        if (Creature* tobias = summoner->ToCreature())
+                            CAST_AI(npc_tobias_mistmantle_qthfs::npc_tobias_mistmantle_qthfsAI, tobias->AI())->Event = true;
+                break;
             }
         }
 
@@ -8150,7 +8150,7 @@ public:
     {
         PrepareSpellScript(spell_captured_riding_bat_SpellScript)
 
-        void OnSummon(SpellEffIndex effIndex)
+            void OnSummon(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
 
@@ -8167,17 +8167,17 @@ public:
                 caster->GetPosition(x, y);
 
             if (Creature* bat = caster->SummonCreature(NPC_CAPTURED_RIDING_BAT, x, y, z, 0.0f))
-            if (npc_vehicle_escortAI* escort = CAST_AI(npc_vehicle_escortAI, bat->AI()))
-            {
-                caster->EnterVehicle(bat, 0);
-                bat->EnableAI();
-                bat->SetSpeed(MOVE_FLIGHT, 4.0f, true);
+                if (npc_vehicle_escortAI* escort = CAST_AI(npc_vehicle_escortAI, bat->AI()))
+                {
+                    caster->EnterVehicle(bat, 0);
+                    bat->EnableAI();
+                    bat->SetSpeed(MOVE_FLIGHT, 4.0f, true);
 
-                for (int i = 0; i < 25; ++i)
-                    escort->AddWaypoint(i, BatWP[i][0], BatWP[i][1], BatWP[i][2]);
+                    for (int i = 0; i < 25; ++i)
+                        escort->AddWaypoint(i, BatWP[i][0], BatWP[i][1], BatWP[i][2]);
 
-                escort->Start(true);
-            }
+                    escort->Start(true);
+                }
         }
 
         void Register()
@@ -8254,80 +8254,80 @@ public:
         void SummonEventCreatures()
         {
             if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            if (Player* player = summoner->ToPlayer())
-            {
-                uint64 uiPlayerGUID = player->GetGUID();
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if (Player* player = summoner->ToPlayer())
+                    {
+                        uint64 uiPlayerGUID = player->GetGUID();
 
-                me->SummonGameObject(GO_OFFERINGS, -1645.87f, 1903.36f, 29.9745f, 0, 0, 0, 0, 0, 0);
+                        me->SummonGameObject(GO_OFFERINGS, -1645.87f, 1903.36f, 29.9745f, 0, 0, 0, 0, 0, 0);
 
-                if (Creature* greymane = me->SummonCreature(NPC_KING_GENN_GREYMANE_QPB, -1644.238f, 1904.066f, 30.04164f, 3.56047f))
-                {
-                    greymane->SetSeerGUID(uiPlayerGUID);
-                    greymane->SetVisible(false);
-                    uiGreymaneGUID = greymane->GetGUID();
-                }
+                        if (Creature* greymane = me->SummonCreature(NPC_KING_GENN_GREYMANE_QPB, -1644.238f, 1904.066f, 30.04164f, 3.56047f))
+                        {
+                            greymane->SetSeerGUID(uiPlayerGUID);
+                            greymane->SetVisible(false);
+                            uiGreymaneGUID = greymane->GetGUID();
+                        }
 
-                if (Creature* crowley = me->SummonCreature(NPC_LORD_DARIUS_CROWLEY_QPB, -1642.351f, 1907.467f, 30.03497f, 3.577925f))
-                {
-                    crowley->SetSeerGUID(uiPlayerGUID);
-                    crowley->SetVisible(false);
-                    uiCrowleyGUID = crowley->GetGUID();
-                }
+                        if (Creature* crowley = me->SummonCreature(NPC_LORD_DARIUS_CROWLEY_QPB, -1642.351f, 1907.467f, 30.03497f, 3.577925f))
+                        {
+                            crowley->SetSeerGUID(uiPlayerGUID);
+                            crowley->SetVisible(false);
+                            uiCrowleyGUID = crowley->GetGUID();
+                        }
 
-                if (Creature* lorna = me->SummonCreature(NPC_LORNA_CROWLEY_QPB, -1640.884f, 1903.595f, 30.03497f, 3.351032f))
-                {
-                    lorna->SetSeerGUID(uiPlayerGUID);
-                    lorna->SetVisible(false);
-                    uiLornaGUID = lorna->GetGUID();
-                }
+                        if (Creature* lorna = me->SummonCreature(NPC_LORNA_CROWLEY_QPB, -1640.884f, 1903.595f, 30.03497f, 3.351032f))
+                        {
+                            lorna->SetSeerGUID(uiPlayerGUID);
+                            lorna->SetVisible(false);
+                            uiLornaGUID = lorna->GetGUID();
+                        }
 
-                if (Creature* clone = me->SummonCreature(NPC_CLONE_QPB, -1640.681f, 1905.854f, 30.03497f, 3.682645f))
-                {
-                    clone->SetSeerGUID(uiPlayerGUID);
-                    clone->SetVisible(false);
-                    player->AddAura(SPELL_MIRROR_IMAGE, clone);
+                        if (Creature* clone = me->SummonCreature(NPC_CLONE_QPB, -1640.681f, 1905.854f, 30.03497f, 3.682645f))
+                        {
+                            clone->SetSeerGUID(uiPlayerGUID);
+                            clone->SetVisible(false);
+                            player->AddAura(SPELL_MIRROR_IMAGE, clone);
 
-                    if (Item const* item = (player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)))
-                        clone->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, item->GetEntry());
+                            if (Item const* item = (player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)))
+                                clone->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, item->GetEntry());
 
-                    if (Item const* item = (player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND)))
-                        clone->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, item->GetEntry());
+                            if (Item const* item = (player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND)))
+                                clone->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, item->GetEntry());
 
-                    if (Item const* item = (player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED)))
-                        clone->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, item->GetEntry());
+                            if (Item const* item = (player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED)))
+                                clone->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, item->GetEntry());
 
-                    uiCloneGUID = clone->GetGUID();
-                }
-            }
+                            uiCloneGUID = clone->GetGUID();
+                        }
+                    }
         }
 
         void DespawnEvent()
         {
             if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            if (Player* player = summoner->ToPlayer())
-            {
-                Despawn = true;
-                player->CastSpell(player, SPELL_FADE_TO_BLACK, false);
-            }
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if (Player* player = summoner->ToPlayer())
+                    {
+                        Despawn = true;
+                        player->CastSpell(player, SPELL_FADE_TO_BLACK, false);
+                    }
 
-            if (GameObject* go = me->FindNearestGameObject(GO_OFFERINGS, 30.0f))
-                go->RemoveFromWorld();
+                    if (GameObject* go = me->FindNearestGameObject(GO_OFFERINGS, 30.0f))
+                        go->RemoveFromWorld();
 
-            if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
-                greymane->DespawnOrUnsummon();
+                    if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
+                        greymane->DespawnOrUnsummon();
 
-            if (Creature* crowley = Unit::GetCreature(*me, uiCrowleyGUID))
-                crowley->DespawnOrUnsummon();
+                    if (Creature* crowley = Unit::GetCreature(*me, uiCrowleyGUID))
+                        crowley->DespawnOrUnsummon();
 
-            if (Creature* lorna = Unit::GetCreature(*me, uiLornaGUID))
-                lorna->DespawnOrUnsummon();
+                    if (Creature* lorna = Unit::GetCreature(*me, uiLornaGUID))
+                        lorna->DespawnOrUnsummon();
 
-            if (Creature* clone = Unit::GetCreature(*me, uiCloneGUID))
-                clone->DespawnOrUnsummon();
+                    if (Creature* clone = Unit::GetCreature(*me, uiCloneGUID))
+                        clone->DespawnOrUnsummon();
 
-            me->DespawnOrUnsummon(500);
+                    me->DespawnOrUnsummon(500);
         }
 
         void UpdateAI(const uint32 diff)
@@ -8337,72 +8337,72 @@ public:
                 Despawn = false;
 
                 if (me->isSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                if (Player* player = summoner->ToPlayer())
-                    player->TeleportTo(Gilneas2, -1725.0f, 1871.91f, 17.7934f, 3.17831f);
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if (Player* player = summoner->ToPlayer())
+                            player->TeleportTo(Gilneas2, -1725.0f, 1871.91f, 17.7934f, 3.17831f);
             }
 
             if (Event)
-            if (uiEventTimer <= diff)
-            {
-                ++uiPhase;
-
-                if (me->isSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                if (Player* player = summoner->ToPlayer())
-                    switch (uiPhase)
+                if (uiEventTimer <= diff)
                 {
-                        case 1:
-                            uiEventTimer = 7000;
-                            SummonEventCreatures();
-                            player->EnterVehicle(me);
-                            me->EnableAI();
-                            break;
-                        case 2:
-                            uiEventTimer = 9000;
-                            if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
+                    ++uiPhase;
+
+                    if (me->isSummon())
+                        if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                            if (Player* player = summoner->ToPlayer())
+                                switch (uiPhase)
                             {
-                                greymane->DoPersonalScriptText(GREYMANE_SAY_QPB_1, player);
-                                greymane->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                                case 1:
+                                    uiEventTimer = 7000;
+                                    SummonEventCreatures();
+                                    player->EnterVehicle(me);
+                                    me->EnableAI();
+                                    break;
+                                case 2:
+                                    uiEventTimer = 9000;
+                                    if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
+                                    {
+                                        greymane->DoPersonalScriptText(GREYMANE_SAY_QPB_1, player);
+                                        greymane->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                                    }
+                                    break;
+                                case 3:
+                                    uiEventTimer = 7000;
+                                    if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
+                                    {
+                                        greymane->DoPersonalScriptText(GREYMANE_SAY_QPB_2, player);
+                                        greymane->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                                    }
+                                    break;
+                                case 4:
+                                    uiEventTimer = 9000;
+                                    if (Creature* lorna = Unit::GetCreature(*me, uiLornaGUID))
+                                        lorna->DoPersonalScriptText(LORNA_SAY_QPB, player);
+                                    break;
+                                case 5:
+                                    uiEventTimer = 5000;
+                                    if (Creature* crowley = Unit::GetCreature(*me, uiCrowleyGUID))
+                                    {
+                                        crowley->DoPersonalScriptText(CROWLEY_SAY_QPB, player);
+                                        crowley->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                                    }
+                                    if (Creature* clone = Unit::GetCreature(*me, uiCloneGUID))
+                                        clone->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                                    break;
+                                case 6:
+                                    uiEventTimer = 7000;
+                                    if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
+                                    {
+                                        greymane->DoPersonalScriptText(GREYMANE_SAY_QPB_3, player);
+                                        greymane->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                                    }
+                                    break;
+                                case 7:
+                                    player->ExitVehicle();
+                                    break;
                             }
-                            break;
-                        case 3:
-                            uiEventTimer = 7000;
-                            if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
-                            {
-                                greymane->DoPersonalScriptText(GREYMANE_SAY_QPB_2, player);
-                                greymane->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                            }
-                            break;
-                        case 4:
-                            uiEventTimer = 9000;
-                            if (Creature* lorna = Unit::GetCreature(*me, uiLornaGUID))
-                                lorna->DoPersonalScriptText(LORNA_SAY_QPB, player);
-                            break;
-                        case 5:
-                            uiEventTimer = 5000;
-                            if (Creature* crowley = Unit::GetCreature(*me, uiCrowleyGUID))
-                            {
-                                crowley->DoPersonalScriptText(CROWLEY_SAY_QPB, player);
-                                crowley->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
-                            }
-                            if (Creature* clone = Unit::GetCreature(*me, uiCloneGUID))
-                                clone->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
-                            break;
-                        case 6:
-                            uiEventTimer = 7000;
-                            if (Creature* greymane = Unit::GetCreature(*me, uiGreymaneGUID))
-                            {
-                                greymane->DoPersonalScriptText(GREYMANE_SAY_QPB_3, player);
-                                greymane->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
-                            }
-                            break;
-                        case 7:
-                            player->ExitVehicle();
-                            break;
-                }
-            } else
-                uiEventTimer -= diff;
+                } else
+                    uiEventTimer -= diff;
         }
     };
 };
@@ -8416,7 +8416,7 @@ public:
     {
         PrepareSpellScript(spell_place_blessed_offerings_SpellScript)
 
-        void SummonOfferings(SpellEffIndex effIndex)
+            void SummonOfferings(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
 
@@ -8517,139 +8517,139 @@ public:
 
         switch (action)
         {
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[2], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[3], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[4], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                player->SEND_GOSSIP_MENU(MENU_GATHERING_AND_MINING_PROFESSIONS, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 2:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[5], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[6], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[7], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[8], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[9], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[10], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[11], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[12], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->SEND_GOSSIP_MENU(MENU_CRAFTING_PROFESSIONS, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 3:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[14], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_HERBALISM);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[5], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[9], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                player->SEND_GOSSIP_MENU(MENU_HERBALISM, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 4:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[16], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_MINING);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[6], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[8], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[10], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                player->SEND_GOSSIP_MENU(MENU_MINING, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 5:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[18], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_SKINNING);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[11], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                player->SEND_GOSSIP_MENU(MENU_SKINNING, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 6:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[13], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_ALCHEMY);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[2], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[9], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                player->SEND_GOSSIP_MENU(MENU_ALCHEMY, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 7:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[17], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_BLACKSMITHING);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[3], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                player->SEND_GOSSIP_MENU(MENU_BLACKSMITHING, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 8:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[23], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_ENCHANTING);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[12], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                player->SEND_GOSSIP_MENU(MENU_ENCHANTING, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 9:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[19], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_ENGINEERING);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[3], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                player->SEND_GOSSIP_MENU(MENU_ENGINERING, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 10:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[15], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_INSCRIPTION);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[2], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                player->SEND_GOSSIP_MENU(MENU_INSCRIPTION, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 11:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[20], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_JEWELCRAFTING);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[3], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                player->SEND_GOSSIP_MENU(MENU_JEWELCRAFTING, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 12:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[21], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_LEATHERWORKING);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[4], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                player->SEND_GOSSIP_MENU(MENU_LEATHERWORKING, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 13:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[22], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_TAILORING);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[7], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                player->SEND_GOSSIP_MENU(MENU_TAILORING, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + SKILL_HERBALISM:
-                SendTrainerList(player, creature, SKILL_HERBALISM);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + SKILL_ALCHEMY:
-                SendTrainerList(player, creature, SKILL_ALCHEMY);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + SKILL_INSCRIPTION:
-                SendTrainerList(player, creature, SKILL_INSCRIPTION);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + SKILL_MINING:
-                SendTrainerList(player, creature, SKILL_MINING);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + SKILL_BLACKSMITHING:
-                SendTrainerList(player, creature, SKILL_BLACKSMITHING);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + SKILL_SKINNING:
-                SendTrainerList(player, creature, SKILL_SKINNING);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + SKILL_ENGINEERING:
-                SendTrainerList(player, creature, SKILL_ENGINEERING);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + SKILL_JEWELCRAFTING:
-                SendTrainerList(player, creature, SKILL_JEWELCRAFTING);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + SKILL_LEATHERWORKING:
-                SendTrainerList(player, creature, SKILL_LEATHERWORKING);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + SKILL_TAILORING:
-                SendTrainerList(player, creature, SKILL_TAILORING);
-                break;
-            case GOSSIP_ACTION_INFO_DEF + SKILL_ENCHANTING:
-                SendTrainerList(player, creature, SKILL_ENCHANTING);
-                break;
+        case GOSSIP_ACTION_INFO_DEF + 1:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[2], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[3], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[4], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            player->SEND_GOSSIP_MENU(MENU_GATHERING_AND_MINING_PROFESSIONS, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 2:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[5], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[6], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[7], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[8], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[9], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[10], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[11], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[12], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->SEND_GOSSIP_MENU(MENU_CRAFTING_PROFESSIONS, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 3:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[14], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_HERBALISM);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[5], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[9], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            player->SEND_GOSSIP_MENU(MENU_HERBALISM, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 4:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[16], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_MINING);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[6], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[8], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[10], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            player->SEND_GOSSIP_MENU(MENU_MINING, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 5:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[18], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_SKINNING);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[11], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            player->SEND_GOSSIP_MENU(MENU_SKINNING, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 6:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[13], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_ALCHEMY);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[2], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[9], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            player->SEND_GOSSIP_MENU(MENU_ALCHEMY, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 7:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[17], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_BLACKSMITHING);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[3], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            player->SEND_GOSSIP_MENU(MENU_BLACKSMITHING, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 8:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[23], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_ENCHANTING);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[12], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            player->SEND_GOSSIP_MENU(MENU_ENCHANTING, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 9:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[19], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_ENGINEERING);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[3], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            player->SEND_GOSSIP_MENU(MENU_ENGINERING, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 10:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[15], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_INSCRIPTION);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[2], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            player->SEND_GOSSIP_MENU(MENU_INSCRIPTION, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 11:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[20], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_JEWELCRAFTING);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[3], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            player->SEND_GOSSIP_MENU(MENU_JEWELCRAFTING, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 12:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[21], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_LEATHERWORKING);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[4], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            player->SEND_GOSSIP_MENU(MENU_LEATHERWORKING, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 13:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GossipMenu[22], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + SKILL_TAILORING);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[7], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[0], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GossipMenu[1], GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            player->SEND_GOSSIP_MENU(MENU_TAILORING, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + SKILL_HERBALISM:
+            SendTrainerList(player, creature, SKILL_HERBALISM);
+            break;
+        case GOSSIP_ACTION_INFO_DEF + SKILL_ALCHEMY:
+            SendTrainerList(player, creature, SKILL_ALCHEMY);
+            break;
+        case GOSSIP_ACTION_INFO_DEF + SKILL_INSCRIPTION:
+            SendTrainerList(player, creature, SKILL_INSCRIPTION);
+            break;
+        case GOSSIP_ACTION_INFO_DEF + SKILL_MINING:
+            SendTrainerList(player, creature, SKILL_MINING);
+            break;
+        case GOSSIP_ACTION_INFO_DEF + SKILL_BLACKSMITHING:
+            SendTrainerList(player, creature, SKILL_BLACKSMITHING);
+            break;
+        case GOSSIP_ACTION_INFO_DEF + SKILL_SKINNING:
+            SendTrainerList(player, creature, SKILL_SKINNING);
+            break;
+        case GOSSIP_ACTION_INFO_DEF + SKILL_ENGINEERING:
+            SendTrainerList(player, creature, SKILL_ENGINEERING);
+            break;
+        case GOSSIP_ACTION_INFO_DEF + SKILL_JEWELCRAFTING:
+            SendTrainerList(player, creature, SKILL_JEWELCRAFTING);
+            break;
+        case GOSSIP_ACTION_INFO_DEF + SKILL_LEATHERWORKING:
+            SendTrainerList(player, creature, SKILL_LEATHERWORKING);
+            break;
+        case GOSSIP_ACTION_INFO_DEF + SKILL_TAILORING:
+            SendTrainerList(player, creature, SKILL_TAILORING);
+            break;
+        case GOSSIP_ACTION_INFO_DEF + SKILL_ENCHANTING:
+            SendTrainerList(player, creature, SKILL_ENCHANTING);
+            break;
         }
 
         return true;
@@ -8691,10 +8691,10 @@ public:
                 return;
 
             if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-            if (me->getVictim()->GetHealthPct() < 90)
-                miss = true;
-            else
-                miss = false;
+                if (me->getVictim()->GetHealthPct() < 90)
+                    miss = true;
+                else
+                    miss = false;
 
             if (uiShootTimer <= diff)
             {
@@ -8702,30 +8702,30 @@ public:
                 Unit* target = NULL;
 
                 if (!me->IsWithinMeleeRange(me->getVictim(), 0.0f))
-                if (target = me->FindNearestCreature(NPC_FORSAKEN_INVADER, 40.0f))
-                if (target != me->getVictim())
-                {
-                    me->getThreatManager().modifyThreatPercent(me->getVictim(), -100);
-                    me->CombatStart(target);
-                    me->AddThreat(target, 1000);
-                }
+                    if (target = me->FindNearestCreature(NPC_FORSAKEN_INVADER, 40.0f))
+                        if (target != me->getVictim())
+                        {
+                            me->getThreatManager().modifyThreatPercent(me->getVictim(), -100);
+                            me->CombatStart(target);
+                            me->AddThreat(target, 1000);
+                        }
 
-                if (!me->IsWithinMeleeRange(me->getVictim(), 0.0f))
-                {
-                    if (me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
-                    {
-                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-                        me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
-                        me->SendMeleeAttackStop(me->getVictim());
-                    }
+                        if (!me->IsWithinMeleeRange(me->getVictim(), 0.0f))
+                        {
+                            if (me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
+                            {
+                                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+                                me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
+                                me->SendMeleeAttackStop(me->getVictim());
+                            }
 
-                    me->CastSpell(me->getVictim(), SPELL_SHOOT, false);
-                } else
-                if (!me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
-                {
-                    me->AddUnitState(UNIT_STATE_MELEE_ATTACKING);
-                    me->SendMeleeAttackStart(me->getVictim());
-                }
+                            me->CastSpell(me->getVictim(), SPELL_SHOOT, false);
+                        } else
+                            if (!me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
+                            {
+                                me->AddUnitState(UNIT_STATE_MELEE_ATTACKING);
+                                me->SendMeleeAttackStart(me->getVictim());
+                            }
             } else
                 uiShootTimer -= diff;
 
@@ -8864,8 +8864,8 @@ public:
                 uiFindEnemyTimer = 10000;
 
                 if (me->getVictim())
-                if (me->IsWithinMeleeRange(me->getVictim(), 0.0f))
-                    return;
+                    if (me->IsWithinMeleeRange(me->getVictim(), 0.0f))
+                        return;
 
                 FindEnemy();
             } else
@@ -8875,10 +8875,10 @@ public:
                 return;
 
             if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-            if (me->getVictim()->GetHealthPct() < 90)
-                miss = true;
-            else
-                miss = false;
+                if (me->getVictim()->GetHealthPct() < 90)
+                    miss = true;
+                else
+                    miss = false;
 
             if (uiShootTimer <= diff)
             {
@@ -8895,11 +8895,11 @@ public:
 
                     me->CastSpell(me->getVictim(), SPELL_SHOOT, false);
                 } else
-                if (!me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
-                {
-                    me->AddUnitState(UNIT_STATE_MELEE_ATTACKING);
-                    me->SendMeleeAttackStart(me->getVictim());
-                }
+                    if (!me->HasUnitState(UNIT_STATE_MELEE_ATTACKING))
+                    {
+                        me->AddUnitState(UNIT_STATE_MELEE_ATTACKING);
+                        me->SendMeleeAttackStart(me->getVictim());
+                    }
             } else
                 uiShootTimer -= diff;
 
@@ -8936,8 +8936,8 @@ public:
             Unit* victim = NULL;
 
             if (victim = me->getVictim())
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                return;
+                if (victim->GetTypeId() == TYPEID_PLAYER)
+                    return;
 
             if (victim)
                 me->getThreatManager().modifyThreatPercent(victim, -100);
@@ -8952,10 +8952,10 @@ public:
                 return;
 
             if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-            if (me->getVictim()->GetHealthPct() < 90)
-                miss = true;
-            else
-                miss = false;
+                if (me->getVictim()->GetHealthPct() < 90)
+                    miss = true;
+                else
+                    miss = false;
 
             DoMeleeAttackIfReady();
         }
@@ -9002,10 +9002,10 @@ public:
 
             if (!tList.empty())
 
-            for (std::list<HostileReference*>::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
-            if (Unit* target = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
-            if (Player* player = target->ToPlayer())
-                player->KilledMonsterCredit(NPC_DARK_RANGER_THYALA, 0);
+                for (std::list<HostileReference*>::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
+                    if (Unit* target = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
+                        if (Player* player = target->ToPlayer())
+                            player->KilledMonsterCredit(NPC_DARK_RANGER_THYALA, 0);
         }
 
         void JustDied(Unit* /*who*/)
@@ -9014,15 +9014,15 @@ public:
             me->GetCreatureListWithEntryInGrid(lMastiffs, NPC_ATTACK_MASTIFF, 50.0f);
 
             if (!lMastiffs.empty())
-            for (std::list<Creature*>::const_iterator itr = lMastiffs.begin(); itr != lMastiffs.end(); ++itr)
-            if ((*itr)->isAlive())
-            {
-                (*itr)->SetReactState(REACT_PASSIVE);
-                (*itr)->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                (*itr)->CombatStop();
-                (*itr)->GetMotionMaster()->MoveTargetedHome();
-                (*itr)->DespawnOrUnsummon(3000);
-            }
+                for (std::list<Creature*>::const_iterator itr = lMastiffs.begin(); itr != lMastiffs.end(); ++itr)
+                    if ((*itr)->isAlive())
+                    {
+                        (*itr)->SetReactState(REACT_PASSIVE);
+                        (*itr)->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        (*itr)->CombatStop();
+                        (*itr)->GetMotionMaster()->MoveTargetedHome();
+                        (*itr)->DespawnOrUnsummon(3000);
+                    }
         }
 
         void UpdateAI(const uint32 diff)
@@ -9114,7 +9114,7 @@ public:
     {
         PrepareSpellScript(spell_call_attack_mastiffs_SpellScript)
 
-        void SummonMastiffs(SpellEffIndex effIndex)
+            void SummonMastiffs(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
 
@@ -9282,8 +9282,8 @@ public:
                 uiFindEnemyTimer = 10000;
 
                 if (me->getVictim())
-                if (me->IsWithinMeleeRange(me->getVictim(), 0.0f))
-                    return;
+                    if (me->IsWithinMeleeRange(me->getVictim(), 0.0f))
+                        return;
 
                 FindEnemy();
             } else
@@ -9293,11 +9293,11 @@ public:
                 return;
 
             if (me->getVictim())
-            if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-            if (me->getVictim()->GetHealthPct() < 90)
-                miss = true;
-            else
-                miss = false;
+                if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
+                    if (me->getVictim()->GetHealthPct() < 90)
+                        miss = true;
+                    else
+                        miss = false;
 
             DoMeleeAttackIfReady();
         }
@@ -9325,11 +9325,11 @@ public:
             CanCast = false;
 
             for (int i = 0; i < 5; ++i)
-            if (me->GetDistance(CataCastPos[i][0], CataCastPos[i][1], CataCastPos[i][2]) < 15.0f)
-            {
-                CanCast = true;
-                me->setActive(true);
-            }
+                if (me->GetDistance(CataCastPos[i][0], CataCastPos[i][1], CataCastPos[i][2]) < 15.0f)
+                {
+                    CanCast = true;
+                    me->setActive(true);
+                }
         }
 
         uint32 uiCastTimer;
@@ -9343,20 +9343,20 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (CanCast)
-            if (uiCastTimer <= diff)
-            {
-                uiCastTimer = urand(2000, 7000);
-                float x, y, z;
-                me->GetNearPoint2D(x, y, urand(100, 150), me->GetOrientation());
-                z = me->GetBaseMap()->GetHeight(x, y, MAX_HEIGHT);
-                me->CastSpell(x, y, z, SPELL_PLAGUE_BARREL_LAUNCH, false);
-            } else
-                uiCastTimer -= diff;
+                if (uiCastTimer <= diff)
+                {
+                    uiCastTimer = urand(2000, 7000);
+                    float x, y, z;
+                    me->GetNearPoint2D(x, y, urand(100, 150), me->GetOrientation());
+                    z = me->GetBaseMap()->GetHeight(x, y, MAX_HEIGHT);
+                    me->CastSpell(x, y, z, SPELL_PLAGUE_BARREL_LAUNCH, false);
+                } else
+                    uiCastTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -9441,9 +9441,9 @@ public:
                 return;
 
             for (Map::PlayerList::const_iterator i = PlList.begin(); i != PlList.end(); ++i)
-            if (Player* player = i->getSource())
-            if (uiPhase & player->GetPhaseMask())
-                player->CastSpell(player, uiSpellId, false);
+                if (Player* player = i->getSource())
+                    if (uiPhase & player->GetPhaseMask())
+                        player->CastSpell(player, uiSpellId, false);
         }
 
         void UpdateAI(const uint32 diff)
@@ -9756,10 +9756,10 @@ public:
                 return;
 
             if (me->getVictim()->GetTypeId() == TYPEID_UNIT)
-            if (me->getVictim()->GetHealthPct() < 90)
-                miss = true;
-            else
-                miss = false;
+                if (me->getVictim()->GetHealthPct() < 90)
+                    miss = true;
+                else
+                    miss = false;
 
             DoMeleeAttackIfReady();
         }

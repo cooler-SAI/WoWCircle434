@@ -93,7 +93,7 @@ enum Points
     POINT_EYE       = 1,
 };
 
-const Position centerPos ={3335.07f, -4891.54f, 181.16f, 0.0f};
+const Position centerPos = {3335.07f, -4891.54f, 181.16f, 0.0f};
 
 class boss_perotharn : public CreatureScript
 {
@@ -250,95 +250,97 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_ILLIDAN_AGGRO:
-                        if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_1, 100.0f))
-                            pIllidan->AI()->Talk(1); // SAY_ILLIDAN_1_AGGRO
-                        break;
-                    case EVENT_CORRUPTING_TOUCH:
-                        DoCastVictim(SPELL_CORRUPTING_TOUCH_DMG);
-                        events.ScheduleEvent(EVENT_CORRUPTING_TOUCH, urand(13000, 17000));
-                        break;
-                    case EVENT_FEL_FLAMES:
-                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                            DoCast(pTarget, SPELL_FEL_FLAMES);
-                        events.ScheduleEvent(EVENT_FEL_FLAMES, urand(20000, 30000));
-                        break;
-                    case EVENT_FEL_DECAY:
-                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
-                            DoCast(pTarget, SPELL_FEL_DECAY);
-                        events.ScheduleEvent(EVENT_FEL_DECAY, urand(20000, 30000));
-                        break;
-                    case EVENT_ILLIDAN_BREAK:
-                        DoCastAOE(SPELL_FEL_ADLED, true);
-                        if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_1, 100.0f))
-                        {
-                            pIllidan->AI()->Talk(5); // SAY_ILLIDAN_1_SPELL
-                            pIllidan->CastSpell(pIllidan, SPELL_CONSUME_ESSENCE);
-                            pIllidan->ClearUnitState(UNIT_STATE_CASTING);
-                            pIllidan->CastSpell(me, SPELL_ABSORB_FEL_ENERGY);
-                        }
-                        events.ScheduleEvent(EVENT_CAMOUFLAGE, 6000);
-                        break;
-                    case EVENT_CAMOUFLAGE:
-                        phase = 3;
-                        Talk(SAY_SPELL_2);
-                        DoCast(me, SPELL_CAMOUFLAGE);
-                        events.ScheduleEvent(EVENT_ILLIDAN_HIDE, 5000);
-                        break;
-                    case EVENT_ILLIDAN_HIDE:
-                        if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_1, 100.0f))
-                            pIllidan->AI()->Talk(0); // SAY_ILLIDAN_1_HIDE
-                        events.ScheduleEvent(EVENT_HUNTING, 2000);
-                        break;
-                    case EVENT_HUNTING:
-                        events.ScheduleEvent(EVENT_END_HUNT, 45000);
-                        for (float i = 0.0f; i < 2 * M_PI; i += (M_PI / 4))
-                        {
-                            Position pos;
-                            me->GetNearPosition(pos, 5.0f, i);
-                            me->SummonCreature(NPC_HUNTING_SUMMON_CIRCLE, pos);
-                            me->SummonCreature(NPC_EYE_OF_PEROTHARN_1, pos);
-                        }
-                        DoCast(me, SPELL_HUNTING_CHANNEL);
-                        break;
-                    case EVENT_EASY_PREY:
-                        phase = 4;
-                        events.CancelEvent(EVENT_END_HUNT);
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        DoCast(me, SPELL_CAMOUFLAGE_REMOVE, true);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                        if (targetGUID)
+                case EVENT_ILLIDAN_AGGRO:
+                    if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_1, 100.0f))
+                        pIllidan->AI()->Talk(1); // SAY_ILLIDAN_1_AGGRO
+                    break;
+                case EVENT_CORRUPTING_TOUCH:
+                    DoCastVictim(SPELL_CORRUPTING_TOUCH_DMG);
+                    events.ScheduleEvent(EVENT_CORRUPTING_TOUCH, urand(13000, 17000));
+                    break;
+                case EVENT_FEL_FLAMES:
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        DoCast(pTarget, SPELL_FEL_FLAMES);
+                    events.ScheduleEvent(EVENT_FEL_FLAMES, urand(20000, 30000));
+                    break;
+                case EVENT_FEL_DECAY:
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                        DoCast(pTarget, SPELL_FEL_DECAY);
+                    events.ScheduleEvent(EVENT_FEL_DECAY, urand(20000, 30000));
+                    break;
+                case EVENT_ILLIDAN_BREAK:
+                    DoCastAOE(SPELL_FEL_ADLED, true);
+                    if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_1, 100.0f))
+                    {
+                        pIllidan->AI()->Talk(5); // SAY_ILLIDAN_1_SPELL
+                        pIllidan->CastSpell(pIllidan, SPELL_CONSUME_ESSENCE);
+                        pIllidan->ClearUnitState(UNIT_STATE_CASTING);
+                        pIllidan->CastSpell(me, SPELL_ABSORB_FEL_ENERGY);
+                    }
+                    events.ScheduleEvent(EVENT_CAMOUFLAGE, 6000);
+                    break;
+                case EVENT_CAMOUFLAGE:
+                    phase = 3;
+                    Talk(SAY_SPELL_2);
+                    DoCast(me, SPELL_CAMOUFLAGE);
+                    events.ScheduleEvent(EVENT_ILLIDAN_HIDE, 5000);
+                    break;
+                case EVENT_ILLIDAN_HIDE:
+                    if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_1, 100.0f))
+                        pIllidan->AI()->Talk(0); // SAY_ILLIDAN_1_HIDE
+                    events.ScheduleEvent(EVENT_HUNTING, 2000);
+                    break;
+                case EVENT_HUNTING:
+                    events.ScheduleEvent(EVENT_END_HUNT, 45000);
+                    for (float i = 0.0f; i < 2 * M_PI; i += (M_PI / 4))
+                    {
+                        Position pos;
+                        me->GetNearPosition(pos, 5.0f, i);
+                        me->SummonCreature(NPC_HUNTING_SUMMON_CIRCLE, pos);
+                        me->SummonCreature(NPC_EYE_OF_PEROTHARN_1, pos);
+                    }
+                    DoCast(me, SPELL_HUNTING_CHANNEL);
+                    break;
+                case EVENT_EASY_PREY:
+                    phase = 4;
+                    events.CancelEvent(EVENT_END_HUNT);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    DoCast(me, SPELL_CAMOUFLAGE_REMOVE, true);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                    if (targetGUID)
+                    {
                         if (Player* pPlayer = ObjectAccessor::GetPlayer(*me, targetGUID))
                         {
                             pPlayer->CastSpell(pPlayer, SPELL_ATTACK_ME_PEROTHARN, true);
                             DoCast(pPlayer, SPELL_TRACKED_LOCK_ON_PLAYER);
                         }
-                        events.ScheduleEvent(EVENT_CORRUPTING_TOUCH, 5000);
-                        events.ScheduleEvent(EVENT_FEL_FLAMES, urand(10000, 12000));
-                        events.ScheduleEvent(EVENT_FEL_DECAY, urand(12000, 15000));
-                        break;
-                    case EVENT_END_HUNT:
-                        events.CancelEvent(EVENT_EASY_PREY);
-                        phase = 4;
-                        summons.DespawnEntry(NPC_EYE_OF_PEROTHARN_1);
-                        summons.DespawnEntry(NPC_HUNTING_SUMMON_CIRCLE);
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        DoCast(me, SPELL_CAMOUFLAGE_REMOVE, true);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                        Talk(SAY_ACHIEVE);
-                        bAchieve = true;
-                        DoCast(me, SPELL_ENFEEBLED, true);
-                        events.ScheduleEvent(EVENT_CORRUPTING_TOUCH, 20000);
-                        events.ScheduleEvent(EVENT_FEL_FLAMES, urand(25000, 27000));
-                        events.ScheduleEvent(EVENT_FEL_DECAY, urand(27000, 30000));
-                        break;
-                    default:
-                        break;
+                    }
+                    events.ScheduleEvent(EVENT_CORRUPTING_TOUCH, 5000);
+                    events.ScheduleEvent(EVENT_FEL_FLAMES, urand(10000, 12000));
+                    events.ScheduleEvent(EVENT_FEL_DECAY, urand(12000, 15000));
+                    break;
+                case EVENT_END_HUNT:
+                    events.CancelEvent(EVENT_EASY_PREY);
+                    phase = 4;
+                    summons.DespawnEntry(NPC_EYE_OF_PEROTHARN_1);
+                    summons.DespawnEntry(NPC_HUNTING_SUMMON_CIRCLE);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    DoCast(me, SPELL_CAMOUFLAGE_REMOVE, true);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                    Talk(SAY_ACHIEVE);
+                    bAchieve = true;
+                    DoCast(me, SPELL_ENFEEBLED, true);
+                    events.ScheduleEvent(EVENT_CORRUPTING_TOUCH, 20000);
+                    events.ScheduleEvent(EVENT_FEL_FLAMES, urand(25000, 27000));
+                    events.ScheduleEvent(EVENT_FEL_DECAY, urand(27000, 30000));
+                    break;
+                default:
+                    break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
+
     private:
         uint8 phase;
         uint64 targetGUID;
@@ -378,8 +380,8 @@ public:
         void MovementInform(uint32 type, uint32 data)
         {
             if (type == POINT_MOTION_TYPE)
-            if (data == POINT_EYE)
-                events.ScheduleEvent(EVENT_NEXT_MOVE, 500);
+                if (data == POINT_EYE)
+                    events.ScheduleEvent(EVENT_NEXT_MOVE, 500);
         }
 
         void UpdateAI(const uint32 diff)
@@ -407,24 +409,25 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_NEXT_MOVE:
-                        me->GetMotionMaster()->MovementExpired();
-                        if (urand(0, 1))
-                        {
-                            if (Creature* pStalker = me->FindNearestCreature(NPC_HUNTING_STALKERS, 100.0f))
-                                me->GetMotionMaster()->MovePoint(POINT_EYE, pStalker->GetPositionX(), pStalker->GetPositionY(), pStalker->GetPositionZ());
-                        } else
-                        {
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                                me->GetMotionMaster()->MoveFollow(pTarget, 0.0f, 0.0f);
-                        }
-                        events.ScheduleEvent(EVENT_NEXT_MOVE, urand(7000, 10000));
-                        break;
-                    default:
-                        break;
+                case EVENT_NEXT_MOVE:
+                    me->GetMotionMaster()->MovementExpired();
+                    if (urand(0, 1))
+                    {
+                        if (Creature* pStalker = me->FindNearestCreature(NPC_HUNTING_STALKERS, 100.0f))
+                            me->GetMotionMaster()->MovePoint(POINT_EYE, pStalker->GetPositionX(), pStalker->GetPositionY(), pStalker->GetPositionZ());
+                    } else
+                    {
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                            me->GetMotionMaster()->MoveFollow(pTarget, 0.0f, 0.0f);
+                    }
+                    events.ScheduleEvent(EVENT_NEXT_MOVE, urand(7000, 10000));
+                    break;
+                default:
+                    break;
                 }
             }
         }
+
     private:
         EventMap events;
         bool bDespawn;

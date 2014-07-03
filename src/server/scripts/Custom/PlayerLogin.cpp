@@ -9,7 +9,7 @@
 
 #define SPELL_KEYS_TO_THE_HOT_ROD    91551
 #define Gilneas2                     654
-#define Gilneas                      uint32<638>
+#define Gilneas                      638
 #define GilneasPhase1                655
 #define GilneasPhase2                656
 
@@ -40,18 +40,12 @@ public:
     {
         if (player->GetMapId() == Gilneas2 && player->GetPhaseMask() == 1)
         {
-            char* t = strtok(NULL, "638");
-            char* p = strtok(NULL, "2");
-
             std::set<uint32> terrainswap;
             std::set<uint32> phaseId;
+            terrainswap.insert(Gilneas);
+            phaseId.insert(2);
 
-            terrainswap.insert((uint32)atoi(t));
-
-            if (p)
-                phaseId.insert((uint32)atoi(p));
-
-            player->GetSession()->SendSetPhaseShift(phaseId, terrainswap);
+            player->ToPlayer()->GetSession()->SendSetPhaseShift(phaseId, terrainswap);
         }
 
         if (player->HasAura(SPELL_KEYS_TO_THE_HOT_ROD))
@@ -63,8 +57,8 @@ public:
         uint32 uiSpellId = 0;
         Unit::AuraEffectList const& phases = player->GetAuraEffectsByType(SPELL_AURA_PHASE);
         if (!phases.empty())
-        for (Unit::AuraEffectList::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
-            uiSpellId = (*itr)->GetSpellInfo()->Id;
+            for (Unit::AuraEffectList::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
+                uiSpellId = (*itr)->GetSpellInfo()->Id;
 
         if (uiSpellId)
         {
@@ -75,8 +69,8 @@ public:
         uiSpellId = 0;
         Unit::AuraEffectList const& overrided = player->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_SPELLS);
         if (!overrided.empty())
-        for (Unit::AuraEffectList::const_iterator itr = overrided.begin(); itr != overrided.end(); ++itr)
-            uiSpellId = (*itr)->GetSpellInfo()->Id;
+            for (Unit::AuraEffectList::const_iterator itr = overrided.begin(); itr != overrided.end(); ++itr)
+                uiSpellId = (*itr)->GetSpellInfo()->Id;
 
         if (uiSpellId)
         {

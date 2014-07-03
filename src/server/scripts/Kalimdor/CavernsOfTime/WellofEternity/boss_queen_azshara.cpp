@@ -88,7 +88,7 @@ const Position addsPos[6] =
     {3461.139893f, -5283.169922f, 230.04f, 4.31f}, // arcane 1
     {3435.590088f, -5278.350098f, 230.04f, 4.50f}, // fire 2
     {3469.729980f, -5282.430176f, 230.04f, 4.53f}, // frost 2
-    {3428.43f, -5274.59f, 230.04f, 4.20f}  // arcane 2
+    {3428.43f,     -5274.59f,     230.04f, 4.20f}  // arcane 2
 };
 
 const uint32 addsEntry[6] =
@@ -145,8 +145,8 @@ public:
             memset(addsGUIDs, 0, sizeof(addsGUIDs));
 
             for (uint8 i = 0; i < 6; ++i)
-            if (Creature* pAdd = me->SummonCreature(addsEntry[i], addsPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
-                addsGUIDs[i] = pAdd->GetGUID();
+                if (Creature* pAdd = me->SummonCreature(addsEntry[i], addsPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
+                    addsGUIDs[i] = pAdd->GetGUID();
 
             addsCount = 0;
         }
@@ -184,11 +184,11 @@ public:
         void SpellHit(Unit* /*who*/, const SpellInfo* spellInfo)
         {
             if (Spell* spell = me->GetCurrentSpell(CURRENT_GENERIC_SPELL))
-            if (spellInfo->HasEffect(SPELL_EFFECT_INTERRUPT_CAST))
-            {
-                me->InterruptSpell(CURRENT_GENERIC_SPELL);
-                Talk(SAY_INTERRUPT);
-            }
+                if (spellInfo->HasEffect(SPELL_EFFECT_INTERRUPT_CAST))
+                {
+                    me->InterruptSpell(CURRENT_GENERIC_SPELL);
+                    Talk(SAY_INTERRUPT);
+                }
         }
 
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
@@ -226,44 +226,43 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_TOTAL_OBEDIENCE:
-                        Talk(SAY_ALL);
-                        DoCastAOE(SPELL_TOTAL_OBEDIENCE);
-                        break;
-                    case EVENT_ADDS_1:
-                        Talk((addsCount / 2) + 9);
-                        events.RescheduleEvent(EVENT_ADDS_2, 7000);
-                        break;
-                    case EVENT_ADDS_2:
-                        if (Creature* pAdd = ObjectAccessor::GetCreature(*me, addsGUIDs[addsCount]))
-                            pAdd->AI()->Talk(addsCount / 2);
-                        events.RescheduleEvent(EVENT_ADDS_3, 6000);
-                        break;
-                    case EVENT_ADDS_3:
-                        for (uint8 i = addsCount; i < (addsCount + 2); ++i)
-                        {
-                            if (Creature* pAdd = ObjectAccessor::GetCreature(*me, addsGUIDs[i]))
-                            {
-                                pAdd->SetReactState(REACT_AGGRESSIVE);
-                                pAdd->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                                DoZoneInCombat(pAdd);
-                                pAdd->AI()->DoAction(ACTION_ATTACK);
-                            }
-                        }
-                        events.ScheduleEvent(EVENT_TOTAL_OBEDIENCE, urand(10000, 20000));
-                        break;
-                    case EVENT_END:
+                case EVENT_TOTAL_OBEDIENCE:
+                    Talk(SAY_ALL);
+                    DoCastAOE(SPELL_TOTAL_OBEDIENCE);
+                    break;
+                case EVENT_ADDS_1:
+                    Talk((addsCount / 2) + 9);
+                    events.RescheduleEvent(EVENT_ADDS_2, 7000);
+                    break;
+                case EVENT_ADDS_2:
+                    if (Creature* pAdd = ObjectAccessor::GetCreature(*me, addsGUIDs[addsCount]))
+                        pAdd->AI()->Talk(addsCount / 2);
+                    events.RescheduleEvent(EVENT_ADDS_3, 6000);
+                    break;
+                case EVENT_ADDS_3:
+                    for (uint8 i = addsCount; i < (addsCount + 2); ++i)
                     {
-                                      instance->DoKilledMonsterKredit(QUEST_THE_VAINGLORIOUS, 54853, 0);
-
-                                      instance->SetBossState(DATA_AZSHARA, DONE);
-                                      instance->DoRespawnGameObject(instance->GetData64(DATA_ROYAL_CACHE), DAY);
-                                      instance->DoModifyPlayerCurrencies(CURRENCY_TYPE_JUSTICE_POINTS, 7000);
-                                      me->DespawnOrUnsummon();
-                                      break;
+                        if (Creature* pAdd = ObjectAccessor::GetCreature(*me, addsGUIDs[i]))
+                        {
+                            pAdd->SetReactState(REACT_AGGRESSIVE);
+                            pAdd->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                            DoZoneInCombat(pAdd);
+                            pAdd->AI()->DoAction(ACTION_ATTACK);
+                        }
                     }
-                    default:
+                    events.ScheduleEvent(EVENT_TOTAL_OBEDIENCE, urand(10000, 20000));
+                    break;
+                case EVENT_END:
+                    {
+                        instance->DoKilledMonsterKredit(QUEST_THE_VAINGLORIOUS, NPC_AZSHARA, 0);
+                        instance->SetBossState(DATA_AZSHARA, DONE);
+                        instance->DoRespawnGameObject(instance->GetData64(DATA_ROYAL_CACHE), DAY);
+                        instance->DoModifyPlayerCurrencies(CURRENCY_TYPE_JUSTICE_POINTS, 7000);
+                        me->DespawnOrUnsummon();
                         break;
+                    }
+                default:
+                    break;
                 }
             }
         }
@@ -287,8 +286,7 @@ public:
 
     struct npc_queen_azshara_enchanted_magusAI : public ScriptedAI
     {
-        npc_queen_azshara_enchanted_magusAI(Creature* pCreature) : ScriptedAI(pCreature)
-        { }
+        npc_queen_azshara_enchanted_magusAI(Creature* pCreature) : ScriptedAI(pCreature) { }
 
         void Reset()
         {
@@ -339,56 +337,55 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_FIREBALL:
-                        DoCastVictim(SPELL_FIREBALL);
-                        events.ScheduleEvent(EVENT_FIREBALL, 3000);
-                        break;
-                    case EVENT_FIREBOMB:
-                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                            DoCast(pTarget, SPELL_FIREBOMB);
-                        events.ScheduleEvent(EVENT_FIREBOMB, urand(15000, 20000));
-                        break;
-                    case EVENT_BLASTWAVE:
-                        DoCastAOE(SPELL_BLASTWAVE);
-                        events.ScheduleEvent(EVENT_BLASTWAVE, urand(15000, 20000));
-                        break;
-                    case EVENT_ICE_FLING:
-                        DoCastAOE(SPELL_ICE_FLING);
-                        events.ScheduleEvent(EVENT_ICE_FLING, urand(10000, 20000));
-                        break;
-                    case EVENT_BLADES_OF_ICE:
-                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                            DoCast(pTarget, SPELL_BLADES_OF_ICE);
-                        events.ScheduleEvent(EVENT_BLADES_OF_ICE, urand(12000, 20000));
-                        break;
-                    case EVENT_COLDFLAME:
-                        //if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                        //DoCast(pTarget, SPELL_COLDFLAME);
-                        events.ScheduleEvent(EVENT_COLDFLAME, urand(16000, 25000));
-                        break;
-                    case EVENT_ARCANE_SHOCK:
-                        me->StopMoving();
-                        DoCast(me, SPELL_ARCANE_SHOCK);
-                        events.ScheduleEvent(EVENT_ARCANE_SHOCK, urand(12000, 20000));
-                        break;
-                    case EVENT_ARCANE_BOMB:
+                case EVENT_FIREBALL:
+                    DoCastVictim(SPELL_FIREBALL);
+                    events.ScheduleEvent(EVENT_FIREBALL, 3000);
+                    break;
+                case EVENT_FIREBOMB:
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        DoCast(pTarget, SPELL_FIREBOMB);
+                    events.ScheduleEvent(EVENT_FIREBOMB, urand(15000, 20000));
+                    break;
+                case EVENT_BLASTWAVE:
+                    DoCastAOE(SPELL_BLASTWAVE);
+                    events.ScheduleEvent(EVENT_BLASTWAVE, urand(15000, 20000));
+                    break;
+                case EVENT_ICE_FLING:
+                    DoCastAOE(SPELL_ICE_FLING);
+                    events.ScheduleEvent(EVENT_ICE_FLING, urand(10000, 20000));
+                    break;
+                case EVENT_BLADES_OF_ICE:
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        DoCast(pTarget, SPELL_BLADES_OF_ICE);
+                    events.ScheduleEvent(EVENT_BLADES_OF_ICE, urand(12000, 20000));
+                    break;
+                case EVENT_COLDFLAME:
+                    //if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    //DoCast(pTarget, SPELL_COLDFLAME);
+                    events.ScheduleEvent(EVENT_COLDFLAME, urand(16000, 25000));
+                    break;
+                case EVENT_ARCANE_SHOCK:
+                    me->StopMoving();
+                    DoCast(me, SPELL_ARCANE_SHOCK);
+                    events.ScheduleEvent(EVENT_ARCANE_SHOCK, urand(12000, 20000));
+                    break;
+                case EVENT_ARCANE_BOMB:
                     {
-                                              if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                                              {
-                                                  Creature* pStalker1 = me->SummonCreature(NPC_HAMMER_OF_DIVINITY_2, pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), pTarget->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 20000);
-                                                  Creature* pStalker2 = me->SummonCreature(NPC_HAMMER_OF_DIVINITY_1, pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ() + 30.0f, pTarget->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 20000);
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        {
+                            Creature* pStalker1 = me->SummonCreature(NPC_HAMMER_OF_DIVINITY_2, pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), pTarget->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 20000);
+                            Creature* pStalker2 = me->SummonCreature(NPC_HAMMER_OF_DIVINITY_1, pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ() + 30.0f, pTarget->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 20000);
 
-                                                  if (pStalker1 && pStalker2)
-                                                      pStalker2->GetMotionMaster()->MovePoint(0, pStalker1->GetPositionX(), pStalker1->GetPositionY(), pStalker1->GetPositionZ());
-                                              }
-                                              events.ScheduleEvent(EVENT_ARCANE_BOMB, urand(18000, 25000));
-                                              break;
-                    }
-                    default:
+                            if (pStalker1 && pStalker2)
+                                pStalker2->GetMotionMaster()->MovePoint(0, pStalker1->GetPositionX(), pStalker1->GetPositionY(), pStalker1->GetPositionZ());
+                        }
+                        events.ScheduleEvent(EVENT_ARCANE_BOMB, urand(18000, 25000));
                         break;
+                    }
+                default:
+                    break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
 
@@ -495,7 +492,7 @@ public:
         void ChangeSummonPos(SpellEffIndex /*effIndex*/)
         {
             WorldLocation summonPos = *GetExplTargetDest();
-            Position offset ={0.0f, 0.0f, 15.0f, 0.0f};
+            Position offset = {0.0f, 0.0f, 15.0f, 0.0f};
             summonPos.RelocateOffset(offset);
             SetExplTargetDest(summonPos);
             GetHitDest()->RelocateOffset(offset);

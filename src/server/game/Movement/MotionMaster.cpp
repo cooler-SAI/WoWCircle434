@@ -677,3 +677,15 @@ bool MotionMaster::GetDestination(float &x, float &y, float &z)
     z = dest.z;
     return true;
 }
+
+void MotionMaster::ForceMoveJump(float x, float y, float z, float speedXY, float speedZ, float max_height, uint32 id)
+{
+    float moveTimeHalf = speedZ / Movement::gravity;
+
+    Movement::MoveSplineInit init(*_owner);
+    init.MoveTo(x, y, z);
+    init.SetParabolic(max_height, 0);
+    init.SetVelocity(speedXY);
+    init.Launch();
+    Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);
+}

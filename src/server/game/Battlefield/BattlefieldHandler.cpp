@@ -273,7 +273,7 @@ void WorldSession::HandleBfQueueInviteResponse(WorldPacket& recvData)
         .ReadByteSeq(guid[0])
         .ReadByteSeq(guid[5]);
 
-    sLog->outError(LOG_FILTER_BATTLEFIELD, "HandleQueueInviteResponse: battlefieldGuid: " UI64FMTD " accepted: %u", guid, accepted);
+    sLog->outError(LOG_FILTER_BATTLEFIELD, "HandleBfQueueInviteResponse: battlefieldGuid: " UI64FMTD " accepted: %u", guid, accepted);
 
     if (!accepted)
         return;
@@ -354,7 +354,7 @@ void WorldSession::HandleBfQueueRequest(WorldPacket& recvData)
         .ReadByteSeq(guid[5])
         .ReadByteSeq(guid[0]);
 
-    sLog->outError(LOG_FILTER_GENERAL, "HandleBattlefieldInviteResponse: GUID:" UI64FMTD "", uint64(guid));
+    sLog->outError(LOG_FILTER_GENERAL, "HandleBfQueueRequest: GUID:" UI64FMTD "", uint64(guid));
 
     //if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldByGUID(guid))
 
@@ -363,14 +363,14 @@ void WorldSession::HandleBfQueueRequest(WorldPacket& recvData)
         if (bf->IsWarTime())
         {
             bf->InvitePlayerToWar(_player);
-            sLog->outError(LOG_FILTER_GENERAL, "HandleBattlefieldInviteResponse: GUID:" UI64FMTD " IsWarTime:%u", uint64(guid), bf->IsWarTime());
+            sLog->outError(LOG_FILTER_GENERAL, "HandleBfQueueRequest: GUID:" UI64FMTD " IsWarTime:%u", uint64(guid), bf->IsWarTime());
         }
         else
         {
             uint32 timer = bf->GetTimer() / 1000;
             if (timer < 15 * MINUTE)
             {
-                sLog->outError(LOG_FILTER_GENERAL, "HandleBattlefieldInviteResponse: GUID:" UI64FMTD " timer:%u", uint64(guid), uint32(timer));
+                sLog->outError(LOG_FILTER_GENERAL, "HandleBfQueueRequest: GUID:" UI64FMTD " timer:%u", uint64(guid), uint32(timer));
                 bf->InvitePlayerToQueue(_player);
             }
         }
@@ -404,6 +404,6 @@ void WorldSession::HandleBfExitRequest(WorldPacket& recvData)
     if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_TB))
     {
         bf->AskToLeaveQueue(_player);
-        sLog->outError(LOG_FILTER_GENERAL, "HandleBattlefieldInviteResponse: GUID:" UI64FMTD " AskToLeaveQueue", uint64(guid));
+        sLog->outError(LOG_FILTER_GENERAL, "HandleBfExitRequest: GUID:" UI64FMTD " AskToLeaveQueue", uint64(guid));
     }
 }

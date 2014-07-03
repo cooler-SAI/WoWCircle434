@@ -168,6 +168,7 @@ class MotionMaster //: private std::stack<MovementGenerator *>
         { MoveJump(pos.m_positionX, pos.m_positionY, pos.m_positionZ, speedXY, speedZ, id); };
         void CustomJump(float x, float y, float z, float speedXY, float speedZ, uint32 id = 0);
         void MoveFall(uint32 id = 0);
+        void ForceMoveJump(float x, float y, float z, float speedXY, float speedZ, float max_height, uint32 id = EVENT_JUMP);
 
         void MoveSeekAssistance(float x, float y, float z);
         void MoveSeekAssistanceDistract(uint32 timer);

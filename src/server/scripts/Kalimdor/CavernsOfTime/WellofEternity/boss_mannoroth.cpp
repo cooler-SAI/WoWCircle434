@@ -12,12 +12,10 @@ enum ScriptedTextMannoroth
     SAY_MANNOROTH_EVENT     = 6,
     SAY_MANNOROTH_KILL      = 7,
     SAY_MANNOROTH_SPELL     = 8,
-};
-enum ScriptedTextVarothen
-{
-    SAY_VAROTHEN_AGGRO  = 0,
-    SAY_VAROTHEN_DEATH  = 1,
-    SAY_VAROTHEN_KILL   = 2,
+
+    SAY_VAROTHEN_AGGRO      = 0,
+    SAY_VAROTHEN_DEATH      = 1,
+    SAY_VAROTHEN_KILL       = 2,
 };
 
 enum Spells
@@ -54,22 +52,22 @@ enum Spells
     SPELL_COMPLETE_ENCOUNTER        = 105576,
 
     // Illidan 2
-    SPELL_WATERS_OF_ETERNITY    = 103952,
-    SPELL_TAUNT                 = 104461,
-    SPELL_DEMON_RUSH            = 104205,
-    SPELL_DARKLANCE             = 104394,
-    SPELL_AURA_OF_IMMOLATION    = 104379,
-    SPELL_GIFT_OF_SARGERAS      = 104998,
-    SPELL_GIFT_OF_SARGERAS_AOE  = 105009,
+    SPELL_WATERS_OF_ETERNITY        = 103952,
+    SPELL_TAUNT                     = 104461,
+    SPELL_DEMON_RUSH                = 104205,
+    SPELL_DARKLANCE                 = 104394,
+    SPELL_AURA_OF_IMMOLATION        = 104379,
+    SPELL_GIFT_OF_SARGERAS          = 104998,
+    SPELL_GIFT_OF_SARGERAS_AOE      = 105009,
 
     // Tyrande
-    SPELL_BLESSING_OF_ELUNE     = 103917,
-    SPELL_HAND_OF_ELUNE         = 105072,
-    SPELL_WRATH_OF_ELUNE_1      = 105073, // 30k damage
-    SPELL_WRATH_OF_ELUNE_2      = 105075, // 300k damage
-    SPELL_LUNAR_SHOT_1          = 104214, // 30k damage, single
-    SPELL_LUNAR_SHOT_2          = 104313, // 300k damage, single
-    SPELL_LUNAR_SHOT_3          = 104688, // 300k damage, aoe
+    SPELL_BLESSING_OF_ELUNE         = 103917,
+    SPELL_HAND_OF_ELUNE             = 105072,
+    SPELL_WRATH_OF_ELUNE_1          = 105073, // 30k damage
+    SPELL_WRATH_OF_ELUNE_2          = 105075, // 300k damage
+    SPELL_LUNAR_SHOT_1              = 104214, // 30k damage, single
+    SPELL_LUNAR_SHOT_2              = 104313, // 300k damage, single
+    SPELL_LUNAR_SHOT_3              = 104688, // 300k damage, aoe
 };
 
 enum Events
@@ -116,9 +114,9 @@ enum Actions
     ACTION_DEBILITATING_OFF = 2,
 };
 
-const Position portalPos ={3338.699951f, -5699.775879f, 13.01f, 3.87f};
+const Position portalPos = {3338.699951f, -5699.775879f, 13.01f, 3.87f};
 
-const Position varothenPos ={3319.669922f, -5716.470215f, 16.18f, 2.68f};
+const Position varothenPos = {3319.669922f, -5716.470215f, 16.18f, 2.68f};
 
 const Position debilitatorPos[2] =
 {
@@ -210,8 +208,8 @@ public:
         void EnterCombat(Unit* attacker)
         {
             if (Creature* pVarothen = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_VAROTHEN)))
-            if (!pVarothen->isInCombat())
-                DoZoneInCombat(pVarothen);
+                if (!pVarothen->isInCombat())
+                    DoZoneInCombat(pVarothen);
 
             if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_2, 150.0f))
                 pIllidan->AI()->DoAction(6); // ACTION_MANNOROTH_AGGRO
@@ -231,8 +229,8 @@ public:
             events.ScheduleEvent(EVENT_CHECK_PLAYERS, 3000);
 
             for (uint8 i = 0; i < 2; ++i)
-            if (Creature* pStalker = me->SummonCreature(NPC_PURPOSE_BUNNY_1, stalkerPos[i]))
-                pStalker->RemoveAllAuras();
+                if (Creature* pStalker = me->SummonCreature(NPC_PURPOSE_BUNNY_1, stalkerPos[i]))
+                    pStalker->RemoveAllAuras();
 
             if (Creature* pStalker = me->SummonCreature(NPC_PURPOSE_BUNNY_2, stalkerPos[2]))
                 pStalker->RemoveAllAuras();
@@ -267,8 +265,8 @@ public:
         void DamageTaken(Unit* /*who*/, uint32 &damage)
         {
             if (!bDebilitating)
-            if (me->HealthBelowPctDamaged(88, damage))
-                damage = 0;
+                if (me->HealthBelowPctDamaged(88, damage))
+                    damage = 0;
 
             if (damage >= me->GetHealth())
                 damage = 0;
@@ -328,109 +326,109 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_CHECK_PLAYERS:
-                        if (!SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
-                        {
-                            events.Reset();
-                            EnterEvadeMode();
-                            return;
-                        } else
-                            events.ScheduleEvent(EVENT_CHECK_PLAYERS, 3000);
-                        break;
-                    case EVENT_MANNOROTH_AGGRO:
-                        Talk(SAY_MANNOROTH_AGGRO);
-                        break;
-                    case EVENT_FEL_FIRESTORM:
-                        //DoCast(me, SPELL_FEL_FIRESTORM);
-                        //events.ScheduleEvent(EVENT_FEL_FIRESTORM, urand(25000, 35000));
-                        break;
-                    case EVENT_FELBLADE:
-                        DoCast(me, SPELL_FELBLADE);
-                        events.ScheduleEvent(EVENT_FELBLADE, urand(15000, 25000));
-                        break;
-                    case EVENT_SUMMON_DEBILITATOR:
-                        DoCast(me, SPELL_NETHER_PORTAL);
-                        events.ScheduleEvent(EVENT_SUMMON_DEBILITATOR_1, 7000);
-                        break;
-                    case EVENT_SUMMON_DEBILITATOR_1:
-                        for (uint8 i = 0; i < 2; ++i)
-                            me->SummonCreature(NPC_DOOMGUARD_DEBILITATOR, debilitatorPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
-                        break;
-                    case EVENT_SUMMON_DEVASTATOR:
+                case EVENT_CHECK_PLAYERS:
+                    if (!SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
                     {
-                                                    uint32 i = urand(0, 2);
-                                                    me->SummonCreature(NPC_DOOMGUARD_DEVASTATOR, devastatorPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
-                                                    events.ScheduleEvent(EVENT_SUMMON_DEVASTATOR, urand(4000, 7000));
-                                                    break;
+                        events.Reset();
+                        EnterEvadeMode();
+                        return;
+                    } else
+                        events.ScheduleEvent(EVENT_CHECK_PLAYERS, 3000);
+                    break;
+                case EVENT_MANNOROTH_AGGRO:
+                    Talk(SAY_MANNOROTH_AGGRO);
+                    break;
+                case EVENT_FEL_FIRESTORM:
+                    //DoCast(me, SPELL_FEL_FIRESTORM);
+                    //events.ScheduleEvent(EVENT_FEL_FIRESTORM, urand(25000, 35000));
+                    break;
+                case EVENT_FELBLADE:
+                    DoCast(me, SPELL_FELBLADE);
+                    events.ScheduleEvent(EVENT_FELBLADE, urand(15000, 25000));
+                    break;
+                case EVENT_SUMMON_DEBILITATOR:
+                    DoCast(me, SPELL_NETHER_PORTAL);
+                    events.ScheduleEvent(EVENT_SUMMON_DEBILITATOR_1, 7000);
+                    break;
+                case EVENT_SUMMON_DEBILITATOR_1:
+                    for (uint8 i = 0; i < 2; ++i)
+                        me->SummonCreature(NPC_DOOMGUARD_DEBILITATOR, debilitatorPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                    break;
+                case EVENT_SUMMON_DEVASTATOR:
+                    {
+                        uint32 i = urand(0, 2);
+                        me->SummonCreature(NPC_DOOMGUARD_DEVASTATOR, devastatorPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+                        events.ScheduleEvent(EVENT_SUMMON_DEVASTATOR, urand(4000, 7000));
+                        break;
                     }
-                    case EVENT_EMBEDDED_BLADE:
-                        Talk(SAY_MANNOROTH_SWORD);
-                        DoCast(me, SPELL_EMBEDDED_BLADE_2, true);
-                        DoCast(me, SPELL_EMBEDDED_BLADE_DUMMY, true);
-                        events.ScheduleEvent(EVENT_EMBEDDED_BLADE_1, 3000);
+                case EVENT_EMBEDDED_BLADE:
+                    Talk(SAY_MANNOROTH_SWORD);
+                    DoCast(me, SPELL_EMBEDDED_BLADE_2, true);
+                    DoCast(me, SPELL_EMBEDDED_BLADE_DUMMY, true);
+                    events.ScheduleEvent(EVENT_EMBEDDED_BLADE_1, 3000);
 
-                        break;
-                    case EVENT_EMBEDDED_BLADE_1:
-                        if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_2, 100.0f))
-                            pIllidan->AI()->Talk(15); // SAY_ILLIDAN_2_SWORD
-                        //events.RescheduleEvent(EVENT_FEL_FIRESTORM, urand(25000, 30000));
-                        //events.RescheduleEvent(EVENT_FELBLADE, urand(10000, 55000));
-                        break;
-                    case EVENT_MANNOROTH_SARGERAS_1:
-                        if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_2, 100.0f))
-                            pIllidan->AI()->Talk(19); // SAY_ILLIDAN_2_SPELL
-                        DoCast(me, SPELL_SUMMON_FELHOUND_AURA, true);
-                        break;
-                    case EVENT_MANNOROTH_SARGERAS_2:
-                        if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 150.0f))
-                        {
-                            pTyrande->AI()->Talk(10); // SAY_TYRANDE_ARROWS
-                            pTyrande->AI()->DoAction(9); // ACTION_MANNOROTH_SARGERAS
-                        }
-                        break;
-                    case EVENT_INFERNAL:
-                        if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 150.0f))
-                        {
-                            pTyrande->AI()->Talk(14); // SAY_TYRANDE_MANY_DEMONS
-                            pTyrande->AI()->DoAction(10); // ACTION_MANNOROTH_INFERNO
-                        }
-                        //events.RescheduleEvent(EVENT_FEL_FIRESTORM, urand(40000, 50000));
-                        //events.RescheduleEvent(EVENT_FELBLADE, urand(45000, 55000));
-                        events.ScheduleEvent(EVENT_GIFT_OF_SARGERAS_1, 5000);
-                        break;
-                    case EVENT_GIFT_OF_SARGERAS_1:
-                        if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_2, 100.0f))
-                        {
-                            pIllidan->AI()->Talk(16); // SAY_ILLIDAN_2_BUFF_1
-                            pIllidan->CastSpell(me, SPELL_GIFT_OF_SARGERAS);
-                        }
-                        events.ScheduleEvent(EVENT_GIFT_OF_SARGERAS_2, 8000);
-                        break;
-                    case EVENT_GIFT_OF_SARGERAS_2:
-                        if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 150.0f))
-                            pTyrande->AI()->Talk(11); // SAY_TYRANDE_NO_1
-                        events.ScheduleEvent(EVENT_GIFT_OF_SARGERAS_3, 2000);
-                        break;
-                    case EVENT_GIFT_OF_SARGERAS_3:
-                        if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_2, 100.0f))
-                            pIllidan->AI()->Talk(17); // SAY_ILLIDAN_2_BUFF_2
-                        events.ScheduleEvent(EVENT_GIFT_OF_SARGERAS_4, 8000);
-                        break;
-                    case EVENT_GIFT_OF_SARGERAS_4:
-                        if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 150.0f))
-                            pTyrande->AI()->Talk(12); // SAY_TYRANDE_NO_2
-                        events.ScheduleEvent(EVENT_GIFT_OF_SARGERAS_5, 2000);
-                        break;
-                    case EVENT_GIFT_OF_SARGERAS_5:
-                        if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_2, 100.0f))
-                            pIllidan->AI()->Talk(18); // SAY_ILLIDAN_2_BUFF_3
-                        break;
-                    case EVENT_DESPAWN:
-                        instance->DoRespawnGameObject(instance->GetData64(DATA_MINOR_CACHE), DAY);
-                        me->DespawnOrUnsummon();
-                        break;
-                    default:
-                        break;
+                    break;
+                case EVENT_EMBEDDED_BLADE_1:
+                    if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_2, 100.0f))
+                        pIllidan->AI()->Talk(15); // SAY_ILLIDAN_2_SWORD
+                    //events.RescheduleEvent(EVENT_FEL_FIRESTORM, urand(25000, 30000));
+                    //events.RescheduleEvent(EVENT_FELBLADE, urand(10000, 55000));
+                    break;
+                case EVENT_MANNOROTH_SARGERAS_1:
+                    if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_2, 100.0f))
+                        pIllidan->AI()->Talk(19); // SAY_ILLIDAN_2_SPELL
+                    DoCast(me, SPELL_SUMMON_FELHOUND_AURA, true);
+                    break;
+                case EVENT_MANNOROTH_SARGERAS_2:
+                    if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 150.0f))
+                    {
+                        pTyrande->AI()->Talk(10); // SAY_TYRANDE_ARROWS
+                        pTyrande->AI()->DoAction(9); // ACTION_MANNOROTH_SARGERAS
+                    }
+                    break;
+                case EVENT_INFERNAL:
+                    if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 150.0f))
+                    {
+                        pTyrande->AI()->Talk(14); // SAY_TYRANDE_MANY_DEMONS
+                        pTyrande->AI()->DoAction(10); // ACTION_MANNOROTH_INFERNO
+                    }
+                    //events.RescheduleEvent(EVENT_FEL_FIRESTORM, urand(40000, 50000));
+                    //events.RescheduleEvent(EVENT_FELBLADE, urand(45000, 55000));
+                    events.ScheduleEvent(EVENT_GIFT_OF_SARGERAS_1, 5000);
+                    break;
+                case EVENT_GIFT_OF_SARGERAS_1:
+                    if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_2, 100.0f))
+                    {
+                        pIllidan->AI()->Talk(16); // SAY_ILLIDAN_2_BUFF_1
+                        pIllidan->CastSpell(me, SPELL_GIFT_OF_SARGERAS);
+                    }
+                    events.ScheduleEvent(EVENT_GIFT_OF_SARGERAS_2, 8000);
+                    break;
+                case EVENT_GIFT_OF_SARGERAS_2:
+                    if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 150.0f))
+                        pTyrande->AI()->Talk(11); // SAY_TYRANDE_NO_1
+                    events.ScheduleEvent(EVENT_GIFT_OF_SARGERAS_3, 2000);
+                    break;
+                case EVENT_GIFT_OF_SARGERAS_3:
+                    if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_2, 100.0f))
+                        pIllidan->AI()->Talk(17); // SAY_ILLIDAN_2_BUFF_2
+                    events.ScheduleEvent(EVENT_GIFT_OF_SARGERAS_4, 8000);
+                    break;
+                case EVENT_GIFT_OF_SARGERAS_4:
+                    if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 150.0f))
+                        pTyrande->AI()->Talk(12); // SAY_TYRANDE_NO_2
+                    events.ScheduleEvent(EVENT_GIFT_OF_SARGERAS_5, 2000);
+                    break;
+                case EVENT_GIFT_OF_SARGERAS_5:
+                    if (Creature* pIllidan = me->FindNearestCreature(NPC_ILLIDAN_2, 100.0f))
+                        pIllidan->AI()->Talk(18); // SAY_ILLIDAN_2_BUFF_3
+                    break;
+                case EVENT_DESPAWN:
+                    instance->DoRespawnGameObject(instance->GetData64(DATA_MINOR_CACHE), DAY);
+                    me->DespawnOrUnsummon();
+                    break;
+                default:
+                    break;
                 }
             }
 
@@ -462,12 +460,12 @@ public:
                     for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                     {
                         if (Player* pPlayer = i->getSource())
-                        if (Group* pGroup = pPlayer->GetGroup())
-                        if (pPlayer->GetGuildId() && pGroup->IsGuildGroup(pPlayer->GetGuildId(), true, true))
-                        {
-                            pGroup->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_COMPLETE_ENCOUNTER, 0, 0, NULL, me);
-                            break;
-                        }
+                            if (Group* pGroup = pPlayer->GetGroup())
+                                if (pPlayer->GetGuildId() && pGroup->IsGuildGroup(pPlayer->GetGuildId(), true, true))
+                                {
+                                    pGroup->UpdateGuildAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_COMPLETE_ENCOUNTER, 0, 0, NULL, me);
+                                    break;
+                                }
                     }
                 }
                 instance->DoKilledMonsterKredit(QUEST_THE_PATH_TO_THE_DRAGON_SOUL, NPC_MANNOROTH, 0);
@@ -528,9 +526,9 @@ public:
             events.ScheduleEvent(EVENT_MAGNISTRIKE, urand(3000, 7000));
 
             if (pInstance)
-            if (Creature* pMannoroth = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MANNOROTH)))
-            if (!pMannoroth->isInCombat())
-                DoZoneInCombat(pMannoroth);
+                if (Creature* pMannoroth = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MANNOROTH)))
+                    if (!pMannoroth->isInCombat())
+                        DoZoneInCombat(pMannoroth);
         }
 
         void KilledUnit(Unit* who)
@@ -556,10 +554,10 @@ public:
 
                 Map::PlayerList const &PlayerList = pInstance->instance->GetPlayers();
                 if (!PlayerList.isEmpty())
-                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                if (Player* pPlayer = i->getSource())
-                if (me->GetDistance(pPlayer) <= 50.0f && pPlayer->GetQuestStatus(QUEST_DOCUMENTING_THE_TIMEWAYS) == QUEST_STATUS_INCOMPLETE)
-                    pPlayer->CastSpell(me, SPELL_ARCHIVED_VAROTHEN_1, true);
+                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                        if (Player* pPlayer = i->getSource())
+                            if (me->GetDistance(pPlayer) <= 50.0f && pPlayer->GetQuestStatus(QUEST_DOCUMENTING_THE_TIMEWAYS) == QUEST_STATUS_INCOMPLETE)
+                                pPlayer->CastSpell(me, SPELL_ARCHIVED_VAROTHEN_1, true);
             }
         }
 
@@ -581,9 +579,9 @@ public:
                     events.ScheduleEvent(EVENT_MAGNISTRIKE, urand(10000, 15000));
                 }
             }
-
             DoMeleeAttackIfReady();
         }
+
     private:
         EventMap events;
         InstanceScript* pInstance;

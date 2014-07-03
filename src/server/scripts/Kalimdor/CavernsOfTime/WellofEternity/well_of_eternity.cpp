@@ -5,27 +5,21 @@
 
 enum ScriptedTextNozdormu
 {
-    SAY_NOZDORMU_EVENT_1    = 0,
-    SAY_NOZDORMU_INTRO_1    = 1,
-    SAY_NOZDORMU_INTRO_2    = 2,
-    SAY_NOZDORMU_INTRO_3    = 3,
-    SAY_NOZDORMU_INTRO_4    = 4,
-};
+    SAY_NOZDORMU_EVENT_1        = 0,
+    SAY_NOZDORMU_INTRO_1        = 1,
+    SAY_NOZDORMU_INTRO_2        = 2,
+    SAY_NOZDORMU_INTRO_3        = 3,
+    SAY_NOZDORMU_INTRO_4        = 4,
 
-enum ScriptedTextIllidan1
-{
-    SAY_ILLIDAN_HIDE        = 0,
-    SAY_ILLIDAN_1_AGGRO     = 1,
-    SAY_ILLIDAN_1_NEAR      = 2,
-    SAY_ILLIDAN_1_OUTRO_1   = 3,
-    SAY_ILLIDAN_1_OUTRO_2   = 4,
-    SAY_ILLIDAN_1_SPELL     = 5,
-    SAY_ILLIDAN_1_MOVE      = 13,
-    SAY_ILLIDAN_1_INTRO     = 24,
-};
+    SAY_ILLIDAN_HIDE            = 0,
+    SAY_ILLIDAN_1_AGGRO         = 1,
+    SAY_ILLIDAN_1_NEAR          = 2,
+    SAY_ILLIDAN_1_OUTRO_1       = 3,
+    SAY_ILLIDAN_1_OUTRO_2       = 4,
+    SAY_ILLIDAN_1_SPELL         = 5,
+    SAY_ILLIDAN_1_MOVE          = 13,
+    SAY_ILLIDAN_1_INTRO         = 24,
 
-enum ScriptedTextIllidan2
-{
     SAY_ILLIDAN_2_INTRO_1       = 4,
     SAY_ILLIDAN_2_INTRO_2       = 5,
     SAY_ILLIDAN_2_INTRO_3       = 6,
@@ -40,27 +34,21 @@ enum ScriptedTextIllidan2
     SAY_ILLIDAN_2_BUFF_2        = 17,
     SAY_ILLIDAN_2_BUFF_3        = 18,
     SAY_ILLIDAN_2_SPELL         = 19,
-};
 
-enum ScriptedTextMalfurion
-{
-    SAY_MALFURION_INTRO_1   = 4,
-    SAY_MALFURION_INTRO_2   = 5,
-};
+    SAY_MALFURION_INTRO_1       = 4,
+    SAY_MALFURION_INTRO_2       = 5,
 
-enum ScriptedTextTyrande
-{
-    SAY_TYRANDE_INTRO_1     = 3,
-    SAY_TYRANDE_INTRO_2     = 4,
-    SAY_TYRANDE_ELEMENTAL   = 5,
-    SAY_TYRANDE_DEMONS      = 7,
-    SAY_TYRANDE_ELUNE       = 8,
-    SAY_TYRANDE_CONTINUE    = 9,
-    SAY_TYRANDE_ARROWS      = 10,
-    SAY_TYRANDE_NO_1        = 11,
-    SAY_TYRANDE_NO_2        = 12,
-    SAY_TYRANDE_MALFURION   = 13,
-    SAY_TYRANDE_MANY_DEMONS = 14,
+    SAY_TYRANDE_INTRO_1         = 3,
+    SAY_TYRANDE_INTRO_2         = 4,
+    SAY_TYRANDE_ELEMENTAL       = 5,
+    SAY_TYRANDE_DEMONS          = 7,
+    SAY_TYRANDE_ELUNE           = 8,
+    SAY_TYRANDE_CONTINUE        = 9,
+    SAY_TYRANDE_ARROWS          = 10,
+    SAY_TYRANDE_NO_1            = 11,
+    SAY_TYRANDE_NO_2            = 12,
+    SAY_TYRANDE_MALFURION       = 13,
+    SAY_TYRANDE_MANY_DEMONS     = 14,
 };
 
 enum Spells
@@ -284,9 +272,9 @@ const Position illidan2Pos[10] =
     {3192.839844f, -5638.349121f, 18.085392f, 0.0f},
     {3205.317871f, -5666.366211f, 18.083393f, 0.0f},  // near elemental
     {3219.282227f, -5683.890137f, 18.111153f, 0.0f},  // attack elemental
-    {3259.732178f, -5703.202637f, 17.23f, 6.15f}, // after elemental
-    {3281.667236f, -5706.658203f, 16.42f, 6.09f}, // near varo'then
-    {3339.285889f, -5730.857910f, 15.23f, 5.64f}  // near mannoroth
+    {3259.732178f, -5703.202637f, 17.23f,     6.15f}, // after elemental
+    {3281.667236f, -5706.658203f, 16.42f,     6.09f}, // near varo'then
+    {3339.285889f, -5730.857910f, 15.23f,     5.64f}  // near mannoroth
 };
 
 const Position tyrandePos ={3310.190674f, -5691.714355f, 14.78f, 1.78f};
@@ -315,8 +303,8 @@ public:
         {
             events.Reset();
             if (npc_id == 1)
-            if (pInstance && pInstance->GetData(DATA_EVENT_NOZDORMU) == DONE)
-                me->DespawnOrUnsummon(500);
+                if (pInstance && pInstance->GetData(DATA_EVENT_NOZDORMU) == DONE)
+                    me->DespawnOrUnsummon(500);
 
         }
 
@@ -352,31 +340,31 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_NOZDORMU_TALK_1:
-                        Talk(SAY_NOZDORMU_INTRO_1);
-                        events.ScheduleEvent(EVENT_NOZDORMU_TALK_2, 12000);
-                        break;
-                    case EVENT_NOZDORMU_TALK_2:
-                        Talk(SAY_NOZDORMU_INTRO_2);
-                        events.ScheduleEvent(EVENT_NOZDORMU_TALK_3, 7000);
-                        break;
-                    case EVENT_NOZDORMU_TALK_3:
-                        Talk(SAY_NOZDORMU_INTRO_3);
-                        events.ScheduleEvent(EVENT_NOZDORMU_TALK_4, 14000);
-                        break;
-                    case EVENT_NOZDORMU_TALK_4:
-                        Talk(SAY_NOZDORMU_INTRO_4);
-                        if (pInstance)
-                            pInstance->SetData(DATA_EVENT_NOZDORMU, DONE);
-                        me->DespawnOrUnsummon(500);
-                        break;
+                case EVENT_NOZDORMU_TALK_1:
+                    Talk(SAY_NOZDORMU_INTRO_1);
+                    events.ScheduleEvent(EVENT_NOZDORMU_TALK_2, 12000);
+                    break;
+                case EVENT_NOZDORMU_TALK_2:
+                    Talk(SAY_NOZDORMU_INTRO_2);
+                    events.ScheduleEvent(EVENT_NOZDORMU_TALK_3, 7000);
+                    break;
+                case EVENT_NOZDORMU_TALK_3:
+                    Talk(SAY_NOZDORMU_INTRO_3);
+                    events.ScheduleEvent(EVENT_NOZDORMU_TALK_4, 14000);
+                    break;
+                case EVENT_NOZDORMU_TALK_4:
+                    Talk(SAY_NOZDORMU_INTRO_4);
+                    if (pInstance)
+                        pInstance->SetData(DATA_EVENT_NOZDORMU, DONE);
+                    me->DespawnOrUnsummon(500);
+                    break;
                 }
             }
         }
 
     private:
         bool bTalk;
-        uint8 npc_id; // 1 - near entrance
+        uint8 npc_id;
         EventMap events;
         InstanceScript* pInstance;
     };
@@ -416,8 +404,8 @@ public:
         {
             events.Reset();
             if (npc_id == 1)
-            if (pInstance && pInstance->GetData(DATA_EVENT_DEMON) == DONE)
-                me->DespawnOrUnsummon(500);
+                if (pInstance && pInstance->GetData(DATA_EVENT_DEMON) == DONE)
+                    me->DespawnOrUnsummon(500);
         }
 
         void EnterCombat(Unit* who)
@@ -444,8 +432,8 @@ public:
         void JustDied(Unit* /*who*/)
         {
             if (npc_id)
-            if (pInstance)
-                pInstance->SetData(DATA_EVENT_DEMON, DONE);
+                if (pInstance)
+                    pInstance->SetData(DATA_EVENT_DEMON, DONE);
 
             // Quest
             if (!pInstance)
@@ -453,10 +441,10 @@ public:
 
             Map::PlayerList const &PlayerList = pInstance->instance->GetPlayers();
             if (!PlayerList.isEmpty())
-            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* pPlayer = i->getSource())
-            if (me->GetDistance(pPlayer) <= 50.0f && pPlayer->GetQuestStatus(QUEST_DOCUMENTING_THE_TIMEWAYS) == QUEST_STATUS_INCOMPLETE)
-                pPlayer->CastSpell(me, SPELL_ARCHIVED_DEMON_1, true);
+                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                    if (Player* pPlayer = i->getSource())
+                        if (me->GetDistance(pPlayer) <= 50.0f && pPlayer->GetQuestStatus(QUEST_DOCUMENTING_THE_TIMEWAYS) == QUEST_STATUS_INCOMPLETE)
+                            pPlayer->CastSpell(me, SPELL_ARCHIVED_DEMON_1, true);
         }
 
         void UpdateAI(const uint32 diff)
@@ -470,17 +458,17 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_STRIKE_FEAR:
-                        DoCastAOE(SPELL_STRIKE_FEAR);
-                        events.ScheduleEvent(EVENT_STRIKE_FEAR, urand(10000, 15000));
-                        break;
-                    case EVENT_CRUSHING_LEAP:
-                        //if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                        //    DoCastVictim(SPELL_CRUSHING_LEAP);
-                        events.ScheduleEvent(EVENT_STRIKE_FEAR, urand(15000, 20000));
-                        break;
-                    default:
-                        break;
+                case EVENT_STRIKE_FEAR:
+                    DoCastAOE(SPELL_STRIKE_FEAR);
+                    events.ScheduleEvent(EVENT_STRIKE_FEAR, urand(10000, 15000));
+                    break;
+                case EVENT_CRUSHING_LEAP:
+                    //if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                    //    DoCastVictim(SPELL_CRUSHING_LEAP);
+                    events.ScheduleEvent(EVENT_STRIKE_FEAR, urand(15000, 20000));
+                    break;
+                default:
+                    break;
                 }
             }
 
@@ -488,7 +476,7 @@ public:
         }
 
     private:
-        uint8 npc_id; // 1 - near entrance
+        uint8 npc_id;
         EventMap events;
         InstanceScript* pInstance;
     };
@@ -534,15 +522,15 @@ public:
         {
             events.Reset();
             if (pInstance)
-            if (pInstance->GetData(DATA_EVENT_ILLIDAN_1) == DONE)
-                me->DespawnOrUnsummon(500);
+                if (pInstance->GetData(DATA_EVENT_ILLIDAN_1) == DONE)
+                    me->DespawnOrUnsummon(500);
         }
 
         void DamageTaken(Unit* who, uint32 &damage)
         {
             if (who->GetGUID() == me->GetGUID())
-            if (damage >= me->GetHealth())
-                damage = me->GetHealth() - 1;
+                if (damage >= me->GetHealth())
+                    damage = me->GetHealth() - 1;
         }
 
         void MoveInLineOfSight(Unit* who)
@@ -569,35 +557,35 @@ public:
             {
                 switch (data)
                 {
-                    case POINT_ILLIDAN_1_1:
-                        curPoint = 1;
-                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                        break;
-                    case POINT_ILLIDAN_1_2:
-                        curPoint = 2;
-                        events.ScheduleEvent(EVENT_ILLIDAN_MOVE_1_3, 100);
-                        break;
-                    case POINT_ILLIDAN_1_3:
-                        curPoint = 3;
-                        events.ScheduleEvent(EVENT_ILLIDAN_MOVE_1_4, 100);
-                        break;
-                    case POINT_ILLIDAN_1_4:
-                        curPoint = 4;
-                        events.ScheduleEvent(EVENT_ILLIDAN_MOVE_1_5, 100);
-                        break;
-                    case POINT_ILLIDAN_1_5:
-                        curPoint = 5;
-                        curPoint = 6;
-                        if (pInstance)
+                case POINT_ILLIDAN_1_1:
+                    curPoint = 1;
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    break;
+                case POINT_ILLIDAN_1_2:
+                    curPoint = 2;
+                    events.ScheduleEvent(EVENT_ILLIDAN_MOVE_1_3, 100);
+                    break;
+                case POINT_ILLIDAN_1_3:
+                    curPoint = 3;
+                    events.ScheduleEvent(EVENT_ILLIDAN_MOVE_1_4, 100);
+                    break;
+                case POINT_ILLIDAN_1_4:
+                    curPoint = 4;
+                    events.ScheduleEvent(EVENT_ILLIDAN_MOVE_1_5, 100);
+                    break;
+                case POINT_ILLIDAN_1_5:
+                    curPoint = 5;
+                    curPoint = 6;
+                    if (pInstance)
                         if (Creature* pPerotharn = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_PEROTHARN)))
                             pPerotharn->AI()->Talk(9); // SAY_INTRO
-                        events.ScheduleEvent(EVENT_ILLIDAN_START_1_1, 10000);
-                        break;
-                    case POINT_ILLIDAN_1_6:
-                        me->DespawnOrUnsummon(500);
-                        break;
-                    default:
-                        break;
+                    events.ScheduleEvent(EVENT_ILLIDAN_START_1_1, 10000);
+                    break;
+                case POINT_ILLIDAN_1_6:
+                    me->DespawnOrUnsummon(500);
+                    break;
+                default:
+                    break;
                 }
             }
         }
@@ -619,39 +607,39 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_ILLIDAN_MOVE_1_3:
-                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_1_3, illidan1Pos[2]);
-                        break;
-                    case EVENT_ILLIDAN_MOVE_1_4:
-                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_1_4, illidan1Pos[3]);
-                        break;
-                    case EVENT_ILLIDAN_MOVE_1_5:
-                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_1_5, illidan1Pos[4]);
-                        break;
-                    case EVENT_ILLIDAN_MOVE_1_6:
-                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_1_6, illidan1Pos[5]);
-                        break;
-                    case EVENT_ILLIDAN_START_1_1:
-                        Talk(SAY_ILLIDAN_1_NEAR);
-                        events.ScheduleEvent(EVENT_ILLIDAN_START_1_2, 8000);
-                        break;
-                    case EVENT_ILLIDAN_START_1_2:
-                        if (pInstance)
-                        {
-                            if (Creature* pPerotharn = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_PEROTHARN)))
-                                pPerotharn->AI()->DoAction(1); // ACTION_START
-                        }
-                        break;
-                    case EVENT_ILLIDAN_OUTRO_1_1:
-                        Talk(SAY_ILLIDAN_1_OUTRO_1);
-                        events.ScheduleEvent(EVENT_ILLIDAN_OUTRO_1_2, 5000);
-                        break;
-                    case EVENT_ILLIDAN_OUTRO_1_2:
-                        Talk(SAY_ILLIDAN_1_OUTRO_2);
-                        events.ScheduleEvent(EVENT_ILLIDAN_MOVE_1_6, 2000);
-                        break;
-                    default:
-                        break;
+                case EVENT_ILLIDAN_MOVE_1_3:
+                    me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_1_3, illidan1Pos[2]);
+                    break;
+                case EVENT_ILLIDAN_MOVE_1_4:
+                    me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_1_4, illidan1Pos[3]);
+                    break;
+                case EVENT_ILLIDAN_MOVE_1_5:
+                    me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_1_5, illidan1Pos[4]);
+                    break;
+                case EVENT_ILLIDAN_MOVE_1_6:
+                    me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_1_6, illidan1Pos[5]);
+                    break;
+                case EVENT_ILLIDAN_START_1_1:
+                    Talk(SAY_ILLIDAN_1_NEAR);
+                    events.ScheduleEvent(EVENT_ILLIDAN_START_1_2, 8000);
+                    break;
+                case EVENT_ILLIDAN_START_1_2:
+                    if (pInstance)
+                    {
+                        if (Creature* pPerotharn = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_PEROTHARN)))
+                            pPerotharn->AI()->DoAction(1); // ACTION_START
+                    }
+                    break;
+                case EVENT_ILLIDAN_OUTRO_1_1:
+                    Talk(SAY_ILLIDAN_1_OUTRO_1);
+                    events.ScheduleEvent(EVENT_ILLIDAN_OUTRO_1_2, 5000);
+                    break;
+                case EVENT_ILLIDAN_OUTRO_1_2:
+                    Talk(SAY_ILLIDAN_1_OUTRO_2);
+                    events.ScheduleEvent(EVENT_ILLIDAN_MOVE_1_6, 2000);
+                    break;
+                default:
+                    break;
                 }
             }
         }
@@ -701,16 +689,16 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_QUEENS_BLADE:
-                        DoCastVictim(SPELL_QUEENS_BLADE);
-                        events.ScheduleEvent(EVENT_QUEENS_BLADE, urand(6000, 8000));
-                        break;
-                    case EVENT_SHIMMERING_STRIKE:
-                        DoCastAOE(SPELL_SHIMMERING_STRIKE);
-                        events.ScheduleEvent(EVENT_SHIMMERING_STRIKE, urand(12000, 15000));
-                        break;
-                    default:
-                        break;
+                case EVENT_QUEENS_BLADE:
+                    DoCastVictim(SPELL_QUEENS_BLADE);
+                    events.ScheduleEvent(EVENT_QUEENS_BLADE, urand(6000, 8000));
+                    break;
+                case EVENT_SHIMMERING_STRIKE:
+                    DoCastAOE(SPELL_SHIMMERING_STRIKE);
+                    events.ScheduleEvent(EVENT_SHIMMERING_STRIKE, urand(12000, 15000));
+                    break;
+                default:
+                    break;
                 }
             }
 
@@ -761,15 +749,14 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_FEL_FLAMES:
-                        DoCastVictim(SPELL_FEL_FLAMES);
-                        events.ScheduleEvent(EVENT_FEL_FLAMES, urand(10000, 15000));
-                        break;
-                    default:
-                        break;
+                case EVENT_FEL_FLAMES:
+                    DoCastVictim(SPELL_FEL_FLAMES);
+                    events.ScheduleEvent(EVENT_FEL_FLAMES, urand(10000, 15000));
+                    break;
+                default:
+                    break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
 
@@ -790,8 +777,7 @@ public:
 
     struct npc_well_of_eternity_enchanted_highmistressAI : public ScriptedAI
     {
-        npc_well_of_eternity_enchanted_highmistressAI(Creature* pCreature) : ScriptedAI(pCreature)
-        { }
+        npc_well_of_eternity_enchanted_highmistressAI(Creature* pCreature) : ScriptedAI(pCreature) { }
 
         void Reset()
         {
@@ -825,29 +811,28 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_FIREBALL:
-                        DoCastVictim(SPELL_FIREBALL);
-                        events.ScheduleEvent(EVENT_FIREBALL, 2000);
-                        break;
-                    case EVENT_FIREBOMB:
-                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                            DoCast(pTarget, SPELL_FIREBOMB);
-                        events.ScheduleEvent(EVENT_FIREBOMB, urand(10000, 15000));
-                        break;
-                    case EVENT_FROSTBOLT:
-                        DoCastVictim(SPELL_FROSTBOLT);
-                        events.ScheduleEvent(EVENT_FROSTBOLT, 2000);
-                        break;
-                    case EVENT_BLIZZARD:
-                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                            DoCast(pTarget, SPELL_BLIZZARD);
-                        events.ScheduleEvent(EVENT_BLIZZARD, urand(20000, 25000));
-                        break;
-                    default:
-                        break;
+                case EVENT_FIREBALL:
+                    DoCastVictim(SPELL_FIREBALL);
+                    events.ScheduleEvent(EVENT_FIREBALL, 2000);
+                    break;
+                case EVENT_FIREBOMB:
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        DoCast(pTarget, SPELL_FIREBOMB);
+                    events.ScheduleEvent(EVENT_FIREBOMB, urand(10000, 15000));
+                    break;
+                case EVENT_FROSTBOLT:
+                    DoCastVictim(SPELL_FROSTBOLT);
+                    events.ScheduleEvent(EVENT_FROSTBOLT, 2000);
+                    break;
+                case EVENT_BLIZZARD:
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        DoCast(pTarget, SPELL_BLIZZARD);
+                    events.ScheduleEvent(EVENT_BLIZZARD, urand(20000, 25000));
+                    break;
+                default:
+                    break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
 
@@ -891,17 +876,16 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            // Quest
             if (!pInstance)
                 return;
 
             Map::PlayerList const &PlayerList = pInstance->instance->GetPlayers();
             if (!PlayerList.isEmpty())
-            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* pPlayer = i->getSource())
-            if (me->GetDistance2d(pPlayer) <= 50.0f &&
-                pPlayer->GetQuestStatus(QUEST_DOCUMENTING_THE_TIMEWAYS) == QUEST_STATUS_INCOMPLETE)
-                pPlayer->CastSpell(me, SPELL_ARCHIVED_HANDMAIDEN_1, true);
+                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                    if (Player* pPlayer = i->getSource())
+                        if (me->GetDistance2d(pPlayer) <= 50.0f &&
+                            pPlayer->GetQuestStatus(QUEST_DOCUMENTING_THE_TIMEWAYS) == QUEST_STATUS_INCOMPLETE)
+                            pPlayer->CastSpell(me, SPELL_ARCHIVED_HANDMAIDEN_1, true);
         }
 
         void UpdateAI(const uint32 diff)
@@ -918,15 +902,14 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_SWEET_LULLABY:
-                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                            DoCast(pTarget, SPELL_SWEET_LULLABY);
-                        break;
-                    default:
-                        break;
+                case EVENT_SWEET_LULLABY:
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        DoCast(pTarget, SPELL_SWEET_LULLABY);
+                    break;
+                default:
+                    break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
 
@@ -943,12 +926,12 @@ public:
     {
         switch (creature->GetEntry())
         {
-            case NPC_ABYSSAL:
-            case NPC_VAROTHEN:
-            case NPC_DOOMGUARD:
-                if (!creature->isAlive())
-                    creature->Respawn(true);
-                break;
+        case NPC_ABYSSAL:
+        case NPC_VAROTHEN:
+        case NPC_DOOMGUARD:
+            if (!creature->isAlive())
+                creature->Respawn(true);
+            break;
         }
     }
 };
@@ -972,8 +955,7 @@ public:
 
     struct npc_well_of_eternity_doomguard_annihilatorAI : public ScriptedAI
     {
-        npc_well_of_eternity_doomguard_annihilatorAI(Creature* pCreature) : ScriptedAI(pCreature)
-        { }
+        npc_well_of_eternity_doomguard_annihilatorAI(Creature* pCreature) : ScriptedAI(pCreature) { }
 
         void Reset()
         { }
@@ -986,16 +968,16 @@ public:
             std::list<Creature*> creatures;
             GetCreatureListWithEntryInGrid(creatures, me, me->GetEntry(), 500.0f);
             if (!creatures.empty())
-            for (std::list<Creature*>::const_iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
-            if (!(*itr)->isInCombat())
-                (*itr)->AI()->AttackStart(who);
+                for (std::list<Creature*>::const_iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                    if (!(*itr)->isInCombat())
+                        (*itr)->AI()->AttackStart(who);
         }
 
         void JustDied(Unit* /*killer*/)
         {
             if (InstanceScript* pInstance = me->GetInstanceScript())
-            if (Creature* pIllidan = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_EVENT_ILLIDAN_2)))
-                pIllidan->AI()->DoAction(ACTION_DOOMGUARD_DIED);
+                if (Creature* pIllidan = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_EVENT_ILLIDAN_2)))
+                    pIllidan->AI()->DoAction(ACTION_DOOMGUARD_DIED);
         }
     };
 };
@@ -1027,13 +1009,14 @@ public:
             events.Reset();
         }
 
-        void EnterEvadeMode() { }
+        void EnterEvadeMode()
+        { }
 
         void DamageTaken(Unit* who, uint32 &damage)
         {
             if (who->GetGUID() == me->GetGUID())
-            if (damage >= me->GetHealth())
-                damage = me->GetHealth() - 1;
+                if (damage >= me->GetHealth())
+                    damage = me->GetHealth() - 1;
         }
 
         void MoveInLineOfSight(Unit* who)
@@ -1066,45 +1049,45 @@ public:
             {
                 switch (data)
                 {
-                    case POINT_ILLIDAN_2_1:
-                        curPoint = 1;
-                        events.ScheduleEvent(EVENT_ILLIDAN_MOVE_2_2, 100);
-                        break;
-                    case POINT_ILLIDAN_2_2:
-                        curPoint = 2;
-                        events.ScheduleEvent(EVENT_ILLIDAN_MOVE_2_3, 100);
-                        break;
-                    case POINT_ILLIDAN_2_3:
-                        curPoint = 3;
-                        events.ScheduleEvent(EVENT_ILLIDAN_MOVE_2_4, 100);
-                        break;
-                    case POINT_ILLIDAN_2_4:
-                        curPoint = 4;
-                        events.ScheduleEvent(EVENT_ILLIDAN_MOVE_2_5, 100);
-                        break;
-                    case POINT_ILLIDAN_2_5:
-                        curPoint = 5;
-                        events.ScheduleEvent(EVENT_ILLIDAN_MOVE_2_6, 100);
-                        break;
-                    case POINT_ILLIDAN_2_6:
-                        events.ScheduleEvent(EVENT_ILLIDAN_NEAR_ELEMENTAL_1, 3000);
-                        break;
-                    case POINT_ILLIDAN_2_8:
-                        curPoint = 8;
-                        events.ScheduleEvent(EVENT_ILLIDAN_MOVE_2_9, 100);
-                        break;
-                    case POINT_ILLIDAN_2_9:
-                        if (pInstance)
-                        {
-                            if (Creature* pVarothen = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_VAROTHEN)))
-                                pVarothen->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                            if (Creature* pMannoroth = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MANNOROTH)))
-                                pMannoroth->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                        }
-                        Talk(SAY_ILLIDAN_2_VAROTHEN);
-                        break;
-                    default:
-                        break;
+                case POINT_ILLIDAN_2_1:
+                    curPoint = 1;
+                    events.ScheduleEvent(EVENT_ILLIDAN_MOVE_2_2, 100);
+                    break;
+                case POINT_ILLIDAN_2_2:
+                    curPoint = 2;
+                    events.ScheduleEvent(EVENT_ILLIDAN_MOVE_2_3, 100);
+                    break;
+                case POINT_ILLIDAN_2_3:
+                    curPoint = 3;
+                    events.ScheduleEvent(EVENT_ILLIDAN_MOVE_2_4, 100);
+                    break;
+                case POINT_ILLIDAN_2_4:
+                    curPoint = 4;
+                    events.ScheduleEvent(EVENT_ILLIDAN_MOVE_2_5, 100);
+                    break;
+                case POINT_ILLIDAN_2_5:
+                    curPoint = 5;
+                    events.ScheduleEvent(EVENT_ILLIDAN_MOVE_2_6, 100);
+                    break;
+                case POINT_ILLIDAN_2_6:
+                    events.ScheduleEvent(EVENT_ILLIDAN_NEAR_ELEMENTAL_1, 3000);
+                    break;
+                case POINT_ILLIDAN_2_8:
+                    curPoint = 8;
+                    events.ScheduleEvent(EVENT_ILLIDAN_MOVE_2_9, 100);
+                    break;
+                case POINT_ILLIDAN_2_9:
+                    if (pInstance)
+                    {
+                        if (Creature* pVarothen = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_VAROTHEN)))
+                            pVarothen->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        if (Creature* pMannoroth = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MANNOROTH)))
+                            pMannoroth->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    }
+                    Talk(SAY_ILLIDAN_2_VAROTHEN);
+                    break;
+                default:
+                    break;
                 }
             }
         }
@@ -1138,7 +1121,6 @@ public:
                 me->InterruptNonMeleeSpells(false);
                 events.Reset();
             }
-
         }
 
         void UpdateAI(const uint32 diff)
@@ -1152,100 +1134,100 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_MALFURION_INTRO_1:
-                        if (Creature* pMalfurion = me->FindNearestCreature(NPC_MALFURION, 100.0f))
-                            pMalfurion->AI()->Talk(SAY_MALFURION_INTRO_1);
-                        events.ScheduleEvent(EVENT_MALFURION_INTRO_2, 7000);
-                        break;
-                    case EVENT_MALFURION_INTRO_2:
-                        if (Creature* pMalfurion = me->FindNearestCreature(NPC_MALFURION, 100.0f))
-                            pMalfurion->AI()->Talk(SAY_MALFURION_INTRO_2);
-                        events.ScheduleEvent(EVENT_ILLIDAN_INTRO_2_2, 7000);
-                        break;
-                    case EVENT_ILLIDAN_INTRO_2_2:
-                        Talk(SAY_ILLIDAN_2_INTRO_2);
-                        events.ScheduleEvent(EVENT_TYRANDE_INTRO_1, 7000);
-                        break;
-                    case EVENT_TYRANDE_INTRO_1:
-                        if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 100.0f))
-                            pTyrande->AI()->Talk(SAY_TYRANDE_INTRO_1);
-                        events.ScheduleEvent(EVENT_ILLIDAN_INTRO_2_3, 9000);
-                        break;
-                    case EVENT_ILLIDAN_INTRO_2_3:
-                        Talk(SAY_ILLIDAN_2_INTRO_3);
-                        events.ScheduleEvent(EVENT_TYRANDE_INTRO_2, 5000);
-                        break;
-                    case EVENT_TYRANDE_INTRO_2:
-                        if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 100.0f))
-                        {
-                            pTyrande->AI()->Talk(SAY_TYRANDE_INTRO_2);
-                            pTyrande->CastSpell(pTyrande, SPELL_BLESSING_OF_ELUNE);
-                        }
-                        break;
-                    case EVENT_ILLIDAN_MOVE_2_1:
-                        if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 100.0f))
-                            pTyrande->RemoveAura(SPELL_BLESSING_OF_ELUNE);
-                        Talk(SAY_ILLIDAN_2_DEMONS);
-                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_1, illidan2Pos[curPoint]);
-                        break;
-                    case EVENT_ILLIDAN_MOVE_2_2:
-                        if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 100.0f))
-                            pTyrande->AI()->DoAction(ACTION_TYRANDE_MOVE_1);
-                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_2, illidan2Pos[curPoint]);
-                        break;
-                    case EVENT_ILLIDAN_MOVE_2_3:
-                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_3, illidan2Pos[curPoint]);
-                        break;
-                    case EVENT_ILLIDAN_MOVE_2_4:
-                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_4, illidan2Pos[curPoint]);
-                        break;
-                    case EVENT_ILLIDAN_MOVE_2_5:
-                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_5, illidan2Pos[curPoint]);
-                        break;
-                    case EVENT_ILLIDAN_MOVE_2_6:
-                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_6, illidan2Pos[curPoint]);
-                        break;
-                    case EVENT_ILLIDAN_NEAR_ELEMENTAL_1:
-                        Talk(SAY_ILLIDAN_2_ELEMENTAL_1);
-                        events.ScheduleEvent(EVENT_ILLIDAN_NEAR_ELEMENTAL_2, 5000);
-                        break;
-                    case EVENT_ILLIDAN_NEAR_ELEMENTAL_2:
-                        Talk(SAY_ILLIDAN_2_ELEMENTAL_2);
-                        events.ScheduleEvent(EVENT_TYRANDE_NEAR_ELEMENTAL_1, 5000);
-                        break;
-                    case EVENT_TYRANDE_NEAR_ELEMENTAL_1:
-                        if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 100.0f))
-                            pTyrande->AI()->Talk(SAY_TYRANDE_ELEMENTAL);
-                        events.ScheduleEvent(EVENT_ILLIDAN_NEAR_ELEMENTAL_3, 7000);
-                        break;
-                    case EVENT_ILLIDAN_NEAR_ELEMENTAL_3:
-                        Talk(SAY_ILLIDAN_2_ELEMENTAL_3);
-                        events.ScheduleEvent(EVENT_ILLIDAN_NEAR_ELEMENTAL_4, 5000);
-                        break;
-                    case EVENT_ILLIDAN_NEAR_ELEMENTAL_4:
-                        DoCast(me, SPELL_WATERS_OF_ETERNITY);
-                        events.ScheduleEvent(EVENT_ILLIDAN_NEAR_ELEMENTAL_5, 5000);
-                        break;
-                    case EVENT_ILLIDAN_NEAR_ELEMENTAL_5:
-                        Talk(SAY_ILLIDAN_2_ELEMENTAL_4);
-                        curPoint = 6;
-                        events.ScheduleEvent(EVENT_ILLIDAN_MOVE_2_7, 14000);
-                        break;
-                    case EVENT_ILLIDAN_MOVE_2_7:
-                        if (Creature* pAbyssal = me->FindNearestCreature(NPC_ABYSSAL, 100.0f))
-                            pAbyssal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_7, illidan2Pos[curPoint]);
-                        break;
-                    case EVENT_ILLIDAN_MOVE_2_8:
-                        if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 100.0f))
-                            pTyrande->AI()->DoAction(ACTION_TYRANDE_MOVE_2);
-                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_8, illidan2Pos[curPoint]);
-                        break;
-                    case EVENT_ILLIDAN_MOVE_2_9:
-                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_9, illidan2Pos[curPoint]);
-                        break;
-                    default:
-                        break;
+                case EVENT_MALFURION_INTRO_1:
+                    if (Creature* pMalfurion = me->FindNearestCreature(NPC_MALFURION, 100.0f))
+                        pMalfurion->AI()->Talk(SAY_MALFURION_INTRO_1);
+                    events.ScheduleEvent(EVENT_MALFURION_INTRO_2, 7000);
+                    break;
+                case EVENT_MALFURION_INTRO_2:
+                    if (Creature* pMalfurion = me->FindNearestCreature(NPC_MALFURION, 100.0f))
+                        pMalfurion->AI()->Talk(SAY_MALFURION_INTRO_2);
+                    events.ScheduleEvent(EVENT_ILLIDAN_INTRO_2_2, 7000);
+                    break;
+                case EVENT_ILLIDAN_INTRO_2_2:
+                    Talk(SAY_ILLIDAN_2_INTRO_2);
+                    events.ScheduleEvent(EVENT_TYRANDE_INTRO_1, 7000);
+                    break;
+                case EVENT_TYRANDE_INTRO_1:
+                    if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 100.0f))
+                        pTyrande->AI()->Talk(SAY_TYRANDE_INTRO_1);
+                    events.ScheduleEvent(EVENT_ILLIDAN_INTRO_2_3, 9000);
+                    break;
+                case EVENT_ILLIDAN_INTRO_2_3:
+                    Talk(SAY_ILLIDAN_2_INTRO_3);
+                    events.ScheduleEvent(EVENT_TYRANDE_INTRO_2, 5000);
+                    break;
+                case EVENT_TYRANDE_INTRO_2:
+                    if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 100.0f))
+                    {
+                        pTyrande->AI()->Talk(SAY_TYRANDE_INTRO_2);
+                        pTyrande->CastSpell(pTyrande, SPELL_BLESSING_OF_ELUNE);
+                    }
+                    break;
+                case EVENT_ILLIDAN_MOVE_2_1:
+                    if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 100.0f))
+                        pTyrande->RemoveAura(SPELL_BLESSING_OF_ELUNE);
+                    Talk(SAY_ILLIDAN_2_DEMONS);
+                    me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_1, illidan2Pos[curPoint]);
+                    break;
+                case EVENT_ILLIDAN_MOVE_2_2:
+                    if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 100.0f))
+                        pTyrande->AI()->DoAction(ACTION_TYRANDE_MOVE_1);
+                    me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_2, illidan2Pos[curPoint]);
+                    break;
+                case EVENT_ILLIDAN_MOVE_2_3:
+                    me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_3, illidan2Pos[curPoint]);
+                    break;
+                case EVENT_ILLIDAN_MOVE_2_4:
+                    me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_4, illidan2Pos[curPoint]);
+                    break;
+                case EVENT_ILLIDAN_MOVE_2_5:
+                    me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_5, illidan2Pos[curPoint]);
+                    break;
+                case EVENT_ILLIDAN_MOVE_2_6:
+                    me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_6, illidan2Pos[curPoint]);
+                    break;
+                case EVENT_ILLIDAN_NEAR_ELEMENTAL_1:
+                    Talk(SAY_ILLIDAN_2_ELEMENTAL_1);
+                    events.ScheduleEvent(EVENT_ILLIDAN_NEAR_ELEMENTAL_2, 5000);
+                    break;
+                case EVENT_ILLIDAN_NEAR_ELEMENTAL_2:
+                    Talk(SAY_ILLIDAN_2_ELEMENTAL_2);
+                    events.ScheduleEvent(EVENT_TYRANDE_NEAR_ELEMENTAL_1, 5000);
+                    break;
+                case EVENT_TYRANDE_NEAR_ELEMENTAL_1:
+                    if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 100.0f))
+                        pTyrande->AI()->Talk(SAY_TYRANDE_ELEMENTAL);
+                    events.ScheduleEvent(EVENT_ILLIDAN_NEAR_ELEMENTAL_3, 7000);
+                    break;
+                case EVENT_ILLIDAN_NEAR_ELEMENTAL_3:
+                    Talk(SAY_ILLIDAN_2_ELEMENTAL_3);
+                    events.ScheduleEvent(EVENT_ILLIDAN_NEAR_ELEMENTAL_4, 5000);
+                    break;
+                case EVENT_ILLIDAN_NEAR_ELEMENTAL_4:
+                    DoCast(me, SPELL_WATERS_OF_ETERNITY);
+                    events.ScheduleEvent(EVENT_ILLIDAN_NEAR_ELEMENTAL_5, 5000);
+                    break;
+                case EVENT_ILLIDAN_NEAR_ELEMENTAL_5:
+                    Talk(SAY_ILLIDAN_2_ELEMENTAL_4);
+                    curPoint = 6;
+                    events.ScheduleEvent(EVENT_ILLIDAN_MOVE_2_7, 14000);
+                    break;
+                case EVENT_ILLIDAN_MOVE_2_7:
+                    if (Creature* pAbyssal = me->FindNearestCreature(NPC_ABYSSAL, 100.0f))
+                        pAbyssal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_7, illidan2Pos[curPoint]);
+                    break;
+                case EVENT_ILLIDAN_MOVE_2_8:
+                    if (Creature* pTyrande = me->FindNearestCreature(NPC_TYRANDE, 100.0f))
+                        pTyrande->AI()->DoAction(ACTION_TYRANDE_MOVE_2);
+                    me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_8, illidan2Pos[curPoint]);
+                    break;
+                case EVENT_ILLIDAN_MOVE_2_9:
+                    me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_2_9, illidan2Pos[curPoint]);
+                    break;
+                default:
+                    break;
                 }
             }
         }
@@ -1286,74 +1268,74 @@ public:
         void SpellHit(Unit* /*who*/, const SpellInfo* spellInfo)
         {
             if (spellInfo->Id == SPELL_DEBILITATING_FLAY)
-            if (!bDebilitating)
-            {
-                bDebilitating = true;
-                events.CancelEvent(EVENT_TYRANDE_SHOT);
-                me->InterruptNonMeleeSpells(false);
-                Talk(SAY_TYRANDE_ELUNE);
-                DoCast(me, SPELL_BLESSING_OF_ELUNE);
-            }
+                if (!bDebilitating)
+                {
+                    bDebilitating = true;
+                    events.CancelEvent(EVENT_TYRANDE_SHOT);
+                    me->InterruptNonMeleeSpells(false);
+                    Talk(SAY_TYRANDE_ELUNE);
+                    DoCast(me, SPELL_BLESSING_OF_ELUNE);
+                }
         }
 
         void DoAction(const int32 action)
         {
             switch (action)
             {
-                case ACTION_TYRANDE_MOVE_1:
-                    curPoint = 0;
-                    events.ScheduleEvent(EVENT_TYRANDE_MOVE_1, 100);
-                    break;
-                case ACTION_TYRANDE_MOVE_2:
-                    curPoint = 5;
-                    events.ScheduleEvent(EVENT_TYRANDE_MOVE_2, 100);
-                    break;
-                case ACTION_MANNOROTH_AGGRO:
-                    me->GetMotionMaster()->MovePoint(POINT_TYRANDE_3, tyrandePos);
-                    break;
-                case ACTION_MANNOROTH_RESET:
-                    me->RemoveAllAuras();
-                    me->InterruptNonMeleeSpells(false);
-                    events.Reset();
-                    bDebilitating = false;
-                    uiDebilitatingCount = 0;
-                    break;
-                case ACTION_DEBILITATING_OFF:
-                    if (bDebilitating)
+            case ACTION_TYRANDE_MOVE_1:
+                curPoint = 0;
+                events.ScheduleEvent(EVENT_TYRANDE_MOVE_1, 100);
+                break;
+            case ACTION_TYRANDE_MOVE_2:
+                curPoint = 5;
+                events.ScheduleEvent(EVENT_TYRANDE_MOVE_2, 100);
+                break;
+            case ACTION_MANNOROTH_AGGRO:
+                me->GetMotionMaster()->MovePoint(POINT_TYRANDE_3, tyrandePos);
+                break;
+            case ACTION_MANNOROTH_RESET:
+                me->RemoveAllAuras();
+                me->InterruptNonMeleeSpells(false);
+                events.Reset();
+                bDebilitating = false;
+                uiDebilitatingCount = 0;
+                break;
+            case ACTION_DEBILITATING_OFF:
+                if (bDebilitating)
+                {
+                    uiDebilitatingCount++;
+                    if (uiDebilitatingCount >= 2)
                     {
-                        uiDebilitatingCount++;
-                        if (uiDebilitatingCount >= 2)
-                        {
-                            bDebilitating = false;
-                            uiDebilitatingCount = 0;
-                            me->RemoveAura(SPELL_BLESSING_OF_ELUNE);
-                            Talk(SAY_TYRANDE_CONTINUE);
-                            events.ScheduleEvent(EVENT_TYRANDE_SHOT, 1000);
-                            if (pInstance)
+                        bDebilitating = false;
+                        uiDebilitatingCount = 0;
+                        me->RemoveAura(SPELL_BLESSING_OF_ELUNE);
+                        Talk(SAY_TYRANDE_CONTINUE);
+                        events.ScheduleEvent(EVENT_TYRANDE_SHOT, 1000);
+                        if (pInstance)
                             if (Creature* pMannoroth = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MANNOROTH)))
                                 pMannoroth->AI()->DoAction(2); // ACTION_DEBILITATING_OFF
-                        }
                     }
-                    break;
-                case ACTION_MANNOROTH_SARGERAS:
-                    events.CancelEvent(EVENT_TYRANDE_SHOT);
-                    events.ScheduleEvent(EVENT_HAND_OF_ELUNE, 1000);
-                    break;
-                case ACTION_MANNOROTH_INFERNO:
-                    events.CancelEvent(EVENT_TYRANDE_SHOT);
-                    events.CancelEvent(EVENT_HAND_OF_ELUNE);
-                    me->RemoveAura(SPELL_HAND_OF_ELUNE);
-                    DoCastAOE(SPELL_WRATH_OF_ELUNE_2, true);
-                    break;
-                case ACTION_MANNOROTH_END:
-                    me->RemoveAllAuras();
-                    me->InterruptNonMeleeSpells(false);
-                    events.Reset();
-                    bDebilitating = false;
-                    uiDebilitatingCount = 0;
-                    break;
-                default:
-                    break;
+                }
+                break;
+            case ACTION_MANNOROTH_SARGERAS:
+                events.CancelEvent(EVENT_TYRANDE_SHOT);
+                events.ScheduleEvent(EVENT_HAND_OF_ELUNE, 1000);
+                break;
+            case ACTION_MANNOROTH_INFERNO:
+                events.CancelEvent(EVENT_TYRANDE_SHOT);
+                events.CancelEvent(EVENT_HAND_OF_ELUNE);
+                me->RemoveAura(SPELL_HAND_OF_ELUNE);
+                DoCastAOE(SPELL_WRATH_OF_ELUNE_2, true);
+                break;
+            case ACTION_MANNOROTH_END:
+                me->RemoveAllAuras();
+                me->InterruptNonMeleeSpells(false);
+                events.Reset();
+                bDebilitating = false;
+                uiDebilitatingCount = 0;
+                break;
+            default:
+                break;
             }
         }
 
@@ -1391,24 +1373,24 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_TYRANDE_MOVE_1:
-                        me->GetMotionMaster()->MovePoint(POINT_TYRANDE_1, illidan2Pos[curPoint]);
-                        break;
-                    case EVENT_TYRANDE_MOVE_2:
-                        me->GetMotionMaster()->MovePoint(POINT_TYRANDE_2, illidan2Pos[curPoint]);
-                        break;
-                    case EVENT_TYRANDE_SHOT:
-                        DoCastAOE(SPELL_LUNAR_SHOT_3);
-                        events.ScheduleEvent(EVENT_TYRANDE_SHOT, 3000);
-                        break;
-                    case EVENT_HAND_OF_ELUNE:
-                        if (!me->HasAura(SPELL_DEBILITATING_FLAY))
-                            DoCast(me, SPELL_HAND_OF_ELUNE);
-                        else
-                            events.ScheduleEvent(EVENT_HAND_OF_ELUNE, 1000);
-                        break;
-                    default:
-                        break;
+                case EVENT_TYRANDE_MOVE_1:
+                    me->GetMotionMaster()->MovePoint(POINT_TYRANDE_1, illidan2Pos[curPoint]);
+                    break;
+                case EVENT_TYRANDE_MOVE_2:
+                    me->GetMotionMaster()->MovePoint(POINT_TYRANDE_2, illidan2Pos[curPoint]);
+                    break;
+                case EVENT_TYRANDE_SHOT:
+                    DoCastAOE(SPELL_LUNAR_SHOT_3);
+                    events.ScheduleEvent(EVENT_TYRANDE_SHOT, 3000);
+                    break;
+                case EVENT_HAND_OF_ELUNE:
+                    if (!me->HasAura(SPELL_DEBILITATING_FLAY))
+                        DoCast(me, SPELL_HAND_OF_ELUNE);
+                    else
+                        events.ScheduleEvent(EVENT_HAND_OF_ELUNE, 1000);
+                    break;
+                default:
+                    break;
                 }
             }
         }
@@ -1445,7 +1427,8 @@ public:
             events.Reset();
         }
 
-        void EnterEvadeMode() { }
+        void EnterEvadeMode()
+        { }
 
     private:
         EventMap events;
@@ -1496,8 +1479,8 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             if (InstanceScript* pInstance = me->GetInstanceScript())
-            if (Creature* pIllidan = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_EVENT_ILLIDAN_2)))
-                pIllidan->AI()->DoAction(ACTION_DOOMBRINGER_DIED);
+                if (Creature* pIllidan = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_EVENT_ILLIDAN_2)))
+                    pIllidan->AI()->DoAction(ACTION_DOOMBRINGER_DIED);
 
             me->DespawnOrUnsummon(3000);
         }
@@ -1520,7 +1503,6 @@ public:
                     events.ScheduleEvent(EVENT_ABYSSAL_FLAMES, 3000);
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     private:

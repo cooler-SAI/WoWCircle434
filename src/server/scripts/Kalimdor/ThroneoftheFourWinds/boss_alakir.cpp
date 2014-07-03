@@ -1,164 +1,104 @@
-
-
 #include "throne_of_the_four_winds.h"
-#include "ObjectAccessor.h"
-#include "Player.h"
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
+#include "ScriptPCH.h"
+#include "Spell.h"
+#include "WorldPacket.h"
 #include "Vehicle.h"
-#include "GridNotifiers.h"
 
-enum Texts
-{
-    SAY_AGGRO                       = 1, // Your challenge is accepted, mortals! Know that you face Al'Akir, Elemental Lord of Air! You have no hope of defeating me!
-    SAY_WIND_BURST                  = 2, // Winds! Obey my command!
-    SAY_PHASE_2                     = 3, // Your futile persistence angers me.
-    SAY_SQUALL_LINE                 = 4, // Storms! I summon you to my side!
-    SAY_PHASE_3                     = 5, // ENOUGH! I WILL NO LONGER BE CONTAINED!
-    SAY_KILL                        = 6, // Like swatting insects...
-    SAY_KILL_2                      = 7, // This little one will vex me no longer.
-    SAY_BERSERK                     = 8, // Enough! I tire of these games!
-    SAY_DEFEAT                      = 9, // After every storm... comes the calm...
-};
 
 enum Spells
 {
-    // Al'Akir
-    SPELL_WIND_BURST_N_10           = 87770, // PHASE ONE
-    SPELL_WIND_BURST_H_10           = 93261,
-    SPELL_WIND_BURST_N_25           = 93262,
-    SPELL_WIND_BURST_H_25           = 93263,
-    SPELL_LIGHTNING_STRIKE_N_10     = 88214,
-    SPELL_LIGHTNING_STRIKE_H_10     = 93255,
-    SPELL_LIGHTNING_STRIKE_N_25     = 93256,
-    SPELL_LIGHTNING_STRIKE_H_25     = 93257,
-    SPELL_ICE_STORM_SUMMON          = 88239,
+    SPELL_BERSERK                       = 47008,
+    SPELL_TOO_CLOSE_KNOCKBACK           = 90658,
+    SPELL_STATIC_SHOCK                  = 87873,
+    SPELL_SQUALL_LINE                   = 87856, // catch player
+    SPELL_WIND_BURST                    = 87770,
+    SPELL_LIGHTNING_STRIKE_PLAYERS      = 88214,
+    SPELL_LIGHTNING_STRIKE_SINGLE       = 95764,
+    SPELL_LIGHTNING_STRIKE_EFFECT       = 88238,
+    SPELL_ELECTROCUTE                   = 88427,
+    SPELL_FEEDBACK                      = 87904,
+    SPELL_ACID_RAIN                     = 88290,
+    SPELL_ACID_RAIN_REMOVE              = 91216,
+    SPELL_WIND_BURST_INSTANT            = 88858,
+    SPELL_RELENTLESS_STORM_VEHICLE      = 89104,
+    SPELL_RELENTLESS_STORM_RING         = 88866,
+    SPELL_RELENTLESS_STORM_CHANNEL      = 88875,
+    SPELL_LIGHTNING                     = 89641,
+    SPELL_LIGHTNING_ROD                 = 89666,
+    SPELL_LIGHTNING_CLOUDS_VISUAL       = 89564,
+    SPELL_LIGHTNING_CLOUDS_SINGLE_VIS   = 89583,
+    SPELL_LIGHTNING_CLOUDS_DMG          = 89587,
+    SPELL_LIGHTNING_CLOUDS_SUMMON       = 89565, // trigger 48190
+    SPELL_LIGHTNING_CLOUDS_SUMMON_EXTRA = 89577, // trigger 48196
+    SPELL_LIGHTNING_CLOUDS_SUMMON2      = 95783, // trigger 51597
+    SPELL_EYE_OF_THE_STORM_TRIGGERED    = 82724,
 
-    SPELL_ACID_RAIN_N_10            = 88301, // PHASE TWO
-    SPELL_ACID_RAIN_H_10            = 93279,
-    SPELL_ACID_RAIN_N_25            = 93280,
-    SPELL_ACID_RAIN_H_25            = 93281,
-
-    SPELL_RENTLESS_STORM            = 88866, // PHASE THREE
-    SPELL_EYE_OFTHE_STORM           = 82724,
-    SPELL_LIGHTING_ROD_N_10         = 89667,
-    SPELL_LIGHTING_ROD_H_10         = 93293,
-    SPELL_LIGHTING_ROD_N_25         = 93294,
-    SPELL_LIGHTING_ROD_H_25         = 93295,
-    SPELL_WIND_BURST2_N_10          = 88858,
-    SPELL_WIND_BURST2_H_10          = 93286,
-    SPELL_WIND_BURST2_N_25          = 93287,
-    SPELL_WIND_BURST2_H_25          = 93288,
-    SPELL_LIGHTNING_N_10            = 89641,
-    SPELL_LIGHTNING_H_10            = 93290,
-    SPELL_LIGHTNING_N_25            = 93291,
-    SPELL_LIGHTNING_H_25            = 93292,
-
-    SPELL_ELECTROCUE                = 88427, // PHASE ONE & TWO
-    SPELL_STATIC_SHOCK              = 87873,
-
-    SPELL_BLAST_OF_AIR              = 55912, // COMBI WITH WIND BURST
-    SPELL_RELENTLESS_STORM          = 88875, // AURA ON PHASE THREE
-    SPELL_BERSERK                   = 95211, // BERSERK I HOPE ITS THE RIGHT BERSERK
-
-    // Icestorm npc
-    SPELL_ICE_STORM_N_10            = 91020,
-    SPELL_ICE_STORM_H_10            = 93258,
-    SPELL_ICE_STORM_N_25            = 93259,
-    SPELL_ICE_STORM_H_25            = 93260,
-    SPELL_ICE_STORM_AURA_SPAWN      = 87472,
-    SPELL_ICE_STORM_AURA2           = 87469,
-
-    // Squall line
-    SPELL_SQUALL_LINE_AURA          = 87621,
-    SPELL_SQUALL_LINE_DISMOUNT      = 95757,
-    SPELL_SQUALL_LINE_DAMAGE_N_10   = 87856,
-    SPELL_SQUALL_LINE_DAMAGE_H_10   = 93283,
-    SPELL_SQUALL_LINE_DAMAGE_N_25   = 93284,
-    SPELL_SQUALL_LINE_DAMAGE_H_25   = 87855,
-
-    // Clouds
-    SPELL_LIGHTING_CLOUD_N_10       = 89588,
-    SPELL_LIGHTING_CLOUD_H_10       = 93297,
-    SPELL_LIGHTING_CLOUD_N_25       = 93298,
-    SPELL_LIGHTING_CLOUD_H_25       = 93299,
+    // Ice Storm
+    SPELL_ICE_STORM_VISUAL              = 87472,
+    SPELL_ICE_STORM_SUMM                = 87053,
 
     // Stormling
-    SPELL_FEEDBACK                  = 87904,
-    SPELL_STORMLING_H               = 87908,	// only in herioc
-
-};
-
-Position const StormlingListPositions[5] =
-{
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f},
-    {0.0f, 0.0f, 0.0f, 0.0f}
-};
-
-Position const StormlineswListPositions[7] =
-{
-    {-25.299749f, 875.881104f, 189.983994f, 0.0f},
-    {0.0f, 0.0f, 189.983994f, 0.0f},
-    {0.0f, 0.0f, 189.983994f, 0.0f},
-    {0.0f, 0.0f, 189.983994f, 0.0f},
-    {0.0f, 0.0f, 189.983994f, 0.0f},
-    {0.0f, 0.0f, 189.983994f, 0.0f},
-    {-38.400715f, 844.311096f, 189.983994f, 0.0f}
+    SPELL_STORMLING_AURA                = 87905,
+    SPELL_STORMLING_AURA_VISUAL         = 87906,
+    SPELL_STORMLING_PRE_AURA            = 87913,
+    SPELL_STORMLING_SUMMON              = 87914,
+    SPELL_STORMLING_PRE_SUMMON          = 87919,
 };
 
 enum Events
 {
-    EVENT_PHASE_THREE		        = 0,
-    EVENT_BERSERK                   = 1,
-    EVENT_ICE_STORM			        = 2,
-    EVENT_STATIC_SHOCK		        = 3,
-    EVENT_WIND_BURST		        = 4,
-    EVENT_LIGHTNING_STRIKE	        = 5,
-    EVENT_ELECTROCUE		        = 6,
-    EVENT_SQUALL_LINE		        = 7,
-    EVENT_ACID_RAIN			        = 8,
-    EVENT_STATIC_SHOCK2		        = 9,
-    EVENT_ELECTROCUE2		        = 10,
-    EVENT_LIGHTING_ROD		        = 11,
-    EVENT_SUMMON_STORMLING	        = 12,
-    EVENT_EYE_OF_THE_STORM	        = 13,
-    EVENT_RENTLESS_STORM	        = 14,
-    EVENT_WIND_BURST2		        = 15,
-    EVENT_LIGHTNING_CLOUD	        = 16,
-    EVENT_SQUALL_LINE2		        = 17,
-    EVENT_LIGHTING			        = 18,
+    EVENT_MELEE_CHECK                   = 1,
+    EVENT_STATIC_SHOCK,
+    EVENT_SQUALL_LINE,
+    EVENT_WIND_BURST,
+    EVENT_ICE_STORM,
+    EVENT_LIGHTNING_STRIKE,
+    EVENT_STORMLING,
+    EVENT_LIGHTNING,
+    EVENT_LIGHTNING_ROD,
+    EVENT_WIND_BURST_INSTANT,
+    EVENT_LIGHTNING_CLOUDS,
+    EVENT_EYE_OF_THE_STORM_REFRESH,
+    EVENT_BERSERK,
+    EVENT_CHECK_STORM,
 };
 
-enum AlakirEvents
+enum PhaseAlakir
 {
-    DATA_PHASE,
+    PHASE_NONE,
+    PHASE_ICE_STORM,
+    PHASE_STORMLING,
+    PHASE_WEATHER,
 };
 
-enum Phases
+enum DataMisc
 {
-    PHASE_NONE                      = 0,
-    PHASE_ONE                       = 1,
-    PHASE_TWO                       = 2,
-    PHASE_THREE                     = 3,
+    DATA_ALAKIR_BUFF            = 1,
+    DATA_CLOUDS_DEAL_DMG        = 2,
 };
 
-enum MiscData
+enum Timers
 {
-    NORMAL		                    = 2768,
-    DARK		                    = 2810,
+    TIMER_MELEE_CHECK           = 400,
+    TIMER_STATIC_SHOCK          = 10000,
+    TIMER_SQUALL_LINE           = 12000,
+    TIMER_WIND_BURST            = 25000,
+    TIMER_ICE_STORM             = 10000,
+    TIMER_STORMLING             = 15000,
+    TIMER_LIGHTNING_STRIKE      = 8000,
+    TIMER_LIGHTNING             = 6000,
+    TIMER_LIGHTNING_ROD         = 20000,
+    TIMER_WIND_BURST_INSTANT    = 25000,
+    TIMER_LIGHTNING_CLOUDS      = 15000,
+    TIMER_BERSERK               = 540000
 };
 
-enum Achievements
+Position const CenterPoint = {-49.6458f, 815.082f, 191.101f, 3.12414f};
+
+Position const SquallLinePos[2] =
 {
-    ACHIEVEMENT_ALAKIR_DEAD         = 5123,
-    ACHIEVEMENT_FOUR_PLAY           = 5305,
-    ACHIEVEMENT_KILLED_ALAKIR       = 5463,
+    {-13.16094f, 780.8931f, 191.1009f, 3.566774f},
+    {0.279162f,  812.344f,  191.1009f, 1.905972f},
 };
 
 class boss_alakir : public CreatureScript
@@ -166,177 +106,231 @@ class boss_alakir : public CreatureScript
 public:
     boss_alakir() : CreatureScript("boss_alakir") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new boss_alakirAI(pCreature);
+        return new boss_alakirAI (creature);
     }
 
     struct boss_alakirAI : public BossAI
     {
-        boss_alakirAI(Creature* pCreature) : BossAI(pCreature, DATA_ALAKIR)
+        boss_alakirAI(Creature* creature) : BossAI(creature, DATA_ALAKIR_EVENT)
         {
-            instance = pCreature->GetInstanceScript();
-            _phase = PHASE_NONE;
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            instance = creature->GetInstanceScript();
         }
+
+        InstanceScript* instance;
+        PhaseAlakir phase;
+        bool castedElecrocute;
+        uint32 rangeCheckTimer;
+
 
         void Reset()
         {
             _Reset();
-
-            instance->DoSendNotifyToInstance("INSTANCE MESSAGE: Al'Akir _Reset");
-
-            SetPhase(PHASE_ONE, true);
-
-            if (GameObject* Go = GetClosestGameObjectWithEntry(me, GO_FLOOR_ALAKIR, 1000.0f))
-                Go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING);
-
-            Map* pMap = me->GetMap();
-            Map::PlayerList const &PlayerList = pMap->GetPlayers();
-
-            if (PlayerList.isEmpty())
-                return;
-
-            me->SetReactState(REACT_AGGRESSIVE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-
-            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            {
-                Player* plr = i->getSource();
-                if (plr->isAlive())
-                {
-                    plr->RemoveAurasDueToSpell(SPELL_EYE_OFTHE_STORM);
-                }
-            }
-            SendWeather(WEATHER_STATE_FINE);
+            me->AddUnitState(UNIT_STATE_IGNORE_UNATTACKABLE);
+            me->AddUnitState(UNIT_STATE_IGNORE_LOS);
+            me->AddAura(SPELL_TOO_CLOSE_KNOCKBACK, me);
+            me->RemoveAurasDueToSpell(SPELL_ACID_RAIN);
+            me->RemoveAurasDueToSpell(SPELL_BERSERK);
+            me->StopMoving();
+            phase = PHASE_NONE;
+            castedElecrocute = false;
+            rangeCheckTimer = 400;
+            instance->SetData(DATA_ALAKIR_FLIGHT_PHASE, NOT_STARTED);
+            instance->SetData(DATA_ALAKIR_EVENT, NOT_STARTED);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_EYE_OF_THE_STORM_TRIGGERED);
         }
 
-        void KilledUnit(Unit* /*who*/)
+        void EnterEvadeMode()
         {
-            Talk(RAND(SAY_KILL, SAY_KILL_2));
+            _EnterEvadeMode();
+            summons.DespawnAll();
+            DespawnCreatures(NPC_STORMLING);
+            DespawnCreatures(NPC_SQUILL_1);
+            DespawnCreatures(NPC_SQUILL_2);
+            instance->SetData(DATA_ALAKIR_FLIGHT_PHASE, FAIL);
+            instance->SetData(DATA_ALAKIR_EVENT, FAIL);
+            Reset();
         }
 
-        uint32 GetData(uint32 data)
+        void EnterCombat(Unit*)
         {
-            if (data == DATA_PHASE)
-                return _phase;
-
-            return 0;
-        }
-
-        void SetPhase(uint8 phase, bool setEvents = false)
-        {
-            events.Reset();
-
-            events.SetPhase(phase);
-            _phase = phase;
-
-            if (setEvents)
-                SetPhaseEvents();
-        }
-
-        void SetPhaseEvents()
-        {
-            switch (_phase)
-            {
-            case PHASE_ONE:
-                events.ScheduleEvent(EVENT_STATIC_SHOCK, 12000, 0, _phase);
-                events.ScheduleEvent(EVENT_ELECTROCUE, 20000, 0, _phase);
-                events.ScheduleEvent(EVENT_WIND_BURST, 3000, 0, _phase);
-                events.ScheduleEvent(EVENT_LIGHTNING_STRIKE, 18000, 0, _phase);
-                break;
-
-            case PHASE_TWO:
-                events.ScheduleEvent(EVENT_STATIC_SHOCK2, 8000, 0, _phase);
-                events.ScheduleEvent(EVENT_ACID_RAIN, 2000, 0, _phase);
-                events.ScheduleEvent(EVENT_ELECTROCUE2, 5000, 0, _phase);
-                break;
-
-            case PHASE_THREE:
-                events.ScheduleEvent(EVENT_WIND_BURST2, 25000, 0, _phase);
-                events.ScheduleEvent(EVENT_LIGHTING_ROD, 20000, 0, _phase);
-                events.ScheduleEvent(EVENT_LIGHTING, 25000, 0, _phase);
-                break;
-            default:
-                break;
-            }
-        }
-
-        void StartPhaseTwo()
-        {
-            SetPhase(PHASE_TWO, true);
-            SendLightOverride(NORMAL, 5000);
-            SendWeather(WEATHER_STATE_MEDIUM_RAIN);
-            me->MonsterYell("INSTANCE MESSAGE: Al'Akir PhaseTwo started", 0, 0);
-        }
-
-        void StartPhaseThree()
-        {
-            me->MonsterYell("INSTANCE MESSAGE: Al'Akir PhaseThree started", 0, 0);
-            SetPhase(PHASE_THREE, true);
-
-            GameObject* floor = me->FindNearestGameObject(GO_FLOOR_ALAKIR, 200);
-            if (floor)
-                floor->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED);
-
-            me->AddAura(SPELL_RELENTLESS_STORM, me);
-
-            SendWeather(WEATHER_STATE_FINE);
-
-            SendLightOverride(DARK, 5000);
-
-            Map* pMap = me->GetMap();
-            Map::PlayerList const &PlayerList = pMap->GetPlayers();
-
-            if (PlayerList.isEmpty())
-                return;
-
-            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            {
-                Player* plr = i->getSource();
-                if (plr->isAlive())
-                {
-                    plr->CastSpell(plr, SPELL_EYE_OFTHE_STORM, false);
-                }
-            }
-        }
-
-        void EnterCombat(Unit* /*who*/)
-        {
-            Talk(SAY_AGGRO);
             _EnterCombat();
-            me->MonsterYell("INSTANCE MESSAGE: Al'Akir _EnterCombat", 0, 0);
-            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-            events.SetPhase(PHASE_ONE);
-            me->MonsterYell("PHASE_ONE", 0, 0);
-            events.ScheduleEvent(EVENT_BERSERK, 10 * MINUTE * IN_MILLISECONDS);
+            Talk(0);
+
+            events.Reset();
+            events.ScheduleEvent(EVENT_BERSERK, TIMER_BERSERK);
+            events.ScheduleEvent(EVENT_MELEE_CHECK, TIMER_MELEE_CHECK);
+            events.ScheduleEvent(EVENT_STATIC_SHOCK, TIMER_STATIC_SHOCK);
+            events.ScheduleEvent(EVENT_SQUALL_LINE, TIMER_SQUALL_LINE);
+            events.ScheduleEvent(EVENT_WIND_BURST, TIMER_WIND_BURST);
+            events.ScheduleEvent(EVENT_ICE_STORM, TIMER_ICE_STORM);
+            events.ScheduleEvent(EVENT_LIGHTNING_STRIKE, TIMER_LIGHTNING_STRIKE);
+
+            DoZoneInCombat();
+            phase = PHASE_ICE_STORM;
+            instance->SetData(DATA_ALAKIR_EVENT, IN_PROGRESS);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* Killer)
         {
             _JustDied();
-            me->MonsterYell("INSTANCE MESSAGE: Al'Akir _JustDied", 0, 0);
-            me->SummonGameObject(GO_HEART_OF_THE_WIND, 25.359699f, 777.276733f, 200.264008f, 0, 0, 0, 0, 0, 100000);
+            Talk(7);
+            summons.DespawnAll();
+            instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 95673);
+            instance->SetData(DATA_ALAKIR_FLIGHT_PHASE, DONE);
+            instance->SetData(DATA_ALAKIR_EVENT, DONE);
         }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& damage)
+        void JustSummoned(Creature* summoned)
         {
-            if (me->HealthBelowPctDamaged(99, damage))
+            summons.Summon(summoned);
+        }
+
+        void DamageTaken(Unit* /*damageDealer*/, uint32& damage)
+        {
+            if (!HealthAbovePct(80) && phase == PHASE_ICE_STORM)
             {
-                me->MonsterYell("fuck it", 0, 0);
+                phase = PHASE_STORMLING;
+                Talk(3);
+                me->CastSpell(me, SPELL_ACID_RAIN, true);
+                events.CancelEvent(EVENT_ICE_STORM);
+                events.CancelEvent(EVENT_WIND_BURST);
+                events.CancelEvent(EVENT_LIGHTNING_STRIKE);
+                events.ScheduleEvent(EVENT_STORMLING, TIMER_STORMLING);
             }
 
-            if (me->HealthBelowPctDamaged(80, damage) && (_phase == PHASE_ONE))
+            if (!HealthAbovePct(25) && phase == PHASE_STORMLING)
             {
-                StartPhaseTwo();
-                me->MonsterYell("INSTANCE MESSAGE: Al'Akir StartPhaseTwo", 0, 0);
+                phase = PHASE_WEATHER;
+                Talk(5);
+                summons.DespawnAll();
+                DespawnCreatures(NPC_SQUILL_1);
+                DespawnCreatures(NPC_SQUILL_2);
+                me->RemoveAurasDueToSpell(SPELL_TOO_CLOSE_KNOCKBACK);
+                me->RemoveAurasDueToSpell(SPELL_ACID_RAIN);
+                me->CastSpell(me, SPELL_ACID_RAIN_REMOVE, true);
+                events.CancelEvent(EVENT_STATIC_SHOCK);
+                events.CancelEvent(EVENT_SQUALL_LINE);
+                events.CancelEvent(EVENT_STORMLING);
+
+                instance->SetData(DATA_ALAKIR_FLIGHT_PHASE, IN_PROGRESS);
+                me->CastSpell(me, SPELL_RELENTLESS_STORM_CHANNEL, true);
+
+                if (Creature* trigger = me->SummonCreature(NPC_WORLD_TRIGGER, CenterPoint.GetPositionX(), CenterPoint.GetPositionY(), 190.0f, TEMPSUMMON_MANUAL_DESPAWN))
+                    trigger->CastSpell(trigger, SPELL_RELENTLESS_STORM_RING, true);
+
+                PlayersHover();
+                SummonLightningClouds(true);
+                events.ScheduleEvent(EVENT_LIGHTNING, TIMER_LIGHTNING);
+                events.ScheduleEvent(EVENT_LIGHTNING_ROD, TIMER_LIGHTNING_ROD);
+                events.ScheduleEvent(EVENT_WIND_BURST_INSTANT, TIMER_WIND_BURST_INSTANT);
+                events.ScheduleEvent(EVENT_LIGHTNING_CLOUDS, TIMER_LIGHTNING_CLOUDS);
+                events.ScheduleEvent(EVENT_CHECK_STORM, 1000);
             }
-            if (me->HealthBelowPctDamaged(25, damage) && (_phase == PHASE_TWO))
+        }
+
+        void DespawnCreatures(uint32 entry)
+        {
+            std::list<Creature*> creatures;
+            GetCreatureListWithEntryInGrid(creatures, me, entry, 100.0f);
+
+            if (creatures.empty())
+                return;
+
+            for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
+                (*iter)->DespawnOrUnsummon();
+        }
+
+        void PlayersHover()
+        {
+            Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers(); 
+            if (!PlayerList.isEmpty())
             {
-                StartPhaseThree();
-                me->MonsterYell("INSTANCE MESSAGE: Al'Akir StartPhaseThree", 0, 0);
+                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                {
+                    Player* player = i->getSource();
+                    if (player)
+                    {
+                        player->CastSpell(player, SPELL_EYE_OF_THE_STORM, true);
+                        if (Creature* storm = player->SummonCreature(NPC_RELENTLESS_STORM_VEHICLE, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN))
+                            player->EnterVehicle(storm);
+                    }
+                }
+            }
+        }
+
+        void PlayersGetFlyBuff()
+        {
+            Map* map = me->GetMap();
+            Map::PlayerList const& players = map->GetPlayers();
+            if (!players.isEmpty())
+                for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+                    if (Player* player = i->getSource())
+                        if (player->isAlive())
+                            player->CastSpell(player, SPELL_EYE_OF_THE_STORM, true);
+        }
+
+        void CachingStorm()
+        {
+            Map* map = me->GetMap();
+            Map::PlayerList const& players = map->GetPlayers();
+            if (players.isEmpty())
+                return;
+
+            for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+                if (Player* player = i->getSource())
+                    if (player->isAlive())
+                        if (!player->IsInDist2d(CenterPoint.GetPositionX(), CenterPoint.GetPositionY(), 150.0f))
+                            if (Creature* trigger = player->SummonCreature(NPC_ICE_STORM_ROTATE_TRIGGER, CenterPoint, TEMPSUMMON_TIMED_DESPAWN, 5000))
+                            {
+                                trigger->SetOrientation(trigger->GetAngle(player));
+                                float x, y, z;
+                                trigger->GetClosePoint(x, y, z, trigger->GetObjectSize() / 3, 80.0f);
+
+                                if (Creature* storm = player->SummonCreature(NPC_RELENTLESS_STORM, x, y, player->GetPositionZ(), 0.0f, TEMPSUMMON_MANUAL_DESPAWN))
+                                {
+                                    player->CastSpell(player, SPELL_RELENTLESS_STORM_VEHICLE, true);
+                                    player->EnterVehicle(storm);
+                                    storm->DespawnOrUnsummon(6000);
+                                }
+                            }
+        }
+
+        void SummonLightningClouds(bool firstSpawn = false)
+        {
+            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
+            {
+                float pos_z = target->GetPositionZ();
+                if (firstSpawn)
+                    pos_z = 166.7302f;
+
+                if (Creature *centerTrigger = me->SummonCreature(NPC_LIGHTNING_CLOUD_TRIGGER, CenterPoint.GetPositionX(), CenterPoint.GetPositionY(), pos_z, target->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 45000))
+                {
+                    centerTrigger->AI()->SetData(0, DATA_CLOUDS_DEAL_DMG);
+                    int number = 8;
+                    float intervale = (2 * M_PI) / number;
+                    float x, y, z;
+
+                    for (float distance = 30.0f; distance < 151.0f; distance += 30.0f)
+                    {
+                        for (int i = 1; i <= number; ++i)
+                        {
+                            centerTrigger->GetClosePoint(x, y, z, centerTrigger->GetObjectSize() / 3, distance, i * intervale);
+                            me->SummonCreature(NPC_LIGHTNING_CLOUD_TRIGGER, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 45000);
+                        }
+                        number += 4;
+                        intervale = (2 * M_PI) / number;
+                    }
+                }
+            }
+        }
+
+        void SetData(uint32 uiI, uint32 uiValue)
+        {
+            if (uiValue == DATA_ALAKIR_BUFF)
+            {
+                me->CastSpell(me, SPELL_FEEDBACK, true);
             }
         }
 
@@ -347,225 +341,976 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
+            if (castedElecrocute && phase != PHASE_WEATHER)
             {
-                switch (eventId)
+                if (rangeCheckTimer <= diff)
                 {
-                case EVENT_BERSERK:
-                    DoCast(me, SPELL_BERSERK);
-                    break;
-
-                case EVENT_WIND_BURST:
-                    Talk(SAY_WIND_BURST);
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (me->IsWithinMeleeRange(me->getVictim(), 1.0f))
                     {
-                        DoCast(pTarget, SPELL_BLAST_OF_AIR);
-                        DoCast(pTarget, RAID_MODE(SPELL_WIND_BURST_N_10, SPELL_WIND_BURST_H_10, SPELL_WIND_BURST_N_25, SPELL_WIND_BURST_H_25));
+                        me->InterruptSpell(CURRENT_CHANNELED_SPELL);
+                        castedElecrocute = false;
                     }
-                    events.ScheduleEvent(EVENT_WIND_BURST, 25000, 0, PHASE_ONE);
-                    break;
+                    rangeCheckTimer = 400;
+                }
+                else rangeCheckTimer -= diff;
+            }
 
-                case EVENT_LIGHTNING_STRIKE:
-                    DoCastVictim(RAID_MODE(SPELL_LIGHTNING_STRIKE_N_10, SPELL_LIGHTNING_STRIKE_H_10, SPELL_LIGHTNING_STRIKE_N_25, SPELL_LIGHTNING_STRIKE_H_25));
-                    events.ScheduleEvent(EVENT_LIGHTNING_STRIKE, 20000, 0, PHASE_ONE);
-                    break;
+            while(uint32 eventId = events.ExecuteEvent())
+            {
+                if (eventId == EVENT_BERSERK)
+                {
+                    me->CastSpell(me, SPELL_BERSERK, true);
+                    events.CancelEvent(EVENT_BERSERK);
+                }
 
-                case EVENT_ELECTROCUE:
-                    if (Unit* pTarget = me->getVictim())
-                        if (me->IsWithinDistInMap(pTarget, 5.0f))
-                            DoCast(me->getVictim(), SPELL_ELECTROCUE);
-                    events.ScheduleEvent(EVENT_ELECTROCUE, 17000, 0, PHASE_ONE);
-                    break;
-
-                case EVENT_STATIC_SHOCK:
-                    DoCast(me->getVictim(), SPELL_STATIC_SHOCK);
-                    events.ScheduleEvent(EVENT_STATIC_SHOCK, 17000, 0, PHASE_ONE);
-                    break;
-
-                case EVENT_STATIC_SHOCK2:
-                    DoCast(me->getVictim(), SPELL_STATIC_SHOCK);
-                    events.ScheduleEvent(EVENT_STATIC_SHOCK2, 17000, 0, PHASE_TWO);
-                    break;
-
-                case EVENT_ELECTROCUE2:
-                    if (Unit* pTarget = me->getVictim())
-                        if (me->IsWithinDistInMap(pTarget, 5.0f))
-                            DoCast(me->getVictim(), SPELL_ELECTROCUE);
-                    events.ScheduleEvent(EVENT_ELECTROCUE2, 17000, 0, PHASE_TWO);
-                    break;
-
-                case EVENT_ACID_RAIN:
-                    DoCastAOE(RAID_MODE(SPELL_ACID_RAIN_N_10, SPELL_ACID_RAIN_H_10, SPELL_ACID_RAIN_N_25, SPELL_ACID_RAIN_H_25));
-                    events.ScheduleEvent(EVENT_ACID_RAIN, 15000, 0, PHASE_TWO);
-                    break;
-
-                case EVENT_WIND_BURST2:
-                    Talk(SAY_WIND_BURST);
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM))
+                if (phase == PHASE_ICE_STORM || phase == PHASE_STORMLING)
+                {
+                    switch (eventId)
                     {
-                        DoCast(pTarget, RAID_MODE(SPELL_WIND_BURST2_N_10, SPELL_WIND_BURST2_H_10, SPELL_WIND_BURST2_N_25, SPELL_WIND_BURST2_H_25));
-                    }
-                    events.ScheduleEvent(EVENT_WIND_BURST2, 5000, 0, PHASE_THREE);
-                    break;
+                    case EVENT_MELEE_CHECK:
+                        if (me->HasUnitState(UNIT_STATE_CASTING))
+                        {
+                            events.RescheduleEvent(EVENT_MELEE_CHECK, 100);
+                            break;
+                        }
+                        if (!me->IsWithinMeleeRange(me->getVictim()))
+                        {
+                            castedElecrocute = true;
+                            DoCastVictim(SPELL_ELECTROCUTE);
+                        }
+                        events.RescheduleEvent(EVENT_MELEE_CHECK, 400);
+                        break;
+                    case EVENT_STATIC_SHOCK:
+                        me->CastSpell(me, SPELL_STATIC_SHOCK, true);
+                        events.RescheduleEvent(EVENT_STATIC_SHOCK, 7000);
+                        break;
+                    case EVENT_SQUALL_LINE:
+                        switch (urand(0, 1))
+                        {
+                        case 0:
+                            me->SummonCreature(NPC_SQUILL_LINE_2, SquallLinePos[0], TEMPSUMMON_TIMED_DESPAWN, 40000);
+                            break;
+                        case 1:
+                            me->SummonCreature(NPC_SQUILL_LINE_1, SquallLinePos[1], TEMPSUMMON_TIMED_DESPAWN, 40000);
+                            break;
+                        }
+                        events.RescheduleEvent(EVENT_SQUALL_LINE, 35000);
+                        break;
 
-                case EVENT_LIGHTING_ROD:
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM))
-                    {
-                        DoCast(pTarget, RAID_MODE(SPELL_LIGHTING_ROD_N_10, SPELL_LIGHTING_ROD_H_10, SPELL_LIGHTING_ROD_N_25, SPELL_LIGHTING_ROD_H_25));
-                    }
-                    events.ScheduleEvent(EVENT_LIGHTING_ROD, 15000, 0, PHASE_THREE);
-                    break;
+                    case EVENT_WIND_BURST:
+                        Talk(1);
+                        Talk(2);
+                        me->CastSpell(me, SPELL_WIND_BURST, false);
+                        events.RescheduleEvent(EVENT_WIND_BURST, 35000);
+                        break;
+                    case EVENT_ICE_STORM:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 24.0f, true))
+                        {
+                            me->SummonCreature(NPC_ICE_STORM_RAIN, target->GetPositionX(), target->GetPositionY(), CenterPoint.GetPositionZ(), target->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 15000);
+                        }
+                        events.RescheduleEvent(EVENT_ICE_STORM, 20000);
+                        break;
+                    case EVENT_LIGHTNING_STRIKE:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 80.0f, true))
+                        {
+                            float orient = me->GetAngle(target);
+                            me->SetOrientation(orient);
+                            float x, y, z;
 
-                case EVENT_LIGHTING:
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM))
-                    {
-                        DoCast(pTarget, RAID_MODE(SPELL_LIGHTNING_N_10, SPELL_LIGHTNING_H_10, SPELL_LIGHTNING_N_25, SPELL_LIGHTNING_H_25));
+                            for (int i = 1; i < 17; i++)
+                            {
+                                me->GetClosePoint(x, y, z, me->GetObjectSize() / 10, 24.0f, i * 0.04188f);
+                                if (Creature* trigger = me->SummonCreature(NPC_LIGHTNING_STRIKE_TRIGGER, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 4000))
+                                    me->CastSpell(trigger, SPELL_LIGHTNING_STRIKE_SINGLE, true);
+                            }
+                            for (int i = 1; i < 17; i++)
+                            {
+                                me->GetClosePoint(x, y, z, me->GetObjectSize() / 10, 24.0f, -i * 0.04188f);
+                                if (Creature* trigger = me->SummonCreature(NPC_LIGHTNING_STRIKE_TRIGGER, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 4000))
+                                    me->CastSpell(trigger, SPELL_LIGHTNING_STRIKE_SINGLE, true);
+                            }
+
+                            me->CastSpell(me, SPELL_LIGHTNING_STRIKE_PLAYERS, true);
+                        }
+                        events.RescheduleEvent(EVENT_LIGHTNING_STRIKE, urand(8000,10000));
+                        break;
                     }
-                    events.ScheduleEvent(EVENT_LIGHTING, 20000, 0, PHASE_THREE);
-                    break;
-                default:
-                    break;
+                }
+                if (phase == PHASE_STORMLING)
+                {
+                    switch (eventId)
+                    {
+                    case EVENT_STORMLING:
+                        Talk(4);
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 25.0f, true))
+                        {
+                            me->SummonCreature(NPC_STORMLING_PRE_EFFECT, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_MANUAL_DESPAWN);
+                        }
+                        events.RescheduleEvent(EVENT_STORMLING, 20000);
+                        break;
+                    }
+                }
+                if (phase == PHASE_WEATHER)
+                {
+                    switch (eventId)
+                    {
+                    case EVENT_LIGHTNING:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
+                        {
+                            me->CastSpell(target, SPELL_LIGHTNING, false);
+                        }
+                        events.RescheduleEvent(EVENT_LIGHTNING, urand(2000, 3000));
+                        break;
+                    case EVENT_LIGHTNING_ROD:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
+                        {
+                            target->CastSpell(target, SPELL_LIGHTNING_ROD, true);
+                        }
+                        events.RescheduleEvent(EVENT_LIGHTNING_ROD, urand(15000, 20000));
+                        break;
+                    case EVENT_WIND_BURST_INSTANT:
+                        Talk(1);
+                        Talk(2);
+                        me->CastSpell(me, SPELL_WIND_BURST_INSTANT, true);
+                        events.RescheduleEvent(EVENT_WIND_BURST_INSTANT, 20000);
+                        events.ScheduleEvent(EVENT_EYE_OF_THE_STORM_REFRESH, 1000);
+                        break;
+                    case EVENT_EYE_OF_THE_STORM_REFRESH:
+                        PlayersGetFlyBuff();
+                        events.CancelEvent(EVENT_EYE_OF_THE_STORM_REFRESH);
+                        break;
+                    case EVENT_LIGHTNING_CLOUDS:
+                        SummonLightningClouds();
+                        events.RescheduleEvent(EVENT_LIGHTNING_CLOUDS, 15000);
+                        break;
+                    case EVENT_CHECK_STORM:
+                        CachingStorm();
+                        events.RescheduleEvent(EVENT_CHECK_STORM, 1000);
+                        break;
+                    }
                 }
             }
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        void SendLightOverride(uint32 overrideId, uint32 fadeInTime) const
-        {
-            WorldPacket data(SMSG_OVERRIDE_LIGHT, 12);
-            data << uint32(NORMAL);     // Light.dbc entry (map default)
-            data << uint32(overrideId); // Light.dbc entry (override)
-            data << uint32(fadeInTime);
-            SendPacketToPlayers(&data);
-        }
-
-        void SendWeather(WeatherState weather) const
-        {
-            WorldPacket data(SMSG_WEATHER, 9);
-            data << uint32(weather);
-            data << float(0.5f);
-            data << uint8(0);
-            SendPacketToPlayers(&data);
-        }
-
-        void SendPacketToPlayers(WorldPacket const* data) const
-        {
-            Map::PlayerList const& players = me->GetMap()->GetPlayers();
-            if (!players.isEmpty())
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                    if (Player* player = itr->getSource())
-                        if (player->GetAreaId() == AREA_TO4W)
-                            player->GetSession()->SendPacket(data);
-        }
-
-        InstanceScript* instance;
-        uint8 _phase;
-        uint32 phase;
-    };
-};
-
-class npc_stormling : public CreatureScript
-{
-public:
-    npc_stormling() : CreatureScript("npc_stormling") { }
-
-    struct npc_stormlingAI : public ScriptedAI
-    {
-        npc_stormlingAI(Creature* pCreature) : ScriptedAI(pCreature) { }
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_stormlingAI(creature);
-        }
-
-        uint32 GravityTimer;
-
-        void Reset()
-        {
-            GravityTimer = 10000;
-        }
-
-        void JustDied(Unit* killer)
-        {
-            DoCast(SPELL_FEEDBACK);
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if (IsHeroic())
-                if (GravityTimer <= diff)
-                {
-                    DoCast(SPELL_STORMLING_H);
-                    GravityTimer = 10000;
-                }
-
+            if (phase != PHASE_WEATHER)
                 DoMeleeAttackIfReady();
         }
     };
 };
 
-class npc_tornado_moving : public CreatureScript
+class npc_squall_line : public CreatureScript
 {
 public:
-    npc_tornado_moving() : CreatureScript("npc_tornado_moving") { }
+    npc_squall_line() : CreatureScript("npc_squall_line") { }
 
-    struct npc_tornado_movingAI : public ScriptedAI
+    CreatureAI* GetAI(Creature* creature) const
     {
-        npc_tornado_movingAI(Creature* creature) : ScriptedAI(creature) { }
+        return new npc_squall_lineAI (creature);
+    }
 
-        bool MoveSide; // true = right, false = left
-        float defaultDistX;
-        float defaultDistY;
+    struct npc_squall_lineAI : public ScriptedAI
+    {
+        npc_squall_lineAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_INTERRUPT, false);
+        }
 
         void IsSummonedBy(Unit* /*summoner*/)
         {
-            //me->AddAura(SPELL_TORNADO_VISUAL, me);
+            if (!me->GetVehicleKit())
+                return;
 
-            defaultDistX = GetAlakir()->GetPositionX() > me->GetPositionX() ? GetAlakir()->GetPositionX() - me->GetPositionX() : me->GetPositionX() - GetAlakir()->GetPositionX();
-            defaultDistY = GetAlakir()->GetPositionY() > me->GetPositionY() ? GetAlakir()->GetPositionY() - me->GetPositionY() : me->GetPositionY() - GetAlakir()->GetPositionY();
+            uint32 tornadoEntry = 0;
+            if (me->GetEntry() == NPC_SQUILL_LINE_2)
+                tornadoEntry = NPC_SQUILL_2;
+            else
+                tornadoEntry = NPC_SQUILL_1;
 
-            std::list<Creature*> tornados;
-            GetCreatureListWithEntryInGrid(tornados, me, me->GetEntry(), 40.0f);
+            for (int i = 0; i < 8; ++i)
+            {
+                if (Creature* tornado = me->SummonCreature(tornadoEntry, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 40000))
+                {
+                    tornado->EnterVehicle(me, i);
+                }
+            }
 
-            if (!tornados.empty() && tornados.size() < 4)
-                //me->SummonCreature(me->GetEntry(),me->GetPositionX() - (cos(me->GetOrientation())*2),me->GetPositionY() - (sin(me->GetOrientation())*2),me->GetPositionZ());
+            uint8 holeWall = urand(0, 7);
+            if (Unit* passenger = me->GetVehicleKit()->GetPassenger(holeWall))
+            {
+                passenger->ToCreature()->Kill(passenger);
+                passenger->ToCreature()->DespawnOrUnsummon();
+            }
 
-                    if (me->GetEntry() == 48854)
-                        MoveSide = true; // west
-                    else
-                        MoveSide = false; // east
+            if (holeWall == 7 && tornadoEntry == NPC_SQUILL_1)
+                holeWall = 6;
+            else if (holeWall == 7 && tornadoEntry == NPC_SQUILL_2)
+                holeWall = 5;
+            else if (holeWall == 6 && tornadoEntry == NPC_SQUILL_1)
+                holeWall = 7;
+            else if (holeWall == 6 && tornadoEntry == NPC_SQUILL_2)
+                holeWall = 4;
+            else if (holeWall == 5)
+                holeWall = 3;
+            else
+                holeWall = holeWall + 2;
+
+            if (Unit* passenger = me->GetVehicleKit()->GetPassenger(holeWall))
+            {
+                passenger->ToCreature()->Kill(passenger);
+                passenger->ToCreature()->DespawnOrUnsummon();
+            }
+        }
+        void Reset()
+        { }
+    };
+};
+
+class npc_wind_funnel : public CreatureScript
+{
+public:
+    npc_wind_funnel() : CreatureScript("npc_wind_funnel") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_wind_funnelAI (creature);
+    }
+
+    struct npc_wind_funnelAI : public ScriptedAI
+    {
+        npc_wind_funnelAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+        }
+
+        bool mounted;
+        uint32 CheckPlayerTimer;
+        uint32 DebuffRemoveTimer;
+
+        void Reset()
+        {
+            mounted = false;
+            CheckPlayerTimer = 5000;
+            DebuffRemoveTimer = 6000;
+        }
+
+        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
+        {
+            if (!me)
+                return;
+
+            if (apply)
+            {
+                mounted = true;
+            }
         }
 
         void UpdateAI(uint32 const diff)
         {
-            if (GetAlakir() && GetAlakir()->isAlive())
+            if (mounted)
             {
-                float distanceX = GetAlakir()->GetPositionX() > me->GetPositionX() ? GetAlakir()->GetPositionX() - me->GetPositionX() : me->GetPositionX() - GetAlakir()->GetPositionX();
-                float distanceY = GetAlakir()->GetPositionY() > me->GetPositionY() ? GetAlakir()->GetPositionY() - me->GetPositionY() : me->GetPositionY() - GetAlakir()->GetPositionY();
-                me->GetMotionMaster()->MovePoint(0, (distanceX < defaultDistX) ? me->GetPositionX() + MoveSide ? 1 : - 1 : me->GetPositionX(), (distanceY < defaultDistY) ? me->GetPositionY() + MoveSide ? 1 : - 1 : me->GetPositionY(), me->GetPositionZ());
+                if (DebuffRemoveTimer <= diff)
+                {
+                    mounted = false;
+                    DebuffRemoveTimer = 6000;
+                }
+                else DebuffRemoveTimer -= diff;
+
+                return;
             }
-        }
 
-        Creature* GetAlakir()
-        {
-            return me->FindNearestCreature(BOSS_ALAKIR, 5000.0f, true);
-        }
+            if (CheckPlayerTimer <= diff)
+            {
+                if (Player* pPlayer = me->FindNearestPlayer(2.0f, true))
+                {
+                    if (pPlayer->HasAura(SPELL_SQUALL_LINE))
+                        return;
 
+                    pPlayer->CastSpell(me, SPELL_SQUALL_LINE, true);
+                }
+                CheckPlayerTimer = 500;
+            }
+            else CheckPlayerTimer -= diff;
+        }
     };
+};
+
+// Ice Storm 46973
+class npc_ice_storm : public CreatureScript
+{
+public:
+    npc_ice_storm() : CreatureScript("npc_ice_storm") { }
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_tornado_movingAI(creature);
+        return new npc_ice_stormAI (creature);
+    }
+
+    struct npc_ice_stormAI : public ScriptedAI
+    {
+        npc_ice_stormAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_INTERRUPT, false);
+        }
+
+        void Reset()
+        {
+            me->DespawnOrUnsummon(20000);
+        }
+
+        void UpdateAI(uint32 const diff)
+        { }
+    };
+};
+
+// Ice Storm 46734
+class npc_ice_storm_rain : public CreatureScript
+{
+public:
+    npc_ice_storm_rain() : CreatureScript("npc_ice_storm_rain") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ice_storm_rainAI (creature);
+    }
+
+    struct npc_ice_storm_rainAI : public ScriptedAI
+    {
+        npc_ice_storm_rainAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_INTERRUPT, false);
+        }
+
+        float angelRain;
+        float radiusRain;
+        uint64 triggerGUID;
+        uint32 changeAngelRainTimer;
+        uint32 visualRainTimer;
+
+        void Reset()
+        {
+            changeAngelRainTimer = 1;
+            visualRainTimer = 1500;
+            radiusRain = me->GetDistance2d(CenterPoint.GetPositionX(), CenterPoint.GetPositionY());
+            if (urand(0, 1))
+                angelRain = 1.0f;
+            else
+                angelRain = -1.0f;
+            if (Creature* trigger = me->SummonCreature(NPC_ICE_STORM_ROTATE_TRIGGER, CenterPoint, TEMPSUMMON_TIMED_DESPAWN, 20000))
+                triggerGUID = trigger->GetGUID();
+
+            me->CastSpell(me, SPELL_ICE_STORM_VISUAL, true);
+            me->CastSpell(me, SPELL_ICE_STORM_SUMM, true);
+        }
+
+        void RunArc()
+        {
+            if (Creature* trigger = me->GetCreature(*me, triggerGUID))
+            {
+                trigger->SetOrientation(trigger->GetAngle(me));
+                float orient = trigger->GetOrientation();
+                trigger->SetOrientation(orient + angelRain);
+
+                float x, y, z;
+                trigger->GetClosePoint(x, y, z, me->GetObjectSize() / 3, radiusRain);
+
+                me->GetMotionMaster()->Clear(true);
+                me->GetMotionMaster()->MovePoint(0, x, y, z);
+            }
+        }
+
+        void UpdateAI(uint32 const diff)
+        {
+            if (changeAngelRainTimer <= diff)
+            {
+                RunArc();
+                changeAngelRainTimer = 3000;
+            }
+            else changeAngelRainTimer -= diff;
+
+            if (visualRainTimer <= diff)
+            {
+                me->CastSpell(me, SPELL_ICE_STORM_VISUAL, true);
+                visualRainTimer = 500;
+            }
+            else visualRainTimer -= diff;
+        }
+    };
+};
+
+// Stormling Pre-effect 47177
+class npc_stormling_pre_effect : public CreatureScript
+{
+public:
+    npc_stormling_pre_effect() : CreatureScript("npc_stormling_pre_effect") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_stormling_pre_effectAI (creature);
+    }
+
+    struct npc_stormling_pre_effectAI : public ScriptedAI
+    {
+        npc_stormling_pre_effectAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_INTERRUPT, false);
+        }
+
+        uint32 summonTimmer;
+
+        void Reset()
+        {
+            summonTimmer = 5000;
+            me->CastSpell(me, SPELL_STORMLING_PRE_AURA, true);
+        }
+
+        void UpdateAI(uint32 const diff)
+        {
+            if (summonTimmer <= diff)
+            {
+                me->CastSpell(me, SPELL_STORMLING_SUMMON, true);
+                me->DespawnOrUnsummon();
+            }
+            else summonTimmer -= diff;
+        }
+    };
+};
+
+// Stormling 47175
+class npc_stormling : public CreatureScript
+{
+public:
+    npc_stormling() : CreatureScript("npc_stormling") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_stormlingAI (creature);
+    }
+
+    struct npc_stormlingAI : public ScriptedAI
+    {
+        npc_stormlingAI(Creature* creature) : ScriptedAI(creature)
+        {
+            instance = me->GetInstanceScript();
+        }
+
+        InstanceScript* instance;
+
+        void Reset()
+        {
+            me->CastSpell(me, SPELL_STORMLING_AURA, true);
+            me->CastSpell(me, SPELL_STORMLING_AURA_VISUAL, true);
+        }
+
+        void JustDied(Unit* /*who*/)
+        {
+            if (Creature *boss = me->GetCreature(*me, instance->GetData64(DATA_ALAKIR)))
+            {
+                boss->AI()->SetData(0, DATA_ALAKIR_BUFF);
+            }
+        }
+
+        void IsSummonedBy(Unit* /*summoner*/)
+        {
+            if (Unit *target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+            {
+                me->AI()->AttackStart(target);
+            }
+        }
+
+        void UpdateAI(uint32 const diff)
+        {
+            if (!me->getVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+    };
+};
+
+// Electrocute 88427
+class spell_electrocute: public SpellScriptLoader
+{
+public:
+    spell_electrocute() : SpellScriptLoader("spell_electrocute") { }
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_electrocute_AuraScript();
+    }
+
+    class spell_electrocute_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_electrocute_AuraScript)
+
+            void OnUpdate(AuraEffect* aurEff)
+        {
+            uint32 dmg = urand(103950, 106050);
+            aurEff->SetAmount(dmg / (11 - (aurEff->GetTickNumber() / 2)));
+        }
+
+        void Register()
+        {
+            OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_electrocute_AuraScript::OnUpdate, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        }
+    };
+};
+
+// Wind Burst 87770
+class spell_wind_burst : public SpellScriptLoader
+{
+public:
+    spell_wind_burst() : SpellScriptLoader("spell_wind_burst") { }
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_wind_burst_SpellScript();
+    }
+
+    class spell_wind_burst_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_wind_burst_SpellScript);
+
+
+        void SummonTriggerOnHit(SpellEffIndex /*effIndex*/)
+        {
+            Unit* player = GetHitPlayer();
+            if (!player)
+                return;
+
+            player->SummonCreature(NPC_WIND_BURST_TRIGGER, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0.0f, TEMPSUMMON_MANUAL_DESPAWN);
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_wind_burst_SpellScript::SummonTriggerOnHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+};
+
+// Wind Burst Trigger 8777000
+class npc_wind_burst_trigger : public CreatureScript
+{
+public:
+    npc_wind_burst_trigger() : CreatureScript("npc_wind_burst_trigger") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_wind_burst_triggerAI (creature);
+    }
+
+    struct npc_wind_burst_triggerAI : public ScriptedAI
+    {
+        npc_wind_burst_triggerAI(Creature* creature) : ScriptedAI(creature)
+        {
+            instance = me->GetInstanceScript();
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+        }
+
+        InstanceScript *instance;
+        uint64 playerGUID;
+        uint32 playerReturnTimer;
+
+        void Reset()
+        {
+            playerGUID = 0;
+            playerReturnTimer = 13000;
+        }
+
+        void IsSummonedBy(Unit* summoner)
+        {
+            if (summoner->GetTypeId() == TYPEID_PLAYER)
+                playerGUID = summoner->GetGUID();
+        }
+
+        void UpdateAI(uint32 const diff)
+        {
+            if (playerReturnTimer <= diff)
+            {
+                if (Player* player = me->GetPlayer(*me, playerGUID))
+                {
+                    if (player->HasAura(SPELL_RELENTLESS_STORM_VISUAL))
+                    {
+                        player->RemoveAurasDueToSpell(SPELL_RELENTLESS_STORM_VISUAL);
+                        player->GetMotionMaster()->Clear();
+                        player->GetMotionMaster()->MoveJump(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 20.0f, 6.0f);
+                    }
+                }
+                me->DespawnOrUnsummon();
+            }
+            else playerReturnTimer -= diff;
+        }
+    };
+};
+
+// Relentless Storm Initial Vehicle 47806
+class npc_relentless_storm_initial_vehicle : public CreatureScript
+{
+public:
+    npc_relentless_storm_initial_vehicle() : CreatureScript("npc_relentless_storm_initial_vehicle") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_relentless_storm_initial_vehicleAI (creature);
+    }
+
+    struct npc_relentless_storm_initial_vehicleAI : public ScriptedAI
+    {
+        npc_relentless_storm_initial_vehicleAI(Creature* creature) : ScriptedAI(creature) 
+        {
+            instance = me->GetInstanceScript();
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+        }
+
+        InstanceScript* instance;
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type != POINT_MOTION_TYPE)
+                return;
+
+            if (id == 1)
+            {
+                me->DespawnOrUnsummon();
+            }
+        }
+
+        void Reset()
+        {
+            me->SetSpeed(MOVE_WALK, 7.0f, true);
+            me->SetSpeed(MOVE_RUN, 7.0f, true);
+            me->SetSpeed(MOVE_FLIGHT, 7.0f, true);
+
+            if (Creature *boss = me->GetCreature(*me, instance->GetData64(DATA_ALAKIR)))
+                me->GetMotionMaster()->MovePoint(1, me->GetPositionX() + (me->GetPositionX() - boss->GetPositionX()), me->GetPositionY() + (me->GetPositionY() - boss->GetPositionY()), me->GetPositionZ() + 80.0f);
+        }
+    };
+};
+
+// Lightning Coulds 48190
+class npc_lightning_coulds : public CreatureScript
+{
+public:
+    npc_lightning_coulds() : CreatureScript("npc_lightning_coulds") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_lightning_couldsAI (creature);
+    }
+
+    struct npc_lightning_couldsAI : public ScriptedAI
+    {
+        npc_lightning_couldsAI(Creature* creature) : ScriptedAI(creature) 
+        {
+            instance = me->GetInstanceScript();
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
+            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_INTERRUPT, false);
+        }
+
+        InstanceScript* instance;
+        uint32 lightningVisual;
+        uint32 readyDealDamageTimer;
+        bool readyDealDamage;
+
+        void Reset()
+        {
+            me->SetSpeed(MOVE_WALK, 0.2f, true);
+            me->SetSpeed(MOVE_RUN, 0.2f, true);
+            lightningVisual = 3000;
+            readyDealDamage = false;
+            readyDealDamageTimer = 4000;
+        }
+
+        void SetData(uint32 uiI, uint32 uiValue)
+        {
+            if (uiValue == DATA_CLOUDS_DEAL_DMG)
+            {
+                readyDealDamage = true;
+            }
+        }
+
+        void UpdateAI(uint32 const diff)
+        {
+            if (lightningVisual <= diff)
+            {
+                me->CastSpell(me, SPELL_LIGHTNING_CLOUDS_SINGLE_VIS, true);
+                lightningVisual = urand(1000, 6000);
+            }
+            else lightningVisual -= diff;
+
+            if (readyDealDamage)
+            {
+                if (readyDealDamageTimer <= diff)
+                {
+                    readyDealDamage = false;
+                    me->CastSpell(me, SPELL_LIGHTNING_CLOUDS_DMG, true);
+                }
+                else readyDealDamageTimer -= diff;
+            }
+        }
+    };
+};
+
+// Relentless Storm 47807
+class npc_relentless_storm : public CreatureScript
+{
+public:
+    npc_relentless_storm() : CreatureScript("npc_relentless_storm") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_relentless_stormAI (creature);
+    }
+
+    struct npc_relentless_stormAI : public ScriptedAI
+    {
+        npc_relentless_stormAI(Creature* creature) : ScriptedAI(creature) 
+        {
+            instance = me->GetInstanceScript();
+            me->SetReactState(REACT_PASSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+        }
+
+        InstanceScript* instance;
+
+        float angelStorm;
+        float radiusStorm;
+        uint64 triggerGUID;
+        uint32 changeAngelTimer;
+
+        void Reset()
+        {
+            me->SetSpeed(MOVE_WALK, 5.0f, true);
+            me->SetSpeed(MOVE_RUN, 5.0f, true);
+            me->SetSpeed(MOVE_FLIGHT, 5.0f, true);
+
+            changeAngelTimer = 1;
+            radiusStorm = me->GetDistance2d(CenterPoint.GetPositionX(), CenterPoint.GetPositionY());
+            if (urand(0, 1))
+                angelStorm = 1.0f;
+            else
+                angelStorm = -1.0f;
+            if (Creature* trigger = me->SummonCreature(NPC_ICE_STORM_ROTATE_TRIGGER, CenterPoint, TEMPSUMMON_TIMED_DESPAWN, 10000))
+                triggerGUID = trigger->GetGUID();
+        }
+
+        void RunArc()
+        {
+            if (Creature* trigger = me->GetCreature(*me, triggerGUID))
+            {
+                trigger->SetOrientation(trigger->GetAngle(me));
+                float orient = trigger->GetOrientation();
+                trigger->SetOrientation(orient + angelStorm);
+
+                float x, y, z;
+                trigger->GetClosePoint(x, y, z, me->GetObjectSize() / 3, radiusStorm);
+
+                me->GetMotionMaster()->Clear(true);
+                me->GetMotionMaster()->MovePoint(0, x, y, me->GetPositionZ());
+            }
+        }
+
+        void UpdateAI(uint32 const diff)
+        {
+            if (changeAngelTimer <= diff)
+            {
+                RunArc();
+                changeAngelTimer = 1000;
+            }
+            else changeAngelTimer -= diff;
+        }
+    };
+};
+
+class PlayerRangeCheck
+{
+public:
+    explicit PlayerRangeCheck(Unit* _caster) : caster(_caster) { }
+
+    bool operator() (WorldObject* unit)
+    {
+        if (unit->GetTypeId() != TYPEID_PLAYER || (caster->GetPositionZ() + 10.0f > unit->GetPositionZ() && caster->GetPositionZ() - 10.0f < unit->GetPositionZ()))
+            return false;
+
+        return true;
+    }
+
+    Unit* caster;
+};
+
+class spell_lightning_clouds_damage : public SpellScriptLoader
+{
+public:
+    spell_lightning_clouds_damage() : SpellScriptLoader("spell_lightning_clouds_damage") { }
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_lightning_clouds_damage_SpellScript();
+    }
+
+    class spell_lightning_clouds_damage_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_lightning_clouds_damage_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& unitList)
+        {
+            unitList.remove_if(PlayerRangeCheck(GetCaster()));
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_lightning_clouds_damage_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        }
+    };
+};
+
+class spell_lightning_strike : public SpellScriptLoader
+{
+public:
+    spell_lightning_strike() : SpellScriptLoader("spell_lightning_strike") { }
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_lightning_strike_SpellScript();
+    }
+
+    class spell_lightning_strike_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_lightning_strike_SpellScript);
+
+        void HandleDummyHitTarget(SpellEffIndex /*effIndex*/)
+        {
+            Unit* target = GetHitUnit();
+            if (target && target->GetTypeId() == TYPEID_PLAYER)
+            {
+                target->CastSpell(target, SPELL_LIGHTNING_STRIKE_EFFECT, true);
+            }
+        }
+
+        void Register()
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_lightning_strike_SpellScript::HandleDummyHitTarget, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+};
+
+class spell_lightning_strike_effect : public SpellScriptLoader
+{
+public:
+    spell_lightning_strike_effect() : SpellScriptLoader("spell_lightning_strike_effect") { }
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_lightning_strike_effect_SpellScript();
+    }
+
+    class spell_lightning_strike_effect_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_lightning_strike_effect_SpellScript);
+
+        void HandleAfterCast()
+        {
+            std::list<Player*> players;
+            CerberCore::AnyPlayerInObjectRangeCheck checker(GetCaster(), 20.0f);
+            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(GetCaster(), players, checker);
+            GetCaster()->VisitNearbyWorldObject(20.0f, searcher);
+
+            for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            {
+                if (GetCaster()->ToPlayer()->GetGUID() != (*itr)->GetGUID())
+                    GetCaster()->CastSpell((*itr), SPELL_LIGHTNING_STRIKE_SINGLE, true);
+            }
+        }
+
+        void Register()
+        {
+            AfterCast += SpellCastFn(spell_lightning_strike_effect_SpellScript::HandleAfterCast);
+        }
+    };
+};
+
+class AreaTrigger_at_reletness_storm : public AreaTriggerScript
+{
+public:
+    AreaTrigger_at_reletness_storm() : AreaTriggerScript("at_reletness_storm") { }
+
+    bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+    {
+        InstanceScript* instance = player->GetInstanceScript();
+        if (instance)
+        {
+            if (player->isAlive())
+            {
+                if (instance->GetData(DATA_ALAKIR_FLIGHT_PHASE) == IN_PROGRESS)
+                {       
+                    if (Creature* trigger = player->SummonCreature(NPC_ICE_STORM_ROTATE_TRIGGER, CenterPoint, TEMPSUMMON_TIMED_DESPAWN, 5000))
+                    {
+                        trigger->SetOrientation(trigger->GetAngle(player));
+                        float x, y, z;
+                        trigger->GetClosePoint(x, y, z, trigger->GetObjectSize() / 3, 80.0f);
+
+                        if (Creature* storm = player->SummonCreature(NPC_RELENTLESS_STORM, x, y, player->GetPositionZ(), 0.0f, TEMPSUMMON_MANUAL_DESPAWN))
+                        {
+                            player->CastSpell(player, SPELL_RELENTLESS_STORM_VEHICLE, true);
+                            player->EnterVehicle(storm);
+                            storm->DespawnOrUnsummon(6000);
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 };
 
 void AddSC_boss_alakir()
 {
     new boss_alakir();
+    new npc_squall_line();
+    new npc_wind_funnel();
+    new npc_ice_storm();
+    new npc_ice_storm_rain();
+    new npc_stormling_pre_effect();
     new npc_stormling();
-    new npc_tornado_moving();
+    new spell_electrocute();
+    new spell_wind_burst();
+    new npc_wind_burst_trigger();
+    new npc_relentless_storm_initial_vehicle();
+    new npc_lightning_coulds();
+    new npc_relentless_storm();
+    new spell_lightning_clouds_damage();
+    new spell_lightning_strike();
+    new spell_lightning_strike_effect();
+    new AreaTrigger_at_reletness_storm();
 }
