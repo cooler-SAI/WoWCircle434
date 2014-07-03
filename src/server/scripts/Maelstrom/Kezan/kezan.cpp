@@ -60,13 +60,13 @@ public:
                 return;
 
             if (Player* player = who->ToPlayer())
-            if (!player->HasAura(SPELL_POWER_WORD_FORTITUDE))
-            {
-                DoCast(player, SPELL_POWER_WORD_FORTITUDE);
-                me->ModifyPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
-                uint8 roll = urand(0, 6);
-                me->DoPersonalScriptText(SISTER_GOLDSKIMMER_RANDOM_SPEACH - roll, player);
-            }
+                if (!player->HasAura(SPELL_POWER_WORD_FORTITUDE))
+                {
+                    DoCast(player, SPELL_POWER_WORD_FORTITUDE);
+                    me->ModifyPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    uint8 roll = urand(0, 6);
+                    me->DoPersonalScriptText(SISTER_GOLDSKIMMER_RANDOM_SPEACH - roll, player);
+                }
         }
 
         void UpdateAI(const uint32 diff)
@@ -117,16 +117,16 @@ public:
 
             switch (me->GetPhaseMask())
             {
-                case 4:
-                    CanCast = false;
-                    break;
-                case 16384:
-                    CanCast = false;
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-                    break;
-                default:
-                    CanCast = true;
-                    break;
+            case 4:
+                CanCast = false;
+                break;
+            case 16384:
+                CanCast = false;
+                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                break;
+            default:
+                CanCast = true;
+                break;
             }
         }
 
@@ -144,36 +144,36 @@ public:
                 ++uiPhase;
                 switch (uiPhase)
                 {
-                    case 1:
-                        uiEventTimer = 2000;
-                        me->ModifyPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
-                        if (Creature* target = me->FindNearestCreature(NPC_FIZZ_LIGHTER, 30.0f))
-                        {
-                            float x, y, z;
-                            target->GetPosition(x, y, z);
-                            Position pos;
-                            target->GetRandomNearPosition(pos, 3.0f);
-                            me->CastSpell(pos.m_positionX, pos.m_positionY, pos.m_positionZ, SPELL_LIGHTNING_BOLT_FOR_FIZZ, false);
-                        }
-                        break;
-                    case 2:
-                        uiEventTimer = 2000;
-                        me->ModifyPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
-                        if (Creature* target = me->FindNearestCreature(NPC_EVOL_FINGERS, 30.0f))
-                        {
-                            float x, y, z;
-                            target->GetPosition(x, y, z);
-                            Position pos;
-                            target->GetRandomNearPosition(pos, 3.0f);
-                            me->CastSpell(pos.m_positionX, pos.m_positionY, pos.m_positionZ, SPELL_LIGHTNING_BOLT_FOR_EVOL, false);
-                        }
-                        break;
-                    case 3:
-                        uiEventTimer = urand(20000, 80000);
-                        uiPhase = 0;
-                        uint8 roll = urand(0, 6);
-                        DoScriptText(MAXX_AVALANCHE_RANDOM_SPEACH - roll, me);
-                        break;
+                case 1:
+                    uiEventTimer = 2000;
+                    me->ModifyPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    if (Creature* target = me->FindNearestCreature(NPC_FIZZ_LIGHTER, 30.0f))
+                    {
+                        float x, y, z;
+                        target->GetPosition(x, y, z);
+                        Position pos;
+                        target->GetRandomNearPosition(pos, 3.0f);
+                        me->CastSpell(pos.m_positionX, pos.m_positionY, pos.m_positionZ, SPELL_LIGHTNING_BOLT_FOR_FIZZ, false);
+                    }
+                    break;
+                case 2:
+                    uiEventTimer = 2000;
+                    me->ModifyPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+                    if (Creature* target = me->FindNearestCreature(NPC_EVOL_FINGERS, 30.0f))
+                    {
+                        float x, y, z;
+                        target->GetPosition(x, y, z);
+                        Position pos;
+                        target->GetRandomNearPosition(pos, 3.0f);
+                        me->CastSpell(pos.m_positionX, pos.m_positionY, pos.m_positionZ, SPELL_LIGHTNING_BOLT_FOR_EVOL, false);
+                    }
+                    break;
+                case 3:
+                    uiEventTimer = urand(20000, 80000);
+                    uiPhase = 0;
+                    uint8 roll = urand(0, 6);
+                    DoScriptText(MAXX_AVALANCHE_RANDOM_SPEACH - roll, me);
+                    break;
                 }
             } else
                 uiEventTimer -= diff;
@@ -219,16 +219,16 @@ public:
 
             switch (me->GetPhaseMask())
             {
-                case 4:
-                    CanCast = false;
-                    break;
-                case 16384:
-                    CanCast = false;
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-                    break;
-                default:
-                    CanCast = true;
-                    break;
+            case 4:
+                CanCast = false;
+                break;
+            case 16384:
+                CanCast = false;
+                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                break;
+            default:
+                CanCast = true;
+                break;
             }
         }
 
@@ -238,17 +238,17 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (CanCast)
-            if (uiCastTimer <= diff)
-            {
-                uiCastTimer = 3000;
-                DoCast(SPELL_FIREBALL);
-            } else
-                uiCastTimer -= diff;
+                if (uiCastTimer <= diff)
+                {
+                    uiCastTimer = 3000;
+                    DoCast(SPELL_FIREBALL);
+                } else
+                    uiCastTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -291,16 +291,16 @@ public:
 
             switch (me->GetPhaseMask())
             {
-                case 4:
-                    CanCast = false;
-                    break;
-                case 16384:
-                    CanCast = false;
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-                    break;
-                default:
-                    CanCast = true;
-                    break;
+            case 4:
+                CanCast = false;
+                break;
+            case 16384:
+                CanCast = false;
+                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                break;
+            default:
+                CanCast = true;
+                break;
             }
         }
 
@@ -310,19 +310,19 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (CanCast)
-            if (uiCastTimer <= diff)
-            {
-                if (Creature* target = me->FindNearestCreature(NPC_FIZZ_LIGHTER, 40.0f))
-                    DoCast(target, SPELL_SHADOW_BOLT);
+                if (uiCastTimer <= diff)
+                {
+                    if (Creature* target = me->FindNearestCreature(NPC_FIZZ_LIGHTER, 40.0f))
+                        DoCast(target, SPELL_SHADOW_BOLT);
 
-                uiCastTimer = 3000;
-            } else
-                uiCastTimer -= diff;
+                    uiCastTimer = 3000;
+                } else
+                    uiCastTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -364,16 +364,16 @@ public:
 
             switch (me->GetPhaseMask())
             {
-                case 4:
-                    CanCast = false;
-                    break;
-                case 16384:
-                    CanCast = false;
-                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-                    break;
-                default:
-                    CanCast = true;
-                    break;
+            case 4:
+                CanCast = false;
+                break;
+            case 16384:
+                CanCast = false;
+                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                break;
+            default:
+                CanCast = true;
+                break;
             }
         }
 
@@ -383,17 +383,17 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (CanCast)
-            if (uiCastTimer <= diff)
-            {
-                uiCastTimer = urand(3500, 5000);
-                DoCast(SPELL_SHOOT_GUN);
-            } else
-                uiCastTimer -= diff;
+                if (uiCastTimer <= diff)
+                {
+                    uiCastTimer = urand(3500, 5000);
+                    DoCast(SPELL_SHOOT_GUN);
+                } else
+                    uiCastTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -407,9 +407,9 @@ public:
     {
         switch (quest->GetQuestId())
         {
-            case QUEST_EVISCERATE:
-                creature->DoPersonalScriptText(SLINKY_SHARPSHIV_QUEST_ACCEPT, player);
-                break;
+        case QUEST_EVISCERATE:
+            creature->DoPersonalScriptText(SLINKY_SHARPSHIV_QUEST_ACCEPT, player);
+            break;
         }
 
         return true;
@@ -418,16 +418,16 @@ public:
     bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_WALTZ_RIGHT_IN)
-        if (player->GetQuestStatus(QUEST_THE_GREAT_BANK_HEIST) == QUEST_STATUS_REWARDED &&
-            player->GetQuestStatus(QUEST_ROBBING_HOODS) == QUEST_STATUS_REWARDED &&
-            player->GetQuestStatus(QUEST_LIBERATE_THE_KAJAMITE) == QUEST_STATUS_REWARDED)
-        {
-            player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_5);
-            player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_6, player);
-            player->SaveToDB();
-        }
+            if (player->GetQuestStatus(QUEST_THE_GREAT_BANK_HEIST) == QUEST_STATUS_REWARDED &&
+                player->GetQuestStatus(QUEST_ROBBING_HOODS) == QUEST_STATUS_REWARDED &&
+                player->GetQuestStatus(QUEST_LIBERATE_THE_KAJAMITE) == QUEST_STATUS_REWARDED)
+            {
+                player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_5);
+                player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_6, player);
+                player->SaveToDB();
+            }
 
-        return true;
+            return true;
     }
 
     bool OnGossipHello(Player* player, Creature* creature)
@@ -572,142 +572,142 @@ public:
             player->DestroyItemCount(ITEM_HOTROAD_KEY, 1, true);
 
             if (Creature* hotrod = player->SummonCreature(NPC_HOT_ROD_LS, x, y, z))
-            if (npc_vehicle_escortAI* escort = CAST_AI(npc_vehicle_escortAI, hotrod->AI()))
-            {
-                if (Creature* sassy = player->SummonCreature(NPC_SASSY_HARDWRENCH, x, y, z))
-                    sassy->EnterVehicle(hotrod, 0);
+                if (npc_vehicle_escortAI* escort = CAST_AI(npc_vehicle_escortAI, hotrod->AI()))
+                {
+                    if (Creature* sassy = player->SummonCreature(NPC_SASSY_HARDWRENCH, x, y, z))
+                        sassy->EnterVehicle(hotrod, 0);
 
-                player->EnterVehicle(hotrod, 1);
-                hotrod->EnableAI();
-                escort->AddWaypoint(1, -8425.38f, 1328.87f, 101.956f);
-                escort->AddWaypoint(2, -8421.79f, 1333.12f, 102.364f);
-                escort->AddWaypoint(3, -8412.47f, 1335.64f, 102.326f);
-                escort->AddWaypoint(4, -8400.14f, 1337.37f, 101.982f);
-                escort->AddWaypoint(5, -8376.50f, 1348.69f, 101.975f);
-                escort->AddWaypoint(6, -8364.13f, 1347.29f, 100.312f);
-                escort->AddWaypoint(7, -8354.41f, 1343.26f, 95.8217f);
-                escort->AddWaypoint(8, -8344.45f, 1338.25f, 89.7618f);
-                escort->AddWaypoint(9, -8339.29f, 1335.17f, 87.6991f);
-                escort->AddWaypoint(10, -8333.11f, 1331.05f, 87.0341f);
-                escort->AddWaypoint(11, -8321.08f, 1321.99f, 87.9551f);
-                escort->AddWaypoint(12, -8315.27f, 1317.73f, 87.2524f);
-                escort->AddWaypoint(13, -8309.10f, 1314.06f, 84.8207f);
-                escort->AddWaypoint(14, -8303.91f, 1311.26f, 82.2196f);
-                escort->AddWaypoint(15, -8297.86f, 1308.01f, 78.5731f);
-                escort->AddWaypoint(16, -8294.21f, 1306.56f, 75.9687f);
-                escort->AddWaypoint(17, -8292.03f, 1305.61f, 73.5784f);
-                escort->AddWaypoint(18, -8287.09f, 1303.27f, 68.7732f);
-                escort->AddWaypoint(19, -8282.96f, 1301.28f, 65.0758f);
-                escort->AddWaypoint(20, -8276.19f, 1299.01f, 59.8176f);
-                escort->AddWaypoint(21, -8271.50f, 1297.45f, 56.4913f);
-                escort->AddWaypoint(22, -8264.58f, 1295.90f, 51.9402f);
-                escort->AddWaypoint(23, -8259.09f, 1294.71f, 48.8402f);
-                escort->AddWaypoint(24, -8251.53f, 1293.56f, 45.0274f);
-                escort->AddWaypoint(25, -8246.01f, 1292.83f, 42.5180f);
-                escort->AddWaypoint(26, -8238.32f, 1292.11f, 39.2295f);
-                escort->AddWaypoint(27, -8230.16f, 1291.58f, 36.3618f);
-                escort->AddWaypoint(28, -8224.49f, 1291.36f, 34.6277f);
-                escort->AddWaypoint(29, -8217.40f, 1291.24f, 32.7357f);
-                escort->AddWaypoint(30, -8210.30f, 1291.24f, 31.1584f);
-                escort->AddWaypoint(31, -8204.61f, 1291.38f, 30.1318f);
-                escort->AddWaypoint(32, -8197.20f, 1291.88f, 29.1144f);
-                escort->AddWaypoint(33, -8190.99f, 1292.30f, 28.6688f);
-                escort->AddWaypoint(34, -8183.25f, 1293.64f, 27.2814f);
-                escort->AddWaypoint(35, -8174.77f, 1294.94f, 26.0061f);
-                escort->AddWaypoint(36, -8167.61f, 1295.76f, 25.0049f);
-                escort->AddWaypoint(37, -8159.68f, 1296.62f, 24.0758f);
-                escort->AddWaypoint(38, -8153.06f, 1297.29f, 23.2302f);
-                escort->AddWaypoint(39, -8146.75f, 1297.82f, 22.2031f);
-                escort->AddWaypoint(40, -8139.64f, 1297.23f, 20.8587f);
-                escort->AddWaypoint(41, -8135.00f, 1297.57f, 20.5206f);
-                escort->AddWaypoint(42, -8130.32f, 1300.50f, 19.9457f);
-                escort->AddWaypoint(43, -8127.43f, 1306.52f, 19.3136f);
-                escort->AddWaypoint(44, -8126.20f, 1314.47f, 18.7197f);
-                escort->AddWaypoint(45, -8125.68f, 1329.52f, 17.8607f);
-                escort->AddWaypoint(46, -8124.89f, 1341.55f, 17.1133f);
-                escort->AddWaypoint(47, -8124.27f, 1348.29f, 17.3852f);
-                escort->AddWaypoint(48, -8123.51f, 1359.30f, 19.3157f);
-                escort->AddWaypoint(49, -8122.60f, 1371.38f, 22.2654f);
-                escort->AddWaypoint(50, -8122.03f, 1377.20f, 23.1136f);
-                escort->AddWaypoint(51, -8121.24f, 1383.81f, 23.6746f);
-                escort->AddWaypoint(52, -8120.48f, 1389.00f, 23.7922f);
-                escort->AddWaypoint(53, -8119.60f, 1395.60f, 23.3315f);
-                escort->AddWaypoint(54, -8118.66f, 1400.76f, 22.4183f);
-                escort->AddWaypoint(55, -8117.30f, 1407.06f, 20.4558f);
-                escort->AddWaypoint(56, -8116.07f, 1412.83f, 18.1914f);
-                escort->AddWaypoint(57, -8114.92f, 1418.72f, 16.1875f);
-                escort->AddWaypoint(58, -8113.23f, 1429.29f, 13.0687f);
-                escort->AddWaypoint(59, -8112.00f, 1436.06f, 11.5173f);
-                escort->AddWaypoint(60, -8110.77f, 1443.05f, 10.2880f);
-                escort->AddWaypoint(61, -8109.64f, 1449.17f, 9.81804f, 500);
-                escort->AddWaypoint(62, -8108.60f, 1456.10f, 9.98186f);
-                escort->AddWaypoint(63, -8108.21f, 1461.50f, 10.0528f);
-                escort->AddWaypoint(64, -8112.41f, 1467.96f, 10.0984f);
-                escort->AddWaypoint(65, -8119.51f, 1478.24f, 10.4105f);
-                escort->AddWaypoint(66, -8121.80f, 1485.42f, 10.6638f);
-                escort->AddWaypoint(67, -8122.04f, 1492.62f, 11.1742f);
-                escort->AddWaypoint(68, -8121.35f, 1500.88f, 10.5241f);
-                escort->AddWaypoint(69, -8118.24f, 1509.03f, 10.3345f);
-                escort->AddWaypoint(70, -8114.80f, 1516.22f, 10.0675f);
-                escort->AddWaypoint(71, -8107.86f, 1526.28f, 9.52589f);
-                escort->AddWaypoint(72, -8101.88f, 1535.21f, 9.34943f);
-                escort->AddWaypoint(73, -8099.31f, 1546.64f, 9.12364f);
-                escort->AddWaypoint(74, -8098.55f, 1556.10f, 8.94064f);
-                escort->AddWaypoint(75, -8096.11f, 1625.51f, 8.78228f);
-                escort->AddWaypoint(76, -8096.47f, 1649.65f, 10.0208f);
-                escort->AddWaypoint(77, -8096.74f, 1663.73f, 11.5271f);
-                escort->AddWaypoint(78, -8103.78f, 1691.23f, 15.3531f);
-                escort->AddWaypoint(79, -8109.90f, 1696.20f, 16.6564f);
-                escort->AddWaypoint(80, -8113.23f, 1698.49f, 18.9307f);
-                escort->AddWaypoint(81, -8115.83f, 1700.98f, 20.8800f);
-                escort->AddWaypoint(82, -8119.49f, 1704.42f, 23.4167f);
-                escort->AddWaypoint(83, -8124.64f, 1709.90f, 26.8272f);
-                escort->AddWaypoint(84, -8128.63f, 1715.32f, 29.3983f);
-                escort->AddWaypoint(85, -8132.33f, 1721.63f, 31.6928f);
-                escort->AddWaypoint(86, -8134.51f, 1726.81f, 33.0131f);
-                escort->AddWaypoint(87, -8136.43f, 1732.03f, 34.0754f);
-                escort->AddWaypoint(88, -8137.48f, 1738.16f, 34.8704f);
-                escort->AddWaypoint(89, -8137.91f, 1743.78f, 35.1258f);
-                escort->AddWaypoint(90, -8137.37f, 1748.61f, 34.9439f);
-                escort->AddWaypoint(91, -8136.48f, 1754.65f, 34.5787f);
-                escort->AddWaypoint(92, -8134.38f, 1759.58f, 33.9260f);
-                escort->AddWaypoint(93, -8131.15f, 1765.65f, 32.8294f);
-                escort->AddWaypoint(94, -8127.14f, 1770.74f, 31.4358f);
-                escort->AddWaypoint(95, -8121.74f, 1776.90f, 29.6606f);
-                escort->AddWaypoint(96, -8116.82f, 1781.36f, 28.4168f);
-                escort->AddWaypoint(97, -8111.85f, 1784.92f, 28.7040f);
-                escort->AddWaypoint(98, -8108.42f, 1787.96f, 29.3762f);
-                escort->AddWaypoint(99, -8104.37f, 1792.24f, 30.3825f);
-                escort->AddWaypoint(100, -8101.48f, 1796.07f, 31.3296f);
-                escort->AddWaypoint(101, -8098.53f, 1800.13f, 32.4053f);
-                escort->AddWaypoint(102, -8095.65f, 1804.58f, 33.6369f);
-                escort->AddWaypoint(103, -8093.22f, 1808.60f, 34.8034f);
-                escort->AddWaypoint(104, -8090.76f, 1812.98f, 36.3530f);
-                escort->AddWaypoint(105, -8088.47f, 1816.71f, 37.5583f);
-                escort->AddWaypoint(106, -8084.40f, 1823.03f, 39.7250f);
-                escort->AddWaypoint(107, -8077.03f, 1824.59f, 41.3678f);
-                escort->AddWaypoint(108, -8070.16f, 1822.37f, 42.4776f);
-                escort->AddWaypoint(109, -8062.44f, 1821.97f, 42.8076f);
-                escort->AddWaypoint(110, -8056.33f, 1822.18f, 42.8170f);
-                escort->AddWaypoint(111, -8049.89f, 1822.38f, 42.5627f);
-                escort->AddWaypoint(112, -8043.23f, 1822.53f, 42.2247f);
-                escort->AddWaypoint(113, -8034.60f, 1822.42f, 39.8810f);
-                escort->AddWaypoint(114, -8026.67f, 1821.64f, 36.1786f);
-                escort->AddWaypoint(115, -8014.71f, 1820.55f, 29.8471f);
-                escort->AddWaypoint(116, -8000.99f, 1819.48f, 24.6067f);
-                escort->AddWaypoint(117, -7993.08f, 1822.92f, 21.2857f);
-                escort->AddWaypoint(118, -7983.36f, 1827.66f, 16.8506f);
-                escort->AddWaypoint(119, -7976.36f, 1830.73f, 13.8622f);
-                escort->AddWaypoint(120, -7968.22f, 1832.91f, 11.6773f);
-                escort->AddWaypoint(121, -7960.49f, 1833.61f, 10.2075f);
-                escort->AddWaypoint(122, -7953.07f, 1836.06f, 8.50395f);
-                escort->AddWaypoint(123, -7949.61f, 1835.68f, 6.69894f);
-                escort->AddWaypoint(124, -7918.63f, 1835.01f, 5.54989f);
-                escort->AddWaypoint(125, -7884.50f, 1836.57f, 4.28574f);
-                escort->AddWaypoint(126, -7849.60f, 1845.08f, 7.19778f, 0, true);
-                escort->SetSpeedZ(21.0f);
-                escort->Start(true);
-            }
+                    player->EnterVehicle(hotrod, 1);
+                    hotrod->EnableAI();
+                    escort->AddWaypoint(1, -8425.38f, 1328.87f, 101.956f);
+                    escort->AddWaypoint(2, -8421.79f, 1333.12f, 102.364f);
+                    escort->AddWaypoint(3, -8412.47f, 1335.64f, 102.326f);
+                    escort->AddWaypoint(4, -8400.14f, 1337.37f, 101.982f);
+                    escort->AddWaypoint(5, -8376.50f, 1348.69f, 101.975f);
+                    escort->AddWaypoint(6, -8364.13f, 1347.29f, 100.312f);
+                    escort->AddWaypoint(7, -8354.41f, 1343.26f, 95.8217f);
+                    escort->AddWaypoint(8, -8344.45f, 1338.25f, 89.7618f);
+                    escort->AddWaypoint(9, -8339.29f, 1335.17f, 87.6991f);
+                    escort->AddWaypoint(10, -8333.11f, 1331.05f, 87.0341f);
+                    escort->AddWaypoint(11, -8321.08f, 1321.99f, 87.9551f);
+                    escort->AddWaypoint(12, -8315.27f, 1317.73f, 87.2524f);
+                    escort->AddWaypoint(13, -8309.10f, 1314.06f, 84.8207f);
+                    escort->AddWaypoint(14, -8303.91f, 1311.26f, 82.2196f);
+                    escort->AddWaypoint(15, -8297.86f, 1308.01f, 78.5731f);
+                    escort->AddWaypoint(16, -8294.21f, 1306.56f, 75.9687f);
+                    escort->AddWaypoint(17, -8292.03f, 1305.61f, 73.5784f);
+                    escort->AddWaypoint(18, -8287.09f, 1303.27f, 68.7732f);
+                    escort->AddWaypoint(19, -8282.96f, 1301.28f, 65.0758f);
+                    escort->AddWaypoint(20, -8276.19f, 1299.01f, 59.8176f);
+                    escort->AddWaypoint(21, -8271.50f, 1297.45f, 56.4913f);
+                    escort->AddWaypoint(22, -8264.58f, 1295.90f, 51.9402f);
+                    escort->AddWaypoint(23, -8259.09f, 1294.71f, 48.8402f);
+                    escort->AddWaypoint(24, -8251.53f, 1293.56f, 45.0274f);
+                    escort->AddWaypoint(25, -8246.01f, 1292.83f, 42.5180f);
+                    escort->AddWaypoint(26, -8238.32f, 1292.11f, 39.2295f);
+                    escort->AddWaypoint(27, -8230.16f, 1291.58f, 36.3618f);
+                    escort->AddWaypoint(28, -8224.49f, 1291.36f, 34.6277f);
+                    escort->AddWaypoint(29, -8217.40f, 1291.24f, 32.7357f);
+                    escort->AddWaypoint(30, -8210.30f, 1291.24f, 31.1584f);
+                    escort->AddWaypoint(31, -8204.61f, 1291.38f, 30.1318f);
+                    escort->AddWaypoint(32, -8197.20f, 1291.88f, 29.1144f);
+                    escort->AddWaypoint(33, -8190.99f, 1292.30f, 28.6688f);
+                    escort->AddWaypoint(34, -8183.25f, 1293.64f, 27.2814f);
+                    escort->AddWaypoint(35, -8174.77f, 1294.94f, 26.0061f);
+                    escort->AddWaypoint(36, -8167.61f, 1295.76f, 25.0049f);
+                    escort->AddWaypoint(37, -8159.68f, 1296.62f, 24.0758f);
+                    escort->AddWaypoint(38, -8153.06f, 1297.29f, 23.2302f);
+                    escort->AddWaypoint(39, -8146.75f, 1297.82f, 22.2031f);
+                    escort->AddWaypoint(40, -8139.64f, 1297.23f, 20.8587f);
+                    escort->AddWaypoint(41, -8135.00f, 1297.57f, 20.5206f);
+                    escort->AddWaypoint(42, -8130.32f, 1300.50f, 19.9457f);
+                    escort->AddWaypoint(43, -8127.43f, 1306.52f, 19.3136f);
+                    escort->AddWaypoint(44, -8126.20f, 1314.47f, 18.7197f);
+                    escort->AddWaypoint(45, -8125.68f, 1329.52f, 17.8607f);
+                    escort->AddWaypoint(46, -8124.89f, 1341.55f, 17.1133f);
+                    escort->AddWaypoint(47, -8124.27f, 1348.29f, 17.3852f);
+                    escort->AddWaypoint(48, -8123.51f, 1359.30f, 19.3157f);
+                    escort->AddWaypoint(49, -8122.60f, 1371.38f, 22.2654f);
+                    escort->AddWaypoint(50, -8122.03f, 1377.20f, 23.1136f);
+                    escort->AddWaypoint(51, -8121.24f, 1383.81f, 23.6746f);
+                    escort->AddWaypoint(52, -8120.48f, 1389.00f, 23.7922f);
+                    escort->AddWaypoint(53, -8119.60f, 1395.60f, 23.3315f);
+                    escort->AddWaypoint(54, -8118.66f, 1400.76f, 22.4183f);
+                    escort->AddWaypoint(55, -8117.30f, 1407.06f, 20.4558f);
+                    escort->AddWaypoint(56, -8116.07f, 1412.83f, 18.1914f);
+                    escort->AddWaypoint(57, -8114.92f, 1418.72f, 16.1875f);
+                    escort->AddWaypoint(58, -8113.23f, 1429.29f, 13.0687f);
+                    escort->AddWaypoint(59, -8112.00f, 1436.06f, 11.5173f);
+                    escort->AddWaypoint(60, -8110.77f, 1443.05f, 10.2880f);
+                    escort->AddWaypoint(61, -8109.64f, 1449.17f, 9.81804f, 500);
+                    escort->AddWaypoint(62, -8108.60f, 1456.10f, 9.98186f);
+                    escort->AddWaypoint(63, -8108.21f, 1461.50f, 10.0528f);
+                    escort->AddWaypoint(64, -8112.41f, 1467.96f, 10.0984f);
+                    escort->AddWaypoint(65, -8119.51f, 1478.24f, 10.4105f);
+                    escort->AddWaypoint(66, -8121.80f, 1485.42f, 10.6638f);
+                    escort->AddWaypoint(67, -8122.04f, 1492.62f, 11.1742f);
+                    escort->AddWaypoint(68, -8121.35f, 1500.88f, 10.5241f);
+                    escort->AddWaypoint(69, -8118.24f, 1509.03f, 10.3345f);
+                    escort->AddWaypoint(70, -8114.80f, 1516.22f, 10.0675f);
+                    escort->AddWaypoint(71, -8107.86f, 1526.28f, 9.52589f);
+                    escort->AddWaypoint(72, -8101.88f, 1535.21f, 9.34943f);
+                    escort->AddWaypoint(73, -8099.31f, 1546.64f, 9.12364f);
+                    escort->AddWaypoint(74, -8098.55f, 1556.10f, 8.94064f);
+                    escort->AddWaypoint(75, -8096.11f, 1625.51f, 8.78228f);
+                    escort->AddWaypoint(76, -8096.47f, 1649.65f, 10.0208f);
+                    escort->AddWaypoint(77, -8096.74f, 1663.73f, 11.5271f);
+                    escort->AddWaypoint(78, -8103.78f, 1691.23f, 15.3531f);
+                    escort->AddWaypoint(79, -8109.90f, 1696.20f, 16.6564f);
+                    escort->AddWaypoint(80, -8113.23f, 1698.49f, 18.9307f);
+                    escort->AddWaypoint(81, -8115.83f, 1700.98f, 20.8800f);
+                    escort->AddWaypoint(82, -8119.49f, 1704.42f, 23.4167f);
+                    escort->AddWaypoint(83, -8124.64f, 1709.90f, 26.8272f);
+                    escort->AddWaypoint(84, -8128.63f, 1715.32f, 29.3983f);
+                    escort->AddWaypoint(85, -8132.33f, 1721.63f, 31.6928f);
+                    escort->AddWaypoint(86, -8134.51f, 1726.81f, 33.0131f);
+                    escort->AddWaypoint(87, -8136.43f, 1732.03f, 34.0754f);
+                    escort->AddWaypoint(88, -8137.48f, 1738.16f, 34.8704f);
+                    escort->AddWaypoint(89, -8137.91f, 1743.78f, 35.1258f);
+                    escort->AddWaypoint(90, -8137.37f, 1748.61f, 34.9439f);
+                    escort->AddWaypoint(91, -8136.48f, 1754.65f, 34.5787f);
+                    escort->AddWaypoint(92, -8134.38f, 1759.58f, 33.9260f);
+                    escort->AddWaypoint(93, -8131.15f, 1765.65f, 32.8294f);
+                    escort->AddWaypoint(94, -8127.14f, 1770.74f, 31.4358f);
+                    escort->AddWaypoint(95, -8121.74f, 1776.90f, 29.6606f);
+                    escort->AddWaypoint(96, -8116.82f, 1781.36f, 28.4168f);
+                    escort->AddWaypoint(97, -8111.85f, 1784.92f, 28.7040f);
+                    escort->AddWaypoint(98, -8108.42f, 1787.96f, 29.3762f);
+                    escort->AddWaypoint(99, -8104.37f, 1792.24f, 30.3825f);
+                    escort->AddWaypoint(100, -8101.48f, 1796.07f, 31.3296f);
+                    escort->AddWaypoint(101, -8098.53f, 1800.13f, 32.4053f);
+                    escort->AddWaypoint(102, -8095.65f, 1804.58f, 33.6369f);
+                    escort->AddWaypoint(103, -8093.22f, 1808.60f, 34.8034f);
+                    escort->AddWaypoint(104, -8090.76f, 1812.98f, 36.3530f);
+                    escort->AddWaypoint(105, -8088.47f, 1816.71f, 37.5583f);
+                    escort->AddWaypoint(106, -8084.40f, 1823.03f, 39.7250f);
+                    escort->AddWaypoint(107, -8077.03f, 1824.59f, 41.3678f);
+                    escort->AddWaypoint(108, -8070.16f, 1822.37f, 42.4776f);
+                    escort->AddWaypoint(109, -8062.44f, 1821.97f, 42.8076f);
+                    escort->AddWaypoint(110, -8056.33f, 1822.18f, 42.8170f);
+                    escort->AddWaypoint(111, -8049.89f, 1822.38f, 42.5627f);
+                    escort->AddWaypoint(112, -8043.23f, 1822.53f, 42.2247f);
+                    escort->AddWaypoint(113, -8034.60f, 1822.42f, 39.8810f);
+                    escort->AddWaypoint(114, -8026.67f, 1821.64f, 36.1786f);
+                    escort->AddWaypoint(115, -8014.71f, 1820.55f, 29.8471f);
+                    escort->AddWaypoint(116, -8000.99f, 1819.48f, 24.6067f);
+                    escort->AddWaypoint(117, -7993.08f, 1822.92f, 21.2857f);
+                    escort->AddWaypoint(118, -7983.36f, 1827.66f, 16.8506f);
+                    escort->AddWaypoint(119, -7976.36f, 1830.73f, 13.8622f);
+                    escort->AddWaypoint(120, -7968.22f, 1832.91f, 11.6773f);
+                    escort->AddWaypoint(121, -7960.49f, 1833.61f, 10.2075f);
+                    escort->AddWaypoint(122, -7953.07f, 1836.06f, 8.50395f);
+                    escort->AddWaypoint(123, -7949.61f, 1835.68f, 6.69894f);
+                    escort->AddWaypoint(124, -7918.63f, 1835.01f, 5.54989f);
+                    escort->AddWaypoint(125, -7884.50f, 1836.57f, 4.28574f);
+                    escort->AddWaypoint(126, -7849.60f, 1845.08f, 7.19778f, 0, true);
+                    escort->SetSpeedZ(21.0f);
+                    escort->Start(true);
+                }
         }
         return true;
     }
@@ -716,37 +716,37 @@ public:
     {
         switch (quest->GetQuestId())
         {
-            case QUEST_KAJA_COLA:
-                creature->DoPersonalScriptText(SASSY_SAY_LATER, player);
-                break;
-            case QUEST_LIFE_OF_THE_PARTY_MALE:
-            case QUEST_LIFE_OF_THE_PARTY_FEMALE:
-                player->RemoveAura(SPELL_AWESOME_PARTY_ENSEMBLE);
-                player->RemoveAura(SPELL_LOTP_OUTFIT_SECONDARY);
-                player->RemoveAura(SPELL_LOTP_OUTFIT_FEMALE);
-                player->RemoveAura(SPELL_LOTP_OUTFIT_MALE);
-                player->RemoveAura(SPELL_LOTP_PAPARAZZI);
-                player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_1);
-                player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_2, player);
-                break;
-            case QUEST_PIRATE_PARTY_CRASHERS:
-                player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_2);
-                player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_3, false); // wtf? why dont work?
-                break;
-            case QUEST_A_BAZILLION_MACAROONS:
-                player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_4);
-                player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_5, false);
-                break;
-            case QUEST_THE_GREAT_BANK_HEIST:
-                if (player->GetQuestStatus(QUEST_ROBBING_HOODS) == QUEST_STATUS_REWARDED &&
-                    player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_REWARDED &&
-                    player->GetQuestStatus(QUEST_LIBERATE_THE_KAJAMITE) == QUEST_STATUS_REWARDED)
-                {
-                    player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_5);
-                    player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_6, player);
-                    player->SaveToDB();
-                }
-                break;
+        case QUEST_KAJA_COLA:
+            creature->DoPersonalScriptText(SASSY_SAY_LATER, player);
+            break;
+        case QUEST_LIFE_OF_THE_PARTY_MALE:
+        case QUEST_LIFE_OF_THE_PARTY_FEMALE:
+            player->RemoveAura(SPELL_AWESOME_PARTY_ENSEMBLE);
+            player->RemoveAura(SPELL_LOTP_OUTFIT_SECONDARY);
+            player->RemoveAura(SPELL_LOTP_OUTFIT_FEMALE);
+            player->RemoveAura(SPELL_LOTP_OUTFIT_MALE);
+            player->RemoveAura(SPELL_LOTP_PAPARAZZI);
+            player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_1);
+            player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_2, player);
+            break;
+        case QUEST_PIRATE_PARTY_CRASHERS:
+            player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_2);
+            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_3, false); // wtf? why dont work?
+            break;
+        case QUEST_A_BAZILLION_MACAROONS:
+            player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_4);
+            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_5, false);
+            break;
+        case QUEST_THE_GREAT_BANK_HEIST:
+            if (player->GetQuestStatus(QUEST_ROBBING_HOODS) == QUEST_STATUS_REWARDED &&
+                player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_REWARDED &&
+                player->GetQuestStatus(QUEST_LIBERATE_THE_KAJAMITE) == QUEST_STATUS_REWARDED)
+            {
+                player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_5);
+                player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_6, player);
+                player->SaveToDB();
+            }
+            break;
         }
 
         return true;
@@ -756,22 +756,22 @@ public:
     {
         switch (quest->GetQuestId())
         {
-            case QUEST_TAKING_CARE_OF_BUSINESS:
-                creature->DoPersonalScriptText(SASSY_SAY_LOL, player);
-                break;
-            case QUEST_DO_IT_YOURSELF:
-                creature->DoPersonalScriptText(SASSY_SAY_HELP_HIM, player);
-                break;
-            case QUEST_447:
-                if (player->GetPhaseMask() == 8192)
-                    player->CompleteQuest(QUEST_447);
-                else
-                    creature->DoPersonalScriptText(SASSY_SAY_CANT_LOOK, player);
-                break;
-            case QUEST_LIFE_SAVINGS:
-                if (player->GetPhaseMask() == 8192)
-                    creature->DoPersonalScriptText(SASSY_SAY_GO_TO_THE_GALLYWIX_BOAT, player);
-                break;
+        case QUEST_TAKING_CARE_OF_BUSINESS:
+            creature->DoPersonalScriptText(SASSY_SAY_LOL, player);
+            break;
+        case QUEST_DO_IT_YOURSELF:
+            creature->DoPersonalScriptText(SASSY_SAY_HELP_HIM, player);
+            break;
+        case QUEST_447:
+            if (player->GetPhaseMask() == 8192)
+                player->CompleteQuest(QUEST_447);
+            else
+                creature->DoPersonalScriptText(SASSY_SAY_CANT_LOOK, player);
+            break;
+        case QUEST_LIFE_SAVINGS:
+            if (player->GetPhaseMask() == 8192)
+                creature->DoPersonalScriptText(SASSY_SAY_GO_TO_THE_GALLYWIX_BOAT, player);
+            break;
         }
 
         return true;
@@ -836,16 +836,16 @@ public:
         }
 
         if (quest->GetQuestId() == QUEST_LIBERATE_THE_KAJAMITE)
-        if (player->GetQuestStatus(QUEST_THE_GREAT_BANK_HEIST) == QUEST_STATUS_REWARDED &&
-            player->GetQuestStatus(QUEST_ROBBING_HOODS) == QUEST_STATUS_REWARDED &&
-            player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_REWARDED)
-        {
-            player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_5);
-            player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_6, player);
-            player->SaveToDB();
-        }
+            if (player->GetQuestStatus(QUEST_THE_GREAT_BANK_HEIST) == QUEST_STATUS_REWARDED &&
+                player->GetQuestStatus(QUEST_ROBBING_HOODS) == QUEST_STATUS_REWARDED &&
+                player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_REWARDED)
+            {
+                player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_5);
+                player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_6, player);
+                player->SaveToDB();
+            }
 
-        return true;
+            return true;
     }
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
@@ -885,60 +885,60 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (CanYell)
-            if (uiRandomYellTimer <= diff)
-            {
-                uiRandomYellTimer = urand(20000, 60000);
-                Map::PlayerList const &lPlayers = me->GetMap()->GetPlayers();
-
-                if (lPlayers.isEmpty())
-                    return;
-
-                for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                if (Player* player = itr->getSource())
-                if (player->GetPhaseMask() == 1 && player->GetAreaId() == AREA_KAJAMITE_MINE)
+                if (uiRandomYellTimer <= diff)
                 {
-                    uint8 roll = urand(0, 7);
-                    me->DoPersonalScriptText(FOREMAN_DAMPWICK_RANDOM_YELL - roll, player, true);
-                }
-            } else
-                uiRandomYellTimer -= diff;
+                    uiRandomYellTimer = urand(20000, 60000);
+                    Map::PlayerList const &lPlayers = me->GetMap()->GetPlayers();
 
-            if (!lPlayers.empty())
-            for (std::list<Psc>::iterator itr = lPlayers.begin(); itr != lPlayers.end();)
-            if ((*itr).uiEventTimer <= diff)
-            {
-                ++(*itr).uiPhase;
+                    if (lPlayers.isEmpty())
+                        return;
 
-                if (Player* player = Unit::GetPlayer(*me, (*itr).uiPlayerGUID))
-                {
-                    switch ((*itr).uiPhase)
-                    {
-                        case 1:
-                            (*itr).uiEventTimer = 1000;
-                            me->DoPersonalScriptText(DAMPWICK_SAY_NICE, player);
-                            break;
-                        case 2:
-                            (*itr).uiEventTimer = 3000;
-                            DoCast(SPELL_SASSYS_INCENTIVE);
-                            me->DoPersonalScriptText(DAMPWICK_YELL_OUCH, player);
-                            break;
-                        case 3:
-                            me->DoPersonalScriptText(DAMPWICK_SAY_OK, player);
-                            itr = lPlayers.erase(itr);
-                            break;
-                    }
+                    for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                        if (Player* player = itr->getSource())
+                            if (player->GetPhaseMask() == 1 && player->GetAreaId() == AREA_KAJAMITE_MINE)
+                            {
+                                uint8 roll = urand(0, 7);
+                                me->DoPersonalScriptText(FOREMAN_DAMPWICK_RANDOM_YELL - roll, player, true);
+                            }
                 } else
-                    itr = lPlayers.erase(itr);
-            } else
-            {
-                (*itr).uiEventTimer -= diff;
-                ++itr;
-            }
+                    uiRandomYellTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!lPlayers.empty())
+                    for (std::list<Psc>::iterator itr = lPlayers.begin(); itr != lPlayers.end();)
+                        if ((*itr).uiEventTimer <= diff)
+                        {
+                            ++(*itr).uiPhase;
 
-            DoMeleeAttackIfReady();
+                            if (Player* player = Unit::GetPlayer(*me, (*itr).uiPlayerGUID))
+                            {
+                                switch ((*itr).uiPhase)
+                                {
+                                case 1:
+                                    (*itr).uiEventTimer = 1000;
+                                    me->DoPersonalScriptText(DAMPWICK_SAY_NICE, player);
+                                    break;
+                                case 2:
+                                    (*itr).uiEventTimer = 3000;
+                                    DoCast(SPELL_SASSYS_INCENTIVE);
+                                    me->DoPersonalScriptText(DAMPWICK_YELL_OUCH, player);
+                                    break;
+                                case 3:
+                                    me->DoPersonalScriptText(DAMPWICK_SAY_OK, player);
+                                    itr = lPlayers.erase(itr);
+                                    break;
+                                }
+                            } else
+                                itr = lPlayers.erase(itr);
+                        } else
+                        {
+                            (*itr).uiEventTimer -= diff;
+                            ++itr;
+                        }
+
+                        if (!UpdateVictim())
+                            return;
+
+                        DoMeleeAttackIfReady();
         }
     };
 };
@@ -990,7 +990,7 @@ public:
     {
         PrepareSpellScript(spell_goblin_all_in_1_der_belt_shocker_SpellScript)
 
-        void DummyEffect(SpellEffIndex effIndex)
+            void DummyEffect(SpellEffIndex effIndex)
         {
             Creature* troll = NULL;
 
@@ -1051,31 +1051,31 @@ public:
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_ROLLING_WITH_MY_HOMIES)
-        if (Creature* hotrod = player->GetVehicleCreatureBase())
-        {
-            if (hotrod->GetEntry() == NPC_HOT_ROD)
-            if (Vehicle* vehicle = hotrod->GetVehicleKit())
+            if (Creature* hotrod = player->GetVehicleCreatureBase())
             {
-                player->KilledMonsterCredit(NPC_HOTROD_KILL_CREDIT, 0);
+                if (hotrod->GetEntry() == NPC_HOT_ROD)
+                    if (Vehicle* vehicle = hotrod->GetVehicleKit())
+                    {
+                        player->KilledMonsterCredit(NPC_HOTROD_KILL_CREDIT, 0);
 
+                        for (int i = 0; i < 3; ++i)
+                            if (Unit* passenger = vehicle->GetPassenger(i + 1))
+                                player->KilledMonsterCredit(InvisHomies[i], 0);
+                            else
+                                player->AddAura(DetectSpells[i], player);
+
+                        return true;
+                    }
+            } else
+            {
                 for (int i = 0; i < 3; ++i)
-                if (Unit* passenger = vehicle->GetPassenger(i + 1))
-                    player->KilledMonsterCredit(InvisHomies[i], 0);
-                else
-                    player->AddAura(DetectSpells[i], player);
+                    player->CastSpell(player, DetectSpells[i], false);
 
-                return true;
+                creature->Whisper(DREADSHREDDER_SAY_USE_KEYS, player->GetGUID(), true);
+                creature->DoPersonalScriptText(DREADSHREDDER_SAY_YOU_LIKE_IT, player);
             }
-        } else
-        {
-            for (int i = 0; i < 3; ++i)
-                player->CastSpell(player, DetectSpells[i], false);
 
-            creature->Whisper(DREADSHREDDER_SAY_USE_KEYS, player->GetGUID(), true);
-            creature->DoPersonalScriptText(DREADSHREDDER_SAY_YOU_LIKE_IT, player);
-        }
-
-        return true;
+            return true;
     }
 
     bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
@@ -1084,16 +1084,16 @@ public:
             creature->DoPersonalScriptText(DREADSHREDDER_SAY_FINISH, player);
 
         if (quest->GetQuestId() == QUEST_ROBBING_HOODS)
-        if (player->GetQuestStatus(QUEST_THE_GREAT_BANK_HEIST) == QUEST_STATUS_REWARDED &&
-            player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_REWARDED &&
-            player->GetQuestStatus(QUEST_LIBERATE_THE_KAJAMITE) == QUEST_STATUS_REWARDED)
-        {
-            player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_5);
-            player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_6, player);
-            player->SaveToDB();
-        }
+            if (player->GetQuestStatus(QUEST_THE_GREAT_BANK_HEIST) == QUEST_STATUS_REWARDED &&
+                player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_REWARDED &&
+                player->GetQuestStatus(QUEST_LIBERATE_THE_KAJAMITE) == QUEST_STATUS_REWARDED)
+            {
+                player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_5);
+                player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_6, player);
+                player->SaveToDB();
+            }
 
-        return true;
+            return true;
     }
 
     CreatureAI* GetAI(Creature* creature) const
@@ -1127,22 +1127,22 @@ public:
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_ROLLING_WITH_MY_HOMIES)
-        if (Creature* hotrod = player->GetVehicleCreatureBase())
-        if (hotrod->GetEntry() == NPC_HOT_ROD)
-        if (Vehicle* vehicle = hotrod->GetVehicleKit())
-        {
-            player->KilledMonsterCredit(NPC_HOTROD_KILL_CREDIT, 0);
+            if (Creature* hotrod = player->GetVehicleCreatureBase())
+                if (hotrod->GetEntry() == NPC_HOT_ROD)
+                    if (Vehicle* vehicle = hotrod->GetVehicleKit())
+                    {
+                        player->KilledMonsterCredit(NPC_HOTROD_KILL_CREDIT, 0);
 
-            for (int i = 0; i < 3; ++i)
-            if (Unit* passenger = vehicle->GetPassenger(i + 1))
-                player->KilledMonsterCredit(InvisHomies[i], 0);
-            else
-                player->AddAura(DetectSpells[i], player);
+                        for (int i = 0; i < 3; ++i)
+                            if (Unit* passenger = vehicle->GetPassenger(i + 1))
+                                player->KilledMonsterCredit(InvisHomies[i], 0);
+                            else
+                                player->AddAura(DetectSpells[i], player);
 
-            return true;
-        }
+                        return true;
+                    }
 
-        return true;
+                    return true;
     }
 
     CreatureAI* GetAI(Creature* creature) const
@@ -1173,12 +1173,12 @@ public:
                 Follow = false;
 
                 if (me->isSummon())
-                if (Player* player = me->ToTempSummon()->GetSummoner()->ToPlayer())
-                {
-                    float angle = 0.0f;
-
-                    switch (me->GetEntry())
+                    if (Player* player = me->ToTempSummon()->GetSummoner()->ToPlayer())
                     {
+                        float angle = 0.0f;
+
+                        switch (me->GetEntry())
+                        {
                         case NPC_ACE:
                             angle = M_PI + M_PI / 4;
                             break;
@@ -1188,10 +1188,10 @@ public:
                         case NPC_IZZY:
                             angle = M_PI - M_PI / 4;
                             break;
-                    }
+                        }
 
-                    StartFollow(player, 0, NULL, angle, 0.5f);
-                }
+                        StartFollow(player, 0, NULL, angle, 0.5f);
+                    }
             }
 
             FollowerAI::UpdateAI(diff);
@@ -1257,44 +1257,44 @@ public:
         void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_CREATE_STOLEN_LOOT)
-            if (Vehicle* vehicle = me->GetVehicleKit())
-            if (Unit* passenger = vehicle->GetPassenger(0))
-            if (Player* player = passenger->ToPlayer())
-            {
-                if (player->HasItemCount(ITEM_STOLEN_LOOT, 12))
-                    return;
+                if (Vehicle* vehicle = me->GetVehicleKit())
+                    if (Unit* passenger = vehicle->GetPassenger(0))
+                        if (Player* player = passenger->ToPlayer())
+                        {
+                            if (player->HasItemCount(ITEM_STOLEN_LOOT, 12))
+                                return;
 
-                ItemPosCountVec dest;
-                uint32 no_space = 0;
-                uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_STOLEN_LOOT, 1, &no_space);
+                            ItemPosCountVec dest;
+                            uint32 no_space = 0;
+                            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_STOLEN_LOOT, 1, &no_space);
 
-                if (msg != EQUIP_ERR_OK)
-                    return;
+                            if (msg != EQUIP_ERR_OK)
+                                return;
 
-                Item* item = player->StoreNewItem(dest, ITEM_STOLEN_LOOT, true, Item::GenerateItemRandomPropertyId(ITEM_STOLEN_LOOT));
+                            Item* item = player->StoreNewItem(dest, ITEM_STOLEN_LOOT, true, Item::GenerateItemRandomPropertyId(ITEM_STOLEN_LOOT));
 
-                if (!item)
-                {
-                    player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL);
-                    return;
-                }
+                            if (!item)
+                            {
+                                player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL);
+                                return;
+                            }
 
-                if (item)
-                    player->SendNewItem(item, 1, true, true);
-            }
+                            if (item)
+                                player->SendNewItem(item, 1, true, true);
+                        }
 
-            if (!Boom && spell->Id == SPELL_ROCKET)
-            if (Vehicle* vehicle = me->GetVehicleKit())
-            if (Unit* passenger = vehicle->GetPassenger(0))
-            {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                Boom = true;
-                passenger->ExitVehicle();
-                DoCast(SPELL_BOOM_INVIS_MODEL);
+                        if (!Boom && spell->Id == SPELL_ROCKET)
+                            if (Vehicle* vehicle = me->GetVehicleKit())
+                                if (Unit* passenger = vehicle->GetPassenger(0))
+                                {
+                                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                    Boom = true;
+                                    passenger->ExitVehicle();
+                                    DoCast(SPELL_BOOM_INVIS_MODEL);
 
-                for (int i = 0; i < 12; ++i)
-                    me->SendPlaySpellVisualKit(BoomVisualEffect[i], 0);
-            }
+                                    for (int i = 0; i < 12; ++i)
+                                        me->SendPlaySpellVisualKit(BoomVisualEffect[i], 0);
+                                }
         }
 
         void PressureCitizensEvent(uint8 s_roll, uint32 text_id)
@@ -1303,14 +1303,14 @@ public:
             uint8 h_roll = urand(1, 3);
 
             if (Vehicle* vehicle = me->GetVehicleKit())
-            if (Unit* passenger = vehicle->GetPassenger(h_roll))
-            if (Creature* homies = passenger->ToCreature())
-            if (Unit* passenger_player = vehicle->GetPassenger(0))
-            if (Player* player = passenger_player->ToPlayer())
-            {
-                uint8 roll = urand(0, s_roll);
-                homies->DoPersonalScriptText(text_id - roll, player);
-            }
+                if (Unit* passenger = vehicle->GetPassenger(h_roll))
+                    if (Creature* homies = passenger->ToCreature())
+                        if (Unit* passenger_player = vehicle->GetPassenger(0))
+                            if (Player* player = passenger_player->ToPlayer())
+                            {
+                                uint8 roll = urand(0, s_roll);
+                                homies->DoPersonalScriptText(text_id - roll, player);
+                            }
         }
 
         void SetBoost(bool apply)
@@ -1341,10 +1341,10 @@ public:
             Despawn = true;
 
             if (Vehicle* vehicle = me->GetVehicleKit())
-            for (int i = 1; i < 4; ++i)
-            if (Unit* passenger = vehicle->GetPassenger(i))
-            if (Creature* homies = passenger->ToCreature())
-                homies->DespawnOrUnsummon();
+                for (int i = 1; i < 4; ++i)
+                    if (Unit* passenger = vehicle->GetPassenger(i))
+                        if (Creature* homies = passenger->ToCreature())
+                            homies->DespawnOrUnsummon();
         }
 
         void OnCharmed(bool /*charm*/)
@@ -1356,136 +1356,136 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Say)
-            if (uiSayTimer <= diff)
-            {
-                Say = false;
-                uiSayTimer = 5000;
-            } else
-                uiSayTimer -= diff;
-
-            if (Despawn)
-            {
-                Despawn = false;
-                uint16 uiDespawnTimer = 0;
-
-                if (Boom)
-                    uiDespawnTimer = 5000;
-
-                if (me->isSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                if (Player* player = summoner->ToPlayer())
+                if (uiSayTimer <= diff)
                 {
-                    player->RemoveAura(SPELL_KEYS_TO_THE_HOT_ROD);
-                    player->AddAura(SPELL_KEYS_TO_THE_HOT_ROD, player);
+                    Say = false;
+                    uiSayTimer = 5000;
+                } else
+                    uiSayTimer -= diff;
+
+                if (Despawn)
+                {
+                    Despawn = false;
+                    uint16 uiDespawnTimer = 0;
+
+                    if (Boom)
+                        uiDespawnTimer = 5000;
+
+                    if (me->isSummon())
+                        if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                            if (Player* player = summoner->ToPlayer())
+                            {
+                                player->RemoveAura(SPELL_KEYS_TO_THE_HOT_ROD);
+                                player->AddAura(SPELL_KEYS_TO_THE_HOT_ROD, player);
+                            }
+
+                            me->DespawnOrUnsummon(uiDespawnTimer);
                 }
 
-                me->DespawnOrUnsummon(uiDespawnTimer);
-            }
-
-            if (!Moving && Event)
-            {
-                Event = false;
-                Vehicle* vehicle = me->GetVehicleKit();
-
-                if (!vehicle)
-                    return;
-
-                Player* player = NULL;
-
-                if (Unit* passenger = vehicle->GetPassenger(0))
-                    player = passenger->ToPlayer();
-
-                if (!player)
-                    return;
-
-                QuestStatusMap::iterator itr = player->getQuestStatusMap().find(QUEST_ROLLING_WITH_MY_HOMIES);
-
-                if (itr == player->getQuestStatusMap().end())
-                    return;
-
-                QuestStatusData& q_status = itr->second;
-                Quest const* qInfo = sObjectMgr->GetQuestTemplate(QUEST_ROLLING_WITH_MY_HOMIES);
-
-                if (!qInfo)
-                    return;
-
-                if (q_status.Status == QUEST_STATUS_INCOMPLETE)
-                for (uint32 i = 0; i < 3; ++i)
-                if (q_status.CreatureOrGOCount[i + 1] == 0)
-                if (Creature* invis_homies = player->FindNearestCreature(InvisHomies[i], 10.0f))
+                if (!Moving && Event)
                 {
-                    player->KilledMonsterCredit(InvisHomies[i], 0);
-                    player->RemoveAura(DetectSpells[i]);
-                    float x, y, z, o;
-                    invis_homies->GetPosition(x, y, z, o);
+                    Event = false;
+                    Vehicle* vehicle = me->GetVehicleKit();
 
-                    if (Creature* homies = player->SummonCreature(Homies[i], x, y, z, o))
-                    {
-                        homies->SetSeerGUID(player->GetGUID());
-                        homies->SetVisible(false);
-                        homies->EnterVehicle(me, i + 1);
-                    }
+                    if (!vehicle)
+                        return;
+
+                    Player* player = NULL;
+
+                    if (Unit* passenger = vehicle->GetPassenger(0))
+                        player = passenger->ToPlayer();
+
+                    if (!player)
+                        return;
+
+                    QuestStatusMap::iterator itr = player->getQuestStatusMap().find(QUEST_ROLLING_WITH_MY_HOMIES);
+
+                    if (itr == player->getQuestStatusMap().end())
+                        return;
+
+                    QuestStatusData& q_status = itr->second;
+                    Quest const* qInfo = sObjectMgr->GetQuestTemplate(QUEST_ROLLING_WITH_MY_HOMIES);
+
+                    if (!qInfo)
+                        return;
+
+                    if (q_status.Status == QUEST_STATUS_INCOMPLETE)
+                        for (uint32 i = 0; i < 3; ++i)
+                            if (q_status.CreatureOrGOCount[i + 1] == 0)
+                                if (Creature* invis_homies = player->FindNearestCreature(InvisHomies[i], 10.0f))
+                                {
+                                    player->KilledMonsterCredit(InvisHomies[i], 0);
+                                    player->RemoveAura(DetectSpells[i]);
+                                    float x, y, z, o;
+                                    invis_homies->GetPosition(x, y, z, o);
+
+                                    if (Creature* homies = player->SummonCreature(Homies[i], x, y, z, o))
+                                    {
+                                        homies->SetSeerGUID(player->GetGUID());
+                                        homies->SetVisible(false);
+                                        homies->EnterVehicle(me, i + 1);
+                                    }
+                                }
                 }
-            }
 
-            if (uiSpeedTimer <= diff)
-            {
-                uiSpeedTimer = 100;
-
-                if (me->IsInWater())
-                    InWater = true;
-
-                if (me->isMoving())
+                if (uiSpeedTimer <= diff)
                 {
-                    DoCast(SPELL_HOT_ROD_KNOCKBACK);
-                    Moving = true;
-                    Event = true;
+                    uiSpeedTimer = 100;
 
-                    if (Speed < 3.0f)
+                    if (me->IsInWater())
+                        InWater = true;
+
+                    if (me->isMoving())
                     {
-                        if (IsBoost)
+                        DoCast(SPELL_HOT_ROD_KNOCKBACK);
+                        Moving = true;
+                        Event = true;
+
+                        if (Speed < 3.0f)
                         {
-                            Boost = Speed / 2;
-                            Speed = Speed + 0.2;
-                        } else
-                            Speed = Speed + 0.1;
+                            if (IsBoost)
+                            {
+                                Boost = Speed / 2;
+                                Speed = Speed + 0.2;
+                            } else
+                                Speed = Speed + 0.1;
 
-                        me->SetSpeed(MOVE_RUN, Speed + Boost, true);
+                            me->SetSpeed(MOVE_RUN, Speed + Boost, true);
+                        }
+                    } else
+                    {
+                        Moving = false;
+
+                        if (Speed > 0.5f)
+                        {
+                            Speed = 0.5f;
+                            Boost = 0.0f;
+                            me->SetSpeed(MOVE_RUN, Speed, true);
+                        }
                     }
                 } else
-                {
-                    Moving = false;
+                    uiSpeedTimer -= diff;
 
-                    if (Speed > 0.5f)
+                if (InWater)
+                    if (uiInWaterTimer <= diff)
                     {
-                        Speed = 0.5f;
-                        Boost = 0.0f;
-                        me->SetSpeed(MOVE_RUN, Speed, true);
-                    }
-                }
-            } else
-                uiSpeedTimer -= diff;
+                        InWater = false;
+                        uiInWaterTimer = 1000;
 
-            if (InWater)
-            if (uiInWaterTimer <= diff)
-            {
-                InWater = false;
-                uiInWaterTimer = 1000;
-
-                if (me->IsInWater() && !Boom)
-                if (Vehicle* vehicle = me->GetVehicleKit())
-                if (Unit* passenger = vehicle->GetPassenger(0))
-                {
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    Boom = true;
-                    passenger->ExitVehicle();
-                    DoCast(SPELL_BOOM_INVIS_MODEL);
-                    DoCast(SPELL_COSMETIC_WATER_STEAM_IMPACT);
-                    DoCast(SPELL_WATER_EXPLOSION);
-                    DoCast(SPELL_DUSTY_EXPLOSION);
-                }
-            } else
-                uiInWaterTimer -= diff;
+                        if (me->IsInWater() && !Boom)
+                            if (Vehicle* vehicle = me->GetVehicleKit())
+                                if (Unit* passenger = vehicle->GetPassenger(0))
+                                {
+                                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                                    Boom = true;
+                                    passenger->ExitVehicle();
+                                    DoCast(SPELL_BOOM_INVIS_MODEL);
+                                    DoCast(SPELL_COSMETIC_WATER_STEAM_IMPACT);
+                                    DoCast(SPELL_WATER_EXPLOSION);
+                                    DoCast(SPELL_DUSTY_EXPLOSION);
+                                }
+                    } else
+                        uiInWaterTimer -= diff;
         }
     };
 };
@@ -1606,9 +1606,9 @@ public:
                     CAST_AI(npc_hot_rod::npc_hot_rodAI, hotrod->AI())->PressureCitizensEvent(5, HOMIES_RANDOM_ALARM);
 
                     if (Vehicle* vehicle = hotrod->GetVehicleKit())
-                    if (Unit* passenger = vehicle->GetPassenger(0))
-                    if (Player* player = passenger->ToPlayer())
-                        me->DoPersonalScriptText(CITIZEN_RANDOM_ALARM - y_roll, player);
+                        if (Unit* passenger = vehicle->GetPassenger(0))
+                            if (Player* player = passenger->ToPlayer())
+                                me->DoPersonalScriptText(CITIZEN_RANDOM_ALARM - y_roll, player);
                 } else
                 {
                     uiKnockbackData = DATA_KNOCKBACK_KNOCKBACK;
@@ -1621,26 +1621,26 @@ public:
                         CAST_AI(npc_hot_rod::npc_hot_rodAI, hotrod->AI())->PressureCitizensEvent(10, HOMIES_RANDOM_SAY);
 
                         if (Vehicle* vehicle = hotrod->GetVehicleKit())
-                        if (Unit* passenger = vehicle->GetPassenger(0))
-                        if (Player* player = passenger->ToPlayer())
-                            me->DoPersonalScriptText(CITIZEN_RANDOM_SAY - s_roll, player);
+                            if (Unit* passenger = vehicle->GetPassenger(0))
+                                if (Player* player = passenger->ToPlayer())
+                                    me->DoPersonalScriptText(CITIZEN_RANDOM_SAY - s_roll, player);
                     }
                 }
             } else
-            if (hotrod->GetEntry() == NPC_HOT_ROD_LS)
-            {
-                uiKnockbackData = DATA_KNOCKBACK_KNOCKBACK;
-                uint8 s_roll = urand(0, 13);
-                uint8 e_roll = urand(0, 6);
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, RollingEmoteState[e_roll]);
-            }
+                if (hotrod->GetEntry() == NPC_HOT_ROD_LS)
+                {
+                    uiKnockbackData = DATA_KNOCKBACK_KNOCKBACK;
+                    uint8 s_roll = urand(0, 13);
+                    uint8 e_roll = urand(0, 6);
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, RollingEmoteState[e_roll]);
+                }
         }
 
         void SpellHit(Unit* caster, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_HOT_ROD_HONK_HORN)
-            if (!(Event && uiKnockbackData != DATA_KNOCKBACK_NONE || uiKnockbackData == DATA_KNOCKBACK_IMMUNE))
-                MoveScare(caster);
+                if (!(Event && uiKnockbackData != DATA_KNOCKBACK_NONE || uiKnockbackData == DATA_KNOCKBACK_IMMUNE))
+                    MoveScare(caster);
         }
 
         void UpdateAI(const uint32 diff)
@@ -1666,40 +1666,40 @@ public:
             }
 
             if (Cast)
-            if (uiCastTimer <= diff)
-            {
-                ++uiCastPhase;
-
-                if (Unit* hotrod = Unit::GetCreature(*me, uiHotRodGUID))
-                    switch (uiCastPhase)
+                if (uiCastTimer <= diff)
                 {
+                    ++uiCastPhase;
+
+                    if (Unit* hotrod = Unit::GetCreature(*me, uiHotRodGUID))
+                        switch (uiCastPhase)
+                    {
                         case 1:
-                        {
-                                  uiCastTimer = 500;
-                                  uint8 e_roll = urand(0, 4);
-                                  me->HandleEmoteCommand(RollingEmote[e_roll]);
-                                  me->SetFacingToObject(hotrod);
-                        }
+                            {
+                                uiCastTimer = 500;
+                                uint8 e_roll = urand(0, 4);
+                                me->HandleEmoteCommand(RollingEmote[e_roll]);
+                                me->SetFacingToObject(hotrod);
+                            }
                             break;
                         case 2:
-                        {
-                                  uiCastTimer = 500;
-                                  me->SendPlaySpellVisualKit(SPELL_VISUAL_START_FIRE_ROCKET_1, 0);
-                                  me->SendPlaySpellVisualKit(SPELL_VISUAL_START_FIRE_ROCKET_2, 0);
-                                  float x, y, z;
-                                  hotrod->GetPosition(x, y, z);
-                                  me->GetMotionMaster()->MoveCharge(x, y, z);
-                        }
+                            {
+                                uiCastTimer = 500;
+                                me->SendPlaySpellVisualKit(SPELL_VISUAL_START_FIRE_ROCKET_1, 0);
+                                me->SendPlaySpellVisualKit(SPELL_VISUAL_START_FIRE_ROCKET_2, 0);
+                                float x, y, z;
+                                hotrod->GetPosition(x, y, z);
+                                me->GetMotionMaster()->MoveCharge(x, y, z);
+                            }
                             break;
                         case 3:
-                        {
-                                  uiCastTimer = 1500;
-                                  float x, y, z;
-                                  hotrod->GetPosition(x, y, z);
-                                  me->GetMotionMaster()->MoveCharge(x, y, z);
-                                  me->CastSpell(hotrod, SPELL_ROCKET, false);
-                                  me->setFaction(2159);
-                        }
+                            {
+                                uiCastTimer = 1500;
+                                float x, y, z;
+                                hotrod->GetPosition(x, y, z);
+                                me->GetMotionMaster()->MoveCharge(x, y, z);
+                                me->CastSpell(hotrod, SPELL_ROCKET, false);
+                                me->setFaction(2159);
+                            }
                             break;
                         case 4:
                             Cast = false;
@@ -1707,34 +1707,34 @@ public:
                             uiKnockbackData = DATA_KNOCKBACK_NONE;
                             me->DespawnOrUnsummon();
                             break;
-                }
-            } else
-                uiCastTimer -= diff;
+                    }
+                } else
+                    uiCastTimer -= diff;
 
-            if (uiKnockbackData == DATA_KNOCKBACK_KNOCKBACK)
-            if (uiKnockbackTimer <= diff)
-            {
-                uiKnockbackTimer = 5000;
-                uiKnockbackData = DATA_KNOCKBACK_NONE;
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
-                me->GetMotionMaster()->MoveTargetedHome();
-            } else
-                uiKnockbackTimer -= diff;
+                if (uiKnockbackData == DATA_KNOCKBACK_KNOCKBACK)
+                    if (uiKnockbackTimer <= diff)
+                    {
+                        uiKnockbackTimer = 5000;
+                        uiKnockbackData = DATA_KNOCKBACK_NONE;
+                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
+                        me->GetMotionMaster()->MoveTargetedHome();
+                    } else
+                        uiKnockbackTimer -= diff;
 
-            if (Event)
-            if (uiEventTimer <= diff)
-            {
-                Event = false;
-                uiEventTimer = 5000;
-                me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                me->GetMotionMaster()->MoveTargetedHome();
-            } else
-                uiEventTimer -= diff;
+                    if (Event)
+                        if (uiEventTimer <= diff)
+                        {
+                            Event = false;
+                            uiEventTimer = 5000;
+                            me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                            me->GetMotionMaster()->MoveTargetedHome();
+                        } else
+                            uiEventTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                        if (!UpdateVictim())
+                            return;
 
-            DoMeleeAttackIfReady();
+                        DoMeleeAttackIfReady();
         }
     };
 };
@@ -1789,26 +1789,26 @@ public:
 
             switch (player->getGender())
             {
-                case GENDER_MALE:
+            case GENDER_MALE:
                 {
-                                    if (player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_MALE) == QUEST_STATUS_INCOMPLETE ||
-                                        player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_MALE) == QUEST_STATUS_COMPLETE)
-                                        return;
+                    if (player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_MALE) == QUEST_STATUS_INCOMPLETE ||
+                        player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_MALE) == QUEST_STATUS_COMPLETE)
+                        return;
 
-                                    if (player->GetQuestRewardStatus(QUEST_LIFE_OF_THE_PARTY_MALE))
-                                        return;
+                    if (player->GetQuestRewardStatus(QUEST_LIFE_OF_THE_PARTY_MALE))
+                        return;
                 }
-                    break;
-                case GENDER_FEMALE:
+                break;
+            case GENDER_FEMALE:
                 {
-                                      if (player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_FEMALE) == QUEST_STATUS_INCOMPLETE ||
-                                          player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_FEMALE) == QUEST_STATUS_COMPLETE)
-                                          return;
+                    if (player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_FEMALE) == QUEST_STATUS_INCOMPLETE ||
+                        player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_FEMALE) == QUEST_STATUS_COMPLETE)
+                        return;
 
-                                      if (player->GetQuestRewardStatus(QUEST_LIFE_OF_THE_PARTY_FEMALE))
-                                          return;
+                    if (player->GetQuestRewardStatus(QUEST_LIFE_OF_THE_PARTY_FEMALE))
+                        return;
                 }
-                    break;
+                break;
             }
 
             if (player->GetQuestRewardStatus(QUEST_ROLLING_WITH_MY_HOMIES))
@@ -1829,11 +1829,11 @@ public:
             if (q_status.Status == QUEST_STATUS_INCOMPLETE)
             {
                 for (int i = 0; i < 3; ++i)
-                if (q_status.CreatureOrGOCount[i + 1] == 1)
-                    SummonHomies(player, i);
+                    if (q_status.CreatureOrGOCount[i + 1] == 1)
+                        SummonHomies(player, i);
             } else
-            for (int i = 0; i < 3; ++i)
-                SummonHomies(player, i);
+                for (int i = 0; i < 3; ++i)
+                    SummonHomies(player, i);
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1847,11 +1847,11 @@ public:
                 return;
 
             for (int i = 0; i < 3; ++i)
-            if (Creature* summoned_homies = Unit::GetCreature(*player, uiSummonedHomies[i]))
-            {
-                summoned_homies->DespawnOrUnsummon();
-                uiSummonedHomies[i] = 0;
-            }
+                if (Creature* summoned_homies = Unit::GetCreature(*player, uiSummonedHomies[i]))
+                {
+                    summoned_homies->DespawnOrUnsummon();
+                    uiSummonedHomies[i] = 0;
+                }
         }
 
         void Register()
@@ -1876,7 +1876,7 @@ public:
     {
         PrepareSpellScript(spell_summon_hot_rod_SpellScript)
 
-        void SummonHomies(Player* summoner, Creature* hotrod, int i)
+            void SummonHomies(Player* summoner, Creature* hotrod, int i)
         {
             float x, y, z, o;
             summoner->GetPosition(x, y, z, o);
@@ -1919,26 +1919,26 @@ public:
 
                 switch (player->getGender())
                 {
-                    case GENDER_MALE:
+                case GENDER_MALE:
                     {
-                                        if (player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_MALE) == QUEST_STATUS_INCOMPLETE ||
-                                            player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_MALE) == QUEST_STATUS_COMPLETE)
-                                            return;
+                        if (player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_MALE) == QUEST_STATUS_INCOMPLETE ||
+                            player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_MALE) == QUEST_STATUS_COMPLETE)
+                            return;
 
-                                        if (player->GetQuestRewardStatus(QUEST_LIFE_OF_THE_PARTY_MALE))
-                                            return;
+                        if (player->GetQuestRewardStatus(QUEST_LIFE_OF_THE_PARTY_MALE))
+                            return;
                     }
-                        break;
-                    case GENDER_FEMALE:
+                    break;
+                case GENDER_FEMALE:
                     {
-                                          if (player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_FEMALE) == QUEST_STATUS_INCOMPLETE ||
-                                              player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_FEMALE) == QUEST_STATUS_COMPLETE)
-                                              return;
+                        if (player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_FEMALE) == QUEST_STATUS_INCOMPLETE ||
+                            player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_FEMALE) == QUEST_STATUS_COMPLETE)
+                            return;
 
-                                          if (player->GetQuestRewardStatus(QUEST_LIFE_OF_THE_PARTY_FEMALE))
-                                              return;
+                        if (player->GetQuestRewardStatus(QUEST_LIFE_OF_THE_PARTY_FEMALE))
+                            return;
                     }
-                        break;
+                    break;
                 }
 
                 if (player->GetQuestRewardStatus(QUEST_ROLLING_WITH_MY_HOMIES))
@@ -1957,8 +1957,8 @@ public:
                 QuestStatusData& q_status = incomplete_quest->second;
 
                 for (int i = 1; i < 4; ++i)
-                if (q_status.CreatureOrGOCount[i] == 1)
-                    SummonHomies(player, hotrod, i);
+                    if (q_status.CreatureOrGOCount[i] == 1)
+                        SummonHomies(player, hotrod, i);
             }
         }
 
@@ -2044,14 +2044,14 @@ public:
     {
         PrepareSpellScript(spell_hot_rod_honk_horn_SpellScript)
 
-        void Beep(SpellEffIndex effIndex)
+            void Beep(SpellEffIndex effIndex)
         {
             Player* player = NULL;
 
             if (Unit* caster = GetCaster())
-            if (Vehicle* vehicle = caster->GetVehicleKit())
-            if (Unit* passenger = vehicle->GetPassenger(0))
-                player = passenger->ToPlayer();
+                if (Vehicle* vehicle = caster->GetVehicleKit())
+                    if (Unit* passenger = vehicle->GetPassenger(0))
+                        player = passenger->ToPlayer();
 
             if (!player)
                 return;
@@ -2085,7 +2085,7 @@ public:
     {
         PrepareSpellScript(spell_hot_rod_knockback_SpellScript)
 
-        void Knockback(SpellEffIndex effIndex)
+            void Knockback(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
 
@@ -2209,16 +2209,16 @@ public:
     {
         switch (quest->GetQuestId())
         {
-            case QUEST_THE_REPLACEMENTS:
-                creature->DoPersonalScriptText(COACH_SAY_GOTTA_HURRY, player);
-                break;
-            case QUEST_NECESSARY_ROUGHNESS:
-                creature->DoPersonalScriptText(COACH_SAY_SHREDDER, player);
-                player->AddAura(SPELL_QUEST_INVISIBILITY_DETECTION_4, player);
-                break;
-            case QUEST_FOURTH_AND_GOAL:
-                player->AddAura(SPELL_QUEST_INVISIBILITY_DETECTION_4, player);
-                break;
+        case QUEST_THE_REPLACEMENTS:
+            creature->DoPersonalScriptText(COACH_SAY_GOTTA_HURRY, player);
+            break;
+        case QUEST_NECESSARY_ROUGHNESS:
+            creature->DoPersonalScriptText(COACH_SAY_SHREDDER, player);
+            player->AddAura(SPELL_QUEST_INVISIBILITY_DETECTION_4, player);
+            break;
+        case QUEST_FOURTH_AND_GOAL:
+            player->AddAura(SPELL_QUEST_INVISIBILITY_DETECTION_4, player);
+            break;
         }
 
         return true;
@@ -2257,9 +2257,9 @@ public:
         void StartNewEvent(uint64 uiPlayerGUID)
         {
             if (!lEventPlayers.empty())
-            for (std::list<Psc>::const_iterator itr = lEventPlayers.begin(); itr != lEventPlayers.end(); ++itr)
-            if (itr->uiPlayerGUID == uiPlayerGUID)
-                return;
+                for (std::list<Psc>::const_iterator itr = lEventPlayers.begin(); itr != lEventPlayers.end(); ++itr)
+                    if (itr->uiPlayerGUID == uiPlayerGUID)
+                        return;
 
             Psc new_psc;
             new_psc.uiPlayerGUID = uiPlayerGUID;
@@ -2274,12 +2274,12 @@ public:
                 return;
 
             for (std::list<QFAG>::iterator itr = lPlayers.begin(); itr != lPlayers.end();)
-            if (itr->uiPlayerGUID == uiPlayerGUID)
-            {
-                lPlayers.erase(itr);
-                return;
-            } else
-                ++itr;
+                if (itr->uiPlayerGUID == uiPlayerGUID)
+                {
+                    lPlayers.erase(itr);
+                    return;
+                } else
+                    ++itr;
         }
 
         void StartDeathwingEvent(Player* player)
@@ -2290,14 +2290,14 @@ public:
             uint64 uiPlayerGUID = player->GetGUID();
 
             if (!lPlayers.empty())
-            for (std::list<QFAG>::iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-            if (itr->uiPlayerGUID == uiPlayerGUID)
-            if (Unit::GetCreature(*me, itr->uiDeathwingGUID))
-                return;
-            else
-                itr = lPlayers.erase(itr);
-            else
-                ++itr;
+                for (std::list<QFAG>::iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                    if (itr->uiPlayerGUID == uiPlayerGUID)
+                        if (Unit::GetCreature(*me, itr->uiDeathwingGUID))
+                            return;
+                        else
+                            itr = lPlayers.erase(itr);
+                    else
+                        ++itr;
 
             if (Creature* deathwing = player->SummonCreature(NPC_DEATHWING_QFAG, -8178.59f, 1482.14f, 83.99894f, 3.106686f))
             {
@@ -2328,79 +2328,79 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (!lEventPlayers.empty())
-            for (std::list<Psc>::iterator itr = lEventPlayers.begin(); itr != lEventPlayers.end();)
-            if ((*itr).uiEventTimer <= diff)
-            {
-                if (Player* player = Unit::GetPlayer(*me, itr->uiPlayerGUID))
-                {
-                    ++(*itr).uiPhase;
-
-                    switch ((*itr).uiPhase)
+                for (std::list<Psc>::iterator itr = lEventPlayers.begin(); itr != lEventPlayers.end();)
+                    if ((*itr).uiEventTimer <= diff)
                     {
-                        case 1:
+                        if (Player* player = Unit::GetPlayer(*me, itr->uiPlayerGUID))
                         {
-                                  (*itr).uiEventTimer = 1000;
-                                  std::list<Creature*> lHomies;
-                                  player->GetCreatureListWithEntryInGrid(lHomies, NPC_ACE, 15.0f);
+                            ++(*itr).uiPhase;
 
-                                  if (!lHomies.empty())
-                                  for (std::list<Creature*>::const_iterator homie = lHomies.begin(); homie != lHomies.end(); ++homie)
-                                  if ((*homie)->isSummon())
-                                  if (uint64 guid = (*homie)->ToTempSummon()->GetSummonerGUID())
-                                  if (guid == (*itr).uiPlayerGUID)
-                                  {
-                                      (*homie)->DoPersonalScriptText(ACE_SAY_WHAT_IS_THIS, player);
-                                      return;
-                                  }
-                        }
-                            break;
-                        case 2:
-                        {
-                                  (*itr).uiEventTimer = 1000;
-                                  std::list<Creature*> lHomies;
-                                  player->GetCreatureListWithEntryInGrid(lHomies, NPC_IZZY, 15.0f);
+                            switch ((*itr).uiPhase)
+                            {
+                            case 1:
+                                {
+                                    (*itr).uiEventTimer = 1000;
+                                    std::list<Creature*> lHomies;
+                                    player->GetCreatureListWithEntryInGrid(lHomies, NPC_ACE, 15.0f);
 
-                                  if (!lHomies.empty())
-                                  for (std::list<Creature*>::const_iterator homie = lHomies.begin(); homie != lHomies.end(); ++homie)
-                                  if ((*homie)->isSummon())
-                                  if (uint64 guid = (*homie)->ToTempSummon()->GetSummonerGUID())
-                                  if (guid == (*itr).uiPlayerGUID)
-                                  {
-                                      (*homie)->DoPersonalScriptText(IZZY_SAY_WHAT_IS_THIS, player);
-                                      return;
-                                  }
-                        }
-                            break;
-                        case 3:
-                            me->DoPersonalScriptText(COACH_SAY_GOOD_WORK, player);
+                                    if (!lHomies.empty())
+                                        for (std::list<Creature*>::const_iterator homie = lHomies.begin(); homie != lHomies.end(); ++homie)
+                                            if ((*homie)->isSummon())
+                                                if (uint64 guid = (*homie)->ToTempSummon()->GetSummonerGUID())
+                                                    if (guid == (*itr).uiPlayerGUID)
+                                                    {
+                                                        (*homie)->DoPersonalScriptText(ACE_SAY_WHAT_IS_THIS, player);
+                                                        return;
+                                                    }
+                                }
+                                break;
+                            case 2:
+                                {
+                                    (*itr).uiEventTimer = 1000;
+                                    std::list<Creature*> lHomies;
+                                    player->GetCreatureListWithEntryInGrid(lHomies, NPC_IZZY, 15.0f);
+
+                                    if (!lHomies.empty())
+                                        for (std::list<Creature*>::const_iterator homie = lHomies.begin(); homie != lHomies.end(); ++homie)
+                                            if ((*homie)->isSummon())
+                                                if (uint64 guid = (*homie)->ToTempSummon()->GetSummonerGUID())
+                                                    if (guid == (*itr).uiPlayerGUID)
+                                                    {
+                                                        (*homie)->DoPersonalScriptText(IZZY_SAY_WHAT_IS_THIS, player);
+                                                        return;
+                                                    }
+                                }
+                                break;
+                            case 3:
+                                me->DoPersonalScriptText(COACH_SAY_GOOD_WORK, player);
+                                itr = lEventPlayers.erase(itr);
+                                break;
+                            }
+                        } else
                             itr = lEventPlayers.erase(itr);
-                            break;
+                    } else
+                        (*itr).uiEventTimer -= diff;
+
+
+                    if (!lPlayersGUID.empty())
+                    {
+                        for (std::list<uint64>::iterator itr = lPlayersGUID.begin(); itr != lPlayersGUID.end(); ++itr)
+                            if (Player* player = Unit::GetPlayer(*me, (*itr)))
+                            {
+                                player->RemoveAura(SPELL_KEYS_TO_THE_HOT_ROD);
+                                player->AddAura(SPELL_KEYS_TO_THE_HOT_ROD, player);
+                                player->AddAura(SPELL_QUEST_INVISIBILITY_DETECTION_4, player);
+                                player->RemoveAura(SPELL_INCREASED_MOD_DETECTED_RANGE);
+                            }
+
+                            lPlayersGUID.clear();
                     }
-                } else
-                    itr = lEventPlayers.erase(itr);
-            } else
-                (*itr).uiEventTimer -= diff;
 
 
-            if (!lPlayersGUID.empty())
-            {
-                for (std::list<uint64>::iterator itr = lPlayersGUID.begin(); itr != lPlayersGUID.end(); ++itr)
-                if (Player* player = Unit::GetPlayer(*me, (*itr)))
-                {
-                    player->RemoveAura(SPELL_KEYS_TO_THE_HOT_ROD);
-                    player->AddAura(SPELL_KEYS_TO_THE_HOT_ROD, player);
-                    player->AddAura(SPELL_QUEST_INVISIBILITY_DETECTION_4, player);
-                    player->RemoveAura(SPELL_INCREASED_MOD_DETECTED_RANGE);
-                }
+                    if (!UpdateVictim())
+                        return;
 
-                lPlayersGUID.clear();
-            }
-
-
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
+                    DoMeleeAttackIfReady();
         }
     };
 };
@@ -2433,31 +2433,31 @@ public:
                     return;
 
                 if (Vehicle* vehicle = caster->GetVehicleKit())
-                if (Unit* passenger = vehicle->GetPassenger(0))
-                if (Player* player = passenger->ToPlayer())
-                if (uint64 guid = me->GetSeerGUID())
-                if (player->GetGUID() == guid)
-                {
-                    Hit = true;
-                    player->PlayDirectSound(SOUND_WOW_1, player);
-                    player->KilledMonsterCredit(NPC_STEAMWHEEDLE_SHARK, me->GetGUID());
-                }
+                    if (Unit* passenger = vehicle->GetPassenger(0))
+                        if (Player* player = passenger->ToPlayer())
+                            if (uint64 guid = me->GetSeerGUID())
+                                if (player->GetGUID() == guid)
+                                {
+                                    Hit = true;
+                                    player->PlayDirectSound(SOUND_WOW_1, player);
+                                    player->KilledMonsterCredit(NPC_STEAMWHEEDLE_SHARK, me->GetGUID());
+                                }
 
-                me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, false);
-                me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THROW_FOOTBOMB, true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                me->SetSpeed(MOVE_RUN, 0.0f, true);
-                me->SetSpeed(MOVE_WALK, 0.0f, true);
+                                me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, false);
+                                me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THROW_FOOTBOMB, true);
+                                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                me->SetSpeed(MOVE_RUN, 0.0f, true);
+                                me->SetSpeed(MOVE_WALK, 0.0f, true);
             }
         }
 
         void WaypointReached(uint32 point)
         {
             if (point == 1)
-            if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            if (Creature* buccaneer = summoner->ToCreature())
-                buccaneer->AI()->DoAction(ACTION_FAIL_NECESSARY_ROUGHNESS);
+                if (me->isSummon())
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if (Creature* buccaneer = summoner->ToCreature())
+                            buccaneer->AI()->DoAction(ACTION_FAIL_NECESSARY_ROUGHNESS);
         }
 
         void UpdateAI(const uint32 diff)
@@ -2485,14 +2485,14 @@ public:
             creature->AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
 
             if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            {
-                me->SetSeerGUID(summoner->GetGUID());
-                me->SetVisible(false);
-            }
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                {
+                    me->SetSeerGUID(summoner->GetGUID());
+                    me->SetVisible(false);
+                }
 
-            uiEventTimer = 2000;
-            Event = false;
+                uiEventTimer = 2000;
+                Event = false;
         }
 
         SummonList lSummons;
@@ -2543,32 +2543,32 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Event)
-            if (uiEventTimer <= diff)
-            {
-                Event = false;
-                uiEventTimer = 2000;
-
-                if (me->isSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                if (Player* player = summoner->ToPlayer())
-                if (player->GetQuestStatus(QUEST_NECESSARY_ROUGHNESS) == QUEST_STATUS_INCOMPLETE)
+                if (uiEventTimer <= diff)
                 {
-                    uint64 uiPlayerGUID = player->GetGUID();
-                    me->Whisper(BUCCANEER_SAY_FOOTBOMBS, uiPlayerGUID, true);
+                    Event = false;
+                    uiEventTimer = 2000;
 
-                    for (int i = 0; i < 8; ++i)
-                    if (Creature* shark = me->SummonCreature(NPC_STEAMWHEEDLE_SHARK, SharkSummonPos[i][0], SharkSummonPos[i][1], SharkSummonPos[i][2], SharkSummonPos[i][3], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
-                    {
-                        shark->SetSeerGUID(uiPlayerGUID);
-                        shark->SetVisible(false);
-                        lSummons.Summon(shark);
+                    if (me->isSummon())
+                        if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                            if (Player* player = summoner->ToPlayer())
+                                if (player->GetQuestStatus(QUEST_NECESSARY_ROUGHNESS) == QUEST_STATUS_INCOMPLETE)
+                                {
+                                    uint64 uiPlayerGUID = player->GetGUID();
+                                    me->Whisper(BUCCANEER_SAY_FOOTBOMBS, uiPlayerGUID, true);
 
-                        if (npc_escortAI* escort = CAST_AI(npc_escortAI, shark->AI()))
-                            escort->Start(false);
-                    }
-                }
-            } else
-                uiEventTimer -= diff;
+                                    for (int i = 0; i < 8; ++i)
+                                        if (Creature* shark = me->SummonCreature(NPC_STEAMWHEEDLE_SHARK, SharkSummonPos[i][0], SharkSummonPos[i][1], SharkSummonPos[i][2], SharkSummonPos[i][3], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
+                                        {
+                                            shark->SetSeerGUID(uiPlayerGUID);
+                                            shark->SetVisible(false);
+                                            lSummons.Summon(shark);
+
+                                            if (npc_escortAI* escort = CAST_AI(npc_escortAI, shark->AI()))
+                                                escort->Start(false);
+                                        }
+                                }
+                } else
+                    uiEventTimer -= diff;
         }
     };
 };
@@ -2582,7 +2582,7 @@ public:
     {
         PrepareAuraScript(spell_permanent_feign_deathAuraScript)
 
-        void EffectDeath(AuraEffect const * /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            void EffectDeath(AuraEffect const * /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
 
@@ -2592,8 +2592,8 @@ public:
             target->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
 
             if (target->GetTypeId() == TYPEID_UNIT)
-            if (target->GetEntry() == NPC_STEAMWHEEDLE_SHARK)
-                return;
+                if (target->GetEntry() == NPC_STEAMWHEEDLE_SHARK)
+                    return;
 
             target->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
         }
@@ -2630,11 +2630,11 @@ public:
             uiSeatData = DATA_NONE;
 
             if (creature->isSummon())
-            if (Unit* summoner = creature->ToTempSummon()->GetSummoner())
-            {
-                creature->SetSeerGUID(summoner->GetGUID());
-                creature->SetVisible(false);
-            }
+                if (Unit* summoner = creature->ToTempSummon()->GetSummoner())
+                {
+                    creature->SetSeerGUID(summoner->GetGUID());
+                    creature->SetVisible(false);
+                }
         }
 
         uint8 uiSeatData;
@@ -2647,11 +2647,11 @@ public:
         void DoAction(const int32 action)
         {
             if (Vehicle* vehicle = me->GetVehicleKit())
-            if (Unit* passenger = vehicle->GetPassenger(0))
-            {
-                uiSeatData = DATA_SEAT_IN_CHANGE;
-                passenger->ChangeSeat(1);
-            }
+                if (Unit* passenger = vehicle->GetPassenger(0))
+                {
+                    uiSeatData = DATA_SEAT_IN_CHANGE;
+                    passenger->ChangeSeat(1);
+                }
         }
 
         void Reset()
@@ -2692,13 +2692,13 @@ public:
                     player->AddAura(SPELL_QUEST_INVISIBILITY_DETECTION_5, player);
                     me->Whisper(BUCCANEER_SAY_FOOTBOMB, player->GetGUID(), true);
                 } else
-                if (uiSeatData == DATA_SEAT_IN_CHANGE)
-                    uiSeatData = DATA_NONE;
+                    if (uiSeatData == DATA_SEAT_IN_CHANGE)
+                        uiSeatData = DATA_NONE;
             } else
             {
                 if (uiSeatData != DATA_SEAT_IN_CHANGE)
-                if (Creature* coach = me->FindNearestCreature(NPC_COACH_CROSSCHECK, 30.0f))
-                    CAST_AI(npc_coach_crosscheck::npc_coach_crosscheckAI, coach->AI())->lPlayersGUID.push_back(player->GetGUID());
+                    if (Creature* coach = me->FindNearestCreature(NPC_COACH_CROSSCHECK, 30.0f))
+                        CAST_AI(npc_coach_crosscheck::npc_coach_crosscheckAI, coach->AI())->lPlayersGUID.push_back(player->GetGUID());
             }
         }
 
@@ -2752,9 +2752,9 @@ public:
             Event = false;
 
             if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-            if (Player* player = summoner->ToPlayer())
-                player->PlayDirectSound(DEATHWING_SOUND_1, player);
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    if (Player* player = summoner->ToPlayer())
+                        player->PlayDirectSound(DEATHWING_SOUND_1, player);
         }
 
         uint32 uiEventTimer;
@@ -2769,14 +2769,14 @@ public:
                 DoCast(SPELL_XPLOSION);
 
                 if (me->isSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                if (Player* player = summoner->ToPlayer())
-                {
-                    player->PlayDirectSound(DEATHWING_SOUND_3, player);
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        if (Player* player = summoner->ToPlayer())
+                        {
+                            player->PlayDirectSound(DEATHWING_SOUND_3, player);
 
-                    if (Creature* coach = me->FindNearestCreature(NPC_COACH_CROSSCHECK, 30.0f))
-                        CAST_AI(npc_coach_crosscheck::npc_coach_crosscheckAI, coach->AI())->FinishDeathwingEvent(player->GetGUID());
-                }
+                            if (Creature* coach = me->FindNearestCreature(NPC_COACH_CROSSCHECK, 30.0f))
+                                CAST_AI(npc_coach_crosscheck::npc_coach_crosscheckAI, coach->AI())->FinishDeathwingEvent(player->GetGUID());
+                        }
             }
         }
 
@@ -2784,57 +2784,57 @@ public:
         {
             switch (point)
             {
-                case 1:
-                    if (me->isSummon())
+            case 1:
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    if (Player* player = summoner->ToPlayer())
-                    {
-                        me->DoPersonalScriptText(DEATHWING_YELL, player);
-
-                        if (Creature* buccaneer = player->GetVehicleCreatureBase())
+                        if (Player* player = summoner->ToPlayer())
                         {
-                            player->AddAura(SPELL_QUEST_INVISIBILITY_DETECTION_6, player);
-                            buccaneer->AI()->DoAction(0);
+                            me->DoPersonalScriptText(DEATHWING_YELL, player);
+
+                            if (Creature* buccaneer = player->GetVehicleCreatureBase())
+                            {
+                                player->AddAura(SPELL_QUEST_INVISIBILITY_DETECTION_6, player);
+                                buccaneer->AI()->DoAction(0);
+                            }
                         }
-                    }
-                    break;
-                case 3:
-                    if (me->isSummon())
+                        break;
+            case 3:
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    if (Player* player = summoner->ToPlayer())
-                    {
-                        DoCast(SPELL_DEATHWINGS_ATTACK);
-                        player->CastSpell(player, SPELL_CHARACTER_EARTHQUAKE, false);
-                        player->PlayDirectSound(DEATHWING_SOUND_2, player);
-                    }
-                    break;
-                case 10:
-                    Event = true;
-                    SetEscortPaused(true);
-                    break;
+                        if (Player* player = summoner->ToPlayer())
+                        {
+                            DoCast(SPELL_DEATHWINGS_ATTACK);
+                            player->CastSpell(player, SPELL_CHARACTER_EARTHQUAKE, false);
+                            player->PlayDirectSound(DEATHWING_SOUND_2, player);
+                        }
+                        break;
+            case 10:
+                Event = true;
+                SetEscortPaused(true);
+                break;
             }
         }
 
         void UpdateAI(const uint32 diff)
         {
             if (Event)
-            if (uiEventTimer <= diff)
-            {
-                ++uiPhase;
-                switch (uiPhase)
+                if (uiEventTimer <= diff)
                 {
+                    ++uiPhase;
+                    switch (uiPhase)
+                    {
                     case 1:
                         uiEventTimer = 500;
 
                         if (me->isSummon())
-                        if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                        if (Player* player = summoner->ToPlayer())
-                        if (Creature* coach = me->FindNearestCreature(NPC_COACH_CROSSCHECK, 90.0f))
-                        {
-                            coach->SetFacingToObject(me);
-                            coach->DoPersonalScriptText(COACH_NOT_AT_MY_FIELD, player);
-                        }
-                        break;
+                            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                                if (Player* player = summoner->ToPlayer())
+                                    if (Creature* coach = me->FindNearestCreature(NPC_COACH_CROSSCHECK, 90.0f))
+                                    {
+                                        coach->SetFacingToObject(me);
+                                        coach->DoPersonalScriptText(COACH_NOT_AT_MY_FIELD, player);
+                                    }
+                                    break;
                     case 2:
                         uiEventTimer = 1000;
 
@@ -2851,9 +2851,9 @@ public:
                         if (Creature* coach = me->FindNearestCreature(NPC_COACH_CROSSCHECK, 90.0f))
                         {
                             if (me->isSummon())
-                            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                            if (Player* player = summoner->ToPlayer())
-                                CAST_AI(npc_coach_crosscheck::npc_coach_crosscheckAI, coach->AI())->FinishDeathwingEvent(player->GetGUID());
+                                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                                    if (Player* player = summoner->ToPlayer())
+                                        CAST_AI(npc_coach_crosscheck::npc_coach_crosscheckAI, coach->AI())->FinishDeathwingEvent(player->GetGUID());
 
                             coach->CastSpell(me, 87226, false);
                         }
@@ -2863,11 +2863,11 @@ public:
                         uiEventTimer = 500;
                         SetEscortPaused(false);
                         break;
-                }
-            } else
-                uiEventTimer -= diff;
+                    }
+                } else
+                    uiEventTimer -= diff;
 
-            npc_vehicle_escortAI::UpdateAI(diff);
+                npc_vehicle_escortAI::UpdateAI(diff);
         }
     };
 };
@@ -2881,7 +2881,7 @@ public:
     {
         PrepareSpellScript(spell_kick_footbomb_SpellScript)
 
-        void OnKick(SpellEffIndex effIndex)
+            void OnKick(SpellEffIndex effIndex)
         {
             float x, y, z;
             GetExplTargetDest()->GetPosition(x, y, z);
@@ -2895,17 +2895,17 @@ public:
                 return;
 
             if (Vehicle* vehicle = caster->GetVehicleKit())
-            if (Unit* passenger = vehicle->GetPassenger(0))
-            if (Player* player = passenger->ToPlayer())
-            if (player->GetQuestStatus(QUEST_FOURTH_AND_GOAL) == QUEST_STATUS_INCOMPLETE)
-            {
-                player->RemoveAura(SPELL_QUEST_INVISIBILITY_DETECTION_5);
-                player->PlayDirectSound(SOUND_WOW_2, player);
-                player->KilledMonsterCredit(NPC_FOURTH_AND_GOAL_TARGET, 0);
+                if (Unit* passenger = vehicle->GetPassenger(0))
+                    if (Player* player = passenger->ToPlayer())
+                        if (player->GetQuestStatus(QUEST_FOURTH_AND_GOAL) == QUEST_STATUS_INCOMPLETE)
+                        {
+                            player->RemoveAura(SPELL_QUEST_INVISIBILITY_DETECTION_5);
+                            player->PlayDirectSound(SOUND_WOW_2, player);
+                            player->KilledMonsterCredit(NPC_FOURTH_AND_GOAL_TARGET, 0);
 
-                if (Creature* coach = player->FindNearestCreature(NPC_COACH_CROSSCHECK, 30.0f))
-                    CAST_AI(npc_coach_crosscheck::npc_coach_crosscheckAI, coach->AI())->StartDeathwingEvent(player);
-            }
+                            if (Creature* coach = player->FindNearestCreature(NPC_COACH_CROSSCHECK, 30.0f))
+                                CAST_AI(npc_coach_crosscheck::npc_coach_crosscheckAI, coach->AI())->StartDeathwingEvent(player);
+                        }
         }
 
         void Register()
@@ -2949,38 +2949,38 @@ public:
                 return;
 
             if (who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 10.0f))
-            if (Player* player = who->ToPlayer())
-            {
-                QuestStatusMap::iterator incomplete_quest = player->getQuestStatusMap().find(QUEST_DO_IT_YOURSELF);
-
-                if (incomplete_quest == player->getQuestStatusMap().end())
-                    return;
-
-                QuestStatusData& q_status = incomplete_quest->second;
-                uint64 uiPlayerGUID = player->GetGUID();
-
-                if (q_status.CreatureOrGOCount[0] == 0)
+                if (Player* player = who->ToPlayer())
                 {
-                    me->DoPersonalScriptText(NPC_BRUNO_SAY_1, player);
-                    me->setFaction(AGGRESSIVE_FACTION);
-                    AttackStart(player);
+                    QuestStatusMap::iterator incomplete_quest = player->getQuestStatusMap().find(QUEST_DO_IT_YOURSELF);
 
-                    for (int i = 0; i < 3; ++i)
+                    if (incomplete_quest == player->getQuestStatusMap().end())
+                        return;
+
+                    QuestStatusData& q_status = incomplete_quest->second;
+                    uint64 uiPlayerGUID = player->GetGUID();
+
+                    if (q_status.CreatureOrGOCount[0] == 0)
                     {
-                        std::list<Creature*> lHomies;
-                        me->GetCreatureListWithEntryInGrid(lHomies, Homies[i], 25.0f);
+                        me->DoPersonalScriptText(NPC_BRUNO_SAY_1, player);
+                        me->setFaction(AGGRESSIVE_FACTION);
+                        AttackStart(player);
 
-                        for (std::list<Creature*>::const_iterator itr = lHomies.begin(); itr != lHomies.end(); ++itr)
-                        if ((*itr)->isSummon())
-                        if ((*itr)->ToTempSummon()->GetSummonerGUID() == uiPlayerGUID)
+                        for (int i = 0; i < 3; ++i)
                         {
-                            uint8 roll = urand(0, 6);
-                            (*itr)->DoPersonalScriptText(HOMIES_RANDOM_ATTACK_YELL - roll, player);
-                            (*itr)->AI()->AttackStart(me);
+                            std::list<Creature*> lHomies;
+                            me->GetCreatureListWithEntryInGrid(lHomies, Homies[i], 25.0f);
+
+                            for (std::list<Creature*>::const_iterator itr = lHomies.begin(); itr != lHomies.end(); ++itr)
+                                if ((*itr)->isSummon())
+                                    if ((*itr)->ToTempSummon()->GetSummonerGUID() == uiPlayerGUID)
+                                    {
+                                        uint8 roll = urand(0, 6);
+                                        (*itr)->DoPersonalScriptText(HOMIES_RANDOM_ATTACK_YELL - roll, player);
+                                        (*itr)->AI()->AttackStart(me);
+                                    }
                         }
                     }
                 }
-            }
         }
 
         void DamageTaken(Unit* done_by, uint32 &damage)
@@ -2997,21 +2997,21 @@ public:
                     return;
 
                 for (std::list<HostileReference*>::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
-                if (Unit* attacker = Unit::GetUnit((*me), (*itr)->getUnitGuid()))
-                {
-                    attacker->CombatStop();
-
-                    if (attacker->GetTypeId() == TYPEID_UNIT)
-                        attacker->ToCreature()->AI()->EnterEvadeMode();
-
-                    if (Player* player = attacker->ToPlayer())
+                    if (Unit* attacker = Unit::GetUnit((*me), (*itr)->getUnitGuid()))
                     {
-                        me->DoPersonalScriptText(NPC_BRUNO_SAY_2, player);
-                        player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
-                    }
-                }
+                        attacker->CombatStop();
 
-                EnterEvadeMode();
+                        if (attacker->GetTypeId() == TYPEID_UNIT)
+                            attacker->ToCreature()->AI()->EnterEvadeMode();
+
+                        if (Player* player = attacker->ToPlayer())
+                        {
+                            me->DoPersonalScriptText(NPC_BRUNO_SAY_2, player);
+                            player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
+                        }
+                    }
+
+                    EnterEvadeMode();
             }
         }
 
@@ -3026,20 +3026,20 @@ public:
                     return;
 
                 for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                if (Player* player = itr->getSource())
-                {
-                    QuestStatusMap::iterator incomplete_quest = player->getQuestStatusMap().find(QUEST_DO_IT_YOURSELF);
-
-                    if (incomplete_quest == player->getQuestStatusMap().end())
-                        return;
-
-                    QuestStatusData& q_status = incomplete_quest->second;
-
-                    if (q_status.CreatureOrGOCount[0] == 0)
+                    if (Player* player = itr->getSource())
                     {
-                        me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
+                        QuestStatusMap::iterator incomplete_quest = player->getQuestStatusMap().find(QUEST_DO_IT_YOURSELF);
+
+                        if (incomplete_quest == player->getQuestStatusMap().end())
+                            return;
+
+                        QuestStatusData& q_status = incomplete_quest->second;
+
+                        if (q_status.CreatureOrGOCount[0] == 0)
+                        {
+                            me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
+                        }
                     }
-                }
             } else
                 uiVisualCastTimer -= diff;
 
@@ -3082,38 +3082,38 @@ public:
                 return;
 
             if (who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 10.0f))
-            if (Player* player = who->ToPlayer())
-            {
-                QuestStatusMap::iterator incomplete_quest = player->getQuestStatusMap().find(QUEST_DO_IT_YOURSELF);
-
-                if (incomplete_quest == player->getQuestStatusMap().end())
-                    return;
-
-                QuestStatusData& q_status = incomplete_quest->second;
-                uint64 uiPlayerGUID = player->GetGUID();
-
-                if (q_status.CreatureOrGOCount[1] == 0)
+                if (Player* player = who->ToPlayer())
                 {
-                    me->DoPersonalScriptText(NPC_FRANKIE_SAY_1, player);
-                    me->setFaction(AGGRESSIVE_FACTION);
-                    AttackStart(player);
+                    QuestStatusMap::iterator incomplete_quest = player->getQuestStatusMap().find(QUEST_DO_IT_YOURSELF);
 
-                    for (int i = 0; i < 3; ++i)
+                    if (incomplete_quest == player->getQuestStatusMap().end())
+                        return;
+
+                    QuestStatusData& q_status = incomplete_quest->second;
+                    uint64 uiPlayerGUID = player->GetGUID();
+
+                    if (q_status.CreatureOrGOCount[1] == 0)
                     {
-                        std::list<Creature*> lHomies;
-                        me->GetCreatureListWithEntryInGrid(lHomies, Homies[i], 25.0f);
+                        me->DoPersonalScriptText(NPC_FRANKIE_SAY_1, player);
+                        me->setFaction(AGGRESSIVE_FACTION);
+                        AttackStart(player);
 
-                        for (std::list<Creature*>::const_iterator itr = lHomies.begin(); itr != lHomies.end(); ++itr)
-                        if ((*itr)->isSummon())
-                        if ((*itr)->ToTempSummon()->GetSummonerGUID() == uiPlayerGUID)
+                        for (int i = 0; i < 3; ++i)
                         {
-                            uint8 roll = urand(0, 6);
-                            (*itr)->DoPersonalScriptText(HOMIES_RANDOM_ATTACK_YELL - roll, player);
-                            (*itr)->AI()->AttackStart(me);
+                            std::list<Creature*> lHomies;
+                            me->GetCreatureListWithEntryInGrid(lHomies, Homies[i], 25.0f);
+
+                            for (std::list<Creature*>::const_iterator itr = lHomies.begin(); itr != lHomies.end(); ++itr)
+                                if ((*itr)->isSummon())
+                                    if ((*itr)->ToTempSummon()->GetSummonerGUID() == uiPlayerGUID)
+                                    {
+                                        uint8 roll = urand(0, 6);
+                                        (*itr)->DoPersonalScriptText(HOMIES_RANDOM_ATTACK_YELL - roll, player);
+                                        (*itr)->AI()->AttackStart(me);
+                                    }
                         }
                     }
                 }
-            }
         }
 
         void DamageTaken(Unit* done_by, uint32 &damage)
@@ -3130,21 +3130,21 @@ public:
                     return;
 
                 for (std::list<HostileReference*>::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
-                if (Unit* attacker = Unit::GetUnit((*me), (*itr)->getUnitGuid()))
-                {
-                    attacker->CombatStop();
-
-                    if (attacker->GetTypeId() == TYPEID_UNIT)
-                        attacker->ToCreature()->AI()->EnterEvadeMode();
-
-                    if (Player* player = attacker->ToPlayer())
+                    if (Unit* attacker = Unit::GetUnit((*me), (*itr)->getUnitGuid()))
                     {
-                        me->DoPersonalScriptText(NPC_FRANKIE_SAY_2, player);
-                        player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
-                    }
-                }
+                        attacker->CombatStop();
 
-                EnterEvadeMode();
+                        if (attacker->GetTypeId() == TYPEID_UNIT)
+                            attacker->ToCreature()->AI()->EnterEvadeMode();
+
+                        if (Player* player = attacker->ToPlayer())
+                        {
+                            me->DoPersonalScriptText(NPC_FRANKIE_SAY_2, player);
+                            player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
+                        }
+                    }
+
+                    EnterEvadeMode();
             }
         }
 
@@ -3159,20 +3159,20 @@ public:
                     return;
 
                 for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                if (Player* player = itr->getSource())
-                {
-                    QuestStatusMap::iterator incomplete_quest = player->getQuestStatusMap().find(QUEST_DO_IT_YOURSELF);
-
-                    if (incomplete_quest == player->getQuestStatusMap().end())
-                        return;
-
-                    QuestStatusData& q_status = incomplete_quest->second;
-
-                    if (q_status.CreatureOrGOCount[1] == 0)
+                    if (Player* player = itr->getSource())
                     {
-                        me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
+                        QuestStatusMap::iterator incomplete_quest = player->getQuestStatusMap().find(QUEST_DO_IT_YOURSELF);
+
+                        if (incomplete_quest == player->getQuestStatusMap().end())
+                            return;
+
+                        QuestStatusData& q_status = incomplete_quest->second;
+
+                        if (q_status.CreatureOrGOCount[1] == 0)
+                        {
+                            me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
+                        }
                     }
-                }
             } else
                 uiVisualCastTimer -= diff;
 
@@ -3222,39 +3222,39 @@ public:
                 return;
 
             if (who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 10.0f))
-            if (Player* player = who->ToPlayer())
-            {
-                QuestStatusMap::iterator incomplete_quest = player->getQuestStatusMap().find(QUEST_DO_IT_YOURSELF);
-
-                if (incomplete_quest == player->getQuestStatusMap().end())
-                    return;
-
-                QuestStatusData& q_status = incomplete_quest->second;
-                uint64 uiPlayerGUID = player->GetGUID();
-
-                if (q_status.CreatureOrGOCount[2] == 0)
+                if (Player* player = who->ToPlayer())
                 {
-                    me->DoPersonalScriptText(JACK_THE_HAMMER_SAY_HAMMER, player);
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                    me->setFaction(AGGRESSIVE_FACTION);
-                    AttackStart(player);
+                    QuestStatusMap::iterator incomplete_quest = player->getQuestStatusMap().find(QUEST_DO_IT_YOURSELF);
 
-                    for (int i = 0; i < 3; ++i)
+                    if (incomplete_quest == player->getQuestStatusMap().end())
+                        return;
+
+                    QuestStatusData& q_status = incomplete_quest->second;
+                    uint64 uiPlayerGUID = player->GetGUID();
+
+                    if (q_status.CreatureOrGOCount[2] == 0)
                     {
-                        std::list<Creature*> lHomies;
-                        me->GetCreatureListWithEntryInGrid(lHomies, Homies[i], 25.0f);
+                        me->DoPersonalScriptText(JACK_THE_HAMMER_SAY_HAMMER, player);
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                        me->setFaction(AGGRESSIVE_FACTION);
+                        AttackStart(player);
 
-                        for (std::list<Creature*>::const_iterator itr = lHomies.begin(); itr != lHomies.end(); ++itr)
-                        if ((*itr)->isSummon())
-                        if ((*itr)->ToTempSummon()->GetSummonerGUID() == uiPlayerGUID)
+                        for (int i = 0; i < 3; ++i)
                         {
-                            uint8 roll = urand(0, 6);
-                            (*itr)->DoPersonalScriptText(HOMIES_RANDOM_ATTACK_YELL - roll, player);
-                            (*itr)->AI()->AttackStart(me);
+                            std::list<Creature*> lHomies;
+                            me->GetCreatureListWithEntryInGrid(lHomies, Homies[i], 25.0f);
+
+                            for (std::list<Creature*>::const_iterator itr = lHomies.begin(); itr != lHomies.end(); ++itr)
+                                if ((*itr)->isSummon())
+                                    if ((*itr)->ToTempSummon()->GetSummonerGUID() == uiPlayerGUID)
+                                    {
+                                        uint8 roll = urand(0, 6);
+                                        (*itr)->DoPersonalScriptText(HOMIES_RANDOM_ATTACK_YELL - roll, player);
+                                        (*itr)->AI()->AttackStart(me);
+                                    }
                         }
                     }
                 }
-            }
         }
 
         void DamageTaken(Unit* done_by, uint32 &damage)
@@ -3271,21 +3271,21 @@ public:
                     return;
 
                 for (std::list<HostileReference*>::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
-                if (Unit* attacker = Unit::GetUnit((*me), (*itr)->getUnitGuid()))
-                {
-                    attacker->CombatStop();
-
-                    if (attacker->GetTypeId() == TYPEID_UNIT)
-                        attacker->ToCreature()->AI()->EnterEvadeMode();
-
-                    if (Player* player = attacker->ToPlayer())
+                    if (Unit* attacker = Unit::GetUnit((*me), (*itr)->getUnitGuid()))
                     {
-                        me->DoPersonalScriptText(NPC_JACK_SAY, player);
-                        player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
-                    }
-                }
+                        attacker->CombatStop();
 
-                EnterEvadeMode();
+                        if (attacker->GetTypeId() == TYPEID_UNIT)
+                            attacker->ToCreature()->AI()->EnterEvadeMode();
+
+                        if (Player* player = attacker->ToPlayer())
+                        {
+                            me->DoPersonalScriptText(NPC_JACK_SAY, player);
+                            player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
+                        }
+                    }
+
+                    EnterEvadeMode();
             }
         }
 
@@ -3300,20 +3300,20 @@ public:
                     return;
 
                 for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                if (Player* player = itr->getSource())
-                {
-                    QuestStatusMap::iterator incomplete_quest = player->getQuestStatusMap().find(QUEST_DO_IT_YOURSELF);
-
-                    if (incomplete_quest == player->getQuestStatusMap().end())
-                        return;
-
-                    QuestStatusData& q_status = incomplete_quest->second;
-
-                    if (q_status.CreatureOrGOCount[2] == 0)
+                    if (Player* player = itr->getSource())
                     {
-                        me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
+                        QuestStatusMap::iterator incomplete_quest = player->getQuestStatusMap().find(QUEST_DO_IT_YOURSELF);
+
+                        if (incomplete_quest == player->getQuestStatusMap().end())
+                            return;
+
+                        QuestStatusData& q_status = incomplete_quest->second;
+
+                        if (q_status.CreatureOrGOCount[2] == 0)
+                        {
+                            me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
+                        }
                     }
-                }
             } else
                 uiVisualCastTimer -= diff;
 
@@ -3365,38 +3365,38 @@ public:
                 return;
 
             if (who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 10.0f))
-            if (Player* player = who->ToPlayer())
-            {
-                QuestStatusMap::iterator incomplete_quest = player->getQuestStatusMap().find(QUEST_DO_IT_YOURSELF);
-
-                if (incomplete_quest == player->getQuestStatusMap().end())
-                    return;
-
-                QuestStatusData& q_status = incomplete_quest->second;
-                uint64 uiPlayerGUID = player->GetGUID();
-
-                if (q_status.CreatureOrGOCount[3] == 0)
+                if (Player* player = who->ToPlayer())
                 {
-                    me->DoPersonalScriptText(NPC_SUDSY_SAY_1, player);
-                    me->setFaction(AGGRESSIVE_FACTION);
-                    AttackStart(player);
+                    QuestStatusMap::iterator incomplete_quest = player->getQuestStatusMap().find(QUEST_DO_IT_YOURSELF);
 
-                    for (int i = 0; i < 3; ++i)
+                    if (incomplete_quest == player->getQuestStatusMap().end())
+                        return;
+
+                    QuestStatusData& q_status = incomplete_quest->second;
+                    uint64 uiPlayerGUID = player->GetGUID();
+
+                    if (q_status.CreatureOrGOCount[3] == 0)
                     {
-                        std::list<Creature*> lHomies;
-                        me->GetCreatureListWithEntryInGrid(lHomies, Homies[i], 25.0f);
+                        me->DoPersonalScriptText(NPC_SUDSY_SAY_1, player);
+                        me->setFaction(AGGRESSIVE_FACTION);
+                        AttackStart(player);
 
-                        for (std::list<Creature*>::const_iterator itr = lHomies.begin(); itr != lHomies.end(); ++itr)
-                        if ((*itr)->isSummon())
-                        if ((*itr)->ToTempSummon()->GetSummonerGUID() == uiPlayerGUID)
+                        for (int i = 0; i < 3; ++i)
                         {
-                            uint8 roll = urand(0, 6);
-                            (*itr)->DoPersonalScriptText(HOMIES_RANDOM_ATTACK_YELL - roll, player);
-                            (*itr)->AI()->AttackStart(me);
+                            std::list<Creature*> lHomies;
+                            me->GetCreatureListWithEntryInGrid(lHomies, Homies[i], 25.0f);
+
+                            for (std::list<Creature*>::const_iterator itr = lHomies.begin(); itr != lHomies.end(); ++itr)
+                                if ((*itr)->isSummon())
+                                    if ((*itr)->ToTempSummon()->GetSummonerGUID() == uiPlayerGUID)
+                                    {
+                                        uint8 roll = urand(0, 6);
+                                        (*itr)->DoPersonalScriptText(HOMIES_RANDOM_ATTACK_YELL - roll, player);
+                                        (*itr)->AI()->AttackStart(me);
+                                    }
                         }
                     }
                 }
-            }
         }
 
         void DamageTaken(Unit* done_by, uint32 &damage)
@@ -3413,21 +3413,21 @@ public:
                     return;
 
                 for (std::list<HostileReference*>::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
-                if (Unit* attacker = Unit::GetUnit((*me), (*itr)->getUnitGuid()))
-                {
-                    attacker->CombatStop();
-
-                    if (attacker->GetTypeId() == TYPEID_UNIT)
-                        attacker->ToCreature()->AI()->EnterEvadeMode();
-
-                    if (Player* player = attacker->ToPlayer())
+                    if (Unit* attacker = Unit::GetUnit((*me), (*itr)->getUnitGuid()))
                     {
-                        me->DoPersonalScriptText(NPC_SUDSY_SAY_2, player);
-                        player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
-                    }
-                }
+                        attacker->CombatStop();
 
-                EnterEvadeMode();
+                        if (attacker->GetTypeId() == TYPEID_UNIT)
+                            attacker->ToCreature()->AI()->EnterEvadeMode();
+
+                        if (Player* player = attacker->ToPlayer())
+                        {
+                            me->DoPersonalScriptText(NPC_SUDSY_SAY_2, player);
+                            player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
+                        }
+                    }
+
+                    EnterEvadeMode();
             }
         }
 
@@ -3442,20 +3442,20 @@ public:
                     return;
 
                 for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                if (Player* player = itr->getSource())
-                {
-                    QuestStatusMap::iterator incomplete_quest = player->getQuestStatusMap().find(QUEST_DO_IT_YOURSELF);
-
-                    if (incomplete_quest == player->getQuestStatusMap().end())
-                        return;
-
-                    QuestStatusData& q_status = incomplete_quest->second;
-
-                    if (q_status.CreatureOrGOCount[3] == 0)
+                    if (Player* player = itr->getSource())
                     {
-                        me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
+                        QuestStatusMap::iterator incomplete_quest = player->getQuestStatusMap().find(QUEST_DO_IT_YOURSELF);
+
+                        if (incomplete_quest == player->getQuestStatusMap().end())
+                            return;
+
+                        QuestStatusData& q_status = incomplete_quest->second;
+
+                        if (q_status.CreatureOrGOCount[3] == 0)
+                        {
+                            me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
+                        }
                     }
-                }
             } else
                 uiVisualCastTimer -= diff;
 
@@ -3514,19 +3514,19 @@ public:
     {
         switch (quest->GetQuestId())
         {
-            case QUEST_OFF_TO_THE_BANK_FEMALE:
-                creature->DoPersonalScriptText(CHIP_ENDALE_SAY_START, player);
-                break;
-            case QUEST_LIFE_OF_THE_PARTY_FEMALE:
-                player->CastSpell(player, SPELL_AWESOME_PARTY_ENSEMBLE, false);
-                player->CastSpell(player, SPELL_LOTP_OUTFIT_SECONDARY, false);
-                player->CastSpell(player, SPELL_LOTP_OUTFIT_FEMALE, false);
-                player->CastSpell(player, SPELL_LOTP_PAPARAZZI, false);
-                player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_1, false);
-                player->RemoveAura(SPELL_QUEST_INVISIBILITY_DETECTION_5);
-                creature->DoPersonalScriptText(CHIP_ENDALE_SAY_GO_TO_THE_PARTY, player);
-                creature->Whisper(CHIP_ENDALE_EMOTE_GO, player->GetGUID(), true);
-                break;
+        case QUEST_OFF_TO_THE_BANK_FEMALE:
+            creature->DoPersonalScriptText(CHIP_ENDALE_SAY_START, player);
+            break;
+        case QUEST_LIFE_OF_THE_PARTY_FEMALE:
+            player->CastSpell(player, SPELL_AWESOME_PARTY_ENSEMBLE, false);
+            player->CastSpell(player, SPELL_LOTP_OUTFIT_SECONDARY, false);
+            player->CastSpell(player, SPELL_LOTP_OUTFIT_FEMALE, false);
+            player->CastSpell(player, SPELL_LOTP_PAPARAZZI, false);
+            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_1, false);
+            player->RemoveAura(SPELL_QUEST_INVISIBILITY_DETECTION_5);
+            creature->DoPersonalScriptText(CHIP_ENDALE_SAY_GO_TO_THE_PARTY, player);
+            creature->Whisper(CHIP_ENDALE_EMOTE_GO, player->GetGUID(), true);
+            break;
         }
 
         return true;
@@ -3552,24 +3552,24 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (!lPlayers.empty())
-            for (std::list<Psc_ls>::iterator itr = lPlayers.begin(); itr != lPlayers.end();)
-            if ((*itr).uiPersonalTimer <= diff)
-            {
-                if (Player* player = Unit::GetPlayer(*me, (*itr).uiPlayerGUID))
-                    me->DoPersonalScriptText(CHIP_ENDALE_SAY_GAME_OVER, player);
+                for (std::list<Psc_ls>::iterator itr = lPlayers.begin(); itr != lPlayers.end();)
+                    if ((*itr).uiPersonalTimer <= diff)
+                    {
+                        if (Player* player = Unit::GetPlayer(*me, (*itr).uiPlayerGUID))
+                            me->DoPersonalScriptText(CHIP_ENDALE_SAY_GAME_OVER, player);
 
-                itr = lPlayers.erase(itr);
-            } else
-            {
-                (*itr).uiPersonalTimer -= diff;
-                ++itr;
-            }
+                        itr = lPlayers.erase(itr);
+                    } else
+                    {
+                        (*itr).uiPersonalTimer -= diff;
+                        ++itr;
+                    }
 
 
-            if (!UpdateVictim())
-                return;
+                    if (!UpdateVictim())
+                        return;
 
-            DoMeleeAttackIfReady();
+                    DoMeleeAttackIfReady();
         }
     };
 };
@@ -3600,19 +3600,19 @@ public:
     {
         switch (quest->GetQuestId())
         {
-            case QUEST_OFF_TO_THE_BANK_MALE:
-                creature->DoPersonalScriptText(CANDY_CANE_SAY_START, player);
-                break;
-            case QUEST_LIFE_OF_THE_PARTY_MALE:
-                player->CastSpell(player, SPELL_AWESOME_PARTY_ENSEMBLE, false);
-                player->CastSpell(player, SPELL_LOTP_OUTFIT_SECONDARY, false);
-                player->CastSpell(player, SPELL_LOTP_OUTFIT_MALE, false);
-                player->CastSpell(player, SPELL_LOTP_PAPARAZZI, false);
-                player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_1, false);
-                player->RemoveAura(SPELL_QUEST_INVISIBILITY_DETECTION_5);
-                creature->DoPersonalScriptText(CANDY_CANE_SAY_GO_TO_THE_PARTY, player);
-                creature->Whisper(CANDY_CANE_EMOTE_GO, player->GetGUID(), true);
-                break;
+        case QUEST_OFF_TO_THE_BANK_MALE:
+            creature->DoPersonalScriptText(CANDY_CANE_SAY_START, player);
+            break;
+        case QUEST_LIFE_OF_THE_PARTY_MALE:
+            player->CastSpell(player, SPELL_AWESOME_PARTY_ENSEMBLE, false);
+            player->CastSpell(player, SPELL_LOTP_OUTFIT_SECONDARY, false);
+            player->CastSpell(player, SPELL_LOTP_OUTFIT_MALE, false);
+            player->CastSpell(player, SPELL_LOTP_PAPARAZZI, false);
+            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_1, false);
+            player->RemoveAura(SPELL_QUEST_INVISIBILITY_DETECTION_5);
+            creature->DoPersonalScriptText(CANDY_CANE_SAY_GO_TO_THE_PARTY, player);
+            creature->Whisper(CANDY_CANE_EMOTE_GO, player->GetGUID(), true);
+            break;
         }
 
         return true;
@@ -3638,23 +3638,23 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (!lPlayers.empty())
-            for (std::list<Psc_ls>::iterator itr = lPlayers.begin(); itr != lPlayers.end();)
-            if ((*itr).uiPersonalTimer <= diff)
-            {
-                if (Player* player = Unit::GetPlayer(*me, (*itr).uiPlayerGUID))
-                    me->DoPersonalScriptText(CANDY_CANE_SAY_GAME_OVER, player);
+                for (std::list<Psc_ls>::iterator itr = lPlayers.begin(); itr != lPlayers.end();)
+                    if ((*itr).uiPersonalTimer <= diff)
+                    {
+                        if (Player* player = Unit::GetPlayer(*me, (*itr).uiPlayerGUID))
+                            me->DoPersonalScriptText(CANDY_CANE_SAY_GAME_OVER, player);
 
-                itr = lPlayers.erase(itr);
-            } else
-            {
-                (*itr).uiPersonalTimer -= diff;
-                ++itr;
-            }
+                        itr = lPlayers.erase(itr);
+                    } else
+                    {
+                        (*itr).uiPersonalTimer -= diff;
+                        ++itr;
+                    }
 
-            if (!UpdateVictim())
-                return;
+                    if (!UpdateVictim())
+                        return;
 
-            DoMeleeAttackIfReady();
+                    DoMeleeAttackIfReady();
         }
     };
 };
@@ -3703,17 +3703,17 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (CanSay)
-            if (uiNextTimer <= diff)
-            {
-                DoScriptText(FBOK_BANK_TELLER_SAY_NEXT, me);
-                uiNextTimer = urand(25000, 35000);
-            } else
-                uiNextTimer -= diff;
+                if (uiNextTimer <= diff)
+                {
+                    DoScriptText(FBOK_BANK_TELLER_SAY_NEXT, me);
+                    uiNextTimer = urand(25000, 35000);
+                } else
+                    uiNextTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -3784,25 +3784,25 @@ public:
                     return;
 
                 for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                if (Player* player = itr->getSource())
-                {
-                    QuestStatusMap::iterator incomplete_quest;
-
-                    if (player->getGender() == GENDER_FEMALE)
-                        incomplete_quest = player->getQuestStatusMap().find(QUEST_THE_NEW_YOU_FEMALE);
-                    else
-                        incomplete_quest = player->getQuestStatusMap().find(QUEST_THE_NEW_YOU_MALE);
-
-                    if (incomplete_quest == player->getQuestStatusMap().end())
-                        return;
-
-                    QuestStatusData& q_status = incomplete_quest->second;
-
-                    if (q_status.ItemCount[1] == 0)
+                    if (Player* player = itr->getSource())
                     {
-                        me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
+                        QuestStatusMap::iterator incomplete_quest;
+
+                        if (player->getGender() == GENDER_FEMALE)
+                            incomplete_quest = player->getQuestStatusMap().find(QUEST_THE_NEW_YOU_FEMALE);
+                        else
+                            incomplete_quest = player->getQuestStatusMap().find(QUEST_THE_NEW_YOU_MALE);
+
+                        if (incomplete_quest == player->getQuestStatusMap().end())
+                            return;
+
+                        QuestStatusData& q_status = incomplete_quest->second;
+
+                        if (q_status.ItemCount[1] == 0)
+                        {
+                            me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
+                        }
                     }
-                }
             } else
                 uiVisualCastTimer -= diff;
 
@@ -3877,25 +3877,25 @@ public:
                     return;
 
                 for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                if (Player* player = itr->getSource())
-                {
-                    QuestStatusMap::iterator incomplete_quest;
-
-                    if (player->getGender() == GENDER_FEMALE)
-                        incomplete_quest = player->getQuestStatusMap().find(QUEST_THE_NEW_YOU_FEMALE);
-                    else
-                        incomplete_quest = player->getQuestStatusMap().find(QUEST_THE_NEW_YOU_MALE);
-
-                    if (incomplete_quest == player->getQuestStatusMap().end())
-                        return;
-
-                    QuestStatusData& q_status = incomplete_quest->second;
-
-                    if (q_status.ItemCount[2] == 0)
+                    if (Player* player = itr->getSource())
                     {
-                        me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
+                        QuestStatusMap::iterator incomplete_quest;
+
+                        if (player->getGender() == GENDER_FEMALE)
+                            incomplete_quest = player->getQuestStatusMap().find(QUEST_THE_NEW_YOU_FEMALE);
+                        else
+                            incomplete_quest = player->getQuestStatusMap().find(QUEST_THE_NEW_YOU_MALE);
+
+                        if (incomplete_quest == player->getQuestStatusMap().end())
+                            return;
+
+                        QuestStatusData& q_status = incomplete_quest->second;
+
+                        if (q_status.ItemCount[2] == 0)
+                        {
+                            me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
+                        }
                     }
-                }
             } else
                 uiVisualCastTimer -= diff;
 
@@ -3970,25 +3970,25 @@ public:
                     return;
 
                 for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                if (Player* player = itr->getSource())
-                {
-                    QuestStatusMap::iterator incomplete_quest;
-
-                    if (player->getGender() == GENDER_FEMALE)
-                        incomplete_quest = player->getQuestStatusMap().find(QUEST_THE_NEW_YOU_FEMALE);
-                    else
-                        incomplete_quest = player->getQuestStatusMap().find(QUEST_THE_NEW_YOU_MALE);
-
-                    if (incomplete_quest == player->getQuestStatusMap().end())
-                        return;
-
-                    QuestStatusData& q_status = incomplete_quest->second;
-
-                    if (q_status.ItemCount[0] == 0)
+                    if (Player* player = itr->getSource())
                     {
-                        me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
+                        QuestStatusMap::iterator incomplete_quest;
+
+                        if (player->getGender() == GENDER_FEMALE)
+                            incomplete_quest = player->getQuestStatusMap().find(QUEST_THE_NEW_YOU_FEMALE);
+                        else
+                            incomplete_quest = player->getQuestStatusMap().find(QUEST_THE_NEW_YOU_MALE);
+
+                        if (incomplete_quest == player->getQuestStatusMap().end())
+                            return;
+
+                        QuestStatusData& q_status = incomplete_quest->second;
+
+                        if (q_status.ItemCount[0] == 0)
+                        {
+                            me->SendPlaySpellVisual(SPELL_VISUAL_CATS_MARK);
+                        }
                     }
-                }
             } else
                 uiVisualCastTimer -= diff;
 
@@ -4035,32 +4035,32 @@ public:
 
             switch (roll)
             {
-                case TYPE_BUBBLY:
-                    me->AddAura(AURA_PARTYGOER_BUBBLY, me);
-                    me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, VIRTUAL_ITEM_BUBBLY);
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_EAT_NO_SHEATHE);
-                    break;
-                case TYPE_BUCKET:
-                    me->AddAura(AURA_PARTYGOER_BUCKET, me);
-                    me->AddAura(AURA_DRUNKEN_STUN, me);
-                    me->AddAura(AURA_DRUNKEN_INTOXICATION, me);
-                    me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 0);
-                    break;
-                case TYPE_DANCE:
-                    me->AddAura(AURA_PARTYGOER_DANCE, me);
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DANCE);
-                    me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 0);
-                    break;
-                case TYPE_FIREWORKS:
-                    me->AddAura(AURA_PARTYGOER_FIREWORKS, me);
-                    me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, VIRTUAL_ITEM_FIREWORKS);
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
-                    break;
-                case TYPE_HORS_DOEUVRES:
-                    me->AddAura(AURA_PARTYGOER_HORS_DOEUVRES, me);
-                    me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, VIRTUAL_ITEM_HORS_DOEUVRES);
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_EAT_NO_SHEATHE);
-                    break;
+            case TYPE_BUBBLY:
+                me->AddAura(AURA_PARTYGOER_BUBBLY, me);
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, VIRTUAL_ITEM_BUBBLY);
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_EAT_NO_SHEATHE);
+                break;
+            case TYPE_BUCKET:
+                me->AddAura(AURA_PARTYGOER_BUCKET, me);
+                me->AddAura(AURA_DRUNKEN_STUN, me);
+                me->AddAura(AURA_DRUNKEN_INTOXICATION, me);
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 0);
+                break;
+            case TYPE_DANCE:
+                me->AddAura(AURA_PARTYGOER_DANCE, me);
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DANCE);
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 0);
+                break;
+            case TYPE_FIREWORKS:
+                me->AddAura(AURA_PARTYGOER_FIREWORKS, me);
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, VIRTUAL_ITEM_FIREWORKS);
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
+                break;
+            case TYPE_HORS_DOEUVRES:
+                me->AddAura(AURA_PARTYGOER_HORS_DOEUVRES, me);
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, VIRTUAL_ITEM_HORS_DOEUVRES);
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_EAT_NO_SHEATHE);
+                break;
             }
         }
 
@@ -4070,11 +4070,11 @@ public:
                 return;
 
             if (Player* player = caster->ToPlayer())
-            if (player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_MALE) == QUEST_STATUS_INCOMPLETE ||
-                player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_FEMALE) == QUEST_STATUS_INCOMPLETE)
-            {
-                switch (spell->Id)
+                if (player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_MALE) == QUEST_STATUS_INCOMPLETE ||
+                    player->GetQuestStatus(QUEST_LIFE_OF_THE_PARTY_FEMALE) == QUEST_STATUS_INCOMPLETE)
                 {
+                    switch (spell->Id)
+                    {
                     case SPELL_BUBBLY:
                         if (me->HasAura(AURA_PARTYGOER_BUBBLY))
                         {
@@ -4152,50 +4152,50 @@ public:
                             me->DoPersonalScriptText(PARTYGOER_RANDOM_SAY_OK_HORS_DOEUVRES - roll, player);
                         }
                         break;
+                    }
                 }
-            }
         }
 
         void UpdateAI(const uint32 diff)
         {
             if (reset)
-            if (uiResetTimer <= diff)
-            {
-                reset = false;
-                uiResetTimer = 25000;
-                ChooseAura();
-            } else
-                uiResetTimer -= diff;
+                if (uiResetTimer <= diff)
+                {
+                    reset = false;
+                    uiResetTimer = 25000;
+                    ChooseAura();
+                } else
+                    uiResetTimer -= diff;
 
-            if (me->HasAura(AURA_HAPPY_PARTYGOER))
-                return;
+                if (me->HasAura(AURA_HAPPY_PARTYGOER))
+                    return;
 
-            if (uiSpeachTimer <= diff)
-            {
-                uiSpeachTimer = urand(10000, 40000);
-                uint8 roll = urand(0, 1);
+                if (uiSpeachTimer <= diff)
+                {
+                    uiSpeachTimer = urand(10000, 40000);
+                    uint8 roll = urand(0, 1);
 
-                if (me->HasAura(AURA_PARTYGOER_BUBBLY))
-                    DoScriptText(PARTYGOER_RANDOM_SAY_NEED_BUBBLY - roll, me);
+                    if (me->HasAura(AURA_PARTYGOER_BUBBLY))
+                        DoScriptText(PARTYGOER_RANDOM_SAY_NEED_BUBBLY - roll, me);
 
-                if (me->HasAura(AURA_PARTYGOER_BUCKET))
-                    DoScriptText(PARTYGOER_RANDOM_SAY_NEED_BUCKET - roll, me);
+                    if (me->HasAura(AURA_PARTYGOER_BUCKET))
+                        DoScriptText(PARTYGOER_RANDOM_SAY_NEED_BUCKET - roll, me);
 
-                if (me->HasAura(AURA_PARTYGOER_DANCE))
-                    DoScriptText(PARTYGOER_RANDOM_SAY_NEED_DANCE - roll, me);
+                    if (me->HasAura(AURA_PARTYGOER_DANCE))
+                        DoScriptText(PARTYGOER_RANDOM_SAY_NEED_DANCE - roll, me);
 
-                if (me->HasAura(AURA_PARTYGOER_FIREWORKS))
-                    DoScriptText(PARTYGOER_RANDOM_SAY_NEED_FIREWORKS - roll, me);
+                    if (me->HasAura(AURA_PARTYGOER_FIREWORKS))
+                        DoScriptText(PARTYGOER_RANDOM_SAY_NEED_FIREWORKS - roll, me);
 
-                if (me->HasAura(AURA_PARTYGOER_HORS_DOEUVRES))
-                    DoScriptText(PARTYGOER_RANDOM_SAY_NEED_HORS_DOEUVRES - roll, me);
-            } else
-                uiSpeachTimer -= diff;
+                    if (me->HasAura(AURA_PARTYGOER_HORS_DOEUVRES))
+                        DoScriptText(PARTYGOER_RANDOM_SAY_NEED_HORS_DOEUVRES - roll, me);
+                } else
+                    uiSpeachTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -4212,8 +4212,8 @@ public:
     bool OnGossipHello(Player* player, GameObject* go)
     {
         if (player->GetQuestStatus(QUEST_THE_GREAT_BANK_HEIST) == QUEST_STATUS_INCOMPLETE)
-        if (!player->GetVehicle())
-            player->CastSpell(player, SPELL_TGBH_SUMMON_BUNNY_VEHICLE, false);
+            if (!player->GetVehicle())
+                player->CastSpell(player, SPELL_TGBH_SUMMON_BUNNY_VEHICLE, false);
         return true;
     }
 };
@@ -4261,8 +4261,8 @@ public:
             Player* player;
 
             if (me->isSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                player = summoner->ToPlayer();
+                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                    player = summoner->ToPlayer();
 
             if (!player)
                 return;
@@ -4272,26 +4272,26 @@ public:
 
             switch (roll)
             {
-                case ROLL_INFINIFOLD_LOCKPICK:
-                    me->Whisper(VAULT_SAY_USE_INFINIFOLD_LOCKPICK, player->GetGUID(), true);
-                    me->AddAura(SPELL_TGBH_BUNNY_LOCKPICK_AURA, me);
-                    break;
-                case ROLL_BLASTCRACKERS:
-                    me->Whisper(VAULT_SAY_USE_BLASTCRACKERS, player->GetGUID(), true);
-                    me->AddAura(SPELL_TGBH_BUNNY_EXPLOSIVES_AURA, me);
-                    break;
-                case ROLL_KAJAMITE_DRILL:
-                    me->Whisper(VAULT_SAY_USE_KAJAMITE_DRILL, player->GetGUID(), true);
-                    me->AddAura(SPELL_TGBH_BUNNY_DRILL_AURA, me);
-                    break;
-                case ROLL_AMAZING_G_RAY:
-                    me->Whisper(VAULT_SAY_USE_AMAZING_G_RAY, player->GetGUID(), true);
-                    me->AddAura(SPELL_TGBH_BUNNY_G_RAY_AURA, me);
-                    break;
-                case ROLL_EAR_O_SCOPE:
-                    me->Whisper(VAULT_SAY_USE_EAR_O_SCOPE, player->GetGUID(), true);
-                    me->AddAura(SPELL_TGBH_BUNNY_LISTEN_AURA, me);
-                    break;
+            case ROLL_INFINIFOLD_LOCKPICK:
+                me->Whisper(VAULT_SAY_USE_INFINIFOLD_LOCKPICK, player->GetGUID(), true);
+                me->AddAura(SPELL_TGBH_BUNNY_LOCKPICK_AURA, me);
+                break;
+            case ROLL_BLASTCRACKERS:
+                me->Whisper(VAULT_SAY_USE_BLASTCRACKERS, player->GetGUID(), true);
+                me->AddAura(SPELL_TGBH_BUNNY_EXPLOSIVES_AURA, me);
+                break;
+            case ROLL_KAJAMITE_DRILL:
+                me->Whisper(VAULT_SAY_USE_KAJAMITE_DRILL, player->GetGUID(), true);
+                me->AddAura(SPELL_TGBH_BUNNY_DRILL_AURA, me);
+                break;
+            case ROLL_AMAZING_G_RAY:
+                me->Whisper(VAULT_SAY_USE_AMAZING_G_RAY, player->GetGUID(), true);
+                me->AddAura(SPELL_TGBH_BUNNY_G_RAY_AURA, me);
+                break;
+            case ROLL_EAR_O_SCOPE:
+                me->Whisper(VAULT_SAY_USE_EAR_O_SCOPE, player->GetGUID(), true);
+                me->AddAura(SPELL_TGBH_BUNNY_LISTEN_AURA, me);
+                break;
             }
 
             me->Whisper(VAULT_SAY_EMPTY_TEXT, player->GetGUID(), true);
@@ -4359,44 +4359,44 @@ public:
             Player* player;
 
             if (Vehicle* vehicle = me->GetVehicleKit())
-            if (Unit* passenger = vehicle->GetPassenger(0))
-                player = passenger->ToPlayer();
+                if (Unit* passenger = vehicle->GetPassenger(0))
+                    player = passenger->ToPlayer();
 
             if (!player)
                 return;
 
             switch (spell->Id)
             {
-                case SPELL_INFINIFOLD_LOCKPICK:
-                    if (me->HasAura(SPELL_TGBH_BUNNY_LOCKPICK_AURA))
-                        Hit(player, true);
-                    else
-                        Hit(player, false);
-                    break;
-                case SPELL_BLASTCRACKERS:
-                    if (me->HasAura(SPELL_TGBH_BUNNY_EXPLOSIVES_AURA))
-                        Hit(player, true);
-                    else
-                        Hit(player, false);
-                    break;
-                case SPELL_KAJAMITE_DRILL:
-                    if (me->HasAura(SPELL_TGBH_BUNNY_DRILL_AURA))
-                        Hit(player, true);
-                    else
-                        Hit(player, false);
-                    break;
-                case SPELL_AMAZING_G_RAY:
-                    if (me->HasAura(SPELL_TGBH_BUNNY_G_RAY_AURA))
-                        Hit(player, true);
-                    else
-                        Hit(player, false);
-                    break;
-                case SPELL_EAR_O_SCOPE:
-                    if (me->HasAura(SPELL_TGBH_BUNNY_LISTEN_AURA))
-                        Hit(player, true);
-                    else
-                        Hit(player, false);
-                    break;
+            case SPELL_INFINIFOLD_LOCKPICK:
+                if (me->HasAura(SPELL_TGBH_BUNNY_LOCKPICK_AURA))
+                    Hit(player, true);
+                else
+                    Hit(player, false);
+                break;
+            case SPELL_BLASTCRACKERS:
+                if (me->HasAura(SPELL_TGBH_BUNNY_EXPLOSIVES_AURA))
+                    Hit(player, true);
+                else
+                    Hit(player, false);
+                break;
+            case SPELL_KAJAMITE_DRILL:
+                if (me->HasAura(SPELL_TGBH_BUNNY_DRILL_AURA))
+                    Hit(player, true);
+                else
+                    Hit(player, false);
+                break;
+            case SPELL_AMAZING_G_RAY:
+                if (me->HasAura(SPELL_TGBH_BUNNY_G_RAY_AURA))
+                    Hit(player, true);
+                else
+                    Hit(player, false);
+                break;
+            case SPELL_EAR_O_SCOPE:
+                if (me->HasAura(SPELL_TGBH_BUNNY_LISTEN_AURA))
+                    Hit(player, true);
+                else
+                    Hit(player, false);
+                break;
             }
         }
 
@@ -4423,73 +4423,73 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Event)
-            if (uiEventTimer <= diff)
-            {
-                ++uiPhase;
-
-                if (me->isSummon())
-                if (uint64 uiPlayerGUID = me->ToTempSummon()->GetSummonerGUID())
-                    switch (uiPhase)
+                if (uiEventTimer <= diff)
                 {
-                        case 1:
-                            uiEventTimer = 3500;
-                            me->Whisper(VAULT_SAY_BREAKING, uiPlayerGUID, true);
-                            me->Whisper(VAULT_SAY_EMPTY_TEXT, uiPlayerGUID, true);
-                            break;
-                        case 2:
-                            uiEventTimer = 3500;
-                            me->Whisper(VAULT_SAY_USE_GOBLIN_ALL_IN_1_DER_BELT, uiPlayerGUID, true);
-                            me->Whisper(VAULT_SAY_EMPTY_TEXT, uiPlayerGUID, true);
-                            break;
-                        case 3:
-                            uiEventTimer = 5000;
-                            me->Whisper(VAULT_SAY_VAULT_WILL_BE_CRACKED, uiPlayerGUID, true);
-                            me->Whisper(VAULT_SAY_EMPTY_TEXT, uiPlayerGUID, true);
-                            break;
-                        case 4:
-                            uiEventTimer = 2000;
-                            me->Whisper(VAULT_SAY_GOOD_LUCK, uiPlayerGUID, true);
-                            me->Whisper(VAULT_SAY_EMPTY_TEXT, uiPlayerGUID, true);
-                            break;
-                        case 5:
-                            ChangeAura();
-                            Event = false;
-                            ReRoll = true;
-                            Decrease = true;
-                            uiEventTimer = 1000;
+                    ++uiPhase;
+
+                    if (me->isSummon())
+                        if (uint64 uiPlayerGUID = me->ToTempSummon()->GetSummonerGUID())
+                            switch (uiPhase)
+                        {
+                            case 1:
+                                uiEventTimer = 3500;
+                                me->Whisper(VAULT_SAY_BREAKING, uiPlayerGUID, true);
+                                me->Whisper(VAULT_SAY_EMPTY_TEXT, uiPlayerGUID, true);
+                                break;
+                            case 2:
+                                uiEventTimer = 3500;
+                                me->Whisper(VAULT_SAY_USE_GOBLIN_ALL_IN_1_DER_BELT, uiPlayerGUID, true);
+                                me->Whisper(VAULT_SAY_EMPTY_TEXT, uiPlayerGUID, true);
+                                break;
+                            case 3:
+                                uiEventTimer = 5000;
+                                me->Whisper(VAULT_SAY_VAULT_WILL_BE_CRACKED, uiPlayerGUID, true);
+                                me->Whisper(VAULT_SAY_EMPTY_TEXT, uiPlayerGUID, true);
+                                break;
+                            case 4:
+                                uiEventTimer = 2000;
+                                me->Whisper(VAULT_SAY_GOOD_LUCK, uiPlayerGUID, true);
+                                me->Whisper(VAULT_SAY_EMPTY_TEXT, uiPlayerGUID, true);
+                                break;
+                            case 5:
+                                ChangeAura();
+                                Event = false;
+                                ReRoll = true;
+                                Decrease = true;
+                                uiEventTimer = 1000;
+                                uiDecreaseTimer = 2000;
+                                uiReRollTimer = 5000;
+                                uiPhase = 4;
+                                break;
+                        }
+                } else
+                    uiEventTimer -= diff;
+
+                if (ReRoll)
+                    if (uiReRollTimer <= diff)
+                    {
+                        Event = true;
+                        ReRoll = false;
+                        me->ModifyPower(POWER_MANA, -10);
+                        RemoveEventAuras();
+
+                        if (me->isSummon())
+                            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                                if (Player* player = summoner->ToPlayer())
+                                {
+                                    me->Whisper(VAULT_SAY_IS_NO_TIME, player->GetGUID(), true);
+                                    me->Whisper(VAULT_SAY_EMPTY_TEXT, player->GetGUID(), true);
+                                }
+                    } else
+                        uiReRollTimer -= diff;
+
+                    if (Decrease)
+                        if (uiDecreaseTimer <= diff)
+                        {
                             uiDecreaseTimer = 2000;
-                            uiReRollTimer = 5000;
-                            uiPhase = 4;
-                            break;
-                }
-            } else
-                uiEventTimer -= diff;
-
-            if (ReRoll)
-            if (uiReRollTimer <= diff)
-            {
-                Event = true;
-                ReRoll = false;
-                me->ModifyPower(POWER_MANA, -10);
-                RemoveEventAuras();
-
-                if (me->isSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                if (Player* player = summoner->ToPlayer())
-                {
-                    me->Whisper(VAULT_SAY_IS_NO_TIME, player->GetGUID(), true);
-                    me->Whisper(VAULT_SAY_EMPTY_TEXT, player->GetGUID(), true);
-                }
-            } else
-                uiReRollTimer -= diff;
-
-            if (Decrease)
-            if (uiDecreaseTimer <= diff)
-            {
-                uiDecreaseTimer = 2000;
-                me->ModifyPower(POWER_MANA, -5);
-            } else
-                uiDecreaseTimer -= diff;
+                            me->ModifyPower(POWER_MANA, -5);
+                        } else
+                            uiDecreaseTimer -= diff;
         }
     };
 };
@@ -4533,51 +4533,51 @@ public:
                 Died = true;
 
                 if (Vehicle* vehicle = caster->GetVehicleKit())
-                if (Unit* passenger = vehicle->GetPassenger(0))
-                if (Player* player = passenger->ToPlayer())
-                if (player->GetQuestStatus(QUEST_ROBBING_HOODS) == QUEST_STATUS_INCOMPLETE)
-                    me->CastSpell(player, SPELL_CREATE_STOLEN_LOOT, false);
+                    if (Unit* passenger = vehicle->GetPassenger(0))
+                        if (Player* player = passenger->ToPlayer())
+                            if (player->GetQuestStatus(QUEST_ROBBING_HOODS) == QUEST_STATUS_INCOMPLETE)
+                                me->CastSpell(player, SPELL_CREATE_STOLEN_LOOT, false);
             }
         }
 
         void UpdateAI(const uint32 diff)
         {
             if (Died)
-            if (uiDieTimer <= diff)
-            {
-                Died = false;
-                uiDieTimer = 500;
-                me->Kill(me);
-            } else
-                uiDieTimer -= diff;
-
-            if (!UpdateVictim())
-            {
-                if (!Died)
-                if (uiThrowTimer <= diff)
+                if (uiDieTimer <= diff)
                 {
-                    ++uiPhase;
-
-                    switch (uiPhase)
-                    {
-                        case 1:
-                            uiThrowTimer = 1000;
-                            DoCast(SPELL_THROW_SUPER_SPLODY_COCKTAIL);
-                            break;
-                        case 2:
-                            uiPhase = 0;
-                            uiThrowTimer = urand(3000, 10000);
-                            uint8 roll = urand(0, 5);
-                            me->HandleEmoteCommand(LooterRandomEmote[roll]);
-                            break;
-                    }
+                    Died = false;
+                    uiDieTimer = 500;
+                    me->Kill(me);
                 } else
-                    uiThrowTimer -= diff;
+                    uiDieTimer -= diff;
 
-                return;
-            }
+                if (!UpdateVictim())
+                {
+                    if (!Died)
+                        if (uiThrowTimer <= diff)
+                        {
+                            ++uiPhase;
 
-            DoMeleeAttackIfReady();
+                            switch (uiPhase)
+                            {
+                            case 1:
+                                uiThrowTimer = 1000;
+                                DoCast(SPELL_THROW_SUPER_SPLODY_COCKTAIL);
+                                break;
+                            case 2:
+                                uiPhase = 0;
+                                uiThrowTimer = urand(3000, 10000);
+                                uint8 roll = urand(0, 5);
+                                me->HandleEmoteCommand(LooterRandomEmote[roll]);
+                                break;
+                            }
+                        } else
+                            uiThrowTimer -= diff;
+
+                        return;
+                }
+
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -4610,31 +4610,31 @@ public:
             if (who->isInCombat())
             {
                 if (Player* player = who->ToPlayer())
-                if (me->IsWithinDistInMap(player, 15.0f) && !me->isInCombat())
-                if (player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_COMPLETE)
-                {
-                    me->setFaction(AGGRESSIVE_FACTION);
-                    AttackStart(player);
-                }
+                    if (me->IsWithinDistInMap(player, 15.0f) && !me->isInCombat())
+                        if (player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_COMPLETE)
+                        {
+                            me->setFaction(AGGRESSIVE_FACTION);
+                            AttackStart(player);
+                        }
 
-                return;
+                        return;
             }
 
             if (Player* player = who->ToPlayer())
 
-            if (player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_COMPLETE)
-            if (!player->HasAura(SPELL_HONARTS_INGENIOUS_CAPOFMOOK_FOOLERY))
-            {
-                player->CastSpell(player, SPELL_HONARTS_INGENIOUS_CAPOFMOOK_FOOLERY, false);
+                if (player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_COMPLETE)
+                    if (!player->HasAura(SPELL_HONARTS_INGENIOUS_CAPOFMOOK_FOOLERY))
+                    {
+                        player->CastSpell(player, SPELL_HONARTS_INGENIOUS_CAPOFMOOK_FOOLERY, false);
 
-                if (player->IsVehicle())
-                {
-                    float x, y, z, o;
-                    player->GetPosition(x, y, z, o);
-                    if (Creature* mook = player->SummonCreature(NPC_MOOK_DISGUISE, x, y, z, o))
-                        mook->EnterVehicle(player, 0);
-                }
-            }
+                        if (player->IsVehicle())
+                        {
+                            float x, y, z, o;
+                            player->GetPosition(x, y, z, o);
+                            if (Creature* mook = player->SummonCreature(NPC_MOOK_DISGUISE, x, y, z, o))
+                                mook->EnterVehicle(player, 0);
+                        }
+                    }
         }
 
         void UpdateAI(const uint32 diff)
@@ -4836,22 +4836,22 @@ public:
 
             switch (me->GetPhaseMask())
             {
-                case 3:
-                    Chicken = true;
-                    Kajaro = false;
-                    me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
-                    break;
-                case 4:
-                    Chicken = false;
-                    Kajaro = false;
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
-                    break;
-                default:
-                    Chicken = false;
-                    Kajaro = true;
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
-                    break;
+            case 3:
+                Chicken = true;
+                Kajaro = false;
+                me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
+                break;
+            case 4:
+                Chicken = false;
+                Kajaro = false;
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
+                break;
+            default:
+                Chicken = false;
+                Kajaro = true;
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
+                break;
             }
 
             if (Creature* greely = me->SummonCreature(NPC_ASSISTANT_GREELY, -8405.3f, 1360.25f, 104.021f, 3.61756f))
@@ -4887,12 +4887,12 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Kajaro)
-            if (uiKajaroEventTimer <= diff)
-            {
-                ++uiKajaroPhase;
-
-                switch (uiKajaroPhase)
+                if (uiKajaroEventTimer <= diff)
                 {
+                    ++uiKajaroPhase;
+
+                    switch (uiKajaroPhase)
+                    {
                     case 1:
                         uiKajaroEventTimer = KajaroType[uiKajaroEventType].uiHobartTimer;
                         DoScriptText(KajaroType[uiKajaroEventType].uiHobartTextId, me);
@@ -4906,369 +4906,369 @@ public:
                         uiKajaroEventType = urand(0, 7);
                         uiKajaroPhase = 0;
                         break;
-                }
-            } else
-                uiKajaroEventTimer -= diff;
-
-            if (Chicken)
-            {
-                if (bunny_activated)
-                if (uiBunnyTimer <= diff)
-                {
-                    uiBunnyTimer = 1000;
-                    uint8 l_roll;
-                    uint8 r_roll;
-
-                    if (uiChickenPhase < 37)
-                    {
-                        l_roll = urand(3, 4);
-                        r_roll = urand(3, 4);
-                    } else
-                    {
-                        l_roll = urand(1, 2);
-                        r_roll = urand(1, 2);
                     }
-
-                    for (int i = 0; i < l_roll; ++i)
-                    if (Creature* bunny = Unit::GetCreature(*me, m_auiLeftBunny[urand(0, 6)]))
-                        bunny->CastSpell(bunny, SPELL_LIGHTNING_IMPACT, false);
-
-                    for (int i = 0; i < r_roll; ++i)
-                    if (Creature* bunny = Unit::GetCreature(*me, m_auiRightBunny[urand(0, 6)]))
-                        bunny->CastSpell(bunny, SPELL_LIGHTNING_IMPACT, false);
                 } else
-                    uiBunnyTimer -= diff;
+                    uiKajaroEventTimer -= diff;
 
-                if (uiChickenEventTimer <= diff)
+                if (Chicken)
                 {
-                    ++uiChickenPhase;
-                    switch (uiChickenPhase)
-                    {
-                        case 1:
-                            uiChickenEventTimer = 2500;
-                            DoScriptText(HOBART_YELL_PREPARE, me);
-                            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
+                    if (bunny_activated)
+                        if (uiBunnyTimer <= diff)
+                        {
+                            uiBunnyTimer = 1000;
+                            uint8 l_roll;
+                            uint8 r_roll;
 
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                                greely->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                            break;
-                        case 2:
-                            uiChickenEventTimer = 3000;
-
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                            if (uiChickenPhase < 37)
                             {
-                                greely->GetMotionMaster()->MovePoint(POINT_TESTING_PLATFORM, -8405.96f, 1357.84f, 104.709f);
-                                DoScriptText(GREELY_SAY_SHEESH, greely);
-                            }
-                            break;
-                        case 3:
-                            uiChickenEventTimer = 4000;
-
-                            if (Creature* mechachicken = me->SummonCreature(NPC_MICRO_MECHACHICKEN, -8406.926f, 1356.2f, 104.8625f, 1.53589f))
+                                l_roll = urand(3, 4);
+                                r_roll = urand(3, 4);
+                            } else
                             {
-                                uiMechachickenGUID = mechachicken->GetGUID();
-                                mechachicken->CastSpell(mechachicken, SPELL_COSMETIC_POLYMORPH_IMPACT_VISUAL, false);
+                                l_roll = urand(1, 2);
+                                r_roll = urand(1, 2);
                             }
 
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                                greely->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
-                            break;
-                        case 4:
-                            uiChickenEventTimer = 6000;
+                            for (int i = 0; i < l_roll; ++i)
+                                if (Creature* bunny = Unit::GetCreature(*me, m_auiLeftBunny[urand(0, 6)]))
+                                    bunny->CastSpell(bunny, SPELL_LIGHTNING_IMPACT, false);
 
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                                DoScriptText(GREELY_SAY_ONE_MECHACHICKEN, greely);
-                            break;
-                        case 5:
-                            uiChickenEventTimer = 8000;
-                            DoScriptText(HOBART_SAY_DEAR_GREELY, me);
-                            break;
-                        case 6:
-                            uiChickenEventTimer = 2000;
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                                DoScriptText(GREELY_SIGH, greely);
-                            break;
-                        case 7:
-                            uiChickenEventTimer = 2000;
+                            for (int i = 0; i < r_roll; ++i)
+                                if (Creature* bunny = Unit::GetCreature(*me, m_auiRightBunny[urand(0, 6)]))
+                                    bunny->CastSpell(bunny, SPELL_LIGHTNING_IMPACT, false);
+                        } else
+                            uiBunnyTimer -= diff;
 
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                                DoScriptText(GREELY_SAY_YES_DOCTOR, greely);
-                            break;
-                        case 8:
-                            uiChickenEventTimer = 5000;
-                            DoScriptText(HOBART_SAY_EXCELLENT, me);
-                            break;
-                        case 9:
-                            uiChickenEventTimer = 2000;
-
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                                greely->GetMotionMaster()->MovePoint(POINT_BACK_OF_THE_DOCTOR_1, -8405.3f, 1360.25f, 104.021f);
-                            break;
-                        case 10:
-                            uiChickenEventTimer = 7000;
-                            DoScriptText(HOBART_SAY_THANK_YOU, me);
-                            break;
-                        case 11:
-                            uiChickenEventTimer = 5000;
-                            DoScriptText(HOBART_SAY_HORRIBLE_PROBLEM, me);
-                            break;
-                        case 12:
-                            uiChickenEventTimer = 8000;
-                            DoScriptText(HOBART_SAY_GREATEST_GOBLIN, me);
-                            break;
-                        case 13:
-                            uiChickenEventTimer = 1000;
-                            DoScriptText(HOBART_SAY_FLIP_THE_SWITCH, me);
-                            break;
-                        case 14:
-                            uiChickenEventTimer = 1000;
-
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                                DoScriptText(GREELY_COUGHS, greely);
-                            break;
-                        case 15:
-                            uiChickenEventTimer = 2500;
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                                DoScriptText(GREELY_SAY_AT_THE_CONTROLS, greely);
-                            break;
-                        case 16:
-                            uiChickenEventTimer = 4000;
-                            DoScriptText(HOBART_SAY_QUITE_RIGHT, me);
-                            break;
-                        case 17:
-                            uiChickenEventTimer = 3500;
-                            DoScriptText(HOBART_SAY_FLIPPING, me);
-                            break;
-                        case 18:
-                            uiChickenEventTimer = 5000;
-                            bunny_activated = true;
-                            break;
-                        case 19:
-                            uiChickenEventTimer = 6000;
-                            DoScriptText(HOBART_SAY_CAN_YOU_FEEL, me);
-                            break;
-                        case 20:
-                            uiChickenEventTimer = 6000;
-                            DoScriptText(HOBART_SAY_GROCERY_STORE, me);
-                            break;
-                        case 21:
-                            uiChickenEventTimer = 7000;
-                            DoScriptText(HOBART_SAY_FLIPPING_SECOND, me);
-                            break;
-                        case 22:
-                            uiChickenEventTimer = 500;
-
-                            if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
+                        if (uiChickenEventTimer <= diff)
+                        {
+                            ++uiChickenPhase;
+                            switch (uiChickenPhase)
                             {
+                            case 1:
+                                uiChickenEventTimer = 2500;
+                                DoScriptText(HOBART_YELL_PREPARE, me);
+                                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                    greely->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                                break;
+                            case 2:
+                                uiChickenEventTimer = 3000;
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                {
+                                    greely->GetMotionMaster()->MovePoint(POINT_TESTING_PLATFORM, -8405.96f, 1357.84f, 104.709f);
+                                    DoScriptText(GREELY_SAY_SHEESH, greely);
+                                }
+                                break;
+                            case 3:
+                                uiChickenEventTimer = 4000;
+
+                                if (Creature* mechachicken = me->SummonCreature(NPC_MICRO_MECHACHICKEN, -8406.926f, 1356.2f, 104.8625f, 1.53589f))
+                                {
+                                    uiMechachickenGUID = mechachicken->GetGUID();
+                                    mechachicken->CastSpell(mechachicken, SPELL_COSMETIC_POLYMORPH_IMPACT_VISUAL, false);
+                                }
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                    greely->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
+                                break;
+                            case 4:
+                                uiChickenEventTimer = 6000;
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                    DoScriptText(GREELY_SAY_ONE_MECHACHICKEN, greely);
+                                break;
+                            case 5:
+                                uiChickenEventTimer = 8000;
+                                DoScriptText(HOBART_SAY_DEAR_GREELY, me);
+                                break;
+                            case 6:
+                                uiChickenEventTimer = 2000;
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                    DoScriptText(GREELY_SIGH, greely);
+                                break;
+                            case 7:
+                                uiChickenEventTimer = 2000;
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                    DoScriptText(GREELY_SAY_YES_DOCTOR, greely);
+                                break;
+                            case 8:
+                                uiChickenEventTimer = 5000;
+                                DoScriptText(HOBART_SAY_EXCELLENT, me);
+                                break;
+                            case 9:
+                                uiChickenEventTimer = 2000;
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                    greely->GetMotionMaster()->MovePoint(POINT_BACK_OF_THE_DOCTOR_1, -8405.3f, 1360.25f, 104.021f);
+                                break;
+                            case 10:
+                                uiChickenEventTimer = 7000;
+                                DoScriptText(HOBART_SAY_THANK_YOU, me);
+                                break;
+                            case 11:
+                                uiChickenEventTimer = 5000;
+                                DoScriptText(HOBART_SAY_HORRIBLE_PROBLEM, me);
+                                break;
+                            case 12:
+                                uiChickenEventTimer = 8000;
+                                DoScriptText(HOBART_SAY_GREATEST_GOBLIN, me);
+                                break;
+                            case 13:
+                                uiChickenEventTimer = 1000;
+                                DoScriptText(HOBART_SAY_FLIP_THE_SWITCH, me);
+                                break;
+                            case 14:
+                                uiChickenEventTimer = 1000;
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                    DoScriptText(GREELY_COUGHS, greely);
+                                break;
+                            case 15:
+                                uiChickenEventTimer = 2500;
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                    DoScriptText(GREELY_SAY_AT_THE_CONTROLS, greely);
+                                break;
+                            case 16:
+                                uiChickenEventTimer = 4000;
+                                DoScriptText(HOBART_SAY_QUITE_RIGHT, me);
+                                break;
+                            case 17:
+                                uiChickenEventTimer = 3500;
+                                DoScriptText(HOBART_SAY_FLIPPING, me);
+                                break;
+                            case 18:
+                                uiChickenEventTimer = 5000;
+                                bunny_activated = true;
+                                break;
+                            case 19:
+                                uiChickenEventTimer = 6000;
+                                DoScriptText(HOBART_SAY_CAN_YOU_FEEL, me);
+                                break;
+                            case 20:
+                                uiChickenEventTimer = 6000;
+                                DoScriptText(HOBART_SAY_GROCERY_STORE, me);
+                                break;
+                            case 21:
+                                uiChickenEventTimer = 7000;
+                                DoScriptText(HOBART_SAY_FLIPPING_SECOND, me);
+                                break;
+                            case 22:
+                                uiChickenEventTimer = 500;
+
+                                if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
+                                {
+                                    if (Creature* left_bunny = Unit::GetCreature(*me, m_auiLeftBunny[0]))
+                                    {
+                                        left_bunny->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, chicken->GetGUID());
+                                        left_bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_LIGHTNING_BEAM);
+                                    }
+
+                                    if (Creature* right_bunny = Unit::GetCreature(*me, m_auiRightBunny[0]))
+                                    {
+                                        right_bunny->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, chicken->GetGUID());
+                                        right_bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_LIGHTNING_BEAM);
+                                    }
+                                }
+                                break;
+                            case 23:
+                                uiChickenEventTimer = 3000;
+
+                                if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
+                                {
+                                    chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
+                                    chicken->HandleEmoteCommand(EMOTE_ONESHOT_CUSTOM_SPELL_02);
+                                    chicken->CastSpell(chicken, SPELL_MECHACHICKEN_OVERLOAD, false);
+                                }
+                                break;
+                            case 24:
+                                uiChickenEventTimer = 2000;
+                                DoScriptText(HOBART_SAY_WAIT, me);
+
+                                if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
+                                {
+                                    chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
+                                    chicken->CastSpell(chicken, SPELL_MICRO_MECHACHICKEN_GROW, false);
+                                }
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                    greely->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
+
+                                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
+                                break;
+                            case 25:
+                                uiChickenEventTimer = 1500;
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                {
+                                    greely->CastSpell(greely, SPELL_STEALTH, false);
+                                    greely->GetMotionMaster()->MovePoint(POINT_RUN_AWAY_FROM_CHICKEN, -8404.18f, 1364.28f, 104.021f);
+                                }
+                                break;
+                            case 26:
+                                uiChickenEventTimer = 2000;
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                    DoScriptText(GREELY_SAY_YA_THINK, greely);
+                                break;
+                            case 27:
+                                uiChickenEventTimer = 4000;
+
+                                if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
+                                {
+                                    chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
+                                    chicken->CastSpell(chicken, SPELL_MICRO_MECHACHICKEN_GROW, false);
+                                }
+                                break;
+                            case 28:
+                                uiChickenEventTimer = 2000;
+                                DoScriptText(HOBART_YELL_I_KNOW, me);
+                                break;
+                            case 29:
+                                uiChickenEventTimer = 2000;
+
+                                if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
+                                {
+                                    chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
+                                    chicken->CastSpell(chicken, SPELL_MICRO_MECHACHICKEN_GROW, false);
+                                }
+                                break;
+                            case 30:
+                                uiChickenEventTimer = 2000;
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                    DoScriptText(GREELY_YELL_FAR_RIGHT, greely);
+                                break;
+                            case 31:
+                                uiChickenEventTimer = 2000;
+
+                                if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
+                                {
+                                    chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
+                                    chicken->CastSpell(chicken, SPELL_MICRO_MECHACHICKEN_GROW, false);
+                                }
+                                break;
+                            case 32:
+                                uiChickenEventTimer = 2000;
+
+                                if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
+                                {
+                                    chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
+                                    chicken->CastSpell(chicken, SPELL_MICRO_MECHACHICKEN_GROW, false);
+                                }
+                                break;
+                            case 33:
+                                uiChickenEventTimer = 2000;
+                                DoScriptText(HOBART_YELL_I_ALWAYS_LOVED, me);
+                                break;
+                            case 34:
+                                uiChickenEventTimer = 2000;
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                    DoScriptText(GREELY_YELL_WHAT, greely);
+                                break;
+                            case 35:
+                                uiChickenEventTimer = 5000;
+                                DoScriptText(HOBART_YELL_FLIPPING_THE_OVERRIDE, me);
+                                break;
+                            case 36:
+                                uiChickenEventTimer = 3000;
+
+                                if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
+                                {
+                                    chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
+                                    chicken->RemoveAllAuras();
+                                }
+
                                 if (Creature* left_bunny = Unit::GetCreature(*me, m_auiLeftBunny[0]))
                                 {
-                                    left_bunny->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, chicken->GetGUID());
-                                    left_bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_LIGHTNING_BEAM);
+                                    left_bunny->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+                                    left_bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
                                 }
 
                                 if (Creature* right_bunny = Unit::GetCreature(*me, m_auiRightBunny[0]))
                                 {
-                                    right_bunny->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, chicken->GetGUID());
-                                    right_bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_LIGHTNING_BEAM);
+                                    right_bunny->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+                                    right_bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
                                 }
+                                break;
+                            case 37:
+                                uiChickenEventTimer = 4000;
+                                DoScriptText(HOBART_SAY_ARE_WE_STILL_ALIVE, me);
+                                break;
+                            case 38:
+                                uiChickenEventTimer = 3000;
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                {
+                                    greely->RemoveAllAuras();
+                                    DoScriptText(GREELY_SAY_WERE_STILL_ALIVE, greely);
+                                    greely->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
+                                    greely->GetMotionMaster()->MovePoint(POINT_BACK_OF_THE_DICTOR_2, -8405.3f, 1360.25f, 104.021f);
+                                }
+                                break;
+                            case 39:
+                                uiChickenEventTimer = 4000;
+                                DoScriptText(HOBART_SAY_WELL_OF_COURSE, me);
+                                break;
+                            case 40:
+                                uiChickenEventTimer = 6000;
+                                bunny_activated = false;
+
+                                if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
+                                {
+                                    chicken->CastSpell(chicken, SPELL_MECHACHICKEN_EXPLOSION, false);
+                                    chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
+                                    chicken->DespawnOrUnsummon(3000);
+                                }
+                                break;
+                            case 41:
+                                uiChickenEventTimer = 500;
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                    DoScriptText(GREELY_SAY_IS_THAT_EGG, greely);
+                                break;
+                            case 42:
+                                uiChickenEventTimer = 5000;
+                                DoScriptText(HOBART_OPEN_MOUTH, me);
+                                break;
+                            case 43:
+                                uiChickenEventTimer = 5000;
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                    DoScriptText(GREELY_SAY_ALWAYS_LOVED, greely);
+                                break;
+                            case 44:
+                                uiChickenEventTimer = 3000;
+                                DoScriptText(HOBART_SAY_MISS_GREELY, me);
+                                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
+                                break;
+                            case 45:
+                                uiChickenEventTimer = 3000;
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                    DoScriptText(GREELY_BOTH_AGREE, greely);
+                                break;
+                            case 46:
+                                uiChickenEventTimer = 180000;
+                                uiChickenPhase = 0;
+                                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+
+                                if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
+                                    greely->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                                break;
                             }
-                            break;
-                        case 23:
-                            uiChickenEventTimer = 3000;
+                        } else
+                            uiChickenEventTimer -= diff;
+                }
 
-                            if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
-                            {
-                                chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
-                                chicken->HandleEmoteCommand(EMOTE_ONESHOT_CUSTOM_SPELL_02);
-                                chicken->CastSpell(chicken, SPELL_MECHACHICKEN_OVERLOAD, false);
-                            }
-                            break;
-                        case 24:
-                            uiChickenEventTimer = 2000;
-                            DoScriptText(HOBART_SAY_WAIT, me);
+                if (!UpdateVictim())
+                    return;
 
-                            if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
-                            {
-                                chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
-                                chicken->CastSpell(chicken, SPELL_MICRO_MECHACHICKEN_GROW, false);
-                            }
-
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                                greely->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
-
-                            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
-                            break;
-                        case 25:
-                            uiChickenEventTimer = 1500;
-
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                            {
-                                greely->CastSpell(greely, SPELL_STEALTH, false);
-                                greely->GetMotionMaster()->MovePoint(POINT_RUN_AWAY_FROM_CHICKEN, -8404.18f, 1364.28f, 104.021f);
-                            }
-                            break;
-                        case 26:
-                            uiChickenEventTimer = 2000;
-
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                                DoScriptText(GREELY_SAY_YA_THINK, greely);
-                            break;
-                        case 27:
-                            uiChickenEventTimer = 4000;
-
-                            if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
-                            {
-                                chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
-                                chicken->CastSpell(chicken, SPELL_MICRO_MECHACHICKEN_GROW, false);
-                            }
-                            break;
-                        case 28:
-                            uiChickenEventTimer = 2000;
-                            DoScriptText(HOBART_YELL_I_KNOW, me);
-                            break;
-                        case 29:
-                            uiChickenEventTimer = 2000;
-
-                            if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
-                            {
-                                chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
-                                chicken->CastSpell(chicken, SPELL_MICRO_MECHACHICKEN_GROW, false);
-                            }
-                            break;
-                        case 30:
-                            uiChickenEventTimer = 2000;
-
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                                DoScriptText(GREELY_YELL_FAR_RIGHT, greely);
-                            break;
-                        case 31:
-                            uiChickenEventTimer = 2000;
-
-                            if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
-                            {
-                                chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
-                                chicken->CastSpell(chicken, SPELL_MICRO_MECHACHICKEN_GROW, false);
-                            }
-                            break;
-                        case 32:
-                            uiChickenEventTimer = 2000;
-
-                            if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
-                            {
-                                chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
-                                chicken->CastSpell(chicken, SPELL_MICRO_MECHACHICKEN_GROW, false);
-                            }
-                            break;
-                        case 33:
-                            uiChickenEventTimer = 2000;
-                            DoScriptText(HOBART_YELL_I_ALWAYS_LOVED, me);
-                            break;
-                        case 34:
-                            uiChickenEventTimer = 2000;
-
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                                DoScriptText(GREELY_YELL_WHAT, greely);
-                            break;
-                        case 35:
-                            uiChickenEventTimer = 5000;
-                            DoScriptText(HOBART_YELL_FLIPPING_THE_OVERRIDE, me);
-                            break;
-                        case 36:
-                            uiChickenEventTimer = 3000;
-
-                            if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
-                            {
-                                chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
-                                chicken->RemoveAllAuras();
-                            }
-
-                            if (Creature* left_bunny = Unit::GetCreature(*me, m_auiLeftBunny[0]))
-                            {
-                                left_bunny->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
-                                left_bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
-                            }
-
-                            if (Creature* right_bunny = Unit::GetCreature(*me, m_auiRightBunny[0]))
-                            {
-                                right_bunny->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
-                                right_bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
-                            }
-                            break;
-                        case 37:
-                            uiChickenEventTimer = 4000;
-                            DoScriptText(HOBART_SAY_ARE_WE_STILL_ALIVE, me);
-                            break;
-                        case 38:
-                            uiChickenEventTimer = 3000;
-
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                            {
-                                greely->RemoveAllAuras();
-                                DoScriptText(GREELY_SAY_WERE_STILL_ALIVE, greely);
-                                greely->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
-                                greely->GetMotionMaster()->MovePoint(POINT_BACK_OF_THE_DICTOR_2, -8405.3f, 1360.25f, 104.021f);
-                            }
-                            break;
-                        case 39:
-                            uiChickenEventTimer = 4000;
-                            DoScriptText(HOBART_SAY_WELL_OF_COURSE, me);
-                            break;
-                        case 40:
-                            uiChickenEventTimer = 6000;
-                            bunny_activated = false;
-
-                            if (Creature* chicken = Unit::GetCreature(*me, uiMechachickenGUID))
-                            {
-                                chicken->CastSpell(chicken, SPELL_MECHACHICKEN_EXPLOSION, false);
-                                chicken->PlayDirectSound(SOUND_MECHANICAL_CHICKEN_SOUNDS);
-                                chicken->DespawnOrUnsummon(3000);
-                            }
-                            break;
-                        case 41:
-                            uiChickenEventTimer = 500;
-
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                                DoScriptText(GREELY_SAY_IS_THAT_EGG, greely);
-                            break;
-                        case 42:
-                            uiChickenEventTimer = 5000;
-                            DoScriptText(HOBART_OPEN_MOUTH, me);
-                            break;
-                        case 43:
-                            uiChickenEventTimer = 5000;
-
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                                DoScriptText(GREELY_SAY_ALWAYS_LOVED, greely);
-                            break;
-                        case 44:
-                            uiChickenEventTimer = 3000;
-                            DoScriptText(HOBART_SAY_MISS_GREELY, me);
-                            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
-                            break;
-                        case 45:
-                            uiChickenEventTimer = 3000;
-
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                                DoScriptText(GREELY_BOTH_AGREE, greely);
-                            break;
-                        case 46:
-                            uiChickenEventTimer = 180000;
-                            uiChickenPhase = 0;
-                            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-
-                            if (Creature* greely = Unit::GetCreature(*me, uiGreelyGUID))
-                                greely->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                            break;
-                    }
-                } else
-                    uiChickenEventTimer -= diff;
-            }
-
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -5307,18 +5307,18 @@ public:
 
             switch (me->GetPhaseMask())
             {
-                case 3:
-                    Follow = false;
-                    break;
-                case 4:
-                    Follow = false;
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
-                    break;
-                default:
-                    Follow = true;
-                    me->AddUnitState(UNIT_STATE_ROOT);
-                    me->AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
-                    break;
+            case 3:
+                Follow = false;
+                break;
+            case 4:
+                Follow = false;
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_COWER);
+                break;
+            default:
+                Follow = true;
+                me->AddUnitState(UNIT_STATE_ROOT);
+                me->AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
+                break;
             }
         }
 
@@ -5332,25 +5332,25 @@ public:
 
             switch (id)
             {
-                case POINT_TESTING_PLATFORM:
-                    me->SetFacingTo(4.14084f);
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
-                    break;
-                case POINT_BACK_OF_THE_DOCTOR_1:
-                    if (me->isSummon())
+            case POINT_TESTING_PLATFORM:
+                me->SetFacingTo(4.14084f);
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
+                break;
+            case POINT_BACK_OF_THE_DOCTOR_1:
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     {
                         me->SetFacingToObject(summoner);
                         DoScriptText(GREELY_SHAKES_HEAD, me);
                     }
                     break;
-                case POINT_RUN_AWAY_FROM_CHICKEN:
-                    if (me->isSummon())
+            case POINT_RUN_AWAY_FROM_CHICKEN:
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         me->SetFacingToObject(summoner);
-                    break;
-                case POINT_BACK_OF_THE_DICTOR_2:
-                    if (me->isSummon())
+                break;
+            case POINT_BACK_OF_THE_DICTOR_2:
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     {
                         me->SetFacingToObject(summoner);
@@ -5363,20 +5363,20 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Follow)
-            if (uiFollowTimer <= diff)
-            {
-                uiFollowTimer = 150;
+                if (uiFollowTimer <= diff)
+                {
+                    uiFollowTimer = 150;
 
-                if (me->isSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    me->SetFacingToObject(summoner);
-            } else
-                uiFollowTimer -= diff;
+                    if (me->isSummon())
+                        if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                            me->SetFacingToObject(summoner);
+                } else
+                    uiFollowTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -5413,18 +5413,18 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (Yell)
-            if (uiYellTimer <= diff)
-            {
-                uiYellTimer = urand(30000, 60000);
-                uint8 roll = urand(0, 7);
-                DoScriptText(KAJA_COLA_BALLOON_RANDOM_YELL - roll, me);
-            } else
-                uiYellTimer -= diff;
+                if (uiYellTimer <= diff)
+                {
+                    uiYellTimer = urand(30000, 60000);
+                    uint8 roll = urand(0, 7);
+                    DoScriptText(KAJA_COLA_BALLOON_RANDOM_YELL - roll, me);
+                } else
+                    uiYellTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -5560,14 +5560,14 @@ public:
     {
         switch (quest->GetQuestId())
         {
-            case QUEST_THE_UNINVITED_GUEST:
-                player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_3);
-                player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_4, false);
-                break;
-            case QUEST_LIFE_SAVINGS:
-                player->CastSpell(player, SPELL_LIFE_SAVINGS_QUEST_COMPLETE, false);
-                player->SendMovieStart(22);
-                break;
+        case QUEST_THE_UNINVITED_GUEST:
+            player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_3);
+            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_4, false);
+            break;
+        case QUEST_LIFE_SAVINGS:
+            player->CastSpell(player, SPELL_LIFE_SAVINGS_QUEST_COMPLETE, false);
+            player->SendMovieStart(22);
+            break;
         }
 
         return true;
@@ -5577,15 +5577,15 @@ public:
     {
         switch (creature->GetPhaseMask())
         {
-            case 2048:
-                player->SEND_GOSSIP_MENU(15808, creature->GetGUID());
-                return true;
-            case 28672:
-                player->PrepareQuestMenu(creature->GetGUID());
-                player->SEND_GOSSIP_MENU(17818, creature->GetGUID());
-                return true;
-            default:
-                return false;
+        case 2048:
+            player->SEND_GOSSIP_MENU(15808, creature->GetGUID());
+            return true;
+        case 28672:
+            player->PrepareQuestMenu(creature->GetGUID());
+            player->SEND_GOSSIP_MENU(17818, creature->GetGUID());
+            return true;
+        default:
+            return false;
         }
     }
 
@@ -5610,58 +5610,58 @@ public:
 
                 switch (me->GetPhaseMask())
                 {
-                    case 1:
+                case 1:
                     {
-                              uint32 roll = urand(0, 7);
+                        uint32 roll = urand(0, 7);
 
-                              switch (roll)
-                              {
-                                  case 0:
-                                  case 1:
-                                  case 2:
-                                  {
-                                            Map::PlayerList const &lPlayers = me->GetMap()->GetPlayers();
+                        switch (roll)
+                        {
+                        case 0:
+                        case 1:
+                        case 2:
+                            {
+                                Map::PlayerList const &lPlayers = me->GetMap()->GetPlayers();
 
-                                            if (lPlayers.isEmpty())
-                                                return;
+                                if (lPlayers.isEmpty())
+                                    return;
 
-                                            for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                                            if (Player* player = itr->getSource())
-                                            if (player->GetPhaseMask() == 1)
-                                                me->DoPersonalScriptText(GALLYWIX_RANDOM_YELL_FIRST_PHASE - roll, player);
-                                  }
-                                      break;
-                                  case 3:
-                                  {
-                                            Map::PlayerList const &lPlayers = me->GetMap()->GetPlayers();
+                                for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                                    if (Player* player = itr->getSource())
+                                        if (player->GetPhaseMask() == 1)
+                                            me->DoPersonalScriptText(GALLYWIX_RANDOM_YELL_FIRST_PHASE - roll, player);
+                            }
+                            break;
+                        case 3:
+                            {
+                                Map::PlayerList const &lPlayers = me->GetMap()->GetPlayers();
 
-                                            if (lPlayers.isEmpty())
-                                                return;
+                                if (lPlayers.isEmpty())
+                                    return;
 
-                                            for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                                            if (Player* player = itr->getSource())
-                                            if (player->GetPhaseMask() == 1 && player->GetQuestStatus(QUEST_FOURTH_AND_GOAL) != QUEST_STATUS_COMPLETE)
-                                                me->DoPersonalScriptText(GALLYWIX_RANDOM_YELL_FIRST_PHASE - roll, player);
-                                  }
-                                      break;
-                                  default:
-                                      DoScriptText(GALLYWIX_RANDOM_YELL_FIRST_PHASE - roll, me);
-                                      break;
-                              }
+                                for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                                    if (Player* player = itr->getSource())
+                                        if (player->GetPhaseMask() == 1 && player->GetQuestStatus(QUEST_FOURTH_AND_GOAL) != QUEST_STATUS_COMPLETE)
+                                            me->DoPersonalScriptText(GALLYWIX_RANDOM_YELL_FIRST_PHASE - roll, player);
+                            }
+                            break;
+                        default:
+                            DoScriptText(GALLYWIX_RANDOM_YELL_FIRST_PHASE - roll, me);
+                            break;
+                        }
                     }
-                        break;
-                    case 2048:
+                    break;
+                case 2048:
                     {
-                                 uint32 roll = urand(0, 5);
-                                 DoScriptText(GALLYWIX_RANDOM_YELL_SECOND_PHASE - roll, me);
+                        uint32 roll = urand(0, 5);
+                        DoScriptText(GALLYWIX_RANDOM_YELL_SECOND_PHASE - roll, me);
                     }
-                        break;
-                    case 12288:
+                    break;
+                case 12288:
                     {
-                                  uint32 roll = urand(2, 5);
-                                  DoScriptText(GALLYWIX_RANDOM_YELL_SECOND_PHASE - roll, me);
+                        uint32 roll = urand(2, 5);
+                        DoScriptText(GALLYWIX_RANDOM_YELL_SECOND_PHASE - roll, me);
                     }
-                        break;
+                    break;
                 }
             } else
                 uiYellTimer -= diff;
@@ -5710,13 +5710,13 @@ public:
 
             switch (me->GetEntry())
             {
-                case NPC_GOBLIN_SUPERMODEL_2:
-                    uiTargetEntry = NPC_GOBLIN_SUPERMODEL;
-                    if (Creature* bunny = Unit::GetCreature(*me, uiHoseBunnyGUID))
-                    {
-                        bunny->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, me->GetGUID());
-                        bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_GAS_FIGHTER_GAS_HOSE);
-                    } else
+            case NPC_GOBLIN_SUPERMODEL_2:
+                uiTargetEntry = NPC_GOBLIN_SUPERMODEL;
+                if (Creature* bunny = Unit::GetCreature(*me, uiHoseBunnyGUID))
+                {
+                    bunny->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, me->GetGUID());
+                    bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_GAS_FIGHTER_GAS_HOSE);
+                } else
                     if (Creature* bunny = me->SummonCreature(NPC_ELM_GENERAL_PURPOSE_BUNNY, -8067.288f, 1503.156f, 10.37352f, 0.0f))
                     {
                         uiHoseBunnyGUID = bunny->GetGUID();
@@ -5724,13 +5724,13 @@ public:
                         bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_GAS_FIGHTER_GAS_HOSE);
                     }
                     break;
-                case NPC_GOBLIN_SUPERMODEL_3:
-                    uiTargetEntry = NPC_GOBLIN_SUPERMODEl_4;
-                    if (Creature* bunny = Unit::GetCreature(*me, uiHoseBunnyGUID))
-                    {
-                        bunny->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, me->GetGUID());
-                        bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_GAS_FIGHTER_GAS_HOSE);
-                    } else
+            case NPC_GOBLIN_SUPERMODEL_3:
+                uiTargetEntry = NPC_GOBLIN_SUPERMODEl_4;
+                if (Creature* bunny = Unit::GetCreature(*me, uiHoseBunnyGUID))
+                {
+                    bunny->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, me->GetGUID());
+                    bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_GAS_FIGHTER_GAS_HOSE);
+                } else
                     if (Creature* bunny = me->SummonCreature(NPC_ELM_GENERAL_PURPOSE_BUNNY, -8067.618f, 1494.582f, 10.49888f, 0.0f))
                     {
                         uiHoseBunnyGUID = bunny->GetGUID();
@@ -5738,13 +5738,13 @@ public:
                         bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_GAS_FIGHTER_GAS_HOSE);
                     }
                     break;
-                case NPC_GOBLIN_SUPERMODEl_4:
-                    uiTargetEntry = NPC_GOBLIN_SUPERMODEL_3;
-                    if (Creature* bunny = Unit::GetCreature(*me, uiHoseBunnyGUID))
-                    {
-                        bunny->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, me->GetGUID());
-                        bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_GAS_FIGHTER_GAS_HOSE);
-                    } else
+            case NPC_GOBLIN_SUPERMODEl_4:
+                uiTargetEntry = NPC_GOBLIN_SUPERMODEL_3;
+                if (Creature* bunny = Unit::GetCreature(*me, uiHoseBunnyGUID))
+                {
+                    bunny->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, me->GetGUID());
+                    bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_GAS_FIGHTER_GAS_HOSE);
+                } else
                     if (Creature* bunny = me->SummonCreature(NPC_ELM_GENERAL_PURPOSE_BUNNY, -8067.885f, 1485.495f, 10.51868f, 0.0f))
                     {
                         uiHoseBunnyGUID = bunny->GetGUID();
@@ -5752,13 +5752,13 @@ public:
                         bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_GAS_FIGHTER_GAS_HOSE);
                     }
                     break;
-                case NPC_GOBLIN_SUPERMODEL:
-                    uiTargetEntry = NPC_GOBLIN_SUPERMODEL_2;
-                    if (Creature* bunny = Unit::GetCreature(*me, uiHoseBunnyGUID))
-                    {
-                        bunny->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, me->GetGUID());
-                        bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_GAS_FIGHTER_GAS_HOSE);
-                    } else
+            case NPC_GOBLIN_SUPERMODEL:
+                uiTargetEntry = NPC_GOBLIN_SUPERMODEL_2;
+                if (Creature* bunny = Unit::GetCreature(*me, uiHoseBunnyGUID))
+                {
+                    bunny->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, me->GetGUID());
+                    bunny->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_GAS_FIGHTER_GAS_HOSE);
+                } else
                     if (Creature* bunny = me->SummonCreature(NPC_ELM_GENERAL_PURPOSE_BUNNY, -8067.641f, 1494.582f, 10.52287f, 0.0f))
                     {
                         uiHoseBunnyGUID = bunny->GetGUID();
@@ -5775,26 +5775,26 @@ public:
                 return;
 
             for (std::list<Creature*>::const_iterator itr = lTargets.begin(); itr != lTargets.end(); ++itr)
-            if ((*itr)->GetPhaseMask() == 15)
-            if (Creature* target = (*itr))
-            {
-                float x, y, z, o;
-                target->GetPosition(x, y, z, o);
+                if ((*itr)->GetPhaseMask() == 15)
+                    if (Creature* target = (*itr))
+                    {
+                        float x, y, z, o;
+                        target->GetPosition(x, y, z, o);
 
-                if (Creature* bunny = Unit::GetCreature(*me, uiStreamBunnyGUID))
-                {
-                    bunny->GetMotionMaster()->MoveFollow(target, 0.0f, 0);
-                    me->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, bunny->GetGUID());
-                    me->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_GAS_FIGHTER_GAS_STREAM);
-                } else
-                if (Creature* bunny = me->SummonCreature(NPC_ELM_GENERAL_PURPOSE_BUNNY_NOT_FLOATING, x, y, z, o))
-                {
-                    uiStreamBunnyGUID = bunny->GetGUID();
-                    bunny->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
-                    me->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, bunny->GetGUID());
-                    me->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_GAS_FIGHTER_GAS_STREAM);
-                }
-            }
+                        if (Creature* bunny = Unit::GetCreature(*me, uiStreamBunnyGUID))
+                        {
+                            bunny->GetMotionMaster()->MoveFollow(target, 0.0f, 0);
+                            me->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, bunny->GetGUID());
+                            me->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_GAS_FIGHTER_GAS_STREAM);
+                        } else
+                            if (Creature* bunny = me->SummonCreature(NPC_ELM_GENERAL_PURPOSE_BUNNY_NOT_FLOATING, x, y, z, o))
+                            {
+                                uiStreamBunnyGUID = bunny->GetGUID();
+                                bunny->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
+                                me->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, bunny->GetGUID());
+                                me->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_GAS_FIGHTER_GAS_STREAM);
+                            }
+                    }
         }
 
         void UpdateAI(const uint32 diff)
@@ -5823,7 +5823,7 @@ public:
     {
         PrepareSpellScript(spell_kaja_kola_SpellScript)
 
-        void RandomIdea(SpellEffIndex effIndex)
+            void RandomIdea(SpellEffIndex effIndex)
         {
             Player* player = NULL;
 
@@ -5872,8 +5872,8 @@ public:
                 return;
 
             if (!me->isSummon())
-            if (Creature* brute = me->SummonCreature(NPC_BRUTE_ENFORCER, -8451.56f, 1249.52f, 57.3227f, 4.24208f))
-                uiBruteGUID = brute->GetGUID();
+                if (Creature* brute = me->SummonCreature(NPC_BRUTE_ENFORCER, -8451.56f, 1249.52f, 57.3227f, 4.24208f))
+                    uiBruteGUID = brute->GetGUID();
         }
 
         std::list<Psc_t> lPlayers;
@@ -5882,8 +5882,8 @@ public:
         bool CanSay(uint64 uiPlayerGUID)
         {
             for (std::list<Psc_t>::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-            if (itr->uiPlayerGUID == uiPlayerGUID)
-                return false;
+                if (itr->uiPlayerGUID == uiPlayerGUID)
+                    return false;
 
             return true;
         }
@@ -5911,28 +5911,28 @@ public:
             if (me->isSummon())
             {
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                if (Creature* brute = summoner->ToCreature())
-                if (!CAST_AI(npc_brute_enforcerAI, brute->AI())->CanSay(uiPlayerGUID))
-                    return;
+                    if (Creature* brute = summoner->ToCreature())
+                        if (!CAST_AI(npc_brute_enforcerAI, brute->AI())->CanSay(uiPlayerGUID))
+                            return;
 
                 for (std::list<Psc_t>::iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                if (itr->uiPlayerGUID == uiPlayerGUID)
-                {
-                    if (itr->uiEventMask != CAN_SAY)
-                        return;
+                    if (itr->uiPlayerGUID == uiPlayerGUID)
+                    {
+                        if (itr->uiEventMask != CAN_SAY)
+                            return;
 
-                    (*itr).uiEventMask = SAID;
-                    uint8 roll = urand(0, 3);
-                    me->DoPersonalScriptText(BRUTE_ENFORCER_SECOND_RANDOM_SAY - roll, player);
-                }
+                        (*itr).uiEventMask = SAID;
+                        uint8 roll = urand(0, 3);
+                        me->DoPersonalScriptText(BRUTE_ENFORCER_SECOND_RANDOM_SAY - roll, player);
+                    }
             } else
             {
                 if (!CanSay(uiPlayerGUID))
                     return;
 
                 if (Creature* brute = Unit::GetCreature(*me, uiBruteGUID))
-                if (!CAST_AI(npc_brute_enforcerAI, brute->AI())->CanSay(uiPlayerGUID))
-                    return;
+                    if (!CAST_AI(npc_brute_enforcerAI, brute->AI())->CanSay(uiPlayerGUID))
+                        return;
 
                 uint8 roll = urand(0, 3);
                 me->DoPersonalScriptText(BRUTE_ENFORCER_FIRST_RANDOM_SAY - roll, player);
@@ -5947,37 +5947,37 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (!lPlayers.empty())
-            for (std::list<Psc_t>::iterator itr = lPlayers.begin(); itr != lPlayers.end();)
-            {
-                if ((*itr).uiEventMask == CAN_SAY)
+                for (std::list<Psc_t>::iterator itr = lPlayers.begin(); itr != lPlayers.end();)
                 {
-                    ++itr;
-                    continue;
-                }
-
-                if ((*itr).uiEventTimer <= diff)
-                {
-                    if (Creature* brute = Unit::GetCreature(*me, uiBruteGUID))
+                    if ((*itr).uiEventMask == CAN_SAY)
                     {
-                        Psc_t new_psc;
-                        new_psc.uiEventMask = CAN_SAY;
-                        new_psc.uiPlayerGUID = (*itr).uiPlayerGUID;
-                        new_psc.uiEventTimer = urand(20000, 40000);
-                        CAST_AI(npc_brute_enforcerAI, brute->AI())->lPlayers.push_back(new_psc);
+                        ++itr;
+                        continue;
                     }
 
-                    itr = lPlayers.erase(itr);
-                } else
-                {
-                    (*itr).uiEventTimer -= diff;
-                    ++itr;
+                    if ((*itr).uiEventTimer <= diff)
+                    {
+                        if (Creature* brute = Unit::GetCreature(*me, uiBruteGUID))
+                        {
+                            Psc_t new_psc;
+                            new_psc.uiEventMask = CAN_SAY;
+                            new_psc.uiPlayerGUID = (*itr).uiPlayerGUID;
+                            new_psc.uiEventTimer = urand(20000, 40000);
+                            CAST_AI(npc_brute_enforcerAI, brute->AI())->lPlayers.push_back(new_psc);
+                        }
+
+                        itr = lPlayers.erase(itr);
+                    } else
+                    {
+                        (*itr).uiEventTimer -= diff;
+                        ++itr;
+                    }
                 }
-            }
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -6000,24 +6000,24 @@ public:
             player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_6, false);
 
         if (!lControls.empty())
-        for (std::list<Creature*>::iterator itr = lControls.begin(); itr != lControls.end();)
-        if (Creature* generator = (*itr))
-        {
-            player->m_Controlled.erase(generator);
-            itr = lControls.erase(itr);
-            generator->DespawnOrUnsummon();
-        } else
-            ++itr;
+            for (std::list<Creature*>::iterator itr = lControls.begin(); itr != lControls.end();)
+                if (Creature* generator = (*itr))
+                {
+                    player->m_Controlled.erase(generator);
+                    itr = lControls.erase(itr);
+                    generator->DespawnOrUnsummon();
+                } else
+                    ++itr;
 
-        if (Creature* generator = player->SummonCreature(NPC_OVERLOADED_GENERATOR, -8420.861f, 1372.611f, 105.7554f))
-        {
-            player->m_Controlled.insert(generator);
-            generator->SetSeerGUID(player->GetGUID());
-            generator->SetVisible(false);
-            generator->CastSpell(generator, SPELL_OVERLOADED_GENERATOR_VISUAL, false);
-        }
+                if (Creature* generator = player->SummonCreature(NPC_OVERLOADED_GENERATOR, -8420.861f, 1372.611f, 105.7554f))
+                {
+                    player->m_Controlled.insert(generator);
+                    generator->SetSeerGUID(player->GetGUID());
+                    generator->SetVisible(false);
+                    generator->CastSpell(generator, SPELL_OVERLOADED_GENERATOR_VISUAL, false);
+                }
 
-        return false;
+                return false;
     }
 };
 
@@ -6035,24 +6035,24 @@ public:
             player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_6, false);
 
         if (!lControls.empty())
-        for (std::list<Creature*>::iterator itr = lControls.begin(); itr != lControls.end();)
-        if (Creature* leak = (*itr))
-        {
-            player->m_Controlled.erase(leak);
-            itr = lControls.erase(itr);
-            leak->DespawnOrUnsummon();
-        } else
-            ++itr;
+            for (std::list<Creature*>::iterator itr = lControls.begin(); itr != lControls.end();)
+                if (Creature* leak = (*itr))
+                {
+                    player->m_Controlled.erase(leak);
+                    itr = lControls.erase(itr);
+                    leak->DespawnOrUnsummon();
+                } else
+                    ++itr;
 
-        if (Creature* leak = player->SummonCreature(NPC_STOVE_LEAK, -8402.417f, 1371.373f, 105.6856f))
-        {
-            player->m_Controlled.insert(leak);
-            leak->SetSeerGUID(player->GetGUID());
-            leak->SetVisible(false);
-            leak->CastSpell(leak, SPELL_STOVE_LEAK_VISUAL, false);
-        }
+                if (Creature* leak = player->SummonCreature(NPC_STOVE_LEAK, -8402.417f, 1371.373f, 105.6856f))
+                {
+                    player->m_Controlled.insert(leak);
+                    leak->SetSeerGUID(player->GetGUID());
+                    leak->SetVisible(false);
+                    leak->CastSpell(leak, SPELL_STOVE_LEAK_VISUAL, false);
+                }
 
-        return false;
+                return false;
     }
 };
 
@@ -6080,7 +6080,7 @@ public:
     {
         PrepareSpellScript(spell_smoldering_bed_precast_master_SpellScript)
 
-        void Effect(SpellEffIndex effIndex)
+            void Effect(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
 
@@ -6096,22 +6096,22 @@ public:
             player->GetAllMinionsByEntry(lControls, NPC_SMOLDERING_BED);
 
             if (!lControls.empty())
-            for (std::list<Creature*>::iterator itr = lControls.begin(); itr != lControls.end();)
-            if (Creature* bed = (*itr))
-            {
-                player->m_Controlled.erase(bed);
-                itr = lControls.erase(itr);
-                bed->DespawnOrUnsummon();
-            } else
-                ++itr;
+                for (std::list<Creature*>::iterator itr = lControls.begin(); itr != lControls.end();)
+                    if (Creature* bed = (*itr))
+                    {
+                        player->m_Controlled.erase(bed);
+                        itr = lControls.erase(itr);
+                        bed->DespawnOrUnsummon();
+                    } else
+                        ++itr;
 
-            if (Creature* bed = player->SummonCreature(NPC_SMOLDERING_BED, -8402.31f, 1363.601f, 118.27f))
-            {
-                player->m_Controlled.insert(bed);
-                bed->SetSeerGUID(player->GetGUID());
-                bed->SetVisible(false);
-                bed->CastSpell(bed, SPELL_SMOLDERING_BED_VISUAL, false);
-            }
+                    if (Creature* bed = player->SummonCreature(NPC_SMOLDERING_BED, -8402.31f, 1363.601f, 118.27f))
+                    {
+                        player->m_Controlled.insert(bed);
+                        bed->SetSeerGUID(player->GetGUID());
+                        bed->SetVisible(false);
+                        bed->CastSpell(bed, SPELL_SMOLDERING_BED_VISUAL, false);
+                    }
         }
 
         void Register()
@@ -6141,44 +6141,44 @@ public:
         QuestStatusData& q_status = itr->second;
 
         if (q_status.Status == QUEST_STATUS_INCOMPLETE)
-        for (int i = 0; i < 3; ++i)
-        if (q_status.CreatureOrGOCount[i] != 1)
-            return false;
+            for (int i = 0; i < 3; ++i)
+                if (q_status.CreatureOrGOCount[i] != 1)
+                    return false;
 
         std::list<Creature*> lControls;
         player->GetAllMinionsByEntry(lControls, NPC_GASBOT);
 
         if (!lControls.empty())
-        for (std::list<Creature*>::iterator itr = lControls.begin(); itr != lControls.end();)
-        if (Creature* gasbot = (*itr))
-        {
-            player->m_Controlled.erase(gasbot);
-            itr = lControls.erase(itr);
-            gasbot->DespawnOrUnsummon();
-        } else
-            ++itr;
+            for (std::list<Creature*>::iterator itr = lControls.begin(); itr != lControls.end();)
+                if (Creature* gasbot = (*itr))
+                {
+                    player->m_Controlled.erase(gasbot);
+                    itr = lControls.erase(itr);
+                    gasbot->DespawnOrUnsummon();
+                } else
+                    ++itr;
 
-        if (Creature* gasbot = player->SummonCreature(NPC_GASBOT, -8424.346f, 1328.036f, 102.0427f, 1.570796f))
-        {
-            player->m_Controlled.insert(gasbot);
-            gasbot->SetSeerGUID(player->GetGUID());
-            gasbot->SetVisible(false);
-            float x, y, z;
-            gasbot->GetPosition(x, y, z);
+                if (Creature* gasbot = player->SummonCreature(NPC_GASBOT, -8424.346f, 1328.036f, 102.0427f, 1.570796f))
+                {
+                    player->m_Controlled.insert(gasbot);
+                    gasbot->SetSeerGUID(player->GetGUID());
+                    gasbot->SetVisible(false);
+                    float x, y, z;
+                    gasbot->GetPosition(x, y, z);
 
-            if (Vehicle* vehicle = gasbot->GetVehicleKit())
-            for (int i = 0; i < 4; ++i)
-            if (Creature* target = gasbot->SummonCreature(NPC_GASBOT_GAS_TARGET, x, y, z))
-            {
-                target->SetSeerGUID(player->GetGUID());
-                target->SetVisible(false);
-                target->EnterVehicle(gasbot, i);
-            }
+                    if (Vehicle* vehicle = gasbot->GetVehicleKit())
+                        for (int i = 0; i < 4; ++i)
+                            if (Creature* target = gasbot->SummonCreature(NPC_GASBOT_GAS_TARGET, x, y, z))
+                            {
+                                target->SetSeerGUID(player->GetGUID());
+                                target->SetVisible(false);
+                                target->EnterVehicle(gasbot, i);
+                            }
 
-            gasbot->CastSpell(gasbot, SPELL_GASBOT_GAS_STREAM, false);
-        }
+                            gasbot->CastSpell(gasbot, SPELL_GASBOT_GAS_STREAM, false);
+                }
 
-        return true;
+                return true;
     }
 };
 
@@ -6224,14 +6224,14 @@ public:
             player->GetAllMinionsByEntry(lControls, uiControledEntry);
 
             if (!lControls.empty())
-            for (std::list<Creature*>::iterator itr = lControls.begin(); itr != lControls.end();)
-            if (Creature* controled = (*itr))
-            {
-                player->m_Controlled.erase(controled);
-                itr = lControls.erase(itr);
-                controled->DespawnOrUnsummon();
-            } else
-                ++itr;
+                for (std::list<Creature*>::iterator itr = lControls.begin(); itr != lControls.end();)
+                    if (Creature* controled = (*itr))
+                    {
+                        player->m_Controlled.erase(controled);
+                        itr = lControls.erase(itr);
+                        controled->DespawnOrUnsummon();
+                    } else
+                        ++itr;
         }
 
         void WaypointReached(uint32 point)
@@ -6241,8 +6241,8 @@ public:
                 Player* player = NULL;
 
                 if (me->isSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    player = summoner->ToPlayer();
+                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                        player = summoner->ToPlayer();
 
                 if (!player)
                     return;
@@ -6251,10 +6251,10 @@ public:
                 player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_7, false);
 
                 if (Vehicle* vehicle = me->GetVehicleKit())
-                for (int i = 0; i < 4; ++i)
-                if (Unit* passenger = vehicle->GetPassenger(i))
-                if (Creature* target = passenger->ToCreature())
-                    target->DespawnOrUnsummon();
+                    for (int i = 0; i < 4; ++i)
+                        if (Unit* passenger = vehicle->GetPassenger(i))
+                            if (Creature* target = passenger->ToCreature())
+                                target->DespawnOrUnsummon();
 
                 DespawnPlayerControled(player, NPC_OVERLOADED_GENERATOR);
                 DespawnPlayerControled(player, NPC_STOVE_LEAK);
@@ -6274,32 +6274,32 @@ public:
             npc_escortAI::UpdateAI(diff);
 
             if (Say)
-            if (uiSayTimer <= diff)
-            {
-                Say = false;
-                uiSayTimer = 500;
+                if (uiSayTimer <= diff)
+                {
+                    Say = false;
+                    uiSayTimer = 500;
 
-                if (me->isSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                if (Player* player = summoner->ToPlayer())
-                if (Creature* claims_adjuster = player->FindNearestCreature(NPC_CLAIMS_ADJUSTER, 75.0f))
-                    claims_adjuster->DoPersonalScriptText(CLAIMS_ADJUSTER_YELL_VICTIM, player);
-            } else
-                uiSayTimer -= diff;
+                    if (me->isSummon())
+                        if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                            if (Player* player = summoner->ToPlayer())
+                                if (Creature* claims_adjuster = player->FindNearestCreature(NPC_CLAIMS_ADJUSTER, 75.0f))
+                                    claims_adjuster->DoPersonalScriptText(CLAIMS_ADJUSTER_YELL_VICTIM, player);
+                } else
+                    uiSayTimer -= diff;
 
-            if (Go)
-            if (uiGoTimer <= diff)
-            {
-                Go = false;
-                uiGoTimer = 1500;
-                Start(false);
-            } else
-                uiGoTimer -= diff;
+                if (Go)
+                    if (uiGoTimer <= diff)
+                    {
+                        Go = false;
+                        uiGoTimer = 1500;
+                        Start(false);
+                    } else
+                        uiGoTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                    if (!UpdateVictim())
+                        return;
 
-            DoMeleeAttackIfReady();
+                    DoMeleeAttackIfReady();
         }
     };
 };
@@ -6333,40 +6333,40 @@ public:
         {
             switch (point)
             {
-                case 61:
-                    Event = true;
-                    if (me->isSummon())
+            case 61:
+                Event = true;
+                if (me->isSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    if (Player* player = summoner->ToPlayer())
-                    if (Vehicle* vehicle = me->GetVehicleKit())
-                    if (Unit* passenger = vehicle->GetPassenger(0))
-                    if (Creature* sassy = passenger->ToCreature())
-                        sassy->DoPersonalScriptText(SASSY_SAY_GO_AROUND, player);
-                    break;
-                case 125:
-                    me->CastSpell(me, SPELL_HOT_ROD_SKID, false);
-                    break;
-                case 126:
-                    Event = true;
-                    uiEventPhase = 2;
-                    uiEventTimer = 3500;
-                    if (Vehicle* vehicle = me->GetVehicleKit())
-                    {
-                        if (Unit* passenger = vehicle->GetPassenger(1))
-                            passenger->ExitVehicle();
-
-                        if (me->isSummon())
-                        if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         if (Player* player = summoner->ToPlayer())
-                        {
-                            if (Unit* passenger = vehicle->GetPassenger(0))
-                                passenger->DoPersonalScriptText(SASSY_SAY_OH_NO, player);
+                            if (Vehicle* vehicle = me->GetVehicleKit())
+                                if (Unit* passenger = vehicle->GetPassenger(0))
+                                    if (Creature* sassy = passenger->ToCreature())
+                                        sassy->DoPersonalScriptText(SASSY_SAY_GO_AROUND, player);
+                break;
+            case 125:
+                me->CastSpell(me, SPELL_HOT_ROD_SKID, false);
+                break;
+            case 126:
+                Event = true;
+                uiEventPhase = 2;
+                uiEventTimer = 3500;
+                if (Vehicle* vehicle = me->GetVehicleKit())
+                {
+                    if (Unit* passenger = vehicle->GetPassenger(1))
+                        passenger->ExitVehicle();
 
-                            player->CompleteQuest(QUEST_LIFE_SAVINGS);
-                            player->SaveToDB();
-
-                            switch (player->getGender())
+                    if (me->isSummon())
+                        if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                            if (Player* player = summoner->ToPlayer())
                             {
+                                if (Unit* passenger = vehicle->GetPassenger(0))
+                                    passenger->DoPersonalScriptText(SASSY_SAY_OH_NO, player);
+
+                                player->CompleteQuest(QUEST_LIFE_SAVINGS);
+                                player->SaveToDB();
+
+                                switch (player->getGender())
+                                {
                                 case GENDER_MALE:
                                     if (Creature* candy_cane = me->FindNearestCreature(NPC_CANDY_CANE, 30.0f))
                                     {
@@ -6385,10 +6385,10 @@ public:
                                         CAST_AI(npc_chip_endale::npc_chip_endaleAI, chip_endale->AI())->lPlayers.push_back(new_psc);
                                     }
                                     break;
+                                }
                             }
-                        }
-                    }
-                    break;
+                }
+                break;
             }
         }
 
@@ -6402,33 +6402,33 @@ public:
                 uiCastTimer -= diff;
 
             if (Event)
-            if (uiEventTimer <= diff)
-            {
-                Event = false;
-                uiEventTimer = 1000;
-
-                if (uiEventPhase == 1)
+                if (uiEventTimer <= diff)
                 {
-                    if (me->isSummon())
-                    if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                    if (Player* player = summoner->ToPlayer())
-                    if (Vehicle* vehicle = me->GetVehicleKit())
-                    if (Unit* passenger = vehicle->GetPassenger(0))
-                    if (Creature* sassy = passenger->ToCreature())
-                        sassy->DoPersonalScriptText(SASSY_YELL_OUT_OF_THE_WAY, player);
+                    Event = false;
+                    uiEventTimer = 1000;
+
+                    if (uiEventPhase == 1)
+                    {
+                        if (me->isSummon())
+                            if (Unit* summoner = me->ToTempSummon()->GetSummoner())
+                                if (Player* player = summoner->ToPlayer())
+                                    if (Vehicle* vehicle = me->GetVehicleKit())
+                                        if (Unit* passenger = vehicle->GetPassenger(0))
+                                            if (Creature* sassy = passenger->ToCreature())
+                                                sassy->DoPersonalScriptText(SASSY_YELL_OUT_OF_THE_WAY, player);
+                    } else
+                    {
+                        if (Vehicle* vehicle = me->GetVehicleKit())
+                            if (Unit* passenger = vehicle->GetPassenger(0))
+                                if (Creature* sassy = passenger->ToCreature())
+                                    sassy->DespawnOrUnsummon();
+
+                        me->DespawnOrUnsummon();
+                    }
                 } else
-                {
-                    if (Vehicle* vehicle = me->GetVehicleKit())
-                    if (Unit* passenger = vehicle->GetPassenger(0))
-                    if (Creature* sassy = passenger->ToCreature())
-                        sassy->DespawnOrUnsummon();
+                    uiEventTimer -= diff;
 
-                    me->DespawnOrUnsummon();
-                }
-            } else
-                uiEventTimer -= diff;
-
-            npc_vehicle_escortAI::UpdateAI(diff);
+                npc_vehicle_escortAI::UpdateAI(diff);
         }
     };
 };
@@ -6476,19 +6476,19 @@ public:
         void UpdateAI(const uint32 diff)
         {
             if (uiKnockbackData == DATA_KNOCKBACK_KNOCKBACK)
-            if (uiKnockbackTimer <= diff)
-            {
-                uiKnockbackTimer = 5000;
-                uiKnockbackData = DATA_KNOCKBACK_NONE;
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
-                me->GetMotionMaster()->MoveTargetedHome();
-            } else
-                uiKnockbackTimer -= diff;
+                if (uiKnockbackTimer <= diff)
+                {
+                    uiKnockbackTimer = 5000;
+                    uiKnockbackData = DATA_KNOCKBACK_NONE;
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
+                    me->GetMotionMaster()->MoveTargetedHome();
+                } else
+                    uiKnockbackTimer -= diff;
 
-            if (!UpdateVictim())
-                return;
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
         }
     };
 };
@@ -6502,7 +6502,7 @@ public:
     {
         PrepareSpellScript(spell_ls_hot_rod_knockback_SpellScript)
 
-        void Knockback(SpellEffIndex effIndex)
+            void Knockback(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
 
@@ -6529,14 +6529,14 @@ public:
 
             switch (creature->GetEntry())
             {
-                case NPC_VILLA_MOOK:
-                    creature->KnockbackFrom(x, y, 7.0f, 10.0f);
-                    CAST_AI(npc_villa_mook_ls::npc_villa_mook_lsAI, creature->AI())->MoveKnockback(hotrod);
-                    break;
-                default:
-                    creature->KnockbackFrom(x, y, 15.0f, 10.0f);
-                    CAST_AI(npc_kezan_citizen::npc_kezan_citizenAI, creature->AI())->MoveKnockback(hotrod);
-                    break;
+            case NPC_VILLA_MOOK:
+                creature->KnockbackFrom(x, y, 7.0f, 10.0f);
+                CAST_AI(npc_villa_mook_ls::npc_villa_mook_lsAI, creature->AI())->MoveKnockback(hotrod);
+                break;
+            default:
+                creature->KnockbackFrom(x, y, 15.0f, 10.0f);
+                CAST_AI(npc_kezan_citizen::npc_kezan_citizenAI, creature->AI())->MoveKnockback(hotrod);
+                break;
             }
         }
 
@@ -6546,9 +6546,62 @@ public:
         }
     };
 
-    SpellScript *GetSpellScript() const
+    SpellScript* GetSpellScript() const
     {
         return new spell_ls_hot_rod_knockback_SpellScript();
+    }
+};
+
+class spell_radio : public SpellScriptLoader
+{
+public:
+    spell_radio() : SpellScriptLoader("spell_radio") { }
+
+    class  spell_radioSpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_radioSpellScript);
+
+        bool Validate(SpellInfo const* spellEntry)
+        {
+            st = false;
+            return true;
+        }
+
+        bool Load()
+        {
+            return true;
+        }
+
+        void SendPacketToPlayers(WorldPacket const* data, Player* player) const
+        {
+            player->GetSession()->SendPacket(data);
+        }
+
+        void HandleOnHit()
+        {
+            if (st)
+                return;
+
+            if (Unit* caster = GetCaster()->GetOwner())
+            {
+                if (caster->GetTypeId() == TYPEID_PLAYER)
+                    GetCaster()->PlayDistanceSound(RADIO, caster->ToPlayer());
+                st = true;
+            }
+        }
+
+    private:
+        bool st;
+
+        void Register()
+        {
+            OnHit += SpellHitFn(spell_radioSpellScript::HandleOnHit);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_radioSpellScript();
     }
 };
 
@@ -6663,6 +6716,7 @@ void AddSC_kezan()
     new spell_smoldering_bed_precast_master();
     new spell_ls_hot_rod_knockback();
     new spell_kick_footbomb();
+    new spell_radio();
 
     new item_keys_to_the_hot_rod();
 }
