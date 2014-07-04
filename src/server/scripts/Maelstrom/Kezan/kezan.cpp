@@ -6584,9 +6584,9 @@ public:
 
             if (Unit* caster = GetCaster()->GetOwner())
             {
-                if (caster->GetTypeId() == TYPEID_PLAYER)
-                    GetCaster()->PlayDistanceSound(RADIO, caster->ToPlayer());
-                st = true;
+                //if (caster->GetTypeId() == TYPEID_PLAYER)
+                //    GetCaster()->PlayDistanceSound(RADIO, caster->ToPlayer());
+                //st = true;
             }
         }
 
