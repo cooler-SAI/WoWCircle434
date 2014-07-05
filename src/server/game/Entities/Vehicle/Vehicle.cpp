@@ -554,3 +554,17 @@ void Vehicle::CalculatePassengerOffset(float& x, float& y, float& z, float& o)
     y = (iny - inx * tan(GetBase()->GetOrientation())) / (cos(GetBase()->GetOrientation()) + std::sin(GetBase()->GetOrientation()) * tan(GetBase()->GetOrientation()));
     x = (inx + iny * tan(GetBase()->GetOrientation())) / (cos(GetBase()->GetOrientation()) + std::sin(GetBase()->GetOrientation()) * tan(GetBase()->GetOrientation()));
 }
+
+void Vehicle::TeleportVehicle(float x, float y, float z, float o)
+{
+    vehiclePlayers.clear();
+    for (int8 i = 0; i < 8; i++)
+        if (Unit* player = GetPassenger(i))
+            vehiclePlayers.insert(player->GetGUID());
+
+    RemoveAllPassengers(); // this can unlink Guns from Siege Engines
+    _me->NearTeleportTo(x, y, z, 0);
+    for (GuidSet::const_iterator itr = vehiclePlayers.begin(); itr != vehiclePlayers.end(); ++itr)
+        if (Unit* player = sObjectAccessor->FindUnit(*itr))
+                player->NearTeleportTo(x, y, z, 0);
+}

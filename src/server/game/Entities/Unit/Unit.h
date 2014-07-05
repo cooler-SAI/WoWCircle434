@@ -497,45 +497,48 @@ enum DeathState
 
 enum UnitState
 {
-    UNIT_STATE_DIED            = 0x00000001,                     // player has fake death aura
-    UNIT_STATE_MELEE_ATTACKING = 0x00000002,                     // player is melee attacking someone
-    //UNIT_STATE_MELEE_ATTACK_BY = 0x00000004,                     // player is melee attack by someone
-    UNIT_STATE_STUNNED         = 0x00000008,
-    UNIT_STATE_ROAMING         = 0x00000010,
-    UNIT_STATE_CHASE           = 0x00000020,
-    //UNIT_STATE_SEARCHING       = 0x00000040,
-    UNIT_STATE_FLEEING         = 0x00000080,
-    UNIT_STATE_IN_FLIGHT       = 0x00000100,                     // player is in flight mode
-    UNIT_STATE_FOLLOW          = 0x00000200,
-    UNIT_STATE_ROOT            = 0x00000400,
-    UNIT_STATE_CONFUSED        = 0x00000800,
-    UNIT_STATE_DISTRACTED      = 0x00001000,
-    UNIT_STATE_ISOLATED        = 0x00002000,                     // area auras do not affect other players
-    UNIT_STATE_ATTACK_PLAYER   = 0x00004000,
-    UNIT_STATE_CASTING         = 0x00008000,
-    UNIT_STATE_POSSESSED       = 0x00010000,
-    UNIT_STATE_CHARGING        = 0x00020000,
-    UNIT_STATE_JUMPING         = 0x00040000,
-    UNIT_STATE_ONVEHICLE       = 0x00080000,
-    UNIT_STATE_MOVE            = 0x00100000,
-    UNIT_STATE_ROTATING        = 0x00200000,
-    UNIT_STATE_EVADE           = 0x00400000,
-    UNIT_STATE_ROAMING_MOVE    = 0x00800000,
-    UNIT_STATE_CONFUSED_MOVE   = 0x01000000,
-    UNIT_STATE_FLEEING_MOVE    = 0x02000000,
-    UNIT_STATE_CHASE_MOVE      = 0x04000000,
-    UNIT_STATE_FOLLOW_MOVE     = 0x08000000,
-    UNIT_STATE_UNATTACKABLE    = (UNIT_STATE_IN_FLIGHT | UNIT_STATE_ONVEHICLE),
+    UNIT_STATE_DIED                 = 0x00000001,   // player has fake death aura
+    UNIT_STATE_MELEE_ATTACKING      = 0x00000002,   // player is melee attacking someone
+    //UNIT_STATE_MELEE_ATTACK_BY  = 0x00000004,   // player is melee attack by someone
+    UNIT_STATE_STUNNED              = 0x00000008,
+    UNIT_STATE_ROAMING              = 0x00000010,
+    UNIT_STATE_CHASE                = 0x00000020,
+    //UNIT_STATE_SEARCHING        = 0x00000040,
+    UNIT_STATE_FLEEING              = 0x00000080,
+    UNIT_STATE_IN_FLIGHT            = 0x00000100,   // player is in flight mode
+    UNIT_STATE_FOLLOW               = 0x00000200,
+    UNIT_STATE_ROOT                 = 0x00000400,
+    UNIT_STATE_CONFUSED             = 0x00000800,
+    UNIT_STATE_DISTRACTED           = 0x00001000,
+    UNIT_STATE_ISOLATED             = 0x00002000,   // area auras do not affect other players
+    UNIT_STATE_ATTACK_PLAYER        = 0x00004000,
+    UNIT_STATE_CASTING              = 0x00008000,
+    UNIT_STATE_POSSESSED            = 0x00010000,
+    UNIT_STATE_CHARGING             = 0x00020000,
+    UNIT_STATE_JUMPING              = 0x00040000,
+    UNIT_STATE_ONVEHICLE            = 0x00080000,
+    UNIT_STATE_MOVE                 = 0x00100000,
+    UNIT_STATE_ROTATING             = 0x00200000,
+    UNIT_STATE_EVADE                = 0x00400000,
+    UNIT_STATE_ROAMING_MOVE         = 0x00800000,
+    UNIT_STATE_CONFUSED_MOVE        = 0x01000000,
+    UNIT_STATE_FLEEING_MOVE         = 0x02000000,
+    UNIT_STATE_CHASE_MOVE           = 0x04000000,
+    UNIT_STATE_FOLLOW_MOVE          = 0x08000000,
+    UNIT_STATE_IGNORE_PATHFINDING   = 0x10000000,   // do not use pathfinding in any MovementGenerator
+    UNIT_STATE_IGNORE_UNATTACKABLE  = 0x20000000,   // Force allow attack target with flag: UNIT_STATE_UNATTACKABLE
+    UNIT_STATE_IGNORE_LOS           = 0x40000000,
+    UNIT_STATE_UNATTACKABLE         = (UNIT_STATE_IN_FLIGHT | UNIT_STATE_ONVEHICLE),
     // for real move using movegen check and stop (except unstoppable flight)
-    UNIT_STATE_MOVING          = UNIT_STATE_ROAMING_MOVE | UNIT_STATE_CONFUSED_MOVE | UNIT_STATE_FLEEING_MOVE | UNIT_STATE_CHASE_MOVE | UNIT_STATE_FOLLOW_MOVE ,
-    UNIT_STATE_CONTROLLED      = (UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING),
-    UNIT_STATE_LOST_CONTROL    = (UNIT_STATE_CONTROLLED | UNIT_STATE_JUMPING | UNIT_STATE_CHARGING),
-    UNIT_STATE_SIGHTLESS       = (UNIT_STATE_LOST_CONTROL | UNIT_STATE_EVADE),
-    UNIT_STATE_CANNOT_AUTOATTACK     = (UNIT_STATE_LOST_CONTROL | UNIT_STATE_CASTING),
-    UNIT_STATE_CANNOT_TURN     = (UNIT_STATE_LOST_CONTROL | UNIT_STATE_ROTATING),
+    UNIT_STATE_MOVING               = UNIT_STATE_ROAMING_MOVE | UNIT_STATE_CONFUSED_MOVE | UNIT_STATE_FLEEING_MOVE | UNIT_STATE_CHASE_MOVE | UNIT_STATE_FOLLOW_MOVE ,
+    UNIT_STATE_CONTROLLED           = (UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING),
+    UNIT_STATE_LOST_CONTROL         = (UNIT_STATE_CONTROLLED | UNIT_STATE_JUMPING | UNIT_STATE_CHARGING),
+    UNIT_STATE_SIGHTLESS            = (UNIT_STATE_LOST_CONTROL | UNIT_STATE_EVADE),
+    UNIT_STATE_CANNOT_AUTOATTACK    = (UNIT_STATE_LOST_CONTROL | UNIT_STATE_CASTING),
+    UNIT_STATE_CANNOT_TURN          = (UNIT_STATE_LOST_CONTROL | UNIT_STATE_ROTATING),
     // stay by different reasons
-    UNIT_STATE_NOT_MOVE        = UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DIED | UNIT_STATE_DISTRACTED,
-    UNIT_STATE_ALL_STATE       = 0xffffffff                      //(UNIT_STATE_STOPPED | UNIT_STATE_MOVING | UNIT_STATE_IN_COMBAT | UNIT_STATE_IN_FLIGHT)
+    UNIT_STATE_NOT_MOVE             = UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DIED | UNIT_STATE_DISTRACTED,
+    UNIT_STATE_ALL_STATE            = 0xffffffff                      //(UNIT_STATE_STOPPED | UNIT_STATE_MOVING | UNIT_STATE_IN_COMBAT | UNIT_STATE_IN_FLIGHT)
 };
 
 enum UnitMoveType
@@ -1243,6 +1246,14 @@ enum PlayerTotemType
 #define ATTACK_DISPLAY_DELAY 200
 #define MAX_PLAYER_STEALTH_DETECT_RANGE 30.0f               // max distance for detection targets by player
 
+struct SpellCooldown
+{
+    time_t end;
+    uint16 itemid;
+};
+
+typedef std::map<uint32, SpellCooldown> SpellCooldowns;
+
 struct SpellProcEventEntry;                                 // used only privately
 
 class Unit : public WorldObject
@@ -1629,6 +1640,7 @@ class Unit : public WorldObject
         void CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* victim, bool triggered, Item* castItem = NULL, AuraEffect const* triggeredByAura = NULL, uint64 originalCaster = 0);
         void CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* victim = NULL, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = NULL, AuraEffect const* triggeredByAura = NULL, uint64 originalCaster = 0);
         void CastCustomSpell(uint32 spellId, CustomSpellValues const &value, Unit* victim = NULL, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = NULL, AuraEffect const* triggeredByAura = NULL, uint64 originalCaster = 0);
+        void CastWithDelay(uint32 delay, Unit* victim, uint32 spellid, bool triggered = false, bool repeat = false);
         Aura* AddAura(uint32 spellId, Unit* target);
         Aura* AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target);
         Aura *AddAuraWithModCharges(uint32 spellid, Unit *target, int16 charges);
@@ -2305,6 +2317,8 @@ class Unit : public WorldObject
 
         // Movement info
         Movement::MoveSpline * movespline;
+        inline void DisableMovementFlagUpdate(bool s) { _disableMovementFlagUpdate = s; }
+        inline bool IsMovementFlagUpdateDisable() { return _disableMovementFlagUpdate; }
 
         void OnRelocated();
 
@@ -2337,6 +2351,24 @@ class Unit : public WorldObject
         void removeSimulacrumTarget() { simulacrumTarget = NULL; }
 
         void SpreadAura(uint32 spellId, float radius, bool positive, int8 count = -1, Unit * except = NULL);
+
+        bool HasSpellCooldown(uint32 spell_id) const
+        {
+            SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
+            return itr != m_spellCooldowns.end() && itr->second.end > time(NULL);
+        }
+        void AddSpellCooldown(uint32 spellid, uint32 itemid, time_t end_time);
+        void AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 itemId, Spell* spell = NULL, bool infinityCooldown = false);
+        static uint32 const infinityCooldownDelay = MONTH;  // used for set "infinity cooldowns" for spells and check
+        static uint32 const infinityCooldownDelayCheck = MONTH / 2;
+        uint32 GetSpellCooldownDelay(uint32 spell_id) const
+        {
+            SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
+            time_t t = time(NULL);
+            return uint32(itr != m_spellCooldowns.end() && itr->second.end > t ? itr->second.end - t : 0);
+        }
+        SpellCooldowns m_spellCooldowns;
+        SpellCooldowns const& GetSpellCooldownMap() const { return m_spellCooldowns; }
 
     protected:
         explicit Unit (bool isWorldObject);
@@ -2455,6 +2487,7 @@ class Unit : public WorldObject
 
         uint32 m_rootTimes;
         uint32 m_movementCounters;
+        bool _disableMovementFlagUpdate; // Disable dynamic update movementflag
 
         uint32 m_state;                                     // Even derived shouldn't modify
         uint32 m_CombatTimer;

@@ -6,8 +6,8 @@
 
 static const DoorData doordata[] =
 {
-    {GO_INVISIBLE_FIREWALL_DOOR, DATA_PEROTHARN, DOOR_TYPE_PASSAGE, BOUNDARY_NONE},
-    {0, 0, DOOR_TYPE_ROOM, BOUNDARY_NONE},
+    {GO_INVISIBLE_FIREWALL_DOOR,    DATA_PEROTHARN, DOOR_TYPE_PASSAGE,  BOUNDARY_NONE},
+    {0,                             0,              DOOR_TYPE_ROOM,     BOUNDARY_NONE},
 };
 
 class instance_well_of_eternity : public InstanceMapScript
@@ -150,10 +150,14 @@ public:
         {
             switch (type)
             {
-                case DATA_EVENT_NOZDORMU: return uiEventNozdormu;
-                case DATA_EVENT_DEMON: return uiEventDemon;
-                case DATA_EVENT_ILLIDAN_1: return uiEventIllidan1;
-                default: return 0;
+                case DATA_EVENT_NOZDORMU:
+                    return uiEventNozdormu;
+                case DATA_EVENT_DEMON:
+                    return uiEventDemon;
+                case DATA_EVENT_ILLIDAN_1:
+                    return uiEventIllidan1;
+                default:
+                    return 0;
             }
             return 0;
         }
@@ -162,13 +166,20 @@ public:
         {
             switch (type)
             {
-                case DATA_PEROTHARN: return uiPerotharnGUID;
-                case DATA_ROYAL_CACHE: return uiRoyalCacheGUID;
-                case DATA_MINOR_CACHE: return uiMinorCacheGUID;
-                case DATA_EVENT_ILLIDAN_2: return uiIllidan2GUID;
-                case DATA_VAROTHEN: return uiVarothenGUID;
-                case DATA_MANNOROTH: return uiMannorothGUID;
-                default: return 0;
+                case DATA_PEROTHARN:
+                    return uiPerotharnGUID;
+                case DATA_ROYAL_CACHE:
+                    return uiRoyalCacheGUID;
+                case DATA_MINOR_CACHE:
+                    return uiMinorCacheGUID;
+                case DATA_EVENT_ILLIDAN_2:
+                    return uiIllidan2GUID;
+                case DATA_VAROTHEN:
+                    return uiVarothenGUID;
+                case DATA_MANNOROTH:
+                    return uiMannorothGUID;
+                default:
+                    return 0;
             }
 
             return 0;

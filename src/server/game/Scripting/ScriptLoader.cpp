@@ -776,6 +776,7 @@ void AddScripts()
     AddCommandScripts();
 #ifdef SCRIPTS
     AddWorldScripts();
+    AddMaelstormScripts();
     AddEasternKingdomsScripts();
     AddKalimdorScripts();
     AddOutlandScripts();
@@ -867,6 +868,22 @@ void AddWorldScripts()
     AddSC_tarecgosa_scripts();
     AddSC_fangs_of_father_scripts();
     AddSC_chat_log();
+#endif
+}
+
+void AddMaelstormScripts()
+{
+#ifdef SCRIPTS
+    AddSC_kezan();
+    AddSC_deepholm();
+
+    // The Stonecore
+    AddSC_instance_the_stonecore();
+    AddSC_the_stonecore();
+    AddSC_boss_corborus();
+    AddSC_boss_slabhide();
+    AddSC_boss_ozruk();
+    AddSC_boss_high_priestess_azil();
 #endif
 }
 
@@ -1057,7 +1074,6 @@ void AddEasternKingdomsScripts()
     AddSC_western_plaguelands();
     AddSC_westfall();
     AddSC_wetlands();
-    AddSC_deepholm();
     AddSC_gilneas();
     AddSC_tol_barad();
 #endif
@@ -1153,7 +1169,6 @@ void AddKalimdorScripts()
     AddSC_winterspring();
     AddSC_mount_hyjal(); 
     AddSC_uldum();
-    AddSC_kezan();
 #endif
 }
 
@@ -1444,13 +1459,6 @@ void AddNorthrendScripts()
     AddSC_boss_argaloth();
     AddSC_boss_occuthar();
     AddSC_boss_alizabal();
-
-    AddSC_instance_the_stonecore(); // The Stonecore
-    AddSC_the_stonecore();
-    AddSC_boss_corborus();
-    AddSC_boss_slabhide();
-    AddSC_boss_ozruk();
-    AddSC_boss_high_priestess_azil();
 
     AddSC_instance_grim_batol(); // Grim Batol
     AddSC_grim_batol();

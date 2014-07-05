@@ -217,13 +217,6 @@ namespace WowPacketParser.Parsing.Parsers
                     return;
             }
 
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V5_1_0_16309))
-            {
-                // Not the best way
-                ReadSplineMovement510(ref packet, pos);
-                return;
-            }
-
             if (ClientVersion.AddedInVersion(ClientVersionBuild.V4_2_2_14545))
             {
                 // Not the best way
@@ -413,19 +406,6 @@ namespace WowPacketParser.Parsing.Parsers
             packet.ReadVector3("Position");
             CurrentMapId = (uint) packet.ReadEntryWithName<Int32>(StoreNameType.Map, "Map");
             packet.ReadSingle("Orientation");
-
-            packet.AddSniffData(StoreNameType.Map, (int)CurrentMapId, "NEW_WORLD");
-        }
-
-        [HasSniffData]
-        [Parser(Opcode.SMSG_NEW_WORLD, ClientVersionBuild.V5_1_0_16309)]
-        public static void HandleNewWorld510(Packet packet)
-        {
-            CurrentMapId = (uint)packet.ReadEntryWithName<Int32>(StoreNameType.Map, "Map");
-            packet.ReadSingle("Y");
-            packet.ReadSingle("Orientation");
-            packet.ReadSingle("X");
-            packet.ReadSingle("Z");
 
             packet.AddSniffData(StoreNameType.Map, (int)CurrentMapId, "NEW_WORLD");
         }
@@ -924,67 +904,6 @@ namespace WowPacketParser.Parsing.Parsers
             packet.WriteGuid("Guid", guid);
         }
 
-        [Parser(Opcode.MSG_MOVE_TELEPORT, ClientVersionBuild.V5_1_0_16309)]
-        public static void HandleMoveTeleport510(Packet packet)
-        {
-            var guid = new byte[8];
-            var transGuid = new byte[8];
-            var pos = new Vector4();
-
-            packet.ReadUInt32("Unk");
-
-            pos.X = packet.ReadSingle();
-            pos.Y = packet.ReadSingle();
-            pos.Z = packet.ReadSingle();
-            pos.O = packet.ReadSingle();
-            packet.WriteLine("Destination: {0}", pos);
-
-            guid[3] = packet.ReadBit();
-            guid[1] = packet.ReadBit();
-            guid[7] = packet.ReadBit();
-
-            var bit48 = packet.ReadBit();
-
-            guid[6] = packet.ReadBit();
-
-            if (bit48)
-            {
-                packet.ReadBit("Unk bit 50");
-                packet.ReadBit("Unk bit 51");
-            }
-
-            guid[0] = packet.ReadBit();
-            guid[4] = packet.ReadBit();
-
-            var onTransport = packet.ReadBit("On transport");
-            guid[2] = packet.ReadBit();
-            if (onTransport)
-                transGuid = packet.StartBitStream(7, 5, 2, 1, 0, 4, 3, 6);
-
-            guid[5] = packet.ReadBit();
-
-            if (onTransport)
-            {
-                packet.ParseBitStream(transGuid, 1, 5, 7, 0, 3, 4, 6, 2);
-                packet.WriteGuid("Transport Guid", transGuid);
-            }
-
-            packet.ReadXORByte(guid, 3);
-
-            if (bit48)
-                packet.ReadUInt32("Unk int");
-
-            packet.ReadXORByte(guid, 2);
-            packet.ReadXORByte(guid, 1);
-            packet.ReadXORByte(guid, 7);
-            packet.ReadXORByte(guid, 5);
-            packet.ReadXORByte(guid, 6);
-            packet.ReadXORByte(guid, 4);
-            packet.ReadXORByte(guid, 0);
-
-            packet.WriteGuid("Guid", guid);
-        }
-
         [Parser(Opcode.MSG_MOVE_STOP, ClientVersionBuild.V4_2_2_14545, ClientVersionBuild.V4_3_0_15005)]
         public static void HandleMoveStop422(Packet packet)
         {
@@ -1293,17 +1212,6 @@ namespace WowPacketParser.Parsing.Parsers
             packet.WriteGuid("Guid", guid);
         }
 
-        [Parser(Opcode.SMSG_MOVE_SET_RUN_SPEED, ClientVersionBuild.V5_1_0_16309)]
-        public static void HandleMoveSetRunSpeed510(Packet packet)
-        {
-            var guid = packet.StartBitStream(0, 4, 1, 6, 3, 5, 7, 2);
-            packet.ReadSingle("Speed");
-            packet.ReadXORByte(guid, 7);
-            packet.ReadInt32("Unk Int32");
-            packet.ParseBitStream(guid, 3, 6, 0, 4, 1, 5, 2);
-            packet.WriteGuid("Guid", guid);
-        }
-
         [Parser(Opcode.MSG_MOVE_SET_RUN_SPEED, ClientVersionBuild.V4_2_2_14545)]
         public static void HandleMovementSetRunSpeed422(Packet packet)
         {
@@ -1541,46 +1449,6 @@ namespace WowPacketParser.Parsing.Parsers
                 CurrentPhaseMask = phaseMask;
                 packet.AddSniffData(StoreNameType.Phase, phaseMask, "PHASEMASK 422");
             }
-        }
-
-        [Parser(Opcode.SMSG_SET_PHASE_SHIFT, ClientVersionBuild.V5_1_0_16309)]
-        public static void HandlePhaseShift510(Packet packet)
-        {
-            var guid = packet.StartBitStream(6, 4, 7, 2, 0, 1, 3, 5);
-            packet.ReadXORByte(guid, 4);
-
-            var count = packet.ReadUInt32() / 2;
-            packet.WriteLine("WorldMapArea swap count: {0}", count);
-            for (var i = 0; i < count; ++i)
-                packet.ReadUInt16("WorldMapArea swap", i);
-
-            packet.ReadXORByte(guid, 2);
-            packet.ReadXORByte(guid, 3);
-
-            count = packet.ReadUInt32() / 2;
-            packet.WriteLine("Phases count: {0}", count);
-            for (var i = 0; i < count; ++i)
-                packet.ReadUInt16("Phase id", i); // Phase.dbc
-
-            packet.ReadXORByte(guid, 1);
-            packet.ReadXORByte(guid, 6);
-
-            count = packet.ReadUInt32() / 2;
-            packet.WriteLine("Active Terrain swap count: {0}", count);
-            for (var i = 0; i < count; ++i)
-                packet.ReadEntryWithName<Int16>(StoreNameType.Map, "Active Terrain swap", i);
-
-            packet.ReadUInt32("UInt32");
-            packet.ReadXORByte(guid, 0);
-            packet.ReadXORByte(guid, 7);
-            packet.ReadXORByte(guid, 5);
-
-            count = packet.ReadUInt32() / 2;
-            packet.WriteLine("Inactive Terrain swap count: {0}", count);
-            for (var i = 0; i < count; ++i)
-                packet.ReadEntryWithName<Int16>(StoreNameType.Map, "Inactive Terrain swap", i);
-
-            packet.WriteLine("GUID {0}", new Guid(BitConverter.ToUInt64(guid, 0)));
         }
 
         [Parser(Opcode.SMSG_TRANSFER_PENDING, ClientVersionBuild.Zero, ClientVersionBuild.V4_3_0_15005)]

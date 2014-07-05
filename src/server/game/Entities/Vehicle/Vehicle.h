@@ -55,7 +55,7 @@ class Vehicle : public TransportBase
         void RelocatePassengers();
         void RemoveAllPassengers();
         void Dismiss();
-        void TeleportVehicle(float x, float y, float z, float ang);
+        void TeleportVehicle(float x, float y, float z, float o);
         bool IsVehicleInUse() const;
 
         SeatMap Seats;
@@ -77,5 +77,12 @@ class Vehicle : public TransportBase
         GuidSet vehiclePlayers;
         uint32 _usableSeatNum;         // Number of seats that match VehicleSeatEntry::UsableByPlayer, used for proper display flags
         uint32 _creatureEntry;         // Can be different than me->GetBase()->GetEntry() in case of players
+
+        struct PlayerSeatSave
+        {
+            Player* player;
+            int8 seatId;
+        };
+
 };
 #endif

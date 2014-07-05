@@ -59,18 +59,18 @@ public:
 
         switch (action)
         {
-            case START_TELEPORT:
-                player->CastSpell(player, SPELL_TELEPORT_TO_START, true);
-                player->CLOSE_GOSSIP_MENU();
-                break;
-            case AZSHARA_TELEPORT:
-                player->CastSpell(player, SPELL_TELEPORT_TO_AZSHARA_PALACE, true);
-                player->CLOSE_GOSSIP_MENU();
-                break;
-            case WOE_TELEPORT:
-                player->CastSpell(player, SPELL_TELEPORT_TO_WELL_OF_ETERNITY, true);
-                player->CLOSE_GOSSIP_MENU();
-                break;
+        case START_TELEPORT:
+            player->CastSpell(player, SPELL_TELEPORT_TO_START, true);
+            player->CLOSE_GOSSIP_MENU();
+            break;
+        case AZSHARA_TELEPORT:
+            player->CastSpell(player, SPELL_TELEPORT_TO_AZSHARA_PALACE, true);
+            player->CLOSE_GOSSIP_MENU();
+            break;
+        case WOE_TELEPORT:
+            player->CastSpell(player, SPELL_TELEPORT_TO_WELL_OF_ETERNITY, true);
+            player->CLOSE_GOSSIP_MENU();
+            break;
         }
 
         return true;

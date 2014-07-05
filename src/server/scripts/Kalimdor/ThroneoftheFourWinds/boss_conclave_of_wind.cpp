@@ -1,134 +1,33 @@
-
-#include "ScriptPCH.h"
-#include "Vehicle.h"
-#include "CreatureTextMgr.h"
-
 #include "throne_of_the_four_winds.h"
-
-enum AnshalTalk
-{
-    SAY_ANSHAL_AGGRO = 1, //It shall be I that earns the favor of our lord by casting out the intruders. My calmest wind shall still prove too much for them!
-    SAY_ANSHAL_DEATH,     //Begone, outsider!
-    SAY_ANSHAL_KILL,      //Your presence shall no longer defile our home!
-    SAY_ANSHAL_LOW,       //My power grows feeble, brothers. I shamefully must rely on you for a time.
-    SAY_ANSHAL_ENRAGE,    //You think to outrun the wind? A fatal mistake.
-    SAY_CONCLAVE_ULTIMATE,//The power of our winds, UNLEASHED!
-};
-
-enum NezirTalk
-{
-    SAY_NEZIR_AGGRO = 1, //The honor of slaying the interlopers shall be mine, brothers! Their feeble bodies will freeze solid from my wind's icy chill!
-    SAY_NEZIR_DEATH,     //Frozen solid.
-    SAY_NEZIR_KILL,      //Another mortal has taken their last breath!
-    SAY_NEZIR_LOW,       //Brothers, beware! These mortals are dangerous. I must pause and gather my strength.
-    SAY_NEZIR_ENRAGE,    //You throw away your honor and flee as cowards? Then die!
-};
-
-enum RohashTalk
-{
-    SAY_ROHASH_AGGRO = 1,  //As I am the strongest wind, it shall be I that tears the invaders apart!
-    SAY_ROHASH_DEATH,      //Mere dust...
-    SAY_ROHASH_KILL,       //Blown away!
-    SAY_ROHASH_LOW,        //The intruders stand fast, brothers, I cannot break them. Allow me a brief respite to strengthen my winds.
-    SAY_ROHASH_ENRAGE,     //Why do you flee, mortals? There is nowhere you can run or hide here!
-};
 
 enum Spells
 {
-
-    SPELL_NO_REGEN                  = 78725,
-
-    // Anshal
-    SPELL_SOOTHING_BREEZE           = 86206, // 86205 - Naios must have spell scripted them. - there is no problem doing it this way, without db.
-    SPELL_SOOTHING_BREEZE_SILENCE   = 86207,
+    SPELL_SOOTHING_BREEZE           = 86205,
     SPELL_SOOTHING_BREEZE_SUMMON    = 86204,
     SPELL_SOOTHING_BREEZE_VISUAL    = 86208,
-
-    SPELL_NURTURE                   = 85422, // Base spell, trigger summon every sec.
-    SPELL_NURTURE_SUMMON_TRIGGER    = 85425,
-    SPELL_NURTURE_DUMMY_AURA        = 85428, // Trigger on self.
-    SPELL_NURTURE_CREEPER_SUMMON    = 85429, // Trigger on self.
-
-    SPELL_TOXIC_SPORES              = 86281,
-    SPELL_DUMMY_FOR_NURTURE         = 89813, //Needed on boss before nurture on channel stops.
-
-    // Nezir
-    SPELL_ICE_PATCH                 = 86122,
-    SPELL_ICE_PATCH_VISUAL          = 86107, //it is not a visual you idiot! it's the damn spell.
-    SPELL_ICE_PATCH_AURA            = 86111,
-
-    SPELL_PERMAFROST                = 86082, // 86081 to cast on targets. damn 86082 casts the 86081 on self boss!!
-    SPELL_WIND_CHILL                = 84645,
-
-    // Rohash
-    SPELL_SLICING_GALE              = 86182,
-
-    SPELL_WIND_BLAST                = 86193, //casts the other spell... 
-    SPELL_WIND_BLAST_EFFECT         = 85483, //casted by this 85480
-
-    SPELL_TORNADO_DUMMY             = 109442, //Dummy to warn target!
-    SPELL_DAMAGE_TORNADO            = 86134,  //damage - adds an aura on the targets
-    SPELL_TRI_TORNADO_SUMMON        = 86192,
-    SPELL_TORNADO_VISUAL            = 87621,  //Deals the damage, makes the burn. - Needs to be scripted properly - 3yds range (Naios says 86134 is Hurricane Visual)
-    SPELL_SLOW_SPIN                 = 99380,  //For Spinning and Wind Blast
-
-    SPELL_STORM_SHIELD              = 93059,
-
-    //Play Dead
-    SPELL_DEAD                      = 81238, // Dead look.
-    SPELL_SELF_ROOT                 = 42716,
-    SPELL_CANNOT_TURN               = 95544,
-    //	SPELL_FLIGHT                    = 97249,
-
-    // All
-    SPELL_GATHER_STRENGHT           = 86307,
-
-    // Pre Combat Effects - see .h
-
-    // Other
-    SPELL_TELEPORT_VISUAL           = 83369,
-
-    // Debuffs
-    SPELL_WIND_DISTANCE_CHECKER     = 85763,
-
-    SPELL_WITHERING_WINDS           = 89137,
-    SPELL_WITHERING_WINDS_EFFECT    = 85576,
-    SPELL_WITHERING_WINDS_DAMAGE    = 93168,
-
-    SPELL_CHILLING_WINDS            = 89135,
-    SPELL_CHILLING_WINDS_EFFECT     = 85578,
-    SPELL_CHILLING_WINDS_DAMAGE     = 93163,
-
-    SPELL_DEAFENING_WINDS           = 89136,
-    SPELL_DEAFENING_WINDS_EFFECT    = 85573,
-    SPELL_DEAFENING_WINDS_DAMAGE    = 93166,
-
-    // Ultimates
+    SPELL_NURTURE_CHANNEL           = 85422,
+    SPELL_NURTURE                   = 85425,
+    SPELL_NURTURE_DUMMY_AURA        = 85428,
+    SPELL_NURTURE_CREEPER_SUMMON    = 85429,
     SPELL_ZEPHYR_ULTIMATE           = 84638,
-    SPELL_ZEPHYR_SPEED_AURA         = 85734, // 85740 needs radius 10
+    SPELL_WITHERING_WIND            = 85576,
+    SPELL_TOXIC_SPORE               = 86281,
+    SPELL_ICE_PATCH                 = 86122,
+    SPELL_ICE_PATCH_VISUAL          = 86107,
+    SPELL_ICE_PATCH_AURA            = 86111,
+    SPELL_PERMAFROST                = 86082,
+    SPELL_WIND_CHILL                = 84645,
+    SPELL_CHILLING_WINDS            = 85578,
     SPELL_SLEET_STORM_ULTIMATE      = 84644,
-    SPELL_HURRICANE_ULTIMATE        = 84643,  // 84643 - cannot be cast needs to added as aura.
-    SPELL_HURRICANE_VISUAL          = 86498,  // 74429	- 86492 (on player)
-    SPELL_HURRICANE_CAST            = 86492,
-
-    // Instance
-    SPELL_WINDDRAFT                 = 84576,
-    SPELL_JETSTREAM_PREVENT         = 89771,
-    SPELL_BERSERK                   = 82395,
-    SPELL_SLIPSTREAM                = 87740,
-    SPELL_SLIPSTREAM_VISUAL         = 85063,
-
-    SPELL_WIND_PRE_EFFECT_WARNING   = 96508,
-
-    // Achievements
-    SPELL_ACHIEVEMENT_CONCLAVE      = 88835,
-};
-
-enum ExistingMobs // more - see.h
-{
-    NPC_TORNADO                     = 46207,
-    NPC_HURRICANE                   = 46419,
-    NPC_RAVENOUS_TRIGGER            = 45813,
+    SPELL_SLICING_GALE              = 86182,
+    SPELL_WIND_BLAST                = 86193,
+    SPELL_WIND_BLAST_EFFECT         = 85483,
+    SPELL_HURRICANE_ULTIMATE        = 84643,
+    SPELL_TORNADO                   = 86192,
+    SPELL_TORNADO_DMG               = 86134,
+    SPELL_DEAFING_WINDS             = 85573,
+    SPELL_NO_ENERGY_REGEN           = 72242,
+    SPELL_GATHER_STORMS             = 86307,
 };
 
 enum Events
@@ -136,82 +35,54 @@ enum Events
     // Anshal
     EVENT_SOOTHING_BREEZE           = 1,
     EVENT_NURTURE,
-    EVENT_ULTIMATE_ANSHAL,
+    EVENT_ZEPHYR,
+    EVENT_STOP_NURTURE,
 
     // Nezir
     EVENT_ICE_PATCH,
     EVENT_PERMAFROST,
     EVENT_WIND_CHILL,
     EVENT_SLEET_STORM_ULTIMATE,
-    EVENT_ULTIMATE_NEZIR,
 
     // Rohash
     EVENT_SLICING_GALE,
     EVENT_WIND_BLAST,
+    EVENT_WIND_BLAST_END,
+    EVENT_HURRICANE,
     EVENT_TORNADO,
     EVENT_STORM_SHIELD,
-    EVENT_ULTIMATE_ROHASH,
-
-    //All
-    EVENT_REVIVE,
-    EVENT_GATHER_STRENGHT,
-
-    //Hurricane
-    EVENT_GRAB_PLAYER,
-    EVENT_DESPAWN,
-
-    EVENT_CHECK_POSITION
+    EVENT_DESPAWN_TRIGGER
 };
 
-Position const HomePos[3] =
+Position const TornadoWaypoints[] =
 {
-    {-48.556f,  1054.369f,  199.455f,   4.701710f},     // Anshal 
-    {118.113f,  813.822f,   199.455f,   3.125420f},     // Nezir
-    {-52.820f,  577.172f,   199.455f,   1.565960f},     // Rohash
+    {-4.062f, 604.63f, 198.49f, 0},
+    {-16.88f, 614.48f, 199.49f, 0},
+    {-31.12f, 620.74f, 197.69f, 0},
+    {-19.41f, 599.69f, 199.49f, 0},
+    {-26.89f, 605.23f, 199.49f, 0},
+    {-40.16f, 609.25f, 199.48f, 0},
+    {-22.98f, 587.98f, 199.49f, 0},
+    {-44.01f, 600.01f, 199.49f, 0},
+    {-53.95f, 608.68f, 199.48f, 0},
+    {-67.92f, 619.45f, 197.06f, 0},
+    {-77.55f, 618.57f, 199.49f, 0},
+    {-85.30f, 607.88f, 199.49f, 0},
+    {-68.97f, 602.52f, 199.48f, 0},
+    {-74.77f, 592.49f, 199.48f, 0},
+    {-76.74f, 578.68f, 199.48f, 0},
+    {-62.66f, 590.42f, 199.48f, 0},
+    {-47.44f, 590.97f, 199.46f, 0},
+    {-75.72f, 564.73f, 199.48f, 0},
+    {-64.95f, 554.41f, 199.48f, 0},
+    {-68.06f, 547.86f, 199.48f, 0},
+    {-49.25f, 552.65f, 199.48f, 0},
+    {-26.08f, 558.72f, 199.48f, 0},
+    {-42.69f, 545.89f, 199.48f, 0},
+    {-37.36f, 558.31f, 199.48f, 0},
+    {-24.81f, 572.06f, 199.48f, 0},
 };
 
-class CouncilGameObject
-{
-public:
-    CouncilGameObject() { }
-
-    bool operator()(GameObject* go)
-    {
-        switch (go->GetEntry())
-        {
-        case GOB_WIND_DRAFTEFFECT_CENTER:
-            go->SetGoState(GO_STATE_READY);
-            break;
-
-        case GOB_DEIJING_HEALING:
-        case GOB_DEIJING_FROST:
-        case GOB_DEIJING_TORNADO:
-            go->SetGoState(GO_STATE_ACTIVE);
-            break;
-
-        case GO_FLOOR_ALAKIR:
-            go->SetGoState(GO_STATE_READY);
-            break;
-
-        case GOB_WIND_DRAFTEFFECT_1:
-        case GOB_WIND_DRAFTEFFECT_2:
-        case GOB_WIND_DRAFTEFFECT_3:
-        case GOB_WIND_DRAFTEFFECT_4:
-        case GOB_WIND_DRAFTEFFECT_5:
-        case GOB_WIND_DRAFTEFFECT_6:
-        case GOB_WIND_DRAFTEFFECT_7:
-        case GOB_WIND_DRAFTEFFECT_8:
-            go->SetGoState(GO_STATE_READY);
-            break;
-        default:
-            break;
-        }
-
-        return false;
-    }
-};
-
-//Unlike the Blood Prince Council, we don't use a stalker for all these bosses, so we use Anshal as the main trigger for all actions.
 class boss_anshal : public CreatureScript
 {
 public:
@@ -222,234 +93,333 @@ public:
         return new boss_anshalAI (creature);
     }
 
-    struct boss_anshalAI : public ScriptedAI
+    struct boss_anshalAI : public BossAI
     {
-        boss_anshalAI(Creature* creature) : ScriptedAI(creature), summons(me)
+        boss_anshalAI(Creature* creature) : BossAI(creature, DATA_CONCLAVE_OF_WIND_EVENT)
         {
-            instance = creature->GetInstanceScript();
-
-            ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists - cause we check shit like that... you know? And if it does not exist?...
-            creature->SetPower(POWER_ENERGY, 0);
+            creature->setPowerType(POWER_ENERGY);
             creature->SetMaxPower(POWER_ENERGY, 90);
         }
 
-        bool gatherStormCast;
-
-        InstanceScript* instance;
         EventMap events;
-        SummonList summons;
+        uint32 uiRegentimer;
+        uint32 uiDownTimer;
+        uint32 RecoverTimer;
+        uint64 PlayerGUID;
+        bool UltimateUsed;
+        bool Regen;
+        bool CastingHeal;
+        uint32 uiCheckAgroo;
 
         void Reset()
         {
+            _Reset();
             instance->SetData(DATA_CONCLAVE_OF_WIND_EVENT, NOT_STARTED);
-            instance->SetBossState(DATA_CONCLAVE_OF_WIND_EVENT, NOT_STARTED);
-
-            summons.DespawnAll();
+            instance->SetData(DATA_GATHERING_STRENGTH, 0);
+            instance->SetData(DATA_WEATHER_EVENT, NOT_STARTED);
 
             events.Reset();
-            me->AddAura(SPELL_PRE_COMBAT_EFFECT_ANSHAL, me);
-            gatherStormCast = false;
+            me->GetMotionMaster()->MoveTargetedHome();
+            DespawnCreatures(NPC_RAVENOUS_CREEPER);
 
-            me->RemoveAurasDueToSpell(SPELL_DEAD); // Dead Look
-            me->RemoveAura(SPELL_SELF_ROOT);
-            me->RemoveAura(SPELL_CANNOT_TURN);
-            me->ApplySpellImmune(SPELL_NURTURE, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
-            DoCast(me, SPELL_NO_REGEN);
-            me->SetPower(POWER_ENERGY,0);
+            Regen = true;
+            CastingHeal = false;
+
+            uiCheckAgroo = 5000;
+            uiRegentimer = 1000;
+            uiDownTimer = 0;
+            RecoverTimer = 1000;
+            me->SetPower(POWER_ENERGY, 0);
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        void DespawnCreatures(uint32 entry)
+        {
+            std::list<Creature*> creatures;
+            GetCreatureListWithEntryInGrid(creatures, me, entry, 100.0f);
+
+            if (creatures.empty())
+                return;
+
+            for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
+                (*iter)->DespawnOrUnsummon();
         }
 
         void EnterEvadeMode()
         {
-            Reset();            
-            me->GetMotionMaster()->MoveTargetedHome();   
+            instance->SetData(DATA_CONCLAVE_OF_WIND_EVENT, FAIL);
+            instance->SetData(DATA_GATHERING_STRENGTH, 0);
+            _EnterEvadeMode();
+        }
+
+        void EnterCombat(Unit* /*who*/)
+        {
+            _EnterCombat();
+            instance->SetData(DATA_CONCLAVE_OF_WIND_EVENT, IN_PROGRESS);
+            instance->SetData(DATA_GATHERING_STRENGTH, 0);
+
+            events.ScheduleEvent(EVENT_SOOTHING_BREEZE, urand(13000, 15000));
+            events.ScheduleEvent(EVENT_NURTURE, urand(30000, 35000));
+
+            me->SetInCombatWithZone();
             me->SetReactState(REACT_AGGRESSIVE);
-
-            if (instance)
-            {
-                instance->SetData(DATA_CONCLAVE_OF_WIND_EVENT, FAIL);
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
-            }
         }
 
-        void EnterCombat(Unit* who)
+        void SpellHit(Unit* hitter, const SpellInfo* spell)
         {
-            me->SetPower(POWER_ENERGY,0);
-            if (instance)
-            {
-                instance->SetData(DATA_CONCLAVE_OF_WIND_EVENT, IN_PROGRESS);
-                instance->SetBossState(DATA_CONCLAVE_OF_WIND_EVENT, IN_PROGRESS);
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
-            }
-
-            gatherStormCast = false;
-            DoStartNoMovement(me);
-            DoCast(me, SPELL_NO_REGEN);
-            events.ScheduleEvent(EVENT_SOOTHING_BREEZE,     urand(16500,19000));
-            events.ScheduleEvent(EVENT_NURTURE,             urand(7000,11000));
-            events.ScheduleEvent(EVENT_ULTIMATE_ANSHAL,     1000);
-            events.ScheduleEvent(EVENT_CHECK_POSITION,      1500);
-
-            if (Creature* nezir = me->FindNearestCreature(BOSS_NEZIR, 500.0f, true))
-                if (nezir && !nezir->isInCombat())
-                    nezir->AI()->DoZoneInCombat(nezir, 500.0f);
-
-            if (Creature* rohash = me->FindNearestCreature(BOSS_ROHASH, 500.0f, true))
-                if (rohash && !rohash->isInCombat())
-                    rohash->AI()->DoZoneInCombat(rohash, 500.0f);
-        }
-
-        void DamageTaken(Unit* dealer, uint32 &damage)
-        {
-            if(dealer->GetGUID() == me->GetGUID())
+            if (!hitter || !spell)
                 return;
 
-            if(me->GetHealth() < damage)
-                damage = me->GetHealth()-1;
-        }
-
-        void JustSummoned(Creature *summon)
-        {
-            summons.Summon(summon);
-
-            switch (summon->GetEntry())
+            if (spell->Id == SPELL_GATHER_STORMS)
             {
-            case NPC_SOOTHING_BREEZE:
-                summons.Summon(summon);
-                summon->SetInCombatWithZone();
-                summon->SetReactState(REACT_PASSIVE);
-                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE|UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
-                summon->AddAura(SPELL_SOOTHING_BREEZE_VISUAL, summon);
-                summon->AddAura(SPELL_SOOTHING_BREEZE, summon);
-                summon->AddAura(SPELL_SOOTHING_BREEZE_SILENCE, summon);
-                DoStartNoMovement(summon);
-                break;
-            case NPC_RAVENOUS_CREEPER:
-                DoZoneInCombat(summon);
-                summons.Summon(summon);
-                summon->SetReactState(REACT_AGGRESSIVE);
-                summon->AddAura(SPELL_TOXIC_SPORES, summon);
-                break;
-            default:
-                summon->AI()->DoZoneInCombat();
+                CastingHeal = false;
+                instance->SetData(DATA_GATHERING_STRENGTH, instance->GetData(DATA_GATHERING_STRENGTH) - 1);
+                me->SetInCombatWithZone();
             }
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void DamageTaken(Unit* /*attacker*/, uint32& damage)
         {
-            Talk(SAY_ANSHAL_KILL);
+            if (damage >= me->GetHealth())
+            {
+                uint8 GatherStrenthCount = instance->GetData(DATA_GATHERING_STRENGTH);
+
+                if (GatherStrenthCount < 3)
+                {
+                    damage = 0;
+                    me->SetHealth(1);
+                }
+
+                if (CastingHeal == false)
+                {
+                    instance->SetData(DATA_GATHERING_STRENGTH, GatherStrenthCount + 1);
+                    me->RemoveAura(SPELL_WITHERING_WIND);
+                    DoCast(me, SPELL_GATHER_STORMS);
+                    CastingHeal = true;
+                }
+            }
         }
 
-        void UpdateAI(const uint32 diff)
-        {					
-            if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING) || !instance)
+        void UpdateAI(uint32 const diff)
+        {
+            if (!instance)
                 return;
 
-            Creature* nezir = me->FindNearestCreature(BOSS_NEZIR, 500.0f, true);
-            Creature* rohash = me->FindNearestCreature(BOSS_ROHASH, 500.0f, true);
-
-            if (nezir && rohash)
+            if (instance->GetData(DATA_CONCLAVE_OF_WIND_EVENT) == IN_PROGRESS)
             {
-                if (nezir->HealthBelowPct(2) && rohash->HealthBelowPct(2) && me->HealthBelowPct(2))
+                if (uiRegentimer <= diff && Regen)
                 {
-                    // Bosses are done.
-                    nezir->Kill(nezir); 
-                    me->Kill(me);
-                    rohash->Kill(rohash);
-                }
-                else if (me->HealthBelowPct(2) && (!rohash->HealthBelowPct(2) || !nezir->HealthBelowPct(2)))
-                {
-                    if (gatherStormCast == false)
+                    if (me->GetPower(POWER_ENERGY) == 90 && !UltimateUsed && CastingHeal == false)
                     {
-                        me->AddAura(SPELL_DEAD, me); 
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        me->AddAura(SPELL_SELF_ROOT, me);
-                        DoCast(me, SPELL_CANNOT_TURN);
-                        DoCast(me, SPELL_GATHER_STRENGHT);
-                        events.ScheduleEvent(EVENT_REVIVE, 60000);
-                        gatherStormCast = true;
-                    }
-                }
-            }
-
-            events.Update(diff);
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                case EVENT_CHECK_POSITION:
-                    if (me->GetDistance(HomePos[0]) >= 40.0f)
-                        me->GetMotionMaster()->MoveTargetedHome();
-                    events.ScheduleEvent(EVENT_CHECK_POSITION, 1500);
-                    break;
-
-                case EVENT_SOOTHING_BREEZE:
-                    if (Creature* creeper = me->FindNearestCreature(NPC_RAVENOUS_CREEPER, 90.0f, true))
-                        if (creeper)
-                            DoCast(creeper, SPELL_SOOTHING_BREEZE_SUMMON);
-                    events.ScheduleEvent(EVENT_SOOTHING_BREEZE, 25000);
-                    break;
-
-                case EVENT_NURTURE:
-                    DoCast(me, SPELL_NURTURE, true);
-                    me->AddAura(SPELL_DUMMY_FOR_NURTURE, me);
-                    events.ScheduleEvent(EVENT_NURTURE, urand(111000, 113000));
-                    break;
-
-                case EVENT_ULTIMATE_ANSHAL:
-                    if (me->GetPower(POWER_ENERGY) == 90)
-                    {
-                        me->NearTeleportTo(HomePos[0].GetPositionX(), HomePos[0].GetPositionY(), HomePos[0].GetPositionZ(), HomePos[0].GetOrientation());
-                        me->AttackStop();
-                        me->CastStop();
-                        me->AddAura(SPELL_ZEPHYR_ULTIMATE, me);//drains power and does it nicely
+                        me->NearTeleportTo(-48.f, 1053.f, 200.f, 3.9f);
+                        me->CastSpell(me->getVictim(), SPELL_ZEPHYR_ULTIMATE);
+                        me->AddAura(SPELL_NO_ENERGY_REGEN, me);
+                        instance->SetData(DATA_WEATHER_EVENT, IN_PROGRESS);
+                        UltimateUsed = true;
+                        uiDownTimer = 1000;
                     }
                     else
-                        me->SetPower(POWER_ENERGY,me->GetPower(POWER_ENERGY)+1);
+                        me->SetPower(POWER_ENERGY, me->GetPower(POWER_ENERGY) + 1);
 
-                    if (me->GetPower(POWER_ENERGY) == 0)
-                        Talk(SAY_ANSHAL_LOW);
-
-                    if (!SelectTarget(SELECT_TARGET_NEAREST, 0, 90.0f, true))
-                    {
-                        if (!me->HasAura(SPELL_WITHERING_WINDS))
-                        {
-                            Talk(SAY_ANSHAL_ENRAGE);
-                            DoCast(me, SPELL_WITHERING_WINDS, true);
-                            me->AddAura(SPELL_WITHERING_WINDS_DAMAGE, me);
-                            me->AddAura(SPELL_WITHERING_WINDS_EFFECT, me);
-                        }
-                    } // else
-                    events.ScheduleEvent(EVENT_ULTIMATE_ANSHAL, 1000);
-                    break;
-
-                case EVENT_REVIVE:
-                    me->RemoveAurasDueToSpell(SPELL_DEAD); // Dead Look
-                    me->RemoveAura(SPELL_SELF_ROOT);
-                    me->RemoveAura(SPELL_CANNOT_TURN);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    break;
-                default:
-                    break;
+                    uiRegentimer = 1000;
                 }
-            }		
+                else uiRegentimer -= diff;
 
-            DoMeleeAttackIfReady();
+                if (CastingHeal == true)
+                    return;
+
+                if (UltimateUsed)
+                {
+                    if (uiDownTimer <= diff)
+                    {
+                        Regen = false;
+                        me->SetPower(POWER_ENERGY, me->GetPower(POWER_ENERGY) - 6);
+                        uiDownTimer = 1000;
+                        if (me->GetPower(POWER_ENERGY) == 0)
+                        {
+                            events.RescheduleEvent(EVENT_SOOTHING_BREEZE, urand(15000, 20000));
+                            events.RescheduleEvent(EVENT_NURTURE, urand(30000, 35000));
+                            uiRegentimer = 1000;
+                            UltimateUsed = false;
+                            instance->SetData(DATA_WEATHER_EVENT, NOT_STARTED);
+                            me->RemoveAurasDueToSpell(SPELL_NO_ENERGY_REGEN);
+                            Regen = true;
+
+                            bool changed = false;
+
+                            if (Creature* nezir = me->GetCreature(*me, instance ? instance->GetData64(DATA_NEZIR) : 0))
+                                if (!nezir->FindCurrentSpellBySpellId(SPELL_GATHER_STORMS))
+                                {
+                                    me->SetPower(POWER_ENERGY, nezir->GetPower(POWER_ENERGY));
+                                    changed = true;
+                                }
+
+                                if (changed)
+                                    if (Creature* rohash = me->GetCreature(*me, instance ? instance->GetData64(DATA_ROHASH) : 0))
+                                        if (!rohash->FindCurrentSpellBySpellId(SPELL_GATHER_STORMS))
+                                            me->SetPower(POWER_ENERGY, rohash->GetPower(POWER_ENERGY));
+                        }
+                    }
+                    else uiDownTimer -= diff;
+                }
+
+                if (uiCheckAgroo <= diff)
+                {
+                    if (!SelectTarget(SELECT_TARGET_NEAREST, 0, 90, true))
+                    {
+                        if (!me->HasAura(SPELL_WITHERING_WIND))
+                            DoCast(me, SPELL_WITHERING_WIND, true);
+                    }
+                    else
+                    {
+                        if (me->HasAura(SPELL_WITHERING_WIND))
+                            me->RemoveAura(SPELL_WITHERING_WIND);
+                    }
+
+                    if (me->getVictim())
+                        if (me->GetDistance2d(me->getVictim()) > 90)
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 90.0f, true))
+                            {
+                                me->getThreatManager().resetAllAggro();
+                                me->AddThreat(target, 10);
+                            }
+                            uiCheckAgroo = 5000;
+                }
+                else uiCheckAgroo -= diff;
+
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                    case EVENT_SOOTHING_BREEZE:
+                        if (Creature* creeper = me->FindNearestCreature(NPC_RAVENOUS_CREEPER, 50))
+                            DoCast(creeper, SPELL_SOOTHING_BREEZE_SUMMON, true);
+                        else
+                            DoCast(SPELL_SOOTHING_BREEZE_SUMMON);
+                        events.ScheduleEvent(EVENT_SOOTHING_BREEZE, urand(25000, 35000));
+                        break;
+
+                    case EVENT_NURTURE:
+                        DoCast(me, SPELL_NURTURE_CHANNEL);
+                        events.ScheduleEvent(EVENT_STOP_NURTURE, 5000);
+                        //events.ScheduleEvent(EVENT_NURTURE, urand(70000, 90000));
+                        break;
+                    case EVENT_STOP_NURTURE:
+                        me->RemoveAurasDueToSpell(SPELL_NURTURE_DUMMY_AURA);
+                        me->RemoveAurasDueToSpell(SPELL_NURTURE_CHANNEL);
+                        me->RemoveAurasDueToSpell(SPELL_NURTURE_CREEPER_SUMMON);
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                DoMeleeAttackIfReady();
+            }
         }
 
-        void JustDied(Unit* killer)
+        void JustSummoned(Creature* summon)
         {
-            Talk(SAY_ANSHAL_DEATH);
-            if (instance)
+            summon->AI()->DoZoneInCombat();
+        }
+
+        void JustDied(Unit* Killer)
+        {
+            _JustDied();
+            instance->SetData(DATA_CONCLAVE_OF_WIND_EVENT, DONE);
+            instance->SetData(DATA_GATHERING_STRENGTH, 0);
+            instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 88835);
+        }
+    };
+};
+
+class npc_ravenous_creeper_trigger : public CreatureScript
+{
+public:
+    npc_ravenous_creeper_trigger() : CreatureScript("npc_ravenous_creeper_trigger") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ravenous_creeper_triggerAI(creature);
+    }
+
+    struct npc_ravenous_creeper_triggerAI : public Scripted_NoMovementAI
+    {
+        npc_ravenous_creeper_triggerAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        uint32 DespawnTimer;
+
+        void Reset()
+        {
+            DoCast(me, SPELL_NURTURE_CREEPER_SUMMON);
+        }
+
+        void JustSummoned(Creature* summon)
+        {
+            summon->AI()->DoZoneInCombat();
+        }
+    };
+};
+
+class npc_ravenous_creeper : public CreatureScript
+{
+public:
+    npc_ravenous_creeper() : CreatureScript("npc_ravenous_creeper") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ravenous_creeperAI (creature);
+    }
+
+    struct npc_ravenous_creeperAI : public ScriptedAI
+    {
+        npc_ravenous_creeperAI(Creature* creature) : ScriptedAI(creature) { }
+
+        uint32 uiToxicTimer;
+        uint32 uiCheckAgroo;
+
+        void Reset()
+        {
+            uiToxicTimer = 10000;
+            uiCheckAgroo = 5000;
+        }
+
+        void UpdateAI(uint32 const diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (uiToxicTimer <= diff)
             {
-                instance->SetData(DATA_CONCLAVE_OF_WIND_EVENT, DONE);
-                instance->SetBossState(DATA_CONCLAVE_OF_WIND_EVENT, DONE);
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-            }
-            summons.DespawnAll();
+                DoCast(me, SPELL_TOXIC_SPORE);
+                uiToxicTimer = 21000;
+            } else uiToxicTimer -= diff;
+
+            if (uiCheckAgroo <= diff)
+            {
+                if (me->GetDistance2d(me->getVictim()) > 90)
+                {
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    {
+                        me->getThreatManager().resetAllAggro();
+                        me->AddThreat(target, 10);
+                    }
+                }
+                uiCheckAgroo = 5000;
+            } else uiCheckAgroo -= diff;
+
+            DoMeleeAttackIfReady();
         }
     };
 };
@@ -464,216 +434,338 @@ public:
         return new boss_nezirAI (creature);
     }
 
-    struct boss_nezirAI : public ScriptedAI
+    struct boss_nezirAI : public BossAI
     {
-        boss_nezirAI(Creature* creature) : ScriptedAI(creature), summons(me)
+        boss_nezirAI(Creature* creature) : BossAI(creature, DATA_CONCLAVE_OF_WIND_EVENT)
         {
-            instance = creature->GetInstanceScript();
-
-            ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
-            creature->SetPower(POWER_ENERGY, 0);
+            creature->setPowerType(POWER_ENERGY);
             creature->SetMaxPower(POWER_ENERGY, 90);
         }
 
-        InstanceScript* instance;
         EventMap events;
-        SummonList summons;
-
-        bool gatherStormCast;
+        uint32 uiRegentimer;
+        uint32 uiDownTimer;
+        uint32 uiCheckAgroo;
+        bool Regen;
+        bool UltimateUsed;
+        bool CastingHeal;
 
         void Reset()
         {
-            gatherStormCast = false;
+            _Reset();
+            me->SetReactState(REACT_PASSIVE);
+            instance->SetData(DATA_CONCLAVE_OF_WIND_EVENT, NOT_STARTED);
+            instance->SetData(DATA_GATHERING_STRENGTH, 0);
+            instance->SetData(DATA_WEATHER_EVENT, NOT_STARTED);
 
-            if (instance)
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-
-            summons.DespawnAll();
-
-            me->AddAura(SPELL_PRE_COMBAT_EFFECT_NEZIR, me);
-
-            me->RemoveAurasDueToSpell(SPELL_DEAD); // Dead Look
-            me->RemoveAura(SPELL_SELF_ROOT);
-            me->RemoveAura(SPELL_CANNOT_TURN);
             events.Reset();
-            DoCast(me, SPELL_NO_REGEN);
+            me->GetMotionMaster()->MoveTargetedHome();
 
-            me->SetPower(POWER_ENERGY,0);
+            uiCheckAgroo = 5000;
+            uiRegentimer = 1000;
+            uiDownTimer = 0;
+            me->SetPower(POWER_ENERGY, 0);
+            Regen = true;
+            UltimateUsed = false;
+            CastingHeal = false;
         }
 
         void EnterEvadeMode()
         {
-            Reset();            
-            me->GetMotionMaster()->MoveTargetedHome();   
-            me->SetReactState(REACT_AGGRESSIVE);
-
-            if (instance)
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
+            instance->SetData(DATA_CONCLAVE_OF_WIND_EVENT, FAIL);
+            instance->SetData(DATA_GATHERING_STRENGTH, 0);
+            _EnterEvadeMode();
         }
 
         void EnterCombat(Unit* who)
         {
-            me->SetPower(POWER_ENERGY,0);
-            if (instance)
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
+            _EnterCombat();
+            instance->SetData(DATA_CONCLAVE_OF_WIND_EVENT, IN_PROGRESS);
+            instance->SetData(DATA_GATHERING_STRENGTH, 0);
 
-            DoCast(me, SPELL_NO_REGEN);
-            gatherStormCast = false;
-            Talk(SAY_NEZIR_AGGRO);
+            events.ScheduleEvent(EVENT_ICE_PATCH, urand(10000, 12000));
+            events.ScheduleEvent(EVENT_PERMAFROST, urand(20000, 23000));
+            events.ScheduleEvent(EVENT_WIND_CHILL, 15000);
+            events.ScheduleEvent(EVENT_SLEET_STORM_ULTIMATE, 30000);
 
-            events.ScheduleEvent(EVENT_ICE_PATCH,               urand(10000,12000));
-            events.ScheduleEvent(EVENT_PERMAFROST,              urand(20000,23000));
-            events.ScheduleEvent(EVENT_WIND_CHILL,              15000);
-            events.ScheduleEvent(EVENT_SLEET_STORM_ULTIMATE,    30000);
-            events.ScheduleEvent(EVENT_ULTIMATE_NEZIR,          1000);
-            events.ScheduleEvent(EVENT_CHECK_POSITION,          1500);
-
-            if (Creature* anshal = me->FindNearestCreature(BOSS_ANSHAL, 500.0f, true))
-                if (anshal && !anshal->isInCombat())
-                    anshal->AI()->DoZoneInCombat(anshal, 500.0f);
-
-            if (Creature* rohash = me->FindNearestCreature(BOSS_ROHASH, 500.0f, true))
-                if (rohash && !rohash->isInCombat())
-                    rohash->AI()->DoZoneInCombat(rohash, 500.0f);
+            me->SetInCombatWithZone();
+            me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        //The mob is scripted as part of the database. Use this only if not scripted		
-        void JustSummoned(Creature *summon)
+        void SpellHit(Unit* hitter, const SpellInfo* spell)
         {
-            summons.Summon(summon);
-
-            switch (summon->GetEntry())
-            {
-            case NPC_ICE_PATCH:
-                summons.Summon(summon);
-                summon->SetInCombatWithZone();
-                summon->SetReactState(REACT_PASSIVE);
-                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE|UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
-                summon->AddAura(SPELL_ICE_PATCH_VISUAL, summon);
-                summon->AddAura(SPELL_ICE_PATCH_AURA, summon);
-                DoStartNoMovement(summon);
-                break;                        
-            default:
+            if (!hitter || !spell)
                 return;
+
+            if (spell->Id == SPELL_GATHER_STORMS)
+            {
+                CastingHeal = false;
+                instance->SetData(DATA_GATHERING_STRENGTH, instance->GetData(DATA_GATHERING_STRENGTH) - 1);
+                me->SetInCombatWithZone();
             }
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void DamageTaken(Unit* /*attacker*/, uint32& damage)
         {
-            Talk(SAY_NEZIR_KILL);
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING) || !instance)
-                return;
-
-            Creature* anshal = me->FindNearestCreature(BOSS_ANSHAL, 500.0f, true);
-            Creature* rohash = me->FindNearestCreature(BOSS_ROHASH, 500.0f, true);
-
-            if (anshal && rohash)
+            if (damage >= me->GetHealth())
             {
-                if (me->HealthBelowPct(2) && rohash->HealthBelowPct(2) && anshal->HealthBelowPct(2))
+                uint8 GatherStrenthCount = instance->GetData(DATA_GATHERING_STRENGTH);
+
+                if (GatherStrenthCount < 3)
                 {
-                    // Bosses are done.
-                    anshal->Kill(anshal); 
-                    me->Kill(me);
-                    rohash->Kill(rohash);
+                    damage = 0;
+                    me->SetHealth(1);
                 }
-                else if (me->HealthBelowPct(2) && (!rohash->HealthBelowPct(2) || !anshal->HealthBelowPct(2)))
+
+                if (CastingHeal == false)
                 {
-                    if (gatherStormCast == false)
-                    {
-                        me->AddAura(SPELL_DEAD, me); 
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        me->AddAura(SPELL_SELF_ROOT, me);
-                        DoCast(me, SPELL_CANNOT_TURN);
-                        DoCast(me, SPELL_GATHER_STRENGHT);
-                        events.ScheduleEvent(EVENT_REVIVE, 60000);
-                        gatherStormCast = true;
-                    }
+                    instance->SetData(DATA_GATHERING_STRENGTH, GatherStrenthCount + 1);
+                    me->RemoveAura(SPELL_CHILLING_WINDS);
+                    DoCast(me, SPELL_GATHER_STORMS);
+                    CastingHeal = true;
                 }
             }
+        }
 
-            events.Update(diff);
+        void JustDied(Unit* Killer)
+        {
+            _JustDied();
+            instance->SetData(DATA_CONCLAVE_OF_WIND_EVENT, DONE);
+            instance->SetData(DATA_GATHERING_STRENGTH, 0);
+            instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 88835);
+        }
 
-            while (uint32 eventId = events.ExecuteEvent())
+        void UpdateAI(uint32 const diff)
+        {
+            if (!instance)
+                return;
+
+            if (instance->GetData(DATA_CONCLAVE_OF_WIND_EVENT) == IN_PROGRESS)
             {
-                switch (eventId)
+                if (uiRegentimer <= diff && Regen)
                 {
-                case EVENT_CHECK_POSITION:
-                    if (me->GetDistance(HomePos[1]) >= 40.0f)
-                        me->GetMotionMaster()->MoveTargetedHome();
-                    events.ScheduleEvent(EVENT_CHECK_POSITION, 1500);
-                    break;
-
-                case EVENT_ICE_PATCH:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
-                        DoCast(target, SPELL_ICE_PATCH);
-                    events.ScheduleEvent(EVENT_ICE_PATCH, urand(10000,12000));
-                    break;
-
-                case EVENT_PERMAFROST:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        DoCast(target, SPELL_PERMAFROST);
-                    events.ScheduleEvent(EVENT_PERMAFROST, 20000);
-                    break;
-
-                case EVENT_WIND_CHILL:
-                    DoCastAOE(SPELL_WIND_CHILL);
-                    events.ScheduleEvent(EVENT_WIND_CHILL, 15000);
-                    break;
-
-                case EVENT_ULTIMATE_NEZIR:
-                    if (me->GetPower(POWER_ENERGY) == 90)
+                    if (me->GetPower(POWER_ENERGY) == 90 && !UltimateUsed && CastingHeal == false)
                     {
-                        me->NearTeleportTo(HomePos[1].GetPositionX(), HomePos[1].GetPositionY(), HomePos[1].GetPositionZ(), HomePos[1].GetOrientation());
-                        me->AttackStop();
-                        me->CastStop();
-                        DoCast(me, SPELL_SLEET_STORM_ULTIMATE);//drains power and does it nicely
+                        me->CastSpell(me->getVictim(), SPELL_SLEET_STORM_ULTIMATE);
+                        me->AddAura(SPELL_NO_ENERGY_REGEN, me);
+                        instance->SetData(DATA_WEATHER_EVENT, IN_PROGRESS);
+                        me->NearTeleportTo(188.62f, 812.97f, 199.48f, 0.96f);
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                        UltimateUsed = true;
+                        uiDownTimer = 1000;
                     }
                     else
-                        me->SetPower(POWER_ENERGY,me->GetPower(POWER_ENERGY)+1);
+                        me->SetPower(POWER_ENERGY, me->GetPower(POWER_ENERGY) + 1);
 
-                    if (me->GetPower(POWER_ENERGY) == 0)
-                        Talk(SAY_NEZIR_LOW);
+                    uiRegentimer = 1000;
+                }
+                else uiRegentimer -= diff;
 
-                    if (!SelectTarget(SELECT_TARGET_NEAREST, 0, 90.0f, true))
+                if (CastingHeal == true)
+                    return;
+
+                if (UltimateUsed)
+                {
+                    if (uiDownTimer <= diff)
+                    {
+                        Regen = false;
+                        me->SetPower(POWER_ENERGY, me->GetPower(POWER_ENERGY) - 6);
+                        uiDownTimer = 1000;
+                        if (me->GetPower(POWER_ENERGY) == 0)
+                        {
+                            uiRegentimer = 1000;
+                            UltimateUsed = false;
+                            me->RemoveAurasDueToSpell(SPELL_NO_ENERGY_REGEN);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                            instance->SetData(DATA_WEATHER_EVENT, NOT_STARTED);
+                            Regen = true;
+
+                            bool changed = false;
+                            if (Creature* anshal = me->GetCreature(*me, instance ? instance->GetData64(DATA_ANSHAL) : 0))
+                                if (!anshal->FindCurrentSpellBySpellId(SPELL_GATHER_STORMS))
+                                {
+                                    me->SetPower(POWER_ENERGY, anshal->GetPower(POWER_ENERGY));
+                                    changed = true;
+                                }
+
+                                if (changed)
+                                    if (Creature* rohash = me->GetCreature(*me, instance ? instance->GetData64(DATA_ROHASH) : 0))
+                                        if (!rohash->FindCurrentSpellBySpellId(SPELL_GATHER_STORMS))
+                                            me->SetPower(POWER_ENERGY, rohash->GetPower(POWER_ENERGY));
+                        }
+                    }
+                    else uiDownTimer -= diff;
+                }
+
+                if (uiCheckAgroo <= diff)
+                {
+                    if (!SelectTarget(SELECT_TARGET_NEAREST, 0, 90, true))
                     {
                         if (!me->HasAura(SPELL_CHILLING_WINDS))
-                        {
-                            Talk(SAY_NEZIR_ENRAGE);
                             DoCast(me, SPELL_CHILLING_WINDS, true);
-                            me->AddAura(SPELL_CHILLING_WINDS_DAMAGE, me);
-                            me->AddAura(SPELL_CHILLING_WINDS_EFFECT, me);
-                        }
-                    } //else
-                    events.ScheduleEvent(EVENT_ULTIMATE_NEZIR, 1000);
-                    break;
+                    }
+                    else
+                    {
+                        if (me->HasAura(SPELL_CHILLING_WINDS))
+                            me->RemoveAura(SPELL_CHILLING_WINDS);
+                    }
 
-                case EVENT_REVIVE:
-                    me->RemoveAurasDueToSpell(SPELL_DEAD); // Dead Look
-                    me->RemoveAura(SPELL_SELF_ROOT);
-                    me->RemoveAura(SPELL_CANNOT_TURN);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    break;
-                default:
-                    break;
+                    if (me->getVictim())
+                        if (me->GetDistance2d(me->getVictim()) > 90)
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 90.0f, true))
+                            {
+                                me->getThreatManager().resetAllAggro();
+                                me->AddThreat(target, 10);
+                            }
+
+                            uiCheckAgroo = 5000;
                 }
-            }		
+                else uiCheckAgroo -= diff;
 
-            DoMeleeAttackIfReady();
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                    case EVENT_ICE_PATCH:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0 , 30.0f, true))
+                            DoCast(target, SPELL_ICE_PATCH);
+                        events.ScheduleEvent(EVENT_ICE_PATCH, urand(17000, 22000));
+                        break;
+
+                    case EVENT_PERMAFROST:
+                        DoCastVictim(SPELL_PERMAFROST);
+                        events.ScheduleEvent(EVENT_PERMAFROST, 20000);
+                        break;
+
+                    case EVENT_WIND_CHILL:
+                        DoCastAOE(SPELL_WIND_CHILL);
+                        events.ScheduleEvent(EVENT_WIND_CHILL, 10500);
+                        break;
+
+                    default:
+                        break;
+                    }
+                }
+                DoMeleeAttackIfReady();
+            }
+        }
+    };
+};
+
+class npc_ice_patch : public CreatureScript
+{
+public:
+    npc_ice_patch() : CreatureScript("npc_ice_patch") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ice_patchAI (creature);
+    }
+
+    struct npc_ice_patchAI : public Scripted_NoMovementAI
+    {
+        npc_ice_patchAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
+            me->SetReactState(REACT_PASSIVE);
         }
 
-        void JustDied(Unit* killer)
-        {
-            Talk(SAY_NEZIR_DEATH);
-            if (instance)
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+        uint32 DespawnTimer;
 
-            summons.DespawnAll();
+        void Reset()
+        {
+            DespawnTimer = 30000;
+        }
+
+        void UpdateAI(uint32 const diff)
+        {
+            if (DespawnTimer <= diff)
+            {
+                me->DespawnOrUnsummon();
+
+            }
+            else DespawnTimer -= diff;
+        }
+    };
+};
+
+class npc_soothing_breeze : public CreatureScript
+{
+public:
+    npc_soothing_breeze() : CreatureScript("npc_soothing_breeze") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_soothing_breezeAI (creature);
+    }
+
+    struct npc_soothing_breezeAI : public Scripted_NoMovementAI
+    {
+        npc_soothing_breezeAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetSpeed(MOVE_WALK, 0.4f);
+        }
+
+        uint32 DespawnTimer;
+
+        void Reset()
+        {
+            DespawnTimer = 30000;
+        }
+
+        void UpdateAI(uint32 const diff)
+        {
+            if (DespawnTimer <= diff)
+            {
+                me->DespawnOrUnsummon();
+
+            } else DespawnTimer -= diff;
+        }
+    };
+};
+
+class npc_tornado_rohash : public CreatureScript
+{
+public:
+    npc_tornado_rohash() : CreatureScript("npc_tornado_rohash") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_tornado_rohashAI (creature);
+    }
+
+    struct npc_tornado_rohashAI : public ScriptedAI
+    {
+        npc_tornado_rohashAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+            me->SetReactState(REACT_PASSIVE);
+        }
+
+        uint32 uiPathTimer;
+
+        void Reset()
+        {
+            uiPathTimer = 2000;
+        }
+
+        void UpdateAI(uint32 const diff)
+        {
+            if (uiPathTimer <= diff)
+            {
+                me->GetMotionMaster()->MovePoint(0, TornadoWaypoints[urand(0, 24)]);
+                uiPathTimer = 5000;
+            } else uiPathTimer -= diff;
         }
     };
 };
@@ -688,417 +780,456 @@ public:
         return new boss_rohashAI (creature);
     }
 
-    struct boss_rohashAI : public ScriptedAI
+    struct boss_rohashAI : public BossAI
     {
-        boss_rohashAI(Creature* creature) : ScriptedAI(creature), summons(me)
+        boss_rohashAI(Creature* creature) : BossAI(creature, DATA_CONCLAVE_OF_WIND_EVENT)
         {
-            instance = creature->GetInstanceScript();
-
-            ASSERT(creature->GetVehicleKit()); // we dont actually use it, just check if exists
-            creature->SetPower(POWER_ENERGY, 0);
+            creature->setPowerType(POWER_ENERGY);
             creature->SetMaxPower(POWER_ENERGY, 90);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_WIND_BLAST_EFFECT, true);
         }
 
-        InstanceScript* instance;
-        EventMap events;
-        SummonList summons;
-        bool gatherStormCast;
+        uint32 uiRegentimer;
+        uint32 uiDownTimer;
+        uint32 uiCheckAgroo;
+        uint32 uiTurnTimer;
+
+        bool IsCastingWindBlast;
+        bool UltimateUsed;
+        bool Regen;
+        bool CastingHeal;
 
         void Reset()
-        {		
-            me->AddAura(SPELL_PRE_COMBAT_EFFECT_ROHASH, me);
+        {
+            _Reset();
+            me->SetReactState(REACT_PASSIVE);
+            if (instance)
+            {
+                instance->SetData(DATA_CONCLAVE_OF_WIND_EVENT, NOT_STARTED);
+                instance->SetData(DATA_GATHERING_STRENGTH, 0);
+                instance->SetData(DATA_WEATHER_EVENT, NOT_STARTED);
+            }
 
-            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-            DoStartNoMovement(me);
-            gatherStormCast = false;
-            DoCast(me, SPELL_NO_REGEN);
-            me->RemoveAurasDueToSpell(SPELL_DEAD); // Dead Look
-            me->RemoveAura(SPELL_SELF_ROOT);
-            me->RemoveAura(SPELL_CANNOT_TURN);
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
+            IsCastingWindBlast = false;
+
             events.Reset();
-            me->SetPower(POWER_ENERGY,0);
+
+            if (me->IsInWorld())
+                me->GetMotionMaster()->MoveTargetedHome();
+
+            uiTurnTimer = 30000;
+            uiCheckAgroo = 5000;
+            uiRegentimer = 1000;
+            uiDownTimer = 0;
+            me->SetPower(POWER_ENERGY, 0);
+
+            Regen = true;
+            UltimateUsed = false;
+            CastingHeal = false;
+
+            if (Creature* trigger = me->FindNearestCreature(NPC_GENERAL_PURPOSE_BUNNY_JMF, 90))
+                trigger->DespawnOrUnsummon();
+
+            summons.DespawnAll();
         }
 
         void EnterEvadeMode()
         {
-            Reset();            
-            me->GetMotionMaster()->MoveTargetedHome();   
-            me->SetReactState(REACT_AGGRESSIVE);
-
-            if (instance)
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me); // Remove
+            instance->SetData(DATA_CONCLAVE_OF_WIND_EVENT, FAIL);
+            instance->SetData(DATA_GATHERING_STRENGTH, 0);
+            _EnterEvadeMode();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
-            me->SetPower(POWER_ENERGY,0);
-            if (instance)
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
+            _EnterCombat();
+            instance->SetData(DATA_CONCLAVE_OF_WIND_EVENT, IN_PROGRESS);
+            instance->SetData(DATA_GATHERING_STRENGTH, 0);
 
-            DoCast(me, SPELL_NO_REGEN);
-            DoStartNoMovement(me);
-            gatherStormCast = false;
-            Talk(SAY_ROHASH_AGGRO);
-            events.ScheduleEvent(EVENT_SLICING_GALE, 10000);
+            events.ScheduleEvent(EVENT_SLICING_GALE, 3000);
             events.ScheduleEvent(EVENT_WIND_BLAST, 30000);
-            events.ScheduleEvent(EVENT_TORNADO, 20000);
-            events.ScheduleEvent(EVENT_STORM_SHIELD, 30000);
-            events.ScheduleEvent(EVENT_ULTIMATE_ROHASH, 1000);
-            events.ScheduleEvent(EVENT_CHECK_POSITION, 1500);
+            events.ScheduleEvent(EVENT_TORNADO, 10000);
 
-            if (Creature* nezir = me->FindNearestCreature(BOSS_NEZIR, 500.0f, true))
-                if (nezir && !nezir->isInCombat())
-                    nezir->AI()->DoZoneInCombat(nezir, 500.0f);
-
-            if (Creature* anshal = me->FindNearestCreature(BOSS_ANSHAL, 500.0f, true))
-                if (anshal && !anshal->isInCombat())
-                    anshal->AI()->DoZoneInCombat(anshal, 500.0f);
+            me->SetInCombatWithZone();
+            me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        void JustSummoned(Creature *summon)
+        void JustSummoned(Creature* pSummon)
         {
-            summons.Summon(summon);
-
-            switch (summon->GetEntry())
+            switch (pSummon->GetEntry())
             {
             case NPC_TORNADO:
-                summons.Summon(summon);
-                summon->SetSpeed(MOVE_RUN, 0.3f);
-                summon->SetReactState(REACT_PASSIVE);
-                summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
-                summon->SetInCombatWithZone();
-                summon->CastSpell(summon, SPELL_TORNADO_VISUAL, TRIGGERED_FULL_MASK);
-                summon->AddAura(SPELL_DAMAGE_TORNADO, summon);
-                summon->DespawnOrUnsummon(20000);
-                break; 					
-            default:
-                return;
+                {
+                    summons.Summon(pSummon);
+                    break;
+                }
             }
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void SpellHit(Unit* hitter, const SpellInfo* spell)
         {
-            Talk(SAY_ROHASH_KILL);
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING) || !instance)
+            if (!hitter || !spell)
                 return;
 
-            Creature* anshal = me->FindNearestCreature(BOSS_ANSHAL, 500.0f, true);
-            Creature* nezir = me->FindNearestCreature(BOSS_NEZIR, 500.0f, true);
-
-            if (anshal && nezir)
+            if (spell->Id == SPELL_GATHER_STORMS)
             {
-                if (me->HealthBelowPct(2) && nezir->HealthBelowPct(2) && anshal->HealthBelowPct(2))
-                {
-                    // Bosses are done.
-                    anshal->Kill(anshal); 
-                    me->Kill(me);
-                    nezir->Kill(nezir);
-                }
-                else if (me->HealthBelowPct(2) && (!nezir->HealthBelowPct(2) || !anshal->HealthBelowPct(2)))
-                {
-                    if (gatherStormCast == false)
-                    {
-                        me->AddAura(SPELL_DEAD, me); 
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        me->AddAura(SPELL_SELF_ROOT, me);
-                        DoCast(me, SPELL_CANNOT_TURN);
-                        DoCast(me, SPELL_GATHER_STRENGHT);
-                        events.ScheduleEvent(EVENT_REVIVE, 60000);
-                        gatherStormCast = true;
-                    }
-                }
+                CastingHeal = false;
+                instance->SetData(DATA_GATHERING_STRENGTH, instance->GetData(DATA_GATHERING_STRENGTH) - 1);
+                me->SetInCombatWithZone();
             }
+        }
 
-            events.Update(diff);
-
-            while (uint32 eventId = events.ExecuteEvent())
+        void DamageTaken(Unit* /*attacker*/, uint32& damage)
+        {
+            if (damage >= me->GetHealth())
             {
-                switch (eventId)
+                uint8 GatherStrenthCount = instance->GetData(DATA_GATHERING_STRENGTH);
+
+                if (GatherStrenthCount < 3)
                 {
-                case EVENT_CHECK_POSITION:
-                    if (me->GetDistance(HomePos[2]) >= 40.0f)
-                        me->GetMotionMaster()->MoveTargetedHome();
-                    events.ScheduleEvent(EVENT_CHECK_POSITION, 1500);
-                    break;
+                    damage = 0;
+                    me->SetHealth(1);
+                }
 
-                case EVENT_WIND_BLAST:
-                    DoCast(me, SPELL_WIND_BLAST);
-                    me->GetMotionMaster()->MoveRotate(10000, urand(0, 1) ? ROTATE_DIRECTION_LEFT : ROTATE_DIRECTION_RIGHT);
-                    events.ScheduleEvent(EVENT_WIND_BLAST, 30000); // a rather long cooldown
-                    events.ScheduleEvent(EVENT_SLICING_GALE, 12000);
-                    break;
-
-                case EVENT_SLICING_GALE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        DoCast(target, SPELL_SLICING_GALE);
-                    if (me->HasAura(SPELL_HURRICANE_VISUAL))
-                        me->RemoveAura(SPELL_HURRICANE_VISUAL);
-                    events.ScheduleEvent(EVENT_SLICING_GALE, 1500);
-                    break;
-
-                case EVENT_TORNADO: //This is hawkward
-                    DoCast(me, SPELL_TRI_TORNADO_SUMMON);
-                    events.ScheduleEvent(EVENT_TORNADO, 45000);
-                    break;
-
-                case EVENT_STORM_SHIELD:
-                    if (IsHeroic())
-                        DoCast(me, SPELL_STORM_SHIELD);
-                    events.ScheduleEvent(EVENT_STORM_SHIELD, 105000); // 60s cd
-                    break;
-
-                case EVENT_ULTIMATE_ROHASH:
-                    if (me->GetPower(POWER_ENERGY) == 90)
-                    {
-                        me->CastStop();
-                        me->NearTeleportTo(HomePos[2].GetPositionX(), HomePos[2].GetPositionY(), HomePos[2].GetPositionZ(), HomePos[2].GetOrientation());
-                        me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
-                        //me->DespawnCreaturesInArea(NPC_TORNADO, 90.f);
-                        DoCast(me, SPELL_HURRICANE_ULTIMATE);
-                        me->AddAura(SPELL_HURRICANE_VISUAL, me);
-                    }
-                    else me->SetPower(POWER_ENERGY,me->GetPower(POWER_ENERGY)+1);
-
-                    if (me->GetPower(POWER_ENERGY) == 0)
-                        Talk(SAY_ROHASH_LOW);
-
-                    // if nobody is on platform
-                    if(!SelectTarget(SELECT_TARGET_NEAREST, 0, 90.0f, true))
-                    {
-                        if (!me->HasAura(SPELL_DEAFENING_WINDS))
-                        {
-                            Talk(SAY_ROHASH_ENRAGE);
-                            DoCast(me, SPELL_DEAFENING_WINDS, true);
-                            me->AddAura(SPELL_DEAFENING_WINDS_DAMAGE, me);
-                            me->AddAura(SPELL_DEAFENING_WINDS_EFFECT, me);
-                        }	
-                    }					
-                    events.ScheduleEvent(EVENT_ULTIMATE_ROHASH, 1000);
-                    break;
-
-                case EVENT_REVIVE:
-                    me->RemoveAurasDueToSpell(SPELL_DEAD); // Dead Look
-                    me->RemoveAura(SPELL_SELF_ROOT);
-                    me->RemoveAura(SPELL_CANNOT_TURN);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    break;
-                default:
-                    break;       
+                if (CastingHeal == false)
+                {
+                    instance->SetData(DATA_GATHERING_STRENGTH, GatherStrenthCount + 1);
+                    //me->setDeathState(CORPSE);
+                    me->RemoveAura(SPELL_DEAFING_WINDS);
+                    DoCast(me, SPELL_GATHER_STORMS);
+                    CastingHeal = true;
                 }
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* Killer)
         {
-            Talk(SAY_ROHASH_DEATH);
-            if (instance)
-                instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-
-            summons.DespawnAll();
-        }
-    };
-};
-
-class npc_tornado : public CreatureScript // 46207
-{
-public:
-    npc_tornado() : CreatureScript("npc_tornado") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_tornadoAI (creature);
-    }
-
-    struct npc_tornadoAI : public ScriptedAI
-    {
-        npc_tornadoAI(Creature* creature) : ScriptedAI(creature)
-        {
-            TargetSelectTimer = 2000;
-            creature->SetReactState(REACT_PASSIVE);
+            _JustDied();
+            instance->SetData(DATA_CONCLAVE_OF_WIND_EVENT, DONE);
+            instance->SetData(DATA_GATHERING_STRENGTH, 0);
+            instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 88835);
         }
 
-        uint32 TargetSelectTimer;
-
-        void UpdateAI(const uint32 diff)
+        void SummonThreatController()
         {
-            if (TargetSelectTimer <= diff)
+            if (Creature* hurricane = me->SummonCreature(NPC_HURRICANE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 25, 3.32963f, TEMPSUMMON_TIMED_DESPAWN, 16000))
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 90.0f, true))
-                {
-                    me->GetMotionMaster()->MovePoint(1, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
-                    me->AddAura(SPELL_TORNADO_DUMMY, target);
-                    TargetSelectTimer = 6000;
-                }
+                hurricane->SetCanFly(true);
+                hurricane->SetDisableGravity(true);
+                hurricane->SetUnitMovementFlags(MOVEMENTFLAG_DISABLE_GRAVITY);
+                //hurricane->SetVisible(false);
+                hurricane->GetMotionMaster()->MoveRotate(15000, urand(0, 1) ? ROTATE_DIRECTION_LEFT : ROTATE_DIRECTION_RIGHT);
             }
-            else TargetSelectTimer -= diff;
-        }
-    };
-};
 
-class npc_creeper_trigger : public CreatureScript // 45813
-{
-public:
-    npc_creeper_trigger() : CreatureScript("npc_creeper_trigger") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_creeper_triggerAI (creature);
-    }
-
-    struct npc_creeper_triggerAI : public ScriptedAI
-    {
-        npc_creeper_triggerAI(Creature* creature) : ScriptedAI(creature)
-        {
-            CreeperSummonTimer = 8000;
-            DoCast(creature, SPELL_NURTURE_DUMMY_AURA);
-        }
-
-        uint32 CreeperSummonTimer;
-
-        void UpdateAI(const uint32 diff)
-        {
-            if (CreeperSummonTimer <= diff)
+            me->SetInCombatWithZone();
+            if (Creature* Trigger = me->SummonCreature(NPC_GENERAL_PURPOSE_BUNNY_JMF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 3.32963f, TEMPSUMMON_TIMED_DESPAWN, 16000))
             {
-                //DoCast(me, SPELL_NURTURE_CREEPER_SUMMON);
-                me->SummonCreature(NPC_RAVENOUS_CREEPER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_CORPSE_DESPAWN);
-                me->DespawnOrUnsummon(100);
-                CreeperSummonTimer = 500;
+                Trigger->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+                Trigger->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                Trigger->SetReactState(REACT_AGGRESSIVE);
+                Trigger->setFaction(18);
+                Trigger->Attack(me, true);
+                me->AddThreat(Trigger, 200000.0f);
+                me->_addAttacker(Trigger);
+                me->SetInCombatWith(Trigger);
+                events.ScheduleEvent(EVENT_DESPAWN_TRIGGER, 20000);
             }
-            else CreeperSummonTimer -= diff;
-        }
-    };
-};
-
-//hurricane will also act as the end trigger for the ultimates 
-class npc_hurricane : public CreatureScript
-{
-public:
-    npc_hurricane() : CreatureScript("npc_hurricane") { }
-
-    struct npc_hurricaneAI : public ScriptedAI
-    {
-        npc_hurricaneAI(Creature* creature) : ScriptedAI(creature), grabbedPlayer(0), instance(creature->GetInstanceScript()) { }
-
-        void Reset()
-        {
-            events.Reset();
-            me->SetReactState(REACT_PASSIVE);
         }
 
-        void IsSummonedBy(Unit* /*summoner*/)
+        void UpdateOrientation()
         {
-            events.Reset();
-            events.ScheduleEvent(EVENT_GRAB_PLAYER, 500);
-            events.ScheduleEvent(EVENT_DESPAWN, 15000);
-        }
-
-        void SetGUID(uint64 guid, int32 /* = 0*/)
-        {
-            grabbedPlayer = guid;
+            float orient = me->GetOrientation();
+            me->SetFacingTo(orient - M_PI / 75);
+            float x, y, z;
+            z = me->GetPositionZ();
+            me->GetNearPoint2D(x, y, 10.0f, me->GetOrientation());
+            if (Creature* temp = me->SummonCreature(34211, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 100))
+                me->SetTarget(temp->GetGUID());
         }
 
         void UpdateAI(uint32 const diff)
         {
-            if (!UpdateVictim())
+            if (!instance)
                 return;
 
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
+            if (instance->GetData(DATA_CONCLAVE_OF_WIND_EVENT) == IN_PROGRESS)
             {
-                switch (eventId)
+                if (uiRegentimer <= diff && Regen)
                 {
-                case EVENT_GRAB_PLAYER:
-                    if (!grabbedPlayer)
+                    if (me->GetPower(POWER_ENERGY) == 90 && !UltimateUsed && CastingHeal == false)
                     {
-                        if (Unit* target = GetPlayerAtMinimumRange(0.9f))
+                        SummonThreatController();
+                        summons.DespawnEntry(46207);
+                        me->CastSpell(me->getVictim(), SPELL_HURRICANE_ULTIMATE);
+                        me->AddAura(SPELL_NO_ENERGY_REGEN, me);
+                        instance->SetData(DATA_WEATHER_EVENT, IN_PROGRESS);
+                        UltimateUsed = true;
+                        uiDownTimer = 1000;
+                    }
+                    else
+                        me->SetPower(POWER_ENERGY, me->GetPower(POWER_ENERGY) + 1);
+
+                    uiRegentimer = 1000;
+                }
+                else uiRegentimer -= diff;
+
+                if (CastingHeal == true)
+                    return;
+
+                if (UltimateUsed)
+                {
+                    if (uiDownTimer <= diff)
+                    {
+                        Regen = false;
+                        me->SetPower(POWER_ENERGY, me->GetPower(POWER_ENERGY) - 6);
+                        uiDownTimer = 1000;
+                        if (me->GetPower(POWER_ENERGY) == 0)
                         {
-                            if (me->GetDistance(target) < 6.5f)
-                                DoCast(target, SPELL_HURRICANE_CAST, true);
-                            me->AddAura(SPELL_HURRICANE_CAST, target);
-                            target->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()+30.0f, target->GetOrientation());
+                            uiRegentimer = 1000;
+                            UltimateUsed = false;
+                            me->RemoveAurasDueToSpell(SPELL_NO_ENERGY_REGEN);
+                            instance->SetData(DATA_WEATHER_EVENT, NOT_STARTED);
+                            events.ScheduleEvent(EVENT_TORNADO, 10000);
+                            Regen = true;
+
+                            bool changed = false;
+                            if (Creature* anshal = me->GetCreature(*me, instance ? instance->GetData64(DATA_ANSHAL) : 0))
+                                if (!anshal->FindCurrentSpellBySpellId(SPELL_GATHER_STORMS))
+                                {
+                                    me->SetPower(POWER_ENERGY, anshal->GetPower(POWER_ENERGY));
+                                    changed = true;
+                                }
+
+                                if (changed)
+                                    if (Creature* nezir = me->GetCreature(*me, instance ? instance->GetData64(DATA_NEZIR) : 0))
+                                        if (!nezir->FindCurrentSpellBySpellId(SPELL_GATHER_STORMS))
+                                            me->SetPower(POWER_ENERGY, nezir->GetPower(POWER_ENERGY));
                         }
                     }
-                case EVENT_DESPAWN:
-                    if (Unit* target = GetPlayerAtMinimumRange(45.0f))
-                        if (target && target->HasAura(SPELL_HURRICANE_CAST))
-                            me->RemoveAura(SPELL_HURRICANE_CAST);
-                    CouncilGameObject reset;
-                    CerberCore::GameObjectWorker<CouncilGameObject> worker(me, reset);
-                    me->VisitNearbyGridObject(400.0f, worker);
-                    me->DespawnOrUnsummon(500);
-                    break;
+                    else uiDownTimer -= diff;
                 }
+
+                if (uiCheckAgroo <= diff)
+                {
+                    if (!SelectTarget(SELECT_TARGET_NEAREST, 0, 90, true))
+                    {
+                        if (!me->HasAura(SPELL_DEAFING_WINDS))
+                            DoCast(me, SPELL_DEAFING_WINDS, true);
+
+                    } else if (me->HasAura(SPELL_DEAFING_WINDS))
+                        me->RemoveAura(SPELL_DEAFING_WINDS);
+
+                    if (me->getVictim())
+                        if (me->GetDistance2d(me->getVictim()) > 90)
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 90, true))
+                            {
+                                me->getThreatManager().resetAllAggro();
+                                me->AddThreat(target, 10);
+                            }
+                            uiCheckAgroo = 5000;
+                }
+                else uiCheckAgroo -= diff;
+
+                if (uiTurnTimer <= diff)
+                {
+                    if (IsCastingWindBlast)
+                    {
+                        me->SetFacingTo(irand(0,4));
+                        UpdateOrientation();
+                    }
+                    uiTurnTimer = 70;
+                }
+                else uiTurnTimer -= diff;
+
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+
+                    case EVENT_WIND_BLAST:
+                        me->SetReactState(REACT_PASSIVE);
+                        UpdateOrientation();
+                        DoCast(SPELL_WIND_BLAST);
+                        IsCastingWindBlast = true;
+                        uiTurnTimer = 2000;
+                        uiCheckAgroo = 15000;
+                        events.ScheduleEvent(EVENT_WIND_BLAST_END, 10000);
+                        events.ScheduleEvent(EVENT_WIND_BLAST, 90000);
+                        break;
+
+                    case EVENT_WIND_BLAST_END:
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        uiTurnTimer = 0xFFFFFF;
+                        IsCastingWindBlast = false;
+                        break;
+
+                    case EVENT_SLICING_GALE:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 90.0f, true))
+                        {
+                            DoCast(target, SPELL_SLICING_GALE);
+                        }
+                        else
+                            DoCastVictim(SPELL_SLICING_GALE);
+                        events.ScheduleEvent(EVENT_SLICING_GALE, 4000);
+                        break;
+
+                    case EVENT_TORNADO:
+                        DoCastVictim(SPELL_TORNADO);
+                        //events.ScheduleEvent(EVENT_TORNADO, 45000);
+                        break;
+
+                        /*case EVENT_DESPAWN_TRIGGER:
+                        // Threat Trigger
+                        if (Creature* trigger = me->FindNearestCreature(NPC_GENERAL_PURPOSE_BUNNY_JMF, 90))
+                        trigger->DespawnOrUnsummon();
+                        //Hurricane Trigger
+                        if (Creature* trigger = me->FindNearestCreature(NPC_HURRICANE, 90))
+                        trigger->DespawnOrUnsummon();
+                        break;
+                        */
+                    default:
+                        break;
+                    }
+                }
+                DoMeleeAttackIfReady();
             }
-
-            // no melee attacks
         }
-
-    private:
-        EventMap events;
-        uint64 grabbedPlayer;
-        InstanceScript* instance;
     };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_hurricaneAI(creature);
-    }
 };
 
-class spell_hurricane : public SpellScriptLoader //86492
+class spell_nurture_aura : public SpellScriptLoader
 {
 public:
-    spell_hurricane() : SpellScriptLoader("spell_hurricane") { }
+    spell_nurture_aura() : SpellScriptLoader("spell_nurture_aura") { }
 
-    class spell_hurricane_AuraScript : public AuraScript
+    class spell_nurture_aura_AuraScript : public AuraScript
     {
-        PrepareAuraScript(spell_hurricane_AuraScript);
+        PrepareAuraScript(spell_nurture_aura_AuraScript);
 
-        void HandleEffectApply(AuraEffect const * /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        void HandleEffectCalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
         {
-            if (Unit* target = GetTarget())
-                if (Unit* caster = GetCaster())
-                    target->EnterVehicle(caster, 0);
+            isPeriodic = true;
         }
 
-        void HandleEffectRemove(AuraEffect const * /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        void HandlePeriodic(AuraEffect const* aurEff)
         {
             if (Unit* caster = GetCaster())
-                if (Vehicle* vehicle = caster->GetVehicleKit())
-                    vehicle->RemoveAllPassengers();
+                caster->CastSpell(caster, SPELL_NURTURE_CREEPER_SUMMON, true);
         }
 
         void Register()
         {
-            OnEffectApply += AuraEffectApplyFn(spell_hurricane_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_hurricane_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
+            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_nurture_aura_AuraScript::HandleEffectCalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+            OnEffectPeriodic += AuraEffectPeriodicFn(spell_nurture_aura_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_DUMMY);
         }
     };
 
     AuraScript* GetAuraScript() const
     {
-        return new spell_hurricane_AuraScript();
+        return new spell_nurture_aura_AuraScript();
+    }
+};
+
+class spell_nezir_sleet_storm : public SpellScriptLoader
+{
+public:
+    spell_nezir_sleet_storm() : SpellScriptLoader("spell_nezir_sleet_storm") { }
+
+    class spell_nezir_sleet_storm_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_nezir_sleet_storm_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& unitList)
+        {
+            targetCount = unitList.size();
+        }
+
+        void CalcDamage()
+        {
+            SetHitDamage(int32(GetHitDamage() / targetCount));
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_nezir_sleet_storm_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+            OnHit += SpellHitFn(spell_nezir_sleet_storm_SpellScript::CalcDamage);
+        }
+
+    protected:
+        uint32 targetCount;
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_nezir_sleet_storm_SpellScript();
+    }
+};
+
+class PlayerInRangeCheck
+{
+public:
+    explicit PlayerInRangeCheck(Unit* _caster) : caster(_caster) { }
+
+    bool operator() (WorldObject* unit)
+    {
+        if (caster->HasInArc(M_PI * 104 / 180, unit))
+            return false;
+
+        return true;
+    }
+    Unit* caster;
+};
+
+class spell_wind_blast : public SpellScriptLoader
+{
+public:
+    spell_wind_blast() : SpellScriptLoader("spell_wind_blast") { }
+
+    class spell_wind_blast_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_wind_blast_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& unitList)
+        {
+            unitList.remove_if(PlayerInRangeCheck(GetCaster()));
+        }
+
+        void Register()
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_wind_blast_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_CONE_ENEMY_104);
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_wind_blast_SpellScript::FilterTargets, EFFECT_0, TARGET_DEST_UNK_110);
+        }
+
+    protected:
+        uint32 targetCount;
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_wind_blast_SpellScript();
     }
 };
 
 void AddSC_boss_conclave_of_wind()
 {
     new boss_anshal();
+    new npc_ravenous_creeper_trigger();
+    new npc_ravenous_creeper();
+    new npc_soothing_breeze();
     new boss_nezir();
+    new npc_ice_patch();
     new boss_rohash();
-    new npc_hurricane();
-    new npc_tornado();
-    new npc_creeper_trigger();
-    new spell_hurricane();
+    new spell_nurture_aura();
+    new npc_tornado_rohash();
+    new spell_nezir_sleet_storm();
+    new spell_wind_blast();
 }

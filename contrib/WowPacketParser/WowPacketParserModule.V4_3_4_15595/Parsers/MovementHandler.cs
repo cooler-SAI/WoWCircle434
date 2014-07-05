@@ -32,13 +32,7 @@ namespace WowPacketParserModule.V4_3_4_15595.Parsers
             if (packet.Opcode == Opcodes.GetOpcode(Opcode.SMSG_MONSTER_MOVE_TRANSPORT))
             {
                 packet.ReadPackedGuid("Transport GUID");
-
-                if (ClientVersion.AddedInVersion(ClientVersionBuild.V3_1_0_9767)) // no idea when this was added exactly
-                    packet.ReadByte("Transport Seat");
             }
-
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V3_1_0_9767)) // no idea when this was added exactly
-                packet.ReadBoolean("Toggle AnimTierInTrans");
 
             var pos = packet.ReadVector3("Position");
 

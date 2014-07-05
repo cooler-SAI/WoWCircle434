@@ -1564,16 +1564,6 @@ namespace WowPacketParser.Parsing.Parsers
                 packet.ReadUInt32("Unk UInt32", i);
         }
 
-        [Parser(Opcode.SMSG_PVP_OPTIONS_ENABLED, ClientVersionBuild.Zero, ClientVersionBuild.V4_3_4_15595)]
-        public static void HandlePVPOptionsEnabled430(Packet packet)
-        {
-            packet.ReadBit("WargamesEnabled");
-            packet.ReadBit("RatedArenasEnabled");
-            packet.ReadBit("RatedBGsEnabled");
-            packet.ReadBit("Unk 1"); // probably debug unused
-            packet.ReadBit("Unk 1"); // probably debug unused
-        }
-
         [Parser(Opcode.SMSG_PVP_OPTIONS_ENABLED, ClientVersionBuild.V4_3_4_15595)]
         public static void HandlePVPOptionsEnabled434(Packet packet)
         {
@@ -1582,17 +1572,6 @@ namespace WowPacketParser.Parsing.Parsers
             packet.ReadBit("Unk 1"); // probably debug unused
             packet.ReadBit("RatedBGsEnabled");
             packet.ReadBit("RatedArenasEnabled");
-        }
-
-        [Parser(Opcode.SMSG_REQUEST_PVP_REWARDS_RESPONSE, ClientVersionBuild.Zero, ClientVersionBuild.V4_3_4_15595)]
-        public static void HandlePVPRewardsResponse430(Packet packet)
-        {
-            packet.ReadUInt32("Conquest Points From Arena");
-            packet.ReadUInt32("Arena Conquest Cap");
-            packet.ReadUInt32("Conquest Points From Rated Bg");
-            packet.ReadUInt32("Conquest Weekly Cap");
-            packet.ReadUInt32("Current Conquest Points");
-            packet.ReadUInt32("Conquest Points This Week");
         }
 
         [Parser(Opcode.SMSG_REQUEST_PVP_REWARDS_RESPONSE, ClientVersionBuild.V4_3_4_15595)]

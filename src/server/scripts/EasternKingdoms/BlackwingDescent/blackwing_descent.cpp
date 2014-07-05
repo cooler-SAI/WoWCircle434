@@ -1780,44 +1780,44 @@ public:
     };
 };
 
-class spell_lord_victor_nefarius_shadow_conductor : public SpellScriptLoader
-{
-public:
-    spell_lord_victor_nefarius_shadow_conductor() : SpellScriptLoader("spell_lord_victor_nefarius_shadow_conductor") { }
-
-
-    class spell_lord_victor_nefarius_shadow_conductor_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_lord_victor_nefarius_shadow_conductor_SpellScript);
-
-
-        void HandleScript()
-        {
-            PreventHitDamage();
-
-            if (!GetHitUnit())
-                return;
-
-            float distance;
-            uint32 damage;
-            distance = GetCaster()->GetDistance2d(GetHitUnit());
-            damage = (int)(5000 * (distance / 25));
-            if (damage < 5000)
-                damage = 5000;
-            SetHitDamage(damage);
-        }
-
-        void Register()
-        {
-            BeforeHit += SpellHitFn(spell_lord_victor_nefarius_shadow_conductor_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_lord_victor_nefarius_shadow_conductor_SpellScript();
-    }
-};
+//class spell_lord_victor_nefarius_shadow_conductor : public SpellScriptLoader
+//{
+//public:
+//    spell_lord_victor_nefarius_shadow_conductor() : SpellScriptLoader("spell_lord_victor_nefarius_shadow_conductor") { }
+//
+//
+//    class spell_lord_victor_nefarius_shadow_conductor_SpellScript : public SpellScript
+//    {
+//        PrepareSpellScript(spell_lord_victor_nefarius_shadow_conductor_SpellScript);
+//
+//
+//        void HandleScript()
+//        {
+//            PreventHitDamage();
+//
+//            if (!GetHitUnit())
+//                return;
+//
+//            float distance;
+//            uint32 damage;
+//            distance = GetCaster()->GetDistance2d(GetHitUnit());
+//            damage = (int)(5000 * (distance / 25));
+//            if (damage < 5000)
+//                damage = 5000;
+//            SetHitDamage(damage);
+//        }
+//
+//        void Register()
+//        {
+//            BeforeHit += SpellHitFn(spell_lord_victor_nefarius_shadow_conductor_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+//        }
+//    };
+//
+//    SpellScript* GetSpellScript() const
+//    {
+//        return new spell_lord_victor_nefarius_shadow_conductor_SpellScript();
+//    }
+//};
 
 class spell_lord_victor_nefarius_encasing_shadows : public SpellScriptLoader
 {
@@ -1941,6 +1941,6 @@ void AddSC_blackwing_descent()
     new npc_blazing_bone_construct();
     new spell_lord_victor_nefarius_overcharge();
     new spell_lord_victor_nefarius_encasing_shadows();
-    new spell_lord_victor_nefarius_shadow_conductor();
+    //new spell_lord_victor_nefarius_shadow_conductor();
     new spell_lord_victor_nefarius_grip_of_death();
 }

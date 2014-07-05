@@ -384,6 +384,12 @@ bool Creature::UpdateEntry(uint32 Entry, uint32 team, const CreatureData* data)
     uint32 npcflag, unit_flags, dynamicflags;
     ObjectMgr::ChooseCreatureFlags(cInfo, npcflag, unit_flags, dynamicflags, data);
 
+    if (cInfo->flags_extra & CREATURE_FLAG_EXTRA_VEHICLE_ACC_DMG)
+    {
+        AddUnitState(UNIT_STATE_IGNORE_UNATTACKABLE);
+        AddUnitState(UNIT_STATE_IGNORE_LOS);
+    }
+
     if (cInfo->flags_extra & CREATURE_FLAG_EXTRA_WORLDEVENT)
         SetUInt32Value(UNIT_NPC_FLAGS, npcflag | sGameEventMgr->GetNPCFlag(this));
     else

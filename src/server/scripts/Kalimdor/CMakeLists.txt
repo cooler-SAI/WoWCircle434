@@ -10,8 +10,6 @@
 
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
-  Kalimdor/Kezan/kezan.cpp
-  Kalimdor/Kezan/kezan.h
   Kalimdor/stonetalon_mountains.cpp
   Kalimdor/silithus.cpp
   Kalimdor/moonglade.cpp

@@ -17,13 +17,8 @@ namespace WowPacketParser.Parsing.Parsers
         public static void HandleUpdateObject(Packet packet)
         {
             uint map = MovementHandler.CurrentMapId;
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V4_0_1_13164))
-                map = packet.ReadUInt16("Map");
 
             var count = packet.ReadUInt32("Count");
-
-            if (ClientVersion.RemovedInVersion(ClientVersionBuild.V3_0_2_9056))
-                packet.ReadBoolean("Has Transport");
 
             for (var i = 0; i < count; i++)
             {
@@ -222,50 +217,6 @@ namespace WowPacketParser.Parsing.Parsers
                 packet.WriteLine("[" + index + "] " + key + ": " + value);
                 dict.Add(i, blockVal);
             }
-
-            // Dynamic fields - NYI
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V5_0_4_16016))
-            {
-                maskSize = packet.ReadByte();
-                updateMask = new int[maskSize];
-                for (var i = 0; i < maskSize; i++)
-                    updateMask[i] = packet.ReadInt32();
-
-                mask = new BitArray(updateMask);
-                for (var i = 0; i < mask.Count; ++i)
-                {
-                    if (!mask[i])
-                        continue;
-
-                    var flag = packet.ReadByte();
-
-                    if ((flag & 0x80) != 0)
-                        packet.ReadUInt16();
-
-                    var cnt = flag & 0x7F;
-                    var vals = new uint[cnt];
-                    for (var j = 0; j < cnt; ++j)
-                        vals[j] = packet.ReadUInt32();
-
-                    for (var j = 0; j < cnt; ++j)
-                    {
-                        if (vals[j] != 0)
-                        {
-                            for (var k = 0; k < 32; ++k)
-                            {
-                                if (((1 << k) & vals[j]) != 0)
-                                {
-                                    var blockVal = packet.ReadUpdateField();
-                                    string key = "Dynamic block Value ";
-                                    string value = blockVal.UInt32Value + "/" + blockVal.SingleValue;
-                                    packet.WriteLine("[" + index + "] " + key + ": " + value, i, j, k);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             return dict;
         }
 
@@ -2392,24 +2343,12 @@ namespace WowPacketParser.Parsing.Parsers
 
         private static MovementInfo ReadMovementUpdateBlock(ref Packet packet, Guid guid, int index)
         {
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V5_1_0_16309))
-                return ReadMovementUpdateBlock510(ref packet, guid, index);
-
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V5_0_4_16016))
-                return ReadMovementUpdateBlock504(ref packet, guid, index);
-
             if (ClientVersion.AddedInVersion(ClientVersionBuild.V4_3_3_15354))
                 return ReadMovementUpdateBlock433(ref packet, guid, index);
 
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V4_3_2_15211))
-                return ReadMovementUpdateBlock432(ref packet, guid, index);
-
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V4_3_0_15005))
-                return ReadMovementUpdateBlock430(ref packet, guid, index);
-
             var moveInfo = new MovementInfo();
 
-            var flagsTypeCode = ClientVersion.AddedInVersion(ClientVersionBuild.V3_1_0_9767) ? TypeCode.UInt16 : TypeCode.Byte;
+            var flagsTypeCode = TypeCode.Byte;
             var flags = packet.ReadEnum<UpdateFlag>("[" + index + "] Update Flags", flagsTypeCode);
 
             if (flags.HasAnyFlag(UpdateFlag.Living))
@@ -2439,57 +2378,6 @@ namespace WowPacketParser.Parsing.Parsers
 
                 // Movement flags seem incorrect for 4.2.2
                 // guess in which version they stopped checking movement flag and used bits
-                if ((ClientVersion.RemovedInVersion(ClientVersionBuild.V4_2_0_14333) && moveFlags.HasAnyFlag(MovementFlag.SplineEnabled)) || moveInfo.HasSplineData)
-                {
-                    // Temp solution
-                    // TODO: Make Enums version friendly
-                    if (ClientVersion.AddedInVersion(ClientVersionBuild.V4_2_0_14333))
-                    {
-                        var splineFlags422 = packet.ReadEnum<SplineFlag422>("Spline Flags", TypeCode.Int32, index);
-                        if (splineFlags422.HasAnyFlag(SplineFlag422.FinalOrientation))
-                        {
-                            packet.ReadSingle("Final Spline Orientation", index);
-                        }
-                        else
-                        {
-                            if (splineFlags422.HasAnyFlag(SplineFlag422.FinalTarget))
-                                packet.ReadGuid("Final Spline Target GUID", index);
-                            else if (splineFlags422.HasAnyFlag(SplineFlag422.FinalPoint))
-                                packet.ReadVector3("Final Spline Coords", index);
-                        }
-                    }
-                    else
-                    {
-                        var splineFlags = packet.ReadEnum<SplineFlag>("Spline Flags", TypeCode.Int32, index);
-                        if (splineFlags.HasAnyFlag(SplineFlag.FinalTarget))
-                            packet.ReadGuid("Final Spline Target GUID", index);
-                        else if (splineFlags.HasAnyFlag(SplineFlag.FinalOrientation))
-                            packet.ReadSingle("Final Spline Orientation", index);
-                        else if (splineFlags.HasAnyFlag(SplineFlag.FinalPoint))
-                            packet.ReadVector3("Final Spline Coords", index);
-                    }
-
-                    packet.ReadInt32("Spline Time", index);
-                    packet.ReadInt32("Spline Full Time", index);
-                    packet.ReadInt32("Spline ID", index);
-
-                    if (ClientVersion.AddedInVersion(ClientVersionBuild.V3_1_0_9767))
-                    {
-                        packet.ReadSingle("Spline Duration Multiplier", index);
-                        packet.ReadSingle("Spline Duration Multiplier Next", index);
-                        packet.ReadSingle("Spline Vertical Acceleration", index);
-                        packet.ReadInt32("Spline Start Time", index);
-                    }
-
-                    var splineCount = packet.ReadInt32();
-                    for (var i = 0; i < splineCount; i++)
-                        packet.ReadVector3("Spline Waypoint", index, i);
-
-                    if (ClientVersion.AddedInVersion(ClientVersionBuild.V3_1_0_9767))
-                        packet.ReadEnum<SplineMode>("Spline Mode", TypeCode.Byte, index);
-
-                    packet.ReadVector3("Spline Endpoint", index);
-                }
             }
             else // !UpdateFlag.Living
             {
@@ -2544,28 +2432,9 @@ namespace WowPacketParser.Parsing.Parsers
                 packet.ReadSingle("Vehicle Orientation", index);
             }
 
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V4_2_2_14545))
-            {
-                if (flags.HasAnyFlag(UpdateFlag.AnimKits))
-                {
-                    packet.ReadInt16("Unk Int16", index);
-                    packet.ReadInt16("Unk Int16", index);
-                    packet.ReadInt16("Unk Int16", index);
-                }
-            }
 
             if (flags.HasAnyFlag(UpdateFlag.GORotation))
                 moveInfo.Rotation = packet.ReadPackedQuaternion("GO Rotation", index);
-
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V4_2_2_14545))
-            {
-                if (flags.HasAnyFlag(UpdateFlag.TransportUnkArray))
-                {
-                    var count = packet.ReadByte("Count", index);
-                    for (var i = 0; i < count; i++)
-                        packet.ReadInt32("Unk Int32", index, count);
-                }
-            }
 
             return moveInfo;
         }
@@ -2583,25 +2452,6 @@ namespace WowPacketParser.Parsing.Parsers
         public static void HandleDestroyObject(Packet packet)
         {
             packet.ReadGuid("GUID");
-
-            if (ClientVersion.AddedInVersion(ClientVersionBuild.V3_0_2_9056))
-                packet.ReadBoolean("Despawn Animation");
-        }
-
-        [Parser(Opcode.CMSG_OBJECT_UPDATE_FAILED, ClientVersionBuild.Zero, ClientVersionBuild.V5_1_0_16309)] // 4.3.4
-        public static void HandleObjectUpdateFailed(Packet packet)
-        {
-            var guid = packet.StartBitStream(6, 7, 4, 0, 1, 5, 3, 2);
-            packet.ParseBitStream(guid, 6, 7, 2, 3, 1, 4, 0, 5);
-            packet.WriteGuid("Guid", guid);
-        }
-
-        [Parser(Opcode.CMSG_OBJECT_UPDATE_FAILED, ClientVersionBuild.V5_1_0_16309)]
-        public static void HandleObjectUpdateFailed510(Packet packet)
-        {
-            var guid = packet.StartBitStream(5, 3, 0, 6, 1, 4, 2, 7);
-            packet.ParseBitStream(guid, 2, 3, 7, 4, 5, 1, 0, 6);
-            packet.WriteGuid("Guid", guid);
         }
     }
 }

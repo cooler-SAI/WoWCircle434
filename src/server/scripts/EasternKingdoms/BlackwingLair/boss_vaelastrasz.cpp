@@ -175,9 +175,9 @@ public:
                         break;
                     case EVENT_TAILSWIPE:
                         //Only cast if we are behind
-                        /*if (!me->HasInArc(M_PI, me->GetVictim()))
+                        /*if (!me->HasInArc(M_PI, me->getVictim()))
                         {
-                        DoCast(me->GetVictim(), SPELL_TAILSWIPE);
+                        DoCast(me->getVictim(), SPELL_TAILSWIPE);
                         }*/
                         events.ScheduleEvent(EVENT_TAILSWIPE, 15000);
                         break;
