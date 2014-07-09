@@ -1011,8 +1011,6 @@ public:
             }
             else timerDespawn -= diff;
         }
-
-        void JustDied(Unit* /*killer*/) { }
     };
 };
 
@@ -1097,20 +1095,3 @@ void AddSC_boss_bwd_nefarian()
     new spell_nefarian_tail_lash();
     new spell_onyxia_lightning_discharge();
 }
-
-/* Not needed, kept as building new transport future reference.
-
-Transport* t = new Transport(21867, 0);
-std::set<uint32> unused;
-uint32 theguid = sObjectMgr->GenerateLowGuid(HIGHGUID_MO_TRANSPORT);
-t->Create(theguid, GO_NEFARIAN_FLOOR, 669, -107.213f, -224.62f, -6.867f, 3.14f, 255, 0);
-Map* tMap = me->GetMap();
-t->SetMap(tMap);
-t->AddToWorld();
-t->BuildStopMovePacket(tMap);
-
-// transmit creation packet
-t->UpdateForMap(tMap);
-
-sMapMgr->m_Transports.insert(t);
-sMapMgr->m_TransportsByMap[669].insert(t);*/

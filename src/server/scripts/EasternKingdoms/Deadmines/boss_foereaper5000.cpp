@@ -1,237 +1,476 @@
 #include "ScriptPCH.h"
+#include "Object.h"
 #include "deadmines.h"
 
-
-//todo: реализовать робота и аддов на героике, включение робота после убийства пары мобов
-enum ScriptTexts
+enum eSpell
 {
-    SAY_AGGRO     = 0,
-    SAY_DEATH     = 1,
-    SAY_KILL      = 2,
-    SAY_SPELL1    = 3,
-    SAY_SPELL2    = 4,
-    SAY_SPELL3    = 5,
-    SAY_SPELL4    = 6,
+    SPELL_ENERGIZE              = 89132,
+    SPELL_ENERGIZED             = 91733, // -> 89200,
+    SPELL_ON_FIRE               = 91737,
+    SPELL_COSMETIC_STAND        = 88906,
+    SPELL_OVERDRIVE             = 88481, // 88484
+    SPELL_OFFLINE               = 88348,
+    SPELL_HARVEST               = 88495,
+    SPELL_HARVEST_AURA          = 88497,
+    SPELL_HARVEST_SWEEP         = 88521,
+    SPELL_HARVEST_SWEEP_H       = 91718,
+    SPELL_REAPER_STRIKE         = 88490,
+    SPELL_REAPER_STRIKE_H       = 91717,
+    SPELL_SAFETY_REST_OFFLINE   = 88522,
+    SPELL_SAFETY_REST_OFFLINE_H = 91720,
+    SPELL_SUMMON_MOLTEN_SLAG    = 91839,
 };
 
-enum Spells
+enum eAchievementMisc
 {
-    SPELL_OFF_LINE             = 88348,
-    SPELL_REAPER_STRIKE        = 88490,
-    SPELL_REAPER_STRIKE_H      = 91717,
-    SPELL_SAFETY               = 88522,
-    SPELL_SAFETY_H             = 91720,
-    SPELL_HARVEST              = 88495,
-    SPELL_HARVEST_AURA         = 88497,
-    SPELL_HARVEST_DMG          = 88501,
-    SPELL_HARVEST_DMG_H        = 91719,
-    SPELL_HARVEST_SWEEP        = 88521,
-    SPELL_HARVEST_SWEEP_H      = 91718,
-    SPELL_OVERDRIVE            = 88481,
-    SPELL_OVERDRIVE_DMG        = 88484,
-    SPELL_OVERDRIVE_DMG_H      = 91716,
-    SPELL_TARGET_BUNNY         = 71371, //rocket artillery
-};
-
-enum Adds
-{
-    NPC_TARGETING_BUNNY     = 47468,
-    NPC_DEFIAS_REAPER       = 47403,
-    NPC_MOLTEN_SLAG         = 49229,
-    NPC_PROTOTYPE_REAPER    = 49208, // 87239 91731
+    ACHIEVEMENT_PROTOTYPE_PRODIGY = 5368,
+    DATA_ACHIV_PROTOTYPE_PRODIGY  = 1,
 };
 
 enum Events
 {
-    EVENT_OVERDRIVE         = 1,
-    EVENT_OVERDRIVE1        = 2,
-    EVENT_REAPER_STRIKE     = 3,
-    EVENT_HARVEST           = 4,
-    EVENT_HARVEST1          = 5,
-
+    EVENT_NULL,
+    EVENT_START,
+    EVENT_START_2,
+    EVENT_SRO,
+    EVENT_OVERDRIVE,
+    EVENT_HARVEST,
+    EVENT_HARVEST_SWEAP,
+    EVENT_REAPER_STRIKE,
+    EVENT_SAFETY_OFFLINE,
+    EVENT_SWITCH_TARGET,
+    EVENT_MOLTEN_SLAG,
+    EVENT_START_ATTACK,
 };
 
-const Position defiasreaperPos[3] =
+enum eSays
 {
-    { -182.742f, -565.968f, 19.389f, 3.35f},
-    { -228.675f, -565.752f, 19.389f, 5.98f},
-    { -201.526f, -548.737f, 51.229f, 4.43f},
+    SAY_CAST_OVERDRIVE      = 0,
+    SAY_JUSTDIED            = 1,
+    SAY_KILLED_UNIT         = 2,
+    SAY_EVENT_START         = 3,
+
+    SAY_HARVEST_SWEAP       = 4,
+    SAY_CAST_OVERDRIVE_E    = 5,
+    SAY_EVENT_SRO           = 6,
 };
 
-const Position moltenslagPos[4] =
+#define MONSTER_START       "A stray jolt from the Foe Reaper has distrupted the foundry controls!"
+#define MONSTER_SLAG        "The monster slag begins to bubble furiously!"
+#define MONSTER_CHARGING    "|TInterface\\Icons\\ability_whirlwind.blp:20|tFoe Reaper 5000 begins to activate |cFFFF0000|Hspell:91716|h[Overdrive]|h|r!"
+
+
+Position const HarvestSpawn[] =
 {
-    { -205.582f, -572.034f, 20.97f, 1.59f},
-    { -199.143f, -579.843f, 20.97f, 6.16f},
-    { -206.385f, -585.898f, 20.97f, 5.17f},
-    { -212.704f, -579.072f, 20.97f, 3.09f},
+    {-229.72f, -590.37f, 19.38f, 0.71f},
+    {-229.67f, -565.75f, 19.38f, 5.98f},
+    {-205.53f, -552.74f, 19.38f, 4.53f},
+    {-182.74f, -565.96f, 19.38f, 3.35f},
 };
+
+Position const OverdrivePoint ={-184.3978f, -565.997f, 19.30717f, 0.0f};
+Position const PrototypeSpawn ={-200.499f,  -553.946f, 51.2295f,  4.32651f};
 
 class boss_foereaper5000 : public CreatureScript
 {
 public:
     boss_foereaper5000() : CreatureScript("boss_foereaper5000") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new boss_foereaper5000AI (pCreature);
+        return new boss_foereaper5000AI(creature);
     }
 
     struct boss_foereaper5000AI : public BossAI
     {
-        boss_foereaper5000AI(Creature* pCreature) : BossAI(pCreature, DATA_FOEREAPER)
+        boss_foereaper5000AI(Creature* creature) : BossAI(creature, DATA_FOEREAPER)
         {
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-            me->setActive(true);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_STUNNED);
+            prototypeGUID = 0;
         }
 
-        Creature* harvestTarget;
-        bool bEnrage;
+        uint32 eventId;
+        uint32 Step;
+        uint64 prototypeGUID;
+        bool Below;
 
         void Reset()
         {
-            _Reset();
+            if (!me)
+                return;
 
-            bEnrage = false;
+            _Reset();
+            me->SetReactState(REACT_PASSIVE);
+            me->SetPower(POWER_ENERGY, 100);
+            me->SetMaxPower(POWER_ENERGY, 100);
+            me->setPowerType(POWER_ENERGY);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC);
+            Step = 0;
+            Below = false;
+
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+
+            me->SetFullHealth();
+            me->SetOrientation(4.273f);
+
+            DespawnOldWatchers();
+            RespawnWatchers();
+
+            if (IsHeroic())
+            {
+                if (Creature* Reaper = me->GetCreature(*me, prototypeGUID))
+                    Reaper->DespawnOrUnsummon();
+
+                if (Creature* prototype = me->SummonCreature(NPC_PROTOTYPE_REAPER, PrototypeSpawn, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
+                {
+                    prototype->SetFullHealth();
+                    prototypeGUID = prototype->GetGUID();
+                }
+            }
         }
 
-        void UpdateAI(const uint32 diff)
+        void EnterCombat(Unit* /*who*/)
         {
-            if (!UpdateVictim())
+            _EnterCombat();
+
+            events.ScheduleEvent(EVENT_REAPER_STRIKE, 10000);
+            events.ScheduleEvent(EVENT_OVERDRIVE, 11000);
+            events.ScheduleEvent(EVENT_HARVEST, 25000);
+            if (IsHeroic())
+                events.ScheduleEvent(EVENT_MOLTEN_SLAG, 15000);
+
+            if (!me)
                 return;
 
-            events.Update(diff);
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
+        }
 
-            if (me->HasUnitState(UNIT_STATE_CASTING))
+        void JustDied(Unit* /*Killer*/)
+        {
+            if (!me)
                 return;
 
-            if (HealthBelowPct(30) && !bEnrage)
+            _JustDied();
+            DespawnOldWatchers();
+            Talk(SAY_JUSTDIED);
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+
+            if (IsHeroic())
+                if (Creature* Reaper = me->GetCreature(*me, prototypeGUID))
+                    Reaper->DespawnOrUnsummon();
+        }
+
+        uint32 GetData(uint32 type) const
+        {
+            if (type == DATA_ACHIV_PROTOTYPE_PRODIGY)
             {
-                Talk(SAY_SPELL4);
-                bEnrage = true;
-                DoCast(me, SPELL_SAFETY);
-                return;
+                if (!IsHeroic())
+                    return false;
+
+                if (Creature* prototype_reaper = me->GetCreature(*me, prototypeGUID))
+                    if (prototype_reaper->GetHealth() >= 0.9 * prototype_reaper->GetMaxHealth())
+                        return true;
             }
+
+            return false;
+        }
+
+        void JustReachedHome()
+        {
+            if (!me)
+                return;
+
+            _JustReachedHome();
+            Talk(SAY_KILLED_UNIT);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_STUNNED);
+            instance->SetBossState(DATA_FOEREAPER, FAIL);
+        }
+
+        void DespawnOldWatchers()
+        {
+            std::list<Creature*> reapers;
+            me->GetCreatureListWithEntryInGrid(reapers, NPC_DEFIAS_REAPER, 250.0f);
+
+            reapers.sort(CerberCore::ObjectDistanceOrderPred(me));
+            for (std::list<Creature*>::iterator itr = reapers.begin(); itr != reapers.end(); ++itr)
+            {
+                if (( *itr ) && ( *itr )->GetTypeId() == TYPEID_UNIT)
+                {
+                    ( *itr )->DespawnOrUnsummon();
+                }
+            }
+        }
+
+        void RespawnWatchers()
+        {
+            for (uint8 i = 0; i < 4; ++i)
+            {
+                me->SummonCreature(NPC_DEFIAS_REAPER, HarvestSpawn[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            }
+        }
+
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
+        {
+            if (!spell || !me)
+                return;
+
+            if (spell->Id == SPELL_ENERGIZE)
+            {
+                if (Step == 3)
+                {
+                    events.ScheduleEvent(EVENT_START, 100);
+                }
+                Step++;
+            }
+        }
+
+        void MovementInform(uint32 /*type*/, uint32 id)
+        {
+            if (id == 0)
+            {
+                if (Creature* HarvestTarget = me->FindNearestCreature(NPC_HARVEST_TARGET, 200.0f, true))
+                {
+                    //DoCast(HarvestTarget, IsHeroic() ? SPELL_HARVEST_SWEEP_H : SPELL_HARVEST_SWEEP);
+                    me->RemoveAurasDueToSpell(SPELL_HARVEST_AURA);
+                    events.ScheduleEvent(EVENT_START_ATTACK, 1000);
+                }
+            }
+        }
+
+        void HarvestChase()
+        {
+            if (Creature* HarvestTarget = me->FindNearestCreature(NPC_HARVEST_TARGET, 200.0f, true))
+            {
+                me->SetSpeed(MOVE_RUN, 3.0f, true);
+                me->GetMotionMaster()->MoveCharge(HarvestTarget->GetPositionX(), HarvestTarget->GetPositionY(), HarvestTarget->GetPositionZ(), 5.0f, 0);
+                HarvestTarget->DespawnOrUnsummon(8500);
+            }
+        }
+
+        void UpdateAI(uint32 const uiDiff)
+        {
+            if (!me)
+                return;
+
+            DoMeleeAttackIfReady();
+
+            events.Update(uiDiff);
 
             while (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
-                case EVENT_OVERDRIVE:
-                    DoCast(me, SPELL_OVERDRIVE);
-                    Talk(SAY_SPELL3);
-                    events.ScheduleEvent(EVENT_OVERDRIVE, urand(25000, 30000));
-                    break;
-                case EVENT_REAPER_STRIKE:
-                    DoCast(me->getVictim(), SPELL_REAPER_STRIKE);
-                    events.ScheduleEvent(EVENT_REAPER_STRIKE, urand(7000, 10000));
-                    break;
-                case EVENT_HARVEST:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                    {
-                        DoCast(target, SPELL_HARVEST);
-                        Talk(SAY_SPELL1);
-                    }
-                    events.ScheduleEvent(EVENT_HARVEST, 30000, 40000);
-                    break;
+                    case EVENT_START:
+                        Talk(SAY_EVENT_START);
+                        me->AddAura(SPELL_ENERGIZED, me);
+                        me->MonsterTextEmote(MONSTER_START, 0, true);
+                        events.ScheduleEvent(EVENT_START_2, 5000);
+                        break;
+
+                    case EVENT_START_2:
+                        me->MonsterTextEmote(MONSTER_SLAG, 0, true);
+                        me->SetHealth(me->GetMaxHealth());
+                        DoZoneInCombat();
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
+                        me->RemoveAurasDueToSpell(SPELL_ENERGIZED);
+                        events.ScheduleEvent(EVENT_SRO, 1000);
+                        break;
+
+                    case EVENT_SRO:
+                        me->RemoveAurasDueToSpell(SPELL_OFFLINE);
+
+                        if (Player* victim = me->FindNearestPlayer(40.0f))
+                            me->Attack(victim, false);
+                        break;
+
+                    case EVENT_START_ATTACK:
+                        me->RemoveAurasDueToSpell(SPELL_HARVEST_AURA);
+                        me->SetSpeed(MOVE_RUN, 2.0f, true);
+                        if (Player* victim = me->FindNearestPlayer(40.0f))
+                            me->Attack(victim, true);
+                        break;
+
+                    case EVENT_OVERDRIVE:
+                        if (!UpdateVictim())
+                            return;
+
+                        me->MonsterTextEmote(MONSTER_CHARGING, 0, true);
+                        me->AddAura(SPELL_OVERDRIVE, me);
+                        me->SetSpeed(MOVE_RUN, 4.0f, true);
+                        events.ScheduleEvent(EVENT_SWITCH_TARGET, 1500);
+                        events.ScheduleEvent(EVENT_OVERDRIVE, 45000);
+                        break;
+
+                    case EVENT_SWITCH_TARGET:
+                        if (Unit* victim = SelectTarget(SELECT_TARGET_RANDOM, 0, 150, true))
+                            me->Attack(victim, true);
+
+                        if (me->HasAura(SPELL_OVERDRIVE))
+                        {
+                            events.ScheduleEvent(EVENT_SWITCH_TARGET, 1500);
+                        }
+                        break;
+
+                    case EVENT_HARVEST:
+                        if (!UpdateVictim())
+                            return;
+
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 150, true))
+                            me->CastSpell(target, SPELL_HARVEST);
+
+                        events.RescheduleEvent(EVENT_HARVEST_SWEAP, 5500);
+                        break;
+
+                    case EVENT_HARVEST_SWEAP:
+                        if (!UpdateVictim())
+                            return;
+
+                        HarvestChase();
+                        Talk(SAY_HARVEST_SWEAP);
+                        events.ScheduleEvent(EVENT_START_ATTACK, 8000);
+                        events.RescheduleEvent(EVENT_HARVEST, 45000);
+                        break;
+
+                    case EVENT_REAPER_STRIKE:
+                        if (!UpdateVictim())
+                            return;
+
+                        if (Unit* victim = me->getVictim())
+                        {
+                            if (me->IsWithinDist(victim, 25.0f))
+                            {
+                                DoCast(victim, IsHeroic() ? SPELL_REAPER_STRIKE_H : SPELL_REAPER_STRIKE);
+                            }
+                        }
+                        events.ScheduleEvent(EVENT_REAPER_STRIKE, urand(9000, 12000));
+                        break;
+
+                    case EVENT_MOLTEN_SLAG:
+                        me->MonsterTextEmote(MONSTER_SLAG, 0, true);
+                        me->CastSpell(-213.21f, -576.85f, 20.97f, SPELL_SUMMON_MOLTEN_SLAG, false);
+                        events.ScheduleEvent(EVENT_MOLTEN_SLAG, 20000);
+                        break;
+
+                    case EVENT_SAFETY_OFFLINE:
+                        Talk(SAY_EVENT_SRO);
+                        DoCast(me, IsHeroic() ? SPELL_SAFETY_REST_OFFLINE_H : SPELL_SAFETY_REST_OFFLINE);
+                        break;
                 }
-            }
 
-            DoMeleeAttackIfReady();
-        }
-
-        void MovementInform(uint32 type, uint32 id)
-        {
-            if (type == POINT_MOTION_TYPE)
-            {
-                switch (id)
+                if (HealthBelowPct(30) && !Below)
                 {
-                case 1001:
-                    DoCast(me, DUNGEON_MODE(SPELL_HARVEST_SWEEP, SPELL_HARVEST_SWEEP), true);
-                    me->RemoveAurasDueToSpell(SPELL_HARVEST_AURA);
-                    if (harvestTarget)
-                        harvestTarget->DespawnOrUnsummon();
-                    break;
+                    events.ScheduleEvent(EVENT_SAFETY_OFFLINE, 0);
+                    Below = true;
                 }
             }
-        }
-
-        void EnterCombat(Unit* /*who*/) 
-        {
-            Talk(SAY_AGGRO);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-            events.ScheduleEvent(EVENT_REAPER_STRIKE, urand(5000, 8000));
-            events.ScheduleEvent(EVENT_OVERDRIVE, urand(10000, 15000));
-            events.ScheduleEvent(EVENT_HARVEST, urand(25000, 30000));
-            DoZoneInCombat();
-            instance->SetBossState(DATA_FOEREAPER, IN_PROGRESS);
-        }
-
-        void KilledUnit(Unit * victim)
-        {
-            Talk(SAY_KILL);
-        }
-
-        void JustSummoned(Creature* summon)
-        {
-            BossAI::JustSummoned(summon);
-            if (summon->GetEntry()== NPC_TARGETING_BUNNY)
-            {
-                harvestTarget = summon;
-                Talk(SAY_SPELL2);
-                me->GetMotionMaster()->MovePoint(1001, harvestTarget->GetPositionX(), harvestTarget->GetPositionY(), harvestTarget->GetPositionZ());
-            }
-        }
-
-        void JustDied(Unit* /*killer*/)
-        {
-            _JustDied();
-            Talk(SAY_DEATH); 
         }
     };
 };
 
-class npc_foereaper_targeting_bunny: public CreatureScript
+class npc_defias_watcher : public CreatureScript
 {
 public:
-    npc_foereaper_targeting_bunny() : CreatureScript("npc_foereaper_targeting_bunny") { }
+    npc_defias_watcher() : CreatureScript("npc_defias_watcher") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_foereaper_targeting_bunnyAI (pCreature);
+        return new npc_defias_watcherAI(creature);
     }
 
-    struct npc_foereaper_targeting_bunnyAI : public Scripted_NoMovementAI
+    struct npc_defias_watcherAI : public ScriptedAI
     {
-        npc_foereaper_targeting_bunnyAI(Creature *c) : Scripted_NoMovementAI(c)
+        npc_defias_watcherAI(Creature* creature) : ScriptedAI(creature)
         {
-            pInstance = c->GetInstanceScript();
+            instance = creature->GetInstanceScript();
+            Status = false;
         }
 
-        InstanceScript* pInstance;
+        InstanceScript* instance;
+        bool Status;
 
         void Reset()
         {
-            if (!pInstance)
+            if (!me)
                 return;
 
-            DoCast(SPELL_TARGET_BUNNY);
+            me->SetPower(POWER_ENERGY, 100);
+            me->SetMaxPower(POWER_ENERGY, 100);
+            me->setPowerType(POWER_ENERGY);
+            if (Status == true)
+            {
+                if (!me->HasAura(SPELL_ON_FIRE))
+                    me->AddAura(SPELL_ON_FIRE, me);
+                me->setFaction(35);
+            }
+        }
+
+        void JustDied(Unit* /*Killer*/)
+        {
+            if (!me || Status == true)
+                return;
+
+            Energizing();
+        }
+
+        void Energizing()
+        {
+            Status = true;
+            me->SetHealth(15);
+            me->setRegeneratingHealth(false);
+            me->setFaction(35);
+            me->AddAura(SPELL_ON_FIRE, me);
+            me->CastSpell(me, SPELL_ON_FIRE);
+            me->SetInCombatWithZone();
+
+            if (Creature* reaper = me->FindNearestCreature(NPC_FOE_REAPER_5000, 200.0f))
+            {
+                me->CastSpell(reaper, SPELL_ENERGIZE);
+            }
+        }
+
+        void DamageTaken(Unit* /*attacker*/, uint32& damage)
+        {
+            if (!me || damage <= 0 || Status == true)
+                return;
+
+            if (me->GetHealth() - damage <= me->GetMaxHealth() * 0.10)
+            {
+                damage = 0;
+                Energizing();
+            }
+        }
+
+        void UpdateAI(uint32 const diff)
+        {
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
         }
     };
+};
+
+class achievement_prototype_reaper : public AchievementCriteriaScript
+{
+public:
+    achievement_prototype_reaper() : AchievementCriteriaScript("achievement_prototype_reaper") { }
+
+    bool OnCheck(Player* /*source*/, Unit* target)
+    {
+        if (target && target->IsAIEnabled)
+        {
+            return target->GetAI()->GetData(DATA_ACHIV_PROTOTYPE_PRODIGY);
+        }
+        return false;
+    }
 };
 
 void AddSC_boss_foereaper5000()
 {
+    new npc_defias_watcher();
     new boss_foereaper5000();
-    new npc_foereaper_targeting_bunny();
+    new achievement_prototype_reaper();
 }

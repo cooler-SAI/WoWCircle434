@@ -103,6 +103,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) 
         {
+            _EnterCombat();
             stage = 0;
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_FIST_OF_FLAME, 10000);
@@ -126,7 +127,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if(me->GetHealthPct() <= 50 && stage == 0)
+            if (me->GetHealthPct() <= 50 && stage == 0)
             {
                 stage = 1;
                 events.Reset();
@@ -150,7 +151,7 @@ public:
                     events.ScheduleEvent(EVENT_ARCANE_POWER2, 2200);
                     break;
                 case EVENT_ARCANE_POWER2:
-                    me->NearTeleportTo(-193.43f,-437.86f,54.38f,4.88f,true);
+                    me->NearTeleportTo(-193.43f, -437.86f, 54.38f, 4.88f, true);
                     SetCombatMovement(false);
                     me->AttackStop();
                     me->RemoveAllAuras();
@@ -189,7 +190,6 @@ public:
                     break;
                 }
             }
-
             DoMeleeAttackIfReady();
         }
     };

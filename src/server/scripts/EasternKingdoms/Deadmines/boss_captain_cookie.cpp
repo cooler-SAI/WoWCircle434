@@ -1,289 +1,164 @@
 #include "ScriptPCH.h"
 #include "deadmines.h"
 
-enum Spells
+enum eSpell
 {
-    SPELL_WHO_IS_THAT                       = 89339,
-    SPELL_SETIATED                          = 89267,
-    SPELL_SETIATED_H                        = 92834,
-    SPELL_NAUSEATED                         = 89732,
-    SPELL_NAUSEATED_H                       = 92066,
-    SPELL_ROTTEN_AURA                       = 89734,
-    SPELL_ROTTEN_AURA_H                     = 95513,
-    SPELL_ROTTEN_AURA_DMG                   = 89734,
-    SPELL_ROTTEN_AURA_DMG_H                 = 92065,
-    SPELL_CAULDRON                          = 89250,
-    SPELL_CAULDRON_VISUAL                   = 89251,
-    SPELL_CAULDRON_FIRE                     = 89252,
-
-
-    SPELL_THROW_FOOD_TARGETING_CORN         = 89268,
-    SPELL_THROW_FOOD_TARGETING_ROTTEN_CORN  = 89740,
-    SPELL_THROW_FOOD_TARGETING_MELON        = 90561,
-    SPELL_THROW_FOOD_TARGETING_ROTTEN_MELON = 90582,
-    SPELL_THROW_FOOD_TARGETING_STEAK        = 90562,
-    SPELL_THROW_FOOD_TARGETING_ROTTEN_STEAK = 90583,
-    SPELL_THROW_FOOD_TARGETING_MYSTERY_MEAT = 90563,
-    SPELL_THROW_FOOD_TARGETING_ROTTEN_MM    = 90584,
-    SPELL_THROW_FOOD_TARGETING_LOAF         = 90564,
-    SPELL_THROW_FOOD_TARGETING_ROTTEN_LOAF  = 90585,
-    SPELL_THROW_FOOD_TARGETING_BUN          = 90565,
-    SPELL_THROW_FOOD_TARGETING_ROTTEN_BUN   = 90586,
-
-
-    SPELL_THROW_FOOD        = 89263,
-    SPELL_THROW_FOOD_FORCE  = 89269,
-    SPELL_THROW_FOOD_BACK   = 89264,
-    SPELL_THROW_FOOD_01     = 90557,
-    SPELL_THROW_FOOD_02     = 90560,
-    SPELL_THROW_FOOD_03     = 90603,
-    SPELL_THROW_FOOD_04     = 89739,
-    SPELL_THROW_FOOD_05     = 90605,
-    SPELL_THROW_FOOD_06     = 90556,
-    SPELL_THROW_FOOD_07     = 90680,
-    SPELL_THROW_FOOD_08     = 90559,
-    SPELL_THROW_FOOD_09     = 90602,
-    SPELL_THROW_FOOD_10     = 89263,
-    SPELL_THROW_FOOD_11     = 90604,
-    SPELL_THROW_FOOD_12     = 90555,
-    SPELL_THROW_FOOD_13     = 90606,
+    SPELL_COOKIES_HAT        = 88873,
+    SPELL_WHOS_THAT          = 89339,
+    SPELL_COOKIES_CAULDRON   = 89250,
+    SPELL_ACHIEVEMENT_AURA   = 95650,
+    SPELL_RIE_VEHICLE_HARD   = 46598,
+    SPELL_CAULDRON_FIRE      = 89252,
+    SPELL_VISUAL_FIRE        = 89251,
+    SPELL_SATIATED           = 92834,
+    SPELL_NAUSEATED          = 92066,
 };
 
-enum Adds
+
+const uint32 FoodSpells[13] =
 {
-    NPC_BABY_MURLOC         = 48672,
-
-    NPC_CAULDRON            = 47754,
-
-    NPC_BUN                 = 48301,
-    NPC_MISTERY_MEAT        = 48297,
-    NPC_BREAD_LOAF          = 48300,
-    NPC_STEAK               = 48296,
-    NPC_CORN                = 48006,
-    NPC_MELON               = 48294,
-
-    NPC_ROTTEN_SNEAK        = 48295,
-    NPC_ROTTEN_CORN         = 48276,
-    NPC_ROTTEN_LOAF         = 48299,
-    NPC_ROTTEN_MELON        = 48293,
-    NPC_ROTTEN_MISTERY_MEAT = 48298,
-    NPC_ROTTEN_BUN          = 48302,
+    90557, 90560, 90680, 90606, 90605, 90604, 90603, 90559, 89263, 90555, 90555, 89739, 90602
 };
 
 enum Events
 {
-    EVENT_THROW_FOOD    = 1,
-    EVENT_CAULDRON_1    = 2,
-    EVENT_CAULDRON_2    = 3,
-    EVENT_MOVE          = 4,
+    EVENT_NULL,
+    EVENT_FOOD,
 };
 
-const uint32 ThrowFoodSpells[12] = 
+const Position CookiesPos[2] =
 {
-    SPELL_THROW_FOOD_TARGETING_CORN,
-    SPELL_THROW_FOOD_TARGETING_ROTTEN_CORN,
-    SPELL_THROW_FOOD_TARGETING_MELON,
-    SPELL_THROW_FOOD_TARGETING_ROTTEN_MELON,
-    SPELL_THROW_FOOD_TARGETING_STEAK,
-    SPELL_THROW_FOOD_TARGETING_ROTTEN_STEAK,
-    SPELL_THROW_FOOD_TARGETING_MYSTERY_MEAT,
-    SPELL_THROW_FOOD_TARGETING_ROTTEN_MM,
-    SPELL_THROW_FOOD_TARGETING_LOAF,
-    SPELL_THROW_FOOD_TARGETING_ROTTEN_LOAF,
-    SPELL_THROW_FOOD_TARGETING_BUN,
-    SPELL_THROW_FOOD_TARGETING_ROTTEN_BUN
+    {-67.435249f, -822.357178f, 40.861347f, 0.0f},
+    {-64.2552f,   -820.245f,    41.17154f,  0.0f}
 };
-
-#define POINT_MOVE  1
-
-const Position cauldronPos = {-64.07f, -820.27f, 41.17f, 0.0f};
-const Position movePos = {-64.07f, -820.27f, 41.17f, 0.04f};
 
 class boss_captain_cookie : public CreatureScript
 {
 public:
     boss_captain_cookie() : CreatureScript("boss_captain_cookie") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new boss_captain_cookieAI (pCreature);
+        return new boss_captain_cookieAI(creature);
     }
 
     struct boss_captain_cookieAI : public BossAI
     {
-        boss_captain_cookieAI(Creature* pCreature) : BossAI(pCreature, DATA_CAPTAIN)
-        {
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_GRIP, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_ROOT, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SAPPED, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, true);
-            me->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, true);
-            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CONFUSE, true);
-            me->setActive(true);
-        }
+        boss_captain_cookieAI(Creature* creature) : BossAI(creature, DATA_COOKIE) { }
+
+        uint32 Phase;
+        Creature* bunny;
 
         void Reset()
         {
+            if (!me || !instance)
+                return;
             _Reset();
-            me->SetReactState(REACT_AGGRESSIVE);
-            DoCast(SPELL_WHO_IS_THAT);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        }
 
-        void MoveInLineOfSight(Unit* who)
-        {
-            if (instance->GetBossState(DATA_ADMIRAL) != DONE)
-                return;
-
-            if (me->GetDistance(who) > 5.0f)
-                return;
-
-            BossAI::MoveInLineOfSight(who);
-        }
-
-        void EnterCombat(Unit* who)
-        {
-            me->RemoveAura(SPELL_WHO_IS_THAT);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            me->AttackStop();
             me->SetReactState(REACT_PASSIVE);
-
-            events.ScheduleEvent(EVENT_MOVE, 1000);
-
-            DoZoneInCombat();
-            instance->SetBossState(DATA_CAPTAIN, IN_PROGRESS);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+            Phase = 0;
+            me->AddAura(SPELL_COOKIES_HAT, me);
+            me->AddAura(SPELL_WHOS_THAT, me);
+            if (bunny = me->SummonCreature(NPC_GENERAL_PURPOSE_BUNNY_JMF, CookiesPos[1]))
+            {
+                bunny->AI()->Talk(1);
+            }
+            if (Creature* vehicle = me->FindNearestCreature(47754, 5.0f))
+            {
+                vehicle->DespawnOrUnsummon();
+            }
         }
 
-        void MovementInform(uint32 type, uint32 data)
+        void JustSummoned(Creature* summoned)
         {
-            if (type == POINT_MOTION_TYPE)
-                if (data == POINT_MOVE)
-                    events.ScheduleEvent(EVENT_CAULDRON_1, 2000);
+            summons.Summon(summoned);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* /*Killer*/)
         {
+            if (!me)
+                return;
+
             _JustDied();
-
-            if (IsHeroic())
-                me->SummonCreature(NPC_NOTE_FROM_VANESSA, notePos);
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+            summons.DespawnAll();
         }
 
-        void UpdateAI(const uint32 diff)
+        void SummonedCreatureDespawn(Creature* summon)
         {
-            if (!UpdateVictim())
+            summons.Despawn(summon);
+        }
+
+        void EnterCombat(Unit* /*who*/)
+        {
+            if (!me || !instance)
                 return;
 
-            events.Update(diff);
+            _EnterCombat();
+            instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
+            me->RemoveAura(SPELL_COOKIES_HAT);
+            me->RemoveAura(SPELL_WHOS_THAT);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING))
+            std::list<Player*> players;
+            CerberCore::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
+            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+            me->VisitNearbyWorldObject(150.0f, searcher);
+
+            for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                me->CastSpell(( *itr ), SPELL_ACHIEVEMENT_AURA, true);
+        }
+
+        void UpdateAI(uint32 const uiDiff)
+        {
+            if (!me || !instance)
                 return;
+
+            events.Update(uiDiff);
+
+            if (Creature* cauldron = me->FindNearestCreature(47754, 150.0f))
+                cauldron->SetTarget(0);
 
             while (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
-                case EVENT_MOVE:
-                    me->GetMotionMaster()->MovePoint(POINT_MOVE, movePos);
-                    break;
-                case EVENT_CAULDRON_1:
-                    me->CastSpell(centershipPos.GetPositionX(), centershipPos.GetPositionY(), centershipPos.GetPositionZ(), SPELL_CAULDRON, true);
-                    events.ScheduleEvent(EVENT_CAULDRON_2, 2000);
-                    break;
-                case EVENT_CAULDRON_2:
-                    if (Creature* pCauldron = me->FindNearestCreature(NPC_CAULDRON, 20.0f))
-                        me->GetMotionMaster()->MoveJump(pCauldron->GetPositionX(), pCauldron->GetPositionY(), pCauldron->GetPositionZ(), 5, 10);
-                    events.ScheduleEvent(EVENT_THROW_FOOD, 3000);
-                    break;
-                case EVENT_THROW_FOOD:
-                    DoCastAOE(ThrowFoodSpells[urand(0, 11)]);
-                    events.ScheduleEvent(EVENT_THROW_FOOD, 4000);
-                    break;
+                    case EVENT_FOOD:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                            me->CastSpell(target, FoodSpells[urand(0, 13)], TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE);
+                        events.ScheduleEvent(EVENT_FOOD, 2200);
+                        break;
                 }
             }
+
+            switch (Phase)
+            {
+                case 0:
+                    me->GetMotionMaster()->MovePoint(0, CookiesPos[0]);
+                    Phase++;
+                    break;
+                case 1:
+                    if (me->GetDistance2d(CookiesPos[0].GetPositionX(), CookiesPos[0].GetPositionY()) <= 2.0f)
+                    {
+                        if (bunny)
+                        {
+                            me->CastSpell(bunny, SPELL_COOKIES_CAULDRON);
+                            if (Creature* vehicle = me->FindNearestCreature(47754, 5.0f))
+                            {
+                                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_PACIFIED);
+                                me->SetReactState(REACT_AGGRESSIVE);
+                                SetCombatMovement(false);
+                                me->CastSpell(vehicle, SPELL_RIE_VEHICLE_HARD);
+                                vehicle->AddAura(SPELL_CAULDRON_FIRE, me);
+                                vehicle->CastSpell(vehicle, SPELL_VISUAL_FIRE);
+                                events.ScheduleEvent(EVENT_FOOD, 100);
+                                Phase++;
+                            }
+                        }
+                    }
+                    break;
+            }
         }
-    };
-};
-
-class npc_captain_cookie_cauldron : public CreatureScript
-{
-public:
-    npc_captain_cookie_cauldron() : CreatureScript("npc_captain_cookie_cauldron") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new npc_captain_cookie_cauldronAI (pCreature);
-    }
-
-    struct npc_captain_cookie_cauldronAI : public ScriptedAI
-    {
-        npc_captain_cookie_cauldronAI(Creature* pCreature) : ScriptedAI(pCreature)
-        {
-            me->SetReactState(REACT_PASSIVE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        }
-
-        void Reset() 
-        {
-            DoCast(me, SPELL_CAULDRON_VISUAL, true);
-            DoCast(me, SPELL_CAULDRON_FIRE);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-        }
-    };
-};
-
-class npc_captain_cookie_good_food : public CreatureScript
-{
-public:
-    npc_captain_cookie_good_food() : CreatureScript("npc_captain_cookie_good_food") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new npc_captain_cookie_good_foodAI (pCreature);
-    }
-
-    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
-    {
-        InstanceScript* pInstance = pCreature->GetInstanceScript();
-        if (!pInstance)
-            return true;
-        if (pInstance->GetBossState(DATA_CAPTAIN) != IN_PROGRESS)
-            return true;
-
-        pPlayer->CastSpell(pPlayer, (pPlayer->GetMap()->IsHeroic() ? SPELL_SETIATED_H : SPELL_SETIATED), true);
-
-        pCreature->DespawnOrUnsummon();
-        return true;
-    }
-
-    struct npc_captain_cookie_good_foodAI : public ScriptedAI
-    {
-        npc_captain_cookie_good_foodAI(Creature* pCreature) : ScriptedAI(pCreature) 
-        {
-            pInstance = pCreature->GetInstanceScript();
-        }
-
-        void JustDied(Unit* killer)
-        {
-            me->DespawnOrUnsummon();
-        }
-
-        void UpdateAI(const uint32 diff)
-        {
-            if (!pInstance)
-                return;
-
-            if (pInstance->GetBossState(DATA_CAPTAIN) != IN_PROGRESS)
-                me->DespawnOrUnsummon();
-        }
-    private:
-        InstanceScript* pInstance;
     };
 };
 
@@ -292,154 +167,75 @@ class npc_captain_cookie_bad_food : public CreatureScript
 public:
     npc_captain_cookie_bad_food() : CreatureScript("npc_captain_cookie_bad_food") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    bool OnGossipHello(Player* player, Creature* me)
     {
-        return new npc_captain_cookie_bad_foodAI (pCreature);
-    }
+        if (!me || !player)
+            return false;
 
-    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
-    {
-        InstanceScript* pInstance = pCreature->GetInstanceScript();
-        if (!pInstance)
-            return true;
-        if (pInstance->GetBossState(DATA_CAPTAIN) != IN_PROGRESS)
-            return true;
+        player->CastSpell(player, SPELL_NAUSEATED);
 
-        pPlayer->CastSpell(pPlayer, (pPlayer->GetMap()->IsHeroic() ? SPELL_NAUSEATED_H : SPELL_NAUSEATED), true);
-
-        pCreature->DespawnOrUnsummon();
-        return true;
-    }
-
-    struct npc_captain_cookie_bad_foodAI : public ScriptedAI
-    {
-        npc_captain_cookie_bad_foodAI(Creature* pCreature) : ScriptedAI(pCreature) 
+        Aura* aura = player->GetAura(SPELL_NAUSEATED);
+        if (aura && aura->GetStackAmount() >= 2)
         {
-            pInstance = pCreature->GetInstanceScript();
+            player->RemoveAura(SPELL_ACHIEVEMENT_AURA);
         }
 
-        void JustDied(Unit* killer)
+        me->DespawnOrUnsummon();
+        return true;
+    }
+};
+
+class npc_captain_cookie_good_food : public CreatureScript
+{
+public:
+    npc_captain_cookie_good_food() : CreatureScript("npc_captain_cookie_good_food") { }
+
+    bool OnGossipHello(Player* player, Creature* me)
+    {
+        if (!me || !player)
+            return false;
+
+        player->CastSpell(player, SPELL_SATIATED);
+        me->DespawnOrUnsummon();
+        return true;
+    }
+};
+
+class mob_cookie_cauldron : public CreatureScript
+{
+public:
+    mob_cookie_cauldron() : CreatureScript("mob_cookie_cauldron") { }
+
+    struct mob_cookie_cauldronAI : public ScriptedAI
+    {
+        mob_cookie_cauldronAI(Creature* creature) : ScriptedAI(creature)
         {
-            me->DespawnOrUnsummon();
+            SetCombatMovement(false);
+            me->SetReactState(REACT_DEFENSIVE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
         }
 
         void UpdateAI(const uint32 diff)
         {
-            if (!pInstance)
+            if (!UpdateVictim())
                 return;
 
-            if (pInstance->GetBossState(DATA_CAPTAIN) != IN_PROGRESS)
-                me->DespawnOrUnsummon();
-        }
-    private:
-        InstanceScript* pInstance;
-    };
-};
-
-class spell_captain_cookie_setiated : public SpellScriptLoader
-{
-public:
-    spell_captain_cookie_setiated() : SpellScriptLoader("spell_captain_cookie_setiated") { }
-
-
-    class spell_captain_cookie_setiated_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_captain_cookie_setiated_SpellScript);
-
-
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            if (!GetCaster() || !GetHitUnit())
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
-            GetHitUnit()->RemoveAuraFromStack(SPELL_NAUSEATED);
-            GetHitUnit()->RemoveAuraFromStack(SPELL_NAUSEATED_H);
-        }
-
-        void Register()
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_captain_cookie_setiated_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new spell_captain_cookie_setiated_SpellScript();
+        return new mob_cookie_cauldronAI(creature);
     }
 };
 
-class spell_captain_cookie_nauseated : public SpellScriptLoader
-{
-public:
-    spell_captain_cookie_nauseated() : SpellScriptLoader("spell_captain_cookie_nauseated") { }
-
-
-    class spell_captain_cookie_nauseated_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_captain_cookie_nauseated_SpellScript);
-
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            if (!GetCaster() || !GetHitUnit())
-                return;
-            GetHitUnit()->RemoveAuraFromStack(SPELL_SETIATED);
-            GetHitUnit()->RemoveAuraFromStack(SPELL_SETIATED_H);
-        }
-
-        void Register()
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_captain_cookie_nauseated_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
-        }
-    };
-
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_captain_cookie_nauseated_SpellScript();
-    }
-};
-
-class spell_captain_cookie_throw_food_targeting : public SpellScriptLoader
-{
-public:
-    spell_captain_cookie_throw_food_targeting() : SpellScriptLoader("spell_captain_cookie_throw_food_targeting") { }
-
-    class spell_captain_cookie_throw_food_targeting_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_captain_cookie_throw_food_targeting_SpellScript);
-
-        void HandleAfterHit()
-        {
-            if (!GetCaster() || !GetHitUnit())
-                return;
-
-            uint32 spellId = 0;
-
-            if (SpellInfo const* spellInfo = GetSpellInfo())
-                spellId = spellInfo->Effects[EFFECT_0].BasePoints;
-            if (!sSpellMgr->GetSpellInfo(spellId))
-                return;
-
-            GetCaster()->CastSpell(GetHitUnit(), spellId);
-        }
-
-        void Register()
-        {
-            AfterHit += SpellHitFn(spell_captain_cookie_throw_food_targeting_SpellScript::HandleAfterHit);
-        }
-    };
-
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_captain_cookie_throw_food_targeting_SpellScript();
-    }
-};
 
 void AddSC_boss_captain_cookie()
 {
-    new boss_captain_cookie();
-    new npc_captain_cookie_cauldron();
-    new npc_captain_cookie_good_food();
     new npc_captain_cookie_bad_food();
-    new spell_captain_cookie_setiated();
-    new spell_captain_cookie_nauseated();
-    new spell_captain_cookie_throw_food_targeting();
+    new npc_captain_cookie_good_food();
+    new boss_captain_cookie();
+    new mob_cookie_cauldron();
 }
