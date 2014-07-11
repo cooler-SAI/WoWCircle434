@@ -191,7 +191,6 @@ public:
                     }
                 case DATA_VANESSA:
                     break;
-
             }
 
             return true;

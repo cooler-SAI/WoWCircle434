@@ -62,6 +62,7 @@ enum eCreatures
     NPC_ROPE_ANCHOR                 = 49552,
     NPC_DEFIAS_REAPER               = 47403,
     NPC_PROTOTYPE_REAPER            = 49208,
+    NPC_COOKIES_CAULDRON            = 47754,
 
     NPC_DEFIAS_SHADOWGUARD          = 48505,
     NPC_DEFIAS_ENFORCER             = 48502,
@@ -112,14 +113,15 @@ enum eAcievement
     ACHIEVE_RAT_PACK                = 5367,
 };
 
+enum sharedSpells
+{
+    SPELL_NIGHTMARE_ELIXIR      = 92113,
+    SPELL_OFFLINE               = 88348,
+};
+
 const Position CookieSpawn =
 {
     -88.1319f, -819.33f, 39.23453f, 0.0f
-};
-
-enum Data64
-{
-
 };
 
 #endif

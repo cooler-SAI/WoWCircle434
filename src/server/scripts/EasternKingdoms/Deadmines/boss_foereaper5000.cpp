@@ -9,7 +9,6 @@ enum eSpell
     SPELL_ON_FIRE               = 91737,
     SPELL_COSMETIC_STAND        = 88906,
     SPELL_OVERDRIVE             = 88481, // 88484
-    SPELL_OFFLINE               = 88348,
     SPELL_HARVEST               = 88495,
     SPELL_HARVEST_AURA          = 88497,
     SPELL_HARVEST_SWEEP         = 88521,
@@ -68,8 +67,8 @@ Position const HarvestSpawn[] =
     {-182.74f, -565.96f, 19.38f, 3.35f},
 };
 
-Position const OverdrivePoint ={-184.3978f, -565.997f, 19.30717f, 0.0f};
-Position const PrototypeSpawn ={-200.499f,  -553.946f, 51.2295f,  4.32651f};
+Position const OverdrivePoint = {-184.3978f, -565.997f, 19.30717f, 0.0f};
+Position const PrototypeSpawn = {-200.499f,  -553.946f, 51.2295f,  4.32651f};
 
 class boss_foereaper5000 : public CreatureScript
 {

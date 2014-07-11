@@ -149,7 +149,7 @@ public:
 
         void SummonCrew()
         {
-            for (uint8 i=0; i<4; ++i)
+            for (uint8 i = 0; i < 4; ++i)
             {
                 me->SummonCreature(NPC_HELIX_CREW, CrewSpawn[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
             }
@@ -273,6 +273,7 @@ public:
         {
             if (!me)
                 return;
+
             events.ScheduleEvent(EVENT_OAFQUARD, 5000);
         }
 
@@ -407,6 +408,7 @@ public:
         {
             Phase   = 1;
             uiTimer = 500;
+
             if (!me)
                 return;
 

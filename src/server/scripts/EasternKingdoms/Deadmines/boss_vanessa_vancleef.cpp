@@ -29,13 +29,12 @@ enum Spells
     SPELL_BLOODWASH             = 90946,
     SPELL_RAGEZONE              = 90932,
     //envocer
-    SPELL_HOLY_FIRE     = 91004,
-    SPELL_RENEGADE      = 90047,
-    SPELL_SHIELD        = 92001,
+    SPELL_HOLY_FIRE             = 91004,
+    SPELL_RENEGADE              = 90047,
+    SPELL_SHIELD                = 92001,
     // Vanessa event
     SPELL_SITTING               = 89279,
     SPELL_NOXIOUS_CONCOCTION    = 92100,
-    SPELL_NIGHTMARE_ELIXIR      = 92113,
     SPELL_BLACKOUT              = 92120,
     SPELL_RIDE_VEHICLE          = 46598,
 
@@ -179,30 +178,45 @@ Position const NightmareSpidersSpawn[] =
     {-181.68f, -566.33f, -51.11f, 5.15f},
 };
 
-#define COMBAT_START     "I will not share my father''s fate!  Your tale ends here!"
-#define FOOLS_BOMB       "Fools! This entire ship is rigged with explosives! Enjoy your fiery deaths!"
-#define HUGH_BOMB        "Vanessa pulls out a final barrel of mining powder and ignites it! RUN!"
-#define VANESSA_DETONATE "Vannesa has detonated charges on the ship! Get to the ropes at the side of the boat!"
-#define TEXT_INFO        "A shadowy figure appears in the ship's cabine!"
-#define TEXT_INFO_1      "You hear a voice from above the cabin door"!
-#define TEXT_INFO_2      "Vanessa injects you with the Nightmare Elixir!"
-#define TEXT_INFO_3      "Active the steam valves to free yourself!"
-#define TEXT_INFO_4      "The Nightmare Elixir takes hold!"
-#define TEXT_INFO_5      "You have entered Glubtok's Nightmare!"
-#define VANESSA_SAY_1    "I've been waiting a long time for this you know."
-#define VANESSA_SAY_2    "Biding my time , building my forces, studing the minds of my enemies."
-#define VANESSA_SAY_3    "I was never very good at hand-to-hand combat, you know. Not like my father."
-#define VANESSA_SAY_4    "But I always excelled at poison."
-#define VANESSA_SAY_5    "Especially venoms that affect the mind."
-#define INTRUDER_SAY     "Continue reading... <Note: This will alert Vanessa to your presence!>"
-#define VANESSA_GLUB_1   "Poor Glubtok. When his powers manifested his own ogre mound was the first to burn."
-#define VANESSA_GLUB_2   "Deep within his soul the thing he feared most of all was.. himself!"
-#define VANESSA_HELIX_1  "Most rogues prefer to cloak themselves in the shadows, but not Helix."
-#define VANESSA_HELIX_2  "You never know what skitters in the darkness."
-#define VANESSA_MECHANICAL_1 "Can you imagine the life of a machine?"
-#define VANESSA_MECHANICAL_2 "A simple spark can mean the difference between life... and death."
-#define VANESSA_RIPSNARL_1 "Ripsnarl wasn't always a bloodthirsty savage. Once, he even had a family."
-#define VANESSA_RIPSNARL_2 "He was called James Harringtion. A tragedy in three parts."
+#define COMBAT_START           "I will not share my father''s fate!  Your tale ends here!"
+#define FOOLS_BOMB             "Fools! This entire ship is rigged with explosives! Enjoy your fiery deaths!"
+#define HUGH_BOMB              "Vanessa pulls out a final barrel of mining powder and ignites it! RUN!"
+#define VANESSA_DETONATE       "Vannesa has detonated charges on the ship! Get to the ropes at the side of the boat!"
+#define TEXT_INFO              "A shadowy figure appears in the ship's cabine!"
+#define TEXT_INFO_1            "You hear a voice from above the cabin door"!
+#define TEXT_INFO_2            "Vanessa injects you with the Nightmare Elixir!"
+#define TEXT_INFO_3            "Active the steam valves to free yourself!"
+#define TEXT_INFO_4            "The Nightmare Elixir takes hold!"
+#define TEXT_INFO_5            "You have entered Glubtok's Nightmare!"
+#define VANESSA_SAY_1          "I've been waiting a long time for this you know."
+#define VANESSA_SAY_2          "Biding my time , building my forces, studing the minds of my enemies."
+#define VANESSA_SAY_3          "I was never very good at hand-to-hand combat, you know. Not like my father."
+#define VANESSA_SAY_4          "But I always excelled at poison."
+#define VANESSA_SAY_5          "Especially venoms that affect the mind."
+#define INTRUDER_SAY           "Continue reading... <Note: This will alert Vanessa to your presence!>"
+#define VANESSA_GLUB_1         "Poor Glubtok. When his powers manifested his own ogre mound was the first to burn."
+#define VANESSA_GLUB_2         "Deep within his soul the thing he feared most of all was.. himself!"
+#define VANESSA_HELIX_1        "Most rogues prefer to cloak themselves in the shadows, but not Helix."
+#define VANESSA_HELIX_2        "You never know what skitters in the darkness."
+#define VANESSA_MECHANICAL_1   "Can you imagine the life of a machine?"
+#define VANESSA_MECHANICAL_2   "A simple spark can mean the difference between life... and death."
+#define VANESSA_RIPSNARL_1     "Ripsnarl wasn't always a bloodthirsty savage. Once, he even had a family."
+#define VANESSA_RIPSNARL_2     "He was called James Harringtion. A tragedy in three parts."
+
+#define VANESSA_NIGHTMARE_1    "You hear a voice from above the cabin door."
+#define VANESSA_NIGHTMARE_2    "Vanessa injects you with the Nightmare Elixir!"
+#define VANESSA_NIGHTMARE_3    "You have entered Glubtok's Nightmare!"
+#define VANESSA_NIGHTMARE_4    "Get back to the ship!"
+#define VANESSA_NIGHTMARE_5    "You have entered Helix's nightmare!"
+#define VANESSA_NIGHTMARE_6    "The Nightmare Elixir takes hold!"
+#define VANESSA_NIGHTMARE_7    "Nightmare spiders appear in the darkness! Kill Helix before his nightmare overhelms you!"
+#define VANESSA_NIGHTMARE_8    "You have entered the mechanical nightmare!"
+#define VANESSA_NIGHTMARE_9    "You have entered Ripsnarl's nightmare!"
+#define VANESSA_NIGHTMARE_10   "Save Emme Harrington!"
+#define VANESSA_NIGHTMARE_11   "Save Erik Harrington!"
+#define VANESSA_NIGHTMARE_12   "Save Calissa Harrington!"
+#define VANESSA_NIGHTMARE_13   "The Nightmare Elixir wears off!"
+#define VANESSA_NIGHTMARE_14   "The nightmare shifts!"
 
 Position const RopeSpawn[] =
 {
@@ -247,7 +261,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             if (Creature* controller_achi = me->FindNearestCreature(NPC_ACHIEVEMENT_CONTROLLER, 300.0f))
             {
@@ -905,7 +919,7 @@ public:
                     switch (Phase)
                     {
                         case 0:
-                            me->MonsterTextEmote("You hear a voice from above the cabin door.", 0, true);
+                            me->MonsterTextEmote(VANESSA_NIGHTMARE_1, 0, true);
                             me->RemoveAurasDueToSpell(SPELL_SITTING);
                             PongTimer = 2000;
                             Phase++;
@@ -972,7 +986,7 @@ public:
                                 me->CastSpell(( *itr ), SPELL_BLACKOUT, true);
 
                             }
-                            me->MonsterTextEmote("Vanessa injects you with the Nightmare Elixir!", 0, true);
+                            me->MonsterTextEmote(VANESSA_NIGHTMARE_2, 0, true);
                             PongTimer = 4100;
                             Phase++;
                         }
@@ -1049,8 +1063,6 @@ public:
             {
                 if (Pullplayers)
                 {
-                    me->MonsterWhisper("Pullplayers", PlayerGUID, true);
-
                     std::list<Player*> players;
                     CerberCore::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
                     CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
@@ -1062,7 +1074,7 @@ public:
                         ( *itr )->NearTeleportTo(-205.7569f, -579.0972f, 42.98623f, 2.3f);
                     }
 
-                    me->MonsterWhisper("The Nightmare Elixir takes hold!", PlayerGUID, true);
+                    me->MonsterWhisper(VANESSA_NIGHTMARE_6, PlayerGUID, true);
                     me->DespawnOrUnsummon(3000);
 
                     if (!me->FindNearestPlayer(50))
@@ -1109,22 +1121,6 @@ public:
 
         return true;
     }
-};
-
-class npc_steam_valve : public CreatureScript
-{
-public:
-    npc_steam_valve() : CreatureScript("npc_steam_valve") { }
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_steam_valveAI(creature);
-    }
-
-    struct npc_steam_valveAI : public ScriptedAI
-    {
-        npc_steam_valveAI(Creature* creature) : ScriptedAI(creature) { }
-    };
 };
 
 class npc_vanessa_nightmare : public CreatureScript
@@ -1215,7 +1211,6 @@ public:
                 Phase = 23;
         }
 
-
         void JustSummoned(Creature* summoned)
         {
             summons.Summon(summoned);
@@ -1229,25 +1224,27 @@ public:
         void SummonAllFires()
         {
             for (uint8 i = 0; i < 4/*1*/; ++i)
-                me->SummonCreature(NPC_FIRE_BUNNY, FieryBlaze[i], TEMPSUMMON_MANUAL_DESPAWN, 0);
+                if (Creature* saFires = me->SummonCreature(NPC_FIRE_BUNNY, FieryBlaze[i], TEMPSUMMON_MANUAL_DESPAWN, 0))
+                    saFires->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void SummonSparks()
         {
             for (uint8 i = 0; i < 7; ++i)
-                me->SummonCreature(NPC_SPARK, ElectricSpark[i], TEMPSUMMON_MANUAL_DESPAWN, 0);
+                if (Creature* sSp = me->SummonCreature(NPC_SPARK, ElectricSpark[i], TEMPSUMMON_MANUAL_DESPAWN, 0))
+                    sSp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void SummonWorgen_1()
         {
             for (uint8 i = 0; i < 3; ++i)
-                me->SummonCreature(NPC_ENRAGED_WORGEN, EnragedWorgen_1[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            me->SummonCreature(NPC_ENRAGED_WORGEN, EnragedWorgen_1[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
         }
 
         void SummonWorgen_2()
         {
             for (uint8 i = 0; i < 3; ++i)
-                me->SummonCreature(NPC_ENRAGED_WORGEN, EnragedWorgen_2[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+             me->SummonCreature(NPC_ENRAGED_WORGEN, EnragedWorgen_2[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
         }
 
         void UpdateAI(uint32 const diff)
@@ -1266,7 +1263,7 @@ public:
                             break;
                         case 1:
                         {
-                            me->MonsterTextEmote("You have entered Glubtok's Nightmare!", 0, true);
+                            me->MonsterTextEmote(VANESSA_NIGHTMARE_3, 0, true);
                             NightmareTimer = 4000;
                             Phase++;
                         }
@@ -1279,7 +1276,7 @@ public:
                                 Glubtok->GetMotionMaster()->MoveCharge(-174.85f, -579.76f, 19.31f, 10.0f);
                             }
 
-                            me->MonsterTextEmote("Get back to the ship!", 0, true);
+                            me->MonsterTextEmote(VANESSA_NIGHTMARE_4, 0, true);
                             NightmareTimer = 2000;
                             Phase++;
                         }
@@ -1311,12 +1308,12 @@ public:
                             Phase++;
                             break;
                         case 6:
-                            me->MonsterTextEmote("You have entered Helix's nightmare!", 0, true);
+                            me->MonsterTextEmote(VANESSA_NIGHTMARE_5, 0, true);
                             NightmareTimer = 1000;
                             Phase++;
                             break;
                         case 7:
-                            me->MonsterTextEmote("Nightmare spiders appear in the darkness! Kill Helix before his nightmare overhelms you!", 0, true);
+                            me->MonsterTextEmote(VANESSA_NIGHTMARE_7", 0, true);
                             me->SetVisible(false);
                             NightmareTimer = 2000;
                             Phase++;
@@ -1354,7 +1351,7 @@ public:
                             Phase++;
                             break;
                         case 11:
-                            me->MonsterTextEmote("You have entered the mechanical nightmare!", 0, true);
+                            me->MonsterTextEmote(VANESSA_NIGHTMARE_8, 0, true);
                             NightmareTimer = 3000;
                             Phase++;
                             break;
@@ -1385,7 +1382,7 @@ public:
                             Phase++;
                             break;
                         case 15:
-                            me->MonsterTextEmote("You have entered Ripsnarl's nightmare!", 0, true);
+                            me->MonsterTextEmote(VANESSA_NIGHTMARE_9, 0, true);
                             instance->SetData(DATA_NIGHTMARE_MECHANICAL, DONE);
                             NightmareTimer = 2000;
                             Phase++;
@@ -1402,7 +1399,7 @@ public:
                                 me->CastSpell(( *itr ), SPELL_SPRINT, true);
 
                             me->SummonCreature(NPC_EMME_HARRINGTON, FamilySpawn[0], TEMPSUMMON_MANUAL_DESPAWN, 0);
-                            me->MonsterTextEmote("Save Emme Harrington!", 0, true);
+                            me->MonsterTextEmote(VANESSA_NIGHTMARE_10, 0, true);
                             SummonWorgen_1();
 
                             me->SetVisible(false);
@@ -1424,7 +1421,7 @@ public:
 
                             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                             {
-                                ( *itr )->MonsterTextEmote("Save Erik Harrington!", 0, true);
+                                ( *itr )->MonsterTextEmote(VANESSA_NIGHTMARE_11, 0, true);
                                 me->CastSpell(( *itr ), SPELL_SPRINT, true);
                             }
 
@@ -1450,7 +1447,7 @@ public:
                             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                             {
                                 me->CastSpell(( *itr ), SPELL_SPRINT, true);
-                                ( *itr )->MonsterTextEmote("Save Calissa Harrington!", 0, true);
+                                ( *itr )->MonsterTextEmote(VANESSA_NIGHTMARE_12, 0, true);
                             }
 
                             me->GetMotionMaster()->MovePoint(5, -83.16319f, -774.9636f, 26.90351f);
@@ -1469,7 +1466,6 @@ public:
                         case 23:
                         {
                             std::list<Player*> players;
-
                             CerberCore::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
                             CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
                             me->VisitNearbyWorldObject(150.0f, searcher);
@@ -1478,9 +1474,11 @@ public:
                             {
                                 ( *itr )->RemoveAurasDueToSpell(SPELL_NIGHTMARE_ELIXIR);
                                 ( *itr )->RemoveAurasDueToSpell(SPELL_EFFECT_1);
-                                ( *itr )->MonsterTextEmote("The Nightmare Elixir wears off!", 0, true);
+                                ( *itr )->MonsterTextEmote(VANESSA_NIGHTMARE_13, 0, true);
                             }
                             me->SummonCreature(NPC_VANESSA_BOSS, -79.44965f, -819.8351f, 39.89838f, 0.01745329f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 120000);
+                            if (Creature* note = me->FindNearestCreature(NPC_VANESSA_NOTE, 300.0f))
+                                note->DespawnOrUnsummon(3000);
                             NightmareTimer = 1000;
                             Phase++;
                         }
@@ -1574,7 +1572,7 @@ public:
             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 ( *itr )->AddAura(SPELL_EFFECT_1, ( *itr ));
 
-            me->MonsterTextEmote("The nightmare shifts!", 0, true);
+            me->MonsterTextEmote(VANESSA_NIGHTMARE_14, 0, true);
 
             if (Creature* Vanessa = me->FindNearestCreature(NPC_VANESSA_NIGHTMARE, 500, true))
                 if (npc_vanessa_nightmare::npc_vanessa_nightmareAI* pAI = CAST_AI(npc_vanessa_nightmare::npc_vanessa_nightmareAI, Vanessa->AI()))
@@ -1657,7 +1655,6 @@ public:
                     break;
                 }
             }
-
             summons.Summon(summoned);
         }
 
@@ -1672,7 +1669,7 @@ public:
             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 ( *itr )->AddAura(SPELL_EFFECT_1, ( *itr ));
 
-            me->MonsterTextEmote("The nightmare shifts!", 0, true);
+            me->MonsterTextEmote(VANESSA_NIGHTMARE_14, 0, true);
 
             if (Creature *Vanessa = me->FindNearestCreature(NPC_VANESSA_NIGHTMARE, 500, true))
                 if (npc_vanessa_nightmare::npc_vanessa_nightmareAI* pAI = CAST_AI(npc_vanessa_nightmare::npc_vanessa_nightmareAI, Vanessa->AI()))
@@ -1738,11 +1735,18 @@ public:
             events.Reset();
         }
 
+        void MoveInLineOfSight(Unit* who)
+        {
+            if (me->IsWithinDistInMap(who, 10) && me->IsWithinLOSInMap(who))
+                EnterCombat(who);
+        }
+
         void EnterCombat(Unit* /*who*/)
         {
             DoZoneInCombat();
-            events.ScheduleEvent(EVENT_SPIRIT_STRIKE, 6000);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+            me->RemoveAurasDueToSpell(SPELL_OFFLINE);
+            events.ScheduleEvent(EVENT_SPIRIT_STRIKE, 6000);
         }
 
         void JustDied(Unit* /*killer*/)
@@ -1756,9 +1760,9 @@ public:
             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 ( *itr )->AddAura(SPELL_EFFECT_1, ( *itr ));
 
-            me->MonsterTextEmote("The nightmare shifts!", 0, true);
+            me->MonsterTextEmote(VANESSA_NIGHTMARE_14, 0, true);
 
-            if (Creature *Vanessa = me->FindNearestCreature(NPC_VANESSA_NIGHTMARE, 500, true))
+            if (Creature* Vanessa = me->FindNearestCreature(NPC_VANESSA_NIGHTMARE, 500, true))
                 if (npc_vanessa_nightmare::npc_vanessa_nightmareAI* pAI = CAST_AI(npc_vanessa_nightmare::npc_vanessa_nightmareAI, Vanessa->AI()))
                     pAI->NightmarePass();
         }
@@ -1829,8 +1833,6 @@ public:
     {
         npc_james_dmAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
-
         void JustDied(Unit* /*who*/)
         {
             if (Creature* Vanessa = me->FindNearestCreature(NPC_VANESSA_NIGHTMARE, 500, true))
@@ -1839,7 +1841,7 @@ public:
 
         }
 
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 const /*diff*/)
         {
             if (!me->GetVehicleKit())
                 return;
@@ -1868,11 +1870,24 @@ public:
     {
         npc_lightning_orbsAI(Creature* creature) : Scripted_NoMovementAI(creature) { }
 
-        uint32 TurnTimer;
-
         void Reset()
         {
             TurnTimer = 100;
+
+            if (Vehicle* vehicle = me->GetVehicleKit())
+            {
+                for (uint8 i = 0; i < 8; i++)
+                {
+                    if (vehicle->HasEmptySeat(i))
+                    {
+                        if (Creature* pas = me->SummonCreature(49521, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()))
+                        {
+                            pas->EnterVehicle(me, i);
+                            pas->ClearUnitState(UNIT_STATE_ONVEHICLE);
+                        }
+                    }
+                }
+            }
         }
 
         void UpdateAI(uint32 const diff)
@@ -1883,6 +1898,9 @@ public:
                 TurnTimer = 100;
             } else TurnTimer -= diff;
         }
+
+    private:
+        uint32 TurnTimer;
     };
 };
 
@@ -1902,10 +1920,6 @@ public:
         {
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
         }
-
-        bool RunAway;
-        uint8 Phase;
-        uint32 MoveTimer;
 
         void Reset()
         {
@@ -1957,6 +1971,11 @@ public:
                 } else MoveTimer -= diff;
             }
         }
+
+    private:
+        bool RunAway;
+        uint8 Phase;
+        uint32 MoveTimer;
     };
 };
 
@@ -2036,7 +2055,6 @@ void AddSC_boss_vanessa_vancleef()
     new npc_vanessa_intro();
     new npc_note();
     new npc_magma_pull();
-    new npc_steam_valve();
     new npc_vanessa_nightmare();
     new npc_icycle_dm();
     new npc_glubtok_dm();

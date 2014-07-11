@@ -6,7 +6,11 @@ enum eSpels
     SPELL_CANNONBALL        = 89697, // 91066 (HC) supported by Spell Difficulty
     SPELL_THROW             = 91038,
     SPELL_THROW_H           = 91039,
-    SPELL_EXPLODE           = 89769
+    SPELL_EXPLODE           = 89769,
+    SPELL_EYE_GOUGE         = 90913,
+    SPELL_EYE_GOUGE_H       = 90918,
+    SPELL_EYE_PECK          = 90920,
+    SPELL_EYE_PECK_H        = 90921,
 };
 
 Position const SourcePosition[8]
@@ -256,14 +260,6 @@ public:
     }
 };
 
-enum eSpell
-{
-    SPELL_EYE_GOUGE         = 90913,
-    SPELL_EYE_GOUGE_H       = 90918,
-    SPELL_EYE_PECK          = 90920,
-    SPELL_EYE_PECK_H        = 90921,
-};
-
 class npc_deadmines_bird : public CreatureScript
 {
 public:
@@ -377,12 +373,7 @@ public:
         {
             if (( *itr ) && ( *itr )->isAlive() && ( *itr )->GetTypeId() == TYPEID_UNIT && ( *itr )->HasAura(78087))
             {
-                ( *itr )->GetMotionMaster()->MoveCharge(
-                    me->GetPositionX(),
-                    me->GetPositionY(),
-                    me->GetPositionZ(),
-                    5.0f
-                    );
+                ( *itr )->GetMotionMaster()->MoveCharge( me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 5.0f);
                 ( *itr )->DespawnOrUnsummon(3000);
                 ( *itr )->AI()->Talk(0);
             }
@@ -412,7 +403,7 @@ public:
 
     bool OnGossipSelect(Player* player, GameObject* /*go*/, uint32 sender, uint32 action)
     {
-        if (player->HasAura(92113))
+        if (player->HasAura(SPELL_NIGHTMARE_ELIXIR))
             return false;
 
         player->PlayerTalkClass->ClearMenus();
@@ -422,10 +413,10 @@ public:
             case GOSSIP_ACTION_INFO_DEF:
                 player->TeleportTo(player->GetMapId(), -305.32f, -491.29f, 49.23f, 3.14f);
                 break;
-            case GOSSIP_ACTION_INFO_DEF+1:
+            case GOSSIP_ACTION_INFO_DEF + 1:
                 player->TeleportTo(player->GetMapId(), -201.09f, -606.04f, 19.30f, 3.14f);
                 break;
-            case GOSSIP_ACTION_INFO_DEF+2:
+            case GOSSIP_ACTION_INFO_DEF + 2:
                 player->TeleportTo(player->GetMapId(), -129.91f, -788.89f, 17.34f, 3.14f);
                 break;
         }
@@ -434,7 +425,7 @@ public:
 
     bool OnGossipHello(Player* player, GameObject* go)
     {
-        if (player->HasAura(92113))
+        if (player->HasAura(SPELL_NIGHTMARE_ELIXIR))
             return false;
 
         InstanceScript* instance = go->GetInstanceScript();
@@ -447,11 +438,11 @@ public:
         }
         if (instance->GetBossState(DATA_FOEREAPER) == DONE)
         {
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BOSS_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BOSS_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
         if (instance->GetBossState(DATA_RIPSNARL) == DONE)
         {
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BOSS_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BOSS_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
         }
         player->SEND_GOSSIP_MENU(player->GetGossipTextId(go), go->GetGUID());
         return true;

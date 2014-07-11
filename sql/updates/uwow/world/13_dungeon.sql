@@ -29,6 +29,8 @@ UPDATE `creature_template` SET  `ScriptName` =  'npc_mining_powder' WHERE `entry
 UPDATE `creature_template` SET  `ScriptName` =  'npc_mining_monkey' WHERE `entry` in ('48278', '48440');
 UPDATE `creature_template` SET  `ScriptName` =  'npc_deadmines_bird' WHERE `entry` in ('48447', '48450');
 UPDATE `creature_template` SET  `ScriptName` =  'npc_goblin_engineer' WHERE `entry` in ('622', '1731');
+UPDATE `creature_template` SET  `ScriptName` =  'npc_glubtok_secondary_platter' WHERE `entry` in ('48975', '49039', '49040');
+UPDATE `creature_template` SET  `ScriptName` =  'npc_glubtok_main_platter' WHERE `entry` = '48974';
 
 
 UPDATE `gameobject_template` SET `ScriptName` = 'go_defias_cannon' WHERE `entry` = '16398';
@@ -36,9 +38,14 @@ UPDATE `gameobject_template` SET `ScriptName` = 'go_heavy_door' WHERE `entry` = 
 UPDATE `gameobject_template` SET `ScriptName` = 'go_deadmines_tp' WHERE `entry` = '19072';
 
 
-INSERT INTO `spell_script_names` VALUES
-('92042', 'spell_coalesce_achievement');
+REPLACE INTO `spell_script_names` VALUES
+('92042', 'spell_coalesce_achievement'),
+('87897', 'spell_glubtok_generic_proc'),
+('87900', 'spell_glubtok_generic_proc'),
+('91397', 'spell_glubtok_firewall_targetting');
 
+REPLACE INTO `npc_spellclick_spells` (`npc_entry`, `spell_id`, `cast_flags`, `user_type`) VALUES
+('48092', '46598', '1', '0');
 
-INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`, `ScriptName`) VALUES
+REPLACE INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`, `ScriptName`) VALUES
 ('16210', '11', '0', '0', 'achievement_prototype_reaper');
