@@ -33,7 +33,7 @@ enum Spells
     SPELL_ANIMATE_BONES                 = 78122,
     SPELL_HAIL_OF_BONES                 = 78679,
     SPELL_TAIL_LASH                     = 77827,
-    SPELL_SHADOWBLAZE_SPARK             = 81031,              
+    SPELL_SHADOWBLAZE_SPARK             = 81031,
     SPELL_SHADOWFLAME_BARRAGE           = 78621,
     SPELL_H_EXPLOSIVE_CINDERS_PERIODIC  = 79339,
     SPELL_H_EXPLOSIVE_CINDERS_SUMM_DMG  = 79347,
@@ -56,7 +56,7 @@ enum Spells
     // Anim Bone Warriors
     SPELL_NO_REGEN                      = 78725,
     SPELL_NO_REGEN2                     = 72242,
-    SPELL_EMPOWER                       = 79329, 
+    SPELL_EMPOWER                       = 79329,
     SPELL_HURL_BONE                     = 81586,
     SPELL_DIE_VISUAL                    = 57626,
 
@@ -124,30 +124,30 @@ enum Npc
 {
     NPC_NEFARIAN_INTRO                  = 41379,
     NPC_CHROMATIC_PROTO                 = 41948,
-    NPC_ANIM_BONE_WARR                  = 41918, 
+    NPC_ANIM_BONE_WARR                  = 41918,
     MOB_SHADOWBLAZE                     = 42596,
 };
 
 Position const NefarianPositions[6] =
 {
-    {-167.093f,     -224.479f,      40.399f,        6.278f      },  // lord nefarian intr ! not used yet
-    {-135.795151f,  15.569847f,     73.165909f,     4.646072f   },  // Intro ! not used yet
-    {-129.176636f,  -10.488489f,    73.079071f,     5.631739f   },  // Ground
-    {-106.186249f,  -18.533386f,    72.798332f                  },  // Air intr
-    {-126.518f,     -233.342f,      36.358f                     },  // Position on top of raid.
-    {-100.123f,     -221.522f,      7.156f                      },  // Move down.
+    {-167.093f, -224.479f, 40.399f, 6.278f},  // lord nefarian intr ! not used yet
+    {-135.795151f, 15.569847f, 73.165909f, 4.646072f},  // Intro ! not used yet
+    {-129.176636f, -10.488489f, 73.079071f, 5.631739f},  // Ground
+    {-106.186249f, -18.533386f, 72.798332f},  // Air intr
+    {-126.518f, -233.342f, 36.358f},  // Position on top of raid.
+    {-100.123f, -221.522f, 7.156f},  // Move down.
 };
 
-const Position MiddleRoomLocation = {-103.057961f, -222.698685f, 18.374910f, 0.0f};
+const Position MiddleRoomLocation ={-103.057961f, -222.698685f, 18.374910f, 0.0f};
 
 Position ChromaticPositions[3] =
 {
-    {-86.7713f,     -190.62083f,    14.0571f,        0.00f       },
-    {-87.0204f,     -258.6006f,     14.0575f,        0.00f       },
-    {-148.177f,     -224.4730f,     14.05815f,       0.00f       },
+    {-86.7713f, -190.62083f, 14.0571f, 0.00f},
+    {-87.0204f, -258.6006f, 14.0575f, 0.00f},
+    {-148.177f, -224.4730f, 14.05815f, 0.00f},
 };
 
-const Position centerPos = {-104.7067f, -226.5108f, 41.4890f, 0.00f};  // center
+const Position centerPos ={-104.7067f, -226.5108f, 41.4890f, 0.00f};  // center
 
 class boss_bd_nefarian : public CreatureScript
 {
@@ -156,7 +156,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new boss_bd_nefarianAI (creature);
+        return new boss_bd_nefarianAI(creature);
     }
 
     struct boss_bd_nefarianAI : public BossAI
@@ -166,17 +166,6 @@ public:
             instance = creature->GetInstanceScript();
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
         }
-
-        InstanceScript* instance;
-        Phases phase;
-        uint32 m_uiOnyxiaCheckTimer;
-        uint32 m_uiDistanceCheckTimer;
-        uint32 m_uiChromaticCheckTimer;
-        bool onyxiaAlive, said, secondPhase, finalPhase;
-
-        uint8 healthPct;
-        std::list<uint64> SummonList;
-        uint8 SpawnCount;
 
         void Reset()
         {
@@ -191,6 +180,7 @@ public:
 
             RemoveSummons();
             SpawnCount = 3;
+            stage = 0;
 
             _Reset();
         }
@@ -205,11 +195,11 @@ public:
 
         void SummonedCreatureDespawn(Creature* summon)
         {
-            switch(summon->GetEntry())
+            switch (summon->GetEntry())
             {
-            case NPC_CHROMATIC_PROTO:
-                SpawnCount--;
-                break;
+                case NPC_CHROMATIC_PROTO:
+                    SpawnCount--;
+                    break;
             }
         }
 
@@ -270,10 +260,13 @@ public:
 
         void DamageTaken(Unit* /*who*/, uint32& damage)
         {
-            int ptc = (me->GetHealth() - damage) / me->GetMaxHealth() * 100;
-            if (ptc < healthPct && healthPct > 0)
+            if (
+                ( me->GetHealthPct() < 90 && stage == 0 ) || ( me->GetHealthPct() < 80 && stage == 1 ) || ( me->GetHealthPct() < 70 && stage == 2 ) ||
+                ( me->GetHealthPct() < 60 && stage == 3 ) || ( me->GetHealthPct() < 50 && stage == 4 ) || ( me->GetHealthPct() < 40 && stage == 5 ) ||
+                ( me->GetHealthPct() < 30 && stage == 6 ) || ( me->GetHealthPct() < 20 && stage == 7 ) || ( me->GetHealthPct() < 10 && stage == 8 )
+                )
             {
-                healthPct = (ptc / 10) * 10;
+                stage = ( stage + 1 );
 
                 DoCast(me, SPELL_ELECTROCUTE);
             }
@@ -283,7 +276,7 @@ public:
         {
             phase = PHASE_INTRO;
             events.SetPhase(PHASE_INTRO);
-            initIntroEvents();            
+            initIntroEvents();
         }
 
         void EnterPhaseGround()
@@ -316,13 +309,12 @@ public:
 
             if (onGround)
             {
-                events.ScheduleEvent(EVENT_SHADOWFLAME_BREATH,  5000,   PHASE_GROUND);
-                events.ScheduleEvent(EVENT_SHADOW_COWARDICE,    20000,  PHASE_GROUND);
-            }
-            else
+                events.ScheduleEvent(EVENT_SHADOWFLAME_BREATH, 5000, PHASE_GROUND);
+                events.ScheduleEvent(EVENT_SHADOW_COWARDICE, 20000, PHASE_GROUND);
+            } else
             {
-                events.ScheduleEvent(EVENT_SHADOWFLAME_BARRAGE, 4000,   PHASE_FLIGHT);
-                events.ScheduleEvent(EVENT_SUMMON_CHROMATIC,    10000,  PHASE_FLIGHT);
+                events.ScheduleEvent(EVENT_SHADOWFLAME_BARRAGE, 4000, PHASE_FLIGHT);
+                events.ScheduleEvent(EVENT_SUMMON_CHROMATIC, 10000, PHASE_FLIGHT);
             }
         }
 
@@ -330,9 +322,9 @@ public:
         {
             events.Reset();
 
-            events.ScheduleEvent(EVENT_INTRO,   100);
-            events.ScheduleEvent(EVENT_INTRO2,  9900);
-            events.ScheduleEvent(EVENT_MOVE,    25000);
+            events.ScheduleEvent(EVENT_INTRO, 100);
+            events.ScheduleEvent(EVENT_INTRO2, 9900);
+            events.ScheduleEvent(EVENT_MOVE, 25000);
             events.ScheduleEvent(EVENT_BERSERK, 60000 * 10);
         }
 
@@ -340,30 +332,30 @@ public:
         {
             events.Reset();
 
-            events.ScheduleEvent(EVENT_TAIL_LASH,           4000, PHASE_FINAL);
-            events.ScheduleEvent(EVENT_SHADOWFLAME_BREATH,  5000, PHASE_FINAL);
-            events.ScheduleEvent(EVENT_SHADOWBLAZE,         9000, PHASE_FINAL);
-            events.ScheduleEvent(EVENT_REVIVE_SKELETONS,    1000, PHASE_FINAL);
+            events.ScheduleEvent(EVENT_TAIL_LASH, 4000, PHASE_FINAL);
+            events.ScheduleEvent(EVENT_SHADOWFLAME_BREATH, 5000, PHASE_FINAL);
+            events.ScheduleEvent(EVENT_SHADOWBLAZE, 9000, PHASE_FINAL);
+            events.ScheduleEvent(EVENT_REVIVE_SKELETONS, 1000, PHASE_FINAL);
         }
 
         void JustSummoned(Creature* summon)
         {
             switch (summon->GetEntry())
             {
-            case NPC_CHROMATIC_PROTO:
-                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
-                    summon->AI()->AttackStart(pTarget);
-                SummonList.push_back(summon->GetGUID());
-                break;
-            case NPC_NEFARIAN:
-                if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 100.0f, true))
-                {
-                    summon->GetMotionMaster()->MoveChase(target);
-                    summon->Attack(target, true);
-                }
-                break;
-            default:
-                summon->AI()->DoZoneInCombat();
+                case NPC_CHROMATIC_PROTO:
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                        summon->AI()->AttackStart(pTarget);
+                    SummonList.push_back(summon->GetGUID());
+                    break;
+                case NPC_NEFARIAN:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_NEAREST, 0, 100.0f, true))
+                    {
+                        summon->GetMotionMaster()->MoveChase(target);
+                        summon->Attack(target, true);
+                    }
+                    break;
+                default:
+                    summon->AI()->DoZoneInCombat();
             }
         }
 
@@ -391,8 +383,7 @@ public:
                         me->RemoveAura(SPELL_CHILDREN_OF_DEATHWING_ONY);
 
                 m_uiDistanceCheckTimer = 5000;
-            }
-            else m_uiDistanceCheckTimer -= diff;
+            } else m_uiDistanceCheckTimer -= diff;
 
             if (phase == PHASE_GROUND && m_uiOnyxiaCheckTimer <= diff && !secondPhase)
             {
@@ -410,8 +401,7 @@ public:
                     secondPhase = true;
                 }
                 m_uiOnyxiaCheckTimer = 1000;
-            }
-            else m_uiOnyxiaCheckTimer -= diff;
+            } else m_uiOnyxiaCheckTimer -= diff;
 
             if (phase == PHASE_FLIGHT && m_uiChromaticCheckTimer <= diff && !finalPhase)
             {
@@ -421,8 +411,7 @@ public:
                     finalPhase = true;
                 }
                 m_uiChromaticCheckTimer = 1000;
-            }
-            else m_uiChromaticCheckTimer -= diff;
+            } else m_uiChromaticCheckTimer -= diff;
 
             events.Update(diff);
 
@@ -430,153 +419,171 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_INTRO:
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
-                    me->SetDisableGravity(true);
-                    me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
-                    me->SetCanFly(true);
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MovePoint(1, -126.518f, -233.342f, 36.358f); // Position on top of raid.
-                    break;
+                    case EVENT_INTRO:
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
+                        me->SetDisableGravity(true);
+                        me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
+                        me->SetCanFly(true);
+                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MovePoint(1, -126.518f, -233.342f, 36.358f); // Position on top of raid.
+                        break;
 
-                case EVENT_INTRO2:
-                    Talk(SAY_AGGRO);
-                    events.ScheduleEvent(EVENT_HAIL_OF_BONES, 100);
-                    break;
+                    case EVENT_INTRO2:
+                        Talk(SAY_AGGRO);
+                        events.ScheduleEvent(EVENT_HAIL_OF_BONES, 100);
+                        break;
 
-                case EVENT_BERSERK:
-                    me->AddAura(SPELL_BERSERK_NEF, me);
-                    break;
+                    case EVENT_BERSERK:
+                        me->AddAura(SPELL_BERSERK_NEF, me);
+                        break;
 
-                case EVENT_HAIL_OF_BONES:
-                    DoCast(me, SPELL_HAIL_OF_BONES);
-                    break;
+                    case EVENT_HAIL_OF_BONES:
+                        DoCast(me, SPELL_HAIL_OF_BONES);
+                        break;
 
-                case EVENT_MOVE:
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MovePoint(1, -100.123f, -221.522f, 7.156f); // Move down.
-                    events.ScheduleEvent(EVENT_LANDING, 8000);
-                    break;
+                    case EVENT_MOVE:
+                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MovePoint(1, -100.123f, -221.522f, 7.156f); // Move down.
+                        events.ScheduleEvent(EVENT_LANDING, 8000);
+                        break;
 
-                case EVENT_LANDING:
-                    EnterPhaseGround();
+                    case EVENT_LANDING:
+                        EnterPhaseGround();
 
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
 
-                    me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetDisableGravity(false);
-                    me->SetCanFly(false);
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MoveChase(me->getVictim());
-                    break;
+                        me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetDisableGravity(false);
+                        me->SetCanFly(false);
+                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MoveChase(me->getVictim());
+                        break;
 
-                case EVENT_SHADOWFLAME_BREATH:
-                    Talk(SAY_SHADOWFLAME);
-                    DoCastVictim(SPELL_SHADOWFLAME_BREATH);
-                    events.ScheduleEvent(EVENT_SHADOWFLAME_BREATH, urand(10000, 12000));
-                    break;
+                    case EVENT_SHADOWFLAME_BREATH:
+                        Talk(SAY_SHADOWFLAME);
+                        DoCastVictim(SPELL_SHADOWFLAME_BREATH);
+                        events.ScheduleEvent(EVENT_SHADOWFLAME_BREATH, urand(10000, 12000));
+                        break;
 
-                case EVENT_SHADOW_COWARDICE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
-                        DoCast(target, SPELL_SHADOW_COWARDICE);
-                    events.ScheduleEvent(EVENT_SHADOW_COWARDICE, urand(9000, 10000));
-                    break;
+                    case EVENT_SHADOW_COWARDICE:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                            DoCast(target, SPELL_SHADOW_COWARDICE);
+                        events.ScheduleEvent(EVENT_SHADOW_COWARDICE, urand(9000, 10000));
+                        break;
 
-                case EVENT_LIFTOFF:
-                    Talk(SAY_AIR_PHASE_2);
-                    if (GameObject* elevator = instance->instance->GetGameObject(instance->GetData64(DATA_NEFARIAN_FLOOR)))
-                        elevator->SetGoState(GO_STATE_ACTIVE);
+                    case EVENT_LIFTOFF:
+                        Talk(SAY_AIR_PHASE_2);
+                        if (GameObject* elevator = instance->instance->GetGameObject(instance->GetData64(DATA_NEFARIAN_FLOOR)))
+                            elevator->SetGoState(GO_STATE_ACTIVE);
 
-                    me->GetMotionMaster()->Clear();
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
-                    me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
-                    me->SetDisableGravity(true);
-                    me->SetCanFly(true);
+                        me->GetMotionMaster()->Clear();
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
+                        me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
+                        me->SetDisableGravity(true);
+                        me->SetCanFly(true);
 
-                    events.ScheduleEvent(EVENT_FLIGHT, 1000);
-                    events.ScheduleEvent(EVENT_AIR, 1000);
-                    break;
+                        events.ScheduleEvent(EVENT_FLIGHT, 1000);
+                        events.ScheduleEvent(EVENT_AIR, 1000);
+                        break;
 
-                case EVENT_FLIGHT:
-                    me->SetReactState(REACT_PASSIVE);
-                    me->AttackStop();
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MovePoint(1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 50.0f);
-                    break;
+                    case EVENT_FLIGHT:
+                        me->SetReactState(REACT_PASSIVE);
+                        me->AttackStop();
+                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MovePoint(1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 50.0f);
+                        break;
 
-                case EVENT_AIR:
-                    EnterPhaseAir();
-                    break;
+                    case EVENT_AIR:
+                        EnterPhaseAir();
+                        break;
 
-                case EVENT_SUMMON_CHROMATIC:
-                    me->SummonCreature(NPC_CHROMATIC_PROTO, ChromaticPositions[0], TEMPSUMMON_CORPSE_DESPAWN);
-                    me->SummonCreature(NPC_CHROMATIC_PROTO, ChromaticPositions[1], TEMPSUMMON_CORPSE_DESPAWN);
-                    me->SummonCreature(NPC_CHROMATIC_PROTO, ChromaticPositions[2], TEMPSUMMON_CORPSE_DESPAWN);
-                    break;
+                    case EVENT_SUMMON_CHROMATIC:
+                        me->SummonCreature(NPC_CHROMATIC_PROTO, ChromaticPositions[0], TEMPSUMMON_CORPSE_DESPAWN);
+                        me->SummonCreature(NPC_CHROMATIC_PROTO, ChromaticPositions[1], TEMPSUMMON_CORPSE_DESPAWN);
+                        me->SummonCreature(NPC_CHROMATIC_PROTO, ChromaticPositions[2], TEMPSUMMON_CORPSE_DESPAWN);
+                        break;
 
-                case EVENT_SHADOWFLAME_BARRAGE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
-                        DoCast(target, SPELL_SHADOWFLAME_BARRAGE);
-                    events.ScheduleEvent(EVENT_SHADOWFLAME_BARRAGE, urand(8000, 11000));
-                    break;
+                    case EVENT_SHADOWFLAME_BARRAGE:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
+                            DoCast(target, SPELL_SHADOWFLAME_BARRAGE);
+                        events.ScheduleEvent(EVENT_SHADOWFLAME_BARRAGE, urand(8000, 11000));
+                        break;
 
-                case EVENT_LAND:
-                    me->GetMotionMaster()->Clear();
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
-                    me->SetDisableGravity(false);
-                    me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
-                    me->SetCanFly(false);
-                    events.ScheduleEvent(EVENT_RETURN, 1000);
-                    events.ScheduleEvent(EVENT_GROUND, 1500);
-                    break;
+                    case EVENT_LAND:
+                        me->GetMotionMaster()->Clear();
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+                        me->SetDisableGravity(false);
+                        me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
+                        me->SetCanFly(false);
+                        events.ScheduleEvent(EVENT_RETURN, 1000);
+                        events.ScheduleEvent(EVENT_GROUND, 1500);
+                        break;
 
-                case EVENT_RETURN:
-                    me->SetReactState(REACT_PASSIVE);
-                    me->AttackStop();
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MovePoint(1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 50.0f);
-                    break;
+                    case EVENT_RETURN:
+                        me->SetReactState(REACT_PASSIVE);
+                        me->AttackStop();
+                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MovePoint(1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 50.0f);
+                        break;
 
-                case EVENT_GROUND:
-                    Talk(SAY_FINAL_PHASE);
-                    EnterPhaseFinal();
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    AttackStart(me->getVictim());
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MoveChase(me->getVictim());
+                    case EVENT_GROUND:
+                        Talk(SAY_FINAL_PHASE);
+                        EnterPhaseFinal();
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        AttackStart(me->getVictim());
+                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MoveChase(me->getVictim());
 
-                    if (GameObject* elevator = instance->instance->GetGameObject(instance->GetData64(DATA_NEFARIAN_FLOOR)))
-                        elevator->SetGoState(GO_STATE_READY);
-                    break;
+                        if (GameObject* elevator = instance->instance->GetGameObject(instance->GetData64(DATA_NEFARIAN_FLOOR)))
+                            elevator->SetGoState(GO_STATE_READY);
+                        break;
 
-                case EVENT_TAIL_LASH:
-                    DoCast(me, SPELL_TAIL_LASH);
-                    events.ScheduleEvent(EVENT_TAIL_LASH, urand(8000, 11000));
-                    break;
+                    case EVENT_TAIL_LASH:
+                        DoCast(me, SPELL_TAIL_LASH);
+                        events.ScheduleEvent(EVENT_TAIL_LASH, urand(8000, 11000));
+                        break;
 
-                case EVENT_SHADOWBLAZE:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
-                        DoCast(target, SPELL_SHADOWBLAZE_SPARK);
-                    events.ScheduleEvent(EVENT_TAIL_LASH, urand(18000, 21000));
-                    break;
+                    case EVENT_SHADOWBLAZE:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 200.0f, true))
+                            DoCast(target, SPELL_SHADOWBLAZE_SPARK);
+                        events.ScheduleEvent(EVENT_TAIL_LASH, urand(18000, 21000));
+                        break;
 
-                case EVENT_REVIVE_SKELETONS:
-                    std::list<Creature*> creatures;
-                    GetCreatureListWithEntryInGrid(creatures, me, NPC_ANIM_BONE_WARR, 200.0f);
-                    if (!creatures.empty())
-                        for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
+                    case EVENT_REVIVE_SKELETONS:
+                    {
+                        std::list<Creature*> creatures;
+                        GetCreatureListWithEntryInGrid(creatures, me, NPC_ANIM_BONE_WARR, 200.0f);
+                        if (!creatures.empty())
                         {
-                            DoCast((*iter), SPELL_ANIMATE_BONES, true);
-                            (*iter)->SetReactState(REACT_AGGRESSIVE);
-                            (*iter)->RemoveAura(SPELL_DIE_VISUAL);
+                            for (std::list<Creature*>::iterator iter = creatures.begin(); iter != creatures.end(); ++iter)
+                            {
+                                DoCast(( *iter ), SPELL_ANIMATE_BONES, true);
+                                ( *iter )->SetReactState(REACT_AGGRESSIVE);
+                                ( *iter )->RemoveAura(SPELL_DIE_VISUAL);
+                            }
                         }
+                        break;
+                    }
+                    default:
                         break;
                 }
             }
             if (phase == PHASE_GROUND || phase == PHASE_FINAL)
                 DoMeleeAttackIfReady();
         }
+
+    private:
+        InstanceScript* instance;
+        Phases phase;
+        uint32 m_uiOnyxiaCheckTimer;
+        uint32 m_uiDistanceCheckTimer;
+        uint32 m_uiChromaticCheckTimer;
+        bool onyxiaAlive, said, secondPhase, finalPhase;
+        uint8 healthPct;
+        std::list<uint64> SummonList;
+        uint8 SpawnCount;
+        uint8 stage;
     };
 };
 
@@ -587,7 +594,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new boss_bd_onyxiaAI (creature);
+        return new boss_bd_onyxiaAI(creature);
     }
 
     struct boss_bd_onyxiaAI : public ScriptedAI
@@ -626,9 +633,9 @@ public:
             DoCast(me, SPELL_ONYXIA_DISCHARGE_BAR);
             m_uiPowerTimer          = 2000;
             m_uiDistancesCheckTimer = 10000;
-            events.ScheduleEvent(EVENT_SF_BREATH,           urand(7000, 9000));
+            events.ScheduleEvent(EVENT_SF_BREATH, urand(7000, 9000));
             events.ScheduleEvent(EVENT_LIGHTNING_DISCHARGE, urand(12000, 15000));
-            events.ScheduleEvent(EVENT_TAL_LASH,            urand(4000, 6000));
+            events.ScheduleEvent(EVENT_TAL_LASH, urand(4000, 6000));
         }
 
         void JustDied(Unit* /*killer*/)
@@ -645,8 +652,7 @@ public:
             {
                 DoCast(me, SPELL_INCREASE_BAR);
                 m_uiPowerTimer = 2000;
-            }
-            else m_uiPowerTimer -= diff;
+            } else m_uiPowerTimer -= diff;
 
             if (m_uiDistancesCheckTimer <= diff)
             {
@@ -658,8 +664,7 @@ public:
                         me->RemoveAura(SPELL_CHILDREN_OF_DEATHWING_NEF);
 
                 m_uiDistancesCheckTimer = 5000;
-            }
-            else m_uiDistancesCheckTimer -= diff;
+            } else m_uiDistancesCheckTimer -= diff;
 
             events.Update(diff);
 
@@ -667,22 +672,22 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_SF_BREATH:
-                    DoCastVictim(SPELL_SHADOWFLAME_BREATH);
-                    events.ScheduleEvent(EVENT_SF_BREATH, urand(13000, 17000));
-                    break;                       
+                    case EVENT_SF_BREATH:
+                        DoCastVictim(SPELL_SHADOWFLAME_BREATH);
+                        events.ScheduleEvent(EVENT_SF_BREATH, urand(13000, 17000));
+                        break;
 
-                case EVENT_LIGHTNING_DISCHARGE:
-                    DoCast(me, SPELL_LIGHTNING_DISCHARGE);
-                    events.ScheduleEvent(EVENT_LIGHTNING_DISCHARGE, urand(25000, 30000));
-                    break;
+                    case EVENT_LIGHTNING_DISCHARGE:
+                        DoCast(me, SPELL_LIGHTNING_DISCHARGE);
+                        events.ScheduleEvent(EVENT_LIGHTNING_DISCHARGE, urand(25000, 30000));
+                        break;
 
-                case EVENT_TAL_LASH:
-                    DoCast(me, SPELL_TAIL_LASH);
-                    events.ScheduleEvent(EVENT_TAL_LASH, urand(8000, 11000));
-                    break;
-                default:
-                    break;
+                    case EVENT_TAL_LASH:
+                        DoCast(me, SPELL_TAIL_LASH);
+                        events.ScheduleEvent(EVENT_TAL_LASH, urand(8000, 11000));
+                        break;
+                    default:
+                        break;
                 }
             }
             DoMeleeAttackIfReady();
@@ -697,7 +702,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_nefarian_introAI (creature);
+        return new npc_nefarian_introAI(creature);
     }
 
     struct npc_nefarian_introAI : public ScriptedAI
@@ -753,42 +758,42 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_INTRO_1:
-                    Talk(SAY_INTRO_1);
-                    if (GameObject* elevator = me->FindNearestGameObject(GO_NEFARIAN_FLOOR, 200.0f))
-                        elevator->SetGoState(GO_STATE_READY);
+                    case EVENT_INTRO_1:
+                        Talk(SAY_INTRO_1);
+                        if (GameObject* elevator = me->FindNearestGameObject(GO_NEFARIAN_FLOOR, 200.0f))
+                            elevator->SetGoState(GO_STATE_READY);
 
-                    events.ScheduleEvent(EVENT_SUMMON_ONYXIA,   14000);
-                    events.ScheduleEvent(EVENT_INTRO_2,         15000);
-                    break;
+                        events.ScheduleEvent(EVENT_SUMMON_ONYXIA, 14000);
+                        events.ScheduleEvent(EVENT_INTRO_2, 15000);
+                        break;
 
-                case EVENT_SUMMON_ONYXIA:
-                    if (!me->FindNearestCreature(NPC_ONYXIA, 150.0f))
-                        me->SummonCreature(NPC_ONYXIA, -104.713f, -225.264f, 7.156f, 3.122f, TEMPSUMMON_MANUAL_DESPAWN);
-                    break;
+                    case EVENT_SUMMON_ONYXIA:
+                        if (!me->FindNearestCreature(NPC_ONYXIA, 150.0f))
+                            me->SummonCreature(NPC_ONYXIA, -104.713f, -225.264f, 7.156f, 3.122f, TEMPSUMMON_MANUAL_DESPAWN);
+                        break;
 
-                case EVENT_INTRO_2:
-                    Talk(SAY_INTRO_2);
-                    events.ScheduleEvent(EVENT_INTRO_3, 10000);
-                    break;
+                    case EVENT_INTRO_2:
+                        Talk(SAY_INTRO_2);
+                        events.ScheduleEvent(EVENT_INTRO_3, 10000);
+                        break;
 
-                case EVENT_INTRO_3:
-                    Talk(SAY_INTRO_3);
-                    introDone = true;
-                    events.ScheduleEvent(EVENT_SUMMON_NEFARIAN, 7500);
-                    me->DespawnOrUnsummon(8000);
-                    break;
+                    case EVENT_INTRO_3:
+                        Talk(SAY_INTRO_3);
+                        introDone = true;
+                        events.ScheduleEvent(EVENT_SUMMON_NEFARIAN, 7500);
+                        me->DespawnOrUnsummon(8000);
+                        break;
 
-                case EVENT_SUMMON_NEFARIAN:
-                    me->SummonCreature(NPC_NEFARIAN, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN);
-                    Creature* Nefarian_cr = me->FindNearestCreature(NPC_NEFARIAN, 150.0f, true);
-                    Creature* Onyxia_cr = me->FindNearestCreature(NPC_ONYXIA, 150.0f, true);
-                    if (!Onyxia_cr->isInCombat())
-                    {
-                        Nefarian_cr->GetMotionMaster()->Clear();
-                        Nefarian_cr->GetMotionMaster()->MovePoint(177, NefarianPositions[4]);
-                    }
-                    break;
+                    case EVENT_SUMMON_NEFARIAN:
+                        me->SummonCreature(NPC_NEFARIAN, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN);
+                        Creature* Nefarian_cr = me->FindNearestCreature(NPC_NEFARIAN, 150.0f, true);
+                        Creature* Onyxia_cr = me->FindNearestCreature(NPC_ONYXIA, 150.0f, true);
+                        if (!Onyxia_cr->isInCombat())
+                        {
+                            Nefarian_cr->GetMotionMaster()->Clear();
+                            Nefarian_cr->GetMotionMaster()->MovePoint(177, NefarianPositions[4]);
+                        }
+                        break;
                 }
             }
         }
@@ -810,15 +815,15 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_animated_bone_warriorAI (creature);
+        return new npc_animated_bone_warriorAI(creature);
     }
 
     struct npc_animated_bone_warriorAI : public ScriptedAI
     {
-        npc_animated_bone_warriorAI(Creature* creature) : ScriptedAI(creature) 
+        npc_animated_bone_warriorAI(Creature* creature) : ScriptedAI(creature)
         {
             ASSERT(creature->GetVehicleKit());
-            creature->SetPower(POWER_ENERGY,    100);
+            creature->SetPower(POWER_ENERGY, 100);
             creature->SetMaxPower(POWER_ENERGY, 100);
         }
 
@@ -843,15 +848,14 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 me->RemoveAura(SPELL_ANIMATE_BONES);
                 DoCast(me, SPELL_DIE_VISUAL);
-                me->SetPower(POWER_ENERGY, 0);        
+                me->SetPower(POWER_ENERGY, 0);
             }
 
             if (timerHurlBone <= diff)
             {
                 DoCastVictim(SPELL_HURL_BONE);
                 timerHurlBone = urand(8000, 14000);
-            }
-            else timerHurlBone -= diff;
+            } else timerHurlBone -= diff;
 
             if (me->HasAura(SPELL_ANIMATE_BONES))
                 DoMeleeAttackIfReady();
@@ -871,7 +875,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_chromatic_prototypeAI (creature);
+        return new npc_chromatic_prototypeAI(creature);
     }
 
     struct npc_chromatic_prototypeAI : public ScriptedAI
@@ -905,15 +909,15 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_EXPLOSION:
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                        me->CastSpell(pTarget, SPELL_H_EXPLOSIVE_CINDERS_PERIODIC);
-                    break;
+                    case EVENT_EXPLOSION:
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                            me->CastSpell(pTarget, SPELL_H_EXPLOSIVE_CINDERS_PERIODIC);
+                        break;
                 }
             }
         }
 
-        void JustDied(Unit* /*killer*/) 
+        void JustDied(Unit* /*killer*/)
         {
             me->DespawnOrUnsummon(5000);
         }
@@ -927,7 +931,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_shadowflame_flashfireAI (creature);
+        return new npc_shadowflame_flashfireAI(creature);
     }
 
     struct npc_shadowflame_flashfireAI : public ScriptedAI
@@ -953,20 +957,17 @@ public:
                 float x, y, z;
                 me->GetClosePoint(x, y, z, me->GetObjectSize() / 3, 50.0f);
                 me->GetMotionMaster()->MovePoint(1, x, y, z);
-            }
-            else timerMove -= diff;
+            } else timerMove -= diff;
 
             if (timerDespawn <= diff)
             {
                 me->DespawnOrUnsummon();
-            }
-            else timerDespawn -= diff;
+            } else timerDespawn -= diff;
 
             if (timerSpawn <= diff)
             {
                 me->SummonCreature(MOB_SHADOWBLAZE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 3000);
-            }
-            else timerDespawn -= diff;
+            } else timerDespawn -= diff;
         }
     };
 };
@@ -978,7 +979,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_shadowblazeAI (creature);
+        return new npc_shadowblazeAI(creature);
     }
 
     struct npc_shadowblazeAI : public ScriptedAI
@@ -1002,14 +1003,12 @@ public:
                 if (Unit* skeleton = me->FindNearestCreature(NPC_ANIM_BONE_WARR, 4.0f, true))
                     skeleton->CastSpell(skeleton, SPELL_ANIMATE_BONES, true);
                 timerCheckskeleton = 980;
-            }
-            else timerCheckskeleton -= diff;
+            } else timerCheckskeleton -= diff;
 
             if (timerDespawn <= diff)
             {
                 me->DespawnOrUnsummon();
-            }
-            else timerDespawn -= diff;
+            } else timerDespawn -= diff;
         }
     };
 };
@@ -1032,8 +1031,8 @@ public:
                 targets.remove(owner);
 
             for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                if (!(*itr)->isInBack(GetCaster(), 2.5f))
-                    targets.remove((*itr));
+                if (!( *itr )->isInBack(GetCaster(), 2.5f))
+                    targets.remove(( *itr ));
         }
 
         void Register()

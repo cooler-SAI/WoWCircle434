@@ -73,7 +73,7 @@ bool BattlefieldTB::SetupBattlefield()
         workshop->Init(TBWorkShopDataBase[i].worldstate, TBWorkShopDataBase[i].type, TBWorkShopDataBase[i].nameid);
         workshop->ChangeControl(GetDefenderTeam(),true);
 
-        BfCapturePointTB *point = new BfCapturePointTB(this, GetDefenderTeam());
+        BfCapturePointTB* point = new BfCapturePointTB(this, GetDefenderTeam());
 
         point->SetCapturePointData(GetDefenderTeam() == TEAM_ALLIANCE ? TBWorkShopDataBase[i].CapturePoint.entrya : TBWorkShopDataBase[i].CapturePoint.entryh, BATTLEFIELD_TB_MAPID,
             TBWorkShopDataBase[i].CapturePoint.x, TBWorkShopDataBase[i].CapturePoint.y, TBWorkShopDataBase[i].CapturePoint.z, 0);
@@ -485,8 +485,6 @@ void BattlefieldTB::OnBattleEnd(bool endbytimer)
         sWorld->setWorldState(WS_TB_UNK_2, time(NULL) + 86400);
     }
 
-    sLog->outError(LOG_FILTER_BATTLEFIELD,"void BattlefieldTB::OnBattleEnd(bool endbytimer)");
-
     for (uint8 team = 0; team < 2; ++team)
     {
         for (GuidSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
@@ -495,10 +493,8 @@ void BattlefieldTB::OnBattleEnd(bool endbytimer)
             {
                 if (endbytimer)
                 {
-                    sLog->outError(LOG_FILTER_BATTLEFIELD,"if (endbytimer)");
                     if (plr->GetTeamId() == GetDefenderTeam())
                     {
-                        sLog->outError(LOG_FILTER_BATTLEFIELD,"if (plr->GetTeamId() == GetDefenderTeam())");
                         switch (plr->GetTeamId())
                         {
                         case TEAM_ALLIANCE:
@@ -522,10 +518,8 @@ void BattlefieldTB::OnBattleEnd(bool endbytimer)
                     }
                     else
                     {
-                        sLog->outError(LOG_FILTER_BATTLEFIELD,"! (plr->GetTeamId() == GetDefenderTeam())");
                         switch (plr->GetTeamId())
                         {
-                            sLog->outError(LOG_FILTER_BATTLEFIELD,"! (plr->GetTeamId() == GetDefenderTeam()) plr->GetTeamId()");
                         case TEAM_ALLIANCE:
                             IncrementQuest(plr, QUEST_TB_TOL_BARAD_VICTORY_IN_TOL_BARAD_A, true);
                             break;
@@ -541,7 +535,6 @@ void BattlefieldTB::OnBattleEnd(bool endbytimer)
                 {
                     if (plr->GetTeamId() == GetAttackerTeam())
                     {
-                        sLog->outError(LOG_FILTER_BATTLEFIELD,"if (plr->GetTeamId() == GetAttackerTeam())");
                         switch (team)
                         {
                         case TEAM_ALLIANCE:
@@ -902,7 +895,7 @@ void BattlefieldTB::OnDamaged()
                     plr->CastSpell(plr, SPELL_TB_TOL_BARAD_TOWER_DAMAGED, true);
 }
 
-void BattlefieldTB::ProcessEvent(GameObject *obj, uint32 eventId)
+void BattlefieldTB::ProcessEvent(GameObject* obj, uint32 eventId)
 {
     if (!obj || !IsWarTime())
         return;

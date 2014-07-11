@@ -5,10 +5,10 @@
 enum eSpell
 {
     SPELL_ENERGIZE              = 89132,
-    SPELL_ENERGIZED             = 91733, // -> 89200,
+    SPELL_ENERGIZED             = 91733,
     SPELL_ON_FIRE               = 91737,
     SPELL_COSMETIC_STAND        = 88906,
-    SPELL_OVERDRIVE             = 88481, // 88484
+    SPELL_OVERDRIVE             = 88481,
     SPELL_HARVEST               = 88495,
     SPELL_HARVEST_AURA          = 88497,
     SPELL_HARVEST_SWEEP         = 88521,
