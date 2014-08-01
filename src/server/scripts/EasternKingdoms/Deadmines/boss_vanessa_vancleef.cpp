@@ -1313,7 +1313,7 @@ public:
                             Phase++;
                             break;
                         case 7:
-                            me->MonsterTextEmote(VANESSA_NIGHTMARE_7", 0, true);
+                            me->MonsterTextEmote(VANESSA_NIGHTMARE_7, 0, true);
                             me->SetVisible(false);
                             NightmareTimer = 2000;
                             Phase++;
