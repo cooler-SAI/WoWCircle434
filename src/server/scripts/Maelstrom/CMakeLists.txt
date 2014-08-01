@@ -11,16 +11,19 @@
 file(GLOB_RECURSE scripts_TheStonecore Maelstrom/TheStonecore/*.cpp Maelstrom/TheStonecore/*.h)
 file(GLOB_RECURSE scripts_Zones Maelstrom/*.cpp Maelstrom/*.h)
 file(GLOB_RECURSE scripts_Kezan Maelstrom/*.cpp Maelstrom/*.h)
+file(GLOB_RECURSE scripts_LostIsles Maelstrom/*.cpp Maelstrom/*.h)
 
 source_group(Maelstrom\\TheStonecore FILES ${scripts_TheStonecore})
 source_group(Maelstrom\\Zones FILES ${scripts_Zones})
 source_group(Maelstrom\\Kezan FILES ${scripts_Kezan})
+source_group(Maelstrom\\LostIsles FILES ${scripts_LostIsles})
 
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
   ${scripts_TheStonecore}
   ${scripts_Zones}
   ${scripts_Kezan}
+  ${scripts_LostIsles}
 )
 
 message("  -> Prepared: The Maelstrom")

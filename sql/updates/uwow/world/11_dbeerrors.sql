@@ -21,7 +21,7 @@ UPDATE  `creature_template` SET  `ScriptName` =  'npc_ranshalla' WHERE `entry` =
 UPDATE `gameobject_template` SET `ScriptName` = 'go_orb_of_domination' WHERE `entry` = 177808;
 
 
-INSERT INTO spell_script_names VALUES
+replace INTO spell_script_names VALUES
 (19873, 'spell_egg_event'),
 (96619, 'spell_grilek_rupture_line'),
 (96682, 'spell_mandokir_decapitate'),

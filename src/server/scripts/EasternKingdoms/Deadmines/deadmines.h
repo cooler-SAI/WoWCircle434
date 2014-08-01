@@ -1,75 +1,127 @@
+/*
+ * Copyright (C) 2008-2013 CerberCoreCore <http://www.CerberCorecore.org/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef DEF_DEADMINES_H
 #define DEF_DEADMINES_H
 
 #define DMScriptName "instance_deadmines"
 
-enum CannonState
-{
-    CANNON_NOT_USED,
-    CANNON_BLAST_INITIATED,
-    PIRATES_ATTACK,
-    EVENT_DONE
-};
-
-enum NPCs
-{
-    NPC_GLUBTOK              = 47162,
-    NPC_HELIX_GEARBREAKER    = 47296,
-    NPC_LUMBERING_OAF        = 47297,
-    NPC_FOE_REAPER_5000      = 43778,
-    NPC_ADMIRAL_RIPSNARL     = 47626,
-    NPC_CAPTAIN_COOKIE       = 47739,
-    NPC_VANESSA_VANCLEEF     = 49541,
-    NPC_VANESSA_SITTING      = 49429,
-    NPC_NOTE_FROM_VANESSA    = 49564,
-    // horde npc
-    NPC_KAGTHA               = 46889,
-    NPC_SLINKY_SHARPSHIV     = 46906,
-    NPC_MISS_MAYHEM          = 46902,
-    NPC_MAYHEM_REAPER        = 46903,
-    NPC_HAND_ASSASIN         = 46890,
-    // alliance npc
-    NPC_HORATIO_LAINE        = 46612,
-    NPC_INVESTIGATOR         = 46614,
-    NPC_DEFENDER             = 50595,
-    NPC_CRIME_SCENE_BOT      = 46613,
-};
-
 enum Data
 {
-    DATA_GLUBTOK          = 0,
-    DATA_HELIX            = 1,
-    DATA_FOEREAPER        = 2,
-    DATA_ADMIRAL          = 3,
-    DATA_CAPTAIN          = 4,
-    DATA_VANESSA          = 5,
-    DATA_CANNON_EVENT     = 6,
-    DATA_OAF              = 7,
-    DATA_VANESSA_EVENT    = 8,
-    DATA_TEAM_IN_INSTANCE = 9,
+    DATA_GLUBTOK,
+    DATA_HELIX,
+    DATA_FOEREAPER,
+    DATA_RIPSNARL,
+    DATA_COOKIE,
+    DATA_CANNON_BLAST_TIMER,
+    DATA_VANESSA,
+    DATA_VANNESSA_NIGHTMARE,
+    DATA_NIGHTMARE_HELIX,
+    DATA_NIGHTMARE_MECHANICAL,
+
+    MAX_BOSSES
+};
+
+enum eCreatures
+{
+    NPC_GLUBTOK                     = 47162,
+    NPC_OAF                         = 47297,
+    NPC_HELIX_GEARBREAKER           = 47296,
+    NPC_GENERAL_PURPOSE_BUNNY_JMF   = 45979,
+    NPC_GENERAL_PURPOSE_BUNNY_JMF2  = 47242,
+    NPC_OGRE_HENCHMAN               = 48230,
+    NPC_FOE_REAPER_5000             = 43778,
+    NPC_MINE_RAT                    = 51462,
+    NPC_ADMIRAL_RIPSNARL            = 47626,
+    NPC_VAPOR                       = 47714,
+    NPC_FIRE_WALL                   = 40859,
+    NPC_HARVEST_TARGET              = 47468,
+    NPC_CAPTAIN_COOKIE              = 47739,
+    NPC_VANESSA_VANCLEEF            = 49429,
+    NPC_VANESSA_BOSS                = 49541,
+    NPC_VANESSA_NOTE                = 49564,
+    NPC_SCORCH_MARK_BUNNY_JMF       = 48446,
+    NPC_TRAP_BUNNY                  = 49454,
+    NPC_STEAM_VALVE                 = 49457,
+    NPC_ROPE                        = 49550,
+    NPC_ROPE_ANCHOR                 = 49552,
+    NPC_DEFIAS_REAPER               = 47403,
+    NPC_PROTOTYPE_REAPER            = 49208,
+    NPC_COOKIES_CAULDRON            = 47754,
+
+    NPC_DEFIAS_SHADOWGUARD          = 48505,
+    NPC_DEFIAS_ENFORCER             = 48502,
+    NPC_DEFIAS_BLOODWIZARD          = 48417,
+    NPC_DEFIAS_PIRATE               = 48522,
+    NPC_HELIX_CREW                  = 49136,
+
+    //Nightmare NPC
+    NPC_VANESSA_NIGHTMARE           = 49671,
+    NPC_GLUBTOK_NIGHTMARE           = 49670,
+    NPC_FIRE_BUNNY                  = 51594,
+    NPC_COLAPSING                   = 49481,
+    NPC_HELIX_NIGHTMARE             = 49674,
+    NPC_NIGHTMARE_SPIDER            = 49493,
+    NPC_MAIN_SPIDER                 = 49494,
+    NPC_CHATTERING_HORROR           = 49495,
+    NPC_SPARK                       = 49520,
+    NPC_MECHANICAL_NIGHTMARE        = 49681,
+
+    NPC_ENRAGED_WORGEN              = 49532,
+    NPC_EMME_HARRINGTON             = 49534,
+    NPC_ERIK_HARRINGTON             = 49535,
+    NPC_CALISSA_HARRINGTON          = 49536,
+    NPC_JAMES_HARRINGTON            = 49539,
+
 };
 
 enum GameObjects
 {
-    GO_FOUNDRY_DOOR      = 16399,
-    GO_FACTORY_DOOR      = 13965,
-    GO_MAST_ROOM_DOOR    = 16400,
-    GO_IRONCLAD_DOOR     = 16397,
-    GO_DEFIAS_CANNON     = 16398,
-    GO_DOOR_LEVER        = 101833,
-    GO_HEAVY_DOOR        = 17153,
-    GO_HEAVY_DOOR_2      = 17154,
-    GO_GOBLIN_TELEPORTER = 208002,
+    GO_FACTORY_DOOR                 = 13965, // Door after Glubtok
+    GO_IRONCLAD_DOOR                = 16397, // Door before ship
+    GO_FOUNDRY_DOOR                 = 16399, // Door after Foe Reaper 5000
+    GO_HEAVY_DOOR                   = 17154, // Door before Foe Reaper 5000
+    GO_HEAVY_DOOR_HELIX             = 16400, // Door after helix
+
+    GO_DEFIAS_CANNON                = 16398,
+    GO_MR_SMITE_CHEST               = 144111
 };
 
-enum Sounds
+enum eSound
 {
-    SOUND_CANNONFIRE  = 1400,
-    SOUND_DESTROYDOOR = 3079,
+    SOUND_CANNONFIRE                = 1400,
+    SOUND_DESTROYDOOR               = 3079,
 };
 
-const Position centershipPos = {-63.167f, -819.315f, 41.27f, 6.25f};
-const Position notePos = {-74.3611f, -820.014f, 40.3714f, 4.01426f};
-const Position vanessaPos = {-75.5851f, -819.964f, 47.0673f, 6.17846f};
+enum eAcievement
+{
+    ACHIEVE_RAT_PACK                = 5367,
+};
+
+enum sharedSpells
+{
+    SPELL_NIGHTMARE_ELIXIR      = 92113,
+    SPELL_OFFLINE               = 88348,
+};
+
+const Position CookieSpawn =
+{
+    -88.1319f, -819.33f, 39.23453f, 0.0f
+};
 
 #endif
