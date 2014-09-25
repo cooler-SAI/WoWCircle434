@@ -19826,40 +19826,24 @@ void Unit::SendPlaySpellVisual(uint32 id)
 
 void Unit::ApplyResilience(const Unit *pVictim, int32 *damage) const
 {
-    if (IsVehicle() || pVictim->IsVehicle())
+    // player mounted on multi-passenger mount is also classified as vehicle
+    if (IsVehicle() || (pVictim->IsVehicle() && pVictim->GetTypeId() != TYPEID_PLAYER))
         return;
 
-    const Unit *source = ToPlayer();
-    if (!source)
-    {
-        source = ToCreature();
-        if (source)
-        {
-            source = source->ToCreature()->GetOwner();
-            if (source)
-                source = source->ToPlayer();
-        }
-    }
+    // Don't consider resilience if not in PvP - player or pet
+    if (!GetCharmerOrOwnerPlayerOrPlayerItself())
+        return;
 
-    const Unit *target = pVictim->ToPlayer();
-    if (!target)
-    {
-        target = pVictim->ToCreature();
-        if (target)
-        {
-            target = target->ToCreature()->GetOwner();
-            if (target)
-                target = target->ToPlayer();
-        }
-    }
+    Unit const* target = NULL;
+    if (pVictim->GetTypeId() == TYPEID_PLAYER)
+        target = pVictim;
+    else if (pVictim->GetTypeId() == TYPEID_UNIT && pVictim->GetOwner() && pVictim->GetOwner()->GetTypeId() == TYPEID_PLAYER)
+        target = pVictim->GetOwner();
 
     if (!target)
         return;
 
-    if (source && damage)
-    {
-        *damage -= target->ToPlayer()->GetPlayerDamageReduction(*damage);
-    }
+    *damage -= target->GetDamageReduction(*damage);
 }
 
 // Melee based spells can be miss, parry or dodge on this step
@@ -20116,21 +20100,21 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
     }
 }
 
-float Unit::GetCombatRatingReduction() const
+float Unit::GetCombatRatingReduction(CombatRating cr) const
 {
     if (Player const* player = ToPlayer())
-        return player->GetResilienceBonusValue();
+        return player->GetRatingBonusValue(cr);
     // Player's pet get resilience from owner
     else if (isPet() && GetOwner())
         if (Player* owner = GetOwner()->ToPlayer())
-            return owner->GetResilienceBonusValue();
+            return owner->GetRatingBonusValue(cr);
 
     return 0.0f;
 }
 
-uint32 Unit::GetCombatRatingDamageReduction(float rate, float cap, uint32 damage) const
+uint32 Unit::GetCombatRatingDamageReduction(CombatRating cr, float rate, float cap, uint32 damage) const
 {
-    float percent = std::min(GetCombatRatingReduction() * rate, cap);
+    float percent = std::min(GetCombatRatingReduction(cr) * rate, cap);
     return CalculatePct(damage, percent);
 }
 

@@ -5912,9 +5912,6 @@ float Player::GetRatingMultiplier(CombatRating cr) const
     if (!Rating || !classRating)
         return 1.0f;                                        // By default use minimum coefficient (not must be called)
 
-    if (cr == CR_RESILIENCE_TAKEN_ALL)
-        return Rating->ratio;
-
     return classRating->ratio / Rating->ratio;
 }
 
@@ -5925,11 +5922,10 @@ float Player::GetRatingBonusValue(CombatRating cr) const
 
 float Player::GetResilienceBonusValue() const
 {
-    // temporary hack for resilience calculating
-    float playerResilience = float(GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_RESILIENCE_TAKEN_ALL));
-    float degree = pow(0.99f, (playerResilience / GetRatingMultiplier(CR_RESILIENCE_TAKEN_ALL)));
-    float result = (1 - degree) * 100.0f;
-    return ceilf(result * 100) / 100;
+    float baseResult = float(GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + cr)) * GetRatingMultiplier(cr);
+    if (cr != CR_RESILIENCE_TAKEN_ALL)
+        return baseResult;
+    return float(1.0f - pow(0.99f, baseResult)) * 100.0f;
 }
 
 float Player::GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const
