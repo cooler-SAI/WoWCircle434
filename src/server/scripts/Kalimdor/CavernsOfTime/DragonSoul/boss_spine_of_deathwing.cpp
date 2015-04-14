@@ -304,7 +304,7 @@ public:
                         if (!targets.empty())
                         {
                             num = targets.size();
-                            Unit* pSpawner = CerberCore::Containers::SelectRandomContainerElement(targets);
+                            Unit* pSpawner = Trinity::Containers::SelectRandomContainerElement(targets);
                             if (Creature* pBlood = me->SummonCreature(NPC_CORRUPTED_BLOOD, *pSpawner))
                                 DoZoneInCombat(pBlood);
                         }
@@ -378,7 +378,7 @@ public:
         {
             std::list<Player*> players;
             AnyLivePlayerNoGmCheck check(me, 200.0f, true);
-            CerberCore::PlayerListSearcher<AnyLivePlayerNoGmCheck> searcher(me, players, check);
+            Trinity::PlayerListSearcher<AnyLivePlayerNoGmCheck> searcher(me, players, check);
             me->VisitNearbyWorldObject(200.0f, searcher);
             if (!players.empty())
                 for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++ itr)
@@ -450,7 +450,7 @@ public:
         {
             Player* player = NULL;
             AnyLivePlayerNoGmCheck check(me, 200.0f);
-            CerberCore::PlayerSearcher<AnyLivePlayerNoGmCheck> searcher(me, player, check);
+            Trinity::PlayerSearcher<AnyLivePlayerNoGmCheck> searcher(me, player, check);
             me->VisitNearbyWorldObject(200.0f, searcher);
             return (player ? true : false);
         }
@@ -1043,7 +1043,7 @@ public:
             if (targets.empty())
                 return;
 
-            CerberCore::Containers::RandomResizeList(targets, 1);
+            Trinity::Containers::RandomResizeList(targets, 1);
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -1233,10 +1233,10 @@ public:
                 Unit* target = NULL;
                 std::list<Player*> players;
                 PlayersCheck check(owner);
-                CerberCore::PlayerListSearcher<PlayersCheck> searcher(owner, players, check);
+                Trinity::PlayerListSearcher<PlayersCheck> searcher(owner, players, check);
                 owner->VisitNearbyObject(200.0f, searcher);
                 if (!players.empty())
-                    target = CerberCore::Containers::SelectRandomContainerElement(players);
+                    target = Trinity::Containers::SelectRandomContainerElement(players);
                 else
                     target = owner;
 
@@ -1339,7 +1339,7 @@ public:
             if (targets.empty())
                 return;
 
-            CerberCore::Containers::RandomResizeList(targets, 1);
+            Trinity::Containers::RandomResizeList(targets, 1);
         }
 
         void Register()

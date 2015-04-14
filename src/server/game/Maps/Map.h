@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CERBERCORE_MAP_H
-#define CERBERCORE_MAP_H
+#ifndef TRINITY_MAP_H
+#define TRINITY_MAP_H
 
 #include "Define.h"
 #include <ace/RW_Thread_Mutex.h>
@@ -52,7 +52,7 @@ struct Position;
 class Battleground;
 class MapInstanced;
 class InstanceMap;
-namespace CerberCore { struct ObjectUpdater; }
+namespace Trinity { struct ObjectUpdater; }
 
 struct ScriptAction
 {
@@ -260,7 +260,7 @@ class Map : public GridRefManager<NGridType>
         template<class T> bool AddToMap(T *);
         template<class T> void RemoveFromMap(T *, bool);
 
-        void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<CerberCore::ObjectUpdater, GridTypeMapContainer> &gridVisitor, TypeContainerVisitor<CerberCore::ObjectUpdater, WorldTypeMapContainer> &worldVisitor);
+        void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::ObjectUpdater, GridTypeMapContainer> &gridVisitor, TypeContainerVisitor<Trinity::ObjectUpdater, WorldTypeMapContainer> &worldVisitor);
         virtual void Update(const uint32);
 
         float GetVisibilityRange() const { return m_VisibleDistance; }
@@ -274,13 +274,13 @@ class Map : public GridRefManager<NGridType>
 
         bool IsRemovalGrid(float x, float y) const
         {
-            GridCoord p = CerberCore::ComputeGridCoord(x, y);
+            GridCoord p = Trinity::ComputeGridCoord(x, y);
             return !getNGrid(p.x_coord, p.y_coord) || getNGrid(p.x_coord, p.y_coord)->GetGridState() == GRID_STATE_REMOVAL;
         }
 
         bool IsGridLoaded(float x, float y) const
         {
-            return IsGridLoaded(CerberCore::ComputeGridCoord(x, y));
+            return IsGridLoaded(Trinity::ComputeGridCoord(x, y));
         }
 
         bool GetUnloadLock(const GridCoord &p) const { return getNGrid(p.x_coord, p.y_coord)->getUnloadLock(); }
@@ -690,7 +690,7 @@ inline void Map::Visit(Cell const& cell, TypeContainerVisitor<T, CONTAINER>& vis
 template<class NOTIFIER>
 inline void Map::VisitAll(float const& x, float const& y, float radius, NOTIFIER& notifier, bool loadGrids)
 {
-    CellCoord p(CerberCore::ComputeCellCoord(x, y));
+    CellCoord p(Trinity::ComputeCellCoord(x, y));
     Cell cell(p);
     if (!loadGrids)
         cell.SetNoCreate();
@@ -705,7 +705,7 @@ inline void Map::VisitAll(float const& x, float const& y, float radius, NOTIFIER
 template<class NOTIFIER>
 inline void Map::VisitFirstFound(const float &x, const float &y, float radius, NOTIFIER &notifier, bool loadGrids)
 {
-    CellCoord p(CerberCore::ComputeCellCoord(x, y));
+    CellCoord p(Trinity::ComputeCellCoord(x, y));
     Cell cell(p);
     if (!loadGrids)
         cell.SetNoCreate();
@@ -722,7 +722,7 @@ inline void Map::VisitFirstFound(const float &x, const float &y, float radius, N
 template<class NOTIFIER>
 inline void Map::VisitWorld(const float &x, const float &y, float radius, NOTIFIER &notifier, bool loadGrids)
 {
-    CellCoord p(CerberCore::ComputeCellCoord(x, y));
+    CellCoord p(Trinity::ComputeCellCoord(x, y));
     Cell cell(p);
     if (!loadGrids)
         cell.SetNoCreate();
@@ -734,7 +734,7 @@ inline void Map::VisitWorld(const float &x, const float &y, float radius, NOTIFI
 template<class NOTIFIER>
 inline void Map::VisitGrid(const float &x, const float &y, float radius, NOTIFIER &notifier, bool loadGrids)
 {
-    CellCoord p(CerberCore::ComputeCellCoord(x, y));
+    CellCoord p(Trinity::ComputeCellCoord(x, y));
     Cell cell(p);
     if (!loadGrids)
         cell.SetNoCreate();

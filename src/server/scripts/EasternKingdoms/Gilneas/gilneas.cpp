@@ -982,8 +982,8 @@ public:
             dst_x = src_x + distance2d * cos(absAngle);
             dst_y = src_y + distance2d * sin(absAngle);
 
-            CerberCore::NormalizeMapCoord(dst_x);
-            CerberCore::NormalizeMapCoord(dst_y);
+            Trinity::NormalizeMapCoord(dst_x);
+            Trinity::NormalizeMapCoord(dst_y);
         }
 
         void SummonWorgen(uint32 entry, uint8 id)
@@ -4387,8 +4387,8 @@ public:
                 float dy = y - sin(angle + pathangle) * dist;
                 float dz = z;
 
-                CerberCore::NormalizeMapCoord(dx);
-                CerberCore::NormalizeMapCoord(dy);
+                Trinity::NormalizeMapCoord(dx);
+                Trinity::NormalizeMapCoord(dy);
 
                 member->UpdateGroundPositionZ(dx, dy, dz);
 
@@ -8452,7 +8452,7 @@ public:
 
     void SendTrainerList(Player* player, Creature* creature, uint32 uiReqSkill)
     {
-        std::string  strTitle = player->GetSession()->GetCerberCoreString(LANG_NPC_TAINER_HELLO);;
+        std::string  strTitle = player->GetSession()->GetTrinityString(LANG_NPC_TAINER_HELLO);;
 
         TrainerSpellData const* trainer_spells = creature->GetTrainerSpells();
 

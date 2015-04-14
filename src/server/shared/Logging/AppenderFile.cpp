@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -43,8 +43,8 @@ void AppenderFile::_write(LogMessage& message)
 {
     if (dynamicName)
     {
-        char namebuf[CERBERCORE_PATH_MAX];
-        snprintf(namebuf, CERBERCORE_PATH_MAX, filename.c_str(), message.param1.c_str());
+        char namebuf[TRINITY_PATH_MAX];
+        snprintf(namebuf, TRINITY_PATH_MAX, filename.c_str(), message.param1.c_str());
         logfile = OpenFile(namebuf, mode, backup);
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -391,18 +391,18 @@ struct CellObjectGuids
 typedef UNORDERED_MAP<uint32/*cell_id*/, CellObjectGuids> CellObjectGuidsMap;
 typedef UNORDERED_MAP<uint32/*(mapid, spawnMode) pair*/, CellObjectGuidsMap> MapObjectGuids;
 
-// CerberCore string ranges
-#define MIN_CERBERCORE_STRING_ID           1                    // 'trinity_string'
-#define MAX_CERBERCORE_STRING_ID           2000000000
-#define MIN_DB_SCRIPT_STRING_ID        MAX_CERBERCORE_STRING_ID // 'db_script_string'
+// Trinity string ranges
+#define MIN_TRINITY_STRING_ID           1                    // 'trinity_string'
+#define MAX_TRINITY_STRING_ID           2000000000
+#define MIN_DB_SCRIPT_STRING_ID        MAX_TRINITY_STRING_ID // 'db_script_string'
 #define MAX_DB_SCRIPT_STRING_ID        2000010000
 #define MIN_CREATURE_AI_TEXT_STRING_ID (-1)                 // 'creature_ai_texts'
 #define MAX_CREATURE_AI_TEXT_STRING_ID (-1000000)
 
-// CerberCore Trainer Reference start range
-#define CERBERCORE_TRAINER_START_REF      200000
+// Trinity Trainer Reference start range
+#define TRINITY_TRAINER_START_REF      200000
 
-struct CerberCoreStringLocale
+struct TrinityStringLocale
 {
     StringVector Content;
 };
@@ -417,7 +417,7 @@ typedef UNORDERED_MAP<uint32, ItemLocale> ItemLocaleContainer;
 typedef UNORDERED_MAP<uint32, QuestLocale> QuestLocaleContainer;
 typedef UNORDERED_MAP<uint32, NpcTextLocale> NpcTextLocaleContainer;
 typedef UNORDERED_MAP<uint32, PageTextLocale> PageTextLocaleContainer;
-typedef UNORDERED_MAP<int32, CerberCoreStringLocale> CerberCoreStringLocaleContainer;
+typedef UNORDERED_MAP<int32, TrinityStringLocale> TrinityStringLocaleContainer;
 typedef UNORDERED_MAP<uint32, GossipMenuItemsLocale> GossipMenuItemsLocaleContainer;
 typedef UNORDERED_MAP<uint32, PointOfInterestLocale> PointOfInterestLocaleContainer;
 
@@ -940,8 +940,8 @@ class ObjectMgr
         void LoadSpellScriptNames();
         void ValidateSpellScripts();
 
-        bool LoadCerberCoreStrings(char const* table, int32 min_value, int32 max_value);
-        bool LoadCerberCoreStrings() { return LoadCerberCoreStrings("trinity_string", MIN_CERBERCORE_STRING_ID, MAX_CERBERCORE_STRING_ID); }
+        bool LoadTrinityStrings(char const* table, int32 min_value, int32 max_value);
+        bool LoadTrinityStrings() { return LoadTrinityStrings("trinity_string", MIN_TRINITY_STRING_ID, MAX_TRINITY_STRING_ID); }
         void LoadDbScriptStrings();
         void LoadCreatureClassLevelStats();
         void LoadCreatureLocales();
@@ -1186,14 +1186,14 @@ class ObjectMgr
         GameObjectData& NewGOData(uint32 guid) { return _gameObjectDataStore[guid]; }
         void DeleteGOData(uint32 guid);
 
-        CerberCoreStringLocale const* GetCerberCoreStringLocale(int32 entry) const
+        TrinityStringLocale const* GetTrinityStringLocale(int32 entry) const
         {
-            CerberCoreStringLocaleContainer::const_iterator itr = _trinityStringLocaleStore.find(entry);
+            TrinityStringLocaleContainer::const_iterator itr = _trinityStringLocaleStore.find(entry);
             if (itr == _trinityStringLocaleStore.end()) return NULL;
             return &itr->second;
         }
-        const char *GetCerberCoreString(int32 entry, LocaleConstant locale_idx) const;
-        const char *GetCerberCoreStringForDBCLocale(int32 entry) const { return GetCerberCoreString(entry, DBCLocaleIndex); }
+        const char *GetTrinityString(int32 entry, LocaleConstant locale_idx) const;
+        const char *GetTrinityStringForDBCLocale(int32 entry) const { return GetTrinityString(entry, DBCLocaleIndex); }
         LocaleConstant GetDBCLocaleIndex() const { return DBCLocaleIndex; }
         void SetDBCLocaleIndex(LocaleConstant locale) { DBCLocaleIndex = locale; }
 
@@ -1479,7 +1479,7 @@ class ObjectMgr
         QuestLocaleContainer _questLocaleStore;
         NpcTextLocaleContainer _npcTextLocaleStore;
         PageTextLocaleContainer _pageTextLocaleStore;
-        CerberCoreStringLocaleContainer _trinityStringLocaleStore;
+        TrinityStringLocaleContainer _trinityStringLocaleStore;
         GossipMenuItemsLocaleContainer _gossipMenuItemsLocaleStore;
         PointOfInterestLocaleContainer _pointOfInterestLocaleStore;
 
@@ -1503,6 +1503,6 @@ class ObjectMgr
 #define sObjectMgr ACE_Singleton<ObjectMgr, ACE_Null_Mutex>::instance()
 
 // scripting access functions
-bool LoadCerberCoreStrings(char const* table, int32 start_value = MAX_CREATURE_AI_TEXT_STRING_ID, int32 end_value = std::numeric_limits<int32>::min());
+bool LoadTrinityStrings(char const* table, int32 start_value = MAX_CREATURE_AI_TEXT_STRING_ID, int32 end_value = std::numeric_limits<int32>::min());
 
 #endif

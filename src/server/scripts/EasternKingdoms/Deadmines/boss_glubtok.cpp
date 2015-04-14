@@ -392,12 +392,12 @@ public:
                         std::list<Creature*> cList;
                         me->GetCreatureListWithEntryInGrid(cList, targetEntry, 100.0f);
 
-                        cList.remove_if(CerberCore::UnitAuraCheck(true, indicatorSpellID));
+                        cList.remove_if(Trinity::UnitAuraCheck(true, indicatorSpellID));
 
                         if (cList.empty())
                             break;
 
-                        if (Creature* target = CerberCore::Containers::SelectRandomContainerElement(cList))
+                        if (Creature* target = Trinity::Containers::SelectRandomContainerElement(cList))
                         {
                             target->CastSpell(target, indicatorSpellID, true);
                             me->CastSpell(target, targetSpellID);

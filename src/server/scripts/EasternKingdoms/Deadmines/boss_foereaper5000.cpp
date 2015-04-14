@@ -190,7 +190,7 @@ public:
             std::list<Creature*> reapers;
             me->GetCreatureListWithEntryInGrid(reapers, NPC_DEFIAS_REAPER, 250.0f);
 
-            reapers.sort(CerberCore::ObjectDistanceOrderPred(me));
+            reapers.sort(Trinity::ObjectDistanceOrderPred(me));
             for (std::list<Creature*>::iterator itr = reapers.begin(); itr != reapers.end(); ++itr)
             {
                 if (( *itr ) && ( *itr )->GetTypeId() == TYPEID_UNIT)

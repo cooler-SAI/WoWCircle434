@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -287,7 +287,7 @@ void Quest::BuildExtraQuestInfo(WorldPacket& data, Player* player) const
 
     /* Pre cata struct, some of these unks might be the missing values in cata:
     // rewarded honor points. Multiply with 10 to satisfy client
-    data << 10 * CerberCore::Honor::hk_honor_at_level(_session->GetPlayer()->getLevel(), quest->GetRewHonorMultiplier());
+    data << 10 * Trinity::Honor::hk_honor_at_level(_session->GetPlayer()->getLevel(), quest->GetRewHonorMultiplier());
     data << float(0);                                       // unk, honor multiplier?
     data << uint32(0x08);                                   // unused by client?
     data << uint32(quest->GetRewSpell());                   // reward spell, this spell will display (icon) (casted if RewSpellCast == 0)

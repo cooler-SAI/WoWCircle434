@@ -253,8 +253,8 @@ public:
                         if (Unit* target = me->getVictim())
                         {
                             std::list<Player*> PlayerList;
-                            CerberCore::AnyPlayerInObjectRangeCheck checker(target, 10.0f);
-                            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(target, PlayerList, checker);
+                            Trinity::AnyPlayerInObjectRangeCheck checker(target, 10.0f);
+                            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(target, PlayerList, checker);
                             target->VisitNearbyWorldObject(5.0f, searcher);
                             uint8 const minTargets = Is25ManRaid() ? 18 : 7;
                             if (PlayerList.size() >= minTargets)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -36,17 +36,17 @@
 #include "ScriptedGossip.h"
 #include "CreatureTextMgr.h"
 
-class CerberCoreStringTextBuilder
+class TrinityStringTextBuilder
 {
     public:
-        CerberCoreStringTextBuilder(WorldObject* obj, ChatMsg msgtype, int32 id, uint32 language, uint64 targetGUID)
+        TrinityStringTextBuilder(WorldObject* obj, ChatMsg msgtype, int32 id, uint32 language, uint64 targetGUID)
             : _source(obj), _msgType(msgtype), _textId(id), _language(language), _targetGUID(targetGUID)
         {
         }
 
         size_t operator()(WorldPacket* data, LocaleConstant locale) const
         {
-            std::string text = sObjectMgr->GetCerberCoreString(_textId, locale);
+            std::string text = sObjectMgr->GetTrinityString(_textId, locale);
             char const* localizedName = _source->GetNameForLocaleIdx(locale);
 
             *data << uint8(_msgType);
@@ -699,7 +699,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             else
                 locale = sWorld->GetDefaultDbcLocale();
 
-            std::string text = sObjectMgr->GetCerberCoreString(e.action.announce.tesxid, locale);
+            std::string text = sObjectMgr->GetTrinityString(e.action.announce.tesxid, locale);
 
             sWorld->SendWorldText(e.action.announce.idsample, text.c_str());
 
@@ -739,7 +739,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             me->DoFleeToGetAssistance();
             if (e.action.flee.withEmote)
             {
-                CerberCoreStringTextBuilder builder(me, CHAT_MSG_MONSTER_EMOTE, LANG_FLEE, LANG_UNIVERSAL, 0);
+                TrinityStringTextBuilder builder(me, CHAT_MSG_MONSTER_EMOTE, LANG_FLEE, LANG_UNIVERSAL, 0);
                 sCreatureTextMgr->SendChatPacket(me, builder, CHAT_MSG_MONSTER_EMOTE);
             }
             break;
@@ -2389,8 +2389,8 @@ ObjectList* SmartScript::GetWorldObjectsInDist(float dist)
     WorldObject* obj = GetBaseObject();
     if (obj)
     {
-        CerberCore::AllWorldObjectsInRange u_check(obj, dist);
-        CerberCore::WorldObjectListSearcher<CerberCore::AllWorldObjectsInRange> searcher(obj, *targets, u_check);
+        Trinity::AllWorldObjectsInRange u_check(obj, dist);
+        Trinity::WorldObjectListSearcher<Trinity::AllWorldObjectsInRange> searcher(obj, *targets, u_check);
         obj->VisitNearbyObject(dist, searcher);
     }
     return targets;
@@ -3010,7 +3010,7 @@ void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTriggerEn
 
     for (SmartAIEventList::iterator i = e.begin(); i != e.end(); ++i)
     {
-        #ifndef CERBERCORE_DEBUG
+        #ifndef TRINITY_DEBUG
             if ((*i).event.event_flags & SMART_EVENT_FLAG_DEBUG_ONLY)
                 continue;
         #endif
@@ -3118,16 +3118,16 @@ Unit* SmartScript::DoSelectLowestHpFriendly(float range, uint32 MinHPDiff)
     if (!me)
         return NULL;
 
-    CellCoord p(CerberCore::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
+    CellCoord p(Trinity::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
     Cell cell(p);
     cell.SetNoCreate();
 
     Unit* unit = NULL;
 
-    CerberCore::MostHPMissingInRange u_check(me, range, MinHPDiff);
-    CerberCore::UnitLastSearcher<CerberCore::MostHPMissingInRange> searcher(me, unit, u_check);
+    Trinity::MostHPMissingInRange u_check(me, range, MinHPDiff);
+    Trinity::UnitLastSearcher<Trinity::MostHPMissingInRange> searcher(me, unit, u_check);
 
-    TypeContainerVisitor<CerberCore::UnitLastSearcher<CerberCore::MostHPMissingInRange>, GridTypeMapContainer >  grid_unit_searcher(searcher);
+    TypeContainerVisitor<Trinity::UnitLastSearcher<Trinity::MostHPMissingInRange>, GridTypeMapContainer >  grid_unit_searcher(searcher);
 
     cell.Visit(p, grid_unit_searcher, *me->GetMap(), *me, range);
     return unit;
@@ -3138,14 +3138,14 @@ void SmartScript::DoFindFriendlyCC(std::list<Creature*>& _list, float range)
     if (!me)
         return;
 
-    CellCoord p(CerberCore::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
+    CellCoord p(Trinity::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
     Cell cell(p);
     cell.SetNoCreate();
 
-    CerberCore::FriendlyCCedInRange u_check(me, range);
-    CerberCore::CreatureListSearcher<CerberCore::FriendlyCCedInRange> searcher(me, _list, u_check);
+    Trinity::FriendlyCCedInRange u_check(me, range);
+    Trinity::CreatureListSearcher<Trinity::FriendlyCCedInRange> searcher(me, _list, u_check);
 
-    TypeContainerVisitor<CerberCore::CreatureListSearcher<CerberCore::FriendlyCCedInRange>, GridTypeMapContainer >  grid_creature_searcher(searcher);
+    TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::FriendlyCCedInRange>, GridTypeMapContainer >  grid_creature_searcher(searcher);
 
     cell.Visit(p, grid_creature_searcher, *me->GetMap(), *me, range);
 }
@@ -3155,14 +3155,14 @@ void SmartScript::DoFindFriendlyMissingBuff(std::list<Creature*>& list, float ra
     if (!me)
         return;
 
-    CellCoord p(CerberCore::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
+    CellCoord p(Trinity::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
     Cell cell(p);
     cell.SetNoCreate();
 
-    CerberCore::FriendlyMissingBuffInRange u_check(me, range, spellid);
-    CerberCore::CreatureListSearcher<CerberCore::FriendlyMissingBuffInRange> searcher(me, list, u_check);
+    Trinity::FriendlyMissingBuffInRange u_check(me, range, spellid);
+    Trinity::CreatureListSearcher<Trinity::FriendlyMissingBuffInRange> searcher(me, list, u_check);
 
-    TypeContainerVisitor<CerberCore::CreatureListSearcher<CerberCore::FriendlyMissingBuffInRange>, GridTypeMapContainer >  grid_creature_searcher(searcher);
+    TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::FriendlyMissingBuffInRange>, GridTypeMapContainer >  grid_creature_searcher(searcher);
 
     cell.Visit(p, grid_creature_searcher, *me->GetMap(), *me, range);
 }

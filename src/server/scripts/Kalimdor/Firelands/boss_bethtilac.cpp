@@ -241,7 +241,7 @@ public:
                         //if (!me->getVictim() || !me->IsWithinMeleeRange(me->getVictim()))
                         std::list<Player*> PlayerList;
                         PlayerPositionCheck checker(true);
-                        CerberCore::PlayerListSearcher<PlayerPositionCheck> searcher(me, PlayerList, checker);
+                        Trinity::PlayerListSearcher<PlayerPositionCheck> searcher(me, PlayerList, checker);
                         me->VisitNearbyWorldObject(300.0f, searcher);
                         if (PlayerList.size() == 0)
                             DoCastAOE(SPELL_VENOM_RAIN);
@@ -253,7 +253,7 @@ public:
                     {
                         std::list<Player*> PlayerList;
                         PlayerPositionCheck checker(true);
-                        CerberCore::PlayerListSearcher<PlayerPositionCheck> searcher(me, PlayerList, checker);
+                        Trinity::PlayerListSearcher<PlayerPositionCheck> searcher(me, PlayerList, checker);
                         me->VisitNearbyWorldObject(300.0f, searcher);
                         if (PlayerList.size() > 0)
                             DoCastAOE(SPELL_EMBER_FLARE_1);

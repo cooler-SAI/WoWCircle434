@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -149,7 +149,7 @@ public:
             { "spell_target_position",        SEC_ADMINISTRATOR, true,  &HandleReloadSpellTargetPositionCommand,        "", NULL },
             { "spell_threats",                SEC_ADMINISTRATOR, true,  &HandleReloadSpellThreatsCommand,               "", NULL },
             { "spell_group_stack_rules",      SEC_ADMINISTRATOR, true,  &HandleReloadSpellGroupStackRulesCommand,       "", NULL },
-            { "trinity_string",               SEC_ADMINISTRATOR, true,  &HandleReloadCerberCoreStringCommand,           "", NULL },
+            { "trinity_string",               SEC_ADMINISTRATOR, true,  &HandleReloadTrinityStringCommand,           "", NULL },
             { "warden_action",                SEC_ADMINISTRATOR, true,  &HandleReloadWardenactionCommand,               "", NULL },
             { "waypoint_scripts",             SEC_ADMINISTRATOR, true,  &HandleReloadWpScriptsCommand,                  "", NULL },
             { "waypoint_data",                SEC_ADMINISTRATOR, true,  &HandleReloadWpCommand,                         "", NULL },
@@ -190,7 +190,7 @@ public:
         HandleReloadMailLevelRewardCommand(handler, "");
         HandleReloadCommandCommand(handler, "");
         HandleReloadReservedNameCommand(handler, "");
-        HandleReloadCerberCoreStringCommand(handler, "");
+        HandleReloadTrinityStringCommand(handler, "");
         HandleReloadGameTeleCommand(handler, "");
 
         HandleReloadVehicleAccessoryCommand(handler, "");
@@ -714,10 +714,10 @@ public:
         return true;
     }
 
-    static bool HandleReloadCerberCoreStringCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadTrinityStringCommand(ChatHandler* handler, const char* /*args*/)
     {
         sLog->outInfo(LOG_FILTER_GENERAL, "Re-Loading trinity_string Table!");
-        sObjectMgr->LoadCerberCoreStrings();
+        sObjectMgr->LoadTrinityStrings();
         handler->SendGlobalGMSysMessage("DB table `trinity_string` reloaded.");
         return true;
     }

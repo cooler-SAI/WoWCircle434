@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+* Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
 *
 * Thanks to the original authors: ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
@@ -328,8 +328,8 @@ void ScriptedAI::DoTeleportAll(float x, float y, float z, float o)
 Unit* ScriptedAI::DoSelectLowestHpFriendly(float range, uint32 minHPDiff)
 {
     Unit* unit = NULL;
-    CerberCore::MostHPMissingInRange u_check(me, range, minHPDiff);
-    CerberCore::UnitLastSearcher<CerberCore::MostHPMissingInRange> searcher(me, unit, u_check);
+    Trinity::MostHPMissingInRange u_check(me, range, minHPDiff);
+    Trinity::UnitLastSearcher<Trinity::MostHPMissingInRange> searcher(me, unit, u_check);
     me->VisitNearbyObject(range, searcher);
 
     return unit;
@@ -338,8 +338,8 @@ Unit* ScriptedAI::DoSelectLowestHpFriendly(float range, uint32 minHPDiff)
 std::list<Creature*> ScriptedAI::DoFindFriendlyCC(float range)
 {
     std::list<Creature*> list;
-    CerberCore::FriendlyCCedInRange u_check(me, range);
-    CerberCore::CreatureListSearcher<CerberCore::FriendlyCCedInRange> searcher(me, list, u_check);
+    Trinity::FriendlyCCedInRange u_check(me, range);
+    Trinity::CreatureListSearcher<Trinity::FriendlyCCedInRange> searcher(me, list, u_check);
     me->VisitNearbyObject(range, searcher);
     return list;
 }
@@ -347,8 +347,8 @@ std::list<Creature*> ScriptedAI::DoFindFriendlyCC(float range)
 std::list<Creature*> ScriptedAI::DoFindFriendlyMissingBuff(float range, uint32 uiSpellid)
 {
     std::list<Creature*> list;
-    CerberCore::FriendlyMissingBuffInRange u_check(me, range, uiSpellid);
-    CerberCore::CreatureListSearcher<CerberCore::FriendlyMissingBuffInRange> searcher(me, list, u_check);
+    Trinity::FriendlyMissingBuffInRange u_check(me, range, uiSpellid);
+    Trinity::CreatureListSearcher<Trinity::FriendlyMissingBuffInRange> searcher(me, list, u_check);
     me->VisitNearbyObject(range, searcher);
     return list;
 }
@@ -357,13 +357,13 @@ Player* ScriptedAI::GetPlayerAtMinimumRange(float minimumRange)
 {
     Player* player = NULL;
 
-    CellCoord pair(CerberCore::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
+    CellCoord pair(Trinity::ComputeCellCoord(me->GetPositionX(), me->GetPositionY()));
     Cell cell(pair);
     cell.SetNoCreate();
 
-    CerberCore::PlayerAtMinimumRangeAway check(me, minimumRange);
-    CerberCore::PlayerSearcher<CerberCore::PlayerAtMinimumRangeAway> searcher(me, player, check);
-    TypeContainerVisitor<CerberCore::PlayerSearcher<CerberCore::PlayerAtMinimumRangeAway>, GridTypeMapContainer> visitor(searcher);
+    Trinity::PlayerAtMinimumRangeAway check(me, minimumRange);
+    Trinity::PlayerSearcher<Trinity::PlayerAtMinimumRangeAway> searcher(me, player, check);
+    TypeContainerVisitor<Trinity::PlayerSearcher<Trinity::PlayerAtMinimumRangeAway>, GridTypeMapContainer> visitor(searcher);
 
     cell.Visit(pair, visitor, *me->GetMap(), *me, minimumRange);
 

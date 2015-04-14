@@ -217,7 +217,7 @@ public:
             std::list<Creature*> creature_list;
             me->GetCreatureListWithEntryInGrid(creature_list, NPC_GENERAL_PURPOSE_BUNNY_JMF2, 100.0f);
 
-            creature_list.sort(CerberCore::ObjectDistanceOrderPred(me));
+            creature_list.sort(Trinity::ObjectDistanceOrderPred(me));
             for (std::list<Creature*>::iterator itr = creature_list.begin(); itr != creature_list.end(); ++itr)
             {
                 if (( *itr ) && ( *itr )->isAlive() && ( *itr )->GetTypeId() == TYPEID_UNIT)
@@ -239,8 +239,8 @@ public:
             phase = PHASE_NORMAL;
             std::list<Player*> players;
 
-            CerberCore::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
-            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+            Trinity::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
+            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
             me->VisitNearbyWorldObject(150.0f, searcher);
 
             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)

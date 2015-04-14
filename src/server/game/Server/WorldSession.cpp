@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -211,7 +211,7 @@ void WorldSession::SendPacket(WorldPacket const* packet, bool forced /*= false*/
         }
     }
 
-#ifdef CERBERCORE_DEBUG
+#ifdef TRINITY_DEBUG
     // Code for network use statistic
     static uint64 sendPacketCount = 0;
     static uint64 sendPacketBytes = 0;
@@ -243,7 +243,7 @@ void WorldSession::SendPacket(WorldPacket const* packet, bool forced /*= false*/
         sendLastPacketCount = 1;
         sendLastPacketBytes = packet->wpos();               // wpos is real written size
     }
-#endif                                                      // !CERBERCORE_DEBUG
+#endif                                                      // !TRINITY_DEBUG
 
     if (m_Socket->SendPacket(packet) == -1)
         m_Socket->CloseSocket();
@@ -646,7 +646,7 @@ void WorldSession::SendNotification(const char *format, ...)
 
 void WorldSession::SendNotification(uint32 string_id, ...)
 {
-    char const* format = GetCerberCoreString(string_id);
+    char const* format = GetTrinityString(string_id);
     if (format)
     {
         va_list ap;
@@ -664,9 +664,9 @@ void WorldSession::SendNotification(uint32 string_id, ...)
     }
 }
 
-const char *WorldSession::GetCerberCoreString(int32 entry) const
+const char *WorldSession::GetTrinityString(int32 entry) const
 {
-    return sObjectMgr->GetCerberCoreString(entry, GetSessionDbLocaleIndex());
+    return sObjectMgr->GetTrinityString(entry, GetSessionDbLocaleIndex());
 }
 
 void WorldSession::Handle_NOT_NEED(WorldPacket& recvPacket)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -338,8 +338,8 @@ class npc_thorim_controller : public CreatureScript
                             if (!_gotActivated)
                             {
                                 Player* player = 0;
-                                CerberCore::AnyPlayerInObjectRangeCheck u_check(me, 50.0f, true);
-                                CerberCore::PlayerSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, player, u_check);
+                                Trinity::AnyPlayerInObjectRangeCheck u_check(me, 50.0f, true);
+                                Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, player, u_check);
                                 me->VisitNearbyObject(50.0f, searcher);
                                 if (player)
                                     if (!player->isGameMaster())
@@ -360,8 +360,8 @@ class npc_thorim_controller : public CreatureScript
                         case EVENT_CHECK_WIPE:
                             {
                                 Player* player = NULL;
-                                CerberCore::AnyPlayerInObjectRangeCheck u_check(me, 50.0f, true);
-                                CerberCore::PlayerSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, player, u_check);
+                                Trinity::AnyPlayerInObjectRangeCheck u_check(me, 50.0f, true);
+                                Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, player, u_check);
                                 me->VisitNearbyObject(50.0f, searcher);
                                 if (player)
                                     _events.ScheduleEvent(EVENT_CHECK_WIPE, 3*IN_MILLISECONDS);
@@ -1001,8 +1001,8 @@ class npc_thorim_pre_phase_add : public CreatureScript
                             if (!me->isInCombat())
                             {
                                 Player* player = 0;
-                                CerberCore::AnyPlayerInObjectRangeCheck u_check(me, 70.0f, true);
-                                CerberCore::PlayerSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, player, u_check);
+                                Trinity::AnyPlayerInObjectRangeCheck u_check(me, 70.0f, true);
+                                Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, player, u_check);
                                 me->VisitNearbyObject(30.0f, searcher);
                                 if (player)
                                     if (!player->isGameMaster())
@@ -1801,7 +1801,7 @@ class spell_stormhammer_targeting : public SpellScriptLoader
                 if (targets.empty())
                     return;
 
-                _target = CerberCore::Containers::SelectRandomContainerElement(targets);
+                _target = Trinity::Containers::SelectRandomContainerElement(targets);
                 SetTarget(targets);
             }
 
@@ -1847,7 +1847,7 @@ class spell_thorim_charge_orb_targeting : public SpellScriptLoader
                     return;
 
                 // Charge Orb should be cast always only on 1 orb
-                _target = CerberCore::Containers::SelectRandomContainerElement(targets);
+                _target = Trinity::Containers::SelectRandomContainerElement(targets);
                 SetTarget(targets);
             }
 

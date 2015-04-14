@@ -939,7 +939,7 @@ public:
 static void TrashEvaded(Creature* creature)
 {
     TrashRespawnWorker check;
-    CerberCore::CreatureWorker<TrashRespawnWorker> worker(creature, check);
+    Trinity::CreatureWorker<TrashRespawnWorker> worker(creature, check);
     creature->VisitNearbyGridObject(SIZE_OF_GRIDS, worker);
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -147,7 +147,7 @@ public:
                                                      targetList.push_back((*itr)->getTarget());
                                              }
 
-                                             CerberCore::Containers::RandomResizeList(targetList, 5);
+                                             Trinity::Containers::RandomResizeList(targetList, 5);
 
                                              for (std::list<Unit*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
                                                  DoCast(*itr, SPELL_DRAIN_MANA);

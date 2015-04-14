@@ -38,18 +38,18 @@ public:
         LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
         char printinfo[500]; // Max length
 
-        sprintf(printinfo, sObjectMgr->GetCerberCoreString(20003, loc_idx), priceFaction);
+        sprintf(printinfo, sObjectMgr->GetTrinityString(20003, loc_idx), priceFaction);
         player->ADD_GOSSIP_ITEM(0, printinfo, GOSSIP_SENDER_MAIN, CHANGE_FACTION);
 
-        sprintf(printinfo, sObjectMgr->GetCerberCoreString(20004, loc_idx), priceRace);
+        sprintf(printinfo, sObjectMgr->GetTrinityString(20004, loc_idx), priceRace);
         player->ADD_GOSSIP_ITEM(0, printinfo, GOSSIP_SENDER_MAIN, CHANGE_RACE);
 
-        sprintf(printinfo, sObjectMgr->GetCerberCoreString(20005, loc_idx), priceGender);
+        sprintf(printinfo, sObjectMgr->GetTrinityString(20005, loc_idx), priceGender);
         player->ADD_GOSSIP_ITEM(0, printinfo, GOSSIP_SENDER_MAIN, CHANGE_GENDER);
 
-        sprintf(printinfo, sObjectMgr->GetCerberCoreString(20010, loc_idx), priceRecobery);
+        sprintf(printinfo, sObjectMgr->GetTrinityString(20010, loc_idx), priceRecobery);
         //player->ADD_GOSSIP_ITEM(0, printinfo, GOSSIP_SENDER_MAIN, RECOVERY_CHAR);
-        player->ADD_GOSSIP_ITEM(0, sObjectMgr->GetCerberCoreString(20014, loc_idx), GOSSIP_SENDER_MAIN, EFIRALS_TRANS);
+        player->ADD_GOSSIP_ITEM(0, sObjectMgr->GetTrinityString(20014, loc_idx), GOSSIP_SENDER_MAIN, EFIRALS_TRANS);
 
         player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE,creature->GetGUID());
         return true;
@@ -143,7 +143,7 @@ public:
                         if (!result)
                         {
                             player->CLOSE_GOSSIP_MENU();
-                            player->ADD_GOSSIP_ITEM(0, sObjectMgr->GetCerberCoreString(20015, loc_idx), GOSSIP_SENDER_MAIN, CHANGE_ITEMBACK);
+                            player->ADD_GOSSIP_ITEM(0, sObjectMgr->GetTrinityString(20015, loc_idx), GOSSIP_SENDER_MAIN, CHANGE_ITEMBACK);
                             player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE,creature->GetGUID());
                         }
                         else
@@ -152,7 +152,7 @@ public:
                             uint32 transcount = CalculatePct(countefirs, 85);
                             uint32 delcount = (countefirs - transcount);
                             char printinfo[500]; // Max length
-                            sprintf(printinfo, sObjectMgr->GetCerberCoreString(20016, loc_idx), countefirs, transcount, delcount);
+                            sprintf(printinfo, sObjectMgr->GetTrinityString(20016, loc_idx), countefirs, transcount, delcount);
                             player->ADD_GOSSIP_ITEM(0, printinfo, GOSSIP_SENDER_MAIN, EFIRALS_TRANS);
                             do
                             {
@@ -175,7 +175,7 @@ public:
                         if (!result)
                         {
                             player->CLOSE_GOSSIP_MENU();
-                            player->ADD_GOSSIP_ITEM(0, sObjectMgr->GetCerberCoreString(20009, loc_idx), GOSSIP_SENDER_MAIN, CHANGE_ITEMBACK);
+                            player->ADD_GOSSIP_ITEM(0, sObjectMgr->GetTrinityString(20009, loc_idx), GOSSIP_SENDER_MAIN, CHANGE_ITEMBACK);
                             player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE,creature->GetGUID());
                         }
                         else
@@ -225,7 +225,7 @@ public:
                     // from console show not existed sendermail
                     MailSender sendermail(MAIL_NORMAL, 0, MAIL_STATIONERY_GM);
                     // fill mail
-                    MailDraft draft(sObjectMgr->GetCerberCoreString(20017, loc_idx), sObjectMgr->GetCerberCoreString(20017, loc_idx));
+                    MailDraft draft(sObjectMgr->GetTrinityString(20017, loc_idx), sObjectMgr->GetTrinityString(20017, loc_idx));
                     SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
                     if (Item* item = Item::CreateItem(EFIRALS, transcount, 0))
@@ -336,13 +336,13 @@ public:
         if (!result)
         {
             LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
-            player->ADD_GOSSIP_ITEM(0, sObjectMgr->GetCerberCoreString(20008, loc_idx), GOSSIP_SENDER_MAIN, CHANGE_ITEMBACK);
+            player->ADD_GOSSIP_ITEM(0, sObjectMgr->GetTrinityString(20008, loc_idx), GOSSIP_SENDER_MAIN, CHANGE_ITEMBACK);
             player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE,creature->GetGUID());
         }
         else
         {
             LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
-            player->ADD_GOSSIP_ITEM(0, sObjectMgr->GetCerberCoreString(20006, loc_idx), GOSSIP_SENDER_MAIN, CHANGE_ITEMBACK);
+            player->ADD_GOSSIP_ITEM(0, sObjectMgr->GetTrinityString(20006, loc_idx), GOSSIP_SENDER_MAIN, CHANGE_ITEMBACK);
             do
             {
                 Field* fields = result->Fetch();

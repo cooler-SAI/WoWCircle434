@@ -2741,7 +2741,7 @@ public:
             {
                 std::list<Player*> players;
                 PlayerCheck check(me);
-                CerberCore::PlayerListSearcher<PlayerCheck> searcher(me, players, check);
+                Trinity::PlayerListSearcher<PlayerCheck> searcher(me, players, check);
                 me->VisitNearbyObject(32.0f, searcher);
                 if (!players.empty())
                     for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)

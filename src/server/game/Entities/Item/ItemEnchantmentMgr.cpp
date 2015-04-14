@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -104,7 +104,7 @@ uint32 GetItemEnchantMod(int32 entry, bool isProperty)
     }
 
     if (!tempList.empty())
-        return CerberCore::Containers::SelectRandomContainerElement(tempList);
+        return Trinity::Containers::SelectRandomContainerElement(tempList);
 
     return 0;
 }

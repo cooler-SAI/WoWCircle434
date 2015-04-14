@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CERBERCORE_CELLIMPL_H
-#define CERBERCORE_CELLIMPL_H
+#ifndef TRINITY_CELLIMPL_H
+#define TRINITY_CELLIMPL_H
 
 #include <cmath>
 
@@ -37,7 +37,7 @@ inline Cell::Cell(CellCoord const& p)
 
 inline Cell::Cell(float x, float y)
 {
-    CellCoord p = CerberCore::ComputeCellCoord(x, y);
+    CellCoord p = Trinity::ComputeCellCoord(x, y);
     data.Part.grid_x = p.x_coord / MAX_NUMBER_OF_CELLS;
     data.Part.grid_y = p.y_coord / MAX_NUMBER_OF_CELLS;
     data.Part.cell_x = p.x_coord % MAX_NUMBER_OF_CELLS;
@@ -50,12 +50,12 @@ inline CellArea Cell::CalculateCellArea(float x, float y, float radius)
 {
     if (radius <= 0.0f)
     {
-        CellCoord center = CerberCore::ComputeCellCoord(x, y).normalize();
+        CellCoord center = Trinity::ComputeCellCoord(x, y).normalize();
         return CellArea(center, center);
     }
 
-    CellCoord centerX = CerberCore::ComputeCellCoord(x - radius, y - radius).normalize();
-    CellCoord centerY = CerberCore::ComputeCellCoord(x + radius, y + radius).normalize();
+    CellCoord centerX = Trinity::ComputeCellCoord(x - radius, y - radius).normalize();
+    CellCoord centerY = Trinity::ComputeCellCoord(x + radius, y + radius).normalize();
 
     return CellArea(centerX, centerY);
 }

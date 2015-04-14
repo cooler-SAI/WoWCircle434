@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+* Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 *
 * This program is free software; you can redistribute it and/or modify it
@@ -423,7 +423,7 @@ WorldPacket Battlefield::BuildWarningAnnPacket(std::string msg)
 
 void Battlefield::SendWarningToAllInZone(uint32 entry,...)
 {
-    const char *format = sObjectMgr->GetCerberCoreStringForDBCLocale(entry);
+    const char *format = sObjectMgr->GetTrinityStringForDBCLocale(entry);
     va_list ap;
     char str [1024];
     va_start(ap, entry);
@@ -912,8 +912,8 @@ bool BfCapturePoint::Update(uint32 diff)
     }
 
     std::list<Player*> players;
-    CerberCore::AnyPlayerInObjectRangeCheck checker(m_capturePoint, radius);
-    CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(m_capturePoint, players, checker);
+    Trinity::AnyPlayerInObjectRangeCheck checker(m_capturePoint, radius);
+    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(m_capturePoint, players, checker);
     m_capturePoint->VisitNearbyWorldObject(radius, searcher);
 
     for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)

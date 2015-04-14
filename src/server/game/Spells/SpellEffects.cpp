@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -1842,7 +1842,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                 uint32 maxTargets = std::min<uint32>(3, attackers.size());
                 for (uint32 i = 0; i < maxTargets; ++i)
                 {
-                    Unit* attacker = CerberCore::Containers::SelectRandomContainerElement(attackers);
+                    Unit* attacker = Trinity::Containers::SelectRandomContainerElement(attackers);
                     m_caster->CastSpell(attacker, 31790, true);
                     attackers.erase(attacker);
                 }
@@ -3101,7 +3101,7 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
         if (!avalibleElixirs.empty())
         {
             // cast random elixir on target
-            m_caster->CastSpell(unitTarget, CerberCore::Containers::SelectRandomContainerElement(avalibleElixirs), true, m_CastItem);
+            m_caster->CastSpell(unitTarget, Trinity::Containers::SelectRandomContainerElement(avalibleElixirs), true, m_CastItem);
         }
     }
 }
@@ -3583,7 +3583,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
                             if (summons.size() >= 3)
                             {
-                                summons.sort(CerberCore::SummonTimerOrderPred(false));
+                                summons.sort(Trinity::SummonTimerOrderPred(false));
                                 summons.pop_front();
                                 summons.pop_front();
                                 for (std::list<Creature*>::iterator itr = summons.begin(); itr != summons.end();)
@@ -6171,8 +6171,8 @@ void Spell::EffectAddComboPoints(SpellEffIndex /*effIndex*/)
 
             // Copy Bandit's Vile
             Unit* _target = NULL;
-            CerberCore::AnyUnitHavingBuffInObjectRangeCheck u_check(player, player, 100, 84748, false);
-            CerberCore::UnitLastSearcher<CerberCore::AnyUnitHavingBuffInObjectRangeCheck> searcher(player, _target, u_check);
+            Trinity::AnyUnitHavingBuffInObjectRangeCheck u_check(player, player, 100, 84748, false);
+            Trinity::UnitLastSearcher<Trinity::AnyUnitHavingBuffInObjectRangeCheck> searcher(player, _target, u_check);
             player->VisitNearbyObject(100, searcher);
                         
             if (_target)

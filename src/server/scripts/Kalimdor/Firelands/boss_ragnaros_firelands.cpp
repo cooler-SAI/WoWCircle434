@@ -970,7 +970,7 @@ public:
                             t_pos.push_back(floorPos[i]);
 
                         if (t_pos.size() > max)
-                            CerberCore::Containers::RandomResizeList(t_pos, max);
+                            Trinity::Containers::RandomResizeList(t_pos, max);
 
                         if (!t_pos.empty())
                             for (std::list<Position>::const_iterator itr = t_pos.begin(); itr != t_pos.end(); ++itr)
@@ -995,8 +995,8 @@ public:
                             {
                                 Player* plr = (*itr)->getTarget()->ToPlayer();
                                 std::list<Player*> PlayerList;
-                                CerberCore::AnyPlayerInObjectRangeCheck checker(plr, 3.0f);
-                                CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(plr, PlayerList, checker);
+                                Trinity::AnyPlayerInObjectRangeCheck checker(plr, 3.0f);
+                                Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(plr, PlayerList, checker);
                                 plr->VisitNearbyWorldObject(3.0f, searcher);
                                 if (PlayerList.size() >= minTargets)
                                 {
@@ -2106,7 +2106,7 @@ public:
                     {
                         UnitList targets;
                         CloudburstCheck check(me);
-                        CerberCore::UnitListSearcher<CloudburstCheck> searcher(me, targets, check);
+                        Trinity::UnitListSearcher<CloudburstCheck> searcher(me, targets, check);
                         me->VisitNearbyObject(3.0f, searcher);
                         if (!targets.empty())
                         {
@@ -2185,8 +2185,8 @@ public:
                 case EVENT_CHECK_TARGET:
                     {
                         std::list<Player*> targets;
-                        CerberCore::AnyPlayerInObjectRangeCheck check(me, 3.0f, true);
-                        CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, targets, check);
+                        Trinity::AnyPlayerInObjectRangeCheck check(me, 3.0f, true);
+                        Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, targets, check);
                         me->VisitNearbyObject(3.0f, searcher);
                         if (!targets.empty())
                         {
@@ -2203,7 +2203,7 @@ public:
                     {
                         UnitList targets;
                         CloudburstCheck check(me);
-                        CerberCore::UnitListSearcher<CloudburstCheck> searcher(me, targets, check);
+                        Trinity::UnitListSearcher<CloudburstCheck> searcher(me, targets, check);
                         me->VisitNearbyObject(3.0f, searcher);
                         if (!targets.empty())
                         {
@@ -2309,7 +2309,7 @@ public:
             if (!targets.empty())
             {
                 uint32 max_size = (GetCaster()->GetMap()->Is25ManRaid() ? 3 : 1);
-                CerberCore::Containers::RandomResizeList(targets, max_size);
+                Trinity::Containers::RandomResizeList(targets, max_size);
             }
         }
 
@@ -2370,10 +2370,10 @@ public:
             if (!tempList.empty())
             {
                 targets.clear();
-                targets.push_back(CerberCore::Containers::SelectRandomContainerElement(tempList));
+                targets.push_back(Trinity::Containers::SelectRandomContainerElement(tempList));
             }
             else
-                CerberCore::Containers::RandomResizeList(targets, 1);
+                Trinity::Containers::RandomResizeList(targets, 1);
         }
 
         void HandleDummy(SpellEffIndex effIndex)
@@ -2420,10 +2420,10 @@ public:
             if (!tempList.empty())
             {
                 targets.clear();
-                targets.push_back(CerberCore::Containers::SelectRandomContainerElement(tempList));
+                targets.push_back(Trinity::Containers::SelectRandomContainerElement(tempList));
             }
             else
-                CerberCore::Containers::RandomResizeList(targets, 1);
+                Trinity::Containers::RandomResizeList(targets, 1);
         }
 
         void Register()

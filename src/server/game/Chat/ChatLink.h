@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CERBERCORE_CHATLINK_H
-#define CERBERCORE_CHATLINK_H
+#ifndef TRINITY_CHATLINK_H
+#define TRINITY_CHATLINK_H
 
 #include "SharedDefines.h"
 #include <sstream>
@@ -167,4 +167,4 @@ private:
 };
 
 
-#endif // CERBERCORE_CHATLINK_H
+#endif // TRINITY_CHATLINK_H

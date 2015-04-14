@@ -368,7 +368,7 @@ public:
         std::list<Creature*> creature_list;
         me->GetCreatureListWithEntryInGrid(creature_list, entry, ragne);
 
-        creature_list.sort(CerberCore::ObjectDistanceOrderPred(me));
+        creature_list.sort(Trinity::ObjectDistanceOrderPred(me));
         for (std::list<Creature*>::iterator itr = creature_list.begin(); itr != creature_list.end(); ++itr)
         {
             if (( *itr ) && ( *itr )->isAlive() && ( *itr )->GetTypeId() == TYPEID_UNIT && ( *itr )->HasAura(78087))

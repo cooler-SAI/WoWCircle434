@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -82,7 +82,7 @@ void MapManager::checkAndCorrectGridStatesArray()
             ok = false;
             si_GridStates[i] = i_GridStates[i];
         }
-        #ifdef CERBERCORE_DEBUG
+        #ifdef TRINITY_DEBUG
         // inner class checking only when compiled with debug
         if (!si_GridStates[i]->checkMagic())
         {
@@ -101,7 +101,7 @@ Map* MapManager::CreateBaseMap(uint32 id)
 
     if (map == NULL)
     {
-        CERBERCORE_GUARD(ACE_Thread_Mutex, Lock);
+        TRINITY_GUARD(ACE_Thread_Mutex, Lock);
 
         const MapEntry* entry = sMapStore.LookupEntry(id);
         if (entry && entry->Instanceable())
@@ -228,7 +228,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
         {
             // probably there must be special opcode, because client has this string constant in GlobalStrings.lua
             // TODO: this is not a good place to send the message
-            player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetCerberCoreString(LANG_INSTANCE_RAID_GROUP_ONLY), mapName);
+            player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetTrinityString(LANG_INSTANCE_RAID_GROUP_ONLY), mapName);
             sLog->outDebug(LOG_FILTER_MAPS, "MAP: Player '%s' must be in a raid group to enter instance '%s'", player->GetName(), mapName);
             return false;
         }
@@ -306,7 +306,7 @@ void MapManager::DoDelayedMovesAndRemoves()
 
 bool MapManager::ExistMapAndVMap(uint32 mapid, float x, float y)
 {
-    GridCoord p = CerberCore::ComputeGridCoord(x, y);
+    GridCoord p = Trinity::ComputeGridCoord(x, y);
 
     int gx=63-p.x_coord;
     int gy=63-p.y_coord;
@@ -349,7 +349,7 @@ void MapManager::UnloadAll()
 
 uint32 MapManager::GetNumInstances()
 {
-    CERBERCORE_GUARD(ACE_Thread_Mutex, Lock);
+    TRINITY_GUARD(ACE_Thread_Mutex, Lock);
 
     uint32 ret = 0;
     for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)
@@ -366,7 +366,7 @@ uint32 MapManager::GetNumInstances()
 
 uint32 MapManager::GetNumPlayersInInstances()
 {
-    CERBERCORE_GUARD(ACE_Thread_Mutex, Lock);
+    TRINITY_GUARD(ACE_Thread_Mutex, Lock);
 
     uint32 ret = 0;
     for (MapMapType::iterator itr = i_maps.begin(); itr != i_maps.end(); ++itr)

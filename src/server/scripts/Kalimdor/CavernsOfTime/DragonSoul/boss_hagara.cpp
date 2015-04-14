@@ -2076,7 +2076,7 @@ public:
 
             std::list<Player*> players;
             AnyPlayerOrCrystalCheck check(GetTarget(), 10.0f);
-            CerberCore::PlayerListSearcher<AnyPlayerOrCrystalCheck> searcher(GetTarget(), players, check); 
+            Trinity::PlayerListSearcher<AnyPlayerOrCrystalCheck> searcher(GetTarget(), players, check); 
             GetTarget()->VisitNearbyObject(10.0f, searcher);
 
             if (!players.empty())

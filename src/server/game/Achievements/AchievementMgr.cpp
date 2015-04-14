@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -42,7 +42,7 @@
 #include "InstanceScript.h"
 #include "Group.h"
 
-namespace CerberCore
+namespace Trinity
 {
     class AchievementChatBuilder
     {
@@ -51,7 +51,7 @@ namespace CerberCore
                 : i_player(player), i_msgtype(msgtype), i_textId(textId), i_achievementId(ach_id) {}
             void operator()(WorldPacket& data, LocaleConstant loc_idx)
             {
-                char const* text = sObjectMgr->GetCerberCoreString(i_textId, loc_idx);
+                char const* text = sObjectMgr->GetTrinityString(i_textId, loc_idx);
 
                 data << uint8(i_msgtype);
                 data << uint32(LANG_UNIVERSAL);
@@ -70,7 +70,7 @@ namespace CerberCore
             int32 i_textId;
             uint32 i_achievementId;
     };
-}                                                           // namespace CerberCore
+}                                                           // namespace Trinity
 
 bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
 {
@@ -923,8 +923,8 @@ void AchievementMgr<T>::SendAchievementEarned(AchievementEntry const* achievemen
 
     if (Guild* guild = sGuildMgr->GetGuildById(GetOwner()->GetGuildId()))
     {
-        CerberCore::AchievementChatBuilder say_builder(*GetOwner(), CHAT_MSG_GUILD_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
-        CerberCore::LocalizedPacketDo<CerberCore::AchievementChatBuilder> say_do(say_builder);
+        Trinity::AchievementChatBuilder say_builder(*GetOwner(), CHAT_MSG_GUILD_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
+        Trinity::LocalizedPacketDo<Trinity::AchievementChatBuilder> say_do(say_builder);
         guild->BroadcastWorker(say_do);
             
         guild->UpdateMemberData(GetOwner(), GUILD_MEMBER_DATA_ACHIEVEMENT_POINTS, GetAchievementPoints());
@@ -943,16 +943,16 @@ void AchievementMgr<T>::SendAchievementEarned(AchievementEntry const* achievemen
     // if player is in world he can tell his friends about new achievement
     else if (GetOwner()->IsInWorld())
     {
-        CerberCore::AchievementChatBuilder say_builder(*GetOwner(), CHAT_MSG_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
+        Trinity::AchievementChatBuilder say_builder(*GetOwner(), CHAT_MSG_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
 
-        CellCoord p = CerberCore::ComputeCellCoord(GetOwner()->GetPositionX(), GetOwner()->GetPositionY());
+        CellCoord p = Trinity::ComputeCellCoord(GetOwner()->GetPositionX(), GetOwner()->GetPositionY());
 
         Cell cell(p);
         cell.SetNoCreate();
 
-        CerberCore::LocalizedPacketDo<CerberCore::AchievementChatBuilder> say_do(say_builder);
-        CerberCore::PlayerDistWorker<CerberCore::LocalizedPacketDo<CerberCore::AchievementChatBuilder> > say_worker(GetOwner(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
-        TypeContainerVisitor<CerberCore::PlayerDistWorker<CerberCore::LocalizedPacketDo<CerberCore::AchievementChatBuilder> >, WorldTypeMapContainer > message(say_worker);
+        Trinity::LocalizedPacketDo<Trinity::AchievementChatBuilder> say_do(say_builder);
+        Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::AchievementChatBuilder> > say_worker(GetOwner(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
+        TypeContainerVisitor<Trinity::PlayerDistWorker<Trinity::LocalizedPacketDo<Trinity::AchievementChatBuilder> >, WorldTypeMapContainer > message(say_worker);
         cell.Visit(p, message, *GetOwner()->GetMap(), *GetOwner(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
     }
 

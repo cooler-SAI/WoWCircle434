@@ -407,7 +407,7 @@ public:
                                 if (me->HasInArc(M_PI / 2, (*itr)))
                                     volcanos_1.push_back((*itr));
                             }
-                            pTarget = CerberCore::Containers::SelectRandomContainerElement((volcanos_1.empty() ? volcanos : volcanos_1));
+                            pTarget = Trinity::Containers::SelectRandomContainerElement((volcanos_1.empty() ? volcanos : volcanos_1));
                         }
                         if (pTarget)
                         {
@@ -1376,7 +1376,7 @@ public:
 
             uint32 max_size = (GetCaster()->GetMap()->Is25ManRaid() ? 6 : 3);
             if (!targets.empty())
-                CerberCore::Containers::RandomResizeList(targets, max_size);
+                Trinity::Containers::RandomResizeList(targets, max_size);
         }
 
         void HandleDummy(SpellEffIndex effIndex)

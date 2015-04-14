@@ -2058,7 +2058,7 @@ public:
 
             uint8 roll = urand(0, 19);
             LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
-            char const* text = sObjectMgr->GetCerberCoreString(PLAYER_RANDOM_YELL - roll, loc_idx);
+            char const* text = sObjectMgr->GetTrinityString(PLAYER_RANDOM_YELL - roll, loc_idx);
             player->Yell(text, LANG_UNIVERSAL);
             roll = urand(0, 3);
             player->HandleEmoteCommand(RollingEmote[roll]);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -498,7 +498,7 @@ LfgCompatibility LFGQueue::CheckCompatibility(LfgGuidList check)
     proposal.cancelTime = time(NULL) + LFG_TIME_PROPOSAL;
     proposal.state = LFG_PROPOSAL_INITIATING;
     proposal.leader = 0;
-    proposal.dungeonId = CerberCore::Containers::SelectRandomContainerElement(proposalDungeons);
+    proposal.dungeonId = Trinity::Containers::SelectRandomContainerElement(proposalDungeons);
 
     bool leader = false;
     for (LfgRolesMap::const_iterator itRoles = proposalRoles.begin(); itRoles != proposalRoles.end(); ++itRoles)

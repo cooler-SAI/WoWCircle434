@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -408,7 +408,7 @@ void World::LoadConfigSettings(bool reload)
 
     ///- Read the player limit and the Message of the day from the config file
     SetPlayerAmountLimit(ConfigMgr::GetIntDefault("PlayerLimit", 100));
-    SetMotd(ConfigMgr::GetStringDefault("Motd", "Welcome to a CerberCore Core Server."));
+    SetMotd(ConfigMgr::GetStringDefault("Motd", "Welcome to a Trinity Core Server."));
 
     ///- Read ticket system setting from the config file
     m_bool_configs[CONFIG_ALLOW_TICKETS] = ConfigMgr::GetBoolDefault("AllowTickets", true);
@@ -1370,8 +1370,8 @@ void World::SetInitialWorldSettings()
 
     ///- Loading strings. Getting no records means core load has to be canceled because no error message can be output.
 
-    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading CerberCore strings...");
-    if (!sObjectMgr->LoadCerberCoreStrings())
+    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Loading Trinity strings...");
+    if (!sObjectMgr->LoadTrinityStrings())
         exit(1);                                            // Error message displayed in function already
 
     ///- Update the realm entry in the database with the realm type from the config file
@@ -2287,7 +2287,7 @@ void World::SendGlobalGMMessage(WorldPacket* packet, WorldSession* self, uint32 
     }
 }
 
-namespace CerberCore
+namespace Trinity
 {
     class WorldWorldTextBuilder
     {
@@ -2296,7 +2296,7 @@ namespace CerberCore
             explicit WorldWorldTextBuilder(int32 textId, va_list* args = NULL) : i_textId(textId), i_args(args) {}
             void operator()(WorldPacketList& data_list, LocaleConstant loc_idx)
             {
-                char const* text = sObjectMgr->GetCerberCoreString(i_textId, loc_idx);
+                char const* text = sObjectMgr->GetTrinityString(i_textId, loc_idx);
 
                 if (i_args)
                 {
@@ -2342,7 +2342,7 @@ namespace CerberCore
             int32 i_textId;
             va_list* i_args;
     };
-}                                                           // namespace CerberCore
+}                                                           // namespace Trinity
 
 /// Send a System Message to all players (except self if mentioned)
 void World::SendWorldText(int32 string_id, ...)
@@ -2350,8 +2350,8 @@ void World::SendWorldText(int32 string_id, ...)
     va_list ap;
     va_start(ap, string_id);
 
-    CerberCore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    CerberCore::LocalizedPacketListDo<CerberCore::WorldWorldTextBuilder> wt_do(wt_builder);
+    Trinity::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    Trinity::LocalizedPacketListDo<Trinity::WorldWorldTextBuilder> wt_do(wt_builder);
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
     {
         if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
@@ -2369,8 +2369,8 @@ void World::SendGMText(int32 string_id, ...)
     va_list ap;
     va_start(ap, string_id);
 
-    CerberCore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    CerberCore::LocalizedPacketListDo<CerberCore::WorldWorldTextBuilder> wt_do(wt_builder);
+    Trinity::WorldWorldTextBuilder wt_builder(string_id, &ap);
+    Trinity::LocalizedPacketListDo<Trinity::WorldWorldTextBuilder> wt_do(wt_builder);
     for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
     {
         if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
@@ -2803,7 +2803,7 @@ void World::SendAutoBroadcast()
     if (m_Autobroadcasts.empty())
         return;
 
-    std::string msg = CerberCore::Containers::SelectRandomContainerElement(m_Autobroadcasts);
+    std::string msg = Trinity::Containers::SelectRandomContainerElement(m_Autobroadcasts);
 
     uint32 abcenter = sWorld->getIntConfig(CONFIG_AUTOBROADCAST_CENTER);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -180,7 +180,7 @@ public:
                 if (unit && unit->isAlive())
                     targets.push_back(unit);
             }
-            targets.sort(CerberCore::ObjectDistanceOrderPred(me));
+            targets.sort(Trinity::ObjectDistanceOrderPred(me));
             Unit* target = targets.front();
             if (target && me->IsWithinDistInMap(target, me->GetAttackDistance(target)))
             {

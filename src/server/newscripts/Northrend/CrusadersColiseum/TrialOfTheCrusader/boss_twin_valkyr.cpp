@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -117,7 +117,7 @@ class OrbsDespawner : public BasicEvent
 
         bool Execute(uint64 /*currTime*/, uint32 /*diff*/)
         {
-            CerberCore::CreatureWorker<OrbsDespawner> worker(_creature, *this);
+            Trinity::CreatureWorker<OrbsDespawner> worker(_creature, *this);
             _creature->VisitNearbyGridObject(5000.0f, worker);
             return true;
         }

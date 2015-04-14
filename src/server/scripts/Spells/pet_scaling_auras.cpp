@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2005-2011 MaNGOS <http://www.getmangos.com/>
  *
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * Copyright (C) 2006-2011 ScriptDev2 <http://www.scriptdev2.com/>
  *

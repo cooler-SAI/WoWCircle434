@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,7 +16,7 @@
  */
 
 /** \file
-    \ingroup CerberCored
+    \ingroup Trinityd
  */
 
 #include "Common.h"
@@ -67,11 +67,11 @@ void RARunnable::run()
 
     if (acceptor.open(listen_addr, m_Reactor) == -1)
     {
-        sLog->outError(LOG_FILTER_WORLDSERVER, "CerberCore RA can not bind to port %d on %s", raport, stringip.c_str());
+        sLog->outError(LOG_FILTER_WORLDSERVER, "Trinity RA can not bind to port %d on %s", raport, stringip.c_str());
         return;
     }
 
-    sLog->outInfo(LOG_FILTER_WORLDSERVER, "Starting CerberCore RA on port %d on %s", raport, stringip.c_str());
+    sLog->outInfo(LOG_FILTER_WORLDSERVER, "Starting Trinity RA on port %d on %s", raport, stringip.c_str());
 
     while (!World::IsStopped())
     {
@@ -82,5 +82,5 @@ void RARunnable::run()
             break;
     }
 
-    sLog->outDebug(LOG_FILTER_WORLDSERVER, "CerberCore RA thread exiting");
+    sLog->outDebug(LOG_FILTER_WORLDSERVER, "Trinity RA thread exiting");
 }

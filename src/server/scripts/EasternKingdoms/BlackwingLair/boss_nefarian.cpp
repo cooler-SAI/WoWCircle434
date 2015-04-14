@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -458,8 +458,8 @@ public:
             ObjectList* targets = new ObjectList();
             if (obj)
             {
-                CerberCore::AllWorldObjectsInRange u_check(obj, dist);
-                CerberCore::WorldObjectListSearcher<CerberCore::AllWorldObjectsInRange> searcher(obj, *targets, u_check);
+                Trinity::AllWorldObjectsInRange u_check(obj, dist);
+                Trinity::WorldObjectListSearcher<Trinity::AllWorldObjectsInRange> searcher(obj, *targets, u_check);
                 obj->VisitNearbyObject(dist, searcher);
             }
             return targets;

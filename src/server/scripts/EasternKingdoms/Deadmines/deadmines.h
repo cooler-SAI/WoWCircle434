@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 CerberCoreCore <http://www.CerberCorecore.org/>
+ * Copyright (C) 2008-2013 TrinityCore <http://www.Trinitycore.org/>
  * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it

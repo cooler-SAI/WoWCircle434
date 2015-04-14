@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CERBERCORE_GRIDNOTIFIERSIMPL_H
-#define CERBERCORE_GRIDNOTIFIERSIMPL_H
+#ifndef TRINITY_GRIDNOTIFIERSIMPL_H
+#define TRINITY_GRIDNOTIFIERSIMPL_H
 
 #include "GridNotifiers.h"
 #include "WorldPacket.h"
@@ -28,7 +28,7 @@
 #include "SpellAuras.h"
 
 template<class T>
-inline void CerberCore::VisibleNotifier::Visit(GridRefManager<T> &m)
+inline void Trinity::VisibleNotifier::Visit(GridRefManager<T> &m)
 {
     for (typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
@@ -37,7 +37,7 @@ inline void CerberCore::VisibleNotifier::Visit(GridRefManager<T> &m)
     }
 }
 
-inline void CerberCore::ObjectUpdater::Visit(CreatureMapType &m)
+inline void Trinity::ObjectUpdater::Visit(CreatureMapType &m)
 {
     for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
         if (iter->getSource()->IsInWorld())
@@ -49,7 +49,7 @@ inline void CerberCore::ObjectUpdater::Visit(CreatureMapType &m)
 // WorldObject searchers & workers
 
 template<class Check>
-void CerberCore::WorldObjectSearcher<Check>::Visit(GameObjectMapType &m)
+void Trinity::WorldObjectSearcher<Check>::Visit(GameObjectMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_GAMEOBJECT))
         return;
@@ -72,7 +72,7 @@ void CerberCore::WorldObjectSearcher<Check>::Visit(GameObjectMapType &m)
 }
 
 template<class Check>
-void CerberCore::WorldObjectSearcher<Check>::Visit(PlayerMapType &m)
+void Trinity::WorldObjectSearcher<Check>::Visit(PlayerMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_PLAYER))
         return;
@@ -95,7 +95,7 @@ void CerberCore::WorldObjectSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void CerberCore::WorldObjectSearcher<Check>::Visit(CreatureMapType &m)
+void Trinity::WorldObjectSearcher<Check>::Visit(CreatureMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_CREATURE))
         return;
@@ -118,7 +118,7 @@ void CerberCore::WorldObjectSearcher<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void CerberCore::WorldObjectSearcher<Check>::Visit(CorpseMapType &m)
+void Trinity::WorldObjectSearcher<Check>::Visit(CorpseMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_CORPSE))
         return;
@@ -141,7 +141,7 @@ void CerberCore::WorldObjectSearcher<Check>::Visit(CorpseMapType &m)
 }
 
 template<class Check>
-void CerberCore::WorldObjectSearcher<Check>::Visit(DynamicObjectMapType &m)
+void Trinity::WorldObjectSearcher<Check>::Visit(DynamicObjectMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_DYNAMICOBJECT))
         return;
@@ -165,7 +165,7 @@ void CerberCore::WorldObjectSearcher<Check>::Visit(DynamicObjectMapType &m)
 
 
 template<class Check>
-void CerberCore::WorldObjectLastSearcher<Check>::Visit(GameObjectMapType &m)
+void Trinity::WorldObjectLastSearcher<Check>::Visit(GameObjectMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_GAMEOBJECT))
         return;
@@ -181,7 +181,7 @@ void CerberCore::WorldObjectLastSearcher<Check>::Visit(GameObjectMapType &m)
 }
 
 template<class Check>
-void CerberCore::WorldObjectLastSearcher<Check>::Visit(PlayerMapType &m)
+void Trinity::WorldObjectLastSearcher<Check>::Visit(PlayerMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_PLAYER))
         return;
@@ -197,7 +197,7 @@ void CerberCore::WorldObjectLastSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void CerberCore::WorldObjectLastSearcher<Check>::Visit(CreatureMapType &m)
+void Trinity::WorldObjectLastSearcher<Check>::Visit(CreatureMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_CREATURE))
         return;
@@ -213,7 +213,7 @@ void CerberCore::WorldObjectLastSearcher<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void CerberCore::WorldObjectLastSearcher<Check>::Visit(CorpseMapType &m)
+void Trinity::WorldObjectLastSearcher<Check>::Visit(CorpseMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_CORPSE))
         return;
@@ -229,7 +229,7 @@ void CerberCore::WorldObjectLastSearcher<Check>::Visit(CorpseMapType &m)
 }
 
 template<class Check>
-void CerberCore::WorldObjectLastSearcher<Check>::Visit(DynamicObjectMapType &m)
+void Trinity::WorldObjectLastSearcher<Check>::Visit(DynamicObjectMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_DYNAMICOBJECT))
         return;
@@ -245,7 +245,7 @@ void CerberCore::WorldObjectLastSearcher<Check>::Visit(DynamicObjectMapType &m)
 }
 
 template<class Check>
-void CerberCore::WorldObjectListSearcher<Check>::Visit(PlayerMapType &m)
+void Trinity::WorldObjectListSearcher<Check>::Visit(PlayerMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_PLAYER))
         return;
@@ -256,7 +256,7 @@ void CerberCore::WorldObjectListSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void CerberCore::WorldObjectListSearcher<Check>::Visit(CreatureMapType &m)
+void Trinity::WorldObjectListSearcher<Check>::Visit(CreatureMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_CREATURE))
         return;
@@ -267,7 +267,7 @@ void CerberCore::WorldObjectListSearcher<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void CerberCore::WorldObjectListSearcher<Check>::Visit(CorpseMapType &m)
+void Trinity::WorldObjectListSearcher<Check>::Visit(CorpseMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_CORPSE))
         return;
@@ -278,7 +278,7 @@ void CerberCore::WorldObjectListSearcher<Check>::Visit(CorpseMapType &m)
 }
 
 template<class Check>
-void CerberCore::WorldObjectListSearcher<Check>::Visit(GameObjectMapType &m)
+void Trinity::WorldObjectListSearcher<Check>::Visit(GameObjectMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_GAMEOBJECT))
         return;
@@ -289,7 +289,7 @@ void CerberCore::WorldObjectListSearcher<Check>::Visit(GameObjectMapType &m)
 }
 
 template<class Check>
-void CerberCore::WorldObjectListSearcher<Check>::Visit(DynamicObjectMapType &m)
+void Trinity::WorldObjectListSearcher<Check>::Visit(DynamicObjectMapType &m)
 {
     if (!(i_mapTypeMask & GRID_MAP_TYPE_MASK_DYNAMICOBJECT))
         return;
@@ -302,7 +302,7 @@ void CerberCore::WorldObjectListSearcher<Check>::Visit(DynamicObjectMapType &m)
 // Gameobject searchers
 
 template<class Check>
-void CerberCore::GameObjectSearcher<Check>::Visit(GameObjectMapType &m)
+void Trinity::GameObjectSearcher<Check>::Visit(GameObjectMapType &m)
 {
     // already found
     if (i_object)
@@ -322,7 +322,7 @@ void CerberCore::GameObjectSearcher<Check>::Visit(GameObjectMapType &m)
 }
 
 template<class Check>
-void CerberCore::GameObjectLastSearcher<Check>::Visit(GameObjectMapType &m)
+void Trinity::GameObjectLastSearcher<Check>::Visit(GameObjectMapType &m)
 {
     for (GameObjectMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
     {
@@ -335,7 +335,7 @@ void CerberCore::GameObjectLastSearcher<Check>::Visit(GameObjectMapType &m)
 }
 
 template<class Check>
-void CerberCore::GameObjectListSearcher<Check>::Visit(GameObjectMapType &m)
+void Trinity::GameObjectListSearcher<Check>::Visit(GameObjectMapType &m)
 {
     for (GameObjectMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
         if (itr->getSource()->InSamePhase(i_phaseMask))
@@ -346,7 +346,7 @@ void CerberCore::GameObjectListSearcher<Check>::Visit(GameObjectMapType &m)
 // Unit searchers
 
 template<class Check>
-void CerberCore::UnitSearcher<Check>::Visit(CreatureMapType &m)
+void Trinity::UnitSearcher<Check>::Visit(CreatureMapType &m)
 {
     // already found
     if (i_object)
@@ -366,7 +366,7 @@ void CerberCore::UnitSearcher<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void CerberCore::UnitSearcher<Check>::Visit(PlayerMapType &m)
+void Trinity::UnitSearcher<Check>::Visit(PlayerMapType &m)
 {
     // already found
     if (i_object)
@@ -386,7 +386,7 @@ void CerberCore::UnitSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void CerberCore::UnitLastSearcher<Check>::Visit(CreatureMapType &m)
+void Trinity::UnitLastSearcher<Check>::Visit(CreatureMapType &m)
 {
     for (CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
     {
@@ -399,7 +399,7 @@ void CerberCore::UnitLastSearcher<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void CerberCore::UnitLastSearcher<Check>::Visit(PlayerMapType &m)
+void Trinity::UnitLastSearcher<Check>::Visit(PlayerMapType &m)
 {
     for (PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
     {
@@ -412,7 +412,7 @@ void CerberCore::UnitLastSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void CerberCore::UnitListSearcher<Check>::Visit(PlayerMapType &m)
+void Trinity::UnitListSearcher<Check>::Visit(PlayerMapType &m)
 {
     for (PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
         if (itr->getSource()->InSamePhase(i_phaseMask))
@@ -421,7 +421,7 @@ void CerberCore::UnitListSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void CerberCore::UnitListSearcher<Check>::Visit(CreatureMapType &m)
+void Trinity::UnitListSearcher<Check>::Visit(CreatureMapType &m)
 {
     for (CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
         if (itr->getSource()->InSamePhase(i_phaseMask))
@@ -432,7 +432,7 @@ void CerberCore::UnitListSearcher<Check>::Visit(CreatureMapType &m)
 // Creature searchers
 
 template<class Check>
-void CerberCore::CreatureSearcher<Check>::Visit(CreatureMapType &m)
+void Trinity::CreatureSearcher<Check>::Visit(CreatureMapType &m)
 {
     // already found
     if (i_object)
@@ -452,7 +452,7 @@ void CerberCore::CreatureSearcher<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void CerberCore::CreatureLastSearcher<Check>::Visit(CreatureMapType &m)
+void Trinity::CreatureLastSearcher<Check>::Visit(CreatureMapType &m)
 {
     for (CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
     {
@@ -465,7 +465,7 @@ void CerberCore::CreatureLastSearcher<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void CerberCore::CreatureListSearcher<Check>::Visit(CreatureMapType &m)
+void Trinity::CreatureListSearcher<Check>::Visit(CreatureMapType &m)
 {
     for (CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
         if (itr->getSource()->InSamePhase(i_phaseMask))
@@ -474,7 +474,7 @@ void CerberCore::CreatureListSearcher<Check>::Visit(CreatureMapType &m)
 }
 
 template<class Check>
-void CerberCore::PlayerListSearcher<Check>::Visit(PlayerMapType &m)
+void Trinity::PlayerListSearcher<Check>::Visit(PlayerMapType &m)
 {
     for (PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
         if (itr->getSource()->InSamePhase(i_phaseMask))
@@ -483,7 +483,7 @@ void CerberCore::PlayerListSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void CerberCore::PlayerSearcher<Check>::Visit(PlayerMapType &m)
+void Trinity::PlayerSearcher<Check>::Visit(PlayerMapType &m)
 {
     // already found
     if (i_object)
@@ -503,7 +503,7 @@ void CerberCore::PlayerSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
-void CerberCore::PlayerLastSearcher<Check>::Visit(PlayerMapType& m)
+void Trinity::PlayerLastSearcher<Check>::Visit(PlayerMapType& m)
 {
     for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
     {
@@ -516,7 +516,7 @@ void CerberCore::PlayerLastSearcher<Check>::Visit(PlayerMapType& m)
 }
 
 template<class Builder>
-void CerberCore::LocalizedPacketDo<Builder>::operator()(Player* p)
+void Trinity::LocalizedPacketDo<Builder>::operator()(Player* p)
 {
     LocaleConstant loc_idx = p->GetSession()->GetSessionDbLocaleIndex();
     uint32 cache_idx = loc_idx+1;
@@ -541,7 +541,7 @@ void CerberCore::LocalizedPacketDo<Builder>::operator()(Player* p)
 }
 
 template<class Builder>
-void CerberCore::LocalizedPacketListDo<Builder>::operator()(Player* p)
+void Trinity::LocalizedPacketListDo<Builder>::operator()(Player* p)
 {
     LocaleConstant loc_idx = p->GetSession()->GetSessionDbLocaleIndex();
     uint32 cache_idx = loc_idx+1;
@@ -564,4 +564,4 @@ void CerberCore::LocalizedPacketListDo<Builder>::operator()(Player* p)
         p->SendDirectMessage((*data_list)[i]);
 }
 
-#endif                                                      // CERBERCORE_GRIDNOTIFIERSIMPL_H
+#endif                                                      // TRINITY_GRIDNOTIFIERSIMPL_H

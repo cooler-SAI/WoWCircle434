@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __CERBERCORE_REPUTATION_MGR_H
-#define __CERBERCORE_REPUTATION_MGR_H
+#ifndef __TRINITY_REPUTATION_MGR_H
+#define __TRINITY_REPUTATION_MGR_H
 
 #include "Common.h"
 #include "SharedDefines.h"

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -78,7 +78,7 @@ enum SpellModType
     SPELLMOD_PCT          = 108                             // SPELL_AURA_ADD_PCT_MODIFIER
 };
 
-// 2^n values, Player::m_isunderwater is a bitmask. These are CerberCore internal values, they are never send to any client
+// 2^n values, Player::m_isunderwater is a bitmask. These are Trinity internal values, they are never send to any client
 enum PlayerUnderwaterState
 {
     UNDERWATER_NONE                     = 0x00,

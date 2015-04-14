@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -426,8 +426,8 @@ public:
             return false;
         }
 
-        char const* talentStr = handler->GetCerberCoreString(LANG_TALENT);
-        char const* passiveStr = handler->GetCerberCoreString(LANG_PASSIVE);
+        char const* talentStr = handler->GetTrinityString(LANG_TALENT);
+        char const* passiveStr = handler->GetTrinityString(LANG_PASSIVE);
 
         Unit::AuraApplicationMap const& auras = unit->GetAppliedAuras();
         handler->PSendSysMessage(LANG_COMMAND_TARGET_LISTAURAS, auras.size());

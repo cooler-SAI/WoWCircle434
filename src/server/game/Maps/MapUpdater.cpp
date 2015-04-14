@@ -82,7 +82,7 @@ int MapUpdater::deactivate()
 
 int MapUpdater::wait()
 {
-    CERBERCORE_GUARD(ACE_Thread_Mutex, m_mutex);
+    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
 
     while (pending_requests > 0)
         m_condition.wait();
@@ -92,7 +92,7 @@ int MapUpdater::wait()
 
 int MapUpdater::schedule_update(Map& map, ACE_UINT32 diff)
 {
-    CERBERCORE_GUARD(ACE_Thread_Mutex, m_mutex);
+    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
 
     ++pending_requests;
 
@@ -114,7 +114,7 @@ bool MapUpdater::activated()
 
 void MapUpdater::update_finished()
 {
-    CERBERCORE_GUARD(ACE_Thread_Mutex, m_mutex);
+    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
 
     if (pending_requests == 0)
     {

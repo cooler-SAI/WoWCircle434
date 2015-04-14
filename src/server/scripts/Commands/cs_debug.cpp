@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -1002,8 +1002,8 @@ public:
         else
         {
             Creature* passenger = NULL;
-            CerberCore::AllCreaturesOfEntryInRange check(handler->GetSession()->GetPlayer(), entry, 20.0f);
-            CerberCore::CreatureSearcher<CerberCore::AllCreaturesOfEntryInRange> searcher(handler->GetSession()->GetPlayer(), passenger, check);
+            Trinity::AllCreaturesOfEntryInRange check(handler->GetSession()->GetPlayer(), entry, 20.0f);
+            Trinity::CreatureSearcher<Trinity::AllCreaturesOfEntryInRange> searcher(handler->GetSession()->GetPlayer(), passenger, check);
             handler->GetSession()->GetPlayer()->VisitNearbyObject(30.0f, searcher);
             if (!passenger || passenger == target)
                 return false;
@@ -1572,8 +1572,8 @@ public:
 
             bool talent = GetTalentSpellCost(aura->GetId()) > 0;
 
-            char const* talentStr = handler->GetCerberCoreString(LANG_TALENT);
-            char const* passiveStr = handler->GetCerberCoreString(LANG_PASSIVE);
+            char const* talentStr = handler->GetTrinityString(LANG_TALENT);
+            char const* passiveStr = handler->GetTrinityString(LANG_PASSIVE);
 
             AuraApplication * app = aura->GetApplicationOfTarget(unit->GetGUID());
 

@@ -221,8 +221,8 @@ public:
                         break;
                     case EVENT_ACHIEVEVEMENT_BUFF:
                         std::list<Player*> players;
-                        CerberCore::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
-                        CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+                        Trinity::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
+                        Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
                         me->VisitNearbyWorldObject(150.0f, searcher);
 
                         for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)

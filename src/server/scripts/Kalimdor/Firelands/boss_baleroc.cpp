@@ -354,13 +354,13 @@ public:
                             meleetargets.remove_if(AuraCheck(SPELL_BLAZE_OF_GLORY));
 
                         if (meleetargets.size() > 1)
-                            CerberCore::Containers::RandomResizeList(meleetargets, 1);
+                            Trinity::Containers::RandomResizeList(meleetargets, 1);
 
                         targets.clear();
                         targets.push_back(meleetargets.front());
                     }
                     else
-                        CerberCore::Containers::RandomResizeList(targets, 1);
+                        Trinity::Containers::RandomResizeList(targets, 1);
 
                     break;
                 }
@@ -387,7 +387,7 @@ public:
                             targets.remove_if(AuraCheck(SPELL_BLAZE_OF_GLORY));
 
                         if (targets.size() > 2)
-                            CerberCore::Containers::RandomResizeList(targets, 2);
+                            Trinity::Containers::RandomResizeList(targets, 2);
                     }
                     else if (!meleetargets.empty() && !rangetargets.empty())
                     {
@@ -395,13 +395,13 @@ public:
                             meleetargets.remove_if(AuraCheck(SPELL_BLAZE_OF_GLORY));
 
                         if (meleetargets.size() > 1)
-                            CerberCore::Containers::RandomResizeList(meleetargets, 1);
+                            Trinity::Containers::RandomResizeList(meleetargets, 1);
 
                         if (GetMembersWithoutAura(rangetargets, SPELL_BLAZE_OF_GLORY) >= 1)
                             rangetargets.remove_if(AuraCheck(SPELL_BLAZE_OF_GLORY));
 
                         if (rangetargets.size() > 1)
-                            CerberCore::Containers::RandomResizeList(rangetargets, 1);
+                            Trinity::Containers::RandomResizeList(rangetargets, 1);
 
                         targets.clear();;
                         targets.push_back(meleetargets.front());

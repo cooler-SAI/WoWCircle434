@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -108,7 +108,7 @@ ChatCommand* ChatHandler::getCommandTable()
 
 std::string ChatHandler::PGetParseString(int32 entry, ...) const
 {
-    const char *format = GetCerberCoreString(entry);
+    const char *format = GetTrinityString(entry);
     char str[1024];
     va_list ap;
     va_start(ap, entry);
@@ -117,9 +117,9 @@ std::string ChatHandler::PGetParseString(int32 entry, ...) const
     return std::string(str);
 }
 
-const char *ChatHandler::GetCerberCoreString(int32 entry) const
+const char *ChatHandler::GetTrinityString(int32 entry) const
 {
-    return m_session->GetCerberCoreString(entry);
+    return m_session->GetTrinityString(entry);
 }
 
 bool ChatHandler::isAvailable(ChatCommand const& cmd) const
@@ -257,12 +257,12 @@ void ChatHandler::SendGlobalGMSysMessage(const char *str)
 
 void ChatHandler::SendSysMessage(int32 entry)
 {
-    SendSysMessage(GetCerberCoreString(entry));
+    SendSysMessage(GetTrinityString(entry));
 }
 
 void ChatHandler::PSendSysMessage(int32 entry, ...)
 {
-    const char *format = GetCerberCoreString(entry);
+    const char *format = GetTrinityString(entry);
     va_list ap;
     char str [2048];
     va_start(ap, entry);
@@ -889,8 +889,8 @@ GameObject* ChatHandler::GetNearbyGameObject()
 
     Player* pl = m_session->GetPlayer();
     GameObject* obj = NULL;
-    CerberCore::NearestGameObjectCheck check(*pl);
-    CerberCore::GameObjectLastSearcher<CerberCore::NearestGameObjectCheck> searcher(pl, obj, check);
+    Trinity::NearestGameObjectCheck check(*pl);
+    Trinity::GameObjectLastSearcher<Trinity::NearestGameObjectCheck> searcher(pl, obj, check);
     pl->VisitNearbyGridObject(SIZE_OF_GRIDS, searcher);
     return obj;
 }
@@ -907,13 +907,13 @@ GameObject* ChatHandler::GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid
     if (!obj && sObjectMgr->GetGOData(lowguid))                   // guid is DB guid of object
     {
         // search near player then
-        CellCoord p(CerberCore::ComputeCellCoord(pl->GetPositionX(), pl->GetPositionY()));
+        CellCoord p(Trinity::ComputeCellCoord(pl->GetPositionX(), pl->GetPositionY()));
         Cell cell(p);
 
-        CerberCore::GameObjectWithDbGUIDCheck go_check(*pl, lowguid);
-        CerberCore::GameObjectSearcher<CerberCore::GameObjectWithDbGUIDCheck> checker(pl, obj, go_check);
+        Trinity::GameObjectWithDbGUIDCheck go_check(*pl, lowguid);
+        Trinity::GameObjectSearcher<Trinity::GameObjectWithDbGUIDCheck> checker(pl, obj, go_check);
 
-        TypeContainerVisitor<CerberCore::GameObjectSearcher<CerberCore::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > object_checker(checker);
+        TypeContainerVisitor<Trinity::GameObjectSearcher<Trinity::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > object_checker(checker);
         cell.Visit(p, object_checker, *pl->GetMap(), *pl, pl->GetGridActivationRange());
     }
 
@@ -1191,9 +1191,9 @@ int ChatHandler::GetSessionDbLocaleIndex() const
     return m_session->GetSessionDbLocaleIndex();
 }
 
-const char *CliHandler::GetCerberCoreString(int32 entry) const
+const char *CliHandler::GetTrinityString(int32 entry) const
 {
-    return sObjectMgr->GetCerberCoreStringForDBCLocale(entry);
+    return sObjectMgr->GetTrinityStringForDBCLocale(entry);
 }
 
 bool CliHandler::isAvailable(ChatCommand const& cmd) const
@@ -1210,7 +1210,7 @@ void CliHandler::SendSysMessage(const char *str)
 
 std::string CliHandler::GetNameLink() const
 {
-    return GetCerberCoreString(LANG_CONSOLE_COMMAND);
+    return GetTrinityString(LANG_CONSOLE_COMMAND);
 }
 
 bool CliHandler::needReportToTarget(Player* /*chr*/) const

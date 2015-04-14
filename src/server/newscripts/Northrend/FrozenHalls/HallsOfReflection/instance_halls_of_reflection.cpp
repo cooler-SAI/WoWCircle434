@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -389,9 +389,9 @@ public:
                             uint64 bossGuid = i <= 3 ? _falricGUID : _marwynGUID;
 
                             if (!i)
-                                CerberCore::Containers::RandomResizeList(tempList, 3);
+                                Trinity::Containers::RandomResizeList(tempList, 3);
                             else if (i < 6 && i != 3)
-                                CerberCore::Containers::RandomResizeList(tempList, 4);
+                                Trinity::Containers::RandomResizeList(tempList, 4);
 
                             for (std::list<uint32>::const_iterator itr = tempList.begin(); itr != tempList.end(); ++itr)
                             {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -303,7 +303,7 @@ public:
             }
         }
 
-        CellCoord cellCoord = CerberCore::ComputeCellCoord(object->GetPositionX(), object->GetPositionY());
+        CellCoord cellCoord = Trinity::ComputeCellCoord(object->GetPositionX(), object->GetPositionY());
         Cell cell(cellCoord);
 
         uint32 zoneId, areaId;
@@ -322,7 +322,7 @@ public:
         float groundZ = map->GetHeight(object->GetPhaseMask(), object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
         float floorZ = map->GetHeight(object->GetPhaseMask(), object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
 
-        GridCoord gridCoord = CerberCore::ComputeGridCoord(object->GetPositionX(), object->GetPositionY());
+        GridCoord gridCoord = Trinity::ComputeGridCoord(object->GetPositionX(), object->GetPositionY());
 
         // 63? WHY?
         int gridX = 63 - gridCoord.x_coord;
@@ -646,7 +646,7 @@ public:
 
             std::string nameLink = handler->playerLink(targetName);
 
-            handler->PSendSysMessage(LANG_SUMMONING, nameLink.c_str(), handler->GetCerberCoreString(LANG_OFFLINE));
+            handler->PSendSysMessage(LANG_SUMMONING, nameLink.c_str(), handler->GetTrinityString(LANG_OFFLINE));
 
             // in point where GM stay
             Player::SavePositionInDB(handler->GetSession()->GetPlayer()->GetMapId(),
@@ -922,13 +922,13 @@ public:
 
             if (!sSpellMgr->GetSpellInfo(spellIid))
             {
-                handler->PSendSysMessage(LANG_UNKNOWN_SPELL, target == handler->GetSession()->GetPlayer() ? handler->GetCerberCoreString(LANG_YOU) : nameLink.c_str());
+                handler->PSendSysMessage(LANG_UNKNOWN_SPELL, target == handler->GetSession()->GetPlayer() ? handler->GetTrinityString(LANG_YOU) : nameLink.c_str());
                 handler->SetSentErrorMessage(true);
                 return false;
             }
 
             target->RemoveSpellCooldown(spellIid, true);
-            handler->PSendSysMessage(LANG_REMOVE_COOLDOWN, spellIid, target == handler->GetSession()->GetPlayer() ? handler->GetCerberCoreString(LANG_YOU) : nameLink.c_str());
+            handler->PSendSysMessage(LANG_REMOVE_COOLDOWN, spellIid, target == handler->GetSession()->GetPlayer() ? handler->GetTrinityString(LANG_YOU) : nameLink.c_str());
         }
         return true;
     }
@@ -1195,14 +1195,14 @@ public:
 
             team = data->team;
 
-            std::string team_name = handler->GetCerberCoreString(LANG_COMMAND_GRAVEYARD_NOTEAM);
+            std::string team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_NOTEAM);
 
             if (team == 0)
-                team_name = handler->GetCerberCoreString(LANG_COMMAND_GRAVEYARD_ANY);
+                team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_ANY);
             else if (team == HORDE)
-                team_name = handler->GetCerberCoreString(LANG_COMMAND_GRAVEYARD_HORDE);
+                team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_HORDE);
             else if (team == ALLIANCE)
-                team_name = handler->GetCerberCoreString(LANG_COMMAND_GRAVEYARD_ALLIANCE);
+                team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_ALLIANCE);
 
             handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDNEAREST, graveyardId, team_name.c_str(), zone_id);
         }
@@ -1211,11 +1211,11 @@ public:
             std::string team_name;
 
             if (team == 0)
-                team_name = handler->GetCerberCoreString(LANG_COMMAND_GRAVEYARD_ANY);
+                team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_ANY);
             else if (team == HORDE)
-                team_name = handler->GetCerberCoreString(LANG_COMMAND_GRAVEYARD_HORDE);
+                team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_HORDE);
             else if (team == ALLIANCE)
-                team_name = handler->GetCerberCoreString(LANG_COMMAND_GRAVEYARD_ALLIANCE);
+                team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_ALLIANCE);
 
             if (team == ~uint32(0))
                 handler->PSendSysMessage(LANG_COMMAND_ZONENOGRAVEYARDS, zone_id);
@@ -1342,7 +1342,7 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-        sLog->outDebug(LOG_FILTER_GENERAL, handler->GetCerberCoreString(LANG_ADDITEM), itemId, count);
+        sLog->outDebug(LOG_FILTER_GENERAL, handler->GetTrinityString(LANG_ADDITEM), itemId, count);
 
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
         if (!itemTemplate)
@@ -1421,7 +1421,7 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-        sLog->outDebug(LOG_FILTER_GENERAL, handler->GetCerberCoreString(LANG_ADDITEMSET), itemSetId);
+        sLog->outDebug(LOG_FILTER_GENERAL, handler->GetTrinityString(LANG_ADDITEMSET), itemSetId);
 
         bool found = false;
         ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
@@ -1674,11 +1674,11 @@ public:
             areaId            = fields[7].GetUInt16();
         }
 
-        std::string userName    = handler->GetCerberCoreString(LANG_ERROR);
-        std::string eMail       = handler->GetCerberCoreString(LANG_ERROR);
-        std::string lastIp      = handler->GetCerberCoreString(LANG_ERROR);
+        std::string userName    = handler->GetTrinityString(LANG_ERROR);
+        std::string eMail       = handler->GetTrinityString(LANG_ERROR);
+        std::string lastIp      = handler->GetTrinityString(LANG_ERROR);
         uint32 security         = 0;
-        std::string lastLogin   = handler->GetCerberCoreString(LANG_ERROR);
+        std::string lastLogin   = handler->GetTrinityString(LANG_ERROR);
 
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO);
         stmt->setInt32(0, int32(realmID));
@@ -1702,7 +1702,7 @@ public:
                 lastLogin = fields[4].GetString();
 
                 uint32 ip = inet_addr(lastIp.c_str());
-#if CERBERCORE_ENDIAN == BIGENDIAN
+#if TRINITY_ENDIAN == BIGENDIAN
                 EndianConvertReverse(ip);
 #endif
 
@@ -1729,7 +1729,7 @@ public:
 
         std::string nameLink = handler->playerLink(targetName);
 
-        handler->PSendSysMessage(LANG_PINFO_ACCOUNT, (target ? "" : handler->GetCerberCoreString(LANG_OFFLINE)), nameLink.c_str(), GUID_LOPART(targetGuid), userName.c_str(), accId, eMail.c_str(), security, lastIp.c_str(), lastLogin.c_str(), latency);
+        handler->PSendSysMessage(LANG_PINFO_ACCOUNT, (target ? "" : handler->GetTrinityString(LANG_OFFLINE)), nameLink.c_str(), GUID_LOPART(targetGuid), userName.c_str(), accId, eMail.c_str(), security, lastIp.c_str(), lastLogin.c_str(), latency);
 
         std::string bannedby = "unknown";
         std::string banreason = "";
@@ -1888,14 +1888,14 @@ public:
             return true;
         }
 
-        CellCoord p(CerberCore::ComputeCellCoord(player->GetPositionX(), player->GetPositionY()));
+        CellCoord p(Trinity::ComputeCellCoord(player->GetPositionX(), player->GetPositionY()));
         Cell cell(p);
         cell.SetNoCreate();
 
-        CerberCore::RespawnDo u_do;
-        CerberCore::WorldObjectWorker<CerberCore::RespawnDo> worker(player, u_do);
+        Trinity::RespawnDo u_do;
+        Trinity::WorldObjectWorker<Trinity::RespawnDo> worker(player, u_do);
 
-        TypeContainerVisitor<CerberCore::WorldObjectWorker<CerberCore::RespawnDo>, GridTypeMapContainer > obj_worker(worker);
+        TypeContainerVisitor<Trinity::WorldObjectWorker<Trinity::RespawnDo>, GridTypeMapContainer > obj_worker(worker);
         cell.Visit(p, obj_worker, *player->GetMap(), *player, player->GetGridActivationRange());
 
         return true;
@@ -1985,7 +1985,7 @@ public:
         announce += muteReasonStr;
         
         char buff[2048];
-        sprintf(buff, handler->GetCerberCoreString(LANG_SYSTEMMESSAGE), announce.c_str());
+        sprintf(buff, handler->GetTrinityString(LANG_SYSTEMMESSAGE), announce.c_str());
         sWorld->SendServerMessage(SERVER_MSG_STRING, buff);
 
         return true;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CERBERCORE_CONFUSEDGENERATOR_H
-#define CERBERCORE_CONFUSEDGENERATOR_H
+#ifndef TRINITY_CONFUSEDGENERATOR_H
+#define TRINITY_CONFUSEDGENERATOR_H
 
 #include "MovementGenerator.h"
 #include "Timer.h"

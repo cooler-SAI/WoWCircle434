@@ -1,5 +1,5 @@
-#ifndef __CERBERCORE_ARCHAEOLOGYMGR_H
-#define __CERBERCORE_ARCHAEOLOGYMGR_H
+#ifndef __TRINITY_ARCHAEOLOGYMGR_H
+#define __TRINITY_ARCHAEOLOGYMGR_H
 
 #include <map>
 #include <string>

@@ -325,7 +325,7 @@ public:
         {
             std::list<Creature*> fiery;
             me->GetCreatureListWithEntryInGrid(fiery, NPC_GENERAL_PURPOSE_BUNNY_JMF2, 150.0f);
-            fiery.sort(CerberCore::ObjectDistanceOrderPred(me));
+            fiery.sort(Trinity::ObjectDistanceOrderPred(me));
             for (std::list<Creature*>::iterator itr = fiery.begin(); itr != fiery.end(); ++itr)
             {
                 if (( *itr )->isAlive() && ( *itr )->GetTypeId() == TYPEID_UNIT)
@@ -339,7 +339,7 @@ public:
         {
             std::list<Creature*> fiery;
             me->GetCreatureListWithEntryInGrid(fiery, NPC_GENERAL_PURPOSE_BUNNY_JMF2, 150.0f);
-            fiery.sort(CerberCore::ObjectDistanceOrderPred(me));
+            fiery.sort(Trinity::ObjectDistanceOrderPred(me));
             for (std::list<Creature*>::iterator itr = fiery.begin(); itr != fiery.end(); ++itr)
             {
                 if (( *itr )->isAlive() && ( *itr )->GetTypeId() == TYPEID_UNIT)
@@ -951,8 +951,8 @@ public:
                         {
                             std::list<Player*> players;
 
-                            CerberCore::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
-                            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+                            Trinity::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
+                            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
                             me->VisitNearbyWorldObject(150.0f, searcher);
 
                             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -971,8 +971,8 @@ public:
                         {
                             std::list<Player*> players;
 
-                            CerberCore::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
-                            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+                            Trinity::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
+                            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
                             me->VisitNearbyWorldObject(150.0f, searcher);
 
                             if (Creature *controller_achi = me->FindNearestCreature(NPC_ACHIEVEMENT_CONTROLLER, 300.0f))
@@ -995,8 +995,8 @@ public:
                         {
                             std::list<Player*> players;
 
-                            CerberCore::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
-                            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+                            Trinity::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
+                            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
                             me->VisitNearbyWorldObject(150.0f, searcher);
 
                             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -1064,8 +1064,8 @@ public:
                 if (Pullplayers)
                 {
                     std::list<Player*> players;
-                    CerberCore::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
-                    CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+                    Trinity::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
+                    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
                     me->VisitNearbyWorldObject(150.0f, searcher);
 
                     for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -1391,8 +1391,8 @@ public:
                         {
                             std::list<Player*> players;
 
-                            CerberCore::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
-                            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+                            Trinity::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
+                            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
                             me->VisitNearbyWorldObject(150.0f, searcher);
 
                             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -1415,8 +1415,8 @@ public:
                         {
                             std::list<Player*> players;
 
-                            CerberCore::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
-                            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+                            Trinity::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
+                            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
                             me->VisitNearbyWorldObject(150.0f, searcher);
 
                             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -1440,8 +1440,8 @@ public:
                         {
                             std::list<Player*> players;
 
-                            CerberCore::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
-                            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+                            Trinity::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
+                            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
                             me->VisitNearbyWorldObject(150.0f, searcher);
 
                             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -1466,8 +1466,8 @@ public:
                         case 23:
                         {
                             std::list<Player*> players;
-                            CerberCore::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
-                            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+                            Trinity::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
+                            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
                             me->VisitNearbyWorldObject(150.0f, searcher);
 
                             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -1565,8 +1565,8 @@ public:
         {
             std::list<Player*> players;
 
-            CerberCore::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
-            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+            Trinity::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
+            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
             me->VisitNearbyWorldObject(150.0f, searcher);
 
             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -1662,8 +1662,8 @@ public:
         {
             std::list<Player*> players;
 
-            CerberCore::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
-            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+            Trinity::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
+            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
             me->VisitNearbyWorldObject(150.0f, searcher);
 
             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -1753,8 +1753,8 @@ public:
         {
             std::list<Player*> players;
 
-            CerberCore::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
-            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
+            Trinity::AnyPlayerInObjectRangeCheck checker(me, 150.0f);
+            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
             me->VisitNearbyWorldObject(150.0f, searcher);
 
             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)

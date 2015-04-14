@@ -760,7 +760,7 @@ struct BfTBGameObjectBuilding
         m_State = BATTLEFIELD_TB_OBJECTSTATE_ALLIANCE_DAMAGE - (m_Team * 3);
 
         if (m_NameId)
-            m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_TOWER_DAMAGE, sObjectMgr->GetCerberCoreStringForDBCLocale(m_NameId));
+            m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_TOWER_DAMAGE, sObjectMgr->GetTrinityStringForDBCLocale(m_NameId));
     }
 
     void Destroyed()
@@ -781,7 +781,7 @@ struct BfTBGameObjectBuilding
         m_State = BATTLEFIELD_TB_OBJECTSTATE_ALLIANCE_DESTROY - (m_Team * 3);
 
         if (m_NameId)
-            m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_TOWER_DESTROY, sObjectMgr->GetCerberCoreStringForDBCLocale(m_NameId));
+            m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_TOWER_DESTROY, sObjectMgr->GetTrinityStringForDBCLocale(m_NameId));
 
         m_TB->AddBrokenTower(TeamId(m_Team));
     }
@@ -885,8 +885,8 @@ struct BfTBWorkShopData
                     }
                 }
 
-                m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_WORKSHOP_ATTACK, sObjectMgr->GetCerberCoreStringForDBCLocale(m_NameId),
-                    sObjectMgr->GetCerberCoreStringForDBCLocale(m_TeamControl ? BATTLEFIELD_TB_TEXT_ALLIANCE:BATTLEFIELD_TB_TEXT_HORDE));
+                m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_WORKSHOP_ATTACK, sObjectMgr->GetTrinityStringForDBCLocale(m_NameId),
+                    sObjectMgr->GetTrinityStringForDBCLocale(m_TeamControl ? BATTLEFIELD_TB_TEXT_ALLIANCE:BATTLEFIELD_TB_TEXT_HORDE));
                 break;
             }
         case BATTLEFIELD_TB_TEAM_ALLIANCE:
@@ -902,8 +902,8 @@ struct BfTBWorkShopData
                 m_State = BATTLEFIELD_TB_OBJECTSTATE_ALLIANCE_INTACT;
 
                 if (!init)
-                    m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_WORKSHOP_TAKEN, sObjectMgr->GetCerberCoreStringForDBCLocale(m_NameId),
-                    sObjectMgr->GetCerberCoreStringForDBCLocale(BATTLEFIELD_TB_TEXT_ALLIANCE));
+                    m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_WORKSHOP_TAKEN, sObjectMgr->GetTrinityStringForDBCLocale(m_NameId),
+                    sObjectMgr->GetTrinityStringForDBCLocale(BATTLEFIELD_TB_TEXT_ALLIANCE));
 
                 m_TeamControl = team;
                 break;
@@ -921,8 +921,8 @@ struct BfTBWorkShopData
                 m_State = BATTLEFIELD_TB_OBJECTSTATE_HORDE_INTACT;
 
                 if (!init)
-                    m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_WORKSHOP_TAKEN, sObjectMgr->GetCerberCoreStringForDBCLocale(m_NameId),
-                    sObjectMgr->GetCerberCoreStringForDBCLocale(BATTLEFIELD_TB_TEXT_HORDE));
+                    m_TB->SendWarningToAllInZone(BATTLEFIELD_TB_TEXT_WORKSHOP_TAKEN, sObjectMgr->GetTrinityStringForDBCLocale(m_NameId),
+                    sObjectMgr->GetTrinityStringForDBCLocale(BATTLEFIELD_TB_TEXT_HORDE));
 
                 m_TeamControl = team;
                 break;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2012 Trinity Core <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -52,8 +52,8 @@ void ConfusedMovementGenerator<T>::Initialize(T &unit)
         float wanderY = y + (wander_distance * (float)rand_norm() - wander_distance/2);
 
         // prevent invalid coordinates generation
-        CerberCore::NormalizeMapCoord(wanderX);
-        CerberCore::NormalizeMapCoord(wanderY);
+        Trinity::NormalizeMapCoord(wanderX);
+        Trinity::NormalizeMapCoord(wanderY);
 
         if (unit.IsWithinLOS(wanderX, wanderY, z))
         {

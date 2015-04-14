@@ -686,7 +686,7 @@ public:
                         std::list<Creature*> creatures;
                         me->GetCreatureListWithEntryInGrid(creatures, NPC_ONSLAUGHT_TARGET, 300.0f);
                         if (!creatures.empty())
-                            if (Unit* pTarget = CerberCore::Containers::SelectRandomContainerElement(creatures))
+                            if (Unit* pTarget = Trinity::Containers::SelectRandomContainerElement(creatures))
                             {
                                 pTarget->CastSpell(pTarget, SPELL_TWILIGHT_ONSLAUGHT_DUMMY_1, true);
                                 me->CastSpell(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), SPELL_TWILIGHT_ONSLAUGHT, false);
@@ -1580,7 +1580,7 @@ public:
         {
             Player* player = NULL;
             AnyLivePlayerNoGmCheck check(me, 200.0f);
-            CerberCore::PlayerSearcher<AnyLivePlayerNoGmCheck> searcher(me, player, check);
+            Trinity::PlayerSearcher<AnyLivePlayerNoGmCheck> searcher(me, player, check);
             me->VisitNearbyWorldObject(200.0f, searcher);
             return (player ? true : false);
         }
@@ -1765,7 +1765,7 @@ public:
             }
 
             if (targets.size() > 1)
-                CerberCore::Containers::RandomResizeList(targets, 1);
+                Trinity::Containers::RandomResizeList(targets, 1);
         }
 
         void Register()
@@ -1860,10 +1860,10 @@ public:
             if (new_targets.size() >= 2)
             {
                 targets.clear();
-                targets.push_back(CerberCore::Containers::SelectRandomContainerElement(new_targets));
+                targets.push_back(Trinity::Containers::SelectRandomContainerElement(new_targets));
             }
             else
-                CerberCore::Containers::RandomResizeList(targets, 1);
+                Trinity::Containers::RandomResizeList(targets, 1);
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)

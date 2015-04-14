@@ -1242,8 +1242,8 @@ public:
         void HandleAfterCast()
         {
             std::list<Player*> players;
-            CerberCore::AnyPlayerInObjectRangeCheck checker(GetCaster(), 20.0f);
-            CerberCore::PlayerListSearcher<CerberCore::AnyPlayerInObjectRangeCheck> searcher(GetCaster(), players, checker);
+            Trinity::AnyPlayerInObjectRangeCheck checker(GetCaster(), 20.0f);
+            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(GetCaster(), players, checker);
             GetCaster()->VisitNearbyWorldObject(20.0f, searcher);
 
             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
