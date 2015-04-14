@@ -149,7 +149,7 @@ public:
             { "spell_target_position",        SEC_ADMINISTRATOR, true,  &HandleReloadSpellTargetPositionCommand,        "", NULL },
             { "spell_threats",                SEC_ADMINISTRATOR, true,  &HandleReloadSpellThreatsCommand,               "", NULL },
             { "spell_group_stack_rules",      SEC_ADMINISTRATOR, true,  &HandleReloadSpellGroupStackRulesCommand,       "", NULL },
-            { "cerbercore_string",            SEC_ADMINISTRATOR, true,  &HandleReloadCerberCoreStringCommand,           "", NULL },
+            { "trinity_string",               SEC_ADMINISTRATOR, true,  &HandleReloadCerberCoreStringCommand,           "", NULL },
             { "warden_action",                SEC_ADMINISTRATOR, true,  &HandleReloadWardenactionCommand,               "", NULL },
             { "waypoint_scripts",             SEC_ADMINISTRATOR, true,  &HandleReloadWpScriptsCommand,                  "", NULL },
             { "waypoint_data",                SEC_ADMINISTRATOR, true,  &HandleReloadWpCommand,                         "", NULL },
@@ -716,9 +716,9 @@ public:
 
     static bool HandleReloadCerberCoreStringCommand(ChatHandler* handler, const char* /*args*/)
     {
-        sLog->outInfo(LOG_FILTER_GENERAL, "Re-Loading cerbercore_string Table!");
+        sLog->outInfo(LOG_FILTER_GENERAL, "Re-Loading trinity_string Table!");
         sObjectMgr->LoadCerberCoreStrings();
-        handler->SendGlobalGMSysMessage("DB table `cerbercore_string` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `trinity_string` reloaded.");
         return true;
     }
 

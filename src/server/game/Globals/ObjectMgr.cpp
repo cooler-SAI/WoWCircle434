@@ -7786,9 +7786,9 @@ const char *ObjectMgr::GetCerberCoreString(int32 entry, LocaleConstant locale_id
     }
 
     if (entry > 0)
-        sLog->outError(LOG_FILTER_SQL, "Entry %i not found in `cerbercore_string` table.", entry);
+        sLog->outError(LOG_FILTER_SQL, "Entry %i not found in `trinity_string` table.", entry);
     else
-        sLog->outError(LOG_FILTER_SQL, "CerberCore string entry %i not found in DB.", entry);
+        sLog->outError(LOG_FILTER_SQL, "TrinityCore string entry %i not found in DB.", entry);
     return "<error>";
 }
 
