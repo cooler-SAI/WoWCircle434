@@ -24,7 +24,7 @@
 #include "Define.h"
 #include "revision.h"
 
-#define _PACKAGENAME "CerberProject Core"
+#define _PACKAGENAME "Core:EWCore\nBased on: EWTDB\nMain Developer: Shuni \n"
 
 #if CERBERCORE_ENDIAN == CERBERCORE_BIGENDIAN
 # define _ENDIAN_STRING "big-endian"
