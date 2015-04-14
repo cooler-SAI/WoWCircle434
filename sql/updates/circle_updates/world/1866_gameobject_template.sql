@@ -1,1 +1,0 @@
-DELETE FROM `gameobject` WHERE `id`=180322 AND `map`=30;

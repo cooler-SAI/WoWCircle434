@@ -1,1 +1,0 @@
-DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_pal_lay_on_hands';

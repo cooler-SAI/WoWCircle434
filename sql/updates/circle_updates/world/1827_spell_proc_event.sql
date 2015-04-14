@@ -1,1 +1,0 @@
-delete from spell_proc_event where entry in (53486, 53488, 87138);

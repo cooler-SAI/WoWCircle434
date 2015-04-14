@@ -1,1 +1,0 @@
-DELETE FROM `spell_linked_spell` WHERE (`spell_trigger`='11327') AND (`spell_effect`='-1130');

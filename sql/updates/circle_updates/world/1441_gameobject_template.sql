@@ -1,1 +1,0 @@
-﻿UPDATE `gameobject_template` SET `faction`=0 WHERE `entry` IN (184632, 184322);

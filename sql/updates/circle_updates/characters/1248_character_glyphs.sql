@@ -1,1 +1,0 @@
-ALTER TABLE `character_glyphs`  CHANGE COLUMN `glyph9` `glyph9` SMALLINT(5) UNSIGNED NULL DEFAULT '0' AFTER `glyph8`;

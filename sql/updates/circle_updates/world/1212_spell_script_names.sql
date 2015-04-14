@@ -1,2 +1,0 @@
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES ('56641', 'spell_hun_steady_shot');
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES ('77767', 'spell_hun_cobra_shot');

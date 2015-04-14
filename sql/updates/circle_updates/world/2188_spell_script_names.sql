@@ -1,1 +1,0 @@
-REPLACE INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES ('15487', 'spell_pri_silence');

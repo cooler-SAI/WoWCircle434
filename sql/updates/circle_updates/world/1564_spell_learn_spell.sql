@@ -1,1 +1,0 @@
-delete from spell_learn_spell where entry >= 86467;

@@ -1,1 +1,0 @@
-DELETE FROM `spell_script_names` WHERE (`spell_id`='-746') AND (`ScriptName`='spell_gen_bandage');

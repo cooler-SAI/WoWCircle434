@@ -1,1 +1,0 @@
-UPDATE `gameobject_template` SET `flags`=1056 WHERE `entry`=209251;

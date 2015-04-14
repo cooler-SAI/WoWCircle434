@@ -1,1 +1,0 @@
-UPDATE `quest_template` SET `RewardSpellCast`=0 WHERE `Id`=26507;

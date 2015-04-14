@@ -1,1 +1,0 @@
-UPDATE `creature_template` SET `ScriptName`='npc_hand_of_guldan' WHERE `entry`=46157;

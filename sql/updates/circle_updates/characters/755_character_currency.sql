@@ -1,1 +1,0 @@
-UPDATE `character_currency` SET `season_count`='0' WHERE `season_count`='2147483647';

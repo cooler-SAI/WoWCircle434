@@ -1,1 +1,0 @@
-REPLACE INTO `skill_discovery_template` (`spellId`, `reqSpell`, `reqSkillValue`, `chance`) VALUES ('94711', '64323', '0', '100');

@@ -1,1 +1,0 @@
-UPDATE `creature_template_addon` SET `auras`='109247' WHERE `entry` IN (55695, 55696, 55697, 55698)

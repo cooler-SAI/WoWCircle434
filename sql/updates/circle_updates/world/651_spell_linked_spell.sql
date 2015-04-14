@@ -1,1 +1,0 @@
-INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `comment`) VALUES ('45438', '41425', 'Ice Block - Hypothermia');

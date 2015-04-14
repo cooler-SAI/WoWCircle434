@@ -1,1 +1,0 @@
-UPDATE `creature_template` SET `ScriptName`='npc_kwee_q_peddlefeet' WHERE `entry`=37887;

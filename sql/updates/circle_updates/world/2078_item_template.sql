@@ -1,1 +1,0 @@
-UPDATE `item_template` SET `spellid_1`=86425 WHERE `entry`=65898;

@@ -1,1 +1,0 @@
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES ('17364', 'spell_sha_stormstrike');

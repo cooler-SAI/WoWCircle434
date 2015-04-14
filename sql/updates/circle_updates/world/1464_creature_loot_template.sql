@@ -1,2 +1,0 @@
-UPDATE creature_loot_template SET ChanceOrQuestChance=-ABS(ChanceOrQuestChance) WHERE item IN (71141,69815);
-UPDATE gameobject_loot_template SET ChanceOrQuestChance=-ABS(ChanceOrQuestChance) WHERE item IN (71141,69815);

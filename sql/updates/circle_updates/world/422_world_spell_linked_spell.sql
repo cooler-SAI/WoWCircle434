@@ -1,1 +1,0 @@
-REPLACE INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES (-588, -91724, 0, 'Inner Sanctum removal link');

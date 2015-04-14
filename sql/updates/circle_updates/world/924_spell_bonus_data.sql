@@ -1,1 +1,0 @@
-INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `comments`) VALUES ('73921', '0.076', 'Shaman - Healing Rain');

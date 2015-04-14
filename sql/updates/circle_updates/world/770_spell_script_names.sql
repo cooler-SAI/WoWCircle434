@@ -1,1 +1,0 @@
-REPLACE INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (75192, 'spell_item_flameseers_staff_weakening');

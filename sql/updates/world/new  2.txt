@@ -1,7 +1,0 @@
-CREATE DATABASE world;
-CREATE DATABASE auth;
-CREATE DATABASE characters;
-GRANT ALL ON auth.* TO akriso@'%' identified by '101019';
-
-
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '101019' WITH GRANT OPTION;

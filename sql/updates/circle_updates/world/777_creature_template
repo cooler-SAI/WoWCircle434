@@ -1,1 +1,0 @@
-UPDATE `creature_template` SET `ScriptName`='npc_zulaman_forest_frog' WHERE `entry`=24396;

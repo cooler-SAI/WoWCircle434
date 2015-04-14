@@ -1,1 +1,0 @@
-UPDATE `gameobject_template` SET `faction`=0, `flags`=0 WHERE `entry` IN (195235, 195331, 190752);

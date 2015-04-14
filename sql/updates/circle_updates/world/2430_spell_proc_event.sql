@@ -1,1 +1,0 @@
-update spell_proc_event set ppmRate = 0 where entry = 26016;

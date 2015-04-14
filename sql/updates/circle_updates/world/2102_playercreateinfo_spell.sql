@@ -1,1 +1,0 @@
-UPDATE `playercreateinfo_spell` SET `class`=0 WHERE `spell`=89964;

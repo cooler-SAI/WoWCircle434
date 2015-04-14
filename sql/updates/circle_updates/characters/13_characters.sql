@@ -1,1 +1,0 @@
-ALTER TABLE `characters`  CHANGE COLUMN `map` `map` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Map Identifier' AFTER `position_z`;

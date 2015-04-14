@@ -1,2 +1,0 @@
-DELETE FROM `spell_bonus_data` WHERE `entry`=85222;
-INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES (85222, 0.132, 0, 0, 0, 'Paladin - Light of Dawn');
