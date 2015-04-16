@@ -370,8 +370,9 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
         }
     }
     else
-        _player->SendQuestWindowClose(quest->GetQuestId());
+        
         _player->PlayerTalkClass->SendQuestGiverOfferReward(quest, guid, true);
+		_player->SendQuestWindowClose(quest->GetQuestId());
 }
 
 void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPacket & recvData)
@@ -499,6 +500,7 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
         {
             sLog->outError(LOG_FILTER_NETWORKIO, "Possible hacking attempt: Player %s [playerGuid: %u] tried to complete questId [entry: %u] without being in possession of the questId!",
                           _player->GetName(), _player->GetGUIDLow(), questId);
+						  _player->SendQuestWindowClose(quest->GetQuestId());
             return;
         }
         // TODO: need a virtual function
