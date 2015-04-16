@@ -69,14 +69,14 @@ void SystemMgr::LoadScriptTexts()
         if (temp.uiSoundId)
         {
             if (!sSoundEntriesStore.LookupEntry(temp.uiSoundId))
-                sLog->outError(LOG_FILTER_SQL, "TSCR: Entry %i in table `script_texts` has soundId %u but sound does not exist.", iId, temp.uiSoundId);
+                sLog->outDebug(LOG_FILTER_SQL, "TSCR: Entry %i in table `script_texts` has soundId %u but sound does not exist.", iId, temp.uiSoundId);
         }
 
         if (!GetLanguageDescByID(temp.uiLanguage))
-            sLog->outError(LOG_FILTER_SQL, "TSCR: Entry %i in table `script_texts` using Language %u but Language does not exist.", iId, temp.uiLanguage);
+            sLog->outDebug(LOG_FILTER_SQL, "TSCR: Entry %i in table `script_texts` using Language %u but Language does not exist.", iId, temp.uiLanguage);
 
         if (temp.uiType > CHAT_TYPE_ZONE_YELL)
-            sLog->outError(LOG_FILTER_SQL, "TSCR: Entry %i in table `script_texts` has Type %u but this Chat Type does not exist.", iId, temp.uiType);
+            sLog->outDebug(LOG_FILTER_SQL, "TSCR: Entry %i in table `script_texts` has Type %u but this Chat Type does not exist.", iId, temp.uiType);
 
         m_mTextDataMap[iId] = temp;
         ++uiCount;
