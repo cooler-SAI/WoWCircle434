@@ -539,3 +539,18 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 
 
 INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES (68211, 68212, 0, 'Trigger spell - Weed Whacker');
+
+--
+-- Добавление хакового решения (Самое первое задание на острове - 15000) (NonBlizzlike)
+--
+
+INSERT INTO `quest_template` VALUES (15000, 2, 4, 1, 0, 4737, 0, 0, 0, 0, 256, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14233, 0, 14233, 1, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4980736, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1133, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Up, Up & Away!', 'We stayed as they could, go to the camp survivors Hamm and others will be glad to see you.', 'Find camp survivors', '', 'Find camp survivors', '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', '', '', 890, 878, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15595);
+INSERT INTO `creature_questrelation` VALUES (36600, 15000);
+INSERT INTO `creature_involvedrelation` VALUES (35650, 15000);
+INSERT INTO `quest_poi` VALUES (15000, 1, -1, 648, 4720, 0, 0, 1);
+INSERT INTO `quest_poi_points` VALUES (15000, 0, 0, 607, 3125);
+INSERT INTO `quest_poi_points` VALUES (15000, 1, 0, 607, 3125);
+
+
+INSERT INTO `locales_quest` VALUES (15000, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Выживший', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Мы очень рады видеть тебя $N', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Я знаю, это поганая работа, $N, но ее необходимо выполнить ради нашей жизни', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Найти лагерь выживших.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '');
+
