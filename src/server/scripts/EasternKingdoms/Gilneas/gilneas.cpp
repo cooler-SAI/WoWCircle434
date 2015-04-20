@@ -1969,7 +1969,7 @@ public:
             {
                 if (me->GetHealthPct() <= 30)
                 {
-                    me->MonsterTextEmote(-106, 0);
+                    //me->MonsterTextEmote(-106, 0);
                     DoCast(me, SPELL_ENRAGE);
                     tEnrage = CD_ENRAGE;
                 }

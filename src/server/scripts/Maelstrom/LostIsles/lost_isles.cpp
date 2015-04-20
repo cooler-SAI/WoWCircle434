@@ -1042,7 +1042,7 @@ public:
         if (_Quest->GetQuestId() == QUEST_SURREND_OR_ELSE)
             player->SummonCreature(NPC_CRACK, player->GetPositionX(), player->GetPositionY(),  player->GetPositionZ(),  player->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN);
         else if (_Quest->GetQuestId() == QUEST_GET_BACK_TO_TOWN)
-            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_6, true);
+            //player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_6, true);
         return true;
     }
 
@@ -1511,7 +1511,7 @@ public:
             if (player->GetPhaseMask() == 32768)
                 return false;
 
-            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_9, true);
+            //player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_9, true);
             player->AddAura(SPELL_VOLCANIC_SKYBOX, player);
             player->KilledMonsterCredit(NPC_SWEET_OIL_KILL_CREDIT, 0);
             if (Creature* t = player->SummonCreature(NPC_CAULDRON_TRIGGER, 2477.0f, 2082.0f,  14.0f,  go->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 10 * IN_MILLISECONDS))
@@ -1731,7 +1731,7 @@ public:
         if (_Quest->GetQuestId() == QUEST_VICTORY)
         {
             player->AddAura(SPELL_ROCKIN_POWER_INFUSED_ROCKET_BOOTS, player);
-            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_4, true);
+            //player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_4, true);
             player->AddAura(SPELL_VOLCANIC_SKYBOX, player);
             player->GetMotionMaster()->ForceMoveJump(2352.31f, 2483.97f, 13.0f, 15.0f, 20.0f, 150.0f);
         }

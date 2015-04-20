@@ -1,8 +1,20 @@
 /*
-*
-* Copyright (C) 2012-2014 Cerber Project <https://bitbucket.org/mojitoice/>
-*
-*/
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "kezan.h"
 
@@ -422,8 +434,8 @@ public:
                 player->GetQuestStatus(QUEST_ROBBING_HOODS) == QUEST_STATUS_REWARDED &&
                 player->GetQuestStatus(QUEST_LIBERATE_THE_KAJAMITE) == QUEST_STATUS_REWARDED)
             {
-                player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_5);
-                player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_6, player);
+                //player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_5);
+                //player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_6, player);
                 player->SaveToDB();
             }
 
@@ -568,7 +580,7 @@ public:
         {
             float x, y, z = creature->GetPositionZ();
             creature->GetNearPoint2D(x, y, 3.0f, creature->GetOrientation() + M_PI / 4);
-            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_8, false);
+            //player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_8, false);
             player->DestroyItemCount(ITEM_HOTROAD_KEY, 1, true);
 
             if (Creature* hotrod = player->SummonCreature(NPC_HOT_ROD_LS, x, y, z))
@@ -726,24 +738,24 @@ public:
             player->RemoveAura(SPELL_LOTP_OUTFIT_FEMALE);
             player->RemoveAura(SPELL_LOTP_OUTFIT_MALE);
             player->RemoveAura(SPELL_LOTP_PAPARAZZI);
-            player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_1);
-            player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_2, player);
+            //player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_1);
+            //player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_2, player);
             break;
         case QUEST_PIRATE_PARTY_CRASHERS:
-            player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_2);
-            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_3, false); // wtf? why dont work?
+            //player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_2);
+            //player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_3, false); // wtf? why dont work?
             break;
         case QUEST_A_BAZILLION_MACAROONS:
-            player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_4);
-            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_5, false);
+            //player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_4);
+            //player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_5, false);
             break;
         case QUEST_THE_GREAT_BANK_HEIST:
             if (player->GetQuestStatus(QUEST_ROBBING_HOODS) == QUEST_STATUS_REWARDED &&
                 player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_REWARDED &&
                 player->GetQuestStatus(QUEST_LIBERATE_THE_KAJAMITE) == QUEST_STATUS_REWARDED)
             {
-                player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_5);
-                player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_6, player);
+                //player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_5);
+                //player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_6, player);
                 player->SaveToDB();
             }
             break;
@@ -840,8 +852,8 @@ public:
                 player->GetQuestStatus(QUEST_ROBBING_HOODS) == QUEST_STATUS_REWARDED &&
                 player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_REWARDED)
             {
-                player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_5);
-                player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_6, player);
+                //player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_5);
+                //player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_6, player);
                 player->SaveToDB();
             }
 
@@ -1088,8 +1100,8 @@ public:
                 player->GetQuestStatus(QUEST_WALTZ_RIGHT_IN) == QUEST_STATUS_REWARDED &&
                 player->GetQuestStatus(QUEST_LIBERATE_THE_KAJAMITE) == QUEST_STATUS_REWARDED)
             {
-                player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_5);
-                player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_6, player);
+                //player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_5);
+                //player->AddAura(PHASE_QUEST_ZONE_SPECIFIC_6, player);
                 player->SaveToDB();
             }
 
@@ -3522,7 +3534,7 @@ public:
             player->CastSpell(player, SPELL_LOTP_OUTFIT_SECONDARY, false);
             player->CastSpell(player, SPELL_LOTP_OUTFIT_FEMALE, false);
             player->CastSpell(player, SPELL_LOTP_PAPARAZZI, false);
-            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_1, false);
+            //player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_1, false);
             player->RemoveAura(SPELL_QUEST_INVISIBILITY_DETECTION_5);
             creature->DoPersonalScriptText(CHIP_ENDALE_SAY_GO_TO_THE_PARTY, player);
             creature->Whisper(CHIP_ENDALE_EMOTE_GO, player->GetGUID(), true);
@@ -3608,7 +3620,7 @@ public:
             player->CastSpell(player, SPELL_LOTP_OUTFIT_SECONDARY, false);
             player->CastSpell(player, SPELL_LOTP_OUTFIT_MALE, false);
             player->CastSpell(player, SPELL_LOTP_PAPARAZZI, false);
-            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_1, false);
+            //player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_1, false);
             player->RemoveAura(SPELL_QUEST_INVISIBILITY_DETECTION_5);
             creature->DoPersonalScriptText(CANDY_CANE_SAY_GO_TO_THE_PARTY, player);
             creature->Whisper(CANDY_CANE_EMOTE_GO, player->GetGUID(), true);
@@ -5561,8 +5573,8 @@ public:
         switch (quest->GetQuestId())
         {
         case QUEST_THE_UNINVITED_GUEST:
-            player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_3);
-            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_4, false);
+            //player->RemoveAura(PHASE_QUEST_ZONE_SPECIFIC_3);
+            //player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_4, false);
             break;
         case QUEST_LIFE_SAVINGS:
             player->CastSpell(player, SPELL_LIFE_SAVINGS_QUEST_COMPLETE, false);
@@ -5996,8 +6008,8 @@ public:
         std::list<Creature*> lControls;
         player->GetAllMinionsByEntry(lControls, NPC_OVERLOADED_GENERATOR);
 
-        if (!player->HasAura(PHASE_QUEST_ZONE_SPECIFIC_6))
-            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_6, false);
+        //if (!player->HasAura(PHASE_QUEST_ZONE_SPECIFIC_6))
+            //player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_6, false);
 
         if (!lControls.empty())
             for (std::list<Creature*>::iterator itr = lControls.begin(); itr != lControls.end();)
@@ -6031,8 +6043,8 @@ public:
         std::list<Creature*> lControls;
         player->GetAllMinionsByEntry(lControls, NPC_STOVE_LEAK);
 
-        if (!player->HasAura(PHASE_QUEST_ZONE_SPECIFIC_6))
-            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_6, false);
+        //if (!player->HasAura(PHASE_QUEST_ZONE_SPECIFIC_6))
+            //player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_6, false);
 
         if (!lControls.empty())
             for (std::list<Creature*>::iterator itr = lControls.begin(); itr != lControls.end();)
@@ -6063,8 +6075,8 @@ public:
 
     bool OnGossipHello(Player* player, GameObject* go)
     {
-        if (!player->HasAura(PHASE_QUEST_ZONE_SPECIFIC_6))
-            player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_6, false);
+        //if (!player->HasAura(PHASE_QUEST_ZONE_SPECIFIC_6))
+            //player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_6, false);
 
         player->CastSpell(player, SPELL_SMOLDERING_BED_PRECAST_MASTER, false);
         return false;
@@ -6248,7 +6260,7 @@ public:
                     return;
 
                 DoCast(SPELL_GASBOT_EXPLOSION);
-                player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_7, false);
+                //player->CastSpell(player, PHASE_QUEST_ZONE_SPECIFIC_7, false);
 
                 if (Vehicle* vehicle = me->GetVehicleKit())
                     for (int i = 0; i < 4; ++i)
