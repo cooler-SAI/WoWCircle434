@@ -1,4 +1,5 @@
 -- Fix spell script name on startup error
+DELETE FROM `spell_script_names`WHERE `spell_id` IN (66299, 83883, 19593);
 INSERT INTO `spell_script_names` VALUES
 (66299,'spell_radio'),
 (83883,'spell_q26861_door_dummy'),
