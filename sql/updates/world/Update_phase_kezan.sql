@@ -106,8 +106,14 @@ UPDATE `creature` SET `phaseMask` = 2 WHERE `guid` = 6674644;
 UPDATE `creature` SET `phaseMask` = 2 WHERE `guid` = 6672971;
 UPDATE `creature` SET `phaseMask` = 2 WHERE `guid` = 6674598;
 UPDATE `creature` SET `phaseMask` = 2 WHERE `guid` = 6675452;
-UPDATE `creature` SET `phaseMask` = 2 WHERE `guid` = 6674620;
+UPDATE `creature` SET `phaseMask` = 2 WHERE `guid` = 6674640;
 UPDATE `creature` SET `phaseMask` = 2 WHERE `guid` = 6674619;
+
+-- Перестановка НИП
+INSERT INTO `creature` VALUES 
+(6674619, 35054, 648, 1, 1, 0, 0, -8428.21, 1320.96, 102.005, 1.44126, 300, 0, 0, 40, 0, 0, 0, 0, 0),
+(6674620, 35053, 648, 1, 1, 0, 0, -8426.13, 1321.2, 102.095, 1.49624, 300, 0, 0, 40, 0, 0, 0, 0, 0);
+
 
 -- Изменение квестгиверов
 UPDATE `creature_involvedrelation` SET `quest` = 14116 WHERE `id` = 35222;
