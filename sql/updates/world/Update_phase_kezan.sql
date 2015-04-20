@@ -100,3 +100,16 @@ INSERT INTO `gameobject` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`position_x`
 (602102, 195492, 648, 1, 1, -8355.4, 1134.21, 34.3112, 0.733038, 0, 0, 0.358368, 0.933581, 300, 255, 1),
 (602101, 195492, 648, 1, 1, -8360.65, 1152.36, 34.854, -2.91469, 0, 0, -0.993571, 0.113208, 300, 255, 1),
 (602100, 195492, 648, 1, 1, -8375.64, 1119.39, 34.206, 3.12412, 0, 0, 0.999962, 0.00873464, 300, 255, 1);
+
+-- Изменение фазирования не нужные НИП
+UPDATE `creature` SET `phaseMask` = 2 WHERE `guid` = 6674644;
+UPDATE `creature` SET `phaseMask` = 2 WHERE `guid` = 6672971;
+UPDATE `creature` SET `phaseMask` = 2 WHERE `guid` = 6674598;
+UPDATE `creature` SET `phaseMask` = 2 WHERE `guid` = 6675452;
+UPDATE `creature` SET `phaseMask` = 2 WHERE `guid` = 6674620;
+UPDATE `creature` SET `phaseMask` = 2 WHERE `guid` = 6674619;
+
+-- Изменение квестгиверов
+UPDATE `creature_involvedrelation` SET `quest` = 14116 WHERE `id` = 35222;
+UPDATE `creature_involvedrelation` SET `quest` = 14126 WHERE `id` = 35222;
+UPDATE `creature_questrelation` SET `quest` = 14120 WHERE `id` = 34668;
