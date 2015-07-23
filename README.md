@@ -1,4 +1,4 @@
-# ![logo](http://evagames.net/images/logo-index.png) Evagames.net 4.3.4
+# ![logo](http://evagames.net/images/bott2.png) Evagames.net 4.3.4
 
 + Платформа: Linux
 + Процессор с поддержкой: SSE2
