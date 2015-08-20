@@ -1,4 +1,4 @@
-# ![logo](http://evagames.net/images/bott2.png) Evagames.net 4.3.4
+# ![logo](http://bnetcmsus-a.akamaihd.net/cms/blog_header/r1/R1Q6OMJJCBTI1438211806112.jpg) EvaCore 4.3.4
 
 + Платформа: Linux
 + Процессор с поддержкой: SSE2
