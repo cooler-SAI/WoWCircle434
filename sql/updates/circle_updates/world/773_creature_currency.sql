@@ -1,0 +1,1 @@
+ALTER TABLE `creature_currency`  CHANGE COLUMN `CurrencyCount1` `CurrencyCount1` INT(10) NULL DEFAULT NULL AFTER `CurrencyId3`,  CHANGE COLUMN `CurrencyCount2` `CurrencyCount2` INT(10) NULL DEFAULT NULL AFTER `CurrencyCount1`,  CHANGE COLUMN `CurrencyCount3` `CurrencyCount3` INT(10) NULL DEFAULT NULL AFTER `CurrencyCount2`;

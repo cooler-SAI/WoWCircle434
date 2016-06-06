@@ -1,0 +1,1 @@
+INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `comment`) VALUES ('-98970', '-98971', 'Item - Death Knight T12 DPS 2P Bonus proc removal');

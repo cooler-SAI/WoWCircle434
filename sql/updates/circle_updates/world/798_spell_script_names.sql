@@ -1,0 +1,2 @@
+REPLACE INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (97145, 'spell_item_stay_of_execution');
+REPLACE INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (96988, 'spell_item_stay_of_execution');

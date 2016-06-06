@@ -1,0 +1,1 @@
+UPDATE `spell_bonus_data` SET `direct_bonus`=1.236 WHERE `entry`=133;

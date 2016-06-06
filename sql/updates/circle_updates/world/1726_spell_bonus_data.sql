@@ -1,0 +1,1 @@
+UPDATE `spell_bonus_data` SET `dot_bonus`='0.2' WHERE (`entry`='47960');

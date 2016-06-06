@@ -1,0 +1,16 @@
+DELETE FROM `spell_bonus_data` WHERE `entry`=139;
+DELETE FROM `spell_bonus_data` WHERE `entry`=596;
+DELETE FROM `spell_bonus_data` WHERE `entry`=2050;
+DELETE FROM `spell_bonus_data` WHERE `entry`=2060;
+DELETE FROM `spell_bonus_data` WHERE `entry`=2061;
+DELETE FROM `spell_bonus_data` WHERE `entry`=32546;
+DELETE FROM `spell_bonus_data` WHERE `entry`=33110;
+DELETE FROM `spell_bonus_data` WHERE `entry`=64844;
+INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES (139, 0, 0.131, -1, -1, 'Priest - Renew');
+INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES (596, 0.34, -1, -1, -1, 'Priest - Prayer of Healing');
+INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES (2050, 0.362, -1, -1, -1, 'Priest - Heal');
+INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES (2060, 0.967, -1, -1, -1, 'Priest - Greater Heal');
+INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES (2061, 0.725, -1, -1, -1, 'Priest - Flash Heal');
+INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES (32546, 0.544, -1, -1, -1, 'Priest - Binding Heal');
+INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES (33110, 0.318, 0, 0, 0, 'Priest - Prayer of Mending');
+INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES (64844, 0.429, -1, -1, -1, 'Priest - Divine Hymn');

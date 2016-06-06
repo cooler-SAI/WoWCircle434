@@ -1,0 +1,1 @@
+UPDATE `skill_discovery_template` SET `reqSkillValue`=0 WHERE `reqSpell`=101805;

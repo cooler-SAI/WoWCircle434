@@ -1,0 +1,1 @@
+INSERT INTO `spell_bonus_data` (`entry`, `comments`) VALUES ('24275', 'Paladin - Hammer of Wrath');

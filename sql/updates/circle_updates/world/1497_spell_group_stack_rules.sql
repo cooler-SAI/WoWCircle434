@@ -1,0 +1,41 @@
+DROP TABLE IF EXISTS `spell_group_stack_rules`;
+CREATE TABLE IF NOT EXISTS `spell_group_stack_rules` (
+  `group_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `stack_rule` tinyint(3) NOT NULL DEFAULT '0',
+  `comments` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`group_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+INSERT INTO `spell_group_stack_rules` (`group_id`, `stack_rule`, `comments`) VALUES
+	(1, 1, 'Battle elixirs'),
+	(2, 1, 'Guardian Elixirs'),
+	(3, 1, 'Food'),
+	(4, 1, 'Food'),
+	(1006, 2, 'Battle Shout, Commander Shout (1 caster)'),
+	(1012, 3, 'Expose Armor, Sunder Armor, Fiery Fire, Corrosive Spit, Tear Armor'),
+	(1016, 3, 'Improved Icy Talons, Windfury Totem, Hunting Party'),
+	(1022, 3, 'Furiois Howl, Terrifying Roar, Honor Among Thieves,  Leader of the Pack, Rampage, Elemental Oath'),
+	(1028, 3, 'Blessing of Might, Trueshot Aura, Abomination\'s Might, Unleashed Rage'),
+	(1036, 3, 'Gore, Tendon Rip, Stampede, Hemorrhage, Mangle, Trauma'),
+	(1040, 3, 'Wrath of Air Totem, Moonkin Aura, Mind Quickening'),
+	(1043, 3, ' Critical Mass, Shadow Mastery'),
+	(1050, 3, 'Flametongue Totem, Totem of Wrath, Demonic Pact, Dalaran Brilliance, Arcane Brilliance'),
+	(1079, 1, 'Roar of Courage,  Strength of Earth, Horn of Winter, Battle Shout, '),
+	(1075, 1, 'Demoralizing Roar, Scarlet Fever,  Vindication, Demoralizing Shout, Curse of Weakness, Demoralizing Roar'),
+	(1121, 2, 'Blessing of Kings + Blessing of Might (1 caster)'),
+	(1068, 3, 'Legion Strike, Mind Trauma, Monstrous Bite, , Widow Venom, Permafrost, Furious Attacks, Mortal Strike, Wound Poison'),
+	(1122, 2, 'Blessing of Kings + Blessing of Might (1 caster)'),
+	(1059, 3, 'Frost Fever, Infected Wounds, Judgements of the Just, Thunderclap,  Dust Cloud, Earth Shock, Riposte, Tailspin'),
+	(1085, 1, 'Power World: Fortitude, Blood Pact, Qiraji Fortitude, Commander Shout, Runescroll of Fortitude, Runescroll of Fortitude II'),
+	(1087, 3, 'Arcane Brilliance, Dalaran Brilliance,  Fel Intelligence'),
+	(1089, 3, 'Blessing of Might, Fel Intelligence, Mana Spring, Blessing of Kings'),
+	(1092, 1, 'Inspiration, Ancestral Fortitude'),
+	(1099, 3, 'Lava Breath, Necrotic Strike, Spore Cloud, Mind-numbing Poison, Slow '),
+	(1105, 1, 'Mark of the Wild, Embrace of the Shale Spider, Blessing of Kings, '),
+	(1114, 3, 'Earth and Moon, Curse of the Elements, Master Poisiner, Ebon Plague, Fire Breath, Jinx: Curse of the Elements, Lightning Breath'),
+	(1120, 3, 'Savage Combat, Ravage, Brittle Bones, Acid Spit, Blood Frenzy'),
+	(2107, 1, NULL),
+	(2112, 2, NULL),
+	(2115, 1, NULL),
+	(2116, 1, NULL),
+	(2121, 1, NULL);

@@ -1,0 +1,1 @@
+REPLACE INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES (81229, 0, 15, 8192, 536870916, 1, 0, 1027, 0, 0, 0);

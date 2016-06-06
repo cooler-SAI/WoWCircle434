@@ -1,0 +1,10 @@
+UPDATE `item_template` SET `BuyPrice` = 250000 WHERE `entry` = 23247;
+UPDATE `item_template` SET `BuyPrice` = 150000 WHERE `entry` = 34599;
+DELETE FROM `npc_vendor` WHERE (`entry`=26123) AND (`item`=23247);
+INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES (26123, 0, 23247, 0, 0, 0);
+DELETE FROM `npc_vendor` WHERE (`entry`=26123) AND (`item`=34599);
+INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES (26123, 0, 34599, 0, 0, 0);
+DELETE FROM `npc_vendor` WHERE (`entry`=26124) AND (`item`=23247);
+INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES (26124, 0, 23247, 0, 0, 0);
+DELETE FROM `npc_vendor` WHERE (`entry`=26124) AND (`item`=34599);
+INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES (26124, 0, 34599, 0, 0, 0);

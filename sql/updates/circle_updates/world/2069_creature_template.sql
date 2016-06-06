@@ -1,0 +1,2 @@
+UPDATE `creature_template` SET `mindmg`=532, `maxdmg`=798, `dmg_multiplier`=30 WHERE `entry` IN (56265, 57434);
+UPDATE `creature_template` SET `mindmg`=532, `maxdmg`=798, `dmg_multiplier`=40 WHERE `entry` IN (57435, 57436);

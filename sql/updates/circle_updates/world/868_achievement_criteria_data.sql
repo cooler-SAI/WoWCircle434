@@ -1,0 +1,14 @@
+DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=3936 AND `type`=5;
+DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=3937 AND `type`=5;
+DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=3938 AND `type`=5;
+DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=6225 AND `type`=1;
+DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=6226 AND `type`=1;
+DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=6228 AND `type`=1;
+DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=6229 AND `type`=1;
+DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=6230 AND `type`=1;
+DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=6231 AND `type`=1;
+DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=6232 AND `type`=1;
+DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=6233 AND `type`=1;
+DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=6234 AND `type`=1;
+DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=6235 AND `type`=1;
+DELETE FROM `achievement_criteria_data` WHERE `criteria_id`=6662 AND `type`=1;

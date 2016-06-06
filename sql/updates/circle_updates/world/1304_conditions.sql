@@ -1,0 +1,3 @@
+DELETE FROM `conditions` WHERE `SourceEntry`=77682;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES 
+(17, 0, 77682, 0, 0, 31, 1, 3, 41520, 0, 0, 0, '', 'Duarn\'s Net - Hurl Net');

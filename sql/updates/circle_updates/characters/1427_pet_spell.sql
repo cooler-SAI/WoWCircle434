@@ -1,0 +1,1 @@
+DELETE FROM `pet_spell`;

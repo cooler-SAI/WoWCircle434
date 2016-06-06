@@ -1,0 +1,4 @@
+UPDATE `command` SET `help`='Syntax: .setskill #nickname #skill #level [#max]\r\n\r\nSet a skill of id #skill with a current skill value of #level and a maximum value of #max (or equal current maximum if not provide) for the selected character. If no character is selected, you learn the skill.' WHERE (`name`='setskill');
+UPDATE `command` SET `help`='Syntax: .unlearn #nickname #spell [all]\r\n\r\nUnlearn for selected player a spell #spell.  If \'all\' provided then all ranks unlearned.' WHERE (`name`='unlearn');
+UPDATE `command` SET `help`='Syntax: .learn #nickname #spell [all]\r\n\r\nSelected character learn a spell of id #spell. If \'all\' provided then all ranks learned.' WHERE (`name`='learn');
+UPDATE `command` SET `help`='Syntax: .maxskill #nickname or select\r\nSets all skills of the targeted player to their maximum values for its current level.' WHERE (`name`='maxskill');

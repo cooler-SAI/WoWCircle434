@@ -1,0 +1,3 @@
+INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `comment`) VALUES ('51755', '80326', 'Hunter - Camouflage');
+INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `comment`) VALUES ('-51755', '-80325', 'Hunter - Remove Camouflage');
+INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `comment`) VALUES ('-51755', '-80326', 'Hunter - Remove Camouflage');

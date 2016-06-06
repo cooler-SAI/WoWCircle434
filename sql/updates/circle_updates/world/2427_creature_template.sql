@@ -1,0 +1,1 @@
+UPDATE `creature_template` SET `ScriptName` = 'npc_guardian_of_ancient_kings' WHERE `entry` = '46499';

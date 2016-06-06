@@ -1,0 +1,1 @@
+INSERT INTO `spell_proc_event` (`entry`, `CustomChance`) VALUES ('52007', '20');

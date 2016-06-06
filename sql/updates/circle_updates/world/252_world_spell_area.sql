@@ -1,0 +1,1 @@
+UPDATE `spell_area` SET `quest_start_status`=72, `quest_end_status`=9 WHERE `spell`=52693;

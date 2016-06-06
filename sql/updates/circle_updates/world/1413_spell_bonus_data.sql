@@ -1,0 +1,1 @@
+REPLACE INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES ('61295', '0.234', '0.15', '-1', '-1', 'Shaman - Riptide');

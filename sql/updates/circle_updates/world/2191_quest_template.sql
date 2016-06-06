@@ -1,0 +1,1 @@
+﻿UPDATE `quest_template` SET `RequiredSourceItemId1`=77952, `RequiredSourceItemCount1`=333 WHERE `Id`=30107;

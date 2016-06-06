@@ -1,0 +1,3 @@
+﻿INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc8`) VALUES ('820', 'Cap resetting will start in 20 second. Be ready for it. Please, don\'t use teleports at this time!', 'Сброс лимита очков завоевания начнется через 20 секунд. Будьте готовы. Пожалуйста, не используйте телепорты в это время!');
+INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc8`) VALUES ('821', 'Cap resetting part %u', 'Сброс лимита очков завоевания, часть %u');
+INSERT INTO `trinity_string` (`entry`, `content_default`, `content_loc8`) VALUES ('822', 'Cap resetting is done!', 'Сброс лимита очков завоевания окончен!');
